@@ -1,51 +1,49 @@
-import { debounce } from "lodash";
-import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
-import React, { useState, useEffect } from "react";
+import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { _ServerInstance as Axios } from "/services/axios";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
     Grid6,
+    Edit as IconEdit
 } from "iconsax-react";
 import { Tooltip } from "react-tippy";
 
 import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/btnAction";
-import TabFilter from "@/components/UI/tabFilter";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ImageErrors from "@/components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import ImageErrors from "@/components/UI/imageErrors";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import OnResetData from "@/components/UI/btnResetData/btnReset";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import TabFilter from "@/components/UI/tabFilter";
 
-import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import apiClient from "@/Api/apiClients/client/apiClient";
+import apiComons from "@/Api/apiComon/apiComon";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
-
+import { useQuery } from "@tanstack/react-query";
 const Index = (props) => {
     const isShow = useToast();
 
@@ -66,16 +64,12 @@ const Index = (props) => {
     const initalState = {
         tabPage: router.query?.tab,
         keySearch: "",
-        onFetching: false,
-        onFetchingBranch: false,
         data: {},
         data_ex: [],
         listDs: [],
         listSelectCt: [],
         listBr: [],
         idBranch: null,
-        onFetchingGroup: false,
-        onFetchingSelectCt: false,
     };
     const [isState, setIsState] = useState(initalState);
 
@@ -93,93 +87,72 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : 0 },
         });
-        queryState({ onFetchingBranch: true, onFetchingSelectCt: true });
     }, []);
 
-    const _ServerFetching = () => {
-        const id = Number(router.query?.tab);
-        Axios(
-            "GET",
-            `/api_web/${router.query?.tab === "0" || router.query?.tab === "-1"
-                ? "api_client/client?csrf_protection=true"
-                : "api_client/client/?csrf_protection=true"
-            }`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[client_group_id]":
-                        router.query?.tab !== "0" ? (router.query?.tab !== "-1" ? id : -1) : null,
-                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    updateTotalItems(output);
-                    queryState({ data: rResult, data_ex: rResult });
-                }
-                queryState({ onFetching: false });
-            }
-        );
-    };
-    const _ServerFetching_brand = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) });
-                }
-                queryState({ onFetchingBranch: false });
-            }
-        );
-    };
 
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/group_count/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    queryState({ listDs: rResult });
-                }
-                queryState({ onFetchingGroup: false });
-            }
-        );
-    };
+    const { isLoading, isFetching, refetch } = useQuery({
+        queryKey: ["clients", limit, router.query?.page, router.query?.tab, isState.idBranch, isState.keySearch],
+        queryFn: async () => {
+            const url = `/api_web/${router.query?.tab === "0" || router.query?.tab === "-1" ? "api_client/client?csrf_protection=true" : "api_client/client/?csrf_protection=true"}`
 
-    const _ServerFetching_selectct = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_address/province?limit=0`,
-            {
+            const id = router.query?.tab
+
+            const params = {
+                search: isState.keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[client_group_id]": router.query?.tab != "0" ? (router.query?.tab != "-1" ? id : -1) : null,
+                "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
+            }
+
+            const { rResult, output } = await apiClient.apiListClient({ params: params }, url);
+
+            updateTotalItems(output);
+
+            queryState({ data: rResult, data_ex: rResult });
+
+            return rResult
+        },
+        ...reTryQuery
+    });
+
+    const { isPending: isPendingBranch } = useQuery({
+        queryKey: ["clients_branch"],
+        queryFn: async () => {
+            const { result } = await apiComons.apiBranchCombobox();
+            queryState({ listBr: result?.map((e) => ({ label: e.name, value: e.id })) });
+            return result
+        },
+        ...reTryQuery
+    });
+
+    const { isPending, refetch: refetchGroup } = useQuery({
+        queryKey: ["clients_group", limit, router.query?.page, router.query?.tab, isState.idBranch, isState.keySearch],
+        queryFn: async () => {
+
+            const params = {
                 limit: 0,
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    queryState({ listSelectCt: rResult });
-                }
-                queryState({ onFetchingSelectCt: false });
+                search: isState.keySearch,
+                "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
             }
-        );
-    };
+
+            const { rResult, output } = await apiClient.apiListGroupClient({ params: params });
+
+            queryState({ listDs: rResult })
+
+            return rResult
+        },
+        ...reTryQuery
+    });
+
+    const { } = useQuery({
+        queryKey: ["clients_province"],
+        queryFn: async () => {
+            const { rResult, output } = await apiClient.apiListProvinceClient();
+            queryState({ listSelectCt: rResult });
+            return rResult
+        },
+    });
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -189,28 +162,8 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
 
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
-
-    useEffect(() => {
-        isState.onFetchingBranch && _ServerFetching_brand();
-    }, [isState.onFetchingBranch]);
-
-    useEffect(() => {
-        isState.onFetchingGroup && _ServerFetching_group();
-    }, [isState.onFetchingGroup]);
-
-    useEffect(() => {
-        isState.onFetchingSelectCt && _ServerFetching_selectct();
-    }, [isState.onFetchingSelectCt]);
-
-    useEffect(() => {
-        queryState({ onFetching: true, onFetchingGroup: true });
-    }, [limit, router.query?.page, router.query?.tab, isState.idBranch]);
 
     //excel
     const multiDataSet = [
@@ -351,7 +304,7 @@ const Index = (props) => {
                                     <Popup_dskh
                                         listBr={isState.listBr}
                                         listSelectCt={isState.listSelectCt}
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"client_contact"}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -373,7 +326,7 @@ const Index = (props) => {
                             {isState.listDs &&
                                 isState.listDs.map((e) => {
                                     return (
-                                        <div>
+                                        <div key={e.id}>
                                             <TabFilter
                                                 backgroundColor={e.color}
                                                 key={e.id}
@@ -419,7 +372,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={() => refetch()} sOnFetching={() => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
@@ -478,7 +431,7 @@ const Index = (props) => {
                                             {dataLang?.branch_popup_properties}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {(isLoading || isFetching) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
@@ -560,8 +513,8 @@ const Index = (props) => {
                                                         colSpan={1}
                                                         className="flex items-center gap-1 flex-wrap"
                                                     >
-                                                        {e.branch?.map((i) => (
-                                                            <TagBranch key={i}>{i.name}</TagBranch>
+                                                        {e.branch?.map((i, index) => (
+                                                            <TagBranch key={index}>{i.name}</TagBranch>
                                                         ))}
                                                     </RowItemTable>
                                                     <RowItemTable
@@ -572,7 +525,7 @@ const Index = (props) => {
                                                             <Popup_dskh
                                                                 listBr={isState.listBr}
                                                                 listSelectCt={isState.listSelectCt}
-                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
                                                                 className="xl:text-base text-xs "
                                                                 listDs={isState.listDs}
                                                                 dataLang={dataLang}
@@ -602,8 +555,8 @@ const Index = (props) => {
                                                             />
                                                         )}
                                                         <BtnAction
-                                                            onRefresh={_ServerFetching.bind(this)}
-                                                            onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                            onRefresh={refetch.bind(this)}
+                                                            onRefreshGroup={refetchGroup.bind(this)}
                                                             dataLang={dataLang}
                                                             id={e?.id}
                                                             type="client_customers"

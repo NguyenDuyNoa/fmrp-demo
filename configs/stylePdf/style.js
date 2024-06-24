@@ -62,7 +62,7 @@ export const styles = {
     dateText: {
         fontSize: 12,
         bold: true,
-        margin: [0, 10, 0, 2],
+        margin: [0, 15, 0, 2],
     },
     signatureText: {
         fontSize: 12,

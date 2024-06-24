@@ -1,19 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
+import apiClient from "@/Api/apiClients/client/apiClient";
 import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useQuery } from "@tanstack/react-query";
 import ImageErrors from "components/UI/imageErrors";
 import Loading from "components/UI/loading";
-import {
-    SearchNormal1 as IconSearch
-} from "iconsax-react";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
 import { Tooltip } from "react-tippy";
 import TableContact from "../table/tableContact";
 import TableDelivery from "../table/tableDelivery";
 import PopupEdit from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -32,31 +31,15 @@ const Popup_chitiet = (props) => {
 
     const [data, sData] = useState();
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-
-    const _ServerFetching_detailUser = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/client/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching_detailUser();
-    }, [open]);
+    const { isLoading } = useQuery({
+        queryKey: ["detailUser", props?.id],
+        enabled: open,
+        queryFn: async () => {
+            const db = await apiClient.apiDetailClient(props?.id)
+            sData(db);
+            return db
+        },
+    })
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -113,7 +96,7 @@ const Popup_chitiet = (props) => {
                             speed={1}
                             smoothScrolling={true}
                         >
-                            {onFetching ? (
+                            {isLoading ? (
                                 <Loading className="h-80" color="#0f4f9e" />
                             ) : (
                                 data != "" && (
@@ -402,7 +385,7 @@ const Popup_chitiet = (props) => {
                     )}
                     {tab === 1 && (
                         <TableContact
-                            onFetching={onFetching}
+                            onFetching={isLoading}
                             data={data}
                             dataLang={props.dataLang}
                         >
@@ -411,7 +394,7 @@ const Popup_chitiet = (props) => {
                     )}
                     {tab === 2 && (
                         <TableDelivery
-                            onFetching={onFetching}
+                            onFetching={isLoading}
                             data={data}
                             dataLang={props.dataLang}
                         >

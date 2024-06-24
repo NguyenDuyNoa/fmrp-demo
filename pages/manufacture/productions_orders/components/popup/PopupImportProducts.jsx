@@ -1,37 +1,167 @@
-import { useEffect, useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupEdit from "@/components/UI/popup";
+import { memo, useState } from "react";
 
+import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
+import ButtonCancel from "@/components/UI/button/buttonCancel";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import NoData from "@/components/UI/noData/nodata";
+import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
-import { isAllowedNumber } from "@/utils/helpers/common";
-import { SelectCore, componentsCore } from "@/utils/lib/Select";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SelectCore } from "@/utils/lib/Select";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash as IconDelete } from "iconsax-react";
-import { v4 as uuid } from "uuid";
-const PopupImportProducts = ({ data, id, quantityError, queryStateQlty, ...props }) => {
+import Image from "next/image";
+import { FaBox } from "react-icons/fa";
+import { RiBox3Fill } from "react-icons/ri";
+
+const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
     const isShow = useToast();
 
     const initilaState = {
         open: false,
-
+        item: [],
+        dtPois: {},
+        warehouseImport: [],
+        idWarehouseImport: null,
     };
+
+    const queryClient = useQueryClient()
 
     const [isState, sIsState] = useState(initilaState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
+    const dataSeting = useSetingServer()
 
+    const formanumber = (num) => formatNumberConfig(+num, dataSeting)
+
+    const handingPopup = useMutation({
+        mutationFn: (data) => {
+            if (type == "begin_production") {
+                return apiProductionsOrders.apiAgreeProcess(data)
+            }
+            if (type == "end_production") {
+
+            }
+        }
+    })
+
+    useQuery({
+        queryKey: ["api_dataProducts"],
+        queryFn: async () => {
+            let formData = new FormData();
+            formData.append('poi_id', dataStage?.poi_id);
+            formData.append('pois_id', dataStage?.id);
+            formData.append('type', dataStage?.type);
+            formData.append('bom_id', dataStage?.bom_id);
+            const { data } = await apiProductionsOrders.apiDataProducts(formData);
+            console.log(data);
+            queryState({
+                warehouseImport: data?.warehouses?.map(e => {
+                    return {
+                        value: e?.id,
+                        label: e?.name
+                    }
+                }),
+                dtPois: {
+                    ...data?.product?.dtPois,
+                    quantity: 1000,
+                    code_stage: 'COAOTHUN',
+                    image: '/no_img.png',
+                },
+                item: [
+                    {
+                        id: 1,
+                        item: "Cổ áo",
+                        code: "Coaothun",
+                        quantity: null,
+                        quantityWarehouse: 1000,
+                        quantityKeep: 1500,
+                        image: '/no_img.png',
+                    },
+                    {
+                        id: 2,
+                        item: "Cổ áo",
+                        code: "Coaothun",
+                        quantity: null,
+                        quantityWarehouse: 1000,
+                        quantityKeep: 1500,
+                        image: '/no_img.png',
+                    },
+                    {
+                        id: 3,
+                        item: "Cổ áo",
+                        code: "Coaothun",
+                        quantity: null,
+                        quantityWarehouse: 1000,
+                        quantityKeep: 1500,
+                        image: '/no_img.png',
+                    },
+                    {
+                        id: 4,
+                        item: "Cổ áo",
+                        code: "Coaothun",
+                        quantity: null,
+                        quantityWarehouse: 1000,
+                        quantityKeep: 1500,
+                        image: '/no_img.png',
+                    },
+                    {
+                        id: 5,
+                        item: "Cổ áo",
+                        code: "Coaothun",
+                        quantity: null,
+                        quantityWarehouse: 1000,
+                        quantityKeep: 1500,
+                        image: '/no_img.png',
+                    },
+                ]
+            })
+        },
+        enabled: isState.open && type === 'end_production' ? true : false,
+    })
+
+
+    const handleDeleteItem = (id) => {
+        queryState({ item: isState.item.filter((e) => e.id != id) });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        let formData = new FormData()
+
+        if (type == "begin_production") {
+            formData.append('pois_id', dataStage?.id)
+            formData.append('status', 1)
+            formData.append('type_event', type)
+            handingPopup.mutate(formData, {
+                onSuccess: ({ isSuccess, message }) => {
+                    isShow("success", message)
+                    queryClient.invalidateQueries('apiItemOrdersDetail');
+                },
+                onError: (error) => {
+                    isShow("error", error)
+                },
+            })
+        }
+        queryState({ open: false })
+    }
 
     return (
         <PopupEdit
-            title={"Nhập thành phẩm"}
+            title={type === "begin_production" ? "Bạn có muốn bắt đầu sản xuất công đoạn này ?" : `Hoàn thành công đoạn ${dataStage?.stage_name?.toUpperCase()}`}
             button={props.children}
             onClickOpen={() => {
-                queryState({ open: true });
-
+                if (type == 'begin_production' && dataStage?.begin_production == 1) {
+                    return isShow("error", "Công đoạn đã bắt đầu sản xuất")
+                }
+                // if (type == 'end_production' && dataStage?.begin_production == 1) {
+                //     return isShow("error", "Công đoạn đã hoàn thành")
+                // }
+                queryState({ open: true })
             }}
             lockScroll={true}
             open={isState.open}
@@ -39,15 +169,248 @@ const PopupImportProducts = ({ data, id, quantityError, queryStateQlty, ...props
             classNameBtn={`${props?.className}`}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
-            <div className="3xl:w-[1100px] 2xl:w-[800px] xl:w-[700px] w-[600px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
-                <div className="w-full">
+            <div className={`${type === "begin_production" ? "w-[500px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto" : "3xl:w-[1100px] 2xl:w-[900px] xl:w-[800px] w-[700px] h-[575px]"} `}>
+                {
+                    type == 'end_production' &&
+                    <>
+                        <div className="w-full flex flex-col gap-2">
+                            <div className="flex items-center gap-2 bg-[#EEF1FC] p-3 rounded-lg">
+                                <RiBox3Fill className="text-[#5770F7]" size={20} />
+                                <h2 className="font-medium  uppercase text-[#5770F7] 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
+                                    Thành phẩm
+                                </h2>
+                            </div>
+                            <div className="bg-[#F8FAFC] p-3 rounded-sm  flex flex-col gap-2">
+                                <div className="grid grid-cols-12 items-center">
+                                    <div className="col-span-9 flex items-center gap-3">
+                                        <div className="h-11 w-11">
+                                            <Image src={isState.dtPois.image} width={1280} height={1024} alt="" className="object-cover h-full w-full" />
+                                        </div>
+                                        <div className="">
+                                            <h1 className="text-base font-medium">{isState.dtPois.name_stage}</h1>
+                                            <div className="flex items-center gap-2">
+                                                <h1 className="2xl:text-sm text-xs font-medium text-black/60">{isState.dtPois.code_stage} - Cần SX: <span className="text-black font-medium">{formanumber(isState.dtPois.quantity)}</span></h1>
+                                                <div className="flex items-center justify-center  n gap-3">
+                                                    <h1 className="2xl:text-sm text-xs font-medium">Số lượng hoàn thành</h1>
+                                                    <InPutNumericFormat
+                                                        className={'border-2 text-right pr-2 text-base  rounded-xl focus:outline-none border-[#BAD1FE] bg-transparent w-1/3'}
+                                                        placeholder={'0'}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <div className="col-span-3">
+                                        <SelectCore
+                                            options={isState.warehouseImport}
+                                            onChange={(e) => {
+                                                queryState({ idWarehouseImport: e });
+                                            }}
+                                            value={isState.idWarehouseImport}
+                                            isClearable={true}
+                                            closeMenuOnSelect={true}
+                                            hideSelectedOptions={false}
+                                            placeholder={'Chọn kho nhập'}
+                                            className={`placeholder:text-slate-300 w-full z-50 rounded-xl bg-[#ffffff] text-[#52575E] font-normal outline-none border `}
+                                            isSearchable={true}
+                                            style={{
+                                                border: "none",
+                                                boxShadow: "none",
+                                                outline: "none",
+                                            }}
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: "#EBF5FF",
+                                                    primary50: "#92BFF7",
+                                                    primary: "#0F4F9E",
+                                                },
+                                                borderRadius: "12px",
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menu: (provided) => ({
+                                                    ...provided,
+                                                    zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                                }),
+                                                control: (base, state) => ({
+                                                    ...base,
+                                                    boxShadow: "none",
+                                                    padding: "2.7px",
+                                                    ...(state.isFocused && {
+                                                        border: "0 0 0 1px #92BFF7",
+                                                        borderRadius: "12px",
+                                                    }),
+                                                }),
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2 bg-[#FCF3EE] p-3 rounded-lg">
+                                <FaBox className="text-[#FF641C]" size={16} />
+                                <h2 className="font-medium  uppercase text-[#FF641C] 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
+                                    Nguyên vật liệu
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="">
+                                    <label className="text-[#344054] font-normal 2xl:text-sm text-xs mb-1 ">
+                                        Chọn kho xuất
+                                        <span className="text-red-500 pl-1">*</span>
+                                    </label>
+                                    <SelectCore
+                                        options={[]}
+                                        // onChange={(e) => {
+                                        //     queryStateQlty({ idCategoryError: e });
+                                        // }}
+                                        // value={isState.idCategoryError}
+                                        isClearable={true}
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={'Chọn kho xuất'}
+                                        className={`placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded-xl text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        style={{
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none",
+                                        }}
+                                        theme={(theme) => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                primary25: "#EBF5FF",
+                                                primary50: "#92BFF7",
+                                                primary: "#0F4F9E",
+                                            },
+                                            borderRadius: "12px",
+                                        })}
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                            }),
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                            }),
+                                            control: (base, state) => ({
+                                                ...base,
+                                                boxShadow: "none",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                    borderRadius: "12px",
+                                                }),
+                                            }),
+                                        }}
+                                    />
+                                </div>
+                                <div className="">
+                                    <label className="text-[#344054] font-normal 2xl:text-sm text-xs mb-1 ">
+                                        Thêm NVL/BTP xuất kho
+                                        <span className="text-red-500 pl-1">*</span>
+                                    </label>
+                                    <SelectCore
+                                        options={[]}
+                                        // onChange={(e) => {
+                                        //     queryStateQlty({ idCategoryError: e });
+                                        // }}
+                                        // value={isState.idCategoryError}
+                                        isClearable={true}
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={'Chọn NVL/BTP'}
+                                        className={`placeholder:text-slate-300 rounded-xl w-full z-30 bg-[#ffffff] text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        style={{
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none",
+                                        }}
+                                        theme={(theme) => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                primary25: "#EBF5FF",
+                                                primary50: "#92BFF7",
+                                                primary: "#0F4F9E",
+                                            },
+                                            borderRadius: "12px",
+                                        })}
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                            }),
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                            }),
+                                            control: (base, state) => ({
+                                                ...base,
+                                                boxShadow: "none",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                    borderRadius: "12px",
+                                                }),
+                                            }),
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <Customscrollbar className="3xl:h-[250px] xxl:h-[260px] 2xl:h-[250px] xl:h-[260px] h-[250 px] overflow-hidden mt-2">
+                            <div className="h-full grid grid-cols-2 gap-2">
+                                {isState.item?.length > 0 ? isState.item.map((e, index) => {
+                                    return (
+                                        <div key={e?.id} className="bg-[#FCFAF8] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
+                                            <div className="text-[#667085] font-normal text-[10px]">#{index + 1}</div>
+                                            <div className="flex flex-col w-full">
+                                                <div className="flex items-start gap-3 w-full">
+                                                    <div className="h-11 w-11">
+                                                        <Image src={e.image} width={1280} height={1024} alt="" className="object-cover h-full w-full" />
+                                                    </div>
+                                                    <div className="w-full">
+                                                        <h1 className="text-base font-medium">{e.item}</h1>
+                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">{e.code} - Tồn kho: <span className="text-black font-medium">{formanumber(e.quantityWarehouse)}</span></h1>
+                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(e.quantityKeep)}</span> Kg</h1>
+                                                        <div className="flex items-center justify-between gap-3">
+                                                            <h1 className="2xl:text-sm text-xs font-medium w-1/2">Số lượng xuất</h1>
+                                                            <InPutNumericFormat
+                                                                value={e.quantity}
+                                                                className={'border-2 text-right pr-2 text-base  rounded-xl focus:outline-none border-[#FFC8A6] bg-transparent w-1/2'}
+                                                                placeholder={'0'}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <IconDelete onClick={() => handleDeleteItem(e.id)} cursor={"pointer"} className="absolute top-2 hover:scale-105 transition-all duration-150 ease-linear right-2 text-red-500" size={18} />
+                                            </div>
+                                        </div>
+                                    )
+                                }) : <div className="col-span-2">
+                                    <NoData />
+                                </div>
+                                }
+                            </div>
+                        </Customscrollbar>
+                    </>
+                }
+                <div className="flex justify-end items-center gap-2 mt-2">
+                    <ButtonCancel loading={false} onClick={() => queryState({ open: false })} dataLang={dataLang} />
+                    <ButtonSubmit loading={false} onClick={handleSubmit.bind(this)} dataLang={dataLang} />
                 </div>
-                {/* <div className="flex justify-end items-center">
-                    <ButtonSubmit loading={false} onClick={() => handeSave()} dataLang={props.dataLang} />
-                </div> */}
             </div>
         </PopupEdit>
     );
-};
+})
 export default PopupImportProducts;

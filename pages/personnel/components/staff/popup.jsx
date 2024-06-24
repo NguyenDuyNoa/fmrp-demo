@@ -1,27 +1,24 @@
-import React, { useRef, useState, useEffect } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
+import apiSatff from "@/Api/apiPersonnel/apiStaff";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
+import useToast from "@/hooks/useToast";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
     Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
+    Edit as IconEdit,
+    GalleryEdit as IconEditImg,
     Eye as IconEye,
     EyeSlash as IconEyeSlash,
     Image as IconImage,
-    GalleryEdit as IconEditImg,
-    SearchNormal1,
+    SearchNormal1
 } from "iconsax-react";
 import Image from "next/image";
-import useToast from "@/hooks/useToast";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import { useEffect, useRef, useState } from "react";
 import { MdClear } from "react-icons/md";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
-import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
+import PopupEdit from "/components/UI/popup";
 
 const Popup_dsnd = (props) => {
     const isShow = useToast();
@@ -88,89 +85,77 @@ const Popup_dsnd = (props) => {
         queryState({ thumb: isState.thumb });
     }, [isState.thumb]);
 
-    const fetchDataPower = () => {
-        Axios(
-            "GET",
-            props?.id
-                ? `/api_web/api_staff/getPermissionsStaff/${props?.id}?csrf_protection=true`
-                : `/api_web/api_staff/getPermissionsStaff?csrf_protection=true`,
-            {
-                params: {
-                    position_id: isState?.positionId != isState?.idPos?.value ? isState?.idPos?.value : 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data, isSuccess, message } = response?.data;
-                    if (isSuccess == 1) {
-                        const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
-                            key,
-                            ...value,
-                            child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
-                                key: childKey,
-                                ...childValue,
-                                permissions: Object.entries(childValue?.permissions)?.map(
-                                    ([permissionsKey, permissionsValue]) => ({
-                                        key: permissionsKey,
-                                        ...permissionsValue,
-                                    })
-                                ),
-                            })),
-                        }));
-                        queryState({ room: permissionsArray });
-                    }
-                } else {
-                    {
-                        console.log("err", err);
-                    }
-                }
+
+    useQuery({
+        queryKey: ["api_permissionsStaff"],
+        queryFn: async () => {
+            const params = {
+                position_id: isState?.positionId != isState?.idPos?.value ? isState?.idPos?.value : 0,
             }
-        );
-    };
+            const { data, isSuccess, message } = await apiSatff.apiPermissionsStaff(props?.id, { params })
+            if (isSuccess == 1) {
+                const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
+                    key,
+                    ...value,
+                    child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
+                        key: childKey,
+                        ...childValue,
+                        permissions: Object.entries(childValue?.permissions)?.map(
+                            ([permissionsKey, permissionsValue]) => ({
+                                key: permissionsKey,
+                                ...permissionsValue,
+                            })
+                        ),
+                    })),
+                }));
+                queryState({ room: permissionsArray });
+            }
+            return data
+        },
+        enabled: !!isState.open
+    })
+
+
 
     useEffect(() => {
-        isState.open && fetchDataPower();
         isState.idPos == null && queryState({ manage: [], valueManage: [] });
     }, [isState.idPos]);
 
-    const _ServerFetching_detailUser = () => {
-        Axios("GET", `/api_web/api_staff/staff/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const db = response.data;
-                queryState({
-                    name: db?.full_name,
-                    code: db?.code,
-                    phone_number: db?.phonenumber,
-                    email: db?.email,
-                    admin: db?.admin,
-                    valueBr: db?.branch?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    })),
-                    valueManage: db?.manage?.map((x) => ({
-                        label: x.full_name,
-                        value: Number(x.id),
-                    })),
-                    positionId: db?.position_id,
-                    thumb: db?.profile_image,
-                    idPos: db?.position_id == "0" ? null : { value: db?.position_id, label: db?.position_name },
-                });
-            }
-            queryState({ onFetching: false });
-        });
-    };
+    const { } = useQuery({
+        queryKey: ["api_handle_detail_staff"],
+        queryFn: async () => {
+            const db = await apiSatff.apiDetailStaff(props?.id)
+            queryState({
+                name: db?.full_name,
+                code: db?.code,
+                phone_number: db?.phonenumber,
+                email: db?.email,
+                admin: db?.admin,
+                valueBr: db?.branch?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                })),
+                valueManage: db?.manage?.map((x) => ({
+                    label: x.full_name,
+                    value: Number(x.id),
+                })),
+                positionId: db?.position_id,
+                thumb: db?.profile_image,
+                idPos: db?.position_id == "0" ? null : { value: db?.position_id, label: db?.position_name },
+            });
+            return db
+        },
+        enabled: !!isState.open && !!props?.id
+    })
+
     useEffect(() => {
         if (isState.open) {
             queryState({
-                onFetching: props?.id ? true : false,
                 brandpOpt: props?.isState?.dataBranch || [],
                 dataOption: props?.isState?.dataOption || [],
             });
-            props?.id && _ServerFetching_detailUser();
-            fetchDataPower();
         }
     }, [isState.open]);
-    console.log(props?.isState?.dataBranch);
 
     const handleChange = (parent, child = null, permissions = null) => {
         const newData = isState.room?.map((e) => {
@@ -249,14 +234,18 @@ const Popup_dsnd = (props) => {
                 child: transformedChild,
             };
         });
-
         return transformedData;
     };
 
+    const handingStaff = useMutation({
+        mutationFn: (data) => {
+            return apiSatff.apiHandingStaff(props?.id, data);
+        }
+    })
+
     const _ServerSending = () => {
-        let id = props?.id;
         const transformedResult = transformData(isState.room);
-        var form = new FormData();
+        let form = new FormData();
         form.append("full_name", isState.name || "");
         form.append("code", isState.code || "");
         form.append("password", isState.password || "");
@@ -271,66 +260,52 @@ const Popup_dsnd = (props) => {
         form.append("is_delete_image ", isState.isDeleteThumb || "");
         const utf8Bytes = JSON.stringify(transformedResult);
         form.append("permissions", utf8Bytes);
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/api_staff/staff/${id}?csrf_protection=true`
-                : "/api_web/api_staff/staff/?csrf_protection=true"
-            }`,
-            {
-                data: form,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message, branch_name } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props?.dataLang[message] || message);
-                        props.onRefresh && props.onRefresh();
-                        queryState({ open: false });
-                    } else {
-                        isShow("error", props.dataLang[message] + " " + branch_name || message);
-                    }
+        handingStaff.mutate(form, {
+            onSuccess: ({ isSuccess, message, branch_name }) => {
+                if (isSuccess) {
+                    isShow("success", props?.dataLang[message] || message);
+                    props.onRefresh && props.onRefresh();
+                    queryState({ open: false });
+                } else {
+                    isShow("error", props.dataLang[message] + " " + branch_name || message);
                 }
-                queryState({ onSending: false });
+            },
+            onError: (err) => {
+                isShow("error", err);
             }
-        );
+        })
+        queryState({ onSending: false });
     };
 
     useEffect(() => {
         isState.onSending && _ServerSending();
     }, [isState.onSending]);
 
-    const _ServerFetching__Manage = () => {
-        Axios(
-            "GET",
-            `/api_web/api_staff/staffManage/${isState.idPos?.value ? isState.idPos?.value : -1}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    if (isState.valueManage?.length == 0) {
-                        queryState({
-                            manage: data?.map((e) => ({
-                                label: e.full_name,
-                                value: Number(e.id),
-                            })),
-                        });
-                    } else if (props?.id) {
-                        queryState({
-                            manage: data
-                                ?.map((e) => ({
-                                    label: e.full_name,
-                                    value: Number(e.id),
-                                }))
-                                ?.filter((e) => isState.valueManage.some((x) => e.value !== x.value)),
-                        });
-                    }
-                }
-                queryState({ onFetching_Manage: false });
+    useQuery({
+        queryKey: ["api_staff_manage", isState.idPos],
+        queryFn: async () => {
+            const data = await apiSatff.apiManageStaff(isState.idPos?.value ? isState.idPos?.value : -1);
+            if (isState.valueManage?.length == 0) {
+                queryState({
+                    manage: data?.map((e) => ({
+                        label: e.full_name,
+                        value: Number(e.id),
+                    })),
+                });
+            } else if (props?.id) {
+                queryState({
+                    manage: data
+                        ?.map((e) => ({
+                            label: e.full_name,
+                            value: Number(e.id),
+                        }))
+                        ?.filter((e) => isState.valueManage.some((x) => e.value !== x.value)),
+                });
             }
-        );
-    };
+            return data
+        },
+        enabled: !!isState.idPos
+    })
 
     // save form
     const _HandleSubmit = (e) => {
@@ -356,13 +331,6 @@ const Popup_dsnd = (props) => {
         queryState({ errInputPas: false });
     }, [isState.password != ""]);
 
-    useEffect(() => {
-        isState.open && queryState({ onFetching_Manage: true });
-    }, [isState.idPos]);
-
-    useEffect(() => {
-        isState.onFetching_Manage && _ServerFetching__Manage();
-    }, [isState.onFetching_Manage]);
 
     useEffect(() => {
         const filteredData = isState.room.filter((item) =>
@@ -451,8 +419,8 @@ const Popup_dsnd = (props) => {
                                                     placeholder={props.dataLang?.personnels_staff_popup_name}
                                                     type="text"
                                                     className={`${isState.errInput
-                                                            ? "border-red-500"
-                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                        ? "border-red-500"
+                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                                 />
 
@@ -597,8 +565,8 @@ const Popup_dsnd = (props) => {
                                                         id="userpwd"
                                                         onChange={(e) => queryState({ password: e?.target?.value })}
                                                         className={`${isState.errInputPas
-                                                                ? "border-red-500"
-                                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                            ? "border-red-500"
+                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal py-2 pl-3 pr-12  border outline-none `}
                                                     />
                                                     <button

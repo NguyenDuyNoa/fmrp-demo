@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import Loading from "@/components/UI/loading";
 import PopupEdit from "@/components/UI/popup";
 
+import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
 import TagBranch from "@/components/UI/common/tag/tagBranch";
@@ -17,10 +18,10 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Popup_Bom from "./popupBom";
 import Popup_GiaiDoan from "./popupGiaiDoan";
-import { _ServerInstance as Axios } from "/services/axios";
 const Popup_ThongTin = React.memo((props) => {
     const dataSeting = useSetingServer()
 
@@ -44,12 +45,6 @@ const Popup_ThongTin = React.memo((props) => {
 
     const _HandleSelectTabBom = (e) => sTabBom(e);
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingStage, sOnFetchingStage] = useState(false);
-
-    const [onFetchingBom, sOnFetchingBom] = useState(false);
-
     const [list, sList] = useState({});
 
     const [dataStage, sDataStage] = useState([]);
@@ -58,70 +53,48 @@ const Popup_ThongTin = React.memo((props) => {
 
     const [selectedListBom, sSelectedListBom] = useState([]);
 
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_product/product/${props.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                sList({ ...response.data });
+    const { isFetching } = useQuery({
+        queryKey: ["detail_product"],
+        queryFn: async () => {
+            const data = await apiProducts.apiDetailProducts(props.id)
+            sList({ ...data });
+            return data
+        },
+        enabled: !!open
+    })
+
+    const { isFetching: isFetchingStage } = useQuery({
+        queryKey: ["detail_stage_product"],
+        queryFn: async () => {
+            const data = await apiProducts.apiDetailStageProducts(props.id)
+
+            sDataStage(data);
+
+            return data
+        },
+        enabled: !!open
+    })
+
+
+    const { isFetching: isFetchingBom, refetch: refetchBom } = useQuery({
+        queryKey: ["detail_bom_product"],
+        queryFn: async () => {
+            const params = {
+                id: props.id,
             }
-            sOnFetching(false);
-        });
-    };
+            const { data } = await apiProducts.apiDetailBomProducts({ params })
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
+            sDataBom(data?.variations || []);
+            sTabBom(data?.variations[0]?.product_variation_option_value_id);
 
-    const _ServerFetchingStage = () => {
-        Axios("GET", `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const data = response.data;
-                sDataStage(data);
-            }
-            sOnFetchingStage(false);
-        });
-    };
+            return data
+        },
+        enabled: !!open
+    })
 
-    useEffect(() => {
-        open && _ServerFetchingStage();
-    }, [open]);
-
-    const _ServerFetchingBom = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_product/getDesignBOM?csrf_protection=true`,
-            {
-                params: {
-                    id: props.id,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response.data;
-                    sDataBom(data?.variations || []);
-                    sTabBom(data?.variations[0]?.product_variation_option_value_id);
-                }
-                sOnFetchingBom(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        open && _ServerFetchingBom();
-    }, [open]);
 
     useEffect(() => {
         open && sTab(0);
-        open && sOnFetching(true);
-        open && sOnFetchingStage(true);
-        open && sOnFetchingBom(true);
-    }, [open]);
-
-    useEffect(() => {
-        open && sOnFetchingStage(true);
-    }, [open]);
-
-    useEffect(() => {
-        open && sOnFetchingBom(true);
     }, [open]);
 
     useEffect(() => {
@@ -169,7 +142,7 @@ const Popup_ThongTin = React.memo((props) => {
                     ))}
 
                 </div>
-                {onFetching ? (
+                {isFetching ? (
                     <Loading className="h-96" color="#0f4f9e" />
                 ) : (
                     <React.Fragment>
@@ -398,7 +371,7 @@ const Popup_ThongTin = React.memo((props) => {
                         )}
                         {tab === 2 && (
                             <>
-                                {onFetchingBom ? (
+                                {isFetchingBom ? (
                                     <Loading className="h-96" color="#0f4f9e" />
                                 ) : (
                                     <>
@@ -502,7 +475,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                         code={list?.code}
                                                         type="edit"
                                                         onRefresh={props.onRefresh}
-                                                        onRefreshBom={_ServerFetchingBom}
+                                                        onRefreshBom={refetchBom}
                                                     // className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
                                                     />
                                                 </div>
@@ -523,7 +496,7 @@ const Popup_ThongTin = React.memo((props) => {
                         )}
                         {tab === 3 && (
                             <>
-                                {onFetchingStage ? (
+                                {isFetchingStage ? (
                                     <Loading className="h-96" color="#0f4f9e" />
                                 ) : (
                                     <React.Fragment>

@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import apiCategory from "@/Api/apiProducts/category/apiCategory";
 import PopupEdit from "@/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-import Select from "react-select";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import {
-    Minus as IconMinus,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    Edit as IconEdit,
-} from "iconsax-react";
 import useToast from "@/hooks/useToast";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+    Edit as IconEdit
+} from "iconsax-react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import Select from "react-select";
 
 const Popup_ThanhPham = React.memo((props) => {
     const isShow = useToast()
@@ -24,9 +21,6 @@ const Popup_ThanhPham = React.memo((props) => {
     const [dataOption, sDataOption] = useState([]);
 
     const [onSending, sOnSending] = useState(false);
-    const [onFetching, sOnFetching] = useState(false);
-    const [onFetchingSubId, sOnFetchingSubId] = useState(false);
-    const [onFetchingSub, sOnFetchingSub] = useState(false);
 
     const [name, sName] = useState("");
     const [code, sCode] = useState("");
@@ -49,12 +43,7 @@ const Popup_ThanhPham = React.memo((props) => {
         open && sBranch([]);
         open && sDataOption([]);
         open && sGroup(null);
-        open && props?.id && sOnFetching(true);
-        // setTimeout(() => {
-        //     open && props?.id && sOnFetchingSubId(true);
-        // }, 500);
-        open && sOnFetchingSub(true);
-        open && props?.id && sOnFetchingSubId(true);
+
     }, [open]);
 
     const _HandleChangeInput = (type, value) => {
@@ -71,8 +60,14 @@ const Popup_ThanhPham = React.memo((props) => {
         }
     };
 
+    const handingCategory = useMutation({
+        mutationFn: async (data) => {
+            return apiCategory.apiHandingCategory(props?.id, data);
+        }
+    })
+
     const _ServerSending = () => {
-        var formData = new FormData();
+        let formData = new FormData();
 
         formData.append("code", code);
         formData.append("name", name);
@@ -80,37 +75,28 @@ const Popup_ThanhPham = React.memo((props) => {
         formData.append("parent_id", group);
         branch.forEach((id) => formData.append("branch_id[]", id.value));
 
-        Axios(
-            "POST",
-            `${props?.id
-                ? `/api_web/api_product/category/${props?.id}?csrf_protection=true`
-                : "/api_web/api_product/category?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message] || message);
-                        sOpen(false);
-                        sName("");
-                        sCode("");
-                        sNote("");
-                        sGroup(null);
-                        sBranch([]);
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshSub && props.onRefreshSub();
-                    } else {
-                        isShow("error", props.dataLang[message] || message);
+        handingCategory.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message] || message);
+                    sOpen(false);
+                    sName("");
+                    sCode("");
+                    sNote("");
+                    sGroup(null);
+                    sBranch([]);
+                    props.onRefresh && props.onRefresh();
+                    props.onRefreshSub && props.onRefreshSub();
+                } else {
+                    isShow("error", props.dataLang[message] || message);
 
-                    }
-                    sOnSending(false);
                 }
+            },
+            onError: (error) => {
+                isShow("error", error);
             }
-        );
+        })
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -141,93 +127,59 @@ const Popup_ThanhPham = React.memo((props) => {
         sErrBranch(false);
     }, [branch?.length > 0]);
 
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_product/category/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var list = response.data;
-                sName(list?.name);
-                sCode(list?.code);
-                sNote(list?.note);
-                sGroup(list?.parent_id);
-                sBranch(
-                    list?.branch.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    }))
-                );
+    useQuery({
+        queryKey: ["detail_category"],
+        queryFn: async () => {
+            const list = await apiCategory.apiDetailCategory(props?.id);
+            sName(list?.name);
+            sCode(list?.code);
+            sNote(list?.note);
+            sGroup(list?.parent_id);
+            sBranch(
+                list?.branch.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                }))
+            );
+            return list
+        },
+        enabled: open && !!props?.id
+    })
+
+    useQuery({
+        queryKey: ["detail_options_category", branch],
+        queryFn: async () => {
+            const params = {
+                "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
             }
-            sOnFetching(false);
-        });
-    };
+            const { rResult } = await apiCategory.apiDetailOptionCategory(props?.id, { params });
+            sDataOption(
+                rResult.map((x) => ({
+                    label: x.name,
+                    value: x.id,
+                    level: x.level,
+                }))
+            );
+            return rResult
+        },
+        enabled: open && !!props?.id
+    })
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    const _ServerFetchingSubId = () => {
-        Axios(
-            "GET",
-            `/api_web/api_product/categoryOption/${props.id}?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataOption(
-                        rResult.map((x) => ({
-                            label: x.name,
-                            value: x.id,
-                            level: x.level,
-                        }))
-                    );
-                }
-                sOnFetchingSubId(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetchingSubId && _ServerFetchingSubId();
-    }, [onFetchingSubId]);
-
-    const _ServerFetchingSub = () => {
-        Axios(
-            "GET",
-            `/api_web/api_product/categoryOption/?csrf_protection=true`,
-            {
-                params: {
-                    // "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataOption(
-                        rResult.map((x) => ({
-                            label: x.name,
-                            value: x.id,
-                            level: x.level,
-                        }))
-                    );
-                }
-                sOnFetchingSub(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetchingSub && _ServerFetchingSub();
-    }, [onFetchingSub]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            open && branch && props.id && sOnFetchingSubId(true);
-            // open && branch && !props.id && sOnFetchingSub(true);
-        }, 800);
-    }, [branch]);
+    useQuery({
+        queryKey: ["detail_category_option", branch],
+        queryFn: async () => {
+            const { rResult } = await apiCategory.apiOptionCategory();
+            sDataOption(
+                rResult.map((x) => ({
+                    label: x.name,
+                    value: x.id,
+                    level: x.level,
+                }))
+            );
+            return rResult
+        },
+        enabled: open && !!props?.id
+    })
 
     return (
         <PopupEdit

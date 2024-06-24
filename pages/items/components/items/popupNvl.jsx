@@ -1,29 +1,26 @@
 
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import apiItems from "@/Api/apiMaterial/items/apiItems";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
 import PopupEdit from "@/components/UI/popup";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import Select, { components } from "react-select";
-import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import { _ServerInstance as Axios } from "/services/axios";
-import { NumericFormat } from "react-number-format";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-    SearchNormal1 as IconSearch,
     Trash as IconDelete,
     Edit as IconEdit,
-    UserEdit as IconUserEdit,
-    Grid6 as IconExcel,
-    Image as IconImage,
     GalleryEdit as IconEditImg,
+    Image as IconImage
 } from "iconsax-react";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import Loading from "@/components/UI/loading";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import Select from "react-select";
 const Popup_NVL = React.memo((props) => {
     const dataOptUnit = useSelector((state) => state.unit_NVL);
 
@@ -366,6 +363,12 @@ const Popup_NVL = React.memo((props) => {
         sThumb(thumb);
     }, [thumb]);
 
+    const handingItems = useMutation({
+        mutationFn: async (data) => {
+            return apiItems.apiHandingItems(data, props.id);
+        }
+    })
+
     const _ServerSending = () => {
         var formData = new FormData();
 
@@ -408,38 +411,33 @@ const Popup_NVL = React.memo((props) => {
             }
         }
 
-        Axios("POST", `${props?.id ? `/api_web/api_material/material/${props.id}?csrf_protection=true` : "/api_web/api_material/material?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message] || message);
-                        sOpen(false);
-                        props.onRefresh && props.onRefresh();
-                        sGroupId();
-                        sCode("");
-                        sName("");
-                        sMinimumAmount();
-                        sPrice();
-                        sExpiry();
-                        sUnit();
-                        sUnitChild();
-                        sUnitAmount();
-                        sNote("");
-                        sThumb(null);
-                        sThumbFile(null);
-                    } else {
-                        isShow("error", props.dataLang[message] || message);
-                    }
+        handingItems.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message] || message);
+                    sOpen(false);
+                    props.onRefresh && props.onRefresh();
+                    sGroupId();
+                    sCode("");
+                    sName("");
+                    sMinimumAmount();
+                    sPrice();
+                    sExpiry();
+                    sUnit();
+                    sUnitChild();
+                    sUnitAmount();
+                    sNote("");
+                    sThumb(null);
+                    sThumbFile(null);
+                } else {
+                    isShow("error", props.dataLang[message] || message);
                 }
-                sOnSending(false);
+            },
+            onError: (error) => {
+                console.log(error);
             }
-        );
+        })
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -486,76 +484,58 @@ const Popup_NVL = React.memo((props) => {
         sErrBranch(false);
     }, [branch.length > 0]);
 
-    const _ServerFetchingGroup = () => {
-        Axios("GET", "/api_web/api_material/categoryOption?csrf_protection=true",
-            {
+
+
+    const { } = useQuery({
+        queryKey: ['api_detail_category_option', branch],
+        queryFn: async () => {
+            const { rResult } = await apiItems.apiCategoryOptionItems({
                 params: {
                     "branch_id[]": branch_id.length > 0 ? branch_id : -1,
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataOptGr(
-                        rResult.map((e) => ({
-                            label: e.name + " " + "(" + e.code + ")",
-                            value: e.id,
-                            level: e.level,
-                        }))
-                    );
-                }
-                sOnFetchingGroup(false);
-            }
-        );
-    };
+            })
+            sDataOptGr(
+                rResult.map((e) => ({
+                    label: e.name + " " + "(" + e.code + ")",
+                    value: e.id,
+                    level: e.level,
+                }))
+            );
+            return rResult
+        }
+    })
 
-    useEffect(() => {
-        onFetchingGroup && _ServerFetchingGroup();
-    }, [onFetchingGroup]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            open && sOnFetchingGroup(true);
-        }, 500);
-    }, [branch]);
-
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_material/material/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sName(data?.name);
-                sCode(data?.code);
-                sNote(data?.note);
-                sPrice(Number(data?.import_price));
-                sMinimumAmount(Number(data?.minimum_quantity));
-                sGroupId(data?.category_id);
-                sExpiry(Number(data?.expiry));
-                sUnitAmount(Number(data?.coefficient));
-                sThumb(data?.images);
-                sUnit(data?.unit_id);
-                sUnitChild(data?.unit_convert_id);
-                sBranch(
-                    data?.branch.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    }))
-                );
-                sDataVariantSending(data?.variation);
-                sVariantMain(data?.variation[0]?.id);
-                sVariantSub(data?.variation[1]?.id);
-                sOptSelectedVariantMain(data?.variation[0]?.option);
-                sOptSelectedVariantSub(data?.variation[1]?.option);
-                sDataTotalVariant(data?.variation_option_value);
-            }
-            sOnFetching(false);
-        });
-    };
-
-    useEffect(() => {
-        setTimeout(() => {
-            onFetching && _ServerFetching();
-        }, 1500);
-    }, [onFetching]);
+    const { } = useQuery({
+        queryKey: ['api_detail_items', props?.id],
+        queryFn: async () => {
+            const data = await apiItems.apiDetailItems(props?.id);
+            sName(data?.name);
+            sCode(data?.code);
+            sNote(data?.note);
+            sPrice(Number(data?.import_price));
+            sMinimumAmount(Number(data?.minimum_quantity));
+            sGroupId(data?.category_id);
+            sExpiry(Number(data?.expiry));
+            sUnitAmount(Number(data?.coefficient));
+            sThumb(data?.images);
+            sUnit(data?.unit_id);
+            sUnitChild(data?.unit_convert_id);
+            sBranch(
+                data?.branch.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                }))
+            );
+            sDataVariantSending(data?.variation);
+            sVariantMain(data?.variation[0]?.id);
+            sVariantSub(data?.variation[1]?.id);
+            sOptSelectedVariantMain(data?.variation[0]?.option);
+            sOptSelectedVariantSub(data?.variation[1]?.option);
+            sDataTotalVariant(data?.variation_option_value);
+            return data
+        },
+        enabled: !!open
+    })
 
     const _HandleChangeVariant = (id, type, value) => {
         var index = dataTotalVariant?.findIndex((x) => x.id === id);

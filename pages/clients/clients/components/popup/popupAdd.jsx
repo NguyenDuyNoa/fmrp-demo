@@ -1,41 +1,24 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState } from "react";
 
-import Select, { components } from "react-select";
-import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
 import { v4 as uuidv4 } from "uuid";
+import PopupEdit from "/components/UI/popup";
 
-import dynamic from "next/dynamic";
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-} from "iconsax-react";
-
-import Swal from "sweetalert2";
-import ButtoonAdd from "../button/buttonAdd";
-import FormContactInfo from "../form/formContactInfo";
-import FormContactDelivery from "../form/formDelivery";
-import Form from "../form/form";
-import { useToggle } from "@/hooks/useToggle";
+import apiClient from "@/Api/apiClients/client/apiClient";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import useToast from "@/hooks/useToast";
 import useActionRole from "@/hooks/useRole";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Add as IconAdd, Trash as IconDelete, Edit as IconEdit } from "iconsax-react";
 import { useSelector } from "react-redux";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import ButtoonAdd from "../button/buttonAdd";
+import Form from "../form/form";
+import FormContactInfo from "../form/formContactInfo";
+import FormContactDelivery from "../form/formDelivery";
 
 const Popup_dskh = (props) => {
-    const scrollAreaRef = useRef(null);
-
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit } = useActionRole(auth, props?.nameModel);
@@ -47,12 +30,6 @@ const Popup_dskh = (props) => {
     const initalState = {
         open: false,
         onSending: false,
-        onFetching: false,
-        onFetchingDis: false,
-        onFetchingWar: false,
-        onFetchingChar: false,
-        onFetchingBr: false,
-        onFetchingGr: false,
         errInput: false,
         errInputBr: false,
         option: [],
@@ -96,168 +73,136 @@ const Popup_dskh = (props) => {
             dataBr: props?.listBr || [],
             dataCity: props?.listSelectCt?.map((e) => ({ label: e?.name, value: e?.provinceid })),
         });
-        isState.open && props?.id && queryState({ onFetching: true });
     }, [isState.open]);
 
-    useEffect(() => {
-        if (isState?.onFetching) {
-            _ServerFetching_detailUser();
-        }
-    }, [isState?.onFetching]);
-    const _ServerFetching_detailUser = async () => {
-        await Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var db = response.data;
-                queryState({
-                    valueBr: db?.branch?.map((e) => ({ label: e.name, value: e.id })),
-                    valueChar: db?.staff_charge.map((e) => ({ label: e.full_name, value: e.staffid })),
-                    valueGr: db?.client_group.map((e) => ({ label: e.name, value: e.id })),
-                    name: db?.name,
-                    code: db?.code,
-                    name: db?.name,
-                    tax_code: db?.tax_code,
-                    representative: db?.representative,
-                    phone_number: db?.phone_number,
-                    address: db?.address,
-                    date_incorporation: db?.date_incorporation,
-                    email: db?.email,
-                    note: db?.note,
-                    debt_limit: db?.debt_limit,
-                    debt_limit_day: db?.debt_limit_day,
-                    valueDitrict: db?.district.districtid
-                        ? {
-                            label: db?.district.name,
-                            value: db?.district.districtid,
-                        }
-                        : null,
-                    valueCt: {
-                        value: db?.city.provinceid,
-                        label: db?.city.name,
-                    },
-                    valueWa: {
-                        label: db?.ward.name,
-                        value: db?.ward.wardid,
-                    },
-                    option:
-                        db?.contact?.map((e) => {
-                            return {
-                                idFe: uuidv4(),
-                                idBe: e?.id,
-                                full_name: e?.full_name,
-                                email: e?.email,
-                                position: e?.position,
-                                birthday: e?.birthday,
-                                address: e?.address,
-                                phone_number: e?.phone_number,
-                                // disble: role == true || checkEdit == true
-                            };
-                        }) || [],
-                    optionDelivery: db?.clients_address_delivery?.map((e) => ({
-                        idFe: e?.id,
-                        nameDelivery: e?.fullname,
-                        phoneDelivery: e?.phone,
-                        addressDelivery: e?.address,
-                        actionDelivery: e?.is_primary == "1" ? true : false,
-                        idBe: e?.id,
-                    })),
-                });
-            }
-            queryState({ onFetching: false });
-        });
-    };
-
-    const _ServerFetching_Char = async () => {
-        await Axios(
-            "GET",
-            `/api_web/api_staff/GetstaffInBrard?csrf_protection=true`,
-            {
-                params: {
-                    "brach_id[]": isState.valueBr?.map((e) => e.value),
-                    staffid: isState.valueBr ? isState.valueBr?.map((e) => e.value) : -1,
+    const { isLoading } = useQuery({
+        queryKey: ["apiDetailClient", props?.id],
+        queryFn: async () => {
+            const db = await apiClient.apiDetailClient(props?.id);
+            queryState({
+                valueBr: db?.branch?.map((e) => ({ label: e.name, value: e.id })),
+                valueChar: db?.staff_charge.map((e) => ({ label: e.full_name, value: e.staffid })),
+                valueGr: db?.client_group.map((e) => ({ label: e.name, value: e.id })),
+                name: db?.name,
+                code: db?.code,
+                name: db?.name,
+                tax_code: db?.tax_code,
+                representative: db?.representative,
+                phone_number: db?.phone_number,
+                address: db?.address,
+                date_incorporation: db?.date_incorporation,
+                email: db?.email,
+                note: db?.note,
+                debt_limit: db?.debt_limit,
+                debt_limit_day: db?.debt_limit_day,
+                valueDitrict: db?.district.districtid
+                    ? {
+                        label: db?.district.name,
+                        value: db?.district.districtid,
+                    }
+                    : null,
+                valueCt: {
+                    value: db?.city.provinceid,
+                    label: db?.city.name,
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    let db = response.data;
-                    queryState({
-                        listChar: db?.map((e) => ({
-                            label: e.name,
-                            value: e.staffid,
-                        })),
-                    });
-                }
-                queryState({ onFetchingChar: false });
-            }
-        );
-    };
-
-    useEffect(() => {
-        isState.valueBr?.length > 0 && queryState({ onFetchingChar: true, onFetchingGr: true });
-    }, [isState.valueBr]);
-
-    useEffect(() => {
-        isState.onFetchingChar && _ServerFetching_Char();
-    }, [isState.onFetchingChar]);
-
-    const _ServerFetching_Gr = async () => {
-        await Axios(
-            "GET",
-            `/api_web/Api_client/group?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr?.map((e) => e.value) : -1,
+                valueWa: {
+                    label: db?.ward.name,
+                    value: db?.ward.wardid,
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({
-                        dataGroup: rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                        })),
-                    });
-                }
-                queryState({ onFetchingGr: false });
+                option:
+                    db?.contact?.map((e) => {
+                        return {
+                            idFe: uuidv4(),
+                            idBe: e?.id,
+                            full_name: e?.full_name,
+                            email: e?.email,
+                            position: e?.position,
+                            birthday: e?.birthday,
+                            address: e?.address,
+                            phone_number: e?.phone_number,
+                            // disble: role == true || checkEdit == true
+                        };
+                    }) || [],
+                optionDelivery: db?.clients_address_delivery?.map((e) => ({
+                    idFe: e?.id,
+                    nameDelivery: e?.fullname,
+                    phoneDelivery: e?.phone,
+                    addressDelivery: e?.address,
+                    actionDelivery: e?.is_primary == "1" ? true : false,
+                    idBe: e?.id,
+                })),
+            });
+
+            return db
+        },
+        enabled: isState.open && props?.id ? true : false
+    });
+
+    const { isLoading: isLoadingChar } = useQuery({
+        queryKey: ["getstaffInBrard", isState.valueBr?.length > 0],
+        queryFn: async () => {
+
+            const params = {
+                "brach_id[]": isState.valueBr?.map((e) => e.value),
+                staffid: isState.valueBr ? isState.valueBr?.map((e) => e.value) : -1,
             }
-        );
-    };
 
-    useEffect(() => {
-        isState.onFetchingGr && _ServerFetching_Gr();
-    }, [isState.onFetchingGr]);
+            let db = await apiClient.apiCharClient({ params: params })
 
-    useEffect(() => {
-        isState.valueCt && queryState({ onFetchingDis: true });
-    }, [isState.valueCt]);
+            queryState({
+                listChar: db?.map((e) => ({
+                    label: e.name,
+                    value: e.staffid,
+                })),
+            });
 
-    useEffect(() => {
-        isState.onFetchingDis && _ServerFetching_distric();
-    }, [isState.onFetchingDis]);
+            return db
+        },
+    })
 
-    const _ServerFetching_distric = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_address/district?limit=0",
-            {
-                params: {
-                    provinceid: isState.valueCt?.value ? isState.valueCt?.value : -1,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({
-                        dataDitrict: rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.districtid,
-                        })),
-                    });
-                }
-                queryState({ onFetchingDis: false });
+    const { isLoading: isLoadingGroup } = useQuery({
+        queryKey: ["getGroup", isState.valueBr?.length > 0],
+        queryFn: async () => {
+
+            const params = {
+                "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr?.map((e) => e.value) : -1,
             }
-        );
-    };
+
+            const { rResult } = await apiClient.apiGroupClient({ params: params })
+
+            queryState({
+                dataGroup: rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                })),
+            });
+
+            return rResult
+        },
+    })
+
+
+    const { isLoading: isLoadingDis } = useQuery({
+        queryKey: ["getDis", isState.valueCt],
+        queryFn: async () => {
+
+            const params = {
+                provinceid: isState.valueCt?.value ? isState.valueCt?.value : -1,
+            }
+
+            const { rResult } = await apiClient.apiDistricClient({ params: params })
+
+            queryState({
+                dataDitrict: rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.districtid,
+                })),
+            });
+
+            return rResult
+        },
+    })
+
     useEffect(() => {
         isState.valueBr?.length == 0 &&
             queryState({
@@ -269,17 +214,9 @@ const Popup_dskh = (props) => {
     }, [isState.valueBr]);
 
     useEffect(() => {
-        isState.valueDitrict && queryState({ onFetchingWar: true });
-    }, [isState.valueDitrict]);
-
-    useEffect(() => {
-        isState.onFetchingWar && _ServerFetching_war();
-    }, [isState.onFetchingWar]);
-
-    useEffect(() => {
         isState.valueDitrict == null &&
             queryState({
-                valueWar: null,
+                valueWa: null,
                 dataWar: [],
             });
     }, [isState.valueDitrict]);
@@ -287,38 +224,42 @@ const Popup_dskh = (props) => {
     useEffect(() => {
         isState.valueCt == null &&
             queryState({
-                valueWar: null,
+                valueWa: null,
                 dataWar: [],
                 valueDitrict: null,
                 dataDitrict: [],
             });
     }, [isState.valueCt]);
 
-    const _ServerFetching_war = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_address/ward?limit=0",
-            {
-                params: {
-                    districtid: isState.valueDitrict?.value ? isState.valueDitrict?.value : -1,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({
-                        dataWar: rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.wardid,
-                        })),
-                    });
-                }
-                queryState({ onFetchingWar: false });
-            }
-        );
-    };
 
-    // //onchang ward
+    const { isLoading: isLoadingWar } = useQuery({
+        queryKey: ["getDis", isState.valueDitrict],
+        queryFn: async () => {
+
+            const params = {
+                districtid: isState.valueDitrict?.value ? isState.valueDitrict?.value : -1,
+            }
+
+            const { rResult } = await apiClient.apiWWarClient({ params: params })
+
+            queryState({
+                dataWar: rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.wardid,
+                })),
+            });
+            return rResult
+        },
+    })
+
+
+
+    const addClient = useMutation({
+        mutationFn: (data, url) => {
+            return apiClient.apiHandingClient(data, url);
+        },
+    });
+
 
     const _ServerSending = async () => {
         let id = props?.id;
@@ -362,40 +303,30 @@ const Popup_dskh = (props) => {
             data.append(`items[${index}][address]`, e?.addressDelivery ? e?.addressDelivery : "");
             data.append(`items[${index}][is_primary]`, e?.actionDelivery ? 1 : 0);
         });
-        await Axios(
-            "POST",
-            `${id
-                ? `/api_web/api_client/client/${id}?csrf_protection=true`
-                : "/api_web/api_client/client?csrf_protection=true"
-            }`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message, branch_name } = response.data;
-                    if (isSuccess) {
-                        // isShow("success", typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message);
-                        isShow(
-                            "success",
-                            typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message
-                        );
-                        props.onRefresh && props.onRefresh();
-                        queryState({ open: false });
-                    } else {
-                        // isShow("error", typeof props?.dataLang[message] !== "undefined" ? props.dataLang[message] : message);
-                        isShow(
-                            "error",
-                            typeof props?.dataLang[message] !== "undefined"
-                                ? props.dataLang[message] + " " + branch_name
-                                : message
-                        );
-                    }
+
+        const url = id ? `/api_web/api_client/client/${id}?csrf_protection=true` : "/api_web/api_client/client?csrf_protection=true"
+
+        addClient.mutate({ data, url }, {
+            onSuccess: ({ isSuccess, message, branch_name }) => {
+                if (isSuccess) {
+                    isShow(
+                        "success",
+                        typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message
+                    );
+                    props.onRefresh && props.onRefresh();
+                    queryState({ open: false });
+                } else {
+                    isShow(
+                        "error",
+                        typeof props?.dataLang[message] !== "undefined" ? props.dataLang[message] + " " + branch_name : message
+                    );
                 }
-                queryState({ onSending: false });
-            }
-        );
+            },
+            onError: (error) => {
+                isShow("error", error);
+            },
+        })
+        queryState({ onSending: false });
     };
 
     //onchang option form

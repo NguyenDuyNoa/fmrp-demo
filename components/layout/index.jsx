@@ -1,16 +1,32 @@
+import {
+    QueryClient,
+    QueryClientProvider
+} from '@tanstack/react-query';
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import PopupAppRenewal from "../UI/popup/popupAppRenewal";
 import PopupAppTrial from "../UI/popup/popupAppTrial";
 import Header from "./header";
 
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+        },
+    },
+})
+
 const Index = ({ children }) => {
     return (
         <>
-            <div>
-                <Header />
-                <div className="overflow-hidden">{children}</div>
-            </div>
-            <PopupAppTrial />
-            <PopupAppRenewal />
+            <QueryClientProvider client={queryClient}>
+                <div>
+                    <Header />
+                    <div className="overflow-hidden">{children}</div>
+                </div>
+                <PopupAppTrial />
+                <PopupAppRenewal />
+                <ReactQueryDevtools initialIsOpen={true} />
+            </QueryClientProvider>
         </>
     );
 };

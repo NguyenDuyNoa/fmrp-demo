@@ -1,6 +1,6 @@
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { ContainerFilterTab } from "@/components/UI/common/layout";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Image from "next/image";
@@ -15,6 +15,7 @@ import TabInFormation from "./tabInFormation";
 import TabProcessingCost from "./tabProcessingCost";
 import TabRecallMaterials from "./tabRecallMaterials";
 import TabWarehouseHistory from "./tabWarehouseHistory";
+import { useQuery } from "@tanstack/react-query";
 
 
 const ModalDetail = memo(({ isState, queryState, dataLang }) => {
@@ -150,11 +151,11 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         });
         queryStateModal({ isTab: e });
     };
-
-    const fetchDetailOrder = async () => {
-        try {
+    console.log("isState?.dataModal", isState?.dataModal?.id);
+    const { data, isLoading } = useQuery({
+        queryKey: ["apiItemOrdersDetail", isState.openModal],
+        queryFn: async () => {
             const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
-            console.log("data", data);
             queryStateModal({
                 dataDetail: {
                     ...data,
@@ -163,9 +164,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                         stages: data?.poi.stages?.map(e => {
                             return {
                                 ...e,
-                                name: e?.stage_name,
                                 active: false,
-                                date: new Date(),
                                 quantity: 100,
                                 arraySemi: []
                             }
@@ -173,14 +172,9 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                     }
                 }
             });
-        } catch (error) { }
-    };
-
-    useEffect(() => {
-        if (isState.openModal && isMounted) {
-            fetchDetailOrder();
-        }
-    }, [isState.openModal, isMounted]);
+        },
+        enabled: !!isState.openModal
+    })
 
     const shareProps = { queryStateModal, isState, dataLang, isStateModal, width, listTab };
 
@@ -276,9 +270,9 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                     <div className={`grid grid-cols-3 ${width >= 1100 ? "col-span-7" : "col-span-12"}  gap-5`}>
                         {dataTotal.map((e, i) => (
                             <div
+                                key={i}
                                 className={`w-full p-4 rounded-md space-y-1.5`}
                                 style={{ backgroundColor: `${e.bgColor}` }}
-                                key={i}
                             >
                                 <h4 className={`text-[#3A3E4C] font-normal ${width >= 1100 ? "text-base" : "text-xs"}`}>
                                     {e.title}
@@ -309,11 +303,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                                     className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} ${width > 1100 ? "text-base" : "text-sm"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
                                 >
                                     {e.name}
-                                    <span
-                                        className={`${e?.count > 0 &&
-                                            "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-[13px] xl:text-sm lg:text-sm  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"
-                                            } `}
-                                    >
+                                    <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-[13px] xl:text-sm lg:text-sm  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
                                         {e?.count > 0 && e?.count}
                                     </span>
                                 </h3>

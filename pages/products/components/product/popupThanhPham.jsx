@@ -1,34 +1,27 @@
-import useToast from "@/hooks/useToast";
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import PopupEdit from "@/components/UI/popup";
-import { useToggle } from "@/hooks/useToggle";
-import Select from "react-select";
-import {
-    SearchNormal1 as IconSearch,
-    Trash as IconDelete,
-    UserEdit as IconUserEdit,
-    Grid6 as IconExcel,
-    Image as IconImage,
-    GalleryEdit as IconEditImg,
-    ArrowDown2 as IconDown,
-    Add as IconAdd,
-    Maximize4 as IconMax,
-    CloseCircle as IconClose,
-    TickCircle as IconTick,
-} from "iconsax-react";
-import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import Loading from "@/components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
+import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import useActionRole from "@/hooks/useRole";
+import Loading from "@/components/UI/loading";
+import PopupEdit from "@/components/UI/popup";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { BiEdit } from "react-icons/bi";
+import useActionRole from "@/hooks/useRole";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+    Trash as IconDelete,
+    GalleryEdit as IconEditImg,
+    Image as IconImage
+} from "iconsax-react";
 import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+import { BiEdit } from "react-icons/bi";
+import { useSelector } from "react-redux";
+import Select from "react-select";
 
 const Popup_ThanhPham = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
@@ -55,6 +48,19 @@ const Popup_ThanhPham = React.memo((props) => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+
+
+    const [errGroup, sErrGroup] = useState(false);
+
+    const [errName, sErrName] = useState(false);
+
+    const [errCode, sErrCode] = useState(false);
+
+    const [errUnit, sErrUnit] = useState(false);
+
+    const [errBranch, sErrBranch] = useState(false);
+
+    const [errType, sErrType] = useState(false);
 
     const _ToggleModal = (e) => sIsOpen(e);
 
@@ -251,17 +257,6 @@ const Popup_ThanhPham = React.memo((props) => {
     };
     //////
 
-    const [errGroup, sErrGroup] = useState(false);
-
-    const [errName, sErrName] = useState(false);
-
-    const [errCode, sErrCode] = useState(false);
-
-    const [errUnit, sErrUnit] = useState(false);
-
-    const [errBranch, sErrBranch] = useState(false);
-
-    const [errType, sErrType] = useState(false);
 
     useEffect(() => {
         isOpen && sTab(0);
@@ -291,7 +286,6 @@ const Popup_ThanhPham = React.memo((props) => {
         isOpen && sVariantSub(null);
         isOpen && sPrevVariantMain(null);
         isOpen && sPrevVariantSub(null);
-        isOpen && props?.id && sOnFetching(true);
     }, [isOpen]);
 
     const _HandleChangeInput = (type, value) => {
@@ -349,93 +343,76 @@ const Popup_ThanhPham = React.memo((props) => {
         sThumb(thumb);
     }, [thumb]);
 
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_product/product/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var list = response.data;
+    useQuery({
+        queryKey: ["detail_product", props?.id],
+        enabled: !!isOpen && !!props?.id,
+        queryFn: async () => {
+            const list = await apiProducts.apiDetailProducts(props?.id)
+            sUnit({ label: list?.unit, value: list?.unit_id });
+            sDataVariantSending(list?.variation);
+            sVariantMain(list?.variation[0]?.id);
+            sVariantSub(list?.variation[1]?.id);
 
-                sUnit({ label: list?.unit, value: list?.unit_id });
-                sDataVariantSending(list?.variation);
-                sVariantMain(list?.variation[0]?.id);
-                sVariantSub(list?.variation[1]?.id);
+            sOptSelectedVariantMain(list?.variation[0]?.option);
+            sOptSelectedVariantSub(list?.variation[1]?.option);
+            sDataTotalVariant(list?.variation_option_value);
 
-                sOptSelectedVariantMain(list?.variation[0]?.option);
-                sOptSelectedVariantSub(list?.variation[1]?.option);
-                sDataTotalVariant(list?.variation_option_value);
+            sMinimumAmount(Number(list?.quantity_minimum));
+            sExpiry(Number(list?.expiry));
+            sThumb(list?.images);
+            sBranch(
+                list?.branch?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                }))
+            );
+            sCategory({
+                label: list?.category_name,
+                value: list?.category_id,
+            });
+            sType({
+                label: props.dataLang[list?.type_products?.name],
+                value: list?.type_products?.code,
+            });
+            sCode(list?.code);
+            sName(list?.name);
+            sPrice(Number(list?.price_sell));
+            // sExpiry(Number(data?.expiry));
+            sNote(list?.note);
 
-                sMinimumAmount(Number(list?.quantity_minimum));
-                sExpiry(Number(list?.expiry));
-                sThumb(list?.images);
-                sBranch(
-                    list?.branch?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    }))
-                );
-                sCategory({
-                    label: list?.category_name,
-                    value: list?.category_id,
-                });
-                sType({
-                    label: props.dataLang[list?.type_products?.name],
-                    value: list?.type_products?.code,
-                });
-                sCode(list?.code);
-                sName(list?.name);
-                sPrice(Number(list?.price_sell));
-                sExpiry(Number(data?.expiry));
-                sNote(list?.note);
+            return list
+        },
+    })
+
+    useQuery({
+        queryKey: ["api_category"],
+        queryFn: async () => {
+            const params = {
+                "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
             }
-            sOnFetching(false);
-        });
-    };
+            const { rResult } = await apiProducts.apiCategoryOptionProducts({ params });
+            sDataCategory(
+                rResult.map((e) => ({
+                    label: `${e.name + " " + "(" + e.code + ")"}`,
+                    value: e.id,
+                    level: e.level,
+                    code: e.code,
+                    parent_id: e.parent_id,
+                }))
+            );
+            return rResult
+        },
+        enabled: (!!branch && !!isOpen)
+    })
 
-    useEffect(() => {
-        // onFetching && _ServerFetching();
-        setTimeout(() => {
-            onFetching && _ServerFetching();
-        }, 1500);
-    }, [onFetching]);
-
-    const _ServerFetchingCategory = () => {
-        Axios(
-            "GET",
-            "api_web/api_product/categoryOption/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataCategory(
-                        rResult.map((e) => ({
-                            label: `${e.name + " " + "(" + e.code + ")"}`,
-                            value: e.id,
-                            level: e.level,
-                            code: e.code,
-                            parent_id: e.parent_id,
-                        }))
-                    );
-                }
-                sOnFetchingCategory(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetchingCategory && _ServerFetchingCategory();
-    }, [onFetchingCategory]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            isOpen && branch && sOnFetchingCategory(true);
-        }, 500);
-    }, [branch]);
+    const handingProducts = useMutation({
+        mutationFn: async (data) => {
+            return apiProducts.apiHandingProducts(props?.id, data);
+        }
+    })
 
     const _ServerSending = () => {
-        var formData = new FormData();
+        let formData = new FormData();
 
         formData.append("name", name);
         formData.append("code", code);
@@ -471,31 +448,21 @@ const Popup_ThanhPham = React.memo((props) => {
                 formData.append(`variation[${i}][option_id][${j}]`, dataVariantSending[i].option[j].id);
             }
         }
-
-        Axios(
-            "POST",
-            `${props?.id
-                ? `/api_web/api_product/product/${props.id}?csrf_protection=true`
-                : "/api_web/api_product/product/?csrf_protection=true"
-            } `,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message] || message);
-                        sIsOpen(false);
-                        props.onRefresh && props.onRefresh();
-                    } else {
-                        isShow("error", props.dataLang[message] || message);
-                    }
-                    sOnSending(false);
+        handingProducts.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message] || message);
+                    sIsOpen(false);
+                    props.onRefresh && props.onRefresh();
+                } else {
+                    isShow("error", props.dataLang[message] || message);
                 }
+            },
+            onError: (error) => {
+                isShow("error", error)
             }
-        );
+        });
+        sOnSending(false);
     };
 
     useEffect(() => {

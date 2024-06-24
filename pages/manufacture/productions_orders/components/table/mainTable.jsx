@@ -16,15 +16,16 @@ import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlan
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRM_DELETION, TITLE_DELETE_PRODUCTIONS_ORDER } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
 import ModalDetail from "../modal/modalDetail";
 import TabSemi from "./tabSemi";
-
 const MainTable = ({ dataLang }) => {
     const listTab = [
         {
@@ -133,9 +134,9 @@ const MainTable = ({ dataLang }) => {
             isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
     };
 
-    const fetchisState = async (page) => {
+    const fetchisState = async () => {
         try {
-            const { data } = await apiProductionsOrders.apiProductionOrders(page, isState.limit, { params: params });
+            const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, { params: params });
             const arrayItem = convertArrData(data?.productionOrders);
             queryState({
                 countAll: data?.countAll,
@@ -162,22 +163,24 @@ const MainTable = ({ dataLang }) => {
             }
         } catch (error) { }
     };
+    const { data, isLoading } = useQuery({
+        queryKey: ["apiProductionOrders",
+            isState.page,
+            isState.search,
+            isState.date.dateStart,
+            isState.date.dateEnd,
+            isState.valueProductionOrders,
+            isState.valueProductionOrdersDetail,
+            isState.valueBr,
+            isState.valueOrders,
+            isState.valuePlan,
+            isState.valueProducts],
+        queryFn: () => fetchisState(),
+        enabled: isState.openModal == false,
+        ...reTryQuery
+    })
 
-    useEffect(() => {
-        if (!isMouted) return;
-        fetchisState(1);
-    }, [
-        isState.search,
-        isState.date.dateStart,
-        isState.date.dateEnd,
-        isState.valueProductionOrders,
-        isState.valueProductionOrdersDetail,
-        isState.valueBr,
-        isState.valueOrders,
-        isState.valuePlan,
-        isState.valueProducts,
-        isMouted,
-    ]);
+
 
     const handleFilter = (type, value) => queryState({ [type]: value, page: 1 });
 
@@ -385,19 +388,6 @@ const MainTable = ({ dataLang }) => {
         queryState({
             listDataLeft: isState.listDataLeft.map((e) => {
                 const showParent = e.id == id;
-                // const showParent = e.id == id ? !e.showParent : false;
-                // if (showParent) {
-                //     fetchisStateRight(id);
-                // } else {
-                //     queryState({
-                //         listDataRight: {
-                //             ...isState.listDataRight,
-                //             title: null,
-                //             dataPPItems: [],
-                //             dataSemiItems: [],
-                //         },
-                //     });
-                // }
                 showParent && fetchisStateRight(id);
                 return {
                     ...e,

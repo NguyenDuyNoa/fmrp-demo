@@ -9,7 +9,6 @@ import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 import PopupEdit from "@/components/UI/popup";
 import { debounce } from "lodash";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import {
     Grid6,
@@ -27,15 +26,17 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiItems from "@/Api/apiMaterial/items/apiItems";
 import BtnAction from "@/components/UI/btnAction";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
 import TagBranch from "@/components/UI/common/tag/tagBranch";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -50,8 +51,10 @@ import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import ModalImage from "react-modal-image";
 import Popup_NVL from "./components/items/popupNvl";
+import { reTryQuery } from "@/configs/configRetryQuery";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -70,10 +73,6 @@ const Index = (props) => {
     const dataSeting = useSetingServer()
 
     const statusExprired = useStatusExprired();
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingUnit, sOnFetchingUnit] = useState(false);
 
     //Bộ lọc Danh mục
     const [dataCateOption, sDataCateOption] = useState([]);
@@ -107,111 +106,83 @@ const Index = (props) => {
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_material/material?csrf_protection=true",
-            {
-                params: {
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[category_id]": idCategory?.value ? idCategory?.value : null,
-                    "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { output, rResult } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
-                }
-                sOnFetching(false);
+    const { isFetching, isLoading, refetch } = useQuery({
+        queryKey: ["api_material", limit, router.query?.page, idCategory, idBranch, keySearch],
+        queryFn: async () => {
+            const params = {
+                search: keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[category_id]": idCategory?.value ? idCategory?.value : null,
+                "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
             }
-        );
-    };
+
+            const { output, rResult } = await apiItems.apiListItems({ params: params });
+
+            sData(rResult);
+
+            sTotalItems(output);
+
+            return rResult
+        },
+        ...reTryQuery
+    })
 
     useEffect(() => {
-        onFetching && _ServerFetching();
         sDataMaterialExpiry(feature?.dataProductSerial)
-    }, [onFetching]);
-
-    useEffect(() => {
-        sOnFetching(true) ||
-            (keySearch && sOnFetching(true)) ||
-            (idCategory && sOnFetching(true)) ||
-            (idBranch?.length > 0 && sOnFetching(true)) ||
-            (router.query?.page && sOnFetching(true));
-    }, [limit, router.query?.page, idCategory, idBranch]);
-
-    const _ServerFetchingUnit = () => {
-        Axios("GET", "/api_web/Api_unit/unit/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                dispatch({
-                    type: "unit_NVL/update",
-                    payload: rResult.map((e) => ({
-                        label: e.unit,
-                        value: e.id,
-                    })),
-                });
-            }
-        });
-        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
-                dispatch({
-                    type: "branch/update",
-                    payload: rResult.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    })),
-                });
-            }
-        });
-        Axios("GET", "/api_web/api_material/categoryOption?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                sDataCateOption(
-                    rResult.map((x) => ({
-                        label: `${x.name + " " + "(" + x.code + ")"}`,
-                        value: x.id,
-                        level: x.level,
-                        code: x.code,
-                        parent_id: x.parent_id,
-                    }))
-                );
-            }
-        });
-        Axios("GET", "/api_web/Api_variation/variation?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                dispatch({
-                    type: "variant_NVL/update",
-                    payload: rResult.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        option: e.option,
-                    })),
-                });
-            }
-        });
-        sOnFetchingUnit(false);
-    };
-
-    useEffect(() => {
-        onFetchingUnit && _ServerFetchingUnit();
-    }, [onFetchingUnit]);
-
-    useEffect(() => {
-        sOnFetchingUnit(true);
     }, []);
+
+    const { } = useQuery({
+        queryKey: ['api_branch_categor_variation'],
+        queryFn: async () => {
+            const { rResult: unit } = await apiItems.apiUnitItems()
+
+            const { result } = await apiComons.apiBranchCombobox();
+
+            const { rResult: categoryOption } = await apiItems.apiCategoryOptionItems()
+
+            const { rResult: variation } = await apiItems.apiVariationItems()
+
+            const array = result.map((e) => ({ label: e.name, value: e.id }))
+
+            dispatch({
+                type: "unit_NVL/update",
+                payload: unit.map((e) => ({ label: e.unit, value: e.id })),
+            })
+
+            sDataBranchOption(array);
+
+            dispatch({
+                type: "branch/update",
+                payload: array,
+            });
+
+            sDataCateOption(
+                categoryOption.map((x) => ({
+                    label: `${x.name + " " + "(" + x.code + ")"}`,
+                    value: x.id,
+                    level: x.level,
+                    code: x.code,
+                    parent_id: x.parent_id,
+                }))
+            );
+
+            dispatch({
+                type: "variant_NVL/update",
+                payload: variation.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    option: e.option,
+                })),
+            });
+        }
+    })
+
+
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        sOnFetching(true);
     }, 500)
 
     //Set data cho bộ lọc chi nhánh
@@ -346,7 +317,7 @@ const Index = (props) => {
                                 {role == true || checkAdd ?
                                     <Popup_NVL
                                         dataMaterialExpiry={dataMaterialExpiry}
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"materials"}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
@@ -409,7 +380,7 @@ const Index = (props) => {
 
                                 <div className="col-span-2 ">
                                     <div className="flex space-x-2 items-center justify-end">
-                                        <OnResetData sOnFetching={sOnFetching} />
+                                        <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                         {(role == true || checkExport) ?
                                             <div className={``}>
                                                 {data?.length > 0 && (
@@ -468,7 +439,7 @@ const Index = (props) => {
                                         {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                     </ColumnTable>
                                 </HeaderTable>
-                                {onFetching ? (
+                                {(isFetching || isLoading) ? (
                                     <Loading className="h-80" color="#0f4f9e" />
                                 ) : (
                                     <React.Fragment>
@@ -537,7 +508,7 @@ const Index = (props) => {
                                                         {role == true || checkEdit ?
                                                             <Popup_NVL
                                                                 dataMaterialExpiry={dataMaterialExpiry}
-                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 nameModel={"materials"}
@@ -546,7 +517,7 @@ const Index = (props) => {
                                                             <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
                                                         }
                                                         <BtnAction
-                                                            onRefresh={_ServerFetching.bind(this)}
+                                                            onRefresh={refetch.bind(this)}
                                                             onRefreshGroup={() => { }}
                                                             dataLang={dataLang}
                                                             id={e?.id}
@@ -585,6 +556,7 @@ const Index = (props) => {
 
 const Popup_ThongTin = React.memo((props) => {
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
 
     const dataSeting = useSetingServer();
@@ -597,27 +569,23 @@ const Popup_ThongTin = React.memo((props) => {
     }
 
     const [tab, sTab] = useState(0);
+
     const _HandleSelectTab = (e) => sTab(e);
 
-    const [onFetching, sOnFetching] = useState(false);
     const [list, sList] = useState({});
 
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_material/material/${props.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                sList({ ...response.data });
-            }
-            sOnFetching(false);
-        });
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
+    const { isLoading, isFetching } = useQuery({
+        queryKey: ['api_detail_items', !!open],
+        queryFn: async () => {
+            const data = await apiItems.apiDetailItems(props.id);
+            sList(data);
+            return data
+        },
+        enabled: !!open,
+    })
 
     useEffect(() => {
         open && sTab(0);
-        open && sOnFetching(true);
     }, [open]);
 
     return (
@@ -645,7 +613,7 @@ const Popup_ThongTin = React.memo((props) => {
                         {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
                 </div>
-                {onFetching ? (
+                {(isLoading || isFetching) ? (
                     <Loading className="h-96" color="#0f4f9e" />
                 ) : (
                     <React.Fragment>

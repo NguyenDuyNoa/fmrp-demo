@@ -1,27 +1,22 @@
-import { v4 as uuidv4 } from "uuid";
+import { Edit as IconEdit } from "iconsax-react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import React, { useState, useEffect } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
-import {
-  Edit as IconEdit,
-  Grid6 as IconExcel,
-  Trash as IconDelete,
-  SearchNormal1 as IconSearch,
-  Add as IconAdd,
-} from "iconsax-react";
+import { v4 as uuidv4 } from "uuid";
 
-import FormInfo from "../form/formInfo";
 import ButtonAdd from "../button/buttonAdd";
 import FormContact from "../form/formContact";
+import FormInfo from "../form/formInfo";
 
-import useToast from "@/hooks/useToast";
 import useActionRole from "@/hooks/useRole";
+import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import PopupEdit from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const Popup_dsncc = (props) => {
   const dataLang = props.dataLang;
@@ -85,104 +80,77 @@ const Popup_dsncc = (props) => {
     }
   }, [isState.open]);
 
-  const _ServerFetching_detailUser = () => {
-    Axios("GET", `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-      if (!err) {
-        const db = response.data;
-        queryState({
-          name: db?.name,
-          code: db?.code,
-          tax_code: db?.tax_code,
-          representative: db?.representative,
-          phone_number: db?.phone_number,
-          address: db?.address,
-          date_incorporation: db?.date_incorporation,
-          email: db?.email,
-          note: db?.note,
-          debt_begin: db?.debt_begin,
-          valueBr: db?.branch?.map((e) => ({
-            label: e.name,
-            value: e.id
-          })) || [],
-          valueCt: {
-            value: db?.city.provinceid,
-            label: db?.city.name
-          },
-          valueDitrict: db?.city.provinceid ? {
-            label: db?.district.name,
-            value: db?.district.districtid,
-          } : null,
-          valueWa: db?.district.districtid ? {
-            label: db?.ward.name,
-            value: db?.ward.wardid
-          } : null,
-          valueGr: db?.supplier_group.map((e) => ({ label: e.name, value: e.id })),
-          option: db?.contact?.map(e => {
-            return {
-              idFe: uuidv4(),
-              idBe: e?.id,
-              full_name: e?.full_name,
-              email: e?.email,
-              position: e?.position,
-              address: e?.address,
-              phone_number: e?.phone_number,
-              // disble: role == true || checkEdit == true
-            }
-          }) || [],
-        })
+  const { } = useQuery({
+    queryKey: ["supplier_detail", props?.id],
+    queryFn: async () => {
+      const db = await apiSuppliers.apiDetailSuppliers(props?.id);
+      queryState({
+        name: db?.name,
+        code: db?.code,
+        tax_code: db?.tax_code,
+        representative: db?.representative,
+        phone_number: db?.phone_number,
+        address: db?.address,
+        date_incorporation: db?.date_incorporation,
+        email: db?.email,
+        note: db?.note,
+        debt_begin: db?.debt_begin,
+        valueBr: db?.branch?.map((e) => ({
+          label: e.name,
+          value: e.id
+        })) || [],
+        valueCt: !Array.isArray(db?.city) ? {
+          value: db?.city.provinceid,
+          label: db?.city.name
+        } : null,
+        valueDitrict: db?.city.provinceid ? {
+          label: db?.district.name,
+          value: db?.district.districtid,
+        } : null,
+        valueWa: db?.district.districtid ? {
+          label: db?.ward.name,
+          value: db?.ward.wardid
+        } : null,
+        valueGr: db?.supplier_group.map((e) => ({ label: e.name, value: e.id })),
+        option: db?.contact?.map(e => {
+          return {
+            idFe: uuidv4(),
+            idBe: e?.id,
+            full_name: e?.full_name,
+            email: e?.email,
+            position: e?.position,
+            address: e?.address,
+            phone_number: e?.phone_number,
+            // disble: role == true || checkEdit == true
+          }
+        }) || [],
+      })
+      return db
+    },
+    enabled: isState.open && !!props?.id
+  })
+
+
+  const { } = useQuery({
+    queryKey: ["supplier_group", isState.valueBr?.length > 0],
+    queryFn: async () => {
+
+      const params = {
+        "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr?.map((e) => e.value) : -1,
       }
-      queryState({ onFetching: false });
-    });
-  };
 
-  useEffect(() => {
-    isState.open && props?.id && _ServerFetching_detailUser();
-  }, [isState.open]);
+      const { rResult } = await apiSuppliers.apiGroupSuppliers({ params: params });
 
-  const _ServerFetching_Gr = () => {
-    Axios(
-      "GET",
-      `/api_web/api_supplier/group/?csrf_protection=true`,
-      {
-        params: {
-          "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr?.map((e) => e.value) : -1,
-        },
-      },
-      (err, response) => {
-        if (!err) {
-          const { rResult } = response.data;
-          queryState({ dataGroup: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
-        }
-        queryState({ onFetchingGr: false });
-      }
-    );
-  };
+      queryState({ dataGroup: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
 
-  useEffect(() => {
-    isState.onFetchingGr && _ServerFetching_Gr()
-  }, [isState.onFetchingGr])
+      return rResult
+    },
+  })
 
-
-  useEffect(() => {
-    isState.valueBr?.length > 0 && queryState({ onFetchingGr: true });
-  }, [isState.valueBr])
 
   useEffect(() => {
     isState.valueBr?.length == 0 && queryState({ valueGr: [], dataGroup: [] });
   }, [isState.valueBr])
-
-  useEffect(() => {
-    isState.onFetchingDis && _ServerFetching_distric();
-  }, [isState.onFetchingDis]);
-
-  useEffect(() => {
-    isState.valueCt && queryState({ onFetchingDis: true });
-  }, [isState.valueCt]);
-
-
-  useEffect(() => {
-    isState.valueDitrict && queryState({ onFetchingWar: true });
-  }, [isState.valueDitrict]);
 
   useEffect(() => {
     isState.valueDitrict == null && queryState({
@@ -201,49 +169,56 @@ const Popup_dsncc = (props) => {
     })
   }, [isState.valueCt])
 
-  useEffect(() => {
-    isState.onFetchingWar && _ServerFetching_war()
-  }, [isState.onFetchingWar]);
 
 
-  const _ServerFetching_distric = () => {
-    Axios("GET", "/api_web/Api_address/district?limit=0",
-      {
-        params: {
-          provinceid: isState.valueCt ? isState.valueCt?.value : -1,
-        },
-      },
-      (err, response) => {
-        if (!err) {
-          const { rResult } = response.data;
-          queryState({ dataDitrict: rResult?.map((e) => ({ label: e.name, value: e.districtid })) || [] });
-        }
-        queryState({ onFetchingDis: false });
+
+
+
+  const { } = useQuery({
+    queryKey: ["api_district", isState.valueCt],
+    queryFn: async () => {
+
+      const params = {
+        provinceid: isState.valueCt ? isState.valueCt?.value : -1,
       }
-    );
-  };
 
-  const _ServerFetching_war = () => {
-    Axios("GET", "/api_web/Api_address/ward?limit=0",
-      {
-        params: {
-          districtid: isState.valueDitrict ? isState.valueDitrict?.value : -1,
-        },
-      },
-      (err, response) => {
-        if (!err) {
-          const { rResult } = response.data;
-          queryState({ dataWar: rResult?.map((e) => ({ label: e.name, value: e.wardid })) || [] });
-        }
-        queryState({ onFetchingWar: false });
+      const { rResult } = await apiSuppliers.apiDistricSuppliers({ params: params });
+
+      queryState({ dataDitrict: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
+
+      return rResult
+    },
+  })
+
+
+
+  const { } = useQuery({
+    queryKey: ["api_ward", isState.valueDitrict],
+    queryFn: async () => {
+
+      const params = {
+        districtid: isState.valueDitrict ? isState.valueDitrict?.value : -1,
       }
-    );
-  };
+
+      const { rResult } = await apiSuppliers.apiWardSuppliers({ params: params });
+
+      queryState({ dataWar: rResult?.map((e) => ({ label: e.name, value: e.wardid })) || [] });
+
+      return rResult
+    },
+  })
+
+
+  const handingSupplier = useMutation({
+    mutationFn: async (data) => {
+      return apiSuppliers.apiHandingSuppliers(data, props?.id)
+    }
+  })
+
 
   //post db
   const _ServerSending = () => {
-    let id = props?.id;
-    var data = new FormData();
+    let data = new FormData();
     data.append("name", isState.name ? isState.name : "");
     data.append("code", isState.code ? isState.code : "");
     data.append("tax_code", isState.tax_code ? isState.tax_code : "");
@@ -272,26 +247,23 @@ const Popup_dsncc = (props) => {
       data.append(`contact[${index}][address]`, e?.address);
       data.append(`contact[${index}][phone_number]`, e?.phone_number);
     });
-    Axios("POST", `${id ? `/api_web/api_supplier/supplier/${id}?csrf_protection=true` : "/api_web/api_supplier/supplier/?csrf_protection=true"}`,
-      {
-        data: data,
-        headers: { "Content-Type": "multipart/form-data" },
-      },
-      (err, response) => {
-        if (!err) {
-          const { isSuccess, message, } = response.data;
-          if (isSuccess) {
-            isShow("success", props?.dataLang[message] || message);
-            props.onRefresh && props.onRefresh();
-            props.onRefreshGroup && props.onRefreshGroup();
-            sIsState(initalState)
-          } else {
-            isShow("error", props?.dataLang[message] || message);
-          }
+
+    handingSupplier.mutate(data, {
+      onSuccess: ({ isSuccess, message, }) => {
+        if (isSuccess) {
+          isShow("success", props?.dataLang[message] || message);
+          props.onRefresh && props.onRefresh();
+          props.onRefreshGroup && props.onRefreshGroup();
+          sIsState(initalState)
+        } else {
+          isShow("error", props?.dataLang[message] || message);
         }
-        queryState({ onSending: false });
+      },
+      onError: (err) => {
+        isShow("error", err);
       }
-    );
+    })
+    queryState({ onSending: false });
   };
 
   //onchang option form

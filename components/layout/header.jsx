@@ -982,13 +982,13 @@ const Header = () => {
             text: "Quản lý các tiện ích, công việc",
             title: "Tiện ích",
         },
-        {
-            data: ListAdd,
-            position: "bottom center",
-            text: "Thêm mới",
-            className: "",
-            title: "+ Thêm",
-        },
+        // {
+        //     data: ListAdd,
+        //     position: "bottom center",
+        //     text: "Thêm mới",
+        //     className: "",
+        //     title: "+ Thêm",
+        // },
     ];
 
     const dataPstWH = useSelector((state) => state.statusUser);

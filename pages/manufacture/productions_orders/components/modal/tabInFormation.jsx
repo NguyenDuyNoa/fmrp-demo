@@ -4,12 +4,11 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Image from "next/image";
 import { memo, useEffect, useState } from "react";
-import ModalImage from "react-modal-image";
-import { FaArrowDown } from "react-icons/fa6";
 import { AiOutlineFileText } from "react-icons/ai";
 import { FaArrowAltCircleRight, FaCheck, FaCheckCircle } from "react-icons/fa";
-import { FaRegCalendarCheck } from "react-icons/fa";
-import PopupImportProducts from "../popup/PopupImportProducts";
+import { FaArrowDown } from "react-icons/fa6";
+import ModalImage from "react-modal-image";
+import PopupImportProducts from "../popup/popupImportProducts";
 
 const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }) => {
     const dataSeting = useSetingServer();
@@ -25,23 +24,9 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
 
     const queryStateInfomation = (key) => setIsInfomation((x) => ({ ...x, ...key }));
 
-    const handleShowProcess = (id) => {
-        const newData = isInfomation.dataInformation.arrayProducts.map((e) => {
-            if (e.id == id) {
-                e.show = !e.show;
-            }
-            return e;
-        });
-        queryStateInfomation({
-            dataInformation: {
-                ...isInfomation.dataInformation,
-                arrayProducts: newData,
-            },
-        });
-    };
-
     useEffect(() => {
         if (!isStateModal.dataDetail) return;
+        console.log("isStateModal.dataDetail", isStateModal.dataDetail);
         queryStateInfomation({
             dataInformation: {
                 ...isInfomation.dataInformation,
@@ -54,8 +39,8 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                 unit: isStateModal.dataDetail?.poi?.unit_name,
                 type: "products",
                 arrayProducts: isStateModal.dataDetail?.items_semi?.map(e => {
-                    console.log("eeeee", e);
                     return {
+                        ...e,
                         id: e?.id,
                         image: "/no_img.png",
                         name: e?.item_name,
@@ -66,9 +51,7 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                         processBar: e?.stages?.map(i => {
                             return {
                                 ...i,
-                                name: i?.stage_name,
                                 active: false,
-                                date: new Date(),
                                 quantity: 100,
                                 arraySemi: [
                                     // {
@@ -158,6 +141,7 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                                 quantity={e?.quantity}
                                 processBar={e?.processBar}
                                 type='semi'
+                                dataLang={dataLang}
                             />
                         );
                     })}
@@ -172,24 +156,25 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                             itemVariation={isStateModal.dataDetail?.poi?.product_variation}
                             quantity={isStateModal.dataDetail?.poi?.quantity}
                             processBar={isStateModal.dataDetail?.poi?.stages}
+                            dataLang={dataLang}
                         />
                     </div>
-
                 </div>
             </div>
         </div>
     );
 });
 
-const Renderitem = ({ type, id, image, name, code, itemVariation, quantity, processBar, checkBorder }) => {
+const Renderitem = ({ type, id, image, name, code, itemVariation, quantity, processBar, checkBorder, dataLang }) => {
+
     const dataSeting = useSetingServer()
+
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
     return (
-        <div key={id ?? ""} className="max-w-sm">
-            <div className={`bg-white sticky top-0 z-10`}>
-                <div
-                    className={`flex items-start py-2 px-4 h-[90px]  gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-full`}
-                >
+        <div key={id ?? ""} className={`max-w-sm`}>
+            <div className={`bg-white sticky top-0 z-10 `}>
+                <div className={`flex items-start py-2 px-4 h-[90px]  gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-full`}>
                     <div className="h-8 w-8">
                         <Image src={image} width={1280} height={1024} alt="" className="object-cover w-full h-full" />
                     </div>
@@ -207,56 +192,54 @@ const Renderitem = ({ type, id, image, name, code, itemVariation, quantity, proc
                 </div>
             </div>
             {processBar?.map((j, jIndex) => {
-                console.log("j", processBar);
                 const checkLast = processBar?.length - 1 != jIndex
                 return (
-                    <div className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} `}>
+                    <div className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
                         <div className="flex min-h-[70px] gap-3">
                             <div className={`text-[10px] ${j?.active ? 'text-black' : "text-black/70"} font-normal text-right`}>
-                                <div className="">
-                                    {formatMoment(j?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
+                                <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
+                                    {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
                                 </div>
-                                <div className="">
-                                    {formatMoment(j?.date, FORMAT_MOMENT.TIME_SHORT)}
+                                <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
+                                    {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.TIME_SHORT)}
                                 </div>
                             </div>
                             <div className="flex">
                                 <div className={`mr-3 flex flex-col items-center`}>
                                     <div className="">
-                                        <div className={`flex h-5 w-5 ${j?.active ? "border-[#14b8a6] bg-[#14b8a6]" : "border-gray-400"}  items-center justify-center rounded-full border `}>
+                                        <div className={`flex h-5 w-5 ${j?.active ? "border-[#14b8a6] bg-[#14b8a6]" : j?.begin_production == 1 ? 'border-orange-600' : "border-gray-400"}  items-center justify-center rounded-full border `}>
                                             {
                                                 processBar?.length - 1 != jIndex ?
                                                     <>
-                                                        {jIndex % 2 == 0 && <FaArrowDown size={9} className={`${j?.active ? 'text-white' : "text-gray-400"}`} />}
-                                                        {jIndex % 2 != 0 && <AiOutlineFileText size={9} className={`${j?.active ? 'text-white' : "text-gray-400"}`} />}
+                                                        {jIndex % 2 == 0 && <FaArrowDown size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
+                                                        {jIndex % 2 != 0 && <AiOutlineFileText size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
                                                     </>
-                                                    : <FaCheck size={8} className={`${j?.active ? 'text-white' : "text-gray-400"}`} />
+                                                    : <FaCheck size={8} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />
                                             }
                                         </div>
                                     </div>
-                                    {checkLast && <div className="h-full w-px bg-gray-300"></div>}
+                                    {checkLast && <div className={`h-full w-px ${j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`}>
+                                    </div>}
                                 </div>
                                 <div className="mt-0.5">
                                     <div className="flex items-center gap-2">
-                                        <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : "text-black/60"}`}>{j.name}</p>
-
+                                        <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>{j.stage_name}</p>
                                         {(+j?.type == 2 || +j?.type == 3) ?
                                             <div className="flex items-center gap-1">
-                                                <PopupImportProducts>
-                                                    <FaArrowAltCircleRight className="text-[#5599EC] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
+                                                <PopupImportProducts type='begin_production' dataStage={j} dataLang={dataLang}>
+                                                    <FaArrowAltCircleRight className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#5599EC]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
                                                 </PopupImportProducts>
-                                                <PopupImportProducts>
+                                                <PopupImportProducts type='end_production' dataStage={j} dataLang={dataLang}>
                                                     <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
                                                 </PopupImportProducts>
                                             </div>
                                             :
                                             +j?.type == 0 &&
-                                            <PopupImportProducts>
+                                            <PopupImportProducts type='end_production' dataStage={j} dataLang={dataLang}>
                                                 <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
                                             </PopupImportProducts>
                                         }
                                     </div>
-
                                     <p className="text-gray-600 text-xs dark:text-slate-400"></p>
                                 </div>
                             </div>
@@ -264,77 +247,6 @@ const Renderitem = ({ type, id, image, name, code, itemVariation, quantity, proc
                     </div>
                 )
             })}
-            {/* <ol className={`flex flex-col overflow-hidden ${checkBorder ? "border-r-0" : ""} ${type === "products" ? "border-l pl-2" : ""} `}>
-                    {processBar?.map((j, jIndex) => {
-                        return (
-                            <li
-                                key={jIndex}
-                                className={`${jIndex == processBar?.length - 1 ? "relative flex-1" : `relative flex-1 after:content-['']  
-                                    after:w-[1px] after:h-full  after:inline-block after:absolute after:top-1/2  ${type === "semi" ? "after:left-[82px] " : "after:left-[76px] "}
-                                                            ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} `}`}
-                            >
-
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] text-right inline-block">
-                                        {moment(j?.date).format("DD/MM/YYYY, HH:mm:ss")}
-                                    </span>
-                                    <div className="flex items-center font-medium w-full min-h-[70px]">
-                                        <span
-                                            className={`w-[6px] h-[6px] ${j?.active ? "bg-[#00C170]" : "bg-gray-500"} border-2 border-transparent rounded-full mr-3 text-sm text-white`}
-                                        ></span>
-                                        <div className="block">
-                                            <h4 className={`3xl:text-base xxl:text-sm text-xs ${j?.active ? "text-[#00C170]" : "text-gray-500"}`}>
-                                                {j?.name}
-
-                                            </h4>
-                                            <div className="flex flex-col gap-2">
-                                                {j?.arraySemi?.map((s) => {
-                                                    return (
-                                                        <div key={s?.id} className="">
-                                                            <div className="border border-gray-400 px-2 py-1 rounded-xl flex items-center gap-1">
-                                                                <ModalImage
-                                                                    small={s?.image}
-                                                                    large={s?.image}
-                                                                    width={18}
-                                                                    height={18}
-                                                                    alt={s?.name}
-                                                                    className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
-                                                                />
-                                                                <span className="text-[#9295A4] 3xl:text-[12px]  2xl:text-[10px] xxl:text-[12px] text-[10px]">
-                                                                    {s?.name} - SL:{" "}
-                                                                    {s?.quantity > 0 ? formatNumber(s?.quantity) : "-"}{" "}-{" "} {moment(s?.date).format("DD/MM/YYYY")}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        );
-                    })}
-                </ol> */}
-
-
-            {/* <div className="flex">
-                    <div className="mr-4 flex flex-col items-center">
-                        <div>
-                            <div
-                                className="flex h-3 w-3 items-center justify-center rounded-full border-2 border-blue-900 bg-blue-900">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                    className="h-3 w-3 text-white">
-                                    <path d="M5 12l5 5l10 -10"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="">
-                        <p className="mb-2 text-xl font-bold text-gray-900 ">Ready!</p>
-                    </div>
-                </div> */}
         </div>
     )
 }

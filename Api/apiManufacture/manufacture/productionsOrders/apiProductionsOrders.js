@@ -54,5 +54,25 @@ const apiProductionsOrders = {
             throw error;
         }
     },
+    // api đổi trạng thái sản xuất
+    async apiAgreeProcess(data) {
+        try {
+            const response = await axiosCustom('POST', `/api_web/api_manufactures/agreeProcess`, data);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
+    // Lấy dữ liệu trước khi nhập sản xuất
+
+    async apiDataProducts(data) {
+        try {
+            const response = await axiosCustom('POST', `/api_web/api_manufactures/getDataProducts`, data);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
+
 }
 export default apiProductionsOrders

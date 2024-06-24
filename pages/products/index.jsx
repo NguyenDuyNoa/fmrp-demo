@@ -1,49 +1,49 @@
-import Head from "next/head";
-import { debounce } from "lodash";
-import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { _ServerInstance as Axios } from "/services/axios";
 import {
-    SearchNormal1 as IconSearch,
-    UserEdit as IconUserEdit,
-    TickCircle as IconTick,
     Grid6,
+    TickCircle as IconTick
 } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
+import { useDispatch, useSelector } from "react-redux";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/btnAction";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
 import useFeature from "@/hooks/useConfigFeature";
-import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 
-import Popup_ThanhPham from "./components/product/popupThanhPham";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import Popup_ThanhPham from "./components/product/popupThanhPham";
 
 import Popup_ThongTin from "./components/product/popupThongtin";
 
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProducts from "@/Api/apiProducts/products/apiProducts";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import TagBranch from "@/components/UI/common/tag/tagBranch";
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import useSetingServer from "@/hooks/useConfigNumber";
 import usePagination from "@/hooks/usePagination";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -81,9 +81,6 @@ const Index = (props) => {
 
     const [dataExcel, sDataExcel] = useState([]);
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingAnother, sOnFetchingAnother] = useState(false);
     //Bộ lọc Chi nhánh
     const [dataBranchOption, sDataBranchOption] = useState([]);
 
@@ -111,157 +108,115 @@ const Index = (props) => {
         return formatNumberConfig(+number, dataSeting)
     }
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_product/product/?csrf_protection=true",
-            {
-                params: {
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
-                    "filter[type_products]": router.query?.tab === "all" ? 0 : router.query?.tab,
-                    "filter[category_id]": valueCategory?.value ? valueCategory?.value : "",
-                    "filter[id]": valueFinishedPro?.value ? valueFinishedPro?.value : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { output, rResult } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
-                }
-                sOnFetching(false);
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["api_products", limit, router.query?.page, idBranch, router.query?.tab, valueCategory, valueFinishedPro, keySearch],
+        queryFn: async () => {
+            const params = {
+                search: keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
+                "filter[type_products]": router.query?.tab === "all" ? 0 : router.query?.tab,
+                "filter[category_id]": valueCategory?.value ? valueCategory?.value : "",
+                "filter[id]": valueFinishedPro?.value ? valueFinishedPro?.value : "",
             }
-        );
-    };
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
+            const { output, rResult } = await apiProducts.apiListProducts({ params })
 
-    useEffect(() => {
-        sOnFetching(true) ||
-            (keySearch && sOnFetching(true)) ||
-            (idBranch?.length > 0 && sOnFetching(true)) ||
-            (valueCategory && sOnFetching(true)) ||
-            (valueFinishedPro && sOnFetching(true));
-    }, [limit, router.query?.page, idBranch, router.query?.tab, valueCategory, valueFinishedPro]);
+            sData(rResult);
 
+
+            sDataFinishedPro(
+                rResult.map((e) => ({
+                    label: `${e.code} (${e.name})`,
+                    value: e.id,
+                }))
+            );
+            sDataExcel(rResult);
+
+            sTotalItems(output);
+
+            return rResult
+        }
+    })
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        sOnFetching(true);
     }, 500)
 
+    const db = useQuery({
+        queryKey: ["api_orther"],
+        queryFn: async () => {
+            const { result } = await apiComons.apiBranchCombobox();
+
+            const branch = result?.map((e) => ({ label: e.name, value: e.id }))
+
+            sDataBranchOption(branch);
+
+            dispatch({ type: "branch/update", payload: branch });
 
 
-    const _ServerFetchingAnother = () => {
-        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response?.data;
-                sDataBranchOption(rResult?.map((e) => ({ label: e.name, value: e.id })));
-                dispatch({
-                    type: "branch/update",
-                    payload: rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    })),
-                });
+            const data = await apiProducts.apiProductTypeProducts();
+
+            dispatch({
+                type: "type_finishedProduct/update",
+                payload: data?.map((e) => ({
+                    label: dataLang[e.name],
+                    value: e.code,
+                })),
+            });
+
+            const { rResult: unit } = await apiProducts.apiUnitProducts();
+            dispatch({
+                type: "unit_finishedProduct/update",
+                payload: unit?.map((e) => ({
+                    label: e.unit,
+                    value: e.id,
+                })),
+            });
+
+            const { rResult: variationProducts } = await apiProducts.apiVariationProducts();
+            dispatch({
+                type: "variant_NVL/update",
+                payload: variationProducts?.rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    option: e.option,
+                })),
+            });
+
+
+            const { rResult: categoryOption } = await apiProducts.apiCategoryOptionProducts();
+            sDataCategory(
+                categoryOption.map((e) => ({
+                    label: `${e.name + " " + "(" + e.code + ")"}`,
+                    value: e.id,
+                    level: e.level,
+                    code: e.code,
+                    parent_id: e.parent_id,
+                }))
+            );
+
+            const { rResult: stage } = await apiProducts.apiStageProducts();
+            dispatch({
+                type: "stage_finishedProduct/update",
+                payload: stage?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                })),
+            });
+
+            return {
+                branch,
+                unit,
+                variationProducts,
+                categoryOption,
+                stage,
             }
-        });
-
-        Axios("GET", "/api_web/api_product/productType/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const data = response?.data;
-                dispatch({
-                    type: "type_finishedProduct/update",
-                    payload: data?.map((e) => ({
-                        label: dataLang[e.name],
-                        value: e.code,
-                    })),
-                });
-            }
-        });
-
-        Axios("GET", "/api_web/Api_unit/unit/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response?.data;
-                dispatch({
-                    type: "unit_finishedProduct/update",
-                    payload: rResult?.map((e) => ({
-                        label: e.unit,
-                        value: e.id,
-                    })),
-                });
-            }
-        });
-
-        Axios("GET", "/api_web/Api_variation/variation?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response?.data;
-                dispatch({
-                    type: "variant_NVL/update",
-                    payload: rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        option: e.option,
-                    })),
-                });
-            }
-        });
-
-        Axios("GET", "api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                sDataCategory(
-                    rResult.map((e) => ({
-                        label: `${e.name + " " + "(" + e.code + ")"}`,
-                        value: e.id,
-                        level: e.level,
-                        code: e.code,
-                        parent_id: e.parent_id,
-                    }))
-                );
-            }
-        });
-
-        Axios("GET", "/api_web/api_product/product/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                sDataFinishedPro(
-                    rResult.map((e) => ({
-                        label: `${e.code} (${e.name})`,
-                        value: e.id,
-                    }))
-                );
-                sDataExcel(rResult);
-            }
-        });
-
-        Axios("GET", `/api_web/api_product/stage/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                dispatch({
-                    type: "stage_finishedProduct/update",
-                    payload: rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    })),
-                });
-            }
-        });
-        sOnFetchingAnother(false);
-    };
-
+        }
+    })
     useEffect(() => {
-        onFetchingAnother && _ServerFetchingAnother();
-    }, [onFetchingAnother]);
-
-    useEffect(() => {
-        sOnFetchingAnother(true);
         sDataProductExpiry(feature?.dataProductExpiry);
     }, []);
 
@@ -405,7 +360,7 @@ const Index = (props) => {
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ?
                                     <Popup_ThanhPham
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefresh={refetch.bind(this)}
                                         dataProductExpiry={dataProductExpiry}
                                         dataLang={dataLang}
                                         setOpen={sOpenDetail}
@@ -517,7 +472,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2 ">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={sOnFetching} />
+                                            <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                             {(role == true || checkExport) ?
                                                 <div className={``}>
                                                     {data?.length > 0 && (
@@ -581,7 +536,7 @@ const Index = (props) => {
                                             {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : (
                                         <React.Fragment>
@@ -689,7 +644,7 @@ const Index = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="pl-2 py-2.5 flex space-x-2 justify-center">
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
                                                                 dataLang={dataLang}
                                                                 dataProductExpiry={dataProductExpiry}
                                                                 id={e.id}

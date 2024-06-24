@@ -1,46 +1,47 @@
-import Head from "next/head";
 import { debounce } from "lodash";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useState, useEffect } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import {
-    Minus as IconMinus,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    Edit as IconEdit,
     Grid6,
+    ArrowDown2 as IconDown,
+    Edit as IconEdit,
+    Minus as IconMinus
 } from "iconsax-react";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/btnAction";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 
-import useToast from "@/hooks/useToast";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useToast from "@/hooks/useToast";
 
-import Popup_ThanhPham from "./components/category/popup";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiCategory from "@/Api/apiProducts/category/apiCategory";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { reTryQuery } from "@/configs/configRetryQuery";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import { useQuery } from "@tanstack/react-query";
+import Popup_ThanhPham from "./components/category/popup";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -55,11 +56,9 @@ const Index = (props) => {
 
     const statusExprired = useStatusExprired();
 
-    const [onFetching, sOnFetching] = useState(false);
 
     const [onFetchingAnother, sOnFetchingAnother] = useState(false);
 
-    const [onFetchingSub, sOnFetchingSub] = useState(false);
 
     const [data, sData] = useState([]);
     //Bộ lọc Chi nhánh
@@ -79,37 +78,27 @@ const Index = (props) => {
 
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_product/category/?csrf_protection=true",
-            {
-                params: {
+
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["api_category", limit, router.query?.page, idCategory, idBranch, keySearch],
+        queryFn: async () => {
+            try {
+                const params = {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
                     "filter[id]": idCategory?.value ? idCategory?.value : null,
                     "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { output, rResult } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
                 }
-                sOnFetching(false);
+                const { output, rResult } = await apiCategory.apiListCategory({ params });
+                sData(rResult);
+                sTotalItems(output);
+
+            } catch (error) {
             }
-        );
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    useEffect(() => {
-        sOnFetching(true);
-    }, [limit, router.query?.page, idCategory, idBranch]);
+        },
+        ...reTryQuery
+    })
 
     const _HandleFilterOpt = (type, value) => {
         if (type == "category") {
@@ -122,13 +111,13 @@ const Index = (props) => {
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        sOnFetching(true);
     }, 500);
 
-    const _ServerFetchingSub = () => {
-        Axios("GET", "/api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
+    const { refetch: refetchSup } = useQuery({
+        queryKey: ["api_category_option"],
+        queryFn: async () => {
+            try {
+                const { rResult } = await apiCategory.apiOptionCategory();
                 sDataCategoryOption(
                     rResult.map((e) => ({
                         label: `${e.name + " " + "(" + e.code + ")"}`,
@@ -148,39 +137,29 @@ const Index = (props) => {
                         parent_id: e.parent_id,
                     })),
                 });
-            }
-            sOnFetchingSub(false);
-        });
-    };
+                return rResult
 
-    useEffect(() => {
-        onFetchingSub && _ServerFetchingSub();
-    }, [onFetchingSub]);
+            } catch (error) { }
+        }
+    })
 
-    const _ServerFetchingAnother = () => {
-        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
+    useQuery({
+        queryKey: ["api_branch_option"],
+        queryFn: async () => {
+            try {
+                const { result } = await apiComons.apiBranchCombobox();
+                sDataBranchOption(result.map((e) => ({ label: e.name, value: e.id })));
                 dispatch({
                     type: "branch/update",
-                    payload: rResult.map((e) => ({
+                    payload: result.map((e) => ({
                         label: e.name,
                         value: e.id,
                     })),
                 });
-            }
-        });
-    };
-
-    useEffect(() => {
-        onFetchingAnother && _ServerFetchingAnother();
-    }, [onFetchingAnother]);
-
-    useEffect(() => {
-        sOnFetchingAnother(true);
-        sOnFetchingSub(true);
-    }, []);
+                return result
+            } catch (error) { }
+        }
+    })
 
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
@@ -272,8 +251,8 @@ const Index = (props) => {
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
                                     <Popup_ThanhPham
-                                        onRefresh={_ServerFetching.bind(this)}
-                                        onRefreshSub={_ServerFetchingSub.bind(this)}
+                                        onRefresh={refetch.bind(this)}
+                                        onRefreshSub={refetchSup.bind(this)}
                                         dataLang={dataLang}
                                         // nameModel={"client_contact"}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -345,7 +324,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={sOnFetching} />
+                                            <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {data?.length > 0 && (
@@ -398,13 +377,13 @@ const Index = (props) => {
                                         </ColumnTable>
                                     </HeaderTable>
                                     <div className="divide-y divide-slate-200">
-                                        {onFetching ? (
+                                        {isFetching ? (
                                             <Loading />
                                         ) : data?.length > 0 ? (
                                             data.map((e) => (
                                                 <Item
-                                                    onRefresh={_ServerFetching.bind(this)}
-                                                    onRefreshSub={_ServerFetchingSub.bind(this)}
+                                                    onRefresh={refetch.bind(this)}
+                                                    onRefreshSub={refetchSup.bind(this)}
                                                     dataLang={dataLang}
                                                     key={e.id}
                                                     data={e}

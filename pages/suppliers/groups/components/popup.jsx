@@ -1,18 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import PopupEdit from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import {
-    Edit as IconEdit,
-    Trash as IconDelete,
-    Grid6 as IconExcel,
-    SearchNormal1 as IconSearch,
+    Edit as IconEdit
 } from "iconsax-react";
 
+import apiGroups from "@/Api/apiSuppliers/groups/apiGroups";
+import useToast from "@/hooks/useToast";
+import { useMutation } from "@tanstack/react-query";
 import "react-phone-input-2/lib/style.css";
 import Select from "react-select";
-import useToast from "@/hooks/useToast";
 
 
 const Popup_groupKh = (props) => {
@@ -39,6 +37,7 @@ const Popup_groupKh = (props) => {
     const [isState, sIsState] = useState(initialData)
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
+
     useEffect(() => {
         if (props?.id) {
             queryState({
@@ -69,33 +68,35 @@ const Popup_groupKh = (props) => {
         isState.valueBr?.length > 0 && queryState({ errInputBr: false });
     }, [isState.valueBr]);
 
+
+    const handingGroupSuppliers = useMutation({
+        mutationFn: (data) => {
+            return apiGroups.apiHandingGroup(data, props.id);
+        }
+    })
+
     const _ServerSending = () => {
-        const id = props.id;
         let data = new FormData();
         data.append("name", isState.name);
         isState.valueBr?.forEach((e) => {
             data.append("branch_id[]", e.value);
         })
-        Axios("POST", `${props.id ? `/api_web/api_supplier/group/${id}?csrf_protection=true` : "/api_web/api_supplier/group/?csrf_protection=true"}`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${props.dataLang[message]}` || message)
-                        sIsState(initialData);
-                        props.onRefresh && props.onRefresh();
-                        sOpen(false);
-                    } else {
-                        isShow("error", `${props.dataLang[message]}` || message)
-                    }
+        handingGroupSuppliers.mutate(data, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", `${props.dataLang[message]}` || message)
+                    sIsState(initialData);
+                    props.onRefresh && props.onRefresh();
+                    sOpen(false);
+                } else {
+                    isShow("error", `${props.dataLang[message]}` || message)
                 }
-                queryState({ onSending: false });
+            },
+            onError: (err) => {
+                isShow("error", err)
             }
-        );
+        })
+        queryState({ onSending: false });
     };
     //da up date
     useEffect(() => {

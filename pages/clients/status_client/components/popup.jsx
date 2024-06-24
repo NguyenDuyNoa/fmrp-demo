@@ -1,23 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
-import {
-    Edit as IconEdit,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Grid6 as IconExcel,
-} from "iconsax-react";
-import Swal from "sweetalert2";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-import PopupEdit from "/components/UI/popup";
-import Select, { components } from "react-select";
+import apiStatus from "@/Api/apiClients/status/apiStatus";
 import useToast from "@/hooks/useToast";
+import { useMutation } from "@tanstack/react-query";
+import {
+    Edit as IconEdit
+} from "iconsax-react";
+import { useEffect, useRef, useState } from "react";
+import Select from "react-select";
+import PopupEdit from "/components/UI/popup";
+
 
 const Popup_status = (props) => {
     const scrollAreaRef = useRef(null);
@@ -59,33 +49,34 @@ const Popup_status = (props) => {
         });
     }, [isState.open]);
 
-    const _ServerSending = () => {
-        const id = props.id;
+    const handingStatus = useMutation({
+        mutationFn: (data) => {
+            return apiStatus.apiHandingStatus(data, props.id)
+        }
+    })
+
+    const _ServerSending = async () => {
         let data = new FormData();
         data.append("name", isState.name);
         data.append("color", isState.color);
         isState.valueBr.forEach((e) => {
             data.append("branch_id[]", e?.value);
         })
-        Axios("POST", `${props.id ? `/api_web/api_client/status/${id}?csrf_protection=true` : "/api_web/api_client/status?csrf_protection=true"}`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message] || message);
-                        sIsState(initilaState);
-                        props.onRefresh && props.onRefresh();
-                    } else {
-                        isShow("error", props.dataLang[message] || message);
-                    }
+        handingStatus.mutate(data, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message] || message);
+                    sIsState(initilaState);
+                    props.onRefresh && props.onRefresh();
+                } else {
+                    isShow("error", props.dataLang[message] || message);
                 }
-                queryState({ onSending: false });
+            },
+            onError: (error) => {
+                isShow("error", error);
             }
-        );
+        })
+        queryState({ onSending: false });
     };
 
     useEffect(() => {

@@ -1,43 +1,38 @@
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { _ServerInstance as Axios } from "/services/axios";
-import ReactExport from "react-data-export";
+import React, { useState } from "react";
 
-import Swal from "sweetalert2";
 
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Grid6,
-} from "iconsax-react";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { debounce } from "lodash";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import NoData from "@/components/UI/noData/nodata";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import useToast from "@/hooks/useToast";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import apiContact from "@/Api/apiClients/contact/apiContact";
+import apiComons from "@/Api/apiComon/apiComon";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useQuery } from "@tanstack/react-query";
+import OnResetData from "components/UI/btnResetData/btnReset";
+import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "components/UI/filterComponents/searchComponent";
+import SelectComponent from "components/UI/filterComponents/selectComponent";
+import Loading from "components/UI/loading";
+import {
+    Grid6
+} from "iconsax-react";
+import { debounce } from "lodash";
+import { useSelector } from "react-redux";
+import Pagination from "/components/UI/pagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -71,86 +66,61 @@ const Index = (props) => {
     const [isState, sIsState] = useState(initalState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_supplier/contact/?csrf_protection=true",
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
-                    "filter[supplier_id]":
-                        isState.idSupplier?.length > 0 ? isState.idSupplier?.map((e) => e.value) : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    updateTotalItems(output);
-                    queryState({ data: rResult, data_ex: rResult });
-                }
-                queryState({ onFetching: false });
-            }
-        );
-    };
 
-    const _ServerFetching_brand = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({ dataBr: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
-                }
+    const { isLoading, isFetching, refetch } = useQuery({
+        queryKey: ["supplier_contact", limit, router.query?.page, isState.idBranch, isState.idSupplier, isState.keySearch],
+        queryFn: async () => {
+            const params = {
+                search: isState.keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
+                "filter[supplier_id]":
+                    isState.idSupplier?.length > 0 ? isState.idSupplier?.map((e) => e.value) : "",
             }
-        );
-    };
 
-    const _ServerFetching_Supplier = () => {
-        Axios(
-            "GET",
-            `/api_web/api_supplier/supplier/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({ dataSupplier: rResult?.map((e) => ({ label: e.code, value: e.id })) || [] });
-                }
-            }
-        );
-    };
+            const { rResult, output } = await apiContact.apiListContact({ params: params })
 
-    useEffect(() => {
-        _ServerFetching_brand();
-        _ServerFetching_Supplier();
-    }, []);
+            updateTotalItems(output);
+
+            queryState({ data: rResult, data_ex: rResult });
+
+            return rResult
+        }
+    })
+
+
+    const { data } = useQuery({
+        queryKey: ["apiBranch"],
+        queryFn: async () => {
+
+            const { result } = await apiComons.apiBranchCombobox();
+
+            queryState({ dataBr: result?.map((e) => ({ label: e.name, value: e.id })) || [] });
+
+            return result
+        }
+    })
+
+    const { } = useQuery({
+        queryKey: ["api_supplier"],
+        queryFn: async () => {
+
+            const { rResult } = await apiContact.apiClientContact({ params: { limit: 0 } });
+
+            queryState({ dataSupplier: rResult?.map((e) => ({ label: e.code, value: e.id })) || [] });
+
+            return rResult
+        }
+    })
+
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace({
             pathname: router.route,
         });
-        queryState({ onFetching: true });
     }, 500);
-
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
-    useEffect(() => {
-        queryState({ onFetching: true });
-    }, [limit, router.query?.page, isState.idBranch, isState.idSupplier]);
 
     //excel
     const multiDataSet = [
@@ -280,9 +250,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.suppliers_supplier_code ||
-                                                            "suppliers_supplier_code",
+                                                        label: dataLang?.suppliers_supplier_code || "suppliers_supplier_code",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.dataSupplier,
@@ -301,7 +269,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
@@ -354,15 +322,15 @@ const Index = (props) => {
                                             {dataLang?.client_contact_table_brand || "client_contact_table_brand"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {(isLoading || isFetching) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                                 {isState.data?.map((e) => (
-                                                    <RowTable gridCols={10} key={e.supplier_contact_id.toString()}>
+                                                    <RowTable gridCols={10} key={e?.supplier_contact_id?.toString()}>
                                                         <RowItemTable colSpan={2} textAlign={"left"}>
-                                                            {e.supplier_name}
+                                                            {e?.supplier_name}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.contact_name}

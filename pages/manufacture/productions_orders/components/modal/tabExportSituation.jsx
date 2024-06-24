@@ -1,8 +1,8 @@
 // tình hình xuất NVL
 import apiProductionsOrders from '@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders';
 import OnResetData from '@/components/UI/btnResetData/btnReset';
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/table';
 import { ContainerTotal } from '@/components/UI/common/layout';
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/table';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
@@ -11,6 +11,7 @@ import NoData from '@/components/UI/noData/nodata';
 import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from '@tanstack/react-query';
 import saveAs from 'file-saver';
 import html2canvas from 'html2canvas';
 import dynamic from 'next/dynamic';
@@ -34,6 +35,8 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
         dataDefault: [],
     }
 
+    const [isMounted, setIsMounted] = useState(false)
+
     const router = useRouter()
 
     const [isExportSituation, setIsExportSituation] = useState(initialState)
@@ -48,50 +51,54 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
-    const fetchDataExport = async () => {
-        queryStatesetExportSituation({ onFetching: true })
-        try {
-            const { data } = await apiProductionsOrders.apiExportSituation(isStateModal.dataDetail?.poi?.poi_id)
-            const newData = data?.boms?.map(e => {
-                return {
-                    id: uddid(),
-                    image: '/no_img.png',
-                    name: e?.item_name,
-                    itemVariation: e?.product_variation,
-                    code: e?.item_code,
-                    unit: e?.unit_name,
-                    type: e?.type_products,
-                    quantityPlan: e?.quantity_total_quota,
-                    quantityExport: e?.quantity_exported,
-                    quantityImport: e?.quantity_recovery,
-                    quantityRemaining: e?.quantity_rest
+    useEffect(() => {
+        setIsMounted(true)
+    })
+
+    const fetchData = async () => {
+        const { data } = await apiProductionsOrders.apiExportSituation(isStateModal.dataDetail?.poi?.poi_id)
+        const newData = data?.boms?.map(e => {
+            return {
+                id: uddid(),
+                image: '/no_img.png',
+                name: e?.item_name,
+                itemVariation: e?.product_variation,
+                code: e?.item_code,
+                unit: e?.unit_name,
+                type: e?.type_products,
+                quantityPlan: e?.quantity_total_quota,
+                quantityExport: e?.quantity_exported,
+                quantityImport: e?.quantity_recovery,
+                quantityRemaining: e?.quantity_rest
+            }
+        })
+        const chart = data?.boms?.flatMap(e => {
+            const nameMap = {
+                'quantity_total_quota': 'Kế hoạch',
+                'quantity_exported': 'Đã xuất',
+                'quantity_recovery': 'Thu hồi',
+                'quantity_rest': 'Còn lại'
+            };
+            const columnName = e.item_code;
+            return Object.entries(e).map(([key, value]) => {
+                if (key in nameMap) {
+                    return {
+                        name: nameMap[key],
+                        column: columnName,
+                        value: Number(value),
+                    };
                 }
-            })
-
-            const chart = data?.boms?.flatMap(e => {
-                const nameMap = {
-                    'quantity_total_quota': 'Kế hoạch',
-                    'quantity_exported': 'Đã xuất',
-                    'quantity_recovery': 'Thu hồi',
-                    'quantity_rest': 'Còn lại'
-                };
-                const columnName = e.item_code;
-                return Object.entries(e).map(([key, value]) => {
-                    if (key in nameMap) {
-                        return {
-                            name: nameMap[key],
-                            column: columnName,
-                            value: Number(value),
-                        };
-                    }
-                    return undefined;
-                }).filter(item => item !== undefined);
-            });
-            queryStatesetExportSituation({ dataTable: newData, dataDefault: newData, dataChart: chart, onFetching: false })
-        } catch (error) {
-
-        }
+                return undefined;
+            }).filter(item => item !== undefined);
+        });
+        queryStatesetExportSituation({ dataTable: newData, dataDefault: newData, dataChart: chart, })
     }
+
+    const { isLoading, refetch } = useQuery({
+        queryKey: ["apiExportSituation", isStateModal.dataDetail?.poi?.poi_id, limit, isTab],
+        queryFn: () => fetchData(),
+        enabled: isStateModal.dataDetail?.poi?.poi_id ? true : false,
+    })
 
     const totals = isExportSituation.dataTable?.reduce((acc, e) => {
         return {
@@ -101,13 +108,6 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
             quantityRemaining: acc.quantityRemaining + (+e?.quantityRemaining || 0)
         };
     }, { quantityPlan: 0, quantityExport: 0, quantityImport: 0, quantityRemaining: 0 });
-
-    useEffect(() => {
-        if (!isStateModal.dataDetail) return;
-        fetchDataExport()
-
-    }, [isStateModal.dataDetail, isTab, limit]);
-
 
     function removeDiacritics(str) {
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -206,16 +206,28 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
         },
     ];
 
+    if (!isMounted) return null
     return (
         <div className='h-full'>
             <div className='flex justify-between items-center'>
                 <div className='flex items-center gap-1'>
                     <h1 className="3xl:text-basse text-sm my-1 w-1/3">{listTab[isStateModal.isTab - 1]?.name}</h1>
                     <div className="flex justify-start items-center gap-4">
-                        <button type="button" onClick={() => setIsTab('chart')} className={`${isTab === 'chart' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsTab('chart')
+
+                            }}
+                            className={`${isTab === 'chart' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
                             {dataLang?.productions_orders_details_table_export_chart || 'productions_orders_details_table_export_chart'}
                         </button>
-                        <button type="button" onClick={() => setIsTab('table')} className={`${isTab === 'table' && 'border-[#EE1E1E] border'} bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsTab('table')
+                            }}
+                            className={`${isTab === 'table' && 'border-[#EE1E1E] border'} bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
                             {dataLang?.productions_orders_details_table_export_list || 'productions_orders_details_table_export_list'}
                         </button>
                     </div>
@@ -224,7 +236,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                     isTab == 'table' &&
                     <div className="flex justify-end items-center gap-1">
                         <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={handleSearch} classInput={'border'} />
-                        <OnResetData onClick={() => fetchDataExport()} sOnFetching={() => { }} />
+                        <OnResetData onClick={() => refetch()} sOnFetching={() => { }} />
                         <div className={``}>
                             {isExportSituation.dataDefault?.length > 0 && (
                                 <ExcelFileComponent
@@ -273,7 +285,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                 {dataLang?.productions_orders_details_table_export_recall || 'productions_orders_details_table_export_recall'}
                             </ColumnTable>
                         </HeaderTable>
-                        {isExportSituation.onFetching ? (
+                        {isLoading ? (
                             <Loading className="h-80" color="#0f4f9e" />
                         ) : isExportSituation.dataTable?.length > 0 ? (
                             <>

@@ -1,15 +1,16 @@
+import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useQuery } from "@tanstack/react-query";
 import Loading from "components/UI/loading";
 import {
     Image as IconImage
 } from "iconsax-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PopupEdit from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -23,58 +24,42 @@ const Popup_chitiet = (props) => {
 
     const [dataRole, sDataRole] = useState([])
 
-    const [onFetching, sOnFetching] = useState(false);
+    const { isFetching } = useQuery({
+        queryKey: ["api_detail_staff"],
+        queryFn: async () => {
+            const db = await apiSatff.apiDetailStaff(props?.id)
+            console.log("db", db);
+            sData(db);
+            return db
+        },
+        enabled: !!open && !!props?.id
+    })
 
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-    const _ServerFetching_detailUser = () => {
-        Axios(
-            "GET",
-            `/api_web/api_staff/staff/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
 
-    const fetchDataPower = () => {
-        Axios("GET", `/api_web/api_staff/getPermissionsStaff/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { data, isSuccess, message } = response?.data;
-                if (isSuccess == 1) {
-                    const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
-                        key,
-                        ...value,
-                        child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
-                            key: childKey,
-                            ...childValue,
-                            permissions: Object.entries(childValue?.permissions)?.map(([permissionsKey, permissionsValue]) => ({
-                                key: permissionsKey,
-                                ...permissionsValue,
-                            }))
+    useQuery({
+        queryKey: ["api_permissionsStaff"],
+        queryFn: async () => {
+            const { data, isSuccess, message } = await apiSatff.apiPermissionsStaff(props?.id)
+            if (isSuccess == 1) {
+                const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
+                    key,
+                    ...value,
+                    child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
+                        key: childKey,
+                        ...childValue,
+                        permissions: Object.entries(childValue?.permissions)?.map(([permissionsKey, permissionsValue]) => ({
+                            key: permissionsKey,
+                            ...permissionsValue,
                         }))
-                    }));
-                    sDataRole(permissionsArray);
-                }
-            } else {
-                {
-                    console.log("err", err);
-                }
+                    }))
+                }));
+                sDataRole(permissionsArray);
             }
-        });
-    }
+            return data
+        },
+        enabled: !!open && !!props?.id
+    })
 
-
-    useEffect(() => {
-        onFetching && _ServerFetching_detailUser();
-        onFetching && fetchDataPower();
-    }, [open]);
 
     return (
         <>
@@ -105,7 +90,7 @@ const Popup_chitiet = (props) => {
                 <div className="mt-4 space-x-5 w-[930px] h-auto  ">
                     {tab === 0 && (
                         <Customscrollbar className="h-[auto] overflow-hidden ">
-                            {onFetching ? (
+                            {isFetching ? (
                                 <Loading className="h-80" color="#0f4f9e" />
                             ) : (
                                 data != "" && (

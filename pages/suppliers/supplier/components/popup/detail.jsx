@@ -1,40 +1,27 @@
-import { useEffect, useRef, useState } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
+import { useState } from "react";
 
-import ReactExport from "react-data-export";
 
-import Swal from "sweetalert2";
 
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
 import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useQuery } from "@tanstack/react-query";
 import Loading from "components/UI/loading";
 import {
   SearchNormal1 as IconSearch
 } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-  toast: true,
-  position: "top-end",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
 
 const Popup_chitiet = (props) => {
-  const scrollAreaRef = useRef(null);
   const [open, sOpen] = useState(false);
   const _ToggleModal = (e) => sOpen(e);
   const [tab, sTab] = useState(0);
   const _HandleSelectTab = (e) => sTab(e);
-  const [data, sData] = useState();
-  const [onFetching, sOnFetching] = useState(false);
+
   const formatNumber = (number) => {
     if (!number && number !== 0) return 0;
     const integerPart = Math.floor(number);
@@ -44,26 +31,18 @@ const Popup_chitiet = (props) => {
     return roundedNumber.toLocaleString("en");
   };
 
-  useEffect(() => {
-    props?.id && sOnFetching(true);
-  }, [open]);
-  const _ServerFetching_detailUser = () => {
-    Axios(
-      "GET",
-      `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`,
-      {},
-      (err, response) => {
-        if (!err) {
-          var db = response.data;
-          sData(db);
-        }
-        sOnFetching(false);
-      }
-    );
-  };
-  useEffect(() => {
-    onFetching && _ServerFetching_detailUser();
-  }, [open]);
+
+
+  const { isLoading, isFetching, data } = useQuery({
+    queryKey: ["supplier_detail", props?.id],
+    queryFn: async () => {
+      const db = await apiSuppliers.apiDetailSuppliers(props?.id);
+
+      return db
+    },
+    enabled: (!!props?.id && open),
+  })
+
 
   return (
     <>
@@ -100,7 +79,7 @@ const Popup_chitiet = (props) => {
             <Customscrollbar
               className="3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] overflow-hidden "
             >
-              {onFetching ? (
+              {(isLoading || isFetching) ? (
                 <Loading className="h-80" color="#0f4f9e" />
               ) : (
                 data != "" && (
@@ -287,7 +266,7 @@ const Popup_chitiet = (props) => {
                         {props.dataLang?.suppliers_supplier_adress}
                       </ColumnTablePopup>
                     </HeaderTablePopup>
-                    {onFetching ? (
+                    {(isFetching || isLoading) ? (
                       <Loading className="h-80" color="#0f4f9e" />
                     ) : data?.contact?.length > 0 ? (
                       <>

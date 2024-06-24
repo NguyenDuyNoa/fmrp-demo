@@ -73,7 +73,8 @@ const _ServerInstance = (method, url, dataObject = {}, callback) => {
         withCredentials: false,
         ...(dataObject && dataObject instanceof FormData ? { data: dataObject } : dataObject),
         headers,
-        retries: 3,
+        // retries: 3,
+        // timeout: 30000
         // signal: controller.signal
     })
         .then(async (response) => {

@@ -4,11 +4,8 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
-import { _ServerInstance as Axios } from "/services/axios";
 
-import {
-    Grid6
-} from "iconsax-react";
+import { Grid6 } from "iconsax-react";
 
 import Popup_dsnd from "./components/staff/popup";
 import Popup_chitiet from "./components/staff/popupDetail";
@@ -35,6 +32,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
@@ -43,6 +42,7 @@ import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -58,10 +58,6 @@ const Index = (props) => {
     const statusExprired = useStatusExprired();
 
     const initalState = {
-        onFetching: false,
-        onFetchingRoom: false,
-        onFetchingOpt: false,
-        onFetchingBranch: false,
         onSending: false,
         data: {},
         data_ex: [],
@@ -90,97 +86,65 @@ const Index = (props) => {
 
     const [active, sActive] = useState("");
 
-    const _ServerFetching_room = () => {
-        Axios("GET", `/api_web/api_staff/department/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                queryState({ room: rResult });
+    useQuery({
+        queryKey: ["api_department"],
+        queryFn: async () => {
+            const { rResult } = await apiSatff.apiListDepartment();
+            queryState({ room: rResult });
+            return rResult
+        },
+    })
+
+
+    const { isFetching, isLoading, refetch } = useQuery({
+        queryKey: ["api_staff", limit, router.query?.page, , isState.valueBr, isState.idPos, isState.keySearch],
+        queryFn: async () => {
+            const params = {
+                search: isState.keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr.map((e) => e.value) : null,
+                "filter[position_id]": isState.idPos?.value,
             }
-            queryState({ onFetchingRoom: false });
-        });
-    };
+            const { rResult, output } = await apiSatff.apiListStaff({ params });
+            queryState({ data: rResult || [], data_ex: rResult || [] });
+            sTotalItems(output);
+            return rResult
+        }
+    })
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_staff/staff/?csrf_protection=true" }`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr.map((e) => e.value) : null,
-                    "filter[position_id]": isState.idPos?.value,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    queryState({ data: rResult || [], data_ex: rResult || [] });
-                    sTotalItems(output);
-                }
-                queryState({ onFetching: false });
-            }
-        );
-    };
 
-    const _ServerFetching_brand = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {
-                params: {},
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({
-                        dataBranch: rResult?.map((e) => ({ label: e.name, value: e.id })) || [],
-                    });
-                }
-                queryState({ onFetchingBranch: false });
-            }
-        );
-    };
+    useQuery({
+        queryKey: ["apiBranch"],
+        queryFn: async () => {
 
-    const _ServerFetchingOtp = () => {
-        Axios("GET", "/api_web/api_staff/positionOption", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                queryState({
-                    dataOption:
-                        rResult.map((x) => ({
-                            label: x.name,
-                            value: x.id,
-                            level: x.level,
-                            code: x.code,
-                            parent_id: x.parent_id,
-                        })) || [],
-                });
-            }
-        });
-        queryState({ onFetchingOpt: false });
-    };
+            const { result } = await apiComons.apiBranchCombobox();
 
-    useEffect(() => {
-        isState.onFetchingOpt && _ServerFetchingOtp();
-    }, [isState.onFetchingOpt]);
+            queryState({ dataBranch: result?.map((e) => ({ label: e.name, value: e.id })) });
 
-    useEffect(() => {
-        isState.onFetchingRoom && _ServerFetching_room();
-    }, [isState.onFetchingRoom]);
-    useEffect(() => {
-        isState.onFetchingBranch && _ServerFetching_brand();
-    }, [isState.onFetchingBranch]);
+            return result
+        }
+    })
 
-    useEffect(() => {
-        queryState({
-            onFetching: true,
-            onFetchingOpt: true,
-            onFetchingRoom: true,
-            onFetchingBranch: true,
-        });
-    }, []);
+
+    useQuery({
+        queryKey: ["apiPosition"],
+        queryFn: async () => {
+
+            const { rResult } = await apiSatff.apiListPositionOption();
+            queryState({
+                dataOption:
+                    rResult.map((x) => ({
+                        label: x.name,
+                        value: x.id,
+                        level: x.level,
+                        code: x.code,
+                        parent_id: x.parent_id,
+                    })) || [],
+            });
+            return rResult
+        }
+    })
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -190,16 +154,9 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
 
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
 
-    useEffect(() => {
-        queryState({ onFetching: true });
-    }, [limit, router.query?.page, , isState.valueBr, isState.idPos]);
 
     const handleDelete = async () => {
         sStatus(isKeyState);
@@ -213,31 +170,27 @@ const Index = (props) => {
         handleQueryId({ status: false });
     };
 
+    const handingStatus = useMutation({
+        mutationFn: (data) => {
+            return apiSatff.apiHandingStatus(data, status)
+        }
+    })
+
     const _ServerSending = () => {
-        let id = status;
-        var data = new FormData();
+        let data = new FormData();
         data.append("active", active);
-        Axios(
-            "POST",
-            `${id && `/api_web/api_staff/change_status_staff/${id}?csrf_protection=true`}`,
-            {
-                data: {
-                    active: active,
-                },
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", dataLang[message] || message);
-                    } else {
-                        isShow("error", dataLang[message] || message);
-                    }
+        handingStatus.mutate(data, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", dataLang[message] || message);
+                } else {
+                    isShow("error", dataLang[message] || message);
                 }
-                queryState({ onSending: false });
+            },
+            onError: (error) => {
+                isShow("error", error);
             }
-        );
+        })
     };
 
     useEffect(() => {
@@ -393,7 +346,7 @@ const Index = (props) => {
                                 {role ? (
                                     <Popup_dsnd
                                         isState={isState}
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
@@ -462,7 +415,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
@@ -525,7 +478,7 @@ const Index = (props) => {
                                             {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {(isFetching || isLoading) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
@@ -618,7 +571,7 @@ const Index = (props) => {
                                                             className="space-x-2 text-center flex items-center justify-center"
                                                         >
                                                             <Popup_dsnd
-                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
                                                                 className="xl:text-base text-xs "
                                                                 dataLang={dataLang}
                                                                 name={e.name}
@@ -632,7 +585,7 @@ const Index = (props) => {
                                                                 isState={isState}
                                                             />
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
                                                                 onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}

@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { _ServerInstance as Axios } from "/services/axios";
 
-import useToast from "@/hooks/useToast";
+import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import PopupEdit from "@/components/UI/popup";
-import Select, { components } from "react-select";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import useToast from "@/hooks/useToast";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-    Minus as IconMinus,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    Edit as IconEdit,
+    Edit as IconEdit
 } from "iconsax-react";
+import Select from "react-select";
 
 const Popup_NVL = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
@@ -24,7 +21,6 @@ const Popup_NVL = React.memo((props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
-    const [onFetching, sOnFetching] = useState(false);
     const [onSending, sOnSending] = useState(false);
 
     const [branch, sBranch] = useState([]);
@@ -37,6 +33,7 @@ const Popup_NVL = React.memo((props) => {
     const [errBranch, sErrBranch] = useState(false);
     const [errCode, sErrCode] = useState(false);
     const [errName, sErrName] = useState(false);
+    const [idCategory, sIdCategory] = useState(null);
 
     useEffect(() => {
         open && sCode(props.data?.code ? props.data?.code : "");
@@ -55,7 +52,6 @@ const Popup_NVL = React.memo((props) => {
         open && sErrCode(false);
         open && sErrName(false);
         open && sErrBranch(false);
-        open && sOnFetching(true);
     }, [open]);
 
     const _HandleChangeInput = (type, value) => {
@@ -70,36 +66,32 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `${props.data?.id
-                ? `/api_web/api_material/categoryOption/${props.data?.id}?csrf_protection=true`
-                : "api_web/api_material/categoryOption?csrf_protection=true"
-            }`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataOption(
-                        rResult.map((e) => ({
-                            label: e.name + " " + "(" + e.code + ")",
-                            value: e.id,
-                            level: e.level,
-                        }))
-                    );
-                }
-                sOnFetching(false);
-            }
-        );
-    };
+    const { } = useQuery({
+        queryKey: ['api_detail_category_option', props.data?.id],
+        queryFn: async () => {
+            const { rResult } = await apiCategory.apiDetailCategoryOptionCategory(props.data?.id);
+            sDataOption(
+                rResult.map((e) => ({
+                    label: e.name + " " + "(" + e.code + ")",
+                    value: e.id,
+                    level: e.level,
+                }))
+            );
+            return rResult
+        },
+        enabled: open,
+    })
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
+
+    const handingCategory = useMutation({
+        mutationFn: async (data) => {
+            return apiCategory.apiHandingCategory(data, props.data?.id)
+        }
+    })
+
 
     const _ServerSending = () => {
-        var formData = new FormData();
+        let formData = new FormData();
 
         formData.append("code", code);
         formData.append("name", name);
@@ -107,35 +99,26 @@ const Popup_NVL = React.memo((props) => {
         formData.append("parent_id", idCategory ? idCategory : null);
         branch_id.forEach((id) => formData.append("branch_id[]", id));
 
-        Axios(
-            "POST",
-            `${props.data?.id
-                ? `/api_web/api_material/category/${props.data?.id}?csrf_protection=true`
-                : "/api_web/api_material/category?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
-                        sName("");
-                        sCode("");
-                        sEditorValue("");
-                        sIdCategory([]);
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshOpt && props.onRefreshOpt();
-                        sOpen(false);
-                    } else {
-                        isShow("error", props.dataLang[message]);
-                    }
-                    sOnSending(false);
+        handingCategory.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message]);
+                    sName("");
+                    sCode("");
+                    sEditorValue("");
+                    sIdCategory([]);
+                    props.onRefresh && props.onRefresh();
+                    props.onRefreshOpt && props.onRefreshOpt();
+                    sOpen(false);
+                } else {
+                    isShow("error", props.dataLang[message]);
                 }
+            },
+            onError: (error) => {
+                isShow("error", error);
             }
-        );
+        });
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -165,8 +148,6 @@ const Popup_NVL = React.memo((props) => {
     useEffect(() => {
         sErrBranch(false);
     }, [branch?.length > 0]);
-
-    const [idCategory, sIdCategory] = useState(null);
 
     const valueIdCategory = (e) => sIdCategory(e?.value);
 

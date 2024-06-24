@@ -1,49 +1,47 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
     Grid6,
+    Edit as IconEdit
 } from "iconsax-react";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
-import Popup_dsncc from "./components/popup/popup";
 import Popup_chitiet from "./components/popup/detail";
+import Popup_dsncc from "./components/popup/popup";
 
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
 import BtnAction from "@/components/UI/btnAction";
-import TabFilter from "@/components/UI/tabFilter";
-import NoData from "@/components/UI/noData/nodata";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import TabFilter from "@/components/UI/tabFilter";
 
-import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 
-import { debounce } from "lodash";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import { useQuery } from "@tanstack/react-query";
+import { debounce } from "lodash";
+import { useSelector } from "react-redux";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -62,16 +60,12 @@ const Index = (props) => {
 
     const initalState = {
         keySearch: "",
-        onFetching: false,
         data: [],
         data_ex: [],
         listDs: [],
         listSelectCt: [],
         idBranch: null,
         listBr: [],
-        onFetchingBranch: false,
-        onFetchingGroup: false,
-        onFetchingCt: false,
     };
 
     const [isState, setIsState] = useState(initalState);
@@ -94,102 +88,68 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : 0 },
         });
-        queryState({ onFetchingBranch: true, onFetchingCt: true, onFetchingGroup: true });
     }, []);
 
-    const _ServerFetching = () => {
-        const id = tabPage;
-        Axios(
-            "GET",
-            `/api_web/api_supplier/supplier/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[supplier_group_id]": tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null,
-                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    updateTotalItems(output);
-                    queryState({ data: rResult, data_ex: rResult });
-                }
-                queryState({ onFetching: false });
+    const { isFetching, isLoading, refetch } = useQuery({
+        queryKey: ["supplier", limit, router.query?.page, router.query?.tab, isState.idBranch, isState.keySearch],
+        queryFn: async () => {
+            const params = {
+                search: isState.keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[supplier_group_id]": tabPage !== "0" ? (tabPage !== "-1" ? tabPage : -1) : null,
+                "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
             }
-        );
-    };
 
-    const _ServerFetching_brand = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) });
-                }
-                queryState({ onFetchingBranch: false });
-            }
-        );
-    };
+            const { rResult, output } = await apiSuppliers.apiListSuppliers({ params: params });
 
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/api_supplier/group_count/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({ listDs: rResult });
-                }
-                queryState({ onFetchingGroup: false });
-            }
-        );
-    };
+            updateTotalItems(output);
 
-    useEffect(() => {
-        isState.onFetchingBranch && _ServerFetching_brand();
-    }, [isState.onFetchingBranch]);
+            queryState({ data: rResult, data_ex: rResult });
+        },
+    })
 
-    useEffect(() => {
-        isState.onFetchingGroup && _ServerFetching_group();
-    }, [isState.onFetchingGroup]);
+    const { data } = useQuery({
+        queryKey: ["apiBranch"],
+        queryFn: async () => {
 
-    useEffect(() => {
-        isState.onFetchingCt && _ServerFetching_selectct();
-    }, [isState.onFetchingCt]);
+            const { result } = await apiComons.apiBranchCombobox();
 
-    const _ServerFetching_selectct = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_address/province?limit=0`,
-            {
+            queryState({ listBr: result?.map((e) => ({ label: e.name, value: e.id })) });
+
+            return result
+        }
+    })
+
+    const { refetch: refetchGroup } = useQuery({
+        queryKey: ["apiGroupSupplier"],
+        queryFn: async () => {
+            const params = {
                 limit: 0,
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({ listSelectCt: rResult?.map((e) => ({ label: e.name, value: e.provinceid })) });
-                }
-                queryState({ onFetchingCt: false });
+                search: isState.keySearch,
+                "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
             }
-        );
-    };
+
+            const { rResult } = await apiSuppliers.apiListGroupSuppliers({ params: params });
+
+            queryState({ listDs: rResult });
+
+            return rResult
+        }
+    })
+
+
+    const { } = useQuery({
+        queryKey: ["apiProvince"],
+        queryFn: async () => {
+            const { rResult } = await apiSuppliers.apiListProvinceSuppliers()
+
+            queryState({ listSelectCt: rResult?.map((e) => ({ label: e.name, value: e.provinceid })) });
+
+            return rResult
+        }
+    })
+
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -199,16 +159,10 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
 
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
 
-    useEffect(() => {
-        queryState({ onFetching: true });
-    }, [limit, router.query?.page, router.query?.tab, isState.idBranch]);
+
 
     //excel
     const multiDataSet = [
@@ -339,8 +293,8 @@ const Index = (props) => {
                                 {role == true || checkAdd ? (
                                     <Popup_dsncc
                                         isState={isState}
-                                        onRefresh={_ServerFetching.bind(this)}
-                                        onRefreshGroup={_ServerFetching_group.bind(this)}
+                                        onRefresh={refetch.bind(this)}
+                                        onRefreshGroup={refetchGroup.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"suppliers"}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -409,7 +363,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
@@ -465,7 +419,7 @@ const Index = (props) => {
                                             {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {(isLoading || isFetching) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
@@ -522,7 +476,7 @@ const Index = (props) => {
                                                         >
                                                             {role == true || checkEdit ? (
                                                                 <Popup_dsncc
-                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefresh={refetch.bind(this)}
                                                                     className="xl:text-base text-xs "
                                                                     isState={isState}
                                                                     dataLang={dataLang}
@@ -552,8 +506,8 @@ const Index = (props) => {
                                                                 />
                                                             )}
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
+                                                                onRefreshGroup={refetchGroup.bind(this)}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="suppliers"
