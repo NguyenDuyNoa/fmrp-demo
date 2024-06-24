@@ -8,7 +8,7 @@ import { AiOutlineFileText } from "react-icons/ai";
 import { FaArrowAltCircleRight, FaCheck, FaCheckCircle } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa6";
 import ModalImage from "react-modal-image";
-import PopupImportProducts from "../popup/popupImportProducts";
+import PopupImportProducts from "../popup/PopupImportProducts";
 
 const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }) => {
     const dataSeting = useSetingServer();
