@@ -18,7 +18,7 @@ import { useEffect } from "react";
 import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
+import { TagWarehouse } from "@/components/UI/common/tag/TagWarehouse";
 import CustomAvatar from "@/components/UI/common/user/customAvatar";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";

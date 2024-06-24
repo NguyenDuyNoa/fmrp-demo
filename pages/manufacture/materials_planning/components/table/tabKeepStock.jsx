@@ -1,5 +1,5 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
+import { TagWarehouse } from "@/components/UI/common/tag/TagWarehouse";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";

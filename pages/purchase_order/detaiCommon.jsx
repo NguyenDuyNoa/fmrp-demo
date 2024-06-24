@@ -12,8 +12,8 @@ import NoData from "@/components/UI/noData/nodata";
 import PopupEdit from "@/components/UI/popup";
 
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/tagStatus";
-import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/TagStatus";
+import { TagWarehouse } from "@/components/UI/common/tag/TagWarehouse";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";

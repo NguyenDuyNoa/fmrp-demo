@@ -3,7 +3,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/tag/TagBranch";
-import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/tagStatus";
+import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/customAvatar";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";

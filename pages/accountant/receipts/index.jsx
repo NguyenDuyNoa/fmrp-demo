@@ -20,7 +20,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import TagBranch from "@/components/UI/common/tag/TagBranch";
-import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/tagStatus";
+import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/TagStatus";
 import { Container, ContainerBody, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/customAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
