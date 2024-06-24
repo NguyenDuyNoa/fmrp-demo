@@ -6,7 +6,7 @@ import { getdataDetail } from "../../../../Api/apiReceipts/api";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import CustomAvatar from "@/components/UI/common/user/customAvatar";
 import Loading from "@/components/UI/loading";

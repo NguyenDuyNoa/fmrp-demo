@@ -4,7 +4,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 import ModalImage from "react-modal-image";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
 import ImageErrors from "@/components/UI/imageErrors";

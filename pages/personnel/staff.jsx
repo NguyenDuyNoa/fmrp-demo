@@ -37,7 +37,7 @@ import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";

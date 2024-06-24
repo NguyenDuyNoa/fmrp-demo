@@ -15,7 +15,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";

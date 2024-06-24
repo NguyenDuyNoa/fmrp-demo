@@ -13,7 +13,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

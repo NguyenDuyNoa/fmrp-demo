@@ -38,7 +38,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import BtnAction from "@/components/UI/btnAction";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import usePagination from "@/hooks/usePagination";

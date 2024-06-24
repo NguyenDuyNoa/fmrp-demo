@@ -22,7 +22,7 @@ import TabPlan from "./tabPlan";
 import TabKeepStock from "./tabKeepStock";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { CONFIRM_DELETION, TITLE_DELETE_COMMAND } from "@/constants/delete/deleteTable";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { debounce } from "lodash";

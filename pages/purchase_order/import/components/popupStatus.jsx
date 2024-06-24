@@ -3,7 +3,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupEdit from "@/components/UI/popup";

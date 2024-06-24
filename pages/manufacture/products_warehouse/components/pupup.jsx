@@ -10,7 +10,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import apiProductsWarehouse from "@/Api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
 import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
