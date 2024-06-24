@@ -15,7 +15,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";

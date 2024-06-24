@@ -1,5 +1,5 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";

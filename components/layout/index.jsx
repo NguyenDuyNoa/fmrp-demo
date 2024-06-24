@@ -3,8 +3,8 @@ import {
     QueryClientProvider
 } from '@tanstack/react-query';
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import PopupAppRenewal from "../UI/popup/popupAppRenewal";
-import PopupAppTrial from "../UI/popup/popupAppTrial";
+import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
+import PopupAppTrial from "../UI/popup/PopupAppTrial";
 import Header from "./header";
 
 const queryClient = new QueryClient({

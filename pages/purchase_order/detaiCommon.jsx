@@ -3,8 +3,8 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import ModalImage from "react-modal-image";
 
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
@@ -12,8 +12,8 @@ import NoData from "@/components/UI/noData/nodata";
 import PopupEdit from "@/components/UI/popup";
 
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/tagStatus";
-import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/TagStatus";
+import { TagWarehouse } from "@/components/UI/common/tag/TagWarehouse";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";

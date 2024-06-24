@@ -44,12 +44,12 @@ import { Container, ContainerBody, ContainerTable } from "@/components/UI/common
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import BtnAction from "@/components/UI/btnAction";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {

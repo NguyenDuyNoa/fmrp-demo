@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import Loading from "@/components/UI/loading";
 
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -74,8 +74,8 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                                 <div className="flex flex-col gap-0.5">
                                                     <h1
                                                         className={`${isState.dataModal.id == i.id
-                                                                ? "text-[#0F4F9E]"
-                                                                : "text-[#000000]"
+                                                            ? "text-[#0F4F9E]"
+                                                            : "text-[#000000]"
                                                             } group-hover:text-[#0F4F9E] font-semibold xl:text-sm text-xs`}
                                                     >
                                                         {i.name}
@@ -138,24 +138,24 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
 
                                                             <li
                                                                 className={`${JIndex == i.processBar.length - 1
-                                                                        ? "list-none flex w-full relative text-gray-900 "
-                                                                        : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active
-                                                                            ? "after:bg-[#00C170]"
-                                                                            : "after:bg-gray-500"
-                                                                        }   after:inline-block after:absolute after:top-1 after:left-[15px]`
+                                                                    ? "list-none flex w-full relative text-gray-900 "
+                                                                    : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active
+                                                                        ? "after:bg-[#00C170]"
+                                                                        : "after:bg-gray-500"
+                                                                    }   after:inline-block after:absolute after:top-1 after:left-[15px]`
                                                                     }`}
                                                             >
                                                                 <div className="block whitespace-nowrap z-10 ">
                                                                     <span
                                                                         className={`w-[10px] h-[10px]  border-2  ${j.active
-                                                                                ? "bg-[#00C170] border-[#00C170]"
-                                                                                : "bg-gray-500 border-gray-500"
+                                                                            ? "bg-[#00C170] border-[#00C170]"
+                                                                            : "bg-gray-500 border-gray-500"
                                                                             } rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}
                                                                     ></span>
                                                                     <p
                                                                         className={`${j.active
-                                                                                ? "text-[#0BAA2E]"
-                                                                                : "text-gray-500"
+                                                                            ? "text-[#0BAA2E]"
+                                                                            : "text-gray-500"
                                                                             } font-normal absolute  3xl:text-[11px] text-[10px]`}
                                                                     >
                                                                         {j.title}

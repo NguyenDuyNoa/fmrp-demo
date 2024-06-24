@@ -19,7 +19,7 @@ import moment from "moment";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 
@@ -567,10 +567,10 @@ const Popup_Product = React.memo((props) => {
                                                 <div className="w-full space-y-1">
                                                     <div
                                                         className={`${e?.checkExpiry == "0" && e?.checkSerial == "0"
-                                                                ? "grid-cols-5"
-                                                                : e?.checkExpiry == "1"
-                                                                    ? "grid-cols-7"
-                                                                    : "grid-cols-6"
+                                                            ? "grid-cols-5"
+                                                            : e?.checkExpiry == "1"
+                                                                ? "grid-cols-7"
+                                                                : "grid-cols-6"
                                                             } grid gap-2 items-center`}
                                                     >
                                                         <h5 className="font-[300] text-sm px-1 text-center">
@@ -600,10 +600,10 @@ const Popup_Product = React.memo((props) => {
                                                     </div>
                                                     <div
                                                         className={`${e?.checkExpiry == "0" && e?.checkSerial == "0"
-                                                                ? "grid-cols-5"
-                                                                : e?.checkExpiry == "1"
-                                                                    ? "grid-cols-7"
-                                                                    : "grid-cols-6"
+                                                            ? "grid-cols-5"
+                                                            : e?.checkExpiry == "1"
+                                                                ? "grid-cols-7"
+                                                                : "grid-cols-6"
                                                             } grid gap-2 items-center`}
                                                     >
                                                         {e.child.map((ce) => (

@@ -1,6 +1,6 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useQuery } from "@tanstack/react-query";

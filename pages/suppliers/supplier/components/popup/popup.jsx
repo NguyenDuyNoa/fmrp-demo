@@ -12,7 +12,7 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
 import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupEdit from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";

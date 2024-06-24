@@ -7,7 +7,7 @@ import ModalImage from "react-modal-image";
 import { NumericFormat } from "react-number-format";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
 import PopupEdit from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";

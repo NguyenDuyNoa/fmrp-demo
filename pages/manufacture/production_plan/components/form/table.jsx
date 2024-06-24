@@ -14,7 +14,7 @@ import useToast from "@/hooks/useToast";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
-import { TagColorRed } from "@/components/UI/common/tag/tagStatus";
+import { TagColorRed } from "@/components/UI/common/tag/TagStatus";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
     const showToast = useToast();

@@ -12,12 +12,12 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 
 
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
-import { TagSingle } from "@/components/UI/common/tag/tagSingle";
-import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/tagStatus";
-import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
+import { TagSingle } from "@/components/UI/common/tag/TagSingle";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/TagStatus";
+import { TagWarehouse } from "@/components/UI/common/tag/TagWarehouse";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";

@@ -7,7 +7,7 @@ import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
 import useToast from "@/hooks/useToast";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
     const showToat = useToast();

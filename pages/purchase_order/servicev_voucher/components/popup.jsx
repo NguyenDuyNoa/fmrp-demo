@@ -21,7 +21,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { v4 as uuidv4 } from "uuid";
 
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

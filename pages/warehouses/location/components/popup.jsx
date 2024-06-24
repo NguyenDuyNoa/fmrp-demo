@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupEdit from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
 
@@ -157,8 +157,8 @@ const Popup_Vitrikho = (props) => {
                                                 name="fname"
                                                 type="text"
                                                 className={`${errInputCode
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
@@ -179,8 +179,8 @@ const Popup_Vitrikho = (props) => {
                                                 name="fname"
                                                 type="text"
                                                 className={`${errInputName
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputName && (

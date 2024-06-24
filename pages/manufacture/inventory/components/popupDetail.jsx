@@ -6,9 +6,9 @@ import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 
 import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import CustomAvatar from "@/components/UI/common/user/customAvatar";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";

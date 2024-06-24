@@ -21,8 +21,8 @@ import TabPlan from "./tabPlan";
 // const TabKeepStock = dynamic(() => import("./tabKeepStock"), { ssr: false });
 import TabKeepStock from "./tabKeepStock";
 
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { CONFIRM_DELETION, TITLE_DELETE_COMMAND } from "@/constants/delete/deleteTable";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { debounce } from "lodash";

@@ -6,10 +6,10 @@ import ModalImage from "react-modal-image";
 import PopupEdit from "/components/UI/popup";
 
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
-import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/tagStatus";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/customAvatar";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

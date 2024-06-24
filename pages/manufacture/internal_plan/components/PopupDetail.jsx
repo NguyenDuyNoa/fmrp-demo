@@ -1,7 +1,7 @@
 import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
-import { TagColorLime, TagColorRed } from "@/components/UI/common/tag/tagStatus";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
+import { TagColorLime, TagColorRed } from "@/components/UI/common/tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/customAvatar";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";

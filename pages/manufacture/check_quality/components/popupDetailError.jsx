@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PopupEdit from "/components/UI/popup";
 
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import NoData from "@/components/UI/noData/nodata";

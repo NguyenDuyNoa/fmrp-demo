@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import PopupEdit from "/components/UI/popup";
 
 import apiClient from "@/Api/apiClients/client/apiClient";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useActionRole from "@/hooks/useRole";

@@ -12,7 +12,7 @@ import Popup_chitiet from "./components/staff/popupDetail";
 
 import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
@@ -37,7 +37,7 @@ import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/tagBranch";
+import TagBranch from "@/components/UI/common/tag/TagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
@@ -177,15 +177,17 @@ const Index = (props) => {
     })
 
     const _ServerSending = () => {
-        let data = new FormData();
-        data.append("active", active);
-        handingStatus.mutate(data, {
+        let db = new FormData();
+        db.append("active", active);
+        console.log("Aaaaa");
+        handingStatus.mutate(db, {
             onSuccess: ({ isSuccess, message }) => {
                 if (isSuccess) {
                     isShow("success", dataLang[message] || message);
                 } else {
                     isShow("error", dataLang[message] || message);
                 }
+                refetch()
             },
             onError: (error) => {
                 isShow("error", error);
@@ -195,6 +197,7 @@ const Index = (props) => {
 
     useEffect(() => {
         isState.onSending && _ServerSending();
+        console.log("ok");
     }, [isState.onSending]);
 
     useEffect(() => {

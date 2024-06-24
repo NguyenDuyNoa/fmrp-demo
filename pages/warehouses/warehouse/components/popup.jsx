@@ -22,7 +22,7 @@ import {
 import { _ServerInstance as Axios } from "/services/axios";
 
 import PopupEdit from "@/components/UI/popup";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import useToast from "@/hooks/useToast";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
@@ -214,8 +214,8 @@ const Popup_kho = (props) => {
                                                 name="fname"
                                                 type="text"
                                                 className={`${errInputCode
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
@@ -236,8 +236,8 @@ const Popup_kho = (props) => {
                                                 name="fname"
                                                 type="text"
                                                 className={`${errInputName
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputName && (
@@ -258,8 +258,8 @@ const Popup_kho = (props) => {
                                                 name="fname"
                                                 type="text"
                                                 className={`${errInputAddress
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputAddress && (

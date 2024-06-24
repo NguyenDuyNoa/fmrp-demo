@@ -13,7 +13,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import BtnAction from "@/components/UI/btnAction";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import { Container, ContainerBody } from "@/components/UI/common/layout";

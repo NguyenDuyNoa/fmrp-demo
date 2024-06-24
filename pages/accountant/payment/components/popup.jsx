@@ -36,7 +36,7 @@ import useToast from "@/hooks/useToast";
 import { SelectCore } from "@/utils/lib/Select";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

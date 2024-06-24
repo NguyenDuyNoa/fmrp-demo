@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 
 import { useEffect } from "react";
 import NoData from "@/components/UI/noData/nodata";
-import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
