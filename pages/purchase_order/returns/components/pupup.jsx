@@ -26,9 +26,9 @@ import ExpandableContent from "components/UI/more";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
-import { TagColorOrange, TagColorSky } from "@/components/UI/common/tag/TagStatus";
-import { TagWarehouse } from "@/components/UI/common/tag/TagWarehouse";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { TagColorOrange, TagColorSky } from "@/components/UI/common/tag/tagStatus";
+import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";

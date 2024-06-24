@@ -34,7 +34,7 @@ import TitlePagination from "@/components/UI/common/containerPagination/titlePag
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import {
     Container,
     ContainerBody,
@@ -56,7 +56,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/TagStatus";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";

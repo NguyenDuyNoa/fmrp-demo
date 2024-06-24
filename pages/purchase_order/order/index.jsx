@@ -33,8 +33,8 @@ import {
     ContainerTotal,
 } from "@/components/UI/common/layout";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
-import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/TagStatus";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";

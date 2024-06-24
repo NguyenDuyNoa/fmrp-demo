@@ -26,7 +26,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import { RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import { reTryQuery } from "@/configs/configRetryQuery";

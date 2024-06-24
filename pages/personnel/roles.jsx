@@ -49,7 +49,7 @@ import BtnAction from "@/components/UI/btnAction";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {

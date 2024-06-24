@@ -5,7 +5,7 @@ import { useState } from "react";
 import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useQuery } from "@tanstack/react-query";

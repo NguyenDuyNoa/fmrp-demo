@@ -22,7 +22,7 @@ import TitlePagination from "@/components/UI/common/containerPagination/titlePag
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import {
     Container,
     ContainerBody,

@@ -39,8 +39,8 @@ import TitlePagination from "@/components/UI/common/containerPagination/titlePag
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
-import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/TagStatus";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import {
     Container,
     ContainerBody,

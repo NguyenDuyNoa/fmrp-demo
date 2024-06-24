@@ -28,7 +28,7 @@ import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import PopupCategoryErrors from "./components/popup";
 import apiCategoryDetailErrors from "@/Api/apiManufacture/qc/categoryDetailErrors/apiCategoryDetailErrors";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import apiComons from "@/Api/apiComon/apiComon";
 

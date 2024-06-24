@@ -39,7 +39,7 @@ import ContainerPagination from "@/components/UI/common/containerPagination/cont
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import useSetingServer from "@/hooks/useConfigNumber";
 import usePagination from "@/hooks/usePagination";
 import formatNumberConfig from "@/utils/helpers/formatnumber";

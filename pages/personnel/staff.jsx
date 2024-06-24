@@ -37,7 +37,7 @@ import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
@@ -115,7 +115,7 @@ const Index = (props) => {
 
 
     useQuery({
-        queryKey: ["apiBranch"],
+        queryKey: ["api_branch"],
         queryFn: async () => {
 
             const { result } = await apiComons.apiBranchCombobox();
@@ -128,7 +128,7 @@ const Index = (props) => {
 
 
     useQuery({
-        queryKey: ["apiPosition"],
+        queryKey: ["api_position"],
         queryFn: async () => {
 
             const { rResult } = await apiSatff.apiListPositionOption();
@@ -166,6 +166,7 @@ const Index = (props) => {
         } else if (index !== -1 && isState.data[index].active === "1") {
             sActive((isState.data[index].active = "0"));
         }
+        _ServerSending();
         queryState({ data: [...isState.data] });
         handleQueryId({ status: false });
     };
@@ -179,7 +180,6 @@ const Index = (props) => {
     const _ServerSending = () => {
         let db = new FormData();
         db.append("active", active);
-        console.log("Aaaaa");
         handingStatus.mutate(db, {
             onSuccess: ({ isSuccess, message }) => {
                 if (isSuccess) {
@@ -187,7 +187,6 @@ const Index = (props) => {
                 } else {
                     isShow("error", dataLang[message] || message);
                 }
-                refetch()
             },
             onError: (error) => {
                 isShow("error", error);
@@ -200,11 +199,11 @@ const Index = (props) => {
         console.log("ok");
     }, [isState.onSending]);
 
-    useEffect(() => {
-        if (active || status) {
-            queryState({ onSending: true });
-        }
-    }, [active, status]);
+    // useEffect(() => {
+    //     if (active || status) {
+    //         queryState({ onSending: true });
+    //     }
+    // }, [active, status]);
 
     //excel
 
@@ -487,7 +486,7 @@ const Index = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                 {isState.data?.map((e) => (
-                                                    <RowTable gridCols={13} key={e?.id.toString()}>
+                                                    <RowTable gridCols={13} key={e?.id}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <div className="w-[60px] h-[60px] mx-auto">
                                                                 {e?.profile_image == null ? (
@@ -523,8 +522,8 @@ const Index = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <div className="flex flex-wrap gap-2">
-                                                                {e.department?.map((e) => {
-                                                                    return <span key={e.id}>{e.name}</span>;
+                                                                {e.department?.map((x) => {
+                                                                    return <span key={x.id}>{x.name}</span>;
                                                                 })}
                                                             </div>
                                                         </RowItemTable>
@@ -564,8 +563,8 @@ const Index = (props) => {
                                                             </label>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex  gap-1 flex-wrap">
-                                                            {e.branch?.map((i) => (
-                                                                <TagBranch key={i}>{i.name}</TagBranch>
+                                                            {e.branch?.map((i, indexB) => (
+                                                                <TagBranch key={indexB}>{i.name}</TagBranch>
                                                             ))}
                                                         </RowItemTable>
 
