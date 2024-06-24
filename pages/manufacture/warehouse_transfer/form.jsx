@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";

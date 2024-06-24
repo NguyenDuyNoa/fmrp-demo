@@ -14,7 +14,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";

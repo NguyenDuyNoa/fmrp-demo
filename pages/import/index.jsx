@@ -21,7 +21,7 @@ import Select from "react-select";
 
 import { TiTick } from "react-icons/ti";
 
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";

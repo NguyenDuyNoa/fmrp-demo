@@ -8,7 +8,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 

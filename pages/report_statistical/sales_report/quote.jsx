@@ -2,7 +2,7 @@ import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import { Container, ContainerBody, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";

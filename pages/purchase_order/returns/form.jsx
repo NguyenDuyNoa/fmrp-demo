@@ -24,7 +24,7 @@ import { useToggle } from "@/hooks/useToggle";
 
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";

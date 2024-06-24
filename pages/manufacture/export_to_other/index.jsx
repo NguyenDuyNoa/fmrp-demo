@@ -26,7 +26,7 @@ import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";

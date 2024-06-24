@@ -8,7 +8,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiDashboard from "@/Api/apiDashboard/apiDashboard";

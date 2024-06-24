@@ -22,7 +22,7 @@ import apiComons from "@/Api/apiComon/apiComon";
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";

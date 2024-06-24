@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { Container } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 
 // const Header = dynamic(() => import("./components/header/header"), { ssr: false });
 import Header from "./components/header/header";

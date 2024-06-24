@@ -13,7 +13,7 @@ import Popup_chitiet from "./components/staff/popupDetail";
 import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";

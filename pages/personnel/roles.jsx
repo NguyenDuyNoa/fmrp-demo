@@ -41,7 +41,7 @@ import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLev
 import Popup_ChucVu from "./components/roles/popupChucvu";
 import useActionRole from "@/hooks/useRole";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useStatusExprired from "@/hooks/useStatusExprired";

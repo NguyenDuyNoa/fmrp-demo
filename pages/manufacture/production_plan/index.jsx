@@ -19,7 +19,7 @@ import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
 import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
-import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
