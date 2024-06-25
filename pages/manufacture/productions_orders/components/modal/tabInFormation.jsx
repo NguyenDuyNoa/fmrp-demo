@@ -194,10 +194,11 @@ const Renderitem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
             </div>
             {processBar?.map((j, jIndex) => {
                 const checkLast = processBar?.length - 1 != jIndex
+                const checkDate = processBar?.filter((e) => e?.date_production)?.length > 0
                 return (
                     <div className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
                         <div className="flex min-h-[70px] gap-3">
-                            <div className={`text-[10px] ${j?.active ? 'text-black' : "text-black/70"} font-normal text-right`}>
+                            <div className={`${checkDate ? "" : 'hidden'} text-[10px] ${j?.active ? 'text-black' : "text-black/70"} font-normal text-right`}>
                                 <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
                                     {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
                                 </div>
