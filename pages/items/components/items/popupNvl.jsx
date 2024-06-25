@@ -506,7 +506,7 @@ const Popup_NVL = React.memo((props) => {
         }
     })
 
-    const { isFetching } = useQuery({
+    const { isLoading, isFetching } = useQuery({
         queryKey: ['api_detail_items', props?.id],
         queryFn: async () => {
             const data = await apiItems.apiDetailItems(props?.id);
@@ -539,7 +539,7 @@ const Popup_NVL = React.memo((props) => {
             sDataTotalVariant(data?.variation_option_value);
             return data
         },
-        enabled: !!open && !!props?.id
+        enabled: open && !!props?.id
     })
 
     const _HandleChangeVariant = (id, type, value) => {
@@ -637,7 +637,7 @@ const Popup_NVL = React.memo((props) => {
                 <div
                     className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                 >
-                    {isFetching ? (
+                    {(isFetching || isLoading) ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : (
                         <React.Fragment>
