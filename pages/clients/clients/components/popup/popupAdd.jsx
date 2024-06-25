@@ -95,17 +95,17 @@ const Popup_dskh = (props) => {
                 note: db?.note,
                 debt_limit: db?.debt_limit,
                 debt_limit_day: db?.debt_limit_day,
-                valueDitrict: db?.district.districtid
+                valueDitrict: Array.isArray(db?.district) ? null : db?.district.districtid
                     ? {
                         label: db?.district.name,
                         value: db?.district.districtid,
                     }
                     : null,
-                valueCt: {
+                valueCt: Array.isArray(db?.city) ? null : {
                     value: db?.city.provinceid,
                     label: db?.city.name,
                 },
-                valueWa: {
+                valueWa: Array.isArray(db?.ward) ? null : {
                     label: db?.ward.name,
                     value: db?.ward.wardid,
                 },

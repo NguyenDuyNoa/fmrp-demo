@@ -26,7 +26,6 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
 
     useEffect(() => {
         if (!isStateModal.dataDetail) return;
-        console.log("isStateModal.dataDetail", isStateModal.dataDetail);
         queryStateInfomation({
             dataInformation: {
                 ...isInfomation.dataInformation,
@@ -141,6 +140,7 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                                 quantity={e?.quantity}
                                 processBar={e?.processBar}
                                 type='semi'
+                                dataDetail={isStateModal.dataDetail}
                                 dataLang={dataLang}
                             />
                         );
@@ -151,6 +151,7 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                             code={isStateModal.dataDetail?.poi?.item_code}
                             checkBorder={''}
                             id={undefined}
+                            dataDetail={isStateModal.dataDetail}
                             image={"/no_img.png"}
                             type='products'
                             itemVariation={isStateModal.dataDetail?.poi?.product_variation}
@@ -165,7 +166,7 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
     );
 });
 
-const Renderitem = ({ type, id, image, name, code, itemVariation, quantity, processBar, checkBorder, dataLang }) => {
+const Renderitem = ({ type, id, dataDetail, image, name, code, itemVariation, quantity, processBar, checkBorder, dataLang }) => {
 
     const dataSeting = useSetingServer()
 
@@ -226,16 +227,16 @@ const Renderitem = ({ type, id, image, name, code, itemVariation, quantity, proc
                                         <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>{j.stage_name}</p>
                                         {(+j?.type == 2 || +j?.type == 3) ?
                                             <div className="flex items-center gap-1">
-                                                <PopupImportProducts type='begin_production' dataStage={j} dataLang={dataLang}>
+                                                <PopupImportProducts dataDetail={dataDetail} type='begin_production' dataStage={j} dataLang={dataLang}>
                                                     <FaArrowAltCircleRight className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#5599EC]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
                                                 </PopupImportProducts>
-                                                <PopupImportProducts type='end_production' dataStage={j} dataLang={dataLang}>
+                                                <PopupImportProducts dataDetail={dataDetail} type='end_production' dataStage={j} dataLang={dataLang}>
                                                     <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
                                                 </PopupImportProducts>
                                             </div>
                                             :
                                             +j?.type == 0 &&
-                                            <PopupImportProducts type='end_production' dataStage={j} dataLang={dataLang}>
+                                            <PopupImportProducts dataDetail={dataDetail} type='end_production' dataStage={j} dataLang={dataLang}>
                                                 <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
                                             </PopupImportProducts>
                                         }

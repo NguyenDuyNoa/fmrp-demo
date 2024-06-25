@@ -73,6 +73,16 @@ const apiProductionsOrders = {
             throw error;
         }
     },
+    // lấy combobox kho của NVL/BTP xuất
+    async apiDataWarehousePo(data) {
+        try {
+            const response = await axiosCustom('POST', `/api_web/api_manufactures/searchWarehousePOD`, data);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
+    // /api_web/api_manufactures/searchWarehousePOD
 
 }
 export default apiProductionsOrders

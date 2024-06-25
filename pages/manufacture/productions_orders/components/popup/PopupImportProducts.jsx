@@ -17,14 +17,18 @@ import Image from "next/image";
 import { FaBox } from "react-icons/fa";
 import { RiBox3Fill } from "react-icons/ri";
 
-const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
+const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...props }) => {
     const isShow = useToast();
 
     const initilaState = {
         open: false,
-        item: [],
-        dtPois: {},
+        item: {
+            bom: [],
+        },
+        dtPoi: {},
         warehouseImport: [],
+        warehouseExport: [],
+        idWarehouseExport: [],
         idWarehouseImport: null,
     };
 
@@ -48,9 +52,10 @@ const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
             }
         }
     })
+    console.log("dataDetail", dataDetail);
 
     useQuery({
-        queryKey: ["api_dataProducts"],
+        queryKey: ["api_data_products"],
         queryFn: async () => {
             let formData = new FormData();
             formData.append('poi_id', dataStage?.poi_id);
@@ -58,7 +63,7 @@ const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
             formData.append('type', dataStage?.type);
             formData.append('bom_id', dataStage?.bom_id);
             const { data } = await apiProductionsOrders.apiDataProducts(formData);
-            console.log(data);
+            console.log("data?.product?.item?.bom", data?.product);
             queryState({
                 warehouseImport: data?.warehouses?.map(e => {
                     return {
@@ -66,63 +71,62 @@ const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
                         label: e?.name
                     }
                 }),
-                dtPois: {
-                    ...data?.product?.dtPois,
-                    quantity: 1000,
-                    code_stage: 'COAOTHUN',
-                    image: '/no_img.png',
+                dtPoi: {
+                    ...data?.product?.dtPoi,
+                    // ...data?.product?.item,
+                    // quantityChange: null,
+                    // image: '/no_img.png',
                 },
-                item: [
-                    {
-                        id: 1,
-                        item: "Cổ áo",
-                        code: "Coaothun",
-                        quantity: null,
-                        quantityWarehouse: 1000,
-                        quantityKeep: 1500,
-                        image: '/no_img.png',
-                    },
-                    {
-                        id: 2,
-                        item: "Cổ áo",
-                        code: "Coaothun",
-                        quantity: null,
-                        quantityWarehouse: 1000,
-                        quantityKeep: 1500,
-                        image: '/no_img.png',
-                    },
-                    {
-                        id: 3,
-                        item: "Cổ áo",
-                        code: "Coaothun",
-                        quantity: null,
-                        quantityWarehouse: 1000,
-                        quantityKeep: 1500,
-                        image: '/no_img.png',
-                    },
-                    {
-                        id: 4,
-                        item: "Cổ áo",
-                        code: "Coaothun",
-                        quantity: null,
-                        quantityWarehouse: 1000,
-                        quantityKeep: 1500,
-                        image: '/no_img.png',
-                    },
-                    {
-                        id: 5,
-                        item: "Cổ áo",
-                        code: "Coaothun",
-                        quantity: null,
-                        quantityWarehouse: 1000,
-                        quantityKeep: 1500,
-                        image: '/no_img.png',
-                    },
-                ]
+                item: {
+                    ...data?.product?.item,
+                    quantityChange: null,
+                    image: data?.product?.item?.itme_image ?? '/no_img.png',
+                    bom: data?.product?.item?.bom?.map(e => {
+                        return {
+                            ...e,
+                            quantity: null,
+                            image: e?.images ? e?.images : "/no_img.png",
+                        }
+                    })
+                }
             })
+            // if(data){
+
+            // }
+            // console.log("data", data);
+
+            return data
         },
         enabled: isState.open && type === 'end_production' ? true : false,
     })
+
+    console.log("isState.dtPois", isState.dtPoi);
+
+    // useQuery({
+    //     queryKey: ["api_data_warehouse_po", isState.dtPois],
+    //     queryFn: async () => {
+    //         let formData = new FormData();
+    //         formData.append('branch_id', isState.dtPois?.branch_id);
+    //         // "branch_id": 59, //id chi nhánh
+    //         // "item_variation_id": 626, //item_variation_option_value_id biến thể của BOM
+    //         // "type_item": "product", // type_item của bom
+    //         // "item_id": 1, // item_id của bom
+    //         // "unit_id": 1, // unit_id của bom
+    //         // "pp_id": 1 // id của kế hoạch NVL
+    //         const { data } = await apiProductionsOrders.apiDataWarehousePo(formData);
+    //         console.log("data", data);
+    //         // queryState({
+    //         //     warehouseExport: data?.warehouses?.map(e => {
+    //         //         return {
+    //         //             value: e?.id,
+    //         //             label: e?.name
+    //         //         }
+    //         //     }),
+    //         // })
+    //         // return data
+    //     },
+    //     enabled: isState.open && type === 'end_production' ? true : false,
+    // })
 
 
     const handleDeleteItem = (id) => {
@@ -184,17 +188,18 @@ const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
                                 <div className="grid grid-cols-12 items-center">
                                     <div className="col-span-9 flex items-center gap-3">
                                         <div className="h-11 w-11">
-                                            <Image src={isState.dtPois.image} width={1280} height={1024} alt="" className="object-cover h-full w-full" />
+                                            <Image src={isState.item.image} width={1280} height={1024} alt="" className="object-cover h-full w-full" />
                                         </div>
                                         <div className="">
-                                            <h1 className="text-base font-medium">{isState.dtPois.name_stage}</h1>
+                                            <h1 className="text-base font-medium">{isState.item.item_name}</h1>
                                             <div className="flex items-center gap-2">
-                                                <h1 className="2xl:text-sm text-xs font-medium text-black/60">{isState.dtPois.code_stage} - Cần SX: <span className="text-black font-medium">{formanumber(isState.dtPois.quantity)}</span></h1>
+                                                <h1 className="2xl:text-sm text-xs font-medium text-black/60">{isState.item.item_code} - Cần SX: <span className="text-black font-medium">{formanumber(isState.item.quantity)}</span></h1>
                                                 <div className="flex items-center justify-center  n gap-3">
                                                     <h1 className="2xl:text-sm text-xs font-medium">Số lượng hoàn thành</h1>
                                                     <InPutNumericFormat
-                                                        className={'border-2 text-right pr-2 text-base  rounded-xl focus:outline-none border-[#BAD1FE] bg-transparent w-1/3'}
+                                                        className={'border-2 text-right px-2 text-base  rounded-xl focus:outline-none border-[#BAD1FE] bg-transparent w-1/3'}
                                                         placeholder={'0'}
+                                                        value={isState.item.quantityChange}
                                                     />
                                                 </div>
                                             </div>
@@ -369,9 +374,9 @@ const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
                         </div>
                         <Customscrollbar className="3xl:h-[250px] xxl:h-[260px] 2xl:h-[250px] xl:h-[260px] h-[250 px] overflow-hidden mt-2">
                             <div className="h-full grid grid-cols-2 gap-2">
-                                {isState.item?.length > 0 ? isState.item.map((e, index) => {
+                                {isState.item?.bom?.length > 0 ? isState.item?.bom?.map((e, index) => {
                                     return (
-                                        <div key={e?.id} className="bg-[#FCFAF8] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
+                                        <div key={e?.item_id} className="bg-[#FCFAF8] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
                                             <div className="text-[#667085] font-normal text-[10px]">#{index + 1}</div>
                                             <div className="flex flex-col w-full">
                                                 <div className="flex items-start gap-3 w-full">
@@ -379,9 +384,9 @@ const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
                                                         <Image src={e.image} width={1280} height={1024} alt="" className="object-cover h-full w-full" />
                                                     </div>
                                                     <div className="w-full">
-                                                        <h1 className="text-base font-medium">{e.item}</h1>
-                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">{e.code} - Tồn kho: <span className="text-black font-medium">{formanumber(e.quantityWarehouse)}</span></h1>
-                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(e.quantityKeep)}</span> Kg</h1>
+                                                        <h1 className="text-base font-medium">{e.item_name}</h1>
+                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">{e.item_code} - Tồn kho: <span className="text-black font-medium">{formanumber(e.quantity_quota_primary)}</span></h1>
+                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(e.quantity_total_quota)}</span> Kg</h1>
                                                         <div className="flex items-center justify-between gap-3">
                                                             <h1 className="2xl:text-sm text-xs font-medium w-1/2">Số lượng xuất</h1>
                                                             <InPutNumericFormat
