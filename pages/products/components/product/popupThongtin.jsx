@@ -85,6 +85,7 @@ const Popup_ThongTin = React.memo((props) => {
             const { data } = await apiProducts.apiDetailBomProducts({ params })
 
             sDataBom(data?.variations || []);
+
             sTabBom(data?.variations[0]?.product_variation_option_value_id);
 
             return data
@@ -134,8 +135,7 @@ const Popup_ThongTin = React.memo((props) => {
                     {dataTab.map((item) => (
                         <button
                             onClick={_HandleSelectTab.bind(this, item.id)}
-                            className={`${tab === item.id ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                                }  px-4 py-2 outline-none font-medium`}
+                            className={`${tab === item.id ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}
                         >
                             {item.name}
                         </button>
@@ -188,7 +188,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                 {/* {props.dataLang[list?.type_products?.name]} */}
                                                 <span
                                                     className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
-                                                                     ${(list?.type_products?.id === 0 && "text-lime-500 border-lime-500") ||
+                                                         ${(list?.type_products?.id === 0 && "text-lime-500 border-lime-500") ||
                                                         (list?.type_products?.id === 1 && "text-orange-500 border-orange-500") ||
                                                         (list?.type_products?.id === 2 && "text-sky-500 border-sky-500")
                                                         }`}

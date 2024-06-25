@@ -2,6 +2,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
 import PopupCustom from "@/components/UI/popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useDragAndDrop from "@/hooks/useDragAndDrop";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
 import {
@@ -16,7 +17,6 @@ import { useSelector } from "react-redux";
 import Select from "react-select";
 import { v4 as uddidV4 } from "uuid";
 import { _ServerInstance as Axios } from "/services/axios";
-import useDragAndDrop from "@/hooks/useDragAndDrop";
 const Popup_GiaiDoan = React.memo((props) => {
     const listCd = useSelector((state) => state.stage_finishedProduct);
 
@@ -354,18 +354,13 @@ const Popup_GiaiDoan = React.memo((props) => {
                             isShow("warning", WARNING_STATUS_ROLE);
                         }
                     }}
-                    className={
-                        props.type == "add" &&
-                        "group outline-none transition-all ease-in-out flex items-center justify-center gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"
-                    }
+                    className={props.type == "add" && "group outline-none transition-all ease-in-out flex items-center justify-center gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}
                 >
                     {props.type == "add" && (
                         <I3Square size={20} className="group-hover:text-amber-500 group-hover:scale-110" />
                     )}
                     <button type="button" className="group-hover:text-amber-500">
-                        {props.type == "add"
-                            ? `${props.dataLang?.stage_design_finishedProduct || "stage_design_finishedProduct"}`
-                            : `${props.dataLang?.edit || "edit"}`}
+                        {props.type == "add" ? `${props.dataLang?.stage_design_finishedProduct || "stage_design_finishedProduct"}` : `${props.dataLang?.edit || "edit"}`}
                     </button>
                 </div>
             }
@@ -404,8 +399,7 @@ const Popup_GiaiDoan = React.memo((props) => {
                                 onClick={_HandleAddNew.bind(this)}
                                 disabled={statusBtnAdd}
                                 title="Thêm"
-                                className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
-                                    } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
+                                className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"} transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
                             >
                                 <IconAdd />
                                 {props.dataLang?.stage_add_finishedProduct}

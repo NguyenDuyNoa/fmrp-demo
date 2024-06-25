@@ -473,14 +473,7 @@ const Popup_ThanhPham = React.memo((props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (
-            branch?.length == 0 ||
-            category?.value == null ||
-            type?.value == null ||
-            (props?.id && code == "") ||
-            unit?.value == null ||
-            name == ""
-        ) {
+        if (branch?.length == 0 || category?.value == null || type?.value == null || (props?.id && code == "") || unit?.value == null || name == "") {
             branch?.length == 0 && sErrBranch(true);
             category?.value == null && sErrGroup(true);
             type?.value == null && sErrType(true);
@@ -512,14 +505,12 @@ const Popup_ThanhPham = React.memo((props) => {
     };
     const handleDeleteVariantItems = () => {
         if (isId && isIdChild) {
-            const newData = dataTotalVariant
-                .map((item) => {
-                    if (item.id === isId) {
-                        item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== isIdChild);
-                    }
-                    return item;
-                })
-                .filter((item) => item.variation_option_2.length > 0);
+            const newData = dataTotalVariant.map((item) => {
+                if (item.id === isId) {
+                    item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== isIdChild);
+                }
+                return item;
+            }).filter((item) => item.variation_option_2.length > 0);
             sDataTotalVariant(newData);
 
             const foundParent = newData.some((item) => item.id === isId);
@@ -799,8 +790,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                         {props.dataProductExpiry?.is_enable === "1" && (
                                             <div className="2xl:space-y-1">
                                                 <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                    {props.dataLang?.category_material_list_expiry_date ||
-                                                        "category_material_list_expiry_date"}
+                                                    {props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}
                                                 </label>
                                                 <div className="relative flex flex-col justify-center items-center">
                                                     <InPutNumericFormat
@@ -815,8 +805,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                         value={expiry}
                                                         onValueChange={_HandleChangeInput.bind(this, "expiry")}
                                                         placeholder={
-                                                            props.dataLang?.category_material_list_expiry_date ||
-                                                            "category_material_list_expiry_date"
+                                                            props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"
                                                         }
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`}
                                                     />
@@ -842,10 +831,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${errType && type?.value == null
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errType && type?.value == null ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 theme={(theme) => ({
                                                     ...theme,
                                                     colors: {
@@ -994,15 +980,13 @@ const Popup_ThanhPham = React.memo((props) => {
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <label>
-                                                    {props.dataLang?.category_material_list_variant_main ||
-                                                        "category_material_list_variant_main"}
+                                                    {props.dataLang?.category_material_list_variant_main || "category_material_list_variant_main"}
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
                                                     // isDisabled={false}
                                                     isDisabled={dataVariantSending[0] && dataTotalVariant?.some(e => e?.id != "" || e?.id != null)}
                                                     // isDisabled={dataVariantSending[0] ? true : false}
-
                                                     value={
                                                         variantMain
                                                             ? {
@@ -1016,8 +1000,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     onChange={_HandleChangeInput.bind(this, "variantMain")}
                                                     isClearable={true}
                                                     placeholder={
-                                                        props.dataLang?.category_material_list_variant_main ||
-                                                        "category_material_list_variant_main"
+                                                        props.dataLang?.category_material_list_variant_main || "category_material_list_variant_main"
                                                     }
                                                     noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                     menuPortalTarget={document.body}
@@ -1047,8 +1030,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <h5 className="text-slate-400 text-sm">
-                                                    {props.dataLang?.branch_popup_variant_option ||
-                                                        "branch_popup_variant_option"}
+                                                    {props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantMain && (
                                                     <button
@@ -1116,8 +1098,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <label>
-                                                    {props.dataLang?.category_material_list_variant_sub ||
-                                                        "category_material_list_variant_sub"}
+                                                    {props.dataLang?.category_material_list_variant_sub || "category_material_list_variant_sub"}
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
@@ -1137,10 +1118,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     }
                                                     onChange={_HandleChangeInput.bind(this, "variantSub")}
                                                     isClearable={true}
-                                                    placeholder={
-                                                        props.dataLang?.category_material_list_variant_sub ||
-                                                        "category_material_list_variant_sub"
-                                                    }
+                                                    placeholder={props.dataLang?.category_material_list_variant_sub || "category_material_list_variant_sub"}
                                                     noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                     menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
@@ -1169,8 +1147,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <h5 className="text-slate-400 text-sm">
-                                                    {props.dataLang?.branch_popup_variant_option ||
-                                                        "branch_popup_variant_option"}
+                                                    {props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantSub && (
                                                     <button
@@ -1240,12 +1217,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                     <div className="flex justify-end py-2">
                                         <button
                                             onClick={_HandleApplyVariant.bind(this)}
-                                            disabled={
-                                                optSelectedVariantMain?.length == 0 &&
-                                                    optSelectedVariantSub?.length == 0
-                                                    ? true
-                                                    : false
-                                            }
+                                            disabled={optSelectedVariantMain?.length == 0 && optSelectedVariantSub?.length == 0 ? true : false}
                                             className="disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition"
                                         >
                                             {props.dataLang?.apply || "apply"}
@@ -1272,8 +1244,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     {"Giá"}
                                                 </h4>
                                                 <h4 className="text-[15px] text-left font-[300] text-slate-400">
-                                                    {props.dataLang?.branch_popup_properties ||
-                                                        "branch_popup_properties"}
+                                                    {props.dataLang?.branch_popup_properties || "branch_popup_properties"}
                                                 </h4>
                                             </div>
                                             <Customscrollbar className="max-h-[250px]">
