@@ -11,7 +11,7 @@ import {
 import Popup_chitiet from "./components/popup/detail";
 import Popup_dsncc from "./components/popup/popup";
 
-import { BtnAction } from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";

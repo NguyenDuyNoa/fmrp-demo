@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { useDispatch, useSelector } from "react-redux";
 
-import { BtnAction } from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";

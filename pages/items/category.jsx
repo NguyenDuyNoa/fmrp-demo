@@ -27,7 +27,7 @@ import Popup_NVL from "./components/category/popup";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiCategory from "@/Api/apiMaterial/category/apiCategory";
-import { BtnAction } from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";

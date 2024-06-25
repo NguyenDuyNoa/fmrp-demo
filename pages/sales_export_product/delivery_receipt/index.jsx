@@ -8,7 +8,7 @@ import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { BtnAction } from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";

@@ -19,7 +19,7 @@ import Popup_groupKh from "./components/popup";
 
 import apiGroup from "@/Api/apiClients/group/apiGroup";
 import apiComons from "@/Api/apiComon/apiComon";
-import { BtnAction } from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";

@@ -13,7 +13,7 @@ import LinkWarehouse from "../components/linkWarehouse";
 import Popup_status from "../components/popupStatus";
 import Popup_chitiet from "./components/pupup";
 
-import { BtnAction } from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
