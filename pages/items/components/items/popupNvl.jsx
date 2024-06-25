@@ -48,10 +48,6 @@ const Popup_NVL = React.memo((props) => {
     const _HandleSelectTab = (e) => sTab(e);
 
     const [onSending, sOnSending] = useState(false);
-    ///Fetching Nhóm NVL dựa vào chi nhánh
-    const [onFetchingGroup, sOnFetchingGroup] = useState(false);
-    ///Fetching lấy dữ liệu khi truyền id vào
-    const [onFetching, sOnFetching] = useState(false);
 
     const [branch, sBranch] = useState([]);
 
@@ -84,6 +80,16 @@ const Popup_NVL = React.memo((props) => {
     const [thumbFile, sThumbFile] = useState(null);
 
     const [isDeleteThumb, sIsDeleteThumb] = useState(false);
+
+    const [errGroup, sErrGroup] = useState(false);
+
+    const [errName, sErrName] = useState(false);
+
+    const [errCode, sErrCode] = useState(false);
+
+    const [errUnit, sErrUnit] = useState(false);
+
+    const [errBranch, sErrBranch] = useState(false);
 
     ///Biến thể
     const [variantMain, sVariantMain] = useState(null);
@@ -271,11 +277,6 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
-    const [errGroup, sErrGroup] = useState(false);
-    const [errName, sErrName] = useState(false);
-    const [errCode, sErrCode] = useState(false);
-    const [errUnit, sErrUnit] = useState(false);
-    const [errBranch, sErrBranch] = useState(false);
 
     useEffect(() => {
         open && sTab(0);
@@ -292,7 +293,6 @@ const Popup_NVL = React.memo((props) => {
         open && sThumb(null);
         open && sThumbFile(null);
         open && sBranch([]);
-        open && props?.id && sOnFetching(true);
         open && sDataTotalVariant([]);
         open && sDataVariantSending([]);
         open && sVariantMain(null);
@@ -322,13 +322,14 @@ const Popup_NVL = React.memo((props) => {
         } else if (type == "note") {
             sNote(value.target?.value);
         } else if (type == "group") {
-            sGroupId(value?.value);
+            sGroupId(value);
         } else if (type == "unit") {
             sUnit(value?.value);
         } else if (type == "unitChild") {
             sUnitChild(value?.value);
         } else if (type == "branch") {
             sBranch(value);
+            sGroupId(null);
         } else if (type == "variantMain") {
             if (!checkEqual(variantMain, value)) {
                 sPrevVariantMain(variantMain?.value);
@@ -370,15 +371,15 @@ const Popup_NVL = React.memo((props) => {
     })
 
     const _ServerSending = () => {
-        var formData = new FormData();
+        let formData = new FormData();
 
         formData.append("code", code);
         formData.append("name", name);
         formData.append("import_price", price);
         formData.append("minimum_quantity", minimumAmount);
         formData.append("expiry", expiry);
-        formData.append("note", note);
-        formData.append("category_id", groupId);
+        formData.append("note", note ?? "");
+        formData.append("category_id", groupId?.value);
         formData.append("unit_id", unit);
         formData.append("unit_convert_id", unitChild);
         formData.append("coefficient", unitAmount);
@@ -505,16 +506,20 @@ const Popup_NVL = React.memo((props) => {
         }
     })
 
-    const { } = useQuery({
+    const { isFetching } = useQuery({
         queryKey: ['api_detail_items', props?.id],
         queryFn: async () => {
             const data = await apiItems.apiDetailItems(props?.id);
+            console.log("data", data);
             sName(data?.name);
             sCode(data?.code);
             sNote(data?.note);
             sPrice(Number(data?.import_price));
             sMinimumAmount(Number(data?.minimum_quantity));
-            sGroupId(data?.category_id);
+            sGroupId(data?.category_id ? {
+                label: data?.category_name,
+                value: data?.category_id
+            } : null);
             sExpiry(Number(data?.expiry));
             sUnitAmount(Number(data?.coefficient));
             sThumb(data?.images);
@@ -534,7 +539,7 @@ const Popup_NVL = React.memo((props) => {
             sDataTotalVariant(data?.variation_option_value);
             return data
         },
-        enabled: !!open
+        enabled: !!open && !!props?.id
     })
 
     const _HandleChangeVariant = (id, type, value) => {
@@ -600,6 +605,8 @@ const Popup_NVL = React.memo((props) => {
             handleQueryId({ status: false });
         }
     };
+
+    console.log("groupId", groupId);
     return (
         <PopupCustom
             title={props?.id ? `${props.dataLang?.category_material_list_edit}` : `${props.dataLang?.category_material_list_addnew}`
@@ -630,7 +637,7 @@ const Popup_NVL = React.memo((props) => {
                 <div
                     className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                 >
-                    {onFetching ? (
+                    {isFetching ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : (
                         <React.Fragment>
@@ -691,14 +698,7 @@ const Popup_NVL = React.memo((props) => {
                                             <Select
                                                 options={dataOptGr}
                                                 formatOptionLabel={SelectOptionLever}
-                                                value={
-                                                    groupId
-                                                        ? {
-                                                            label: dataOptGr?.find((x) => x?.value == groupId)?.label,
-                                                            value: groupId,
-                                                        }
-                                                        : null
-                                                }
+                                                value={groupId}
                                                 onChange={_HandleChangeInput.bind(this, "group")}
                                                 isClearable={true}
                                                 noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
@@ -730,15 +730,13 @@ const Popup_NVL = React.memo((props) => {
                                             />
                                             {errGroup && (
                                                 <label className="text-sm text-red-500">
-                                                    {props.dataLang?.category_material_list_err_group ||
-                                                        "category_material_list_err_group"}
+                                                    {props.dataLang?.category_material_list_err_group || "category_material_list_err_group"}
                                                 </label>
                                             )}
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.category_material_list_code ||
-                                                    "category_material_list_code"}{" "}
+                                                {props.dataLang?.category_material_list_code || "category_material_list_code"}{" "}
                                                 {props.id && <span className="text-red-500">*</span>}
                                             </label>
                                             <input
@@ -759,8 +757,7 @@ const Popup_NVL = React.memo((props) => {
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.category_material_list_name ||
-                                                    "category_material_list_name"}{" "}
+                                                {props.dataLang?.category_material_list_name || "category_material_list_name"}{" "}
                                                 <span className="text-red-500">*</span>
                                             </label>
                                             <input
@@ -768,8 +765,7 @@ const Popup_NVL = React.memo((props) => {
                                                 onChange={_HandleChangeInput.bind(this, "name")}
                                                 type="text"
                                                 placeholder={
-                                                    props.dataLang?.category_material_list_name ||
-                                                    "category_material_list_name"
+                                                    props.dataLang?.category_material_list_name || "category_material_list_name"
                                                 }
                                                 className={`${errName
                                                     ? "border-red-500"
@@ -791,8 +787,7 @@ const Popup_NVL = React.memo((props) => {
                                                 value={price}
                                                 onValueChange={_HandleChangeInput.bind(this, "price")}
                                                 placeholder={
-                                                    props.dataLang?.category_material_list_cost_price ||
-                                                    "category_material_list_cost_price"
+                                                    props.dataLang?.category_material_list_cost_price || "category_material_list_cost_price"
                                                 }
                                                 isAllowed={(values) => {
                                                     const { floatValue, value } = values;
@@ -833,8 +828,7 @@ const Popup_NVL = React.memo((props) => {
                                         {props.dataMaterialExpiry?.is_enable === "1" ? (
                                             <div className="2xl:space-y-1">
                                                 <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                    {props.dataLang?.category_material_list_expiry_date ||
-                                                        "category_material_list_expiry_date"}
+                                                    {props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}
                                                 </label>
                                                 <div className="relative flex flex-col justify-center items-center">
                                                     <InPutNumericFormat
@@ -852,8 +846,7 @@ const Popup_NVL = React.memo((props) => {
                                                         value={expiry}
                                                         onValueChange={_HandleChangeInput.bind(this, "expiry")}
                                                         placeholder={
-                                                            props.dataLang?.category_material_list_expiry_date ||
-                                                            "category_material_list_expiry_date"
+                                                            props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"
                                                         }
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`}
                                                     />
@@ -869,8 +862,7 @@ const Popup_NVL = React.memo((props) => {
                                     <div className="2xl:space-y-3 space-y-2">
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.category_material_list_purchase_unit ||
-                                                    "category_material_list_purchase_unit"}{" "}
+                                                {props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"}{" "}
                                                 <span className="text-red-500">*</span>
                                             </label>
                                             <Select
@@ -886,8 +878,7 @@ const Popup_NVL = React.memo((props) => {
                                                 onChange={_HandleChangeInput.bind(this, "unit")}
                                                 isClearable={true}
                                                 placeholder={
-                                                    props.dataLang?.category_material_list_purchase_unit ||
-                                                    "category_material_list_purchase_unit"
+                                                    props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"
                                                 }
                                                 noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 menuPortalTarget={document.body}
@@ -924,8 +915,7 @@ const Popup_NVL = React.memo((props) => {
                                         </div>
                                         <div className="2xl:space-y-0.5">
                                             <h5 className="text-[#344054] font-medium 2xl:text-base text-[15px]">
-                                                {props.dataLang?.category_material_list_converting_unit ||
-                                                    "category_material_list_converting_unit"}
+                                                {props.dataLang?.category_material_list_converting_unit || "category_material_list_converting_unit"}
                                             </h5>
                                             <div className="grid grid-cols-2 gap-5">
                                                 <div className="2xl:space-y-1">
@@ -976,8 +966,7 @@ const Popup_NVL = React.memo((props) => {
                                                 </div>
                                                 <div className="2xl:space-y-1">
                                                     <label className="text-[#344054] font-normal text-sm">
-                                                        {props.dataLang?.category_material_list_converting_amount ||
-                                                            "category_material_list_converting_amount"}
+                                                        {props.dataLang?.category_material_list_converting_amount || "category_material_list_converting_amount"}
                                                     </label>
                                                     <InPutNumericFormat
                                                         isAllowed={(values) => {
@@ -1076,8 +1065,7 @@ const Popup_NVL = React.memo((props) => {
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <label>
-                                                    {props.dataLang?.category_material_list_variant_main ||
-                                                        "category_material_list_variant_main"}
+                                                    {props.dataLang?.category_material_list_variant_main || "category_material_list_variant_main"}
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
@@ -1095,8 +1083,7 @@ const Popup_NVL = React.memo((props) => {
                                                     onChange={_HandleChangeInput.bind(this, "variantMain")}
                                                     isClearable={true}
                                                     placeholder={
-                                                        props.dataLang?.category_material_list_variant_main ||
-                                                        "category_material_list_variant_main"
+                                                        props.dataLang?.category_material_list_variant_main || "category_material_list_variant_main"
                                                     }
                                                     noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                     menuPortalTarget={document.body}
@@ -1126,8 +1113,7 @@ const Popup_NVL = React.memo((props) => {
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <h5 className="text-slate-400 text-sm">
-                                                    {props.dataLang?.branch_popup_variant_option ||
-                                                        "branch_popup_variant_option"}
+                                                    {props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantMain && (
                                                     <button
@@ -1197,8 +1183,7 @@ const Popup_NVL = React.memo((props) => {
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <label>
-                                                    {props.dataLang?.category_material_list_variant_sub ||
-                                                        "category_material_list_variant_sub"}
+                                                    {props.dataLang?.category_material_list_variant_sub || "category_material_list_variant_sub"}
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
@@ -1217,8 +1202,7 @@ const Popup_NVL = React.memo((props) => {
                                                     onChange={_HandleChangeInput.bind(this, "variantSub")}
                                                     isClearable={true}
                                                     placeholder={
-                                                        props.dataLang?.category_material_list_variant_sub ||
-                                                        "category_material_list_variant_sub"
+                                                        props.dataLang?.category_material_list_variant_sub || "category_material_list_variant_sub"
                                                     }
                                                     noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                     menuPortalTarget={document.body}
@@ -1248,8 +1232,7 @@ const Popup_NVL = React.memo((props) => {
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <h5 className="text-slate-400 text-sm">
-                                                    {props.dataLang?.branch_popup_variant_option ||
-                                                        "branch_popup_variant_option"}
+                                                    {props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantSub && (
                                                     <button
@@ -1353,8 +1336,7 @@ const Popup_NVL = React.memo((props) => {
                                                     {dataVariantSending[1]?.name}
                                                 </h4>
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400">
-                                                    {props.dataLang?.branch_popup_properties ||
-                                                        "branch_popup_properties"}
+                                                    {props.dataLang?.branch_popup_properties || "branch_popup_properties"}
                                                 </h4>
                                             </div>
                                             <Customscrollbar
