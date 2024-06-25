@@ -12,22 +12,29 @@ import "../styles/globals.scss";
 import LoginPage from "@/components/UI/login/login";
 import { Lexend_Deca } from "@next/font/google";
 import apiDashboard from "Api/apiDashboard/apiDashboard";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
 });
+
+const queryClient = new QueryClient();
 const Default = (props) => {
     return (
         <React.Fragment>
-            <Head>
-                <link rel="shortcut icon" href="/Favicon.png" />
-            </Head>
-            <Provider store={store}>
-                <main className={deca.className}>
-                    <MainPage {...props} />
-                </main>
-            </Provider>
+            <QueryClientProvider client={queryClient}>
+                <Head>
+                    <link rel="shortcut icon" href="/Favicon.png" />
+                </Head>
+                <Provider store={store}>
+                    <main className={deca.className}>
+                        <MainPage {...props} />
+                    </main>
+                </Provider>
+                <ReactQueryDevtools initialIsOpen={true} />
+            </QueryClientProvider>
         </React.Fragment>
     );
 };
@@ -56,7 +63,7 @@ function MainPage({ Component, pageProps }) {
                 sData(res);
                 sChangeLang(false);
             }
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const FetchSetingServer = async () => {
@@ -72,7 +79,7 @@ function MainPage({ Component, pageProps }) {
             };
             dispatch({ type: "setings/feature", payload: newData });
             sOnSeting(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -105,7 +112,7 @@ function MainPage({ Component, pageProps }) {
                 dispatch({ type: "auth/update", payload: false });
             }
             sOnChecking(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {

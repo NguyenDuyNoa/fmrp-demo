@@ -184,80 +184,78 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                     Thành phẩm
                                 </h2>
                             </div>
-                            <div className="bg-[#F8FAFC] p-3 rounded-sm  flex flex-col gap-2">
-                                <div className="flex">
-                                    <div className="w-[45%] 2xl:w-[45%] lg:w-[40%] flex items-center gap-3">
-                                        <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
-                                            <Image src={isState.item.image} width={1280} height={1024} alt="" className="object-cover  rounded-md h-full w-full" />
-                                        </div>
-                                        <div className="">
-                                            <h1 className="text-base font-medium">{isState.item.item_name}</h1>
-                                            <div className="flex items-center gap-2">
-                                                <h1 className="2xl:text-sm text-xs font-medium text-black/60">{isState.item.item_code} - Cần SX: <span className="text-black font-medium">{formanumber(isState.item.quantity)}</span></h1>
+                            <div className="flex bg-[#F8FAFC] p-3 rounded-sm">
+                                <div className="w-[45%] 2xl:w-[45%] lg:w-[40%] flex items-center gap-3">
+                                    <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
+                                        <Image src={isState.item.image} width={1280} height={1024} alt="" className="object-cover  rounded-md h-full w-full" />
+                                    </div>
+                                    <div className="">
+                                        <h1 className="text-base font-medium">{isState.item.item_name}</h1>
+                                        <div className="flex items-center gap-2">
+                                            <h1 className="2xl:text-sm text-xs font-medium text-black/60">{isState.item.item_code} - Cần SX: <span className="text-black font-medium">{formanumber(isState.item.quantity)}</span></h1>
 
-                                            </div>
                                         </div>
                                     </div>
-                                    <div className="w-[55%] 2xl:w-[55%] lg:w-[60%] flex items-center gap-2">
-                                        <div className="flex items-center justify-center gap-2 w-1/2">
-                                            <h1 className="2xl:text-sm text-xs font-medium">Số lượng hoàn thành</h1>
-                                            <div className="bg-[#BAD1FE] rounded-xl flex justify-center items-center py-[1px]">
-                                                <InPutNumericFormat
-                                                    className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#BAD1FE] bg-white w-[70%]'}
-                                                    placeholder={'0'}
-                                                    value={isState.item.quantityChange}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="w-1/2">
-                                            <SelectCore
-                                                options={isState.warehouseImport}
-                                                onChange={(e) => {
-                                                    queryState({ idWarehouseImport: e });
-                                                }}
-                                                value={isState.idWarehouseImport}
-                                                isClearable={true}
-                                                closeMenuOnSelect={true}
-                                                hideSelectedOptions={false}
-                                                placeholder={'Kho nhập'}
-                                                className={`placeholder:text-slate-300 w-full z-50 rounded-xl bg-[#ffffff] text-[#52575E] font-normal outline-none border `}
-                                                isSearchable={true}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                    borderRadius: "12px",
-                                                })}
-                                                styles={{
-                                                    placeholder: (base) => ({
-                                                        ...base,
-                                                        color: "#cbd5e1",
-                                                    }),
-                                                    menu: (provided) => ({
-                                                        ...provided,
-                                                        zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                                    }),
-                                                    control: (base, state) => ({
-                                                        ...base,
-                                                        boxShadow: "none",
-                                                        padding: "2.7px",
-                                                        ...(state.isFocused && {
-                                                            border: "0 0 0 1px #92BFF7",
-                                                            borderRadius: "12px",
-                                                        }),
-                                                    }),
-                                                }}
+                                </div>
+                                <div className="w-[55%] 2xl:w-[55%] lg:w-[60%] flex items-center gap-2">
+                                    <div className="flex items-center justify-center gap-2 w-1/2">
+                                        <h1 className="2xl:text-sm text-xs font-medium">Số lượng hoàn thành</h1>
+                                        <div className="bg-[#BAD1FE] rounded-xl flex justify-center items-center py-[1px]">
+                                            <InPutNumericFormat
+                                                className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#BAD1FE] bg-white w-[70%]'}
+                                                placeholder={'0'}
+                                                value={isState.item.quantityChange}
                                             />
                                         </div>
+                                    </div>
+                                    <div className="w-1/2">
+                                        <SelectCore
+                                            options={isState.warehouseImport}
+                                            onChange={(e) => {
+                                                queryState({ idWarehouseImport: e });
+                                            }}
+                                            value={isState.idWarehouseImport}
+                                            isClearable={true}
+                                            closeMenuOnSelect={true}
+                                            hideSelectedOptions={false}
+                                            placeholder={'Kho nhập'}
+                                            className={`placeholder:text-slate-300 w-full z-50 rounded-xl bg-[#ffffff] text-[#52575E] font-normal outline-none border `}
+                                            isSearchable={true}
+                                            style={{
+                                                border: "none",
+                                                boxShadow: "none",
+                                                outline: "none",
+                                            }}
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: "#EBF5FF",
+                                                    primary50: "#92BFF7",
+                                                    primary: "#0F4F9E",
+                                                },
+                                                borderRadius: "12px",
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menu: (provided) => ({
+                                                    ...provided,
+                                                    zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                                }),
+                                                control: (base, state) => ({
+                                                    ...base,
+                                                    boxShadow: "none",
+                                                    padding: "2.7px",
+                                                    ...(state.isFocused && {
+                                                        border: "0 0 0 1px #92BFF7",
+                                                        borderRadius: "12px",
+                                                    }),
+                                                }),
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             </div>

@@ -16,6 +16,8 @@ import Swal from "sweetalert2";
 import firebase from "@/utils/lib/Firebase";
 import apiDashboard from "Api/apiDashboard/apiDashboard";
 import apiLogin from "Api/apiLogin/apiLogin";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { reTryQuery } from "@/configs/configRetryQuery";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -44,7 +46,6 @@ const LoginPage = React.memo((props) => {
     const initialState = {
         rememberMe: localStorage?.getItem("remembermeFMRP") ? localStorage?.getItem("remembermeFMRP") : false,
         onSending: false,
-        onFechingRegister: false,
         listMajor: [],
         listPosition: [],
         checkMajior: null,
@@ -164,26 +165,31 @@ const LoginPage = React.memo((props) => {
             };
 
             dispatch({ type: "setings/feature", payload: newData });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     ///Đăng ký
 
     const _HandleIsLogin = (e) => {
         queryState({ isLogin: e });
-        !e && queryState({ onFechingRegister: true });
+        // !e && queryState({ onFechingRegister: true });
     };
 
-    const _ServerFetching_Majior = async () => {
-        try {
+    useQuery({
+        queryKey: ["api_majior"],
+        queryFn: async () => {
             const res = await apiLogin.apiMajior();
-            queryState({ listMajor: res?.career, listPosition: res?.role_user, onFechingRegister: false });
-        } catch (error) {}
-    };
+            queryState({ listMajor: res?.career, listPosition: res?.role_user });
+            return res;
+        },
 
-    useEffect(() => {
-        isState.onFechingRegister && _ServerFetching_Majior();
-    }, [isState.onFechingRegister]);
+        initialData: keepPreviousData,
+
+        staleTime: 1000 * 60 * 5,
+
+        enabled: !isState.isLogin,
+        ...reTryQuery
+    })
 
     const _HandleSelectStep = (e) => {
         if (isState.checkMajior) {
@@ -229,7 +235,7 @@ const LoginPage = React.memo((props) => {
                 } else {
                     showToat("error", `${message || "Đăng nhập thất bại"}`);
                 }
-            } catch (error) {}
+            } catch (error) { }
         }
         if (type == "sendOtp") {
             await handleSendOtp(data?.phone);
@@ -259,7 +265,7 @@ const LoginPage = React.memo((props) => {
                     showToat("error", message);
                     queryState({ loadingRegester: false });
                 }
-            } catch (error) {}
+            } catch (error) { }
         }
     };
 
@@ -286,9 +292,8 @@ const LoginPage = React.memo((props) => {
                                                 name="code"
                                                 {...register("code", { required: true })}
                                                 placeholder="Mã công ty"
-                                                className={`${
-                                                    errors.code ? "border-red-500 border" : "border-[#cccccc]"
-                                                } border outline-none  focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full`}
+                                                className={`${errors.code ? "border-red-500 border" : "border-[#cccccc]"
+                                                    } border outline-none  focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full`}
                                             />
                                             {errors.code && (
                                                 <span className="text-red-500 text-[13px]">
@@ -300,9 +305,8 @@ const LoginPage = React.memo((props) => {
                                                 name="name"
                                                 {...register("name", { required: true })}
                                                 placeholder={dataLang?.auth_user_name || "auth_user_name"}
-                                                className={`${
-                                                    errors.name ? "border-red-500 border" : "border-[#cccccc]"
-                                                } border outline-none  focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full`}
+                                                className={`${errors.name ? "border-red-500 border" : "border-[#cccccc]"
+                                                    } border outline-none  focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full`}
                                             />
                                             {errors.name && (
                                                 <span className="text-red-500 text-[13px]">
@@ -315,9 +319,8 @@ const LoginPage = React.memo((props) => {
                                                     name="password"
                                                     {...register("password", { required: true })}
                                                     placeholder={dataLang?.auth_password || "auth_password"}
-                                                    className={`${
-                                                        errors.password ? "border-red-500 border" : "border-[#cccccc]"
-                                                    } border outline-none focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full`}
+                                                    className={`${errors.password ? "border-red-500 border" : "border-[#cccccc]"
+                                                        } border outline-none focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full`}
                                                 />
                                                 {errors.password && (
                                                     <span className="text-red-500 text-[13px]">
@@ -534,9 +537,8 @@ const LoginPage = React.memo((props) => {
                                     <div className="w-full h-1.5 rounded-full bg-[#3276FA]" />
                                     <div className="w-full h-1.5 rounded-full bg-[#F3F4F6] relative overflow-hidden">
                                         <div
-                                            className={`${
-                                                isState.stepRegister == 0 ? "w-0" : "w-full"
-                                            } duration-300 bg-[#3276FA] transition-[width] h-full absolute`}
+                                            className={`${isState.stepRegister == 0 ? "w-0" : "w-full"
+                                                } duration-300 bg-[#3276FA] transition-[width] h-full absolute`}
                                         />
                                     </div>
                                 </div>
@@ -598,11 +600,10 @@ const LoginPage = React.memo((props) => {
                                                     required: true,
                                                 })}
                                                 placeholder="Nhập họ và tên của bạn"
-                                                className={`${
-                                                    errors.fullName
-                                                        ? "border-red-500 border"
-                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                className={`${errors.fullName
+                                                    ? "border-red-500 border"
+                                                    : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
                                                 <span className="text-red-500 text-[13px]">
@@ -622,11 +623,10 @@ const LoginPage = React.memo((props) => {
                                                     required: true,
                                                 })}
                                                 placeholder="Nhập tên công ty"
-                                                className={`${
-                                                    errors.companyName
-                                                        ? "border-red-500 border"
-                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                className={`${errors.companyName
+                                                    ? "border-red-500 border"
+                                                    : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
                                                 <span className="text-red-500 text-[13px]">
@@ -651,11 +651,10 @@ const LoginPage = React.memo((props) => {
                                                         },
                                                     })}
                                                     placeholder="Nhập Email của bạn"
-                                                    className={`${
-                                                        errors.email
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                    className={`${errors.email
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.email && (
                                                     <span className="text-red-500 text-[13px]" role="alert">
@@ -690,11 +689,10 @@ const LoginPage = React.memo((props) => {
                                                         },
                                                     })}
                                                     placeholder="Nhập số điện thoại"
-                                                    className={`${
-                                                        errors.phone
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                    className={`${errors.phone
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {/* {errors.phone && errors.phone.type === "required" && (
                                                     <span className="text-red-500 text-[13px]">
@@ -736,11 +734,10 @@ const LoginPage = React.memo((props) => {
                                                         minLength: 10,
                                                     })}
                                                     placeholder="Nhập mật khẩu"
-                                                    className={`${
-                                                        errors.password
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                    className={`${errors.password
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.password && errors.password.type === "required" && (
                                                     <span className="text-red-500 text-[13px]">
@@ -775,9 +772,8 @@ const LoginPage = React.memo((props) => {
                                                         />
                                                         <label
                                                             htmlFor={`posiiton ${e?.id}`}
-                                                            className={`${
-                                                                errors.location ? "text-[#52575E]" : "text-[#52575E]"
-                                                            }  2xl:text-base text-sm cursor-pointer`}
+                                                            className={`${errors.location ? "text-[#52575E]" : "text-[#52575E]"
+                                                                }  2xl:text-base text-sm cursor-pointer`}
                                                         >
                                                             {e?.title}
                                                         </label>
@@ -868,8 +864,8 @@ const LoginPage = React.memo((props) => {
                                                             isState?.sendOtp
                                                                 ? "sendOtp"
                                                                 : isState.checkOtp
-                                                                ? "checkOtp"
-                                                                : "register"
+                                                                    ? "checkOtp"
+                                                                    : "register"
                                                         )
                                                     )();
                                                 }}
@@ -878,9 +874,8 @@ const LoginPage = React.memo((props) => {
                                                         ? true
                                                         : isState.loadingRegester
                                                 }
-                                                className={`${
-                                                    isState.loadingRegester ? "relative" : ""
-                                                } w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                className={`${isState.loadingRegester ? "relative" : ""
+                                                    } w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                             >
                                                 {isState.loadingRegester ? (
                                                     <div>

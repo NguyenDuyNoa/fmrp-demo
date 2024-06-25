@@ -43,7 +43,7 @@ import { reTryQuery } from "@/configs/configRetryQuery";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 const Index = (props) => {
     const isShow = useToast();
 
