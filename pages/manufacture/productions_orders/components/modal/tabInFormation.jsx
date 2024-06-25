@@ -176,7 +176,7 @@ const Renderitem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
         <div key={id ?? ""} className={`max-w-sm`}>
             <div className={`bg-white sticky top-0 z-10 `}>
                 <div className={`flex items-start py-2 px-4 h-[90px]  gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-full`}>
-                    <div className="h-8 w-8">
+                    <div className="min-h-[32px] h-8 w-8 min-w-[32px]">
                         <Image src={image} width={1280} height={1024} alt="" className="object-cover w-full h-full" />
                     </div>
                     <div className="flex flex-col gap-0.5">
