@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 
 import { Add as IconAdd, Calendar as IconCalendar, Trash as IconDelete, Image as IconImage } from "iconsax-react";
 import moment from "moment";
@@ -1293,7 +1293,7 @@ const Popup_status = (props) => {
     };
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={"Phiếu kiểm kê bị thay đổi về số lượng thực" + " " + `${moment(new Date()).format("DD/MM/YYYY")}`}
             open={open}
             onClose={_HandleClose.bind(this)}
@@ -1373,7 +1373,7 @@ const Popup_status = (props) => {
                     </div>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 

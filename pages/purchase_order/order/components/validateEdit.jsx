@@ -7,7 +7,7 @@ import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
 
 
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import Loading from "components/UI/loading";
 
 import Swal from "sweetalert2";
@@ -61,7 +61,7 @@ const Popup_TableValidateEdit = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.purchase_order_title || "purchase_order_title"}
                 button={
                     <div onClick={handleClick.bind(this)} className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded">
@@ -129,7 +129,7 @@ const Popup_TableValidateEdit = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

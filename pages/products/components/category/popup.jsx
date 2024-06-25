@@ -1,5 +1,5 @@
 import apiCategory from "@/Api/apiProducts/category/apiCategory";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import useToast from "@/hooks/useToast";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -182,7 +182,7 @@ const Popup_ThanhPham = React.memo((props) => {
     })
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={props?.id
                 ? `${props.dataLang?.catagory_finishedProduct_group_edit || "catagory_finishedProduct_group_edit"}`
                 : `${props.dataLang?.catagory_finishedProduct_group_addnew || "catagory_finishedProduct_group_addnew"}`
@@ -333,7 +333,7 @@ const Popup_ThanhPham = React.memo((props) => {
                     </button>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 });
 export default Popup_ThanhPham

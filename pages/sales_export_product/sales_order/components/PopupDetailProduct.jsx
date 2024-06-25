@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
-import PopupEdit from "../../../../components/UI/Popup";
+import PopupCustom from "../../../../components/UI/Popup";
 
 import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import { registerLocale } from "react-datepicker";
@@ -83,7 +83,7 @@ const PopupDetailProduct = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.sales_product_popup_detail_title || "sales_product_popup_detail_title"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -413,7 +413,7 @@ const PopupDetailProduct = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import {
     Edit as IconEdit
@@ -113,7 +113,7 @@ const Popup_groupKh = (props) => {
         }
     };
     return (
-        <PopupEdit
+        <PopupCustom
             title={props.id ? `${props.dataLang?.suppliers_groups_edit}` : `${props.dataLang?.suppliers_groups_add}`}
             button={props.id ? (<IconEdit />) : (`${props.dataLang?.branch_popup_create_new}`)}
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -213,7 +213,7 @@ const Popup_groupKh = (props) => {
                     </div>
                 </form>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 

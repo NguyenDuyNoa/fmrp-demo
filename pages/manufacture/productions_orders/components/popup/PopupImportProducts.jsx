@@ -1,4 +1,4 @@
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { memo, useState } from "react";
 
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
@@ -151,7 +151,7 @@ const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
     }
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={type === "begin_production" ? "Bạn có muốn bắt đầu sản xuất công đoạn này ?" : `Hoàn thành công đoạn ${dataStage?.stage_name?.toUpperCase()}`}
             button={props.children}
             onClickOpen={() => {
@@ -410,7 +410,7 @@ const PopupImportProducts = memo(({ dataLang, type, dataStage, ...props }) => {
                     <ButtonSubmit loading={false} onClick={handleSubmit.bind(this)} dataLang={dataLang} />
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 })
 export default PopupImportProducts;

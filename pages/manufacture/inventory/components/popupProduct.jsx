@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
@@ -427,7 +427,7 @@ const Popup_Product = React.memo((props) => {
     };
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={"Thêm mặt hàng để kiểm kê"}
             button={`+   Thêm mặt hàng`}
             onClickOpen={_CheckWareHouse.bind(this)}
@@ -828,7 +828,7 @@ const Popup_Product = React.memo((props) => {
                     </button>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 });
 export default Popup_Product;

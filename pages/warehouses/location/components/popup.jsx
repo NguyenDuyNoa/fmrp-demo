@@ -4,7 +4,7 @@ import Select from "react-select";
 
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import useToast from "@/hooks/useToast";
 
 const Popup_Vitrikho = (props) => {
@@ -127,7 +127,7 @@ const Popup_Vitrikho = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.id
                         ? `${props.dataLang?.warehouses_localtion_edit}`
@@ -256,7 +256,7 @@ const Popup_Vitrikho = (props) => {
                         </div>
                     </form>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

@@ -24,7 +24,7 @@ import dynamic from "next/dynamic";
 import { Controller, useForm } from "react-hook-form";
 import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -693,7 +693,7 @@ const Popup_dspt = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.id ? `${"Sửa phiếu thu"}` : `${"Tạo phiếu thu"}`}
                 button={
                     props.id
@@ -1276,7 +1276,7 @@ const Popup_dspt = (props) => {
                         </div>
                     </form>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

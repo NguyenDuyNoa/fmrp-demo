@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -65,7 +65,7 @@ const Popup_TableValidateDelete = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.purchase_order_title || "purchase_order_title"}
                 button={
                     <div
@@ -142,7 +142,7 @@ const Popup_TableValidateDelete = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

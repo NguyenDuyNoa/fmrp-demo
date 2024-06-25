@@ -10,7 +10,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import Loading from "components/UI/loading";
 
 import { useEffect } from "react";
@@ -65,7 +65,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.recall_title_detail || "recall_title_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -321,7 +321,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

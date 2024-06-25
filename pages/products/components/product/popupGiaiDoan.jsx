@@ -1,6 +1,6 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
@@ -342,7 +342,7 @@ const Popup_GiaiDoan = React.memo((props) => {
         return null;
     }
     return (
-        <PopupEdit
+        <PopupCustom
             title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${props.name
                 })`}
             button={
@@ -429,7 +429,7 @@ const Popup_GiaiDoan = React.memo((props) => {
                     </>
                 )}
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 });
 export default Popup_GiaiDoan;

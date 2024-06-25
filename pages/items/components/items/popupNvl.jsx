@@ -4,7 +4,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
@@ -601,7 +601,7 @@ const Popup_NVL = React.memo((props) => {
         }
     };
     return (
-        <PopupEdit
+        <PopupCustom
             title={props?.id ? `${props.dataLang?.category_material_list_edit}` : `${props.dataLang?.category_material_list_addnew}`
             }
             button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
@@ -1492,7 +1492,7 @@ const Popup_NVL = React.memo((props) => {
                     </button>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 });
 export default Popup_NVL

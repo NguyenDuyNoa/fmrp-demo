@@ -8,7 +8,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
@@ -280,7 +280,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -705,7 +705,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                     save={handleDeleteItem}
                     cancel={() => handleQueryId({ status: false })}
                 />
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

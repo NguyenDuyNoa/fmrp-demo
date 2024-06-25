@@ -9,7 +9,7 @@ import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import useSetingServer from "@/hooks/useConfigNumber";
 
 import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
@@ -57,7 +57,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.warehouseTransfer_titleDetail || "warehouseTransfer_titleDetail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -385,7 +385,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

@@ -22,7 +22,7 @@ import {
 
 import { BiEdit } from "react-icons/bi";
 
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import { components } from "react-select";
@@ -860,7 +860,7 @@ const Popup_dspc = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.id
                         ? `${props.dataLang?.payment_edit || "payment_edit"}`
@@ -1546,7 +1546,7 @@ const Popup_dspc = (props) => {
                         </div>
                     </form>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

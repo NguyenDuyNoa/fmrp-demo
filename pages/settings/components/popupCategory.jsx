@@ -7,7 +7,7 @@ import {
     Edit as IconEdit
 } from "iconsax-react";
 
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 
 import useToast from "@/hooks/useToast";
 
@@ -268,7 +268,7 @@ const PopupCategory = (props) => {
     const optionsClient = dataBranch ? dataBranch?.filter((x) => !hiddenOptionsClient.includes(x.value)) : [];
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props.data?.id
                     ? `${(tabPage === "units" && props.dataLang?.category_unit_edit) ||
@@ -612,7 +612,7 @@ const PopupCategory = (props) => {
                     </div>
                 </form>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupCategory

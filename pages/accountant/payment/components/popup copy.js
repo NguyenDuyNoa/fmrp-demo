@@ -25,7 +25,7 @@ import moment from "moment/moment";
 import dynamic from "next/dynamic";
 import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -634,10 +634,10 @@ const Popup_dspc = (props) => {
             Toast.fire({
                 icon: "error",
                 title: `${totalSotienErr < price
-                        ? props?.dataLang.payment_err_alerTotalThan ||
-                        "payment_err_alerTotalThan"
-                        : props.dataLang?.required_field_null ||
-                        "required_field_null"
+                    ? props?.dataLang.payment_err_alerTotalThan ||
+                    "payment_err_alerTotalThan"
+                    : props.dataLang?.required_field_null ||
+                    "required_field_null"
                     }`,
             });
         } else {
@@ -910,7 +910,7 @@ const Popup_dspc = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.id
                         ? `${props.dataLang?.payment_edit || "payment_edit"}`
@@ -1044,8 +1044,8 @@ const Popup_dspc = (props) => {
                                             }),
                                         }}
                                         className={`${errBranch
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            ? "border-red-500"
+                                            : "border-transparent"
                                             } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                     />
                                     {errBranch && (
@@ -1104,8 +1104,8 @@ const Popup_dspc = (props) => {
                                             }),
                                         }}
                                         className={`${errMethod
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            ? "border-red-500"
+                                            : "border-transparent"
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                     />
                                     {errMethod && (
@@ -1164,8 +1164,8 @@ const Popup_dspc = (props) => {
                                             }),
                                         }}
                                         className={`${errObject
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            ? "border-red-500"
+                                            : "border-transparent"
                                             } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                     />
                                     {errObject && (
@@ -1197,8 +1197,8 @@ const Popup_dspc = (props) => {
                                             value={listObject}
                                             classNamePrefix="Select"
                                             className={`${errListObject
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
+                                                ? "border-red-500"
+                                                : "border-transparent"
                                                 } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             isSearchable={true}
                                             noOptionsMessage={() =>
@@ -1290,8 +1290,8 @@ const Popup_dspc = (props) => {
                                                 }),
                                             }}
                                             className={`${errListObject
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
+                                                ? "border-red-500"
+                                                : "border-transparent"
                                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                         />
                                     )}
@@ -1406,10 +1406,10 @@ const Popup_dspc = (props) => {
                                             }),
                                         }}
                                         className={`${errListTypeDoc &&
-                                                typeOfDocument != null &&
-                                                listTypeOfDocument?.length == 0
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            typeOfDocument != null &&
+                                            listTypeOfDocument?.length == 0
+                                            ? "border-red-500"
+                                            : "border-transparent"
                                             } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                     />
                                     {errListTypeDoc &&
@@ -1476,7 +1476,7 @@ const Popup_dspc = (props) => {
                                                         Toast.fire({
                                                             icon: "error",
                                                             title: `${props.dataLang
-                                                                    ?.payment_errPlease ||
+                                                                ?.payment_errPlease ||
                                                                 "payment_errPlease"
                                                                 } ${totalMoney.toLocaleString(
                                                                     "en"
@@ -1494,8 +1494,8 @@ const Popup_dspc = (props) => {
                                             }
                                         }}
                                         className={`${errPrice
-                                                ? "border-red-500"
-                                                : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
+                                            ? "border-red-500"
+                                            : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
                                             } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
                                         thousandSeparator=","
                                     />
@@ -1633,9 +1633,9 @@ const Popup_dspc = (props) => {
                                                             }),
                                                         }}
                                                         className={`${errCosts &&
-                                                                e?.chiphi === ""
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
+                                                            e?.chiphi === ""
+                                                            ? "border-red-500"
+                                                            : "border-transparent"
                                                             } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                                     />
                                                 </div>
@@ -1673,8 +1673,8 @@ const Popup_dspc = (props) => {
                                                                     Toast.fire({
                                                                         icon: "error",
                                                                         title: `${props
-                                                                                .dataLang
-                                                                                ?.payment_errPlease ||
+                                                                            .dataLang
+                                                                            ?.payment_errPlease ||
                                                                             "payment_errPlease"
                                                                             } ${price.toLocaleString(
                                                                                 "en"
@@ -1691,11 +1691,11 @@ const Popup_dspc = (props) => {
                                                         }}
                                                         isNumericString={true}
                                                         className={`${errSotien &&
-                                                                (e?.sotien === "" ||
-                                                                    e?.sotien ===
-                                                                    null)
-                                                                ? "border-b-red-500"
-                                                                : " border-gray-200"
+                                                            (e?.sotien === "" ||
+                                                                e?.sotien ===
+                                                                null)
+                                                            ? "border-b-red-500"
+                                                            : " border-gray-200"
                                                             } placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
                                                         thousandSeparator=","
                                                     />
@@ -1736,7 +1736,7 @@ const Popup_dspc = (props) => {
                         </div>
                     </form>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

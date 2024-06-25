@@ -1,4 +1,4 @@
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
@@ -66,7 +66,7 @@ const PopupDetail = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.delivery_receipt_detail || "delivery_receipt_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -409,7 +409,7 @@ const PopupDetail = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

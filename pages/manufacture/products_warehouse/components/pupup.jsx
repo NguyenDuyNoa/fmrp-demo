@@ -16,7 +16,7 @@ import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 
@@ -55,7 +55,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props?.dataLang?.productsWarehouse_titleDetail || "productsWarehouse_titleDetail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -335,7 +335,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

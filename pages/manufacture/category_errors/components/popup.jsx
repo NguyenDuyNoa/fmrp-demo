@@ -1,6 +1,6 @@
 import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiCategoryErrors from "@/Api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
@@ -48,7 +48,7 @@ const PopupCategoryErrors = (props) => {
             message?.code && isShow("error", message?.code);
             message?.branch_id && isShow("error", message?.branch_id);
             message?.error && isShow("error", message?.error);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const fetchBranch = async () => {
@@ -63,7 +63,7 @@ const PopupCategoryErrors = (props) => {
             setValue("name", data?.dtData?.name);
             setValue("branch", findBranch);
             setValue("note", data?.dtData?.note);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -82,7 +82,7 @@ const PopupCategoryErrors = (props) => {
     }, [isState.dataBranch, props.id]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props.id
                     ? `${props.dataLang?.error_category_edit || "error_category_edit"}`
@@ -105,9 +105,8 @@ const PopupCategoryErrors = (props) => {
                             placeholder={props.dataLang?.error_category_code || "error_category_code"}
                             {...register("code", { required: true })}
                             type="text"
-                            className={`${
-                                errors.code ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none `}
+                            className={`${errors.code ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none `}
                         />
                         {errors.code && (
                             <label className="  text-[14px] text-red-500">
@@ -122,9 +121,8 @@ const PopupCategoryErrors = (props) => {
                             placeholder={props.dataLang?.error_category_name || "error_category_name"}
                             {...register("name", { required: true })}
                             type="text"
-                            className={`${
-                                errors.name ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none `}
+                            className={`${errors.name ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none `}
                         />
                         {errors.name && (
                             <label className="  text-[14px] text-red-500">
@@ -168,9 +166,8 @@ const PopupCategoryErrors = (props) => {
                                             },
                                         }),
                                     }}
-                                    className={`${
-                                        errors.branch ? "border-red-500" : "border-transparent"
-                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                    className={`${errors.branch ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                 />
                             )}
                         />
@@ -208,7 +205,7 @@ const PopupCategoryErrors = (props) => {
                     </div>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupCategoryErrors;

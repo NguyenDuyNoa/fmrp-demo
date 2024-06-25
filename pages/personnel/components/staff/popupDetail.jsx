@@ -10,7 +10,7 @@ import {
 } from "iconsax-react";
 import Image from "next/image";
 import { useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -63,7 +63,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props?.dataLang?.personnels_staff_popup_detail_title}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -451,7 +451,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     )}
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

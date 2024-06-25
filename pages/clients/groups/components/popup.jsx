@@ -3,7 +3,7 @@ import {
 } from "iconsax-react";
 import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import useToast from "@/hooks/useToast";
@@ -101,7 +101,7 @@ const Popup_groupKh = (props) => {
         }
     };
     return (
-        <PopupEdit
+        <PopupCustom
             title={props.id ? `${props.dataLang?.client_group_edit}` : `${props.dataLang?.client_group_add}`}
             button={props.id ? (<IconEdit />) : (`${props.dataLang?.branch_popup_create_new}`)}
             onClickOpen={() => queryState({ open: true })}
@@ -210,7 +210,7 @@ const Popup_groupKh = (props) => {
                     </div>
                 </form>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default Popup_groupKh;

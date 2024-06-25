@@ -3,7 +3,7 @@ import {
 } from "iconsax-react";
 import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -52,7 +52,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.dataLang?.purchase_detail_title ||
                     "purchase_detail_title"
@@ -325,7 +325,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

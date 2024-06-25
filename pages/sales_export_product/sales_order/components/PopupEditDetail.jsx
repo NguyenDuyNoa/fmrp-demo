@@ -9,7 +9,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -173,7 +173,7 @@ const Popup_EditDetail = (props) => {
     }, [isFetching.onSending]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={dataLang?.salesOrder_warehouse_details || "salesOrder_warehouse_details"}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
@@ -436,7 +436,7 @@ const Popup_EditDetail = (props) => {
                 save={handleDeleteItem}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default Popup_EditDetail;

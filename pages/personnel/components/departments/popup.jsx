@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import useToast from "@/hooks/useToast";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 
 const Popup_phongban = (props) => {
     const [open, sOpen] = useState(false);
@@ -109,7 +109,7 @@ const Popup_phongban = (props) => {
         }
     };
     return (
-        <PopupEdit
+        <PopupCustom
             title={props.id ? `${props.dataLang?.personnels_deparrtments_edit}` : `${props.dataLang?.personnels_deparrtments_add}`
             }
             button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
@@ -223,7 +223,7 @@ const Popup_phongban = (props) => {
                     </div>
                 </form>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default Popup_phongban;

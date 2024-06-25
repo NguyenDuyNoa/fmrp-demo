@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import ReactExport from "react-data-export";
 
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -222,7 +222,7 @@ const Popup_status = (props) => {
   const multiDataSet = [{ columns: columns, data: values }];
 
   return (
-    <PopupEdit
+    <PopupCustom
       title={
         <>
           <span className="text-red-500 capitalize">
@@ -338,7 +338,7 @@ const Popup_status = (props) => {
           </div>
         </div>
       </div>
-    </PopupEdit>
+    </PopupCustom>
   );
 };
 export default Popup_status;

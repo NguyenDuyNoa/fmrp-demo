@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import Popup from "reactjs-popup";
 
@@ -34,13 +34,12 @@ const Popup_stages = (props) => {
   }, [props.data]);
 
   return (
-    <PopupEdit
+    <PopupCustom
       title={
         <>
           <span className="text-red-500 capitalize">
-            {`${dataLang?.import_total_detection || "import_total_detection"} ${
-              props?.data?.length
-            } ${dataLang?.import_error || "import_error"} `}{" "}
+            {`${dataLang?.import_total_detection || "import_total_detection"} ${props?.data?.length
+              } ${dataLang?.import_error || "import_error"} `}{" "}
           </span>{" "}
         </>
       }
@@ -121,7 +120,7 @@ const Popup_stages = (props) => {
           </div>
         </div>
       </div>
-    </PopupEdit>
+    </PopupCustom>
   );
 };
 export default Popup_stages;

@@ -1,4 +1,4 @@
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
@@ -77,7 +77,7 @@ const PopupDetailQuote = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.price_quote_popup_detail_title || "price_quote_popup_detail_title"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -357,7 +357,7 @@ const PopupDetailQuote = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

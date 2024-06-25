@@ -8,7 +8,7 @@ import "react-phone-input-2/lib/style.css";
 import useToast from "@/hooks/useToast";
 
 import apiBranch from "@/Api/apiSettings/apiBranch";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 const PopupBranch = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -87,7 +87,7 @@ const PopupBranch = (props) => {
     }, [name.length > 0]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props.id ? `${props.dataLang?.branch_popup_edit}` : `${props.dataLang?.branch_popup_create_new_branch}`
             }
@@ -161,7 +161,7 @@ const PopupBranch = (props) => {
                     </div>
                 </form>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupBranch

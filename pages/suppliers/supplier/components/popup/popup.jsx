@@ -13,7 +13,7 @@ import { useToggle } from "@/hooks/useToggle";
 
 import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -325,7 +325,7 @@ const Popup_dsncc = (props) => {
 
   return (
     <>
-      <PopupEdit
+      <PopupCustom
         title={
           props.id
             ? `${props.dataLang?.suppliers_supplier_edit}`
@@ -400,7 +400,7 @@ const Popup_dsncc = (props) => {
             </div>
           </form>
         </div>
-      </PopupEdit>
+      </PopupCustom>
       <PopupConfim
         dataLang={props.dataLang}
         type="warning"

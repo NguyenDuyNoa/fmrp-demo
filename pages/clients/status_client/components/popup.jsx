@@ -6,7 +6,7 @@ import {
 } from "iconsax-react";
 import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 
 const Popup_status = (props) => {
@@ -107,7 +107,7 @@ const Popup_status = (props) => {
         }
     };
     return (
-        <PopupEdit
+        <PopupCustom
             title={props.id ? `${props.dataLang?.client_group_statusedit}` : `${props.dataLang?.client_group_statusadd}`}
             button={props.id ? (<IconEdit />) : (`${props.dataLang?.branch_popup_create_new}`)}
             onClickOpen={() => queryState({ open: true })}
@@ -225,7 +225,7 @@ const Popup_status = (props) => {
                     </div>
                 </form>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default Popup_status;

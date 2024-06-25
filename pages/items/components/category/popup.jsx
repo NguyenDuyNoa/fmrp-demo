@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import apiCategory from "@/Api/apiMaterial/category/apiCategory";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import useToast from "@/hooks/useToast";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -152,7 +152,7 @@ const Popup_NVL = React.memo((props) => {
     const valueIdCategory = (e) => sIdCategory(e?.value);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props.data?.id
                     ? `${props.dataLang?.category_material_group_edit}`
@@ -309,7 +309,7 @@ const Popup_NVL = React.memo((props) => {
                     </button>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 });
 export default Popup_NVL

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
@@ -54,7 +54,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title"
                 }
@@ -418,7 +418,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

@@ -7,7 +7,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { SearchNormal1 as IconSearch, Trash as IconDelete, BoxSearch, ArrowRight2 } from "iconsax-react";
 
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import Loading from "@/components/UI/loading";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
@@ -295,7 +295,7 @@ const Popup_DetailKeepStock = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={dataLang?.salesOrder_listarchive || "salesOrder_listarchive"}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -679,7 +679,7 @@ const Popup_DetailKeepStock = (props) => {
                     save={handleDeleteItem}
                     cancel={() => handleQueryId({ status: false })}
                 />
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

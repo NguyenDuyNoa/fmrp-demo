@@ -8,7 +8,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Loading from "components/UI/loading";
 import { useEffect, useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
@@ -40,7 +40,7 @@ const Popup_status = (props) => {
     }, [props?.data_export]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={props.dataLang?.inventory_votes || "inventory_votes"}
             open={open}
             onClose={() => sOpen(false)}
@@ -179,7 +179,7 @@ const Popup_status = (props) => {
                     </div>
                 </Customscrollbar>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default Popup_status;

@@ -7,7 +7,7 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
@@ -236,7 +236,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={dataLang?.materials_planning_raw_materials || "materials_planning_raw_materials"}
                 button={
                     <button
@@ -765,7 +765,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

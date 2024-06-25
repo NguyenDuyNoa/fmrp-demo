@@ -3,7 +3,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import { Verify } from "iconsax-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 const PopupModelTime = (props) => {
     const [open, sOpen] = useState(false);
@@ -19,7 +19,7 @@ const PopupModelTime = (props) => {
     return (
         // <div className={`${open ? props?.hidden : props?.hidden}`}>
         <>
-            <PopupEdit
+            <PopupCustom
                 // title={"Khởi đầu chuyển đổi số ngay với phần mềm FMRP !"}
                 // button={"props?.name"}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -118,7 +118,7 @@ const PopupModelTime = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

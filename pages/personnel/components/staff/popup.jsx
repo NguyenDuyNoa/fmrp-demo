@@ -18,7 +18,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 const Popup_dsnd = (props) => {
     const isShow = useToast();
@@ -355,7 +355,7 @@ const Popup_dsnd = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.id
                         ? `${props.dataLang?.personnels_staff_popup_edit}`
@@ -927,7 +927,7 @@ const Popup_dsnd = (props) => {
                         </div>
                     </form>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

@@ -1,5 +1,5 @@
 import { Add } from "iconsax-react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import { useState } from "react";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
@@ -76,7 +76,7 @@ const PopupAdd = ({ data, listStaff }) => {
     );
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 <>
                     <h1 className="font-medium text-xl text-[#101828]">Phân bổ nhân viên</h1>
@@ -373,7 +373,7 @@ const PopupAdd = ({ data, listStaff }) => {
                     </button>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 const MoreSelectedBadge = ({ items }) => {

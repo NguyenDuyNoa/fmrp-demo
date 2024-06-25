@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -122,7 +122,7 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
     };
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={"Thêm chi tiết lỗi"}
             button={props?.name}
             onClickOpen={() => {
@@ -303,7 +303,7 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
                     <ButtonSubmit loading={false} onClick={() => handeSave()} dataLang={props.dataLang} />
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupDetailError;

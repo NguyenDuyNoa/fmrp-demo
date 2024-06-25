@@ -19,7 +19,7 @@ import Select, { components } from "react-select";
 import Swal from "sweetalert2";
 
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import Pagination from "@/components/UI/pagination";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";

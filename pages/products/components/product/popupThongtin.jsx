@@ -6,7 +6,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -121,7 +121,7 @@ const Popup_ThongTin = React.memo((props) => {
         }
     ]
     return (
-        <PopupEdit
+        <PopupCustom
             title={"Chi tiết thành phẩm"}
             button={props.children}
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -560,7 +560,7 @@ const Popup_ThongTin = React.memo((props) => {
                     </React.Fragment>
                 )}
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 });
 

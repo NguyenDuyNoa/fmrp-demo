@@ -12,7 +12,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -61,7 +61,7 @@ const Popup_chitiet = (props) => {
     };
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.inventory_title_detail || "inventory_title_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -379,7 +379,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

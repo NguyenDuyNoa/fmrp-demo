@@ -9,7 +9,7 @@ import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
@@ -83,7 +83,7 @@ const Popup_chitietThere = (props) => {
     }
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     (props?.type == "import" && (props.dataLang?.import_detail_title || "import_detail_title")) ||
                     (props?.type == "service" && (props.dataLang?.serviceVoucher_service_voucher_details || "serviceVoucher_service_voucher_details")) ||
@@ -1614,7 +1614,7 @@ const Popup_chitietThere = (props) => {
                             </div>
                         </div>
                     ))}
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

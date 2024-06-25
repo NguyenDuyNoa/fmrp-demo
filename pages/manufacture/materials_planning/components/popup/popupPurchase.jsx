@@ -6,7 +6,7 @@ import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/Table
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
@@ -151,7 +151,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
     };
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={dataLang?.materials_planning_add_purchase || "materials_planning_add_purchase"}
                 button={
                     <button
@@ -509,7 +509,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 import { Tooltip } from "react-tippy";
 import TableContact from "../table/tableContact";
 import TableDelivery from "../table/tableDelivery";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -66,7 +66,7 @@ const Popup_chitiet = (props) => {
     ];
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.client_popup_detailUser}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -402,7 +402,7 @@ const Popup_chitiet = (props) => {
                         </TableDelivery>
                     )}
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

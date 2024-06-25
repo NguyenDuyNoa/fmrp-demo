@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import useToast from "@/hooks/useToast";
@@ -15,7 +15,7 @@ const PopupCheckQuality = (props) => {
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={"Chi tiết kiểm tra chất lượng"}
             button={props?.name}
             onClickOpen={() => queryState({ open: true })}
@@ -195,7 +195,7 @@ const PopupCheckQuality = (props) => {
                     </div>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupCheckQuality;

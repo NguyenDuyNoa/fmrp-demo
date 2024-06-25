@@ -16,7 +16,7 @@ import vi from "date-fns/locale/vi";
 import moment from "moment/moment";
 registerLocale("vi", vi);
 
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { v4 as uuidv4 } from "uuid";
@@ -622,7 +622,7 @@ const Popup_servie = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.id
                         ? `${props.dataLang?.serviceVoucher_edit || "serviceVoucher_edit"}`
@@ -1121,7 +1121,7 @@ const Popup_servie = (props) => {
                         </div>
                     </form>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

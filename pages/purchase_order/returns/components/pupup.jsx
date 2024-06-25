@@ -15,7 +15,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 
 import Loading from "components/UI/loading";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { useEffect } from "react";
@@ -84,7 +84,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.returns_payment_detail || "returns_payment_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -439,7 +439,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

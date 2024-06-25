@@ -6,7 +6,7 @@ import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
@@ -111,7 +111,7 @@ const Popup_chitietDauki = (props) => {
     const handlePageChange = (pageNumber) => sIsState((pver) => ({ ...pver, currentPage: pageNumber }));
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     (props?.type == "no_start" ? dataLang?.debt_suppliers_detail_dk || 'debt_suppliers_detail_dk'
                         : dataLang?.debt_suppliers_detail_dkc || 'debt_suppliers_detail_dkc')
@@ -276,7 +276,7 @@ const Popup_chitietDauki = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit >
+            </PopupCustom >
         </>
     );
 };

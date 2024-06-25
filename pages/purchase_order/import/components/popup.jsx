@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 
 import Loading from "components/UI/loading";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 
@@ -76,7 +76,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.dataLang?.import_detail_title || "import_detail_title"
                 }
@@ -455,7 +455,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit >
+            </PopupCustom >
         </>
     );
 };

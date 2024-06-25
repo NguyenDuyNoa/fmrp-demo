@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import useToast from "@/hooks/useToast";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
@@ -40,7 +40,7 @@ const PopupAddTask = ({ children, id, isStateCalender, queryStateCalender, disbl
     }
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={"Thêm công việc"}
             button={children
             }
@@ -128,7 +128,7 @@ const PopupAddTask = ({ children, id, isStateCalender, queryStateCalender, disbl
                     <ButtonSubmit loading={false} onClick={() => handleAddTask()} dataLang={dataLang} />
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupAddTask;

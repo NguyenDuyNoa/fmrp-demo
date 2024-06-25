@@ -14,7 +14,7 @@ import {
 import { _ServerInstance as Axios } from "/services/axios";
 import useToast from "@/hooks/useToast";
 
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import Loading from "@/components/UI/loading";
@@ -309,7 +309,7 @@ const Popup_ChucVu = React.memo((props) => {
     }
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props?.id
                     ? `${props.dataLang?.category_personnel_position_edit || "category_personnel_position_edit"}`
@@ -592,7 +592,7 @@ const Popup_ChucVu = React.memo((props) => {
                     </React.Fragment>
                 )}
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 });
 export default Popup_ChucVu

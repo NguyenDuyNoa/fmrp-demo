@@ -6,7 +6,7 @@ import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
@@ -71,7 +71,7 @@ const Popup_chitietPhatsinh = (props) => {
     };
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     (props?.type == "no_debt" && dataLang?.debt_suppliers_detail_ps) ||
                     (props?.type == "chi_debt" && dataLang?.debt_suppliers_detail_c)
@@ -218,7 +218,7 @@ const Popup_chitietPhatsinh = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

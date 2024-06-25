@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { useToggle } from "@/hooks/useToggle";
 
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
@@ -22,7 +22,7 @@ const PopupEditer = ({ }) => {
     }, [isOpen]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 <>
                     <h1 className="font-medium text-xl text-[#101828]">Danh sách bán thành phẩm (SO-1233123)</h1>
@@ -199,7 +199,7 @@ const PopupEditer = ({ }) => {
                     </button>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupEditer;

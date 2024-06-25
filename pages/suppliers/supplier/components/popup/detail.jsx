@@ -13,7 +13,7 @@ import Loading from "components/UI/loading";
 import {
   SearchNormal1 as IconSearch
 } from "iconsax-react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 
 const Popup_chitiet = (props) => {
@@ -46,7 +46,7 @@ const Popup_chitiet = (props) => {
 
   return (
     <>
-      <PopupEdit
+      <PopupCustom
         title={props.dataLang?.suppliers_supplier_detail}
         button={props?.name}
         onClickOpen={_ToggleModal.bind(this, true)}
@@ -320,7 +320,7 @@ const Popup_chitiet = (props) => {
             </div>
           )}
         </div>
-      </PopupEdit>
+      </PopupCustom>
     </>
   );
 };

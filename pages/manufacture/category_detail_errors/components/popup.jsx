@@ -1,6 +1,6 @@
 import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useState } from "react";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import apiCategoryDetailErrors from "@/Api/apiManufacture/qc/categoryDetailErrors/apiCategoryDetailErrors";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
@@ -64,7 +64,7 @@ const PopupCategoryErrors = (props) => {
             message?.branch_id && isShow("error", message?.branch_id);
             message?.category_error_id && isShow("error", message?.category_error_id);
             message?.error && isShow("error", message?.error);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const fetchCategoryError = debounce(async (value) => {
@@ -80,7 +80,7 @@ const PopupCategoryErrors = (props) => {
                         })) || [],
                 });
             }
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     const fetchDetailCategory = async () => {
@@ -92,7 +92,7 @@ const PopupCategoryErrors = (props) => {
             setValue("name", data?.dtData?.name);
             setValue("categoryError", findCategory);
             setValue("note", data?.dtData?.note);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -113,7 +113,7 @@ const PopupCategoryErrors = (props) => {
     if (!isMounted) return null;
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props.id
                     ? `${props.dataLang?.detailed_error_edit || "detailed_error_edit"}`
@@ -137,9 +137,8 @@ const PopupCategoryErrors = (props) => {
                                 {...register("code", { required: true })}
                                 type="text"
                                 placeholder={props?.dataLang?.detailed_error_code || "detailed_error_code"}
-                                className={`${
-                                    errors.code ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none `}
+                                className={`${errors.code ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none `}
                             />
                             {errors.code && (
                                 <label className="  text-[14px] text-red-500">
@@ -155,9 +154,8 @@ const PopupCategoryErrors = (props) => {
                                 {...register("name", { required: true })}
                                 type="text"
                                 placeholder={props?.dataLang?.detailed_error_name || "detailed_error_name"}
-                                className={`${
-                                    errors.name ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none `}
+                                className={`${errors.name ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none `}
                             />
                             {errors.name && (
                                 <label className="  text-[14px] text-red-500">
@@ -204,9 +202,8 @@ const PopupCategoryErrors = (props) => {
                                                 },
                                             }),
                                         }}
-                                        className={`${
-                                            errors.categoryError ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errors.categoryError ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                     />
                                 )}
                             />
@@ -244,7 +241,7 @@ const PopupCategoryErrors = (props) => {
                     </div>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupCategoryErrors;

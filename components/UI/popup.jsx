@@ -8,7 +8,7 @@ const deca = Lexend_Deca({
     weight: ["300", "400", "500", "600", "700"],
 });
 
-const Index = (props) => {
+const Popup = (props) => {
     return (
         <React.Fragment>
             <button className={props.classNameBtn} onClick={props.onClickOpen}>
@@ -27,9 +27,8 @@ const Index = (props) => {
                         className={`${deca.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl `}
                     >
                         <div
-                            className={`${
-                                props.classNameTittle ? props.classNameTittle : "items-center"
-                            } flex justify-between`}
+                            className={`${props.classNameTittle ? props.classNameTittle : "items-center"
+                                } flex justify-between`}
                         >
                             <h1 className="text-[#101828] font-medium 3xl:text-[22px] 2xl:text-[18px] text-lg">
                                 {props.title}
@@ -53,4 +52,4 @@ const Index = (props) => {
     );
 };
 
-export default Index;
+export default Popup;

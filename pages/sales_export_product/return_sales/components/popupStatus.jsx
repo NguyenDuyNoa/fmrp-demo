@@ -10,7 +10,7 @@ registerLocale("vi", vi);
 
 
 import Loading from "components/UI/loading";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Swal from "sweetalert2";
@@ -82,7 +82,7 @@ const Popup_status = (props) => {
     }, [props?.data_export]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={props.dataLang?.inventory_votes || "inventory_votes"}
             open={open}
             onClose={() => sOpen(false)}
@@ -213,7 +213,7 @@ const Popup_status = (props) => {
                     </div>
                 </Customscrollbar>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default Popup_status;

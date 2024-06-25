@@ -5,7 +5,7 @@ import { Add as IconAdd, Trash as IconDelete, Edit as IconEdit } from "iconsax-r
 import useToast from "@/hooks/useToast";
 
 import apiVariant from "@/Api/apiSettings/apiVariant";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 const PopupVariant = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -103,7 +103,7 @@ const PopupVariant = (props) => {
     };
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props.id ? `${props.dataLang?.variant_popup_edit}` : `${props.dataLang?.branch_popup_create_new_variant}`
             }
@@ -197,7 +197,7 @@ const PopupVariant = (props) => {
                     </div>
                 </form>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupVariant

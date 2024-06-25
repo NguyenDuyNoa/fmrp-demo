@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { debounce } from "lodash";
 
 import {
@@ -589,7 +589,7 @@ const Popup_ThongTin = React.memo((props) => {
     }, [open]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={props.dataLang?.category_material_list_detail || "category_material_list_detail"}
             button={props.children}
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -843,7 +843,7 @@ const Popup_ThongTin = React.memo((props) => {
                     </React.Fragment>
                 )}
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 });
 

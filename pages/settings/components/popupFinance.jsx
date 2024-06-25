@@ -10,7 +10,7 @@ import useToast from "@/hooks/useToast";
 import apiFinance from "@/Api/apiSettings/apiFinance";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { isAllowedNumber } from "@/utils/helpers/common";
 const PopupFinance = (props) => {
     const router = useRouter();
@@ -164,7 +164,7 @@ const PopupFinance = (props) => {
     }, [nameTax.length > 0, symbolCu.length > 0, codeCu.length > 0, nameMe.length > 0]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props.data?.id
                     ? `${(tabPage === "taxes" && props.dataLang?.branch_popup_finance_edit) ||
@@ -379,7 +379,7 @@ const PopupFinance = (props) => {
                     </div>
                 </form>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
 };
 export default PopupFinance

@@ -5,21 +5,21 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useState, useEffect, useRef } from "react";
 
-import { _ServerInstance as Axios } from "/services/axios";
+import { \_ServerInstance as Axios } from "/services/axios";
 import Popup from "reactjs-popup";
 
 import {
-    SearchNormal1 as IconSearch,
-    Trash as IconDelete,
-    UserEdit as IconUserEdit,
-    Grid6 as IconExcel,
-    Image as IconImage,
-    GalleryEdit as IconEditImg,
-    ArrowDown2 as IconDown,
-    Add as IconAdd,
-    Maximize4 as IconMax,
-    CloseCircle as IconClose,
-    TickCircle as IconTick,
+SearchNormal1 as IconSearch,
+Trash as IconDelete,
+UserEdit as IconUserEdit,
+Grid6 as IconExcel,
+Image as IconImage,
+GalleryEdit as IconEditImg,
+ArrowDown2 as IconDown,
+Add as IconAdd,
+Maximize4 as IconMax,
+CloseCircle as IconClose,
+TickCircle as IconTick,
 } from "iconsax-react";
 import { NumericFormat } from "react-number-format";
 import Select, { components } from "react-select";
@@ -28,10 +28,10 @@ import ModalImage from "react-modal-image";
 import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
 import { arrayMoveImmutable } from "array-move";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
+ssr: false,
 });
 
-import PopupEdit from "@/components/UI/popup";
+import PopupCustom from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -49,24 +49,24 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
-    <div className="flex space-x-2 truncate">
-        {level == 1 && <span>--</span>}
-        {level == 2 && <span>----</span>}
-        {level == 3 && <span>------</span>}
-        {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
-    </div>
+<div className="flex space-x-2 truncate">
+{level == 1 && <span>--</span>}
+{level == 2 && <span>----</span>}
+{level == 3 && <span>------</span>}
+{level == 4 && <span>--------</span>}
+<span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
+</div>
 );
 
 const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
+const style = {
+marginLeft: "auto",
+background: "#d4eefa",
+borderRadius: "4px",
+fontSize: "14px",
+padding: "1px 3px",
+order: 99,
+};
 
     const title = items.join(", ");
     const length = items.length;
@@ -77,23 +77,25 @@ const MoreSelectedBadge = ({ items }) => {
             {label}
         </div>
     );
+
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 2;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
+const maxToShow = 2;
+const overflow = getValue()
+.slice(maxToShow)
+.map((x) => x.label);
 
     return index < maxToShow ? (
         <components.MultiValue {...props} />
     ) : index === maxToShow ? (
         <MoreSelectedBadge items={overflow} />
     ) : null;
+
 };
 
 const Index = (props) => {
-    const dataLang = props.dataLang;
+const dataLang = props.dataLang;
 
     const router = useRouter();
 
@@ -974,10 +976,11 @@ const Index = (props) => {
             </div>
         </React.Fragment>
     );
+
 };
 
 const BtnTacVu = React.memo((props) => {
-    const isShow = useToast();
+const isShow = useToast();
 
     const [openTacvu, sOpenTacvu] = useState(false);
 
@@ -1096,10 +1099,11 @@ const BtnTacVu = React.memo((props) => {
             </Popup>
         </div>
     );
+
 });
 
 const Popup_ThanhPham = React.memo((props) => {
-    const dataOptBranch = useSelector((state) => state.branch);
+const dataOptBranch = useSelector((state) => state.branch);
 
     const dataOptType = useSelector((state) => state.type_finishedProduct);
 
@@ -1713,7 +1717,7 @@ const Popup_ThanhPham = React.memo((props) => {
     };
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={
                 props?.id
                     ? `${props.dataLang?.edit_finishedProduct || "edit_finishedProduct"}`
@@ -2540,13 +2544,14 @@ const Popup_ThanhPham = React.memo((props) => {
                     </button>
                 </div>
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
+
 });
 
 const Popup_ThongTin = React.memo((props) => {
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
+const [open, sOpen] = useState(false);
+const \_ToggleModal = (e) => sOpen(e);
 
     const [openStage, sOpenStage] = useState(false);
     const [openBom, sOpenBom] = useState(false);
@@ -2639,7 +2644,7 @@ const Popup_ThongTin = React.memo((props) => {
     }, [tabBom, dataBom]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={"Chi tiết thành phẩm"}
             button={props.children}
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -3110,12 +3115,13 @@ const Popup_ThongTin = React.memo((props) => {
                     </React.Fragment>
                 )}
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
+
 });
 
 const Popup_GiaiDoan = React.memo((props) => {
-    const listCd = useSelector((state) => state.stage_finishedProduct);
+const listCd = useSelector((state) => state.stage_finishedProduct);
 
     const isShow = useToast();
 
@@ -3403,7 +3409,7 @@ const Popup_GiaiDoan = React.memo((props) => {
     });
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${props.name
                 })`}
             button={
@@ -3481,12 +3487,13 @@ const Popup_GiaiDoan = React.memo((props) => {
                     </>
                 )}
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
+
 });
 
 const Popup_Bom = React.memo((props) => {
-    const scrollAreaRef = useRef(null);
+const scrollAreaRef = useRef(null);
 
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
@@ -3998,7 +4005,7 @@ const Popup_Bom = React.memo((props) => {
     }, [loadingData]);
 
     return (
-        <PopupEdit
+        <PopupCustom
             title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${props.name
                 })`}
             button={
@@ -4412,8 +4419,9 @@ const Popup_Bom = React.memo((props) => {
                     </>
                 )}
             </div>
-        </PopupEdit>
+        </PopupCustom>
     );
+
 });
 
 export default Index;

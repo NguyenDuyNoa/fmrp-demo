@@ -14,7 +14,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useSetData } from "@/hooks/useSetData";
@@ -101,7 +101,7 @@ const Popup_chitietThere = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={checkKeys[props.type]}
                 button={props?.name}
                 onClickOpen={() => handleOpen(true)}
@@ -2112,7 +2112,7 @@ const Popup_chitietThere = (props) => {
                             </div>
                         </div>
                     ))}
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

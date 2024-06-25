@@ -11,7 +11,7 @@ import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/compon
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 const Popup_chitiet = (props) => {
@@ -42,7 +42,7 @@ const Popup_chitiet = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.receipts_detail || "receipts_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -230,7 +230,7 @@ const Popup_chitiet = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

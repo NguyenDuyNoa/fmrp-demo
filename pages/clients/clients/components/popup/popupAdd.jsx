@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { v4 as uuidv4 } from "uuid";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 
 import apiClient from "@/Api/apiClients/client/apiClient";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -435,7 +435,7 @@ const Popup_dskh = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.id ? `${props.dataLang?.client_popup_edit}` : `${props.dataLang?.client_popup_add}`}
                 button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={() => queryState({ open: true })}
@@ -536,7 +536,7 @@ const Popup_dskh = (props) => {
                         </div>
                     </form>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
             <PopupConfim
                 type="warning"
                 nameModel={props?.nameModel}

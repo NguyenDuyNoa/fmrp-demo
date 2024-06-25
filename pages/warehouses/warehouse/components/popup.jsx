@@ -21,7 +21,7 @@ import {
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/Popup";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import useToast from "@/hooks/useToast";
 import apiComons from "@/Api/apiComon/apiComon";
@@ -180,7 +180,7 @@ const Popup_kho = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={
                     props.id ? `${props.dataLang?.Warehouse_poppup_edit}` : `${props.dataLang?.Warehouse_poppup_add}`
                 }
@@ -353,7 +353,7 @@ const Popup_kho = (props) => {
                         </div>
                     </form>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

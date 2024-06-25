@@ -14,7 +14,7 @@ registerLocale("vi", vi);
 
 
 import Loading from "components/UI/loading";
-import PopupEdit from "/components/UI/popup";
+import PopupCustom from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Swal from "sweetalert2";
@@ -95,7 +95,7 @@ const PopupDetail = (props) => {
 
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.returnSales_detail || "returnSales_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -470,7 +470,7 @@ const PopupDetail = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };
