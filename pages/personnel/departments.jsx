@@ -1,47 +1,44 @@
+import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useRef, useState } from "react";
-import { debounce } from "lodash";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import {
-    Edit as IconEdit,
-    Trash as IconDelete,
-    Grid6 as IconExcel,
-    SearchNormal1 as IconSearch,
     Grid6,
+    Edit as IconEdit
 } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 import Popup_phongban from "./components/departments/popup";
 
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import OnResetData from "@/components/UI/btnResetData/btnReset";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
-import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
 import { BtnAction } from "@/components/UI/BtnAction";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import { useQuery } from "@tanstack/react-query";
 
 const Index = (props) => {
     const router = useRouter();
@@ -64,7 +61,6 @@ const Index = (props) => {
 
     const initalState = {
         keySearch: "",
-        onFetching: false,
         onFetchingBrand: false,
         data: [],
         data_ex: [],
@@ -76,69 +72,39 @@ const Index = (props) => {
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_staff/department/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-
-                    sTotalItem(output);
-                    queryState({ data: rResult || [], data_ex: rResult || [] });
-                }
-                queryState({ onFetching: false });
+    const { isFetching, refetch } = useQuery({
+        queryKey: ['api_list_departments', limit, router.query?.page, isState.valueBr, isState.keySearch],
+        queryFn: async () => {
+            const params = {
+                search: isState.keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr.map((e) => e.value) : null,
             }
-        );
-    };
+            const { rResult, output } = await apiDepartments.apiListDepartment({ params })
+            sTotalItem(output);
 
-    const _ServerFetching_brand = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) });
-                }
-                queryState({ onFetchingBrand: false });
-            }
-        );
-    };
+            queryState({ data: rResult || [], data_ex: rResult || [] });
 
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
+            return rResult
+        }
+    })
 
-    useEffect(() => {
-        isState.onFetchingBrand && _ServerFetching_brand();
-    }, [isState.onFetchingBrand]);
 
-    useEffect(() => {
-        queryState({ onFetching: true });
-    }, [limit, router.query?.page, isState.valueBr, isState.keySearch]);
+    const { data } = useQuery({
+        queryKey: ["api_branch"],
+        queryFn: async () => {
 
-    useEffect(() => {
-        queryState({ onFetchingBrand: true });
-    }, []);
+            const { result } = await apiComons.apiBranchCombobox();
+
+            queryState({ listBr: result?.map((e) => ({ label: e.name, value: e.id })) });
+            return result
+        }
+    })
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace("/personnels/departments");
-        queryState({ onFetching: true });
     }, 500);
 
     const multiDataSet = [
@@ -211,7 +177,7 @@ const Index = (props) => {
                                 {role == true || checkAdd ? (
                                     <Popup_phongban
                                         isState={isState}
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"client_contact"}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -261,7 +227,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
@@ -305,7 +271,7 @@ const Index = (props) => {
                                             {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
@@ -331,7 +297,7 @@ const Index = (props) => {
                                                         >
                                                             {role == true || checkEdit ? (
                                                                 <Popup_phongban
-                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefresh={refetch.bind(this)}
                                                                     className="xl:text-base text-xs "
                                                                     isState={isState}
                                                                     sValueBr={e.branch}
@@ -349,7 +315,7 @@ const Index = (props) => {
                                                                 />
                                                             )}
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
                                                                 onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}

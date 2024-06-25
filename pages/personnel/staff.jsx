@@ -452,8 +452,7 @@ const Index = (props) => {
                                             {dataLang?.personnels_staff_table_avtar || "personnels_staff_table_avtar"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.personnels_staff_table_fullname ||
-                                                "personnels_staff_table_fullname"}
+                                            {dataLang?.personnels_staff_table_fullname || "personnels_staff_table_fullname"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.personnels_staff_table_code || "personnels_staff_table_code"}

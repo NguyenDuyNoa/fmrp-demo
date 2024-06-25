@@ -1,56 +1,47 @@
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
 import {
-    Minus as IconMinus,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    SearchNormal1,
     Grid6,
+    ArrowDown2 as IconDown,
+    Edit as IconEdit,
+    Minus as IconMinus
 } from "iconsax-react";
-import Select, { components } from "react-select";
-import Swal from "sweetalert2";
 
-import Loading from "@/components/UI/loading";
-import PopupCustom from "@/components/UI/popup";
-import Pagination from "@/components/UI/pagination";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
 
-import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import useToast from "@/hooks/useToast";
-import { debounce } from "lodash";
-import { MdClear } from "react-icons/md";
-import NoData from "@/components/UI/noData/nodata";
-import useSetingServer from "@/hooks/useConfigNumber";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import Popup_ChucVu from "./components/roles/popupChucvu";
-import useActionRole from "@/hooks/useRole";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
+import apiRoles from "@/Api/apiPersonnel/apiRoles";
 import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useQuery } from "@tanstack/react-query";
+import { debounce } from "lodash";
+import PopupRoles from "./components/roles/popupRoles";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -64,12 +55,6 @@ const Index = (props) => {
     const isShow = useToast();
 
     const dispatch = useDispatch();
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingAnother, sOnFetchingAnother] = useState(false);
-
-    const [onFetchingSub, sOnFetchingSub] = useState(false);
 
     const [data, sData] = useState([]);
     //Bộ lọc Chi nhánh
@@ -89,37 +74,22 @@ const Index = (props) => {
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "personnel_roles");
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_staff/position/?csrf_protection=true",
-            {
-                params: {
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[position_id]": idPosition?.value ? idPosition?.value : null,
-                    "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { output, rResult } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
-                }
-                sOnFetching(false);
+    const { isFetching, refetch } = useQuery({
+        queryKey: ['api_list_roles', limit, router.query?.page, idPosition, idBranch, keySearch],
+        queryFn: async () => {
+            const params = {
+                search: keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[position_id]": idPosition?.value ? idPosition?.value : null,
+                "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
             }
-        );
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    useEffect(() => {
-        sOnFetching(true);
-    }, [limit, router.query?.page, idPosition, idBranch]);
+            const { output, rResult } = await apiRoles.apiListRoles({ params })
+            sData(rResult);
+            sTotalItems(output);
+            return rResult
+        }
+    })
 
     const _HandleFilterOpt = (type, value) => {
         if (type == "position") {
@@ -132,73 +102,70 @@ const Index = (props) => {
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        sOnFetching(true);
     }, 500);
 
-    const _ServerFetchingSub = () => {
-        Axios("GET", "/api_web/api_staff/positionOption?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                sDataPositionOption(
-                    rResult.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        level: e.level,
-                    }))
-                );
-                dispatch({
-                    type: "position_staff/update",
-                    payload: rResult.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        level: e.level,
-                    })),
-                });
-            }
-            sOnFetchingSub(false);
-        });
-    };
 
-    useEffect(() => {
-        onFetchingSub && _ServerFetchingSub();
-    }, [onFetchingSub]);
+    const { refetch: refetchPosition } = useQuery({
+        queryKey: ["api_position_option"],
+        queryFn: async () => {
+            const { rResult } = await apiRoles.apiPositionOption();
+            sDataPositionOption(
+                rResult.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    level: e.level,
+                }))
+            );
+            dispatch({
+                type: "position_staff/update",
+                payload: rResult.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    level: e.level,
+                })),
+            });
+            return rResult
+        }
+    })
 
-    const _ServerFetchingAnother = () => {
-        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
-                dispatch({
-                    type: "branch/update",
-                    payload: rResult.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    })),
-                });
-            }
-        });
-        Axios("GET", "/api_web/api_staff/department/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                dispatch({
-                    type: "department_staff/update",
-                    payload: rResult.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    })),
-                });
-            }
-        });
-    };
 
-    useEffect(() => {
-        onFetchingAnother && _ServerFetchingAnother();
-    }, [onFetchingAnother]);
 
-    useEffect(() => {
-        sOnFetchingAnother(true);
-        sOnFetchingSub(true);
-    }, []);
+    useQuery({
+        queryKey: ["api_branch"],
+        queryFn: async () => {
+
+            const { result } = await apiComons.apiBranchCombobox();
+
+            sDataBranchOption(result.map((e) => ({ label: e.name, value: e.id })));
+            dispatch({
+                type: "branch/update",
+                payload: result.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                })),
+            });
+
+            return result
+        }
+    })
+
+    useQuery({
+        queryKey: ['api_list_departments'],
+        queryFn: async () => {
+
+            const { rResult, output } = await apiDepartments.apiListDepartment({ params: {} })
+
+            dispatch({
+                type: "department_staff/update",
+                payload: rResult.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                })),
+            });
+
+            return rResult
+        }
+    })
 
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
@@ -285,10 +252,10 @@ const Index = (props) => {
                             </h2>
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
-                                    <Popup_ChucVu
+                                    <PopupRoles
                                         dataLang={dataLang}
-                                        onRefresh={_ServerFetching.bind(this)}
-                                        onRefreshSub={_ServerFetchingSub.bind(this)}
+                                        onRefresh={refetch.bind(this)}
+                                        onRefreshSub={refetchPosition.bind(this)}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
                                 ) : (
@@ -352,15 +319,14 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={sOnFetching} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {data?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
                                                             filename={
-                                                                dataLang?.header_category_personnel_position ||
-                                                                "header_category_personnel_position"
+                                                                dataLang?.header_category_personnel_position || "header_category_personnel_position"
                                                             }
                                                             title="DSCV"
                                                             dataLang={dataLang}
@@ -387,16 +353,13 @@ const Index = (props) => {
                                         <HeaderTable gridCols={10} display={"grid"}>
                                             <ColumnTable colSpan={1} />
                                             <ColumnTable colSpan={2} textAlign={"center"}>
-                                                {dataLang?.category_personnel_position_name ||
-                                                    "category_personnel_position_name"}
+                                                {dataLang?.category_personnel_position_name || "category_personnel_position_name"}
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
-                                                {dataLang?.category_personnel_position_amount ||
-                                                    "category_personnel_position_amount"}
+                                                {dataLang?.category_personnel_position_amount || "category_personnel_position_amount"}
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
-                                                {dataLang?.category_personnel_position_department ||
-                                                    "category_personnel_position_department"}
+                                                {dataLang?.category_personnel_position_department || "category_personnel_position_department"}
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
                                                 {dataLang?.client_list_brand || "client_list_brand"}
@@ -406,13 +369,13 @@ const Index = (props) => {
                                             </ColumnTable>
                                         </HeaderTable>
                                         <div className="divide-y divide-slate-200">
-                                            {onFetching ? (
+                                            {isFetching ? (
                                                 <Loading className="h-80" color="#0f4f9e" />
                                             ) : data?.length > 0 ? (
                                                 data.map((e) => (
                                                     <Item
-                                                        onRefresh={_ServerFetching.bind(this)}
-                                                        onRefreshSub={_ServerFetchingSub.bind(this)}
+                                                        onRefresh={refetch.bind(this)}
+                                                        onRefreshSub={refetchPosition.bind(this)}
                                                         dataLang={dataLang}
                                                         key={e.id}
                                                         data={e}
@@ -489,7 +452,7 @@ const Item = React.memo((props) => {
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2 px-2">
                     {role == true || checkEdit ? (
-                        <Popup_ChucVu
+                        <PopupRoles
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
@@ -592,7 +555,7 @@ const ItemsChild = React.memo((props) => {
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2">
                     {role == true || checkEdit ? (
-                        <Popup_ChucVu
+                        <PopupRoles
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}

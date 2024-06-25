@@ -2,23 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import {
-    Minus as IconMinus,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
     Edit as IconEdit,
-    Grid6 as IconExcel,
-    SearchNormal1,
+    SearchNormal1
 } from "iconsax-react";
 
-import { _ServerInstance as Axios } from "/services/axios";
 import useToast from "@/hooks/useToast";
 
-import PopupCustom from "@/components/UI/popup";
+import apiRoles from "@/Api/apiPersonnel/apiRoles";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import Loading from "@/components/UI/loading";
-const Popup_ChucVu = React.memo((props) => {
+import PopupCustom from "@/components/UI/popup";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { MdClear } from "react-icons/md";
+const PopupRoles = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
 
     const dataOptDepartment = useSelector((state) => state.department_staff);
@@ -31,7 +28,6 @@ const Popup_ChucVu = React.memo((props) => {
         open: false,
         dataOption: [],
         onSending: false,
-        onFetching: false,
         name: "",
         position: "",
         department: "",
@@ -49,8 +45,7 @@ const Popup_ChucVu = React.memo((props) => {
     const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }))
 
     useEffect(() => {
-        isState.open && fetchDataPower()
-        isState.open && props?.id && queryState({ onFetching: true, open: true });
+        isState.open && props?.id && queryState({ open: true });
     }, [isState.open]);
 
     const transformData = (data) => {
@@ -88,33 +83,34 @@ const Popup_ChucVu = React.memo((props) => {
         return transformedData;
     }
 
-
-    const fetchDataPower = () => {
-        Axios("GET", props?.id ? `/api_web/api_staff/getPermissions/${props?.id}?csrf_protection=true` : `/api_web/api_staff/getPermissions?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { data, isSuccess, message } = response?.data;
-                if (isSuccess == 1) {
-                    const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
-                        key,
-                        ...value,
-                        child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
-                            key: childKey,
-                            ...childValue,
-                            permissions: Object.entries(childValue?.permissions)?.map(([permissionsKey, permissionsValue]) => ({
-                                key: permissionsKey,
-                                ...permissionsValue,
-                            }))
+    useQuery({
+        queryKey: ["api_permissions"],
+        queryFn: async () => {
+            const { data, isSuccess, message } = await apiRoles.apiPermissions(props?.id)
+            if (isSuccess == 1) {
+                const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
+                    key,
+                    ...value,
+                    child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
+                        key: childKey,
+                        ...childValue,
+                        permissions: Object.entries(childValue?.permissions)?.map(([permissionsKey, permissionsValue]) => ({
+                            key: permissionsKey,
+                            ...permissionsValue,
                         }))
-                    }));
-                    queryState({ dataPower: permissionsArray })
-                }
-            } else {
-                {
-                    console.log("err", err);
-                }
+                    }))
+                }));
+                queryState({ dataPower: permissionsArray })
             }
-        });
-    }
+        },
+        enabled: !!isState.open && !!props?.id
+    })
+
+    const handingRoles = useMutation({
+        mutationFn: (data) => {
+            return apiRoles.apiHandingRoles(data, props?.id);
+        }
+    })
 
     const _ServerSending = () => {
         let formData = new FormData();
@@ -125,37 +121,23 @@ const Popup_ChucVu = React.memo((props) => {
         isState.valueBranch.forEach((e) => formData.append("branch_id[]", e?.value));
         const utf8Bytes = JSON.stringify(transformedResult)
         formData.append("permissions", utf8Bytes);
-        // Object.keys(transformedResult).forEach((key) => {
-        //     formData.append(key, transformedResult[key]);
-        // });
-        Axios(
-            "POST",
-            `${props?.id
-                ? `/api_web/api_staff/position/${props?.id}?csrf_protection=true`
-                : "/api_web/api_staff/position?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
+        handingRoles.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message] || message);
+                    setIsState(initalState)
+                    props.onRefresh && props.onRefresh();
+                    props.onRefreshSub && props.onRefreshSub();
+                } else {
+                    isShow("error", props.dataLang[message] || message);
+                }
             },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message] || message);
-                        setIsState(initalState)
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshSub && props.onRefreshSub();
-                    } else {
-                        isShow("error", props.dataLang[message] || message);
-                    }
-                    queryState({ onSending: false });
-                }
-                else {
-                    console.log("err", err);
-                }
+            onError: (error) => {
+                isShow("error", error);
             }
-        );
+        })
+        queryState({ onSending: false });
+
     };
 
     useEffect(() => {
@@ -186,41 +168,39 @@ const Popup_ChucVu = React.memo((props) => {
         queryState({ errBranch: false });
     }, [isState.valueBranch?.length > 0])
 
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_staff/position/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const list = response.data;
-                queryState({
-                    name: list?.name,
-                    department: { value: list?.department_id, label: list?.department_name },
-                    position: list?.position_parent_id == 0 ? null : { value: list?.position_parent_id, label: list?.position_parent_name },
-                    valueBranch: list?.branch.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    })),
-                })
-            }
-        });
-        Axios("GET", `/api_web/api_staff/positionOption/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                queryState({
-                    dataOption: rResult.map((x) => ({
-                        label: x.name,
-                        value: x.id,
-                        level: x.level,
-                    }))
-                })
-            }
-        });
-        queryState({ onFetching: false });
-    };
 
-    useEffect(() => {
-        setTimeout(() => {
-            isState.onFetching && _ServerFetching();
-        }, 500);
-    }, [isState.onFetching]);
+    useQuery({
+        queryKey: ["api_position"],
+        queryFn: async () => {
+            const list = await apiRoles.apiPosition(props?.id);
+            queryState({
+                name: list?.name,
+                department: { value: list?.department_id, label: list?.department_name },
+                position: list?.position_parent_id == 0 ? null : { value: list?.position_parent_id, label: list?.position_parent_name },
+                valueBranch: list?.branch.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                })),
+            })
+            return list
+        },
+        enabled: !!isState.open && !!props?.id
+    })
+    const { isFetching } = useQuery({
+        queryKey: ["api_position_option"],
+        queryFn: async () => {
+            const { rResult } = await apiRoles.apiPositionOption(props?.id);
+            queryState({
+                dataOption: rResult.map((x) => ({
+                    label: x.name,
+                    value: x.id,
+                    level: x.level,
+                }))
+            })
+            return rResult
+        },
+        enabled: !!isState.open && !!props?.id
+    })
 
     const handleChange = (parent, child = null, permissions = null) => {
         const newData = isState.dataPower?.map((e) => {
@@ -310,11 +290,7 @@ const Popup_ChucVu = React.memo((props) => {
 
     return (
         <PopupCustom
-            title={
-                props?.id
-                    ? `${props.dataLang?.category_personnel_position_edit || "category_personnel_position_edit"}`
-                    : `${props.dataLang?.category_personnel_position_addnew || "category_personnel_position_addnew"}`
-            }
+            title={props?.id ? `${props.dataLang?.category_personnel_position_edit || "category_personnel_position_edit"}` : `${props.dataLang?.category_personnel_position_addnew || "category_personnel_position_addnew"}`}
             button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={() => queryState({ open: true })}
             open={isState.open}
@@ -338,7 +314,7 @@ const Popup_ChucVu = React.memo((props) => {
                 </button>
             </div>
             <div className="py-4 w-[600px]  space-y-4">
-                {isState.onFetching ? (
+                {isFetching ? (
                     <Loading className="h-80" color="#0f4f9e" />
                 ) : (
 
@@ -372,8 +348,7 @@ const Popup_ChucVu = React.memo((props) => {
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[#344054] font-normal text-base">
-                                        {props.dataLang?.category_personnel_position_department ||
-                                            "category_personnel_position_department"}{" "}
+                                        {props.dataLang?.category_personnel_position_department || "category_personnel_position_department"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <SelectComponent
@@ -384,8 +359,7 @@ const Popup_ChucVu = React.memo((props) => {
                                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                         isClearable={true}
                                         placeholder={
-                                            props.dataLang?.category_personnel_position_department ||
-                                            "category_personnel_position_department"
+                                            props.dataLang?.category_personnel_position_department || "category_personnel_position_department"
                                         }
                                         className={`${isState.errDepartment ? "border-red-500" : "border-transparent"
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border p-0`}
@@ -394,8 +368,7 @@ const Popup_ChucVu = React.memo((props) => {
                                     />
                                     {isState.errDepartment && (
                                         <label className="text-sm text-red-500">
-                                            {props.dataLang?.category_personnel_position_err_department ||
-                                                "category_personnel_position_err_department"}
+                                            {props.dataLang?.category_personnel_position_err_department || "category_personnel_position_err_department"}
                                         </label>
                                     )}
                                 </div>
@@ -414,15 +387,13 @@ const Popup_ChucVu = React.memo((props) => {
                                     />
                                     {isState.errName && (
                                         <label className="text-sm text-red-500">
-                                            {props.dataLang?.category_personnel_position_err_name ||
-                                                "category_personnel_position_err_name"}
+                                            {props.dataLang?.category_personnel_position_err_name || "category_personnel_position_err_name"}
                                         </label>
                                     )}
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[#344054] font-normal text-base">
-                                        {props.dataLang?.category_personnel_position_manage_position ||
-                                            "category_personnel_position_manage_position"}
+                                        {props.dataLang?.category_personnel_position_manage_position || "category_personnel_position_manage_position"}
                                     </label>
                                     <SelectComponent
                                         classParent={"m-0"}
@@ -434,8 +405,7 @@ const Popup_ChucVu = React.memo((props) => {
                                         onChange={(value) => queryState({ position: value })}
                                         isClearable={true}
                                         placeholder={
-                                            props.dataLang?.category_personnel_position_manage_position ||
-                                            "category_personnel_position_manage_position"
+                                            props.dataLang?.category_personnel_position_manage_position || "category_personnel_position_manage_position"
                                         }
                                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none p-0"
                                         isSearchable={true}
@@ -595,4 +565,4 @@ const Popup_ChucVu = React.memo((props) => {
         </PopupCustom>
     );
 });
-export default Popup_ChucVu
+export default PopupRoles

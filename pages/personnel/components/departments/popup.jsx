@@ -1,9 +1,10 @@
-import Select from "react-select";
-import React, { useEffect, useState, useRef } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
-import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
-import useToast from "@/hooks/useToast";
+import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
 import PopupCustom from "@/components/UI/popup";
+import useToast from "@/hooks/useToast";
+import { useMutation } from "@tanstack/react-query";
+import { Edit as IconEdit } from "iconsax-react";
+import { useEffect, useState } from "react";
+import Select from "react-select";
 
 const Popup_phongban = (props) => {
     const [open, sOpen] = useState(false);
@@ -58,40 +59,39 @@ const Popup_phongban = (props) => {
         sErrInputBr(false);
     }, [branch_id?.length > 0]);
 
+    const handingDepartment = useMutation({
+        mutationFn: (data) => {
+            return apiDepartments.apiHandingDepartment(data, props.id)
+        }
+    })
+
     const _ServerSending = () => {
-        const id = props.id;
-        var data = new FormData();
+        let data = new FormData();
         data.append("name", name);
         data.append("email", email);
-        Axios("POST", `${props.id ? `/api_web/api_staff/department/${id}?csrf_protection=true` : "/api_web/api_staff/department/?csrf_protection=true"
-            }`,
-            {
-                data: {
-                    name: name,
-                    email: email,
-                    branch_id: branch_id,
-                },
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
-                        sErrInput(false);
-                        sName("");
-                        sEmail("");
-                        sErrInputBr(false);
-                        sValueBr([]);
-                        props.onRefresh && props.onRefresh();
-                        sOpen(false);
-                    } else {
-                        isShow("error", props.dataLang[message]);
-                    }
+        data.append("branch_id", branch_id);
+        handingDepartment.mutate(data, {
+            onSuccess: ({ isSuccess, message, ...res }) => {
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message] || message);
+                    sErrInput(false);
+                    sName("");
+                    sEmail("");
+                    sErrInputBr(false);
+                    sValueBr([]);
+                    props.onRefresh && props.onRefresh();
+                    sOpen(false);
+                    console.log("res ss", res);
+                } else {
+                    console.log("res err", res);
+                    isShow("error", props.dataLang[message] || message);
                 }
-                sOnSending(false);
-            }
-        );
+            },
+            onError: (error) => {
+                isShow("error", error);
+            },
+        })
+        sOnSending(false);
     };
     //da up date
     useEffect(() => {
@@ -110,8 +110,7 @@ const Popup_phongban = (props) => {
     };
     return (
         <PopupCustom
-            title={props.id ? `${props.dataLang?.personnels_deparrtments_edit}` : `${props.dataLang?.personnels_deparrtments_add}`
-            }
+            title={props.id ? `${props.dataLang?.personnels_deparrtments_edit}` : `${props.dataLang?.personnels_deparrtments_add}`}
             button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}

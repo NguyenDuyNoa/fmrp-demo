@@ -28,7 +28,6 @@ const Popup_chitiet = (props) => {
         queryKey: ["api_detail_staff"],
         queryFn: async () => {
             const db = await apiSatff.apiDetailStaff(props?.id)
-            console.log("db", db);
             sData(db);
             return db
         },
@@ -99,10 +98,8 @@ const Popup_chitiet = (props) => {
                                             <div className="mb-4 h-[50px] flex justify-between items-center p-2">
                                                 <span className="text-slate-400 text-sm w-[25%]">
                                                     {
-                                                        props.dataLang
-                                                            ?.personnels_staff_table_code
-                                                    }
-                                                    :
+                                                        props.dataLang?.personnels_staff_table_code
+                                                    } :
                                                 </span>{" "}
                                                 <span className="font-normal capitalize">
                                                     {data?.code}
@@ -111,8 +108,7 @@ const Popup_chitiet = (props) => {
                                             <div className="mb-4 flex justify-between flex-wrap p-2">
                                                 <span className="text-slate-400 text-sm      w-[25%]">
                                                     {
-                                                        props.dataLang
-                                                            ?.personnels_staff_table_fullname
+                                                        props.dataLang?.personnels_staff_table_fullname
                                                     }
                                                     :
                                                 </span>{" "}
@@ -123,8 +119,7 @@ const Popup_chitiet = (props) => {
                                             <div className="mb-4 flex justify-between flex-wrap p-2">
                                                 <span className="text-slate-400 text-sm      w-[25%]">
                                                     {
-                                                        props.dataLang
-                                                            ?.personnels_staff_popup_email
+                                                        props.dataLang?.personnels_staff_popup_email
                                                     }
                                                     :
                                                 </span>{" "}
@@ -135,8 +130,7 @@ const Popup_chitiet = (props) => {
                                             <div className="mb-4 flex justify-between flex-wrap p-2">
                                                 <span className="text-slate-400 text-sm      w-[25%]">
                                                     {
-                                                        props.dataLang
-                                                            ?.personnels_staff_popup_phone
+                                                        props.dataLang?.personnels_staff_popup_phone
                                                     }
                                                     :
                                                 </span>{" "}
@@ -147,8 +141,7 @@ const Popup_chitiet = (props) => {
                                             <div className="mb-4 flex justify-between flex-wrap p-2">
                                                 <span className="text-slate-400 text-sm      w-[25%]">
                                                     {
-                                                        props.dataLang
-                                                            ?.personnels_staff_table_depart
+                                                        props.dataLang?.personnels_staff_table_depart
                                                     }
                                                     :
                                                 </span>{" "}
@@ -157,11 +150,7 @@ const Popup_chitiet = (props) => {
                                                         {data?.department?.map(
                                                             (e) => {
                                                                 return (
-                                                                    <span
-                                                                        key={
-                                                                            e.id
-                                                                        }
-                                                                    >
+                                                                    <span key={e.id}>
                                                                         {e.name}
                                                                     </span>
                                                                 );
@@ -173,8 +162,7 @@ const Popup_chitiet = (props) => {
                                             <div className="mb-4 flex justify-between flex-wrap p-2">
                                                 <span className="text-slate-400 text-sm      w-[25%]">
                                                     {
-                                                        props.dataLang
-                                                            ?.personnels_staff_popup_manager
+                                                        props.dataLang?.personnels_staff_popup_manager
                                                     }
                                                     :
                                                 </span>{" "}
@@ -201,11 +189,7 @@ const Popup_chitiet = (props) => {
                                                     :
                                                 </span>{" "}
                                                 <span className="font-normal capitalize">
-                                                    {data?.active === "1"
-                                                        ? "Đang hoạt động"
-                                                        : data?.active ===
-                                                        "0" &&
-                                                        "Không hoạt động"}
+                                                    {data?.active === "1" ? "Đang hoạt động" : data?.active === "0" && "Không hoạt động"}
                                                 </span>
                                             </div>
                                         </div>
@@ -252,8 +236,7 @@ const Popup_chitiet = (props) => {
                                                 <div className="mb-4 flex justify-between  p-2 items-center flex-wrap mt-1">
                                                     <span className="text-slate-400 text-sm">
                                                         {
-                                                            props.dataLang
-                                                                ?.client_list_brand
+                                                            props.dataLang?.client_list_brand
                                                         }
                                                         :
                                                     </span>{" "}
@@ -289,8 +272,7 @@ const Popup_chitiet = (props) => {
                                                     <div className="mb-4 flex flex-wrap p-2 items-center">
                                                         <span className="text-slate-400 text-sm w-[15%]">
                                                             {
-                                                                props.dataLang
-                                                                    ?.personnels_staff_position
+                                                                props.dataLang?.personnels_staff_position
                                                             }
                                                             :
                                                         </span>{" "}
@@ -303,8 +285,7 @@ const Popup_chitiet = (props) => {
                                                     <div className="mb-2 flex flex-wrap p-2 items-center">
                                                         <span className="text-slate-400 text-sm w-[15%] ">
                                                             {
-                                                                props.dataLang
-                                                                    ?.personnels_staff_popup_mana
+                                                                props.dataLang?.personnels_staff_popup_mana
                                                             }
                                                             :
                                                         </span>{" "}
