@@ -16,7 +16,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 import Popup_chitiet from "./components/detail";
 import Popup_servie from "./components/popup";
 
-import BtnAction from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/btnAction";
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 

@@ -16,7 +16,7 @@ import Popup_dspc from "./components/popup";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import BtnAction from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";

@@ -11,7 +11,7 @@ import {
     Minus as IconMinus
 } from "iconsax-react";
 
-import BtnAction from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";

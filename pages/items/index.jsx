@@ -28,7 +28,7 @@ import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLev
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiItems from "@/Api/apiMaterial/items/apiItems";
-import BtnAction from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/btnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";

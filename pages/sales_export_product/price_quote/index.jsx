@@ -10,7 +10,7 @@ import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import BtnAction from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/btnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import Loading from "@/components/UI/loading";

@@ -25,7 +25,7 @@ import { useToggle } from "@/hooks/useToggle";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
-import BtnAction from "@/components/UI/btnAction";
+import { BtnAction } from "@/components/UI/btnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
