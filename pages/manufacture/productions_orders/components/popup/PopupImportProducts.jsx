@@ -186,7 +186,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                             </div>
                             <div className="bg-[#F8FAFC] p-3 rounded-sm  flex flex-col gap-2">
                                 <div className="flex">
-                                    <div className="w-[45%] flex items-center gap-3">
+                                    <div className="w-[45%] 2xl:w-[45%] lg:w-[40%] flex items-center gap-3">
                                         <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
                                             <Image src={isState.item.image} width={1280} height={1024} alt="" className="object-cover  rounded-md h-full w-full" />
                                         </div>
@@ -198,7 +198,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="w-[55%] flex items-center gap-2">
+                                    <div className="w-[55%] 2xl:w-[55%] lg:w-[60%] flex items-center gap-2">
                                         <div className="flex items-center justify-center gap-2 w-1/2">
                                             <h1 className="2xl:text-sm text-xs font-medium">Số lượng hoàn thành</h1>
                                             <div className="bg-[#BAD1FE] rounded-xl flex justify-center items-center py-[1px]">
@@ -219,7 +219,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                 isClearable={true}
                                                 closeMenuOnSelect={true}
                                                 hideSelectedOptions={false}
-                                                placeholder={'Chọn kho nhập'}
+                                                placeholder={'Kho nhập'}
                                                 className={`placeholder:text-slate-300 w-full z-50 rounded-xl bg-[#ffffff] text-[#52575E] font-normal outline-none border `}
                                                 isSearchable={true}
                                                 style={{
@@ -390,7 +390,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                     <div className="w-full flex flex-col gap-1">
                                                         <h1 className="text-base font-medium">{e.item_name}</h1>
                                                         <h1 className="2xl:text-sm text-xs font-medium text-black/60">{e.item_code} - Tồn kho: <span className="text-black font-medium">{formanumber(e.quantity_quota_primary)}</span></h1>
-                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(e.quantity_total_quota)}</span> Kg</h1>
+                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(0)}</span> Kg</h1>
+                                                        {/* <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(e.quantity_total_quota)}</span> Kg</h1> */}
                                                         <div className="flex items-center justify-between gap-2">
                                                             <h1 className="2xl:text-sm text-xs font-medium w-1/4">Số lượng xuất kho</h1>
                                                             <div className="bg-[#FFC8A6] rounded-xl flex justify-center items-center py-[1px] w-[73%]">
