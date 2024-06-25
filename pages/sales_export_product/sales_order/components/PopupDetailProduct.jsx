@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
-import PopupCustom from "../../../../components/UI/Popup";
+import PopupCustom from "../../../../components/UI/popup";
 
 import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import { registerLocale } from "react-datepicker";

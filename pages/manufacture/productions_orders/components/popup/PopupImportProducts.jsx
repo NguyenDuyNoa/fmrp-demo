@@ -1,4 +1,4 @@
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import { memo, useState } from "react";
 
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";

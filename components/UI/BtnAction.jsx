@@ -37,7 +37,7 @@ import { useSetData } from "@/hooks/useSetData";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
-import PopupEdit from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 
 import Popup_servie from "@/pages/purchase_order/servicev_voucher/components/popup";
 
@@ -675,7 +675,7 @@ const Popup_Pdf = (props) => {
     };
     return (
         <>
-            <PopupEdit
+            <PopupCustom
                 title={props.dataLang?.option_prin || "option_prin"}
                 button={
                     <div>
@@ -711,7 +711,7 @@ const Popup_Pdf = (props) => {
                         </div>
                     </div>
                 </div>
-            </PopupEdit>
+            </PopupCustom>
         </>
     );
 };

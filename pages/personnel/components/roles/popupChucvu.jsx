@@ -14,7 +14,7 @@ import {
 import { _ServerInstance as Axios } from "/services/axios";
 import useToast from "@/hooks/useToast";
 
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import Loading from "@/components/UI/loading";

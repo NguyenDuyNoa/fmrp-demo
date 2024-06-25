@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import useToast from "@/hooks/useToast";
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 
 const Popup_phongban = (props) => {
     const [open, sOpen] = useState(false);

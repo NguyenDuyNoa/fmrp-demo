@@ -8,7 +8,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading";
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";

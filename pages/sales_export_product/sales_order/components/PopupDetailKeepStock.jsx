@@ -7,7 +7,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { SearchNormal1 as IconSearch, Trash as IconDelete, BoxSearch, ArrowRight2 } from "iconsax-react";
 
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";

@@ -1,4 +1,4 @@
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";

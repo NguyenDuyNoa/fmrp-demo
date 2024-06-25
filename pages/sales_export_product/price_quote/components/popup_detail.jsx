@@ -1,4 +1,4 @@
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import { useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import ModalImage from "react-modal-image";

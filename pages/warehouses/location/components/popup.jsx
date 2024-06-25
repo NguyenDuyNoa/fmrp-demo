@@ -4,7 +4,7 @@ import Select from "react-select";
 
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
 
 const Popup_Vitrikho = (props) => {

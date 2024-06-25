@@ -17,7 +17,7 @@ import {
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";

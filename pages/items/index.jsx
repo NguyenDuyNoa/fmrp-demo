@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import { debounce } from "lodash";
 
 import {

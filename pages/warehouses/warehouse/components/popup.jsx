@@ -21,7 +21,7 @@ import {
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import PopupCustom from "@/components/UI/Popup";
+import PopupCustom from "@/components/UI/popup";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import useToast from "@/hooks/useToast";
 import apiComons from "@/Api/apiComon/apiComon";
