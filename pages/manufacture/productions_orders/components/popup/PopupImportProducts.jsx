@@ -187,8 +187,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                             <div className="bg-[#F8FAFC] p-3 rounded-sm  flex flex-col gap-2">
                                 <div className="flex">
                                     <div className="w-[45%] flex items-center gap-3">
-                                        <div className="min-h-[44px] h-11 w-11 min-w-[44px]">
-                                            <Image src={isState.item.image} width={1280} height={1024} alt="" className="object-cover h-full w-full" />
+                                        <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
+                                            <Image src={isState.item.image} width={1280} height={1024} alt="" className="object-cover  rounded-md h-full w-full" />
                                         </div>
                                         <div className="">
                                             <h1 className="text-base font-medium">{isState.item.item_name}</h1>
@@ -384,8 +384,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                             <div className="text-[#667085] font-normal text-[10px]">#{index + 1}</div>
                                             <div className="flex flex-col w-full">
                                                 <div className="flex items-start gap-3 w-full">
-                                                    <div className="min-h-[44px] h-11 w-11 min-w-[44px]">
-                                                        <Image src={e.image} width={1280} height={1024} alt="" className="object-cover h-full w-full" />
+                                                    <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
+                                                        <Image src={e.image} width={1280} height={1024} alt="" className="object-cover rounded-md h-full w-full" />
                                                     </div>
                                                     <div className="w-full flex flex-col gap-1">
                                                         <h1 className="text-base font-medium">{e.item_name}</h1>
