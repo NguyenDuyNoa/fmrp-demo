@@ -301,6 +301,7 @@ const Popup_ThanhPham = React.memo((props) => {
             sNote(value.target?.value);
         } else if (type == "branch") {
             sBranch(value);
+            sCategory(null);
         } else if (type == "type") {
             sType(value);
         } else if (type == "unit") {
@@ -366,10 +367,10 @@ const Popup_ThanhPham = React.memo((props) => {
                     value: e.id,
                 }))
             );
-            sCategory({
+            sCategory(list?.category_id ? {
                 label: list?.category_name,
                 value: list?.category_id,
-            });
+            } : null);
             sType({
                 label: props.dataLang[list?.type_products?.name],
                 value: list?.type_products?.code,
@@ -385,10 +386,11 @@ const Popup_ThanhPham = React.memo((props) => {
     })
 
     useQuery({
-        queryKey: ["api_category"],
+        queryKey: ["api_category", branch],
         queryFn: async () => {
             const params = {
-                "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
+                "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : -1,
+                // "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
             }
             const { rResult } = await apiProducts.apiCategoryOptionProducts({ params });
             sDataCategory(
