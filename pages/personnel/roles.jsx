@@ -106,9 +106,10 @@ const Index = (props) => {
 
 
     const { refetch: refetchPosition } = useQuery({
-        queryKey: ["api_position_option"],
+        queryKey: ["api_position_option_role"],
         queryFn: async () => {
             const { rResult } = await apiRoles.apiPositionOption();
+            console.log("rResult", rResult);
             sDataPositionOption(
                 rResult.map((e) => ({
                     label: e.name,

@@ -103,7 +103,7 @@ const PopupRoles = React.memo((props) => {
                 queryState({ dataPower: permissionsArray })
             }
         },
-        enabled: !!isState.open && !!props?.id
+        enabled: isState.open && !!props?.id
     })
 
     const handingRoles = useMutation({
@@ -184,12 +184,12 @@ const PopupRoles = React.memo((props) => {
             })
             return list
         },
-        enabled: !!isState.open && !!props?.id
+        enabled: isState.open && !!props?.id
     })
     const { isFetching } = useQuery({
         queryKey: ["api_position_option"],
         queryFn: async () => {
-            const { rResult } = await apiRoles.apiPositionOption(props?.id);
+            const { rResult } = await apiRoles.apiDetailPositionOption(props?.id);
             queryState({
                 dataOption: rResult.map((x) => ({
                     label: x.name,
@@ -199,7 +199,7 @@ const PopupRoles = React.memo((props) => {
             })
             return rResult
         },
-        enabled: !!isState.open && !!props?.id
+        enabled: isState.open && !!props?.id
     })
 
     const handleChange = (parent, child = null, permissions = null) => {

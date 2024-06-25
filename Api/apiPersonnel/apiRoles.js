@@ -43,7 +43,7 @@ const apiRoles = {
             throw error;
         }
     },
-    async apiPositionOption(id) {
+    async apiDetailPositionOption(id) {
         try {
             const response = await axiosCustom('GET', `/api_web/api_staff/positionOption/${id}?csrf_protection=true`);
             return response.data
