@@ -18,7 +18,7 @@ import Pagination from "@/components/UI/pagination";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiGroups from "@/Api/apiSuppliers/groups/apiGroups";
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";

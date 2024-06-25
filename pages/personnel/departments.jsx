@@ -36,7 +36,7 @@ import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

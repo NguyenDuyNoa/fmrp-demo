@@ -18,7 +18,7 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";

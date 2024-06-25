@@ -10,7 +10,7 @@ import { Grid6 } from "iconsax-react";
 import Popup_dsnd from "./components/staff/popup";
 import Popup_chitiet from "./components/staff/popupDetail";
 
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";

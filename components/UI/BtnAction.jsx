@@ -56,7 +56,7 @@ import { useSelector } from "react-redux";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const BtnAction = React.memo((props) => {
+export const BtnAction = React.memo((props) => {
     const router = useRouter();
 
     const isShow = useToast();
@@ -716,4 +716,4 @@ const Popup_Pdf = (props) => {
     );
 };
 
-export default BtnAction;
+

@@ -12,7 +12,7 @@ import Popup_status from "./components/popupStatus";
 
 import { Grid6 } from "iconsax-react";
 
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";

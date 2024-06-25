@@ -14,7 +14,7 @@ import ReactExport from "react-data-export";
 import LinkWarehouse from "../components/linkWarehouse";
 import Popup_chitiet from "./components/pupup";
 
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";

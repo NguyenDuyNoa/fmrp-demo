@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 
 import React, { useEffect, useState, useTransition } from "react";
 
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
