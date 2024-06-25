@@ -1,6 +1,6 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";

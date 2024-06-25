@@ -12,7 +12,7 @@ import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 const Popup_chitietDauki = (props) => {

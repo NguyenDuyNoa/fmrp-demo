@@ -4,7 +4,7 @@ import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";

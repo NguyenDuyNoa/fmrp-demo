@@ -16,7 +16,7 @@ import vi from "date-fns/locale/vi";
 import moment from "moment/moment";
 registerLocale("vi", vi);
 
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { v4 as uuidv4 } from "uuid";

@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 
 import { useToggle } from "@/hooks/useToggle";
 
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
-const PopupEditer = ({}) => {
+const PopupEditer = ({ }) => {
     const { isOpen, handleOpen } = useToggle(false);
 
     const [isLoading, sIsLoading] = useState(false);
@@ -44,7 +44,7 @@ const PopupEditer = ({}) => {
             onClickOpen={() => handleOpen(true)}
             open={isOpen}
             onClose={() => handleOpen(false)}
-            // classNameBtn={props?.className}
+        // classNameBtn={props?.className}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
             <div className="space-x-1 3xl:w-[950px]  xxl:w-[850px] 2xl:w-[800px] xl:w-[800px] lg:w-[800px] w-[750px] 3xl:h-auto xxl:h-[480px]  2xl:h-[520px] xl:h-[480px] lg:h-[500px] h-[500px] ">

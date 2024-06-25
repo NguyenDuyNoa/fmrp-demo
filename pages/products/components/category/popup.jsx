@@ -1,5 +1,5 @@
 import apiCategory from "@/Api/apiProducts/category/apiCategory";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import useToast from "@/hooks/useToast";
 import { useMutation, useQuery } from "@tanstack/react-query";

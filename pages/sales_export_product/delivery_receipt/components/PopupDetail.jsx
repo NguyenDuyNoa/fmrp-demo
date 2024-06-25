@@ -1,4 +1,4 @@
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";

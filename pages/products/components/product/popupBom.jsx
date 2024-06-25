@@ -4,7 +4,7 @@ import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/Table
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";

@@ -37,7 +37,7 @@ import { useSetData } from "@/hooks/useSetData";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 
 import Popup_servie from "@/pages/purchase_order/servicev_voucher/components/popup";
 

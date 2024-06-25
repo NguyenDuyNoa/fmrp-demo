@@ -5,7 +5,7 @@ import { Add as IconAdd, Trash as IconDelete, Edit as IconEdit } from "iconsax-r
 import useToast from "@/hooks/useToast";
 
 import apiVariant from "@/Api/apiSettings/apiVariant";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 const PopupVariant = (props) => {
     const [open, sOpen] = useState(false);
 

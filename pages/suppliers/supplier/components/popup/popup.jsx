@@ -13,7 +13,7 @@ import { useToggle } from "@/hooks/useToggle";
 
 import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { useMutation, useQuery } from "@tanstack/react-query";

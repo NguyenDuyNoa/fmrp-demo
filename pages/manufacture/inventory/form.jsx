@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 
 import { Add as IconAdd, Calendar as IconCalendar, Trash as IconDelete, Image as IconImage } from "iconsax-react";
 import moment from "moment";

@@ -10,7 +10,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import Loading from "components/UI/loading";
 
 import { useEffect } from "react";

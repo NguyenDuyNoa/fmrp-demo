@@ -10,7 +10,7 @@ import useToast from "@/hooks/useToast";
 import apiFinance from "@/Api/apiSettings/apiFinance";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import { isAllowedNumber } from "@/utils/helpers/common";
 const PopupFinance = (props) => {
     const router = useRouter();

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";

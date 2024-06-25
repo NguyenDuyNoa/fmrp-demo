@@ -3,7 +3,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";

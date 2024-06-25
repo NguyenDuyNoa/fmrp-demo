@@ -7,7 +7,7 @@ import {
     Edit as IconEdit
 } from "iconsax-react";
 
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 
 import useToast from "@/hooks/useToast";
 

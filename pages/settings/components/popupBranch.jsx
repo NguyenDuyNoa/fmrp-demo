@@ -8,7 +8,7 @@ import "react-phone-input-2/lib/style.css";
 import useToast from "@/hooks/useToast";
 
 import apiBranch from "@/Api/apiSettings/apiBranch";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 const PopupBranch = (props) => {
     const [open, sOpen] = useState(false);
 

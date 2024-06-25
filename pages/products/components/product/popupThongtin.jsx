@@ -6,7 +6,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/popup";
+import PopupEdit from "@/components/UI/Popup";
 
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
