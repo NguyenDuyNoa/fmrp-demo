@@ -1,46 +1,43 @@
-import { PopupParent } from "@/utils/lib/Popup";
-import moment from "moment/moment";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-
-import { _ServerInstance as Axios } from "/services/axios";
-
-import DatePicker from "react-datepicker";
-import { AiFillPlusCircle } from "react-icons/ai";
-import { BsCalendarEvent } from "react-icons/bs";
-import { MdClear } from "react-icons/md";
-
-import Select, { components } from "react-select";
-
-import { Add, Trash as IconDelete, Minus, TableDocument } from "iconsax-react";
-
-import PopupAddress from "./components/PopupAddress";
-
-import useFeature from "@/hooks/useConfigFeature";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
+import apiContact from "@/Api/apiClients/contact/apiContact";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
+import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
+import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-
-import ButtonBack from "@/components/UI/button/buttonBack";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from '@/utils/helpers/formatMoney';
 import formatNumberConfig from '@/utils/helpers/formatnumber';
+import { PopupParent } from "@/utils/lib/Popup";
+import { useQuery } from "@tanstack/react-query";
+import { Add, Trash as IconDelete, Minus, TableDocument } from "iconsax-react";
+import moment from "moment/moment";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { AiFillPlusCircle } from "react-icons/ai";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import Select, { components } from "react-select";
 import { routerDeliveryReceipt } from "routers/sellingGoods";
+import { v4 as uuidv4 } from "uuid";
+import PopupAddress from "./components/PopupAddress";
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
@@ -52,10 +49,6 @@ const Index = (props) => {
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
     const statusExprired = useStatusExprired();
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
 
@@ -188,35 +181,35 @@ const Index = (props) => {
         router.query && resetAllStates();
     }, [router.query]);
 
-    const _ServerFetching = () => {
-        sOnLoading(true);
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-                sOnLoading(false);
-            }
-        });
-        Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sDataTasxes(
-                    rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        tax_rate: e.tax_rate,
-                    }))
-                );
-                sOnLoading(false);
-            }
-        });
 
-        sOnFetching(false);
-    };
+    useQuery({
+        queryKey: ["api_branch"],
+        queryFn: async () => {
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
+            const { result } = await apiComons.apiBranchCombobox();
+
+            sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+
+            return result
+        }
+    })
+
+    useQuery({
+        queryKey: ["api_tax"],
+        queryFn: async () => {
+
+            const { rResult } = await apiPriceQuocte.apiListTax();
+
+            sDataTasxes(
+                rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    tax_rate: e.tax_rate,
+                }))
+            );
+            return rResult
+        }
+    })
 
     const options = dataItems?.map((e) => ({
         label: `${e.name}
@@ -230,204 +223,172 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetchingDetailPage = () => {
-        Axios("GET", `/api_web/Api_delivery/getDeliveryDetail/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let rResult = response.data;
-                sListData(
-                    rResult?.items.map((e) => {
-                        const child = e?.child.map((ce) => ({
-                            id: Number(ce?.id),
-                            idChildBackEnd: Number(ce?.id),
-                            disabledDate:
-                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                            warehouse: {
-                                label: e?.item?.warehouse_location?.location_name,
-                                value: e?.item?.warehouse_location?.id,
-                                warehouse_name: e?.item?.warehouse_location?.warehouse_name,
-                                qty: e?.item?.warehouse_location?.quantity,
-                                lot: e?.item?.warehouse_location?.lot,
-                                date: e?.item?.warehouse_location?.expiration_date,
-                                serial: e?.item?.warehouse_location?.serial,
-                            },
-                            dataWarehouse: e?.item?.warehouseList?.map((s) => ({
-                                label: s?.location_name,
-                                value: s?.id,
-                                warehouse_name: s?.warehouse_name,
-                                qty: s?.quantity,
-                                lot: s?.lot,
-                                date: s?.expiration_date,
-                                serial: s?.serial,
-                            })),
-                            quantityStock: e?.item?.quantity,
-                            quantityDelive: e?.item?.quantity_delivery,
-                            unit: e?.item?.unit_name,
-                            quantity: Number(ce?.quantity),
-                            price: Number(ce?.price),
-                            discount: Number(ce?.discount_percent_item),
-                            tax: {
-                                tax_rate: ce?.tax_rate_item,
-                                value: ce?.tax_id_item,
-                                label: ce?.tax_name_item || "Miễn thuế",
-                            },
-                            note: ce?.note_item,
-                        }));
-                        return {
-                            id: e?.item?.id,
-                            idParenBackend: e?.item?.id,
-                            matHang: {
-                                e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                    }</span>`,
-                                value: e.item?.id,
-                            },
-                            child: child,
-                        };
-                    })
-                );
-                sCode(rResult?.reference_no);
-                sIdBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
-                });
-                sStartDate(moment(rResult?.date).toDate());
-                sNote(rResult?.note);
-                sIdAddress({ label: rResult?.name_address_delivery, value: rResult?.address_delivery_id });
-                sIdClient({ label: rResult?.customer_name, value: rResult?.customer_id });
-                sIdStaff({ label: rResult?.staff_full_name, value: rResult?.staff_id });
-                sIdProductOrder({ label: rResult?.order_code, value: rResult?.order_id });
-                sIdContactPerson(
-                    rResult?.person_contact_id != 0 && {
-                        label: rResult?.person_contact_name,
-                        value: rResult?.person_contact_id,
-                    }
-                );
-            }
-            sOnFetchingDetail(false);
-        });
-    };
+    const { isFetching } = useQuery({
+        queryKey: ['api_detail_page', id],
+        queryFn: async () => {
+            const rResult = await apiDeliveryReceipt.apiDetailPage(id)
 
-    useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetailPage();
-    }, [onFetchingDetail]);
-
-    useEffect(() => {
-        id && sOnFetchingDetail(true);
-    }, []);
-
-    const _ServerFetching_ItemsAll = () => {
-        Axios("POST", "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true",
-            {
-                params: {
-                    "filter[order_id]": idProductOrder !== null ? +idProductOrder.value : null,
-                    "filter[delivery_id]": id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-                    sDataItems(result);
+            sListData(
+                rResult?.items.map((e) => {
+                    const child = e?.child.map((ce) => ({
+                        id: Number(ce?.id),
+                        idChildBackEnd: Number(ce?.id),
+                        disabledDate:
+                            (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                            (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                            (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                            (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                        warehouse: {
+                            label: e?.item?.warehouse_location?.location_name,
+                            value: e?.item?.warehouse_location?.id,
+                            warehouse_name: e?.item?.warehouse_location?.warehouse_name,
+                            qty: e?.item?.warehouse_location?.quantity,
+                            lot: e?.item?.warehouse_location?.lot,
+                            date: e?.item?.warehouse_location?.expiration_date,
+                            serial: e?.item?.warehouse_location?.serial,
+                        },
+                        dataWarehouse: e?.item?.warehouseList?.map((s) => ({
+                            label: s?.location_name,
+                            value: s?.id,
+                            warehouse_name: s?.warehouse_name,
+                            qty: s?.quantity,
+                            lot: s?.lot,
+                            date: s?.expiration_date,
+                            serial: s?.serial,
+                        })),
+                        quantityStock: e?.item?.quantity,
+                        quantityDelive: e?.item?.quantity_delivery,
+                        unit: e?.item?.unit_name,
+                        quantity: Number(ce?.quantity),
+                        price: Number(ce?.price),
+                        discount: Number(ce?.discount_percent_item),
+                        tax: {
+                            tax_rate: ce?.tax_rate_item,
+                            value: ce?.tax_id_item,
+                            label: ce?.tax_name_item || "Miễn thuế",
+                        },
+                        note: ce?.note_item,
+                    }));
+                    return {
+                        id: e?.item?.id,
+                        idParenBackend: e?.item?.id,
+                        matHang: {
+                            e: e?.item,
+                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
+                            value: e.item?.id,
+                        },
+                        child: child,
+                    };
+                })
+            );
+            sCode(rResult?.reference_no);
+            sIdBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
+            sStartDate(moment(rResult?.date).toDate());
+            sNote(rResult?.note);
+            sIdAddress({ label: rResult?.name_address_delivery, value: rResult?.address_delivery_id });
+            sIdClient({ label: rResult?.customer_name, value: rResult?.customer_id });
+            sIdStaff({ label: rResult?.staff_full_name, value: rResult?.staff_id });
+            sIdProductOrder({ label: rResult?.order_code, value: rResult?.order_id });
+            sIdContactPerson(
+                rResult?.person_contact_id != 0 && {
+                    label: rResult?.person_contact_name,
+                    value: rResult?.person_contact_id,
                 }
+            );
+
+            return rResult
+        },
+        enabled: !!id
+    })
+
+    const _ServerFetching_ItemsAll = async () => {
+        const { data: { result } } = await apiDeliveryReceipt.apiPageItems({
+            params: {
+                "filter[order_id]": idProductOrder !== null ? +idProductOrder.value : null,
+                "filter[delivery_id]": id ? id : "",
             }
-        );
+        })
+        sDataItems(result);
         sOnFetchingItemsAll(false);
     };
 
-    const _ServerFetching_Client = () => {
+    const _ServerFetching_Client = async () => {
         sOnLoading(true);
-        Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult } = response.data;
-                    sDataClient(rResult?.map((e) => ({ label: e.name, value: e.id })));
-                    sOnLoading(false);
-                }
+
+        const { rResult } = apiContact.apiClientContact({
+            params: {
+                "filter[branch_id]": idBranch != null ? idBranch.value : null,
             }
-        );
+        })
+
+        sDataClient(rResult?.map((e) => ({ label: e.name, value: e.id })));
+
+        sOnLoading(false);
+
         sOnFetchingClient(false);
     };
 
-    const _ServerFetching_ContactPerson = () => {
+    const _ServerFetching_ContactPerson = async () => {
         sOnLoading(true);
-        Axios("GET", "/api_web/api_client/contactCombobox/?csrf_protection=true",
-            {
-                params: {
-                    "filter[client_id]": idClient != null ? idClient.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult } = response.data;
-                    sDataContactPerson(rResult?.map((e) => ({ label: e.full_name, value: e.id })));
-                    sOnLoading(false);
-                }
+
+        const { rResult } = await apiDeliveryReceipt.apiContactCombobox({
+            params: {
+                "filter[client_id]": idClient != null ? idClient.value : null,
             }
-        );
+        })
+
+        sDataContactPerson(rResult?.map((e) => ({ label: e.full_name, value: e.id })));
+
+        sOnLoading(false);
+
         sOnFetchingContactPerson(false);
     };
 
-    const _ServerFetching_Staff = () => {
+    const _ServerFetching_Staff = async () => {
         sOnLoading(true);
-        Axios("GET", "/api_web/Api_staff/staffOption?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch !== null ? +idBranch?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult } = response.data;
-                    sDataStaff(rResult?.map((e) => ({ label: e.name, value: e.staffid })));
-                    sOnLoading(false);
-                }
+
+        const { rResult } = await apiPurchases.apiStaffOptionPurchases({
+            params: {
+                "filter[branch_id]": idBranch !== null ? +idBranch?.value : null,
             }
-        );
+        })
+
+        sDataStaff(rResult?.map((e) => ({ label: e.name, value: e.staffid })));
+
+        sOnLoading(false);
+
         sOnFetchingStaff(false);
     };
 
-    const _ServerFetching_ProductOrder = () => {
+    const _ServerFetching_ProductOrder = async () => {
         let data = new FormData();
+
         data.append("branch_id", idBranch !== null ? +idBranch.value : null);
+
         data.append("client_id", idClient !== null ? +idClient.value : null);
+
         id && data.append("filter[delivery_id]", id ? id : "");
-        Axios("POST", `/api_web/api_delivery/searchOrdersToCustomer?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { results } = response?.data;
-                    sDataProductOrder(results?.map((e) => ({ label: e.text, value: e.id })));
-                }
-            }
-        );
+
+        const { results } = await apiDeliveryReceipt.apiSearchOrdersToCustomer(data)
+
+        sDataProductOrder(results?.map((e) => ({ label: e.text, value: e.id })));
+
         sOnFetchingProductOrder(false);
     };
 
-    const _ServerFetching_Address = () => {
+    const _ServerFetching_Address = async () => {
         let data = new FormData();
+
         data.append("client_id", idClient !== null ? +idClient.value : null);
-        Axios("POST", `/api_web/api_delivery/GetShippingClient?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let rResult = response?.data;
-                    sDataAddress(rResult?.map((e) => ({ label: e.name, value: e.id })));
-                }
-            }
-        );
+
+        const rResult = await apiDeliveryReceipt.apiGetShippingClient(data)
+
+        sDataAddress(rResult?.map((e) => ({ label: e.name, value: e.id })));
+
         sOnFetchingAddress(false);
     };
 
@@ -571,10 +532,6 @@ const Index = (props) => {
     useEffect(() => {
         sErrAddress(false);
     }, [idAddress != null]);
-
-    useEffect(() => {
-        router.query && sOnFetching(true);
-    }, [router.query]);
 
     useEffect(() => {
         onFetchingClient && _ServerFetching_Client();
@@ -1063,28 +1020,16 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
             });
         });
-        await Axios(
-            "POST",
-            `${id ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true` : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true"}`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message] || message}`);
-                        resetAllStates();
-                        sListData([]);
-                        router.push(routerDeliveryReceipt.home);
-                    } else {
-                        isShow("error", `${dataLang[message] || message}`);
-                    }
-                }
-                sOnSending(false);
-            }
-        );
+        const { isSuccess, message } = await apiDeliveryReceipt.apiHangdingDeliveryReceipt(id, formData)
+        if (isSuccess) {
+            isShow("success", `${dataLang[message] || message}`);
+            resetAllStates();
+            sListData([]);
+            router.push(routerDeliveryReceipt.home);
+        } else {
+            isShow("error", `${dataLang[message] || message}`);
+        }
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -1095,9 +1040,7 @@ const Index = (props) => {
         <React.Fragment>
             <Head>
                 <title>
-                    {id
-                        ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
-                        : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
+                    {id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit" : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
                 </title>
             </Head>
             <Container className="!h-auto">
@@ -1736,7 +1679,7 @@ const Index = (props) => {
                     </div>
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
-                            {onFetchingDetail ? (
+                            {isFetching ? (
                                 <Loading className="h-10 w-full" color="#0f4f9e" />
                             ) : (
                                 <>

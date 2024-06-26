@@ -1,10 +1,10 @@
 import PopupCustom from "@/components/UI/popup";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 
-import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import { TickCircle } from "iconsax-react";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -14,17 +14,20 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
+import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import NoData from "@/components/UI/noData/nodata";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from '@/utils/helpers/formatMoney';
 import formatNumberConfig from '@/utils/helpers/formatnumber';
+import { useQuery } from "@tanstack/react-query";
 import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
-import { _ServerInstance as Axios } from "/services/axios";
 
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
@@ -33,15 +36,9 @@ const PopupDetail = (props) => {
 
     const [data, setData] = useState();
 
-    const [onFetching, sOnFetching] = useState(false);
-
     const dataSeting = useSetingServer();
 
     const { dataMaterialExpiry, dataProductSerial, dataProductExpiry } = useFeature()
-
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
 
     const formatNumber = (num) => {
         return formatNumberConfig(+num, dataSeting)
@@ -50,19 +47,20 @@ const PopupDetail = (props) => {
         return formatMoneyConfig(+num, dataSeting)
     };
 
-    const handleFetchingDetail = async () => {
-        await Axios("GET", `/api_web/Api_delivery/get/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (response && response?.data) {
-                const db = response?.data;
-                setData(db);
-                sOnFetching(false);
-            }
-        });
-    };
+    const { isFetching } = useQuery({
+        queryKey: ["api_delivery_detail", props?.id],
+        queryFn: async () => {
 
-    useEffect(() => {
-        onFetching && handleFetchingDetail();
-    }, [open]);
+            const db = await apiDeliveryReceipt.apiDetail(props?.id)
+
+            setData(db);
+
+            return db
+        },
+        ...reTryQuery,
+        enabled: open && !!props?.id
+    })
+
 
     return (
         <>
@@ -211,7 +209,7 @@ const PopupDetail = (props) => {
                                     {props.dataLang?.price_quote_note_item || "price_quote_note_item"}
                                 </ColumnTablePopup>
                             </HeaderTablePopup>
-                            {onFetching ? (
+                            {isFetching ? (
                                 <Loading className="max-h-40" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>
@@ -260,9 +258,7 @@ const PopupDetail = (props) => {
                                                                         <div className="flex gap-0.5">
                                                                             <h6 className="text-[12px]">Serial:</h6>
                                                                             <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                {e.serial == null || e.serial == ""
-                                                                                    ? "-"
-                                                                                    : e.serial}
+                                                                                {e.serial == null || e.serial == "" ? "-" : e.serial}
                                                                             </h6>
                                                                         </div>
                                                                     ) : (
@@ -273,16 +269,13 @@ const PopupDetail = (props) => {
                                                                             <div className="flex gap-0.5">
                                                                                 <h6 className="text-[12px]">Lot:</h6>{" "}
                                                                                 <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                    {e?.lot == null || e?.lot == ""
-                                                                                        ? "-"
-                                                                                        : e?.lot}
+                                                                                    {e?.lot == null || e?.lot == "" ? "-" : e?.lot}
                                                                                 </h6>
                                                                             </div>
                                                                             <div className="flex gap-0.5">
                                                                                 <h6 className="text-[12px]">Date:</h6>{" "}
                                                                                 <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                    {e?.expiration_date
-                                                                                        ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                                    {e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                 </h6>
                                                                             </div>
                                                                         </>
@@ -330,22 +323,7 @@ const PopupDetail = (props) => {
                                         </div>
                                     </ScrollArea>
                                 </>
-                            ) : (
-                                <div className=" max-w-[352px] mt-24 mx-auto">
-                                    <div className="text-center">
-                                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                            <IconSearch />
-                                        </div>
-                                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                            {props.dataLang?.price_quote_table_item_not_found ||
-                                                "price_quote_table_item_not_found"}
-                                        </h1>
-                                        <div className="flex items-center justify-around mt-6 ">
-                                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+                            ) : <NoData />}
                         </div>
                         <h2 className="font-medium p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                             {props.dataLang?.purchase_total || "purchase_total"}
@@ -368,8 +346,7 @@ const PopupDetail = (props) => {
                                 </div>
                                 <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
                                     <h3>
-                                        {props.dataLang?.price_quote_total_money_after_discount ||
-                                            "price_quote_money_after_discount"}
+                                        {props.dataLang?.price_quote_total_money_after_discount || "price_quote_money_after_discount"}
                                     </h3>
                                 </div>
                                 <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">

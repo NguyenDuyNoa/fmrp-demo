@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
@@ -43,15 +42,20 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
+import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { useQuery } from "@tanstack/react-query";
 import { routerDeliveryReceipt } from "routers/sellingGoods";
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -79,8 +83,6 @@ const Index = (props) => {
     const initialState = {
         data: [],
         dataExcel: [],
-        onFetching: false,
-        onFetchingFilter: false,
         keySearch: "",
         listBr: [],
         listDelivery: [],
@@ -94,6 +96,9 @@ const Index = (props) => {
             endDate: null,
         },
     };
+    const [checkedWare, sCheckedWare] = useState({});
+
+
     const [isState, sIsState] = useState(initialState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
@@ -110,172 +115,147 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : -1 },
         });
-        queryState({ onFetchingFilter: true, onFetching: true });
+
     }, []);
 
-    const _ServerFetching = () => {
-        const tabPage = router.query?.tab;
-        Axios(
-            "GET",
-            `/api_web/api_delivery/getDeliveries?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    status: tabPage ? tabPage : -1,
-                    branch_id: isState.idBranch != null ? isState.idBranch.value : null,
-                    delivery_id: isState.idDelivery != null ? isState.idDelivery?.value : null,
-                    customer_id: isState.idCustomer != null ? isState.idCustomer.value : null,
-                    start_date: isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    end_date: isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data.data;
-                    sTotalItems(output);
-                    setTotal(rTotal);
-                    queryState({
-                        data: rResult,
-                        dataExcel: rResult,
-                        onFetching: false,
-                    });
-                }
+    const { isFetching, refetch } = useQuery({
+        queryKey: ['list_deleivery',
+            limit,
+            router.query?.page, router.query?.tab,
+            isState.idBranch,
+            isState.keySearch,
+            isState.idDelivery,
+            isState.idCustomer,
+            isState.valueDate?.endDate,
+            isState.valueDate?.startDate,
+        ],
+        queryFn: async () => {
+            const params = {
+                search: isState.keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                status: router.query?.tab ? router.query?.tab : -1,
+                branch_id: isState.idBranch != null ? isState.idBranch.value : null,
+                delivery_id: isState.idDelivery != null ? isState.idDelivery?.value : null,
+                customer_id: isState.idCustomer != null ? isState.idCustomer.value : null,
+                start_date: isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                end_date: isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
             }
-        );
-    };
-    // fetch tab filter
-    const _ServerFetching_group = async () => {
-        await Axios(
-            "GET",
-            `/api_web/api_delivery/statusDelivery?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    branch_id: isState.idBranch != null ? isState.idBranch.value : null,
-                    delivery_id: isState.idDelivery != null ? isState.idDelivery?.value : null,
-                    start_date: isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    end_date: isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                    customer_id: isState.idCustomer != null ? isState.idCustomer.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { data } = response.data;
-                    queryState({ listTabStatus: data?.status, onFetchingFilter: false });
-                }
+
+            const { data: { rResult, output, rTotal } } = await apiDeliveryReceipt.apiListDeliveryReceipt({ params })
+
+            sTotalItems(output);
+
+            setTotal(rTotal);
+
+            queryState({ data: rResult, dataExcel: rResult });
+
+            return rResult
+        },
+        ...reTryQuery
+    })
+
+
+
+    const { refetch: refetchFilterBar } = useQuery({
+        queryKey: ['list_deleivery',
+            limit,
+            router.query?.page, router.query?.tab,
+            isState.idBranch,
+            isState.keySearch,
+            isState.idDelivery,
+            isState.idCustomer,
+            isState.valueDate?.endDate,
+            isState.valueDate?.startDate,
+        ],
+        queryFn: async () => {
+            const params = {
+                limit: 0,
+                search: isState.keySearch,
+                branch_id: isState.idBranch != null ? isState.idBranch.value : null,
+                delivery_id: isState.idDelivery != null ? isState.idDelivery?.value : null,
+                start_date: isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                end_date: isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+                customer_id: isState.idCustomer != null ? isState.idCustomer.value : null,
             }
-        );
-    };
+
+            const { data } = await apiDeliveryReceipt.apiListFilterBar({ params })
+
+            queryState({ listTabStatus: data?.status });
+
+            return data
+        },
+        ...reTryQuery
+    })
+
 
     // filter
     const convertArray = (arr) => {
         return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
     };
-    const _ServerFetching_filter = async () => {
-        await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                queryState({ listBr: convertArray(rResult) });
-            }
-        });
-        await Axios("GET", `api_web/api_delivery/searchDeliveries?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                queryState({
-                    listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [],
-                });
-            }
-        });
-        await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { data } = response.data;
-                queryState({ listCustomer: convertArray(data?.clients) });
-            }
-        });
-        queryState({ onFetchingFilter: false });
-    };
 
-    const handleSearchApiClient = debounce((value) => {
-        Axios(
-            "GET",
-            "/api_web/api_client/searchClients?csrf_protection=true",
-            {
-                params: {
-                    search: value ? value : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { data } = response?.data;
-                    queryState({ listCustomer: convertArray(data?.clients) });
-                }
-            }
-        );
-    }, 500);
+    useQuery({
+        queryKey: ["api_branch"],
+        queryFn: async () => {
 
-    const handleSearchApiOrders = debounce((value) => {
-        Axios(
-            "GET",
-            "/api_web/api_delivery/searchDeliveries?csrf_protection=true",
-            {
-                params: {
-                    search: value ? value : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { data } = response?.data;
-                    queryState({
-                        listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [],
-                    });
-                }
-            }
-        );
-    }, 500);
+            const { result } = await apiComons.apiBranchCombobox();
 
-    useEffect(() => {
-        isState.onFetchingFilter && _ServerFetching_filter();
-    }, [isState.onFetchingFilter]);
+            queryState({ listBr: convertArray(result) });
 
-    useEffect(() => {
-        (isState.onFetching && _ServerFetching()) || (isState.onFetching && _ServerFetching_group());
-    }, [isState.onFetching]);
-
-    useEffect(() => {
-        queryState({ onFetching: true });
-    }, [limit, router.query?.page, router.query?.tab]);
-
-    useEffect(() => {
-        if (
-            isState.idBranch != null ||
-            (isState.valueDate?.startDate != null && isState.valueDate?.endDate != null) ||
-            isState.idCustomer != null ||
-            isState.idDelivery != null
-        ) {
-            router.push({
-                pathname: router.route,
-                query: {
-                    tab: router.query?.tab,
-                },
-            });
-            setTimeout(() => {
-                queryState({ onFetching: true });
-            }, 300);
-        } else {
-            queryState({ onFetching: true });
+            return result
         }
-    }, [
-        limit,
-        isState.idBranch,
-        isState.keySearch,
-        isState.idDelivery,
-        isState.idCustomer,
-        isState.valueDate?.endDate,
-        isState.valueDate?.startDate,
-    ]);
+    })
+
+    useQuery({
+        queryKey: ["api_search_deliveries"],
+        queryFn: async () => {
+
+            const { data } = await apiDeliveryReceipt.apiSearchDeliveries({})
+
+            queryState({
+                listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [],
+            });
+
+            return data
+        }
+    })
+
+    useQuery({
+        queryKey: ["api_search_client"],
+        queryFn: async () => {
+
+            const { data } = await apiPriceQuocte.apiSearchClients({})
+
+            queryState({ listCustomer: convertArray(data?.clients) });
+
+            return data
+        }
+    })
+
+
+    const handleSearchApiClient = debounce(async (value) => {
+        const { data } = await apiPriceQuocte.apiSearchClients({
+            params: {
+                search: value ? value : "",
+            }
+        })
+
+        queryState({ listCustomer: convertArray(data?.clients) });
+
+    }, 500);
+
+    const handleSearchApiOrders = debounce(async (value) => {
+        const { data } = await apiDeliveryReceipt.apiSearchDeliveries({
+            params: {
+                search: value ? value : "",
+            }
+        })
+        queryState({
+            listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [],
+        });
+    }, 500);
+
+
 
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -285,7 +265,6 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
 
     const formatMoney = (number) => {
@@ -406,7 +385,6 @@ const Index = (props) => {
         },
     ];
 
-    const [checkedWare, sCheckedWare] = useState({});
     const handleSaveStatus = () => {
         if (isKeyState?.type === "browser") {
             const checked = isKeyState.value.target.checked;
@@ -431,32 +409,26 @@ const Index = (props) => {
         });
     };
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
+
         let data = new FormData();
+
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
+
         data.append("id", checkedWare?.id);
-        Axios(
-            "POST",
-            `/api_web/Api_delivery/confirmWarehouse?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message, alert_type } = response?.data;
-                    if (isSuccess) {
-                        isShow(alert_type, dataLang[message] || message);
-                        setTimeout(() => {
-                            queryState({ onFetching: true });
-                        }, 300);
-                    } else {
-                        isShow(alert_type, dataLang[message] || message);
-                    }
-                }
-                queryState({ onSending: false });
-            }
-        );
+
+        const { isSuccess, message, alert_type } = await apiDeliveryReceipt.apiHandingWarehouse(data);
+
+        if (isSuccess) {
+            isShow(alert_type, dataLang[message] || message);
+            setTimeout(() => {
+                refetch();
+            }, 300);
+        } else {
+            isShow(alert_type, dataLang[message] || message);
+        }
+
+        queryState({ onSending: false });
     };
 
     useEffect(() => {
@@ -562,7 +534,9 @@ const Index = (props) => {
                                                     },
                                                     ...isState.listDelivery,
                                                 ]}
-                                                onInputChange={handleSearchApiOrders.bind(this)}
+                                                onInputChange={(e) => {
+                                                    handleSearchApiOrders(e)
+                                                }}
                                                 onChange={(e) => queryState({ idDelivery: e })}
                                                 value={isState.idDelivery}
                                                 placeholder={dataLang?.delivery_receipt_code || "delivery_receipt_code"}
@@ -580,7 +554,9 @@ const Index = (props) => {
                                                 ]}
                                                 onChange={(e) => queryState({ idCustomer: e })}
                                                 value={isState.idCustomer}
-                                                onInputChange={handleSearchApiClient.bind(this)}
+                                                onInputChange={(e) => {
+                                                    handleSearchApiClient(e)
+                                                }}
                                                 placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
                                                 isClearable={true}
                                                 colSpan={1}
@@ -594,7 +570,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
@@ -664,7 +640,7 @@ const Index = (props) => {
                                             {dataLang?.price_quote_operations || "price_quote_operations"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
@@ -760,8 +736,8 @@ const Index = (props) => {
                                                             className=" flex items-center justify-center"
                                                         >
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
+                                                                onRefreshGroup={refetchFilterBar.bind(this)}
                                                                 dataLang={dataLang}
                                                                 warehouseman_id={e?.warehouseman_id}
                                                                 id={e?.id}

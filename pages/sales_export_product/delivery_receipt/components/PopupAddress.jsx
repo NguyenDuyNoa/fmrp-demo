@@ -1,20 +1,12 @@
-import React, { useEffect, useState } from "react";
-
-import PopupCustom from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import PhoneInput from "react-phone-input-2";
-import Swal from "sweetalert2";
-import "react-phone-input-2/lib/style.css";
+import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
+import useToast from "@/hooks/useToast";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import PopupCustom from "/components/UI/popup";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const PopupAddress = (props) => {
     const [namePerson, setNamePerson] = useState("");
@@ -24,7 +16,7 @@ const PopupAddress = (props) => {
     const [errAddress, setErrAddress] = useState(false);
     const [errPhone, setErrPhone] = useState(false);
     const [loading, setLoading] = useState(false);
-
+    const isShow = useToast()
     const handleOnChangeInput = (type, value) => {
         if (namePerson !== "" || address !== "" || phone !== "") {
             setLoading(false);
@@ -40,50 +32,44 @@ const PopupAddress = (props) => {
             setErrPhone(false);
         }
     };
-    const handleSubmitAddress = (e) => {
+
+    const handingAddress = useMutation({
+        mutationFn: (data) => {
+            return apiDeliveryReceipt.apiHandingWarehouse(data);
+        }
+    })
+
+    const handleSubmitAddress = async (e) => {
         e.preventDefault();
         if (namePerson === "") setErrNamePerson(true);
         if (address === "") setErrAddress(true);
         if (phone === "") setErrPhone(true);
 
-        var data = new FormData();
+        let data = new FormData();
         data.append("client_id", props?.clientId !== null ? props?.clientId : null);
         data.append("name", namePerson);
         data.append("address", address);
         data.append("phone", phone);
         setLoading(true);
         if (namePerson !== "" && address !== "" && phone !== "") {
-            Axios(
-                "POST",
-                `/api_web/api_delivery/AddShippingClient?csrf_protection=true`,
-                {
-                    data: data,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: `${props.dataLang[message]}`,
-                            });
-                            setNamePerson("");
-                            setAddress("");
-                            setPhone("");
-                            setLoading(false);
-                            // props?.handleFetchingAddress()
-                            handleClosePopup();
-                            // props.onRefresh && props.onRefresh()
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: `${props.dataLang[message]}`,
-                            });
-                        }
+            handingAddress.mutate(data, {
+                onSuccess: ({ isSuccess, message }) => {
+                    if (isSuccess) {
+                        isShow("success", props.dataLang[message] || message);
+                        setNamePerson("");
+                        setAddress("");
+                        setPhone("");
+                        setLoading(false);
+                        handleClosePopup();
+                    } else {
+                        isShow("error", props.dataLang[message] || message);
                     }
+                },
+                onError: (error) => {
+                    isShow("error", error);
+
                 }
-            );
+            });
         }
     };
 
@@ -109,8 +95,7 @@ const PopupAddress = (props) => {
                 <form onSubmit={(e) => handleSubmitAddress(e)} className="space-y-5">
                     <div className="space-y-1">
                         <label className="text-[#344054] font-normal text-base">
-                            {props.dataLang?.delivery_receipt_name_person_address ||
-                                "delivery_receipt_name_person_address"}
+                            {props.dataLang?.delivery_receipt_name_person_address || "delivery_receipt_name_person_address"}
                             <span className="text-red-500 ml-1">*</span>
                         </label>
                         <input
@@ -123,8 +108,7 @@ const PopupAddress = (props) => {
                         />
                         {errNamePerson && (
                             <label className="text-sm text-red-500">
-                                {props.dataLang?.delivery_receipt_err_name_person_address ||
-                                    "delivery_receipt_err_name_person_address"}
+                                {props.dataLang?.delivery_receipt_err_name_person_address || "delivery_receipt_err_name_person_address"}
                             </label>
                         )}
                     </div>
