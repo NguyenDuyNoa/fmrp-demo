@@ -1,29 +1,19 @@
-import PopupCustom from "@/components/UI/popup";
-import { useEffect, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-import {
-    SearchNormal1 as IconSearch
-} from "iconsax-react";
-import "react-datepicker/dist/react-datepicker.css";
-
-
-
-import Loading from "@/components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-
+import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
 
 
 const PopupDetailQuote = (props) => {
@@ -36,15 +26,6 @@ const PopupDetailQuote = (props) => {
 
     const [data, sData] = useState();
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [loading, setLoading] = useState(false);
-
-
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-
     const formatNumber = (num) => {
         return formatNumberConfig(+num, dataSeting)
     };
@@ -53,27 +34,19 @@ const PopupDetailQuote = (props) => {
         return formatMoneyConfig(+num, dataSeting);
     };
 
-    const handleFetchingDetailQuote = async () => {
-        setLoading(true);
-        await Axios(
-            "GET",
-            `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (response && response?.data) {
-                    var db = response?.data;
+    const { isFetching } = useQuery({
+        queryKey: ["detail_quote", props?.id],
+        queryFn: async () => {
 
-                    sData(db);
-                    sOnFetching(false);
-                    setLoading(false);
-                }
-            }
-        );
-    };
+            const db = await apiPriceQuocte.apiDetailQuote(props?.id);
 
-    useEffect(() => {
-        onFetching && handleFetchingDetailQuote();
-    }, [open]);
+            sData(db);
+
+            return db
+        },
+        enabled: open && !!props?.id
+    })
+
 
     return (
         <>
@@ -212,7 +185,7 @@ const PopupDetailQuote = (props) => {
                                     {props.dataLang?.price_quote_note_item || "price_quote_note_item"}
                                 </ColumnTablePopup>
                             </HeaderTablePopup>
-                            {loading ? (
+                            {(isFetching) ? (
                                 <Loading className="h-20 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>
@@ -278,22 +251,7 @@ const PopupDetailQuote = (props) => {
                                         </div>
                                     </Customscrollbar>
                                 </>
-                            ) : (
-                                <div className=" max-w-[352px] mt-24 mx-auto">
-                                    <div className="text-center">
-                                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                            <IconSearch />
-                                        </div>
-                                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                            {props.dataLang?.price_quote_table_item_not_found ||
-                                                "price_quote_table_item_not_found"}
-                                        </h1>
-                                        <div className="flex items-center justify-around mt-6 ">
-                                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+                            ) : <NoData />}
                         </div>
                         <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                             {props.dataLang?.purchase_total || "purchase_total"}
@@ -316,8 +274,7 @@ const PopupDetailQuote = (props) => {
                                 </div>
                                 <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
                                     <h3>
-                                        {props.dataLang?.price_quote_total_money_after_discount ||
-                                            "price_quote_money_after_discount"}
+                                        {props.dataLang?.price_quote_total_money_after_discount || "price_quote_money_after_discount"}
                                     </h3>
                                 </div>
                                 <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">

@@ -8,7 +8,6 @@ import PopupDetailQuote from "./components/PopupDetailQuote";
 import { Grid6, TickCircle } from "iconsax-react";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
@@ -21,6 +20,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -42,6 +43,7 @@ import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecompon
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import NoData from "@/components/UI/noData/nodata";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -52,6 +54,7 @@ import useActionRole from "@/hooks/useRole";
 import { routerPriceQuote } from "@/routers/sellingGoods";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoney from "@/utils/helpers/formatMoney";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 registerLocale("vi", vi);
 
@@ -77,9 +80,6 @@ const Index = (props) => {
     const initData = {
         data: [],
         dataExcel: [],
-        onFetching: false,
-        onFetching_filter: false,
-        onFetchingBar: false,
         keySearch: "",
         listBr: [],
         listQuoteCode: [],
@@ -111,183 +111,134 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
-        queryState({ onFetchingBar: true, onFetching_filter: true });
     }, []);
 
-    const _ServerFetching = () => {
-        const tabPage = router.query?.tab;
-        Axios(
-            "GET",
-            `/api_web/Api_quotation/quotation/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                    "filter[id]": isState.idQuoteCode != null ? isState.idQuoteCode?.value : null,
-                    "filter[status_bar]": tabPage ?? null,
-                    "filter[client_id]": isState.idCustomer ? isState.idCustomer.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output, rTotal } = response.data;
-                    queryState({ data: rResult || [], dataExcel: rResult || [] });
-                    sTotalItems(output);
-                    sTotal(rTotal);
-                }
-                queryState({ onFetching: false });
+    const { isLoading, isFetching, refetch } = useQuery({
+        queryKey: ["list_quote",
+            limit,
+            isState.idBranch,
+            isState.idQuoteCode,
+            isState.keySearch,
+            isState.idCustomer,
+            isState.valueDate.endDate,
+            isState.valueDate.startDate,
+            router.query?.page, router.query?.tab
+        ],
+        queryFn: async () => {
+            const params = {
+                search: isState.keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                "filter[id]": isState.idQuoteCode != null ? isState.idQuoteCode?.value : null,
+                "filter[status_bar]": router.query?.tab ?? null,
+                "filter[client_id]": isState.idCustomer ? isState.idCustomer.value : null,
+                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
             }
-        );
-    };
+
+            const { rResult, output, rTotal } = await apiPriceQuocte.apiListPriceQuocte({ params })
+
+            queryState({ data: rResult || [], dataExcel: rResult || [] });
+
+            sTotalItems(output);
+
+            sTotal(rTotal);
+        },
+        ...reTryQuery,
+    });
 
     // fetch tab filter
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_quotation/filterBar?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const data = response.data;
-                    queryState({ listTabStatus: data || [] });
-                }
-                queryState({ onFetchingBar: false });
-            }
-        );
-    };
+    const { isFetching: isFetchingFilter, refetch: refetchFilter } = useQuery({
+        queryKey: ["api_list_filterBar",
+            limit,
+            isState.idBranch,
+            isState.idQuoteCode,
+            isState.idCustomer,
+            isState.valueDate.endDate,
+            isState.valueDate.startDate,
+        ],
+        queryFn: async () => {
+            const params = {
+                limit: 0,
+                search: isState.keySearch,
+                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+            };
 
-    useEffect(() => {
-        isState.onFetchingBar && _ServerFetching_group();
-    }, [isState.onFetchingBar]);
+            const data = await apiPriceQuocte.apiListFilterBar({ params });
 
-    useEffect(() => {
-        queryState({ onFetchingBar: true });
-    }, [
-        limit,
-        isState.idBranch,
-        isState.idQuoteCode,
-        isState.idCustomer,
-        isState.valueDate.endDate,
-        isState.valueDate.startDate,
-    ]);
+            queryState({ listTabStatus: data || [] });
+
+            return rResult
+        }
+    })
 
     // filter
     const convertArray = (arr) => {
         return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
     };
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                queryState({ listBr: convertArray(rResult) });
-            }
-        });
-        Axios("GET", `/api_web/api_quotation/searchQuotes?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { data } = response.data;
-                queryState({ listQuoteCode: data?.quotes?.map((e) => ({ label: e.reference_no, value: e.id })) || [] });
-            }
-        });
-        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                queryState({ listCustomer: convertArray(data?.clients) });
-            }
-        });
-        queryState({ onFetching_filter: false });
-    };
 
-    const handleSearchClientsApi = debounce((value) => {
-        Axios(
-            "GET",
-            "/api_web/api_client/searchClients?csrf_protection=true",
-            {
-                params: {
-                    search: value ? value : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { data } = response?.data;
-                    queryState({ listCustomer: convertArray(data?.clients) });
-                }
+    useQuery({
+        queryKey: ["price_quote_branch"],
+        queryFn: async () => {
+
+            const { result } = await apiComons.apiBranchCombobox();
+
+            queryState({ listBr: convertArray(result) });
+
+            return result
+        },
+        ...reTryQuery
+    });
+
+    useQuery({
+        queryKey: ["search_price_quote"],
+        queryFn: async () => {
+
+            const { data } = await apiPriceQuocte.apiSearchQuocte({})
+            queryState({ listQuoteCode: data?.quotes?.map((e) => ({ label: e.reference_no, value: e.id })) || [] });
+
+            return data
+        },
+        ...reTryQuery
+    });
+
+    useQuery({
+        queryKey: ["search_client"],
+        queryFn: async () => {
+
+            const { data } = await apiPriceQuocte.apiSearchClients({})
+            queryState({ listCustomer: convertArray(data?.clients) });
+
+            return data
+        },
+        ...reTryQuery
+    });
+
+    const handleSearchClientsApi = debounce(async (value) => {
+        const { data } = await apiPriceQuocte.apiSearchClients({
+            params: {
+                search: value ? value : "",
             }
-        );
+        })
+        queryState({ listCustomer: convertArray(data?.clients) });
     }, 500);
 
-    const handleSearchApi = debounce((value) => {
-        Axios(
-            "GET",
-            `/api_web/api_quotation/searchQuotes?csrf_protection=true`,
-            {
-                params: {
-                    search: value ? value : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response.data;
-                    queryState({ listQuoteCode: data?.quotes?.map((e) => ({ label: e.reference_no, value: e.id })) });
-                }
+    const handleSearchApi = debounce(async (value) => {
+        const { data } = await apiPriceQuocte.apiSearchQuocte({
+            params: {
+                search: value ? value : "",
             }
-        );
+        })
+        queryState({ listQuoteCode: data?.quotes?.map((e) => ({ label: e.reference_no, value: e.id })) || [] });
     }, 500);
 
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
-
-    useEffect(() => {
-        isState.onFetching_filter && _ServerFetching_filter();
-    }, [isState.onFetching_filter]);
-
-    useEffect(() => {
-        router.query.tab && queryState({ onFetching: true });
-    }, [limit, router.query?.page, router.query?.tab]);
-
-    useEffect(() => {
-        if (
-            isState.idBranch != null ||
-            (isState.valueDate.startDate != null && isState.valueDate.endDate != null) ||
-            isState.idCustomer != null ||
-            isState.idQuoteCode != null
-        ) {
-            router.push({
-                pathname: router.route,
-                query: {
-                    tab: router.query?.tab,
-                },
-            });
-            setTimeout(() => {
-                queryState({ onFetching: true });
-            }, 300);
-        } else {
-            queryState({ onFetching: true });
-        }
-    }, [
-        limit,
-        isState.idBranch,
-        isState.idQuoteCode,
-        isState.keySearch,
-        isState.idCustomer,
-        isState.valueDate.endDate,
-        isState.valueDate.startDate,
-    ]);
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -297,7 +248,6 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
 
     // excel
@@ -432,7 +382,9 @@ const Index = (props) => {
 
     const handleDelete = () => {
         const index = isState.data.findIndex((x) => x.id === isId);
+
         let newStatus = "";
+
         if (isState.data[index].status === "not_confirmed") {
             newStatus = "confirmed";
         } else if (isState.data[index].status === "confirmed") {
@@ -440,14 +392,19 @@ const Index = (props) => {
         } else if (isState.data[index].status === "no_confirmed") {
             newStatus = "confirmed";
         }
+
         _ServerPostStatus(isId, newStatus);
+
         handleQueryId({ status: false });
     };
 
     const handleNoconfim = () => {
         const index = isState.data.findIndex((x) => x.id === isId);
+
         const newStatus = isState.data[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
+
         _ServerPostStatus(isId, newStatus);
+
         handleQueryId({ status: false });
     };
 
@@ -459,31 +416,31 @@ const Index = (props) => {
         }
     };
 
+    const handingStatus = useMutation({
+        mutationFn: ({ data, id, stt }) => {
+            return apiPriceQuocte.apiHandingStatus(id, stt, data)
+        }
+    })
+
     const _ServerPostStatus = (id, newStatus) => {
         const formData = new FormData();
 
         formData.append("id", id);
+
         formData.append("status", newStatus);
 
-        Axios(
-            "POST",
-            `/api_web/Api_quotation/changeStatus/${id}/${newStatus}?csrf_protection=true`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess } = response.data;
-
-                    if (isSuccess !== false) {
-                        isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
-                    }
-                    _ServerFetching();
-                    _ServerFetching_group();
+        handingStatus.mutate({ data: formData, id: id, stt: newStatus }, {
+            onSuccess: ({ isSuccess }) => {
+                if (isSuccess !== false) {
+                    isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
                 }
-            }
-        );
+                refetch();
+                refetchFilter();
+            },
+            onError: (err) => {
+                isShow("error", err);
+            },
+        })
     };
 
     // search
@@ -528,7 +485,7 @@ const Index = (props) => {
                             {isState.listTabStatus &&
                                 isState.listTabStatus.map((e) => {
                                     return (
-                                        <div>
+                                        <div key={e?.id}>
                                             <TabFilter
                                                 dataLang={dataLang}
                                                 key={e?.id}
@@ -566,8 +523,7 @@ const Index = (props) => {
                                                     onChange={(e) => queryState({ idBranch: e })}
                                                     value={isState.idBranch}
                                                     placeholder={
-                                                        dataLang?.price_quote_select_branch ||
-                                                        "price_quote_select_branch"
+                                                        dataLang?.price_quote_select_branch || "price_quote_select_branch"
                                                     }
                                                     isClearable={true}
                                                     closeMenuOnSelect={true}
@@ -579,13 +535,14 @@ const Index = (props) => {
                                                         {
                                                             value: "",
                                                             label:
-                                                                dataLang?.price_quote_select_code ||
-                                                                "price_quote_select_code",
+                                                                dataLang?.price_quote_select_code || "price_quote_select_code",
                                                             isDisabled: true,
                                                         },
                                                         ...isState.listQuoteCode,
                                                     ]}
-                                                    onInputChange={handleSearchApi}
+                                                    onInputChange={(e) => {
+                                                        handleSearchApi(e)
+                                                    }}
                                                     onChange={(e) => queryState({ idQuoteCode: e })}
                                                     value={isState.idQuoteCode}
                                                     placeholder={dataLang?.price_quote_code || "price_quote_code"}
@@ -598,13 +555,14 @@ const Index = (props) => {
                                                         {
                                                             value: "",
                                                             label:
-                                                                dataLang?.price_quote_select_customer ||
-                                                                "price_quote_select_customer",
+                                                                dataLang?.price_quote_select_customer || "price_quote_select_customer",
                                                             isDisabled: true,
                                                         },
                                                         ...isState.listCustomer,
                                                     ]}
-                                                    onInputChange={handleSearchClientsApi}
+                                                    onInputChange={(e) => {
+                                                        handleSearchClientsApi()
+                                                    }}
                                                     onChange={(e) => queryState({ idCustomer: e })}
                                                     value={isState.idCustomer}
                                                     placeholder={
@@ -623,7 +581,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
@@ -688,7 +646,7 @@ const Index = (props) => {
                                             {dataLang?.price_quote_operations || "price_quote_operations"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {(isLoading || isFetching) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
@@ -794,7 +752,7 @@ const Index = (props) => {
                                                             className="flex items-center justify-center"
                                                         >
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
                                                                 dataLang={dataLang}
                                                                 status={e?.status}
                                                                 id={e?.id}

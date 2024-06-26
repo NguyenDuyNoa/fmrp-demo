@@ -33,7 +33,6 @@ const Default = (props) => {
                         <MainPage {...props} />
                     </main>
                 </Provider>
-                <ReactQueryDevtools initialIsOpen={true} />
             </QueryClientProvider>
         </React.Fragment>
     );

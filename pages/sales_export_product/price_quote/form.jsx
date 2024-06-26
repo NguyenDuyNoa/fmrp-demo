@@ -8,12 +8,13 @@ import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
@@ -22,6 +23,7 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -29,6 +31,7 @@ import { routerPriceQuote } from "@/routers/sellingGoods";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
 
 const Index = (props) => {
@@ -44,15 +47,7 @@ const Index = (props) => {
 
     const dataLang = props?.dataLang;
 
-    const [onFetching, sOnFetching] = useState(false);
-
     const [onFetchingItems, sOnFetchingItems] = useState(false);
-
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-
-    const [onFetchingCustomer, sOnFetchingCustomer] = useState(false);
-
-    const [onFetchingContactPerson, sOnFetchingContactPerson] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
@@ -141,56 +136,56 @@ const Index = (props) => {
     }, [id, router.query]);
 
     // Fetch edit
-    const _ServerFetchingDetail = () => {
-        Axios("GET", `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const rResult = response.data;
-                const itemlast = [{ item: null }];
-                const items = itemlast?.concat(
-                    rResult?.items?.map((e) => ({
-                        price_quote_order_item_id: e?.id,
-                        id: e.id,
-                        item: {
-                            e: e?.item,
-                            label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.code + e.item?.product_constiation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
-                            value: e.item?.id,
-                        },
-                        quantity: Number(e?.quantity),
-                        price: Number(e?.price),
-                        discount: Number(e?.discount_percent),
-                        taxStages: { tax_rate: e?.tax_rate, value: e?.tax_id },
-                        unit: e.item?.unit_name,
-                        priceAffter: Number(e?.price_after_discount),
-                        note: e?.note,
-                        totalPrice: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
-                    }))
-                );
+    const { isFetching: isFetchingDetail } = useQuery({
+        queryKey: ["api_detail_price_quote"],
+        queryFn: async () => {
+            const rResult = await apiPriceQuocte.apiDetailQuote(id);
+            const itemlast = [{ item: null }];
+            const items = itemlast?.concat(
+                rResult?.items?.map((e) => ({
+                    price_quote_order_item_id: e?.id,
+                    id: e.id,
+                    item: {
+                        e: e?.item,
+                        label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.code + e.item?.product_constiation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
+                        value: e.item?.id,
+                    },
+                    quantity: Number(e?.quantity),
+                    price: Number(e?.price),
+                    discount: Number(e?.discount_percent),
+                    taxStages: { tax_rate: e?.tax_rate, value: e?.tax_id },
+                    unit: e.item?.unit_name,
+                    priceAffter: Number(e?.price_after_discount),
+                    note: e?.note,
+                    totalPrice: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
+                }))
+            );
 
-                sOption(items);
-                sCode(rResult?.reference_no);
-                sIdContactPerson(
-                    rResult?.contact_id == 0 ? null :
-                        {
-                            label: rResult?.contact_name,
-                            value: rResult?.contact_id,
-                        });
-                sIdBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
-                });
-                sIdCustomer({
-                    label: rResult?.client_name,
-                    value: rResult?.client_id,
-                });
-                sStartDate(moment(rResult?.date).toDate());
-                sEffectiveDate(moment(rResult?.validity).toDate());
-                sNote(rResult?.note);
-            }
-            sOnFetchingDetail(false);
-        });
-    };
-
+            sOption(items);
+            sCode(rResult?.reference_no);
+            sIdContactPerson(
+                rResult?.contact_id == 0 ? null :
+                    {
+                        label: rResult?.contact_name,
+                        value: rResult?.contact_id,
+                    });
+            sIdBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
+            sIdCustomer({
+                label: rResult?.client_name,
+                value: rResult?.client_id,
+            });
+            sStartDate(moment(rResult?.date).toDate());
+            sEffectiveDate(moment(rResult?.validity).toDate());
+            sNote(rResult?.note);
+            return rResult
+        },
+        ...reTryQuery,
+        enabled: !!id
+    })
     // onChange
 
     const resetValue = () => {
@@ -261,89 +256,96 @@ const Index = (props) => {
     const convertArray = (arr) => {
         return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
     }
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                sDataBranch(convertArray(rResult));
-            }
-        });
 
-        Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                sDataTasxes(
-                    rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        tax_rate: e.tax_rate,
-                    }))
-                );
-            }
-        });
+    useQuery({
+        queryKey: ["price_quote_branch"],
+        queryFn: async () => {
 
-        sOnFetching(false);
-    };
+            const { result } = await apiComons.apiBranchCombobox();
 
-    // Customer
-    const _ServerFetching_Customer = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/client_option/?csrf_protection=true`,
-            {
+            sDataBranch(convertArray(result));
+            return result
+        },
+        ...reTryQuery
+    });
+
+    useQuery({
+        queryKey: ["price_quote_tax"],
+        queryFn: async () => {
+
+            const { rResult } = await apiPriceQuocte.apiListTax();
+
+            sDataTasxes(
+                rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    tax_rate: e.tax_rate,
+                }))
+            );
+            return rResult
+        },
+        ...reTryQuery
+    });
+
+
+    useQuery({
+        queryKey: ["price_quote_client", idBranch],
+        queryFn: async () => {
+
+            const { rResult } = await apiPriceQuocte.apiClientOption({
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    sDataCustomer(convertArray(rResult));
                 }
-            }
-        );
-        sOnFetchingCustomer(false);
-    };
-    // Contact person
-    const _ServerFetching_Contact_Person = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/contactCombobox/?csrf_protection=true`,
-            {
+            });
+
+            sDataCustomer(convertArray(rResult));
+
+            return rResult
+        },
+        enabled: !!idBranch,
+        ...reTryQuery
+    });
+
+    useQuery({
+        queryKey: ["price_quote_contact", idCustomer],
+        queryFn: async () => {
+
+            const { rResult } = await apiPriceQuocte.apiContact({
                 params: {
                     "filter[client_id]": idCustomer != null ? idCustomer.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    sDataContactPerson(
-                        rResult?.map((e) => ({
-                            label: e.full_name,
-                            value: e.id,
-                        }))
-                    );
                 }
-            }
-        );
-        sOnFetchingContactPerson(false);
-    };
+            });
+
+            sDataContactPerson(
+                rResult?.map((e) => ({
+                    label: e.full_name,
+                    value: e.id,
+                }))
+            );
+
+            return rResult
+        },
+        enabled: !!idCustomer,
+        ...reTryQuery
+    });
 
     // fetch items
+    const handleFetchingItems = useMutation({
+        mutationFn: (data) => {
+            return apiPriceQuocte.apiItems(data)
+        }
+    })
+
     const _ServerFetching_Items = () => {
         let form = new FormData()
         if (idBranch != null) {
             [+idBranch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
         }
-        Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {
-            data: form,
-            headers: { "Content-Type": "multipart/form-data" },
-        }, (err, response) => {
-            if (!err) {
-                const { result } = response.data.data;
-                sDataEditItems(result);
+        handleFetchingItems.mutate(form, {
+            onSuccess: ({ data }) => {
+                sDataEditItems(data?.result)
             }
-        });
+        })
         sOnFetchingItems(false);
     };
 
@@ -360,13 +362,7 @@ const Index = (props) => {
             sOnSending(true);
         }
     };
-    useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetail();
-    }, [onFetchingDetail]);
 
-    useEffect(() => {
-        id && sOnFetchingDetail(true);
-    }, []);
 
     useEffect(() => {
         if (taxTotal == null) return;
@@ -413,15 +409,6 @@ const Index = (props) => {
     }, []);
 
     useEffect(() => {
-        onFetchingCustomer && _ServerFetching_Customer();
-    }, [onFetchingCustomer]);
-
-    useEffect(() => {
-        onFetchingContactPerson && _ServerFetching_Contact_Person();
-    }, [onFetchingContactPerson]);
-
-    useEffect(() => {
-        idBranch != null && sOnFetchingCustomer(true);
         if (idBranch == null) {
             sIdCustomer(null);
             sDataCustomer([]);
@@ -432,10 +419,6 @@ const Index = (props) => {
     }, [idBranch]);
 
     useEffect(() => {
-        idCustomer != null && sOnFetchingContactPerson(true);
-    }, [idCustomer]);
-
-    useEffect(() => {
         onFetchingItems && _ServerFetching_Items();
     }, [onFetchingItems]);
 
@@ -444,14 +427,6 @@ const Index = (props) => {
         value: e.id,
         e,
     }));
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    useEffect(() => {
-        router.query && sOnFetching(true);
-    }, [router.query]);
 
     useEffect(() => {
         sErrDate(false);
@@ -475,20 +450,11 @@ const Index = (props) => {
             [+idBranch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
         }
         form.append("term", inputValue)
-        Axios(
-            "POST",
-            `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
-            {
-                data: form,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { result } = response?.data.data;
-                    setDataItems(result);
-                }
+        handleFetchingItems.mutate(form, {
+            onSuccess: ({ data }) => {
+                sDataEditItems(data?.result)
             }
-        );
+        })
     }, 500)
 
 
@@ -694,6 +660,12 @@ const Index = (props) => {
     });
 
     let newDataOption = dataOption?.filter((e) => e?.item !== undefined);
+
+    const handingPriceQuote = useMutation({
+        mutationFn: (data) => {
+            return apiPriceQuocte.apiHandingPriceQuote(id, data);
+        }
+    })
     // handle submit
     const _ServerSending = () => {
         const formData = new FormData();
@@ -721,19 +693,8 @@ const Index = (props) => {
             tongTienState?.tienThue >= 0 &&
             tongTienState?.tongThanhTien > 0
         ) {
-            Axios(
-                "POST",
-                `${id
-                    ? `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`
-                    : "/api_web/Api_quotation/quotation/?csrf_protection=true"
-                }`,
-                {
-                    data: formData,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    const { isSuccess, message } = response.data;
-
+            handingPriceQuote.mutate(formData, {
+                onSuccess: ({ isSuccess, message }) => {
                     if (isSuccess) {
                         isShow("success", dataLang[message] || message);
                         sCode("");
@@ -760,18 +721,13 @@ const Index = (props) => {
                     } else {
                         isShow("error", dataLang[message] || message);
                     }
-                    sOnSending(false);
                 }
-            );
-        } else {
-            isShow(
-                "error",
-                newDataOption?.length === 0
-                    ? `Chưa chọn thông tin mặt hàng!`
-                    : "Vui lòng kiểm tra dữ liệu"
-            );
+            })
 
             sOnSending(false);
+
+        } else {
+            isShow("error", newDataOption?.length === 0 ? `Chưa chọn thông tin mặt hàng!` : "Vui lòng kiểm tra dữ liệu");
         }
     };
 
@@ -796,9 +752,7 @@ const Index = (props) => {
         <React.Fragment>
             <Head>
                 <title>
-                    {id
-                        ? dataLang?.price_quote_edit_order || "price_quote_edit_order"
-                        : dataLang?.price_quote_add_order || "price_quote_add_order"}
+                    {id ? dataLang?.price_quote_edit_order || "price_quote_edit_order" : dataLang?.price_quote_add_order || "price_quote_add_order"}
                 </title>
             </Head>
             <Container className="!h-auto">
@@ -810,17 +764,13 @@ const Index = (props) => {
                             {dataLang?.price_quote || "price_quote"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{id
-                            ? dataLang?.price_quote_edit_order || "price_quote_edit_order"
-                            : dataLang?.price_quote_add_order || "price_quote_add_order"}</h6>
+                        <h6>{id ? dataLang?.price_quote_edit_order || "price_quote_edit_order" : dataLang?.price_quote_add_order || "price_quote_add_order"}</h6>
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex justify-between items-center">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                            {id
-                                ? dataLang?.price_quote_edit_order || "price_quote_edit_order"
-                                : dataLang?.price_quote_add_order || "price_quote_add_order"}
+                            {id ? dataLang?.price_quote_edit_order || "price_quote_edit_order" : dataLang?.price_quote_add_order || "price_quote_add_order"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
                             <ButtonBack
@@ -883,8 +833,7 @@ const Index = (props) => {
                                     />
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.price_quote_errSelect_table_branch ||
-                                                "price_quote_errSelect_table_branch"}
+                                            {dataLang?.price_quote_errSelect_table_branch || "price_quote_errSelect_table_branch"}
                                         </label>
                                     )}
                                 </div>
@@ -927,8 +876,7 @@ const Index = (props) => {
                                     />
                                     {errCustomer && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.price_quote_errSelect_customer ||
-                                                "price_quote_errSelect_customer"}
+                                            {dataLang?.price_quote_errSelect_customer || "price_quote_errSelect_customer"}
                                         </label>
                                     )}
                                 </div>
@@ -1251,8 +1199,7 @@ const Index = (props) => {
 
                                             <div className="col-span-1 text-right flex items-center justify-end">
                                                 <h3
-                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"
-                                                        } px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
                                                 >
                                                     {formatMoney(e?.priceAffter)}
                                                 </h3>
@@ -1310,8 +1257,7 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-1 text-right flex items-center justify-end">
                                                 <h3
-                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"
-                                                        } px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
                                                 >
                                                     {formatMoney(e?.totalPrice)}
                                                 </h3>
@@ -1442,8 +1388,7 @@ const Index = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.price_quote_total_money_after_discount ||
-                                        "price_quote_total_money_after_discount"}
+                                    {dataLang?.price_quote_total_money_after_discount || "price_quote_total_money_after_discount"}
                                 </h3>
                             </div>
                             <div className="font-normal">
