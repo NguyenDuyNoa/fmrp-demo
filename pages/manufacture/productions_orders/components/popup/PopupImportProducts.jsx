@@ -6,6 +6,7 @@ import ButtonCancel from "@/components/UI/button/buttonCancel";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
@@ -16,7 +17,6 @@ import { Trash as IconDelete } from "iconsax-react";
 import Image from "next/image";
 import { FaBox } from "react-icons/fa";
 import { RiBox3Fill } from "react-icons/ri";
-
 const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...props }) => {
     const isShow = useToast();
 
@@ -52,7 +52,6 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             }
         }
     })
-    console.log("dataDetail", dataDetail);
 
     useQuery({
         queryKey: ["api_data_products"],
@@ -62,8 +61,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             formData.append('pois_id', dataStage?.id);
             formData.append('type', dataStage?.type);
             formData.append('bom_id', dataStage?.bom_id);
-            const { data } = await apiProductionsOrders.apiDataProducts(formData);
-            console.log("data?.product?.item?.bom", data?.product);
+            const { data, ...res } = await apiProductionsOrders.apiDataProducts(formData);
             queryState({
                 warehouseImport: data?.warehouses?.map(e => {
                     return {
@@ -71,66 +69,57 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                         label: e?.name
                     }
                 }),
+                warehouseExport: data?.warehouses_export?.map(e => {
+                    return {
+                        value: e?.id,
+                        label: e?.name
+                    }
+                }),
                 dtPoi: {
                     ...data?.product?.dtPoi,
-                    // ...data?.product?.item,
-                    // quantityChange: null,
-                    // image: '/no_img.png',
                 },
                 item: {
                     ...data?.product?.item,
-                    quantityChange: null,
+                    quantityDefault: data?.product?.item?.quantity,
                     image: data?.product?.item?.itme_image ?? '/no_img.png',
                     bom: data?.product?.item?.bom?.map(e => {
                         return {
                             ...e,
-                            quantity: null,
+                            quantity: e?.quantity_total_quota,
                             image: e?.images ? e?.images : "/no_img.png",
                         }
                     })
                 }
             })
-            // if(data){
-
-            // }
-            // console.log("data", data);
 
             return data
         },
         enabled: isState.open && type === 'end_production' ? true : false,
     })
 
-    console.log("isState.dtPois", isState.dtPoi);
 
-    // useQuery({
-    //     queryKey: ["api_data_warehouse_po", isState.dtPois],
-    //     queryFn: async () => {
-    //         let formData = new FormData();
-    //         formData.append('branch_id', isState.dtPois?.branch_id);
-    //         // "branch_id": 59, //id chi nhánh
-    //         // "item_variation_id": 626, //item_variation_option_value_id biến thể của BOM
-    //         // "type_item": "product", // type_item của bom
-    //         // "item_id": 1, // item_id của bom
-    //         // "unit_id": 1, // unit_id của bom
-    //         // "pp_id": 1 // id của kế hoạch NVL
-    //         const { data } = await apiProductionsOrders.apiDataWarehousePo(formData);
-    //         console.log("data", data);
-    //         // queryState({
-    //         //     warehouseExport: data?.warehouses?.map(e => {
-    //         //         return {
-    //         //             value: e?.id,
-    //         //             label: e?.name
-    //         //         }
-    //         //     }),
-    //         // })
-    //         // return data
-    //     },
-    //     enabled: isState.open && type === 'end_production' ? true : false,
-    // })
-
+    const handChangeQuantityParent = (value) => {
+        queryState({
+            item: {
+                ...isState.item,
+                quantity: formanumber(value?.value),
+                bom: isState.item?.bom?.map(e => {
+                    return {
+                        ...e,
+                        quantity: formanumber((+value?.value * +e?.quota) * (1 + (+e?.loss / 100)))
+                    }
+                })
+            }
+        })
+    }
 
     const handleDeleteItem = (id) => {
-        queryState({ item: isState.item.filter((e) => e.id != id) });
+        queryState({
+            item: {
+                ...isState.item,
+                bom: isState.item?.bom?.filter((e) => e?.item_id != id),
+            }
+        });
     };
 
     const handleSubmit = (e) => {
@@ -192,7 +181,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                     <div className="">
                                         <h1 className="text-base font-medium">{isState.item.item_name}</h1>
                                         <div className="flex items-center gap-2">
-                                            <h1 className="2xl:text-sm text-xs font-medium text-black/60">{isState.item.item_code} - Cần SX: <span className="text-black font-medium">{formanumber(isState.item.quantity)}</span></h1>
+                                            <h1 className="2xl:text-sm text-xs font-medium text-black/60">{isState.item.item_code} - Cần SX: <span className="text-black font-medium">{formanumber(isState.item.quantityDefault)}</span></h1>
 
                                         </div>
                                     </div>
@@ -204,7 +193,21 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                             <InPutNumericFormat
                                                 className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#BAD1FE] bg-white w-[70%]'}
                                                 placeholder={'0'}
-                                                value={isState.item.quantityChange}
+                                                isAllowed={(values) => {
+                                                    const { floatValue, value } = values;
+                                                    if (floatValue == 0) {
+                                                        return true;
+                                                    }
+                                                    if (floatValue < 0) {
+                                                        isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                        return false
+                                                    }
+                                                    return true
+                                                }}
+                                                onValueChange={(value) => {
+                                                    handChangeQuantityParent(value)
+                                                }}
+                                                value={isState.item.quantity}
                                             />
                                         </div>
                                     </div>
@@ -272,11 +275,14 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                         <span className="text-red-500 pl-1">*</span>
                                     </label>
                                     <SelectCore
-                                        options={[]}
-                                        // onChange={(e) => {
-                                        //     queryStateQlty({ idCategoryError: e });
-                                        // }}
-                                        // value={isState.idCategoryError}
+                                        options={isState.warehouseExport}
+                                        onChange={(e) => {
+                                            queryState({ idWarehouseExport: e });
+                                        }}
+                                        components={{ MultiValue }}
+                                        maxShowMuti={1}
+                                        value={isState.idWarehouseExport}
+                                        isMulti={true}
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
@@ -378,7 +384,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                             <div className="h-full grid grid-cols-2 gap-2">
                                 {isState.item?.bom?.length > 0 ? isState.item?.bom?.map((e, index) => {
                                     return (
-                                        <div key={e?.item_id} className="bg-[#FCFAF8] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
+                                        <div key={e?.item_id} className="bg-[#FCFAF8] min-h-[140px] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
                                             <div className="text-[#667085] font-normal text-[10px]">#{index + 1}</div>
                                             <div className="flex flex-col w-full">
                                                 <div className="flex items-start gap-3 w-full">
@@ -387,7 +393,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                     </div>
                                                     <div className="w-full flex flex-col gap-1">
                                                         <h1 className="text-base font-medium">{e.item_name}</h1>
-                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">{e.item_code} - Tồn kho: <span className="text-black font-medium">{formanumber(e.quantity_quota_primary)}</span></h1>
+                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">{e.item_code} - Tồn kho: <span className="text-black font-medium">{formanumber(0)}</span></h1>
                                                         <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(0)}</span> Kg</h1>
                                                         {/* <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(e.quantity_total_quota)}</span> Kg</h1> */}
                                                         <div className="flex items-center justify-between gap-2">
@@ -396,13 +402,14 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                                 <InPutNumericFormat
                                                                     className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#FFC8A6] bg-white max-w-[80%] w-[80%]'}
                                                                     placeholder={'0'}
+
                                                                     value={e.quantity} />
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <IconDelete onClick={() => handleDeleteItem(e.id)} cursor={"pointer"} className="absolute top-2 hover:scale-105 transition-all duration-150 ease-linear right-2 text-red-500" size={18} />
+                                                <IconDelete onClick={() => handleDeleteItem(e.item_id)} cursor={"pointer"} className="absolute top-2 hover:scale-105 transition-all duration-150 ease-linear right-2 text-red-500" size={18} />
                                             </div>
                                         </div>
                                     )

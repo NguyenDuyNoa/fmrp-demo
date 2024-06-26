@@ -1,14 +1,9 @@
 // Chi tiết giữ kho
 
-import { Trash as IconDelete, SearchNormal1 as IconSearch, SearchNormal1 } from "iconsax-react";
-import { useEffect, useState } from "react";
-import { BiEdit } from "react-icons/bi";
-import ModalImage from "react-modal-image";
-import { NumericFormat } from "react-number-format";
-import { _ServerInstance as Axios } from "/services/axios";
-
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
@@ -20,6 +15,12 @@ import { useToggle } from "@/hooks/useToggle";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useMutation } from "@tanstack/react-query";
+import { Trash as IconDelete, SearchNormal1 } from "iconsax-react";
+import { useEffect, useState } from "react";
+import { BiEdit } from "react-icons/bi";
+import ModalImage from "react-modal-image";
+import { NumericFormat } from "react-number-format";
 
 const Popup_EditDetail = (props) => {
     const { dataLang, id, dataClone, sIsFetchingParent } = props;
@@ -135,37 +136,39 @@ const Popup_EditDetail = (props) => {
         }
     };
 
+    const handdingEditkeppStook = useMutation({
+        mutationFn: (data) => {
+            return apiSalesOrder.apiHandingTransferCombobox(data);
+        }
+    })
+
     const sendingData = () => {
         let formData = new FormData();
+
         formData.append("idTranfer", data?.id);
         formData.append("idOrder", dataClone?.order?.id);
+
         data?.items.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.id ? e?.id : "");
             formData.append(`items[${index}][quantity]`, e?.quantity ? e?.quantity : "");
         });
-        Axios(
-            "POST",
-            `/api_web/Api_sale_order/EditKeepStockOrder?csrf_protection=true`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message] || message}`);
 
-                        sIsFetchingParent({ onFetching: true });
+        handdingEditkeppStook.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", `${dataLang[message] || message}`);
 
-                        sOpen(false);
-                    } else {
-                        isShow("error", `${dataLang[message] || message}`);
-                    }
+                    sIsFetchingParent();
+                    sOpen(false);
+                    setIsFetch({ onSending: false });
+                } else {
+                    isShow("error", `${dataLang[message] || message}`);
                 }
-                setIsFetch({ onSending: false });
-            }
-        );
+            },
+            onError: (error) => {
+                isShow("error", error);
+            },
+        })
     };
 
     useEffect(() => {
@@ -277,25 +280,18 @@ const Popup_EditDetail = (props) => {
                                                                     <div className="flex gap-0.5">
                                                                         <h6 className="text-[12px]">Serial:</h6>
                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                            {e?.item?.serial == null ||
-                                                                                e?.item?.serial == ""
-                                                                                ? "-"
-                                                                                : e?.item?.serial}
+                                                                            {e?.item?.serial == null || e?.item?.serial == "" ? "-" : e?.item?.serial}
                                                                         </h6>
                                                                     </div>
                                                                 ) : (
                                                                     ""
                                                                 )}
-                                                                {dataMaterialExpiry.is_enable === "1" ||
-                                                                    dataProductExpiry.is_enable === "1" ? (
+                                                                {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                     <>
                                                                         <div className="flex gap-0.5">
                                                                             <h6 className="text-[12px]">Lot:</h6>{" "}
                                                                             <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                {e?.item?.lot == null ||
-                                                                                    e?.item?.lot == ""
-                                                                                    ? "-"
-                                                                                    : e?.item?.lot}
+                                                                                {e?.item?.lot == null || e?.item?.lot == "" ? "-" : e?.item?.lot}
                                                                             </h6>
                                                                         </div>
                                                                         <div className="flex gap-0.5">
@@ -359,9 +355,7 @@ const Popup_EditDetail = (props) => {
                                                             if (newValue < +e?.quantity_delivery) {
                                                                 ToatstNotifi(
                                                                     "error",
-                                                                    `Số lượng không được bé hơn ${formatNumber(
-                                                                        e?.quantity_delivery
-                                                                    )} số lượng đã giao`
+                                                                    `Số lượng không được bé hơn ${formatNumber(e?.quantity_delivery)} số lượng đã giao`
                                                                 );
                                                                 return;
                                                             }
@@ -388,20 +382,7 @@ const Popup_EditDetail = (props) => {
                                     </div>
                                 </Customscrollbar>
                             </>
-                        ) : (
-                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                <div className="text-center">
-                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                        <IconSearch />
-                                    </div>
-                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                        {dataLang?.purchase_order_table_item_not_found ||
-                                            "purchase_order_table_item_not_found"}
-                                    </h1>
-                                    <div className="flex items-center justify-around mt-6 "></div>
-                                </div>
-                            </div>
-                        )}
+                        ) : <NoData />}
                     </div>
                     <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between border-t">
                         <div className="col-span-10 font-medium grid grid-cols-7 text-left"></div>

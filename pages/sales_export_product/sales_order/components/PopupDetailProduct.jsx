@@ -1,42 +1,36 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import PopupCustom from "../../../../components/UI/popup";
 
-import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import { TickCircle } from "iconsax-react";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import NoData from "@/components/UI/noData/nodata";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoney from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
 
 const PopupDetailProduct = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, setData] = useState();
-    const [onFetching, sOnFetching] = useState(false);
-    const [loading, setLoading] = useState(false);
     const datatSetingFomart = useSetingServer()
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
 
     const formatNumber = (num) => {
-        // if (!num && num !== 0) return 0;
-        // const roundedNum = Number(num).toFixed(2);
-        // return parseFloat(roundedNum).toLocaleString("en");
         return formatNumberConfig(+num, datatSetingFomart)
     };
 
@@ -45,41 +39,20 @@ const PopupDetailProduct = (props) => {
         return formatMoney(+num, datatSetingFomart)
     }
 
-    const handleFetchingDetailQuote = async () => {
-        setLoading(true);
-        await Axios(
-            "GET",
-            `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (response && response?.data) {
-                    var db = response?.data;
+    const { isFetching } = useQuery({
+        queryKey: ["detail_quote", props?.id],
+        queryFn: async () => {
 
-                    setData(db);
-                    sOnFetching(false);
-                    setLoading(false);
-                }
-            }
-        );
-    };
+            const db = await apiSalesOrder.apiDetail(props?.id)
 
-    useEffect(() => {
-        onFetching && handleFetchingDetailQuote();
-    }, [open]);
+            setData(db);
 
-    const scrollableDiv = document.querySelector(".customsroll");
-    scrollableDiv?.addEventListener("wheel", (event) => {
-        const deltaY = event.deltaY;
-        const top = scrollableDiv.scrollTop;
-        const height = scrollableDiv.scrollHeight;
-        const offset = scrollableDiv.offsetHeight;
-        const isScrolledToTop = top === 0;
-        const isScrolledToBottom = top === height - offset;
+            return db
+        },
+        enabled: open && !!props?.id,
+        ...reTryQuery
+    })
 
-        if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
-            event.preventDefault();
-        }
-    });
 
     return (
         <>
@@ -265,7 +238,7 @@ const PopupDetailProduct = (props) => {
                                     {props.dataLang?.price_quote_note_item || "price_quote_note_item"}
                                 </ColumnTablePopup>
                             </HeaderTablePopup>
-                            {loading ? (
+                            {isFetching ? (
                                 <Loading className="h-20 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>
@@ -334,22 +307,7 @@ const PopupDetailProduct = (props) => {
                                         </div>
                                     </Customscrollbar>
                                 </>
-                            ) : (
-                                <div className=" max-w-[352px] mt-24 mx-auto">
-                                    <div className="text-center">
-                                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                            <IconSearch />
-                                        </div>
-                                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                            {props.dataLang?.price_quote_table_item_not_found ||
-                                                "price_quote_table_item_not_found"}
-                                        </h1>
-                                        <div className="flex items-center justify-around mt-6 ">
-                                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+                            ) : <NoData />}
                         </div>
                         <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                             {props.dataLang?.purchase_total || "purchase_total"}

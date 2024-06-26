@@ -8,7 +8,6 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { _ServerInstance as Axios } from "/services/axios";
 registerLocale("vi", vi);
 
 import PopupDetailQuote from "../price_quote/components/PopupDetailQuote";
@@ -32,6 +31,8 @@ import { useToggle } from "@/hooks/useToggle";
 import { routerSalesOrder } from "@/routers/sellingGoods";
 import formatMoney from "@/utils/helpers/formatMoney";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -54,10 +55,12 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import NoData from "@/components/UI/noData/nodata";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -84,31 +87,25 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const { paginate } = usePagination();
-
-    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-
-    const { checkAdd, checkExport } = useActionRole(auth, "sales_product");
-
     const dataSeting = useSetingServer();
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
     const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
 
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkExport } = useActionRole(auth, "sales_product");
+
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
+
     const [initData, sInitData] = useState(initialData);
 
     const [valueChange, sValueChange] = useState(initialValue);
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingGroup, sOnFetchingGroup] = useState(false);
-
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
-
     const [keySearch, sKeySearch] = useState("");
-
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const [total, setTotal] = useState({});
 
@@ -133,205 +130,154 @@ const Index = (props) => {
         dataSeting?.tables_pagination_limit && sLimit(dataSeting?.tables_pagination_limit);
     }, [dataSeting?.tables_pagination_limit]);
 
-    const _ServerFetching = () => {
-        const tabPage = router.query?.tab;
-        Axios(
-            "GET",
-            `/api_web/Api_sale_order/saleOrder/?csrf_protection=true`,
-            {
-                params: {
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
-                    "filter[status_bar]": tabPage ?? null,
-                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
-                    "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
-                    "filter[start_date]":
-                        valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
-                    "filter[end_date]": valueChange.valueDate?.endDate != null ? valueChange.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err && response && response.data) {
-                    let { rResult, output, rTotal } = response?.data;
-                    sInitData((e) => ({
-                        ...e,
-                        data: rResult?.map((e) => ({ ...e, show: false })),
-                        dataExcel: rResult,
-                    }));
-                    sTotalItems(output);
-                    setTotal(rTotal);
-                    sOnFetching(false);
-                }
-            }
-        );
-    };
-    // fetch tab filter
-    const _ServerFetching_group = async () => {
-        await Axios(
-            "GET",
-            `/api_web/Api_sale_order/filterBar?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: keySearch,
-                    "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
-                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
-                    "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
-                    "filter[start_date]":
-                        valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
-                    "filter[end_date]": valueChange.valueDate?.endDate != null ? valueChange.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    sInitData((e) => ({ ...e, listTabStatus: data || [] }));
-                }
-                sOnFetchingGroup(false);
-            }
-        );
-    };
 
-    // filter
-    const _ServerFetching_filter = async () => {
-        await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sInitData((e) => ({ ...e, listBr: rResult?.map(({ name, id }) => ({ label: name, value: id })) }));
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["api_list_sales_order",
+            router.query?.page,
+            router.query?.tab,
+            limit,
+            valueChange.idBranch,
+            valueChange.idQuoteCode,
+            valueChange.idCustomer,
+            valueChange.valueDate.endDate,
+            valueChange.valueDate.startDate,
+            keySearch
+        ],
+        queryFn: async () => {
+            const params = {
+                search: keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
+                "filter[status_bar]": router.query?.tab ?? null,
+                "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
+                "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
+                "filter[start_date]":
+                    valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
+                "filter[end_date]": valueChange.valueDate?.endDate != null ? valueChange.valueDate?.endDate : null,
+            }
+            const { rResult, output, rTotal } = await apiSalesOrder.apiListSalesOrder({ params })
+
+            sInitData((e) => ({
+                ...e,
+                data: rResult?.map((e) => ({ ...e, show: false })),
+                dataExcel: rResult,
+            }));
+
+            sTotalItems(output);
+
+            setTotal(rTotal);
+
+            return rResult
+        },
+        ...reTryQuery
+    })
+
+    const { refetch: refetchFilterBar } = useQuery({
+        queryKey: ["api_list_filterbar",
+            valueChange.idBranch,
+            valueChange.idQuoteCode,
+            valueChange.idCustomer,
+            valueChange.valueDate?.startDate,
+            valueChange.valueDate?.endDate,
+        ],
+        queryFn: async () => {
+            const params = {
+                limit: 0,
+                search: keySearch,
+                "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
+                "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
+                "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
+                "filter[start_date]":
+                    valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
+                "filter[end_date]": valueChange.valueDate?.endDate != null ? valueChange.valueDate?.endDate : null,
+            }
+            const data = await apiSalesOrder.apiListFilterbar({ params })
+
+            sInitData((e) => ({ ...e, listTabStatus: data || [] }));
+
+            return data
+        },
+        ...reTryQuery
+    })
+
+    useQuery({
+        queryKey: ["api_branch"],
+        queryFn: async () => {
+
+            const { result } = await apiComons.apiBranchCombobox();
+
+            sInitData((e) => ({ ...e, listBr: result?.map(({ name, id }) => ({ label: name, value: id })) }));
+
+
+            return result
+        },
+        ...reTryQuery
+    });
+
+    useQuery({
+        queryKey: ["api_search_orders"],
+        queryFn: async () => {
+
+            const { data } = await apiSalesOrder.apiSearchOrder({});
+
+            sInitData((e) => ({
+                ...e,
+                listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({ label: reference_no, value: id })),
+            }));
+
+
+            return data
+        },
+        ...reTryQuery
+    });
+
+    useQuery({
+        queryKey: ["api_search_clients"],
+        queryFn: async () => {
+
+            const { data } = await apiSalesOrder.apiSearchClient({});
+
+            sInitData((e) => ({
+                ...e,
+                listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
+            }));
+
+
+            return data
+        },
+        ...reTryQuery
+    });
+
+
+    const handleSearchApi = debounce(async (value) => {
+        const { data } = await apiSalesOrder.apiSearchClient({
+            params: {
+                search: value ? value : "",
             }
         });
-        await Axios("GET", `/api_web/api_sale_order/searchOrders?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                sInitData((e) => ({
-                    ...e,
-                    listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({ label: reference_no, value: id })),
-                }));
-            }
-        });
-        await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                sInitData((e) => ({
-                    ...e,
-                    listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
-                }));
-            }
-        });
-
-        sOnFetching_filter(false);
-    };
-
-    const handleSearchApi = debounce((value) => {
-        Axios(
-            "GET",
-            "/api_web/api_client/searchClients?csrf_protection=true",
-            {
-                params: {
-                    search: value ? value : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { data } = response?.data;
-                    sInitData((e) => ({
-                        ...e,
-                        listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
-                    }));
-                }
-            }
-        );
+        sInitData((e) => ({
+            ...e,
+            listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
+        }));
     }, 500);
 
-    const handleSearchApiOrders = debounce((value) => {
-        Axios(
-            "GET",
-            `/api_web/api_sale_order/searchOrders?csrf_protection=true`,
-            {
-                params: {
-                    search: value ? value : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { data } = response?.data;
-                    sInitData((e) => ({
-                        ...e,
-                        listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({
-                            label: reference_no,
-                            value: id,
-                        })),
-                    }));
-                }
+    const handleSearchApiOrders = debounce(async (value) => {
+        const { data } = await apiSalesOrder.apiSearchOrder({
+            params: {
+                search: value ? value : "",
             }
-        );
+        })
+        sInitData((e) => ({
+            ...e,
+            listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({
+                label: reference_no,
+                value: id,
+            })),
+        }));
     }, 500);
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
 
-    useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
-
-    useEffect(() => {
-        sOnFetchingGroup(true);
-    }, [
-        valueChange.idBranch,
-        valueChange.idQuoteCode,
-        valueChange.idCustomer,
-        valueChange.valueDate?.startDate,
-        valueChange.valueDate?.endDate,
-    ]);
-
-    useEffect(() => {
-        onFetchingGroup && _ServerFetching_group();
-    }, [onFetchingGroup]);
-
-    useEffect(() => {
-        sOnFetching_filter(true);
-    }, []);
-
-    useEffect(() => {
-        router.query.tab && sOnFetching(true);
-    }, [limit, router.query?.page, router.query?.tab]);
-
-    useEffect(() => {
-        if (
-            valueChange.idBranch != null ||
-            (valueChange.valueDate.startDate != null && valueChange.valueDate.endDate != null) ||
-            valueChange.idCustomer != null ||
-            valueChange.idQuoteCode != null
-        ) {
-            router.push({
-                pathname: router.route,
-                query: {
-                    tab: router.query?.tab,
-                },
-            });
-            setTimeout(() => {
-                (valueChange.idBranch != null && sOnFetching(true)) ||
-                    (valueChange.valueDate.startDate != null &&
-                        valueChange.valueDate.endDate != null &&
-                        sOnFetching(true)) ||
-                    (valueChange.idCustomer != null && sOnFetching(true)) ||
-                    (valueChange.idQuoteCode != null && sOnFetching(true)) ||
-                    (keySearch && sOnFetching(true));
-            }, 300);
-        } else {
-            sOnFetching(true);
-        }
-    }, [
-        limit,
-        valueChange.idBranch,
-        valueChange.idQuoteCode,
-        valueChange.idCustomer,
-        valueChange.valueDate.endDate,
-        valueChange.valueDate.startDate,
-    ]);
 
     const onChangeFilter = (type) => (event) => sValueChange((e) => ({ ...e, [type]: event }));
 
@@ -343,7 +289,6 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        sOnFetching(true);
     }, 500);
 
     const formatNumber = (number) => {
@@ -480,13 +425,13 @@ const Index = (props) => {
     ];
 
     const toggleStatus = () => {
-        const index = initData.data.findIndex((x) => x.id === isId);
+        const index = initData.data.findIndex((x) => x.id == isId);
 
         let newStatus = "";
 
-        if (initData.data[index].status === "approved") {
+        if (initData.data[index].status == "approved") {
             newStatus = "un_approved";
-        } else if (initData.data[index].status === "un_approved") {
+        } else if (initData.data[index].status == "un_approved") {
             newStatus = "approved";
         }
 
@@ -495,35 +440,38 @@ const Index = (props) => {
         handleQueryId({ status: false });
     };
 
+    const handingStatus = useMutation({
+        mutationFn: ({ data, id, status }) => {
+            return apiSalesOrder.apiHandingStatus(id, status, data);
+        },
+    })
+
     const handlePostStatus = (id, newStatus) => {
         const formData = new FormData();
+
         formData.append("id", id);
+
         formData.append("status", newStatus);
 
-        Axios(
-            "POST",
-            `/api_web/Api_sale_order/confirm/${id}/${newStatus}?csrf_protection=true`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
+        handingStatus.mutate({ data: formData, id: id, stt: newStatus }, {
+            onSuccess: ({ isSuccess, message }) => {
 
-                    if (isSuccess) {
-                        isShow(
-                            "success",
-                            `${dataLang?.change_status_when_order || "change_status_when_order"}` || message
-                        );
-                    } else {
-                        isShow("error", `${dataLang[message] || message}` || message);
-                    }
-                    _ServerFetching();
-                    _ServerFetching_group();
+                if (isSuccess) {
+                    isShow(
+                        "success",
+                        `${dataLang?.change_status_when_order || "change_status_when_order"}` || message
+                    );
+                } else {
+                    isShow("error", `${dataLang[message] || message}` || message);
                 }
-            }
-        );
+                refetch()
+                refetchFilterBar()
+            },
+            onError: (error) => {
+                isShow("error", error);
+            },
+        })
+
     };
 
     return (
@@ -567,7 +515,7 @@ const Index = (props) => {
                             {initData?.listTabStatus &&
                                 initData?.listTabStatus?.map((e) => {
                                     return (
-                                        <div>
+                                        <div key={e?.id}>
                                             <TabFilter
                                                 style={{
                                                     backgroundColor: "#e2f0fe",
@@ -626,7 +574,9 @@ const Index = (props) => {
                                                         ...initData.listQuoteCode,
                                                     ]}
                                                     onChange={onChangeFilter("idQuoteCode")}
-                                                    onInputChange={handleSearchApiOrders}
+                                                    onInputChange={(e) => {
+                                                        handleSearchApiOrders(e)
+                                                    }}
                                                     value={valueChange.idQuoteCode}
                                                     placeholder={dataLang?.sales_product_code || "sales_product_code"}
                                                     isClearable={true}
@@ -637,14 +587,14 @@ const Index = (props) => {
                                                     options={[
                                                         {
                                                             value: "",
-                                                            label:
-                                                                dataLang?.price_quote_customer ||
-                                                                "price_quote_customer",
+                                                            label: dataLang?.price_quote_customer || "price_quote_customer",
                                                             isDisabled: true,
                                                         },
                                                         ...initData.listCustomer,
                                                     ]}
-                                                    onInputChange={handleSearchApi}
+                                                    onInputChange={(e) => {
+                                                        handleSearchApi(e)
+                                                    }}
                                                     onChange={onChangeFilter("idCustomer")}
                                                     value={valueChange.idCustomer}
                                                     placeholder={
@@ -663,7 +613,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={sOnFetching} />
+                                            <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {initData.dataExcel?.length > 0 && (
@@ -709,8 +659,7 @@ const Index = (props) => {
                                             {dataLang?.sales_product_type_order || "sales_product_type_order"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.sales_product_total_into_money ||
-                                                "sales_product_total_into_money"}
+                                            {dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.sales_product_status || "sales_product_status"}
@@ -729,7 +678,7 @@ const Index = (props) => {
                                         </ColumnTable>
                                     </HeaderTable>
                                     {/* {loading ? */}
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : initData.data?.length > 0 ? (
                                         <>
@@ -738,9 +687,7 @@ const Index = (props) => {
                                                     <>
                                                         <RowTable gridCols={13} key={e.id.toString()}>
                                                             <RowItemTable colSpan={1} textAlign="center">
-                                                                {e?.date != null
-                                                                    ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)
-                                                                    : ""}
+                                                                {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 <PopupDetailProduct
@@ -750,30 +697,17 @@ const Index = (props) => {
                                                                     id={e?.id}
                                                                 />
                                                             </RowItemTable>
-
                                                             <RowItemTable colSpan={1} textAlign="left">
                                                                 {e?.client_name}
                                                             </RowItemTable>
-
                                                             {/* fix */}
                                                             <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 {e?.quote_code !== null && e?.quote_id !== "0" ? (
-                                                                    // <div className="border  rounded-xl mx-auto w-2/3 group bg-lime-200 border-lime-200 text-lime-500">
                                                                     <Zoom
                                                                         whileHover={{ scale: 1.1 }}
                                                                         whileTap={{ scale: 0.9 }}
                                                                     >
                                                                         <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] border font-medium flex justify-center items-center rounded-2xl mx-auto  px-3 py-0 bg-lime-200 border-lime-200 text-lime-500 ">
-                                                                            {/* <div>Phiếu báo giá</div> */}
-                                                                            {/* {"("}
-                                                                            <PopupDetailQuote
-                                                                                dataLang={dataLang}
-                                                                                className="text-left group-hover:text-green-500"
-                                                                                name={e?.quote_code ? e.quote_code : ""}
-                                                                                id={e?.quote_id}
-                                                                            />
-                                                                            {")"} */}
-
                                                                             <PopupDetailQuote
                                                                                 dataLang={dataLang}
                                                                                 className="text-left "
@@ -827,10 +761,7 @@ const Index = (props) => {
                                                                 {(["payment_unpaid"].includes(e?.status_payment) && (
                                                                     <TagColorSky
                                                                         className={""}
-                                                                        name={
-                                                                            dataLang[e?.status_payment] ||
-                                                                            e?.status_payment
-                                                                        }
+                                                                        name={dataLang[e?.status_payment] || e?.status_payment}
                                                                     />
                                                                 )) ||
                                                                     (["payment_partially_paid"].includes(
@@ -838,17 +769,12 @@ const Index = (props) => {
                                                                     ) && (
                                                                             <TagColorOrange
                                                                                 className={""}
-                                                                                name={`${dataLang[e?.status_payment] ||
-                                                                                    e?.status_payment
-                                                                                    } (${formatNumber(e?.total_payment)})`}
+                                                                                name={`${dataLang[e?.status_payment] || e?.status_payment} (${formatNumber(e?.total_payment)})`}
                                                                             />
                                                                         )) ||
                                                                     (["payment_paid"].includes(e?.status_payment) && (
                                                                         <TagColorLime
-                                                                            name={
-                                                                                dataLang[e?.status_payment] ||
-                                                                                e?.status_payment
-                                                                            }
+                                                                            name={dataLang[e?.status_payment] || e?.status_payment}
                                                                         />
                                                                     ))}
                                                             </RowItemTable>
@@ -866,9 +792,7 @@ const Index = (props) => {
                                                                             "delivery",
                                                                         ].includes(item?.code);
 
-                                                                        const isValueDelivery = ["delivery"].includes(
-                                                                            item?.code
-                                                                        );
+                                                                        const isValueDelivery = ["delivery"].includes(item?.code);
 
                                                                         return (
                                                                             <>
@@ -883,17 +807,11 @@ const Index = (props) => {
                                                                                             <>
                                                                                                 <div className="flex items-center">
                                                                                                     <div
-                                                                                                        className={`${item?.active
-                                                                                                            ? `h-2 w-2 rounded-full bg-green-500`
-                                                                                                            : `h-2 w-2 rounded-full bg-gray-400`
-                                                                                                            } `}
+                                                                                                        className={`${item?.active ? `h-2 w-2 rounded-full bg-green-500` : `h-2 w-2 rounded-full bg-gray-400`} `}
                                                                                                     />
                                                                                                     {!isValueDelivery && (
                                                                                                         <div
-                                                                                                            className={`${item?.active
-                                                                                                                ? `w-full bg-green-500 h-0.5 `
-                                                                                                                : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                                }`}
+                                                                                                            className={`${item?.active ? `w-full bg-green-500 h-0.5 ` : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`}`}
                                                                                                         />
                                                                                                     )}
                                                                                                 </div>
@@ -907,10 +825,7 @@ const Index = (props) => {
                                                                                                         <div className="flex justify-center items-center w-full gap-1">
                                                                                                             <h6>
                                                                                                                 {
-                                                                                                                    dataLang[
-                                                                                                                    item
-                                                                                                                        ?.name
-                                                                                                                    ]
+                                                                                                                    dataLang[item?.name]
                                                                                                                 }
                                                                                                             </h6>
                                                                                                             {isValueDelivery && (
@@ -920,12 +835,7 @@ const Index = (props) => {
                                                                                                                         ? "text-green-500"
                                                                                                                         : "text-orange-500"
                                                                                                                         } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
-                                                                                                                >{`(${dataLang[
-                                                                                                                    item
-                                                                                                                        ?.status
-                                                                                                                ] ||
-                                                                                                                    item?.status
-                                                                                                                    })`}</h6>
+                                                                                                                >{`(${dataLang[item?.status] || item?.status})`}</h6>
                                                                                                             )}
                                                                                                         </div>
                                                                                                     </div>
@@ -934,38 +844,19 @@ const Index = (props) => {
                                                                                         )}
                                                                                     <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
                                                                                         {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
-                                                                                        {isValue &&
-                                                                                            item?.reference &&
-                                                                                            item?.reference
-                                                                                                .slice(
-                                                                                                    0,
-                                                                                                    isExpanded
-                                                                                                        ? item
-                                                                                                            ?.reference
-                                                                                                            .length
-                                                                                                        : 2
-                                                                                                )
-                                                                                                .map((ci, index) => (
-                                                                                                    <div
-                                                                                                        className="flex-col flex"
-                                                                                                        key={index}
-                                                                                                    >
-                                                                                                        {ci?.code}
-                                                                                                    </div>
-                                                                                                ))}
-                                                                                        {item?.reference &&
-                                                                                            item?.reference.length >
-                                                                                            2 && (
-                                                                                                <button
-                                                                                                    onClick={
-                                                                                                        toggleShowAll
-                                                                                                    }
-                                                                                                >
-                                                                                                    {isExpanded
-                                                                                                        ? "Rút gọn"
-                                                                                                        : "Xem thêm"}
-                                                                                                </button>
-                                                                                            )}
+                                                                                        {isValue && item?.reference && item?.reference.slice(0, isExpanded ? item?.reference?.length : 2).map((ci, index) => (
+                                                                                            <div
+                                                                                                className="flex-col flex"
+                                                                                                key={index}
+                                                                                            >
+                                                                                                {ci?.code}
+                                                                                            </div>
+                                                                                        ))}
+                                                                                        {item?.reference && item?.reference?.length > 2 && (
+                                                                                            <button onClick={toggleShowAll}>
+                                                                                                {isExpanded ? "Rút gọn" : "Xem thêm"}
+                                                                                            </button>
+                                                                                        )}
                                                                                     </p>
                                                                                 </div>
                                                                             </>
@@ -975,7 +866,7 @@ const Index = (props) => {
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1}>
                                                                 <BtnAction
-                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefresh={refetch.bind(this)}
                                                                     dataLang={dataLang}
                                                                     status={e?.status}
                                                                     id={e?.id}

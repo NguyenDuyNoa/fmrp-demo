@@ -4,30 +4,30 @@ import { Box1, Trash as IconDelete, SearchNormal1 as IconSearch, TickCircle } fr
 import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { NumericFormat } from "react-number-format";
-import { _ServerInstance as Axios } from "/services/axios";
 
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const initialFetch = {
         onSending: false,
-        onFetching: false,
         onFetchingWarehouse: false,
         onFetchingCondition: false,
     };
@@ -68,37 +68,32 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         sIsIdWarehouse(null);
     }, [open]);
 
-    const handleFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_sale_order/KeepStockOrder/${id}`,
-            { params: { "filter[warehouse_id]": isIdWarehouse?.value } },
-            (err, response) => {
-                if (!err) {
-                    let db = response?.data;
-                    sData(db);
-                    sDataClone(db);
-                }
-            }
-        );
-        setTimeout(() => setIsFetch({ onFetching: false }), 700);
-    };
+    const { isFetching: isFetchingDetailKeepStookOrder } = useQuery({
+        queryKey: ['detail_keep_stock_order', id, isIdWarehouse?.value],
+        queryFn: async () => {
+            const db = await apiSalesOrder.apiDetailKeepStockOrder(id, { params: { "filter[warehouse_id]": isIdWarehouse?.value } })
 
-    const handleFetchingWarehouse = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseCombobox_not_system/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    sDataWarehouse(data.map((e) => ({ label: e.warehouse_name, value: e.id })));
-                }
-            }
-        );
+            sData(db);
 
-        setIsFetch({ onFetchingWarehouse: false });
-    };
+            sDataClone(db);
+
+            return db
+        },
+        enabled: open && !!isIdWarehouse,
+        ...reTryQuery
+    })
+
+    useQuery({
+        queryKey: ["warehouse_combobox_not_system"],
+        queryFn: async () => {
+            const db = await apiSalesOrder.apiWarehouseComboboxNotSystem()
+
+            sDataWarehouse(db.map((e) => ({ label: e.warehouse_name, value: e.id })));
+
+            return db
+        },
+        enabled: open == true
+    })
 
     const handleShow = (idParent, idChild) => {
         sData({
@@ -207,6 +202,12 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         }
     };
 
+    const handingKeepStok = useMutation({
+        mutationFn: (data) => {
+            return apiSalesOrder.apiHanDingKeepStook(data);
+        }
+    })
+
     const sendingData = () => {
         let formData = new FormData();
 
@@ -234,49 +235,26 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                 formData.append(`items[${index}][warehouse_location]`, "");
             }
         });
-
-        Axios(
-            "POST",
-            `/api_web/Api_sale_order/AddKeepStockOrder?csrf_protection=true`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message] || message}`);
-
-                        sOpen(false);
-                    } else {
-                        isShow("error", `${dataLang[message] || message}`);
-                    }
+        handingKeepStok.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", `${dataLang[message] || message}`);
+                    sOpen(false);
+                } else {
+                    isShow("error", `${dataLang[message] || message}`);
                 }
                 setIsFetch({ onSending: false });
+            },
+            onError: (error) => {
+                isShow("error", error);
             }
-        );
+        })
     };
-
-    useEffect(() => {
-        setIsFetch({ onFetching: true });
-    }, [isIdWarehouse]);
 
     useEffect(() => {
         isFetching.onSending && sendingData();
     }, [isFetching.onSending]);
 
-    useEffect(() => {
-        isFetching.onFetching && open && handleFetching();
-    }, [isFetching.onFetching, open]);
-
-    useEffect(() => {
-        isFetching.onFetchingWarehouse && open && handleFetchingWarehouse();
-    }, [isFetching.onFetchingWarehouse, open]);
-
-    useEffect(() => {
-        open && setIsFetch({ onFetchingWarehouse: true });
-    }, [open]);
 
     return (
         <>
@@ -422,7 +400,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                     {dataLang?.salesOrder_action || "salesOrder_action"}
                                 </ColumnTablePopup>
                             </HeaderTablePopup>
-                            {isFetching.onFetching ? (
+                            {isFetchingDetailKeepStookOrder ? (
                                 <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>

@@ -176,7 +176,8 @@ const Index = (props) => {
             queryState({ listTabStatus: data || [] });
 
             return rResult
-        }
+        },
+        ...reTryQuery
     })
 
     // filter

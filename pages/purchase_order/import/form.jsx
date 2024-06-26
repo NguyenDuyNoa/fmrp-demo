@@ -295,7 +295,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    var { rResult } = response?.data;
                     sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
                 }
             }
@@ -556,7 +556,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response.data.data;
+                    var { result } = response?.data?.data;
                     sDataItems(result);
                 }
             }
@@ -575,7 +575,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var result = response.data.rResult;
+                    var result = response?.data?.rResult;
                     sDataWarehouse(
                         result?.map((e) => ({
                             label: e?.name,
@@ -1155,8 +1155,15 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response?.data.data;
-                    sDataItems(result);
+                    console.log(response?.data);
+                    let db = response?.data
+                    sDataThe_order(
+                        db?.map((e) => ({ label: e?.code, value: e?.id })) || {
+                            label: db?.code,
+                            value: db?.id,
+                        }
+                    );
+                    // sDataItems(data);
                 }
             }
         );
@@ -1622,23 +1629,23 @@ const Index = (props) => {
                         </h4>
                         <div className="col-span-10">
                             <div
-                                className={`${dataProductSerial.is_enable == "1"
-                                    ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                className={`${dataProductSerial?.is_enable == "1"
+                                    ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
                                         ? "grid-cols-13"
-                                        : dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" : "grid-cols-11"
-                                    : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
-                                        ? "grid-cols-12" : dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" : "grid-cols-10"
+                                        : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" : "grid-cols-11"
+                                    : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
+                                        ? "grid-cols-12" : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-12" : "grid-cols-10"
                                     } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
                                     {dataLang?.import_from_ware_loca || "import_from_ware_loca"}
                                 </h4>
-                                {dataProductSerial.is_enable === "1" && (
+                                {dataProductSerial?.is_enable === "1" && (
                                     <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
                                         {"Serial"}
                                     </h4>
                                 )}
-                                {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                {dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1" ? (
                                     <>
                                         <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
                                             {"Lot"}
@@ -1782,15 +1789,15 @@ const Index = (props) => {
                         </div>
                         <div className="col-span-10">
                             <div
-                                className={`${dataProductSerial.is_enable == "1"
-                                    ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                className={`${dataProductSerial?.is_enable == "1"
+                                    ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
                                         ? "grid-cols-13"
-                                        : dataMaterialExpiry.is_enable == "1"
+                                        : dataMaterialExpiry?.is_enable == "1"
                                             ? "grid-cols-[repeat(13_minmax(0_1fr))]"
                                             : "grid-cols-11"
-                                    : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                    : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
                                         ? "grid-cols-12"
-                                        : dataMaterialExpiry.is_enable == "1"
+                                        : dataMaterialExpiry?.is_enable == "1"
                                             ? "grid-cols-12"
                                             : "grid-cols-10"
                                     } grid  divide-x border-t border-b border-r border-l`}
@@ -1804,7 +1811,7 @@ const Index = (props) => {
                                         isDisabled={true}
                                     />
                                 </div>
-                                {dataProductSerial.is_enable === "1" ? (
+                                {dataProductSerial?.is_enable === "1" ? (
                                     <div className=" col-span-1 flex items-center">
                                         <div className="flex justify-center   p-0.5 flex-col items-center">
                                             <NumericFormat
@@ -1820,7 +1827,7 @@ const Index = (props) => {
                                 ) : (
                                     ""
                                 )}
-                                {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                {dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1" ? (
                                     <>
                                         <div className=" col-span-1 flex items-center">
                                             <div className="flex justify-center flex-col items-center">
@@ -2028,17 +2035,17 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-10  items-center">
                                                 <div
-                                                    className={`${dataProductSerial.is_enable == "1"
-                                                        ? dataMaterialExpiry.is_enable !=
-                                                            dataProductExpiry.is_enable
+                                                    className={`${dataProductSerial?.is_enable == "1"
+                                                        ? dataMaterialExpiry?.is_enable !=
+                                                            dataProductExpiry?.is_enable
                                                             ? "grid-cols-13"
-                                                            : dataMaterialExpiry.is_enable == "1"
+                                                            : dataMaterialExpiry?.is_enable == "1"
                                                                 ? "grid-cols-[repeat(13_minmax(0_1fr))]"
                                                                 : "grid-cols-11"
-                                                        : dataMaterialExpiry.is_enable !=
-                                                            dataProductExpiry.is_enable
+                                                        : dataMaterialExpiry?.is_enable !=
+                                                            dataProductExpiry?.is_enable
                                                             ? "grid-cols-12"
-                                                            : dataMaterialExpiry.is_enable == "1"
+                                                            : dataMaterialExpiry?.is_enable == "1"
                                                                 ? "grid-cols-12"
                                                                 : "grid-cols-10"
                                                         } grid  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r`}

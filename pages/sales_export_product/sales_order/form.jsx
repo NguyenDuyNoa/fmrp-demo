@@ -1,4 +1,28 @@
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { reTryQuery } from "@/configs/configRetryQuery";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { routerSalesOrder } from "@/routers/sellingGoods";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import { Add, Trash as IconDelete, Minus } from "iconsax-react";
+import { debounce } from "lodash";
 import moment from "moment";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -8,31 +32,8 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { components } from "react-select";
 import { v4 as uuidv4 } from "uuid";
-
 import { _ServerInstance as Axios } from "/services/axios";
-
-import Loading from "@/components/UI/loading";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
-import ButtonBack from "@/components/UI/button/buttonBack";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container } from "@/components/UI/common/layout";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import useSetingServer from "@/hooks/useConfigNumber";
-import { routerSalesOrder } from "@/routers/sellingGoods";
-import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
-import { formatMoment } from "@/utils/helpers/formatMoment";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { debounce } from "lodash";
+import apiComons from "@/Api/apiComon/apiComon";
 const Index = (props) => {
     const router = useRouter();
 
@@ -46,21 +47,9 @@ const Index = (props) => {
 
     const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
 
-    const [onFetching, setOnFetching] = useState(false);
-
     const [onFetchingItemsAll, setOnFetchingItemsAll] = useState(false);
 
     const [onFetchingItem, setOnFetchingItem] = useState(false);
-
-    const [onFetchingDetail, setOnFetchingDetail] = useState(false);
-
-    const [onFetchingCustomer, setOnFetchingCustomer] = useState(false);
-
-    const [onFetchingStaff, setOnFetchingStaff] = useState(false);
-
-    const [onFetchingQuote, setOnFetchingQuote] = useState(false);
-
-    const [onFetchingContactPerson, setOnFetchingContactPerson] = useState(false);
 
     const [onSending, setOnSending] = useState(false);
 
@@ -140,216 +129,211 @@ const Index = (props) => {
         router.query && setDeliveryDate(null);
         router.query && setNote("");
 
-        router.query && setOnFetching(true);
-        // router.query && setOnFetchingItemsAll(true);
     }, [id, router.query]);
 
     // Fetch edit
-    const _ServerFetchingDetail = () => {
-        Axios("GET", `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var rResult = response.data;
+    const { } = useQuery({
+        queryKey: ["api_detail_sale_order", id],
+        queryFn: async () => {
+            const rResult = await apiSalesOrder.apiDetail(id)
 
-                const items = rResult?.items?.map((e) => ({
-                    price_quote_order_item_id: e?.id,
-                    id: e.id,
-                    item: {
-                        e: e?.item,
-                        label: `${e.item?.item_name} <span style={{display: none}}>${
-                            // e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
-                        value: e.item?.id,
-                    },
-                    quantity: +e?.quantity,
-                    price: +e?.price,
-                    discount: +e?.discount_percent,
-                    tax: { tax_rate: e?.tax_rate, value: e?.tax_id },
-                    unit: e.item?.unit_name,
-                    price_after_discount: +e?.price_after_discount,
-                    note: e?.note,
-                    total_amount: +e?.price_after_discount * (1 + +e?.tax_rate / 100) * +e?.quantity,
-                    delivery_date: moment(e?.delivery_date).toDate(),
-                }));
+            const items = rResult?.items?.map((e) => ({
+                price_quote_order_item_id: e?.id,
+                id: e.id,
+                item: {
+                    e: e?.item,
+                    label: `${e.item?.item_name} <span style={{display: none}}>${
+                        // e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                        }</span>`,
+                    value: e.item?.id,
+                },
+                quantity: +e?.quantity,
+                price: +e?.price,
+                discount: +e?.discount_percent,
+                tax: { tax_rate: e?.tax_rate, value: e?.tax_id },
+                unit: e.item?.unit_name,
+                price_after_discount: +e?.price_after_discount,
+                note: e?.note,
+                total_amount: +e?.price_after_discount * (1 + +e?.tax_rate / 100) * +e?.quantity,
+                delivery_date: moment(e?.delivery_date).toDate(),
+            }));
 
-                setOption(items);
-                setCodeProduct(rResult?.code);
-                setContactPerson(
-                    rResult?.contact_name !== null && rResult?.contact_name !== "0"
-                        ? {
-                            label: rResult?.contact_name,
-                            value: rResult?.contact_id,
-                        }
-                        : null
-                );
-                setBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
+            setOption(items);
+            setCodeProduct(rResult?.code);
+            setContactPerson(
+                rResult?.contact_name !== null && rResult?.contact_name !== "0"
+                    ? {
+                        label: rResult?.contact_name,
+                        value: rResult?.contact_id,
+                    }
+                    : null
+            );
+            setBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
+            setStaff({
+                label: rResult?.staff_name,
+                value: rResult?.staff_id,
+            });
+            setCustomer({
+                label: rResult?.client_name,
+                value: rResult?.client_id,
+            });
+            setStartDate(moment(rResult?.date).toDate());
+            // setDeliveryDate(moment(rResult?.validity).toDate())
+            setNote(rResult?.note);
+            if (rResult?.quote_id !== "0" && rResult?.quote_code !== null) {
+                setTypeOrder("1");
+                setHidden(true);
+                setQuote({
+                    label: rResult?.quote_code,
+                    value: rResult?.quote_id,
                 });
-                setStaff({
-                    label: rResult?.staff_name,
-                    value: rResult?.staff_id,
-                });
-                setCustomer({
-                    label: rResult?.client_name,
-                    value: rResult?.client_id,
-                });
-                setStartDate(moment(rResult?.date).toDate());
-                // setDeliveryDate(moment(rResult?.validity).toDate())
-                setNote(rResult?.note);
-                if (rResult?.quote_id !== "0" && rResult?.quote_code !== null) {
-                    setTypeOrder("1");
-                    setHidden(true);
-                    setQuote({
-                        label: rResult?.quote_code,
-                        value: rResult?.quote_id,
-                    });
-                }
             }
-            setOnFetchingDetail(false);
-        });
-    };
 
-    // fetch chi nhanh
-    const handleFetchingBranch = () => {
-        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                setDataBranch(rResult?.map((e) => ({ label: e.name, value: e.id })));
-            }
-        });
+            return rResult
+        },
 
-        Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                setDataTasxes(
-                    rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        tax_rate: e.tax_rate,
-                    }))
-                );
-            }
-        });
+        ...reTryQuery,
 
-        setOnFetching(false);
-    };
+        enabled: !!id,
+    })
+
+    useQuery({
+        queryKey: ["api_branch"],
+        queryFn: async () => {
+
+            const { result } = await apiComons.apiBranchCombobox();
+
+            setDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+
+            return result
+        },
+
+        ...reTryQuery
+    });
+
+    useQuery({
+        queryKey: ["api_tax"],
+        queryFn: async () => {
+
+            const { rResult } = await apiSalesOrder.apiListTax();
+
+            setDataTasxes(
+                rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    tax_rate: e.tax_rate,
+                }))
+            );
+
+            return rResult
+        },
+
+        ...reTryQuery
+    });
 
     // fetch Customer
-    const handleFetchingCustomer = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/searchClients?csrf_protection=true`,
-            {
-                params: {
-                    search: "",
-                    branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    setDataCustomer(data?.clients?.map((e) => ({ label: e.name, value: e.id })));
-                }
+    useQuery({
+        queryKey: ["api_search_clients", branch],
+        queryFn: async () => {
+            const params = {
+                search: "",
+                branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null,
             }
-        );
-        setOnFetchingCustomer(false);
-    };
-    // Contact person
-    const handleFetchingContactPerson = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/searchContact?csrf_protection=true`,
-            {
-                params: {
-                    client_id: customer != null ? customer.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response.data;
-                    setDataContactPerson(
-                        data?.contacts.map((e) => ({
-                            label: e?.full_name,
-                            value: e?.id,
-                        }))
-                    );
-                }
-            }
-        );
-        setOnFetchingContactPerson(false);
-    };
-    // Staff
-    const handleFetchingStaff = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/getStaffBranch?csrf_protection=true`,
-            {
-                params: {
-                    branch_id: branch != null ? [+branch?.value]?.map((e) => e) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response?.data;
-                    setDataStaffs(
-                        data?.staffs?.map((e) => ({
-                            label: e?.full_name,
-                            value: e?.staffid,
-                        }))
-                    );
-                }
-            }
-        );
-        setOnFetchingStaff(false);
-    };
+            const { data } = await apiSalesOrder.apiSearchClient({ params });
 
-    // Quote
-    const handleFetchingQuote = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_quotation/quotationNotOrderedCombobox/?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id]": branch !== null ? +branch?.value : null,
-                    "filter[client_id]": customer !== null ? +customer?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var rResult = response?.data.result;
-                    setDataQuotes(
-                        rResult?.map((e) => ({
-                            label: e.reference_no,
-                            value: e.id,
-                        }))
-                    );
-                }
+            setDataCustomer(data?.clients?.map((e) => ({ label: e.name, value: e.id })));
+
+            return data
+        },
+
+        ...reTryQuery
+    })
+
+    useQuery({
+        queryKey: ["api_search_contact", customer],
+        queryFn: async () => {
+            const params = {
+                client_id: customer != null ? customer.value : null,
             }
-        );
-        setOnFetchingQuote(false);
-    };
+
+            const { data } = await apiSalesOrder.apiSearchContact({ params });
+
+            setDataContactPerson(
+                data?.contacts.map((e) => ({
+                    label: e?.full_name,
+                    value: e?.id,
+                }))
+            );
+
+            return data
+        },
+
+        ...reTryQuery
+    })
+
+    useQuery({
+        queryKey: ["api_taff_branch", branch],
+        queryFn: async () => {
+            const params = {
+                branch_id: branch != null ? [+branch?.value]?.map((e) => e) : null,
+            }
+
+            const data = await apiSalesOrder.apiStaffBranch({ params });
+
+            setDataStaffs(
+                data?.staffs?.map((e) => ({
+                    label: e?.full_name,
+                    value: e?.staffid,
+                }))
+            );
+
+            return data
+        },
+
+        ...reTryQuery
+    })
+
+    const { refetch: refetchQuote } = useQuery({
+        queryKey: ["api_quotation", branch],
+        queryFn: async () => {
+            const params = {
+                "filter[branch_id]": branch !== null ? +branch?.value : null,
+                "filter[client_id]": customer !== null ? +customer?.value : null,
+            }
+
+            const { result } = await apiSalesOrder.apiQuotationNotOrdered({ params });
+
+            setDataQuotes(
+                result?.map((e) => ({
+                    label: e.reference_no,
+                    value: e.id,
+                }))
+            );
+
+            return result
+        },
+
+        enabled: !!branch,
+
+        ...reTryQuery
+    })
 
     // fetch items
-    const handleFetchingItemsAll = () => {
+    const handleFetchingItemsAll = async () => {
         let form = new FormData();
+
         if (branch != null) {
             [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
         }
-        Axios(
-            "POST",
-            "/api_web/Api_product/searchItemsVariant/?csrf_protection=true",
-            {
-                data: form,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { result } = response.data.data;
-                    setDataItems(result);
-                }
-            }
-        );
+
+        const { data: { result } } = await apiSalesOrder.apiItems(form);
+
+        setDataItems(result);
+
         setOnFetchingItemsAll(false);
     };
 
@@ -361,54 +345,26 @@ const Index = (props) => {
         }
         if (typeOrder === "1") {
             if (quote && quote.value !== null) {
-                await Axios(
-                    "POST",
-                    "/api_web/Api_quotation/searchItemsVariant/?csrf_protection=true",
-                    {
-                        params: {
-                            "filter[quote_id]": quote !== null ? +quote?.value : null,
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            const { result } = response.data.data;
-                            setDataItems(result);
-                        }
+                const { data: { result } } = await apiSalesOrder.apiQuotaItems({
+                    params: {
+                        "filter[quote_id]": quote !== null ? +quote?.value : null,
                     }
-                );
+                })
+                setDataItems(result);
+
                 setOnFetchingItem(false);
             } else {
-                await Axios(
-                    "POST",
-                    "/api_web/Api_product/searchItemsVariant/?csrf_protection=true",
-                    {
-                        data: form,
-                        headers: { "Content-Type": "multipart/form-data" },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            const { result } = response.data.data;
-                            setDataItems(result);
-                        }
-                    }
-                );
+                const { data: { result } } = await apiSalesOrder.apiItems(form);
+
+                setDataItems(result);
+
                 setOnFetchingItem(false);
             }
         } else if (typeOrder === "0") {
-            await Axios(
-                "POST",
-                "/api_web/Api_product/searchItemsVariant/?csrf_protection=true",
-                {
-                    data: form,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    if (!err) {
-                        const { result } = response.data.data;
-                        setDataItems(result);
-                    }
-                }
-            );
+            const { data: { result } } = await apiSalesOrder.apiItems(form);
+
+            setDataItems(result);
+
             setOnFetchingItem(false);
         }
     };
@@ -421,13 +377,6 @@ const Index = (props) => {
         };
     });
 
-    useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetail();
-    }, [onFetchingDetail]);
-
-    useEffect(() => {
-        id && setOnFetchingDetail(true);
-    }, []);
 
     // tổng thay đổi
     useEffect(() => {
@@ -487,30 +436,10 @@ const Index = (props) => {
     }, []);
 
     useEffect(() => {
-        onFetchingStaff && handleFetchingStaff();
-    }, [onFetchingStaff]);
-
-    useEffect(() => {
-        onFetchingCustomer && handleFetchingCustomer();
-    }, [onFetchingCustomer]);
-
-    useEffect(() => {
-        onFetchingQuote && handleFetchingQuote();
-    }, [onFetchingQuote]);
-
-    useEffect(() => {
-        onFetchingContactPerson && handleFetchingContactPerson();
-    }, [onFetchingContactPerson]);
-
-    useEffect(() => {
-        branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true));
         branch !== null && setOnFetchingItemsAll(true);
         branch == null && setItemsAll([]);
     }, [branch]);
 
-    useEffect(() => {
-        customer !== null && setOnFetchingContactPerson(true);
-    }, [customer]);
 
     useEffect(() => {
         quote !== null && setOnFetchingItem(true);
@@ -525,12 +454,9 @@ const Index = (props) => {
     }, [onFetchingItem]);
 
     useEffect(() => {
-        onFetching && handleFetchingBranch();
-    }, [onFetching]);
-
-    useEffect(() => {
         setErrDate(false);
     }, [startDate != null]);
+
     useEffect(() => {
         sErrCustomer(false);
     }, [customer != null]);
@@ -538,64 +464,46 @@ const Index = (props) => {
     useEffect(() => {
         setErrDeliveryDate(false);
     }, [deliveryDate != null]);
+
     useEffect(() => {
         setErrBranch(false);
     }, [branch != null]);
+
     useEffect(() => {
         setErrStaff(false);
     }, [staff != null]);
 
     // search api
-    const _HandleSeachApi = debounce((inputValue) => {
+    const _HandleSeachApi = debounce(async (inputValue) => {
         if (branch == null) return;
+
         let form = new FormData();
+
         if (branch != null) {
             [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
         }
+
         form.append("term", inputValue);
+
         if (typeOrder === "1" && quote && +quote.value) {
-            Axios(
-                "POST",
-                `/api_web/Api_quotation/searchItemsVariant/?csrf_protection=true`,
-                {
-                    data: {
-                        term: inputValue,
-                    },
-                    params: {
-                        "filter[quote_id]": quote ? +quote?.value : null,
-                    },
+            const { data: { result } } = await apiSalesOrder.apiQuotaItems({
+                data: {
+                    term: inputValue,
                 },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response?.data.data;
-                        setDataItems(result);
-                    }
-                }
-            );
+                params: {
+                    "filter[quote_id]": quote ? +quote?.value : null,
+                },
+            });
+            setDataItems(result);
         }
         if (typeOrder === "0") {
-            Axios(
-                "POST",
-                `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
-                {
-                    data: form,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response?.data.data;
-                        setDataItems(result);
-                    }
-                }
-            );
+            const { data: { result } } = await apiSalesOrder.apiItems(form);
+            setDataItems(result);
         }
     }, 500);
 
     // format number
     const formatNumber = (number) => {
-        // if (!number && number !== 0) return 0;
-        // const integerPart = Math.floor(number);
-        // return integerPart.toLocaleString("en");
         return formatNumberConfig(+number, dataSeting);
     };
 
@@ -630,7 +538,7 @@ const Index = (props) => {
             setTypeOrder(isId);
             setHidden(isId === "1");
             setQuote(isId === "0" ? null : quote);
-            isId == 1 && setOnFetchingQuote(true);
+            isId == 1 && refetchQuote()
             setOnFetchingItem(isId === "0" && true);
             setOnFetchingItemsAll(isId === "1" && true);
 
@@ -754,16 +662,8 @@ const Index = (props) => {
                                     value: e?.e?.tax_id,
                                     tax_rate: e?.e?.tax_rate,
                                 },
-                                price_after_tax:
-                                    +e?.e?.price *
-                                    e?.e?.quantity *
-                                    (1 - +e?.e?.discount_percent / 100) *
-                                    (1 + e?.e?.tax_rate / 100),
-                                total_amount:
-                                    +e?.e?.price *
-                                    (1 - +e?.e?.discount_percent / 100) *
-                                    (1 + +e?.e?.tax_rate / 100) *
-                                    +e?.e?.quantity,
+                                price_after_tax: +e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
+                                total_amount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
                                 note: e?.e?.note_item,
                                 delivery_date: null,
                             };
@@ -1043,6 +943,7 @@ const Index = (props) => {
         const totalPrice = tinhTongTien(option);
         setTongTienState(totalPrice);
     }, [option]);
+
     const dataOption = option?.map((e) => {
         return {
             item: e?.item?.value,
@@ -1066,13 +967,7 @@ const Index = (props) => {
         let deliveryDateInOption = option.some((e) => e?.delivery_date === null);
 
         if (typeOrder === "0") {
-            if (
-                startDate == null ||
-                customer == null ||
-                branch == null ||
-                staff == null ||
-                deliveryDateInOption === true
-            ) {
+            if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true) {
                 startDate == null && setErrDate(true);
                 customer?.value == null && sErrCustomer(true);
                 branch?.value == null && setErrBranch(true);
@@ -1084,14 +979,7 @@ const Index = (props) => {
                 setOnSending(true);
             }
         } else if (typeOrder === "1") {
-            if (
-                startDate == null ||
-                customer == null ||
-                branch == null ||
-                staff == null ||
-                deliveryDateInOption === true ||
-                quote == null
-            ) {
+            if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true || quote == null) {
                 startDate == null && setErrDate(true);
                 customer?.value == null && sErrCustomer(true);
                 branch?.value == null && setErrBranch(true);
@@ -1142,49 +1030,34 @@ const Index = (props) => {
             tongTienState?.totalTax >= 0 &&
             tongTienState?.totalAmount > 0
         ) {
-            await Axios(
-                "POST",
-                `${id
-                    ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`
-                    : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"
-                }`,
-                {
-                    data: formData,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    const { isSuccess, message } = response?.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message]}` || message);
-                        setCodeProduct("");
-                        setStartDate(new Date());
-                        setDeliveryDate(new Date());
-                        setContactPerson(null);
-                        setStaff(null);
-                        setCustomer(null);
-                        setBranch(null);
-                        setErrQuote(null);
-                        setNote("");
-                        setErrBranch(false);
-                        setErrDate(false);
-                        setErrDeliveryDate(false);
-                        sErrCustomer(false);
-                        setErrStaff(false);
-                        setErrQuote(false);
-                        setOption([]);
-                        router.push(routerSalesOrder.home);
-                    } else {
-                        isShow("error", `${dataLang[message]}` || message);
-                    }
-                    setOnSending(false);
-                }
-            );
+            const { isSuccess, message } = await apiSalesOrder.apiHandingSalesOrder(id, formData);
+            if (isSuccess) {
+                isShow("success", `${dataLang[message]}` || message);
+                setCodeProduct("");
+                setStartDate(new Date());
+                setDeliveryDate(new Date());
+                setContactPerson(null);
+                setStaff(null);
+                setCustomer(null);
+                setBranch(null);
+                setErrQuote(null);
+                setNote("");
+                setErrBranch(false);
+                setErrDate(false);
+                setErrDeliveryDate(false);
+                sErrCustomer(false);
+                setErrStaff(false);
+                setErrQuote(false);
+                setOption([]);
+                router.push(routerSalesOrder.home);
+            } else {
+                isShow("error", `${dataLang[message]}` || message);
+            }
+            setOnSending(false);
         } else {
             isShow(
                 "error",
-                newDataOption?.length === 0
-                    ? `Chưa chọn thông tin mặt hàng!`
-                    : "Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!"
+                newDataOption?.length === 0 ? `Chưa chọn thông tin mặt hàng!` : "Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!"
             );
             setOnSending(false);
         }
@@ -1205,7 +1078,7 @@ const Index = (props) => {
 
     // codeProduct new
     const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : [];
-    const fakeDataQuotes = branch != null ? dataQuotes.filter((x) => !hiddenOptions.includes(x.value)) : [];
+    const fakeDataQuotes = branch != null ? dataQuotes?.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
     // const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
     const allItems = [...options];
@@ -1468,9 +1341,7 @@ const Index = (props) => {
         <React.Fragment className="overflow-hidden">
             <Head>
                 <title>
-                    {id
-                        ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                        : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                    {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
                 </title>
             </Head>
             <Container className="!h-auto">
@@ -1482,9 +1353,7 @@ const Index = (props) => {
                         <span className="text-[#141522]/40">/</span>
                         <h6>
                             {" "}
-                            {id
-                                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                                : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                            {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
                         </h6>
                     </div>
                 )}
@@ -1492,9 +1361,7 @@ const Index = (props) => {
                     <div className="flex justify-between items-center ">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {" "}
-                            {id
-                                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                                : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                            {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
                             <ButtonBack onClick={() => router.push(routerSalesOrder.home)} dataLang={dataLang} />
@@ -1568,8 +1435,7 @@ const Index = (props) => {
                                         placeholder={dataLang?.select_customer || "select_customer"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errCustomer ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${errCustomer ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1677,13 +1543,11 @@ const Index = (props) => {
                                         onChange={(value) => handleOnChangeInput("staff", value)}
                                         value={staff}
                                         placeholder={
-                                            dataLang?.sales_product_select_staff_in_charge ||
-                                            "sales_product_select_staff_in_charge"
+                                            dataLang?.sales_product_select_staff_in_charge || "sales_product_select_staff_in_charge"
                                         }
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errStaff ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${errStaff ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1706,8 +1570,7 @@ const Index = (props) => {
                                     />
                                     {errStaff && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.sales_product_err_staff_in_charge ||
-                                                "sales_product_err_staff_in_charge"}
+                                            {dataLang?.sales_product_err_staff_in_charge || "sales_product_err_staff_in_charge"}
                                         </label>
                                     )}
                                 </div>
@@ -1748,8 +1611,7 @@ const Index = (props) => {
                                                 for="default-radio-2"
                                                 className="ml-2 cursor-pointer 2xl:text-sm xl:text-xs text-[11px] font-normal text-gray-900 dark:text-gray-300"
                                             >
-                                                {dataLang?.sales_product_according_to_quotation ||
-                                                    "sales_product_according_to_quotation"}
+                                                {dataLang?.sales_product_according_to_quotation || "sales_product_according_to_quotation"}
                                             </label>
                                         </div>
                                     </div>
@@ -1764,10 +1626,7 @@ const Index = (props) => {
                                             options={fakeDataQuotes}
                                             onChange={(value) => handleOnChangeInput("quote", value)}
                                             value={quote}
-                                            placeholder={
-                                                dataLang?.sales_product_select_quotation ||
-                                                "sales_product_select_quotation"
-                                            }
+                                            placeholder={dataLang?.sales_product_select_quotation || "sales_product_select_quotation"}
                                             hideSelectedOptions={false}
                                             isClearable={true}
                                             className={`${errQuote && quote === null ? "border border-red-500 rounded-md" : ""
@@ -1880,8 +1739,7 @@ const Index = (props) => {
                                                             <div className="flex gap-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <h5 className="text-gray-400 font-normal">
-                                                                        {dataLang?.purchase_survive ||
-                                                                            "purchase_survive"}
+                                                                        {dataLang?.purchase_survive || "purchase_survive"}
                                                                         :
                                                                     </h5>
                                                                     <h5 className=" font-medium">

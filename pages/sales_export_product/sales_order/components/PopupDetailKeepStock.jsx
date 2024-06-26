@@ -1,46 +1,35 @@
 // Danh sách dữ kho
 
-import { v4 as uuid } from "uuid";
-import dynamic from "next/dynamic";
-import React, { useEffect, useState } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import { SearchNormal1 as IconSearch, Trash as IconDelete, BoxSearch, ArrowRight2 } from "iconsax-react";
-
-import PopupCustom from "@/components/UI/popup";
-import Loading from "@/components/UI/loading";
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-import { useChangeValue } from "@/hooks/useChangeValue";
-
-import { formatMoment } from "@/utils/helpers/formatMoment";
-
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import ModalImage from "react-modal-image";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useFeature from "@/hooks/useConfigFeature";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import PopupCustom from "@/components/UI/popup";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useChangeValue } from "@/hooks/useChangeValue";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight2, BoxSearch, Trash as IconDelete } from "iconsax-react";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import ModalImage from "react-modal-image";
+import { v4 as uuid } from "uuid";
 
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
 
 const Popup_DetailKeepStock = (props) => {
     const { dataLang, id } = props;
-
-    const initialFetchs = {
-        onSending: false,
-        onFetching: false,
-        onFetchingFilter: false,
-        onFetchingWarehouse: false,
-        onFetchingCondition: false,
-    };
 
     const initialValues = {
         idTranfer: null,
@@ -67,8 +56,6 @@ const Popup_DetailKeepStock = (props) => {
 
     const { isOpen, isId, handleQueryId } = useToggle();
 
-    const [isFetching, sIsFetching] = useState(initialFetchs);
-
     const [dataFilter, sDataFilter] = useState(initialDataFilters);
 
     const { isValue, sIsValue, onChangeValue } = useChangeValue(initialValues);
@@ -77,11 +64,8 @@ const Popup_DetailKeepStock = (props) => {
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const setIsFetch = (e) => sIsFetching((prev) => ({ ...prev, ...e }));
-
     useEffect(() => {
         open && sIsValue(initialValues);
-        open && setIsFetch({ onFetching: true, onFetchingFilter: true });
     }, [open]);
 
     const formatNumber = (number) => {
@@ -90,86 +74,68 @@ const Popup_DetailKeepStock = (props) => {
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
-    const handleFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_sale_order/GetListKeepOrder/${id}/?csrf_protection=true`,
-            {
-                params: {
-                    "filter[status_bar]": isValue.idStatus?.value,
-                    "filter[id]": isValue.idTranfer?.value,
-                    "filter[warehouses_id]": isValue.idWarehouse?.value,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let db = response?.data;
-                    const newDb = {
-                        order: db.order,
-                        transfer: db.transfer.map((e) => {
-                            return {
-                                ...e,
-                                isShow: false,
-                            };
-                        }),
+    const { isFetching: isFetchingListKeepStock, refetch: refetchListKeepStock } = useQuery({
+        queryKey: ['api_list_keep_stock'],
+        queryFn: async () => {
+            const params = {
+                "filter[status_bar]": isValue.idStatus?.value,
+                "filter[id]": isValue.idTranfer?.value,
+                "filter[warehouses_id]": isValue.idWarehouse?.value,
+            }
+            const db = await apiSalesOrder.apiListKeepOrder(id, { params })
+
+            const newDb = {
+                order: db.order,
+                transfer: db.transfer.map((e) => {
+                    return {
+                        ...e,
+                        isShow: false,
                     };
-                    sData(newDb);
-                }
+                }),
+            };
 
-                setIsFetch({ onFetching: false });
-            }
-        );
-    };
+            sData(newDb);
 
-    const _ServerFetching_filter = () => {
-        Axios("GET", "/api_web/Api_transfer/TransferCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response?.data;
+            return db
+        },
+        enabled: !!isValue && open
+    })
 
-                sDataFilter((prev) => ({
-                    ...prev,
-                    tranfer: result?.map(({ code, id }) => ({ label: code, value: id })),
-                }));
-            }
-        });
+    useQuery({
+        queryKey: ['api_list_transfer'],
+        queryFn: async () => {
+            const { result } = await apiSalesOrder.apiListTransferCombobox()
 
-        Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseComboboxFindBranch/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    let data = response?.data;
+            sDataFilter((prev) => ({
+                ...prev,
+                tranfer: result?.map(({ code, id }) => ({ label: code, value: id })),
+            }));
+            return result
+        }
+    })
+    useQuery({
+        queryKey: ['api_list_warehouse_combobox_find_branch'],
+        queryFn: async () => {
+            const data = await apiSalesOrder.apiWarehouseComboboxFindBranch()
 
-                    sDataFilter((prev) => ({
-                        ...prev,
-                        warehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
-                    }));
-                }
-            }
-        );
+            sDataFilter((prev) => ({
+                ...prev,
+                warehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
+            }));
+            return data
+        }
+    })
 
-        setIsFetch({ onFetchingFilter: false });
-    };
+    const handleDeleteItem = async () => {
 
-    const handleDeleteItem = () => {
-        Axios(
-            "DELETE",
-            `/api_web/Api_transfer/deletetransferKeep/${isId}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
+        let { isSuccess, message } = await apiSalesOrder.apiDeleteTransferKeep(isId)
 
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
-                        sIsFetching({ onFetching: true });
-                    } else {
-                        isShow("error", props.dataLang[message]);
-                    }
-                }
-            }
-        );
+        if (isSuccess) {
+            isShow("success", props.dataLang[message] || message);
+            refetchListKeepStock()
+        } else {
+            isShow("error", props.dataLang[message] || message);
+        }
         handleQueryId({ status: false });
     };
 
@@ -189,17 +155,7 @@ const Popup_DetailKeepStock = (props) => {
         sData({ ...newDb });
     };
 
-    useEffect(() => {
-        isFetching.onFetching && handleFetching();
-    }, [isFetching.onFetching]);
 
-    useEffect(() => {
-        isFetching.onFetchingFilter && _ServerFetching_filter();
-    }, [isFetching.onFetchingFilter]);
-
-    useEffect(() => {
-        isValue && open && setIsFetch({ onFetching: true });
-    }, [isValue]);
 
     const selectArray = [
         {
@@ -346,7 +302,7 @@ const Popup_DetailKeepStock = (props) => {
                                 />
                             ))}
                             <div className="col-span-5 justify-end flex items-center gap-1 mr-2">
-                                <OnResetData sOnFetching={sIsFetching} />
+                                <OnResetData onClick={refetchListKeepStock.bind(this)} sOnFetching={(e) => { }} />
                                 {dataClone?.transfer?.length > 0 && (
                                     <ExcelFileComponent
                                         multiDataSet={multiDataSet}
@@ -369,12 +325,10 @@ const Popup_DetailKeepStock = (props) => {
                                     {dataLang?.salesOrder_code_orders || "salesOrder_code_orders"}
                                 </ColumnTablePopup>
                                 <ColumnTablePopup colSpan={2}>
-                                    {dataLang?.warehouseTransfer_transferWarehouse ||
-                                        "warehouseTransfer_transferWarehouse"}
+                                    {dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
                                 </ColumnTablePopup>
                                 <ColumnTablePopup colSpan={2}>
-                                    {dataLang?.warehouseTransfer_receivingWarehouse ||
-                                        "warehouseTransfer_receivingWarehouse"}
+                                    {dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
                                 </ColumnTablePopup>
                                 <ColumnTablePopup>
                                     {dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}
@@ -384,7 +338,7 @@ const Popup_DetailKeepStock = (props) => {
                                     {dataLang?.salesOrder_action || "salesOrder_action"}
                                 </ColumnTablePopup>
                             </HeaderTablePopup>
-                            {isFetching.onFetching ? (
+                            {isFetchingListKeepStock ? (
                                 <Loading className="max-h-28" color="#0f4f9e" />
                             ) : dataClone?.transfer?.length > 0 ? (
                                 <>
@@ -403,10 +357,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                     size="22"
                                                                     color="red"
                                                                     variant="Bold"
-                                                                    className={`${e.isShow
-                                                                        ? "rotate-90 transition-all duration-200 ease-linear"
-                                                                        : ""
-                                                                        } cursor-pointer`}
+                                                                    className={`${e.isShow ? "rotate-90 transition-all duration-200 ease-linear" : ""} cursor-pointer`}
                                                                 />
                                                                 {formatMoment(e?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
                                                             </h6>
@@ -423,15 +374,9 @@ const Popup_DetailKeepStock = (props) => {
                                                                 {e?.warehouses_to_name}
                                                             </h6>
                                                             <h6
-                                                                className={`text-[12px] ${e?.warehouseman_id == "0"
-                                                                    ? "bg-blue-200 text-blue-700 px-1.5"
-                                                                    : " bg-green-200 text-green-700 px-3"
-                                                                    } py-1 col-span-1 font-medium text-center break-words w-fit  mx-auto rounded-2xl`}
+                                                                className={`text-[12px] ${e?.warehouseman_id == "0" ? "bg-blue-200 text-blue-700 px-1.5" : " bg-green-200 text-green-700 px-3"} py-1 col-span-1 font-medium text-center break-words w-fit  mx-auto rounded-2xl`}
                                                             >
-                                                                {`${e?.warehouseman_id == "0"
-                                                                    ? "Chưa duyệt kho"
-                                                                    : "Đã duyệt kho"
-                                                                    }`}
+                                                                {`${e?.warehouseman_id == "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}`}
                                                             </h6>
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
                                                                 {e?.note}
@@ -440,7 +385,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                 <Popup_EditDetail
                                                                     {...props}
                                                                     id={e.id}
-                                                                    sIsFetchingParent={sIsFetching}
+                                                                    sIsFetchingParent={refetchListKeepStock.bind(this)}
                                                                     dataClone={dataClone}
                                                                 />
                                                                 <button
@@ -484,10 +429,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                         <div className="max-h-[300px] col-span-10 grid grid-cols-10 items-center ">
                                                                             {e?.items?.map((e, index) => (
                                                                                 <div
-                                                                                    className={`col-span-10 ${index == 0
-                                                                                        ? "border-t-0"
-                                                                                        : "border-t"
-                                                                                        }  overflow-hidden grid grid-cols-9  hover:bg-slate-50 items-center`}
+                                                                                    className={`col-span-10 ${index == 0 ? "border-t-0" : "border-t"}  overflow-hidden grid grid-cols-9  hover:bg-slate-50 items-center`}
                                                                                     key={e.id}
                                                                                 >
                                                                                     <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
@@ -496,17 +438,10 @@ const Popup_DetailKeepStock = (props) => {
                                                                                     <h6 className="text-[13px]  px-2 py-2 col-span-2 text-left ">
                                                                                         <div className="flex items-center gap-2">
                                                                                             <div>
-                                                                                                {e?.item?.images !=
-                                                                                                    null ? (
+                                                                                                {e?.item?.images != null ? (
                                                                                                     <ModalImage
-                                                                                                        small={
-                                                                                                            e?.item
-                                                                                                                ?.images
-                                                                                                        }
-                                                                                                        large={
-                                                                                                            e?.item
-                                                                                                                ?.images
-                                                                                                        }
+                                                                                                        small={e?.item?.images}
+                                                                                                        large={e?.item?.images}
                                                                                                         alt="Product Image"
                                                                                                         className="custom-modal-image object-cover rounded w-[40px] h-[50px] mx-auto"
                                                                                                     />
@@ -526,55 +461,30 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                 </h6>
                                                                                                 <h6 className="text-[13px] text-left font-medium capitalize">
                                                                                                     {
-                                                                                                        e?.item
-                                                                                                            ?.product_variation
+                                                                                                        e?.item?.product_variation
                                                                                                     }
                                                                                                 </h6>
                                                                                                 <div className="flex items-center font-oblique flex-wrap">
-                                                                                                    {dataProductSerial.is_enable ===
-                                                                                                        "1" ? (
+                                                                                                    {dataProductSerial.is_enable === "1" ? (
                                                                                                         <div className="flex gap-0.5">
                                                                                                             <h6 className="text-[12px]">
                                                                                                                 Serial:
                                                                                                             </h6>
                                                                                                             <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                                                {e?.item
-                                                                                                                    ?.serial ==
-                                                                                                                    null ||
-                                                                                                                    e?.item
-                                                                                                                        ?.serial ==
-                                                                                                                    ""
-                                                                                                                    ? "-"
-                                                                                                                    : e
-                                                                                                                        ?.item
-                                                                                                                        ?.serial}
+                                                                                                                {e?.item?.serial == null || e?.item?.serial == "" ? "-" : e?.item?.serial}
                                                                                                             </h6>
                                                                                                         </div>
                                                                                                     ) : (
                                                                                                         ""
                                                                                                     )}
-                                                                                                    {dataMaterialExpiry.is_enable ===
-                                                                                                        "1" ||
-                                                                                                        dataProductExpiry.is_enable ===
-                                                                                                        "1" ? (
+                                                                                                    {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                                         <>
                                                                                                             <div className="flex gap-0.5">
                                                                                                                 <h6 className="text-[12px]">
                                                                                                                     Lot:
                                                                                                                 </h6>{" "}
                                                                                                                 <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                                                    {e
-                                                                                                                        ?.item
-                                                                                                                        ?.lot ==
-                                                                                                                        null ||
-                                                                                                                        e
-                                                                                                                            ?.item
-                                                                                                                            ?.lot ==
-                                                                                                                        ""
-                                                                                                                        ? "-"
-                                                                                                                        : e
-                                                                                                                            ?.item
-                                                                                                                            ?.lot}
+                                                                                                                    {e?.item?.lot == null || e?.item?.lot == "" ? "-" : e?.item?.lot}
                                                                                                                 </h6>
                                                                                                             </div>
                                                                                                             <div className="flex gap-0.5">
@@ -582,16 +492,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                                     Date:
                                                                                                                 </h6>{" "}
                                                                                                                 <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                                                    {e
-                                                                                                                        ?.item
-                                                                                                                        ?.expiration_date
-                                                                                                                        ? formatMoment(
-                                                                                                                            e
-                                                                                                                                ?.item
-                                                                                                                                ?.expiration_date,
-                                                                                                                            FORMAT_MOMENT.DATE_TIME_SLASH_LONG
-                                                                                                                        )
-                                                                                                                        : "-"}
+                                                                                                                    {e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : "-"}
                                                                                                                 </h6>
                                                                                                             </div>
                                                                                                         </>
@@ -608,16 +509,14 @@ const Popup_DetailKeepStock = (props) => {
                                                                                     <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
                                                                                         <h6 className="font-medium">
                                                                                             {
-                                                                                                e?.warehouse_location
-                                                                                                    ?.location_name
+                                                                                                e?.warehouse_location?.location_name
                                                                                             }
                                                                                         </h6>
                                                                                     </h6>
                                                                                     <h6 className="text-[13px]    py-2 col-span-2 text-center break-words">
                                                                                         <h6 className="font-medium">
                                                                                             {
-                                                                                                e?.warehouse_location_to
-                                                                                                    ?.location_name
+                                                                                                e?.warehouse_location_to?.location_name
                                                                                             }
                                                                                         </h6>
                                                                                     </h6>
@@ -637,20 +536,7 @@ const Popup_DetailKeepStock = (props) => {
                                         </div>
                                     </Customscrollbar>
                                 </>
-                            ) : (
-                                <div className=" max-w-[352px] mt-24 mx-auto">
-                                    <div className="text-center">
-                                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                            <IconSearch />
-                                        </div>
-                                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                            {dataLang?.purchase_order_table_item_not_found ||
-                                                "purchase_order_table_item_not_found"}
-                                        </h1>
-                                        <div className="flex items-center justify-around mt-6 "></div>
-                                    </div>
-                                </div>
-                            )}
+                            ) : <NoData />}
                         </div>
                         <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between border-t">
                             <div className="col-span-7 font-medium grid grid-cols-7 text-left"></div>
