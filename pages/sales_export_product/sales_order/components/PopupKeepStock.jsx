@@ -246,7 +246,6 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                 setIsFetch({ onSending: false });
             },
             onError: (error) => {
-                isShow("error", error);
             }
         })
     };

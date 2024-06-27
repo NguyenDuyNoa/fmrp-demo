@@ -1,27 +1,8 @@
-import vi from "date-fns/locale/vi";
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import PopupDetailQuote from "./components/PopupDetailQuote";
-
-import { Grid6, TickCircle } from "iconsax-react";
-import { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
-
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
-import apiComons from "@/Api/apiComon/apiComon";
-import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -42,7 +23,10 @@ import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComp
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -51,11 +35,23 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { routerPriceQuote } from "@/routers/sellingGoods";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoney from "@/utils/helpers/formatMoney";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import vi from "date-fns/locale/vi";
+import { Grid6, TickCircle } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
+import PopupDetailQuote from "./components/PopupDetailQuote";
 registerLocale("vi", vi);
 
 const Index = (props) => {
@@ -120,7 +116,7 @@ const Index = (props) => {
     }, []);
 
     const { isLoading, isFetching, refetch } = useQuery({
-        queryKey: ["list_quote",
+        queryKey: ["api_list_quote",
             limit,
             isState.idBranch,
             isState.idQuoteCode,
@@ -186,7 +182,7 @@ const Index = (props) => {
     };
 
     useQuery({
-        queryKey: ["price_quote_branch"],
+        queryKey: ["api_price_quote_branch"],
         queryFn: async () => {
 
             const { result } = await apiComons.apiBranchCombobox();
@@ -199,7 +195,7 @@ const Index = (props) => {
     });
 
     useQuery({
-        queryKey: ["search_price_quote"],
+        queryKey: ["api_search_price_quote"],
         queryFn: async () => {
 
             const { data } = await apiPriceQuocte.apiSearchQuocte({})
@@ -211,10 +207,10 @@ const Index = (props) => {
     });
 
     useQuery({
-        queryKey: ["search_client"],
+        queryKey: ["api_search_client"],
         queryFn: async () => {
 
-            const { data } = await apiPriceQuocte.apiSearchClients({})
+            const { data } = await apiComons.apiSearchClient({})
             queryState({ listCustomer: convertArray(data?.clients) });
 
             return data
@@ -223,7 +219,7 @@ const Index = (props) => {
     });
 
     const handleSearchClientsApi = debounce(async (value) => {
-        const { data } = await apiPriceQuocte.apiSearchClients({
+        const { data } = await apiComons.apiSearchClient({
             params: {
                 search: value ? value : "",
             }
@@ -439,7 +435,6 @@ const Index = (props) => {
                 refetchFilter();
             },
             onError: (err) => {
-                isShow("error", err);
             },
         })
     };

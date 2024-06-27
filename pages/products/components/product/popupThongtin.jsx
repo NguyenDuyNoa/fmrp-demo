@@ -1,25 +1,19 @@
-import {
-    SearchNormal1 as IconSearch,
-    TickCircle as IconTick,
-    UserEdit as IconUserEdit,
-} from "iconsax-react";
-import React, { useEffect, useState } from "react";
-
-import Loading from "@/components/UI/loading";
-import PopupCustom from "@/components/UI/popup";
-
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
+import { SearchNormal1 as IconSearch, TickCircle as IconTick, UserEdit as IconUserEdit, } from "iconsax-react";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import Popup_Bom from "./popupBom";
 import Popup_GiaiDoan from "./popupGiaiDoan";
 const Popup_ThongTin = React.memo((props) => {

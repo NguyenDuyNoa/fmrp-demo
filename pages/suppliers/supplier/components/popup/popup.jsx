@@ -261,7 +261,6 @@ const Popup_dsncc = (props) => {
         }
       },
       onError: (err) => {
-        isShow("error", err);
       }
     })
     queryState({ onSending: false });

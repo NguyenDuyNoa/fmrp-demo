@@ -436,7 +436,7 @@ const Popup_NVL = React.memo((props) => {
                 }
             },
             onError: (error) => {
-                console.log(error);
+
             }
         })
         sOnSending(false);
@@ -607,7 +607,6 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
-    console.log("groupId", groupId);
     return (
         <PopupCustom
             title={props?.id ? `${props.dataLang?.category_material_list_edit}` : `${props.dataLang?.category_material_list_addnew}`

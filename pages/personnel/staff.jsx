@@ -1,19 +1,14 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import ModalImage from "react-modal-image";
-import { useSelector } from "react-redux";
-
-import { Grid6 } from "iconsax-react";
-
-import Popup_dsnd from "./components/staff/popup";
-import Popup_chitiet from "./components/staff/popupDetail";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
+import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -25,25 +20,25 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-
-import apiComons from "@/Api/apiComon/apiComon";
-import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
-import apiSatff from "@/Api/apiPersonnel/apiStaff";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
-import usePagination from "@/hooks/usePagination";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Grid6 } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import ModalImage from "react-modal-image";
+import { useSelector } from "react-redux";
+import Popup_dsnd from "./components/staff/popup";
+import Popup_chitiet from "./components/staff/popupDetail";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -190,14 +185,13 @@ const Index = (props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error);
+
             }
         })
     };
 
     useEffect(() => {
         isState.onSending && _ServerSending();
-        console.log("ok");
     }, [isState.onSending]);
 
     // useEffect(() => {

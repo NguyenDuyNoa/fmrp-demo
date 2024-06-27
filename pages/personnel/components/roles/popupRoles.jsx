@@ -1,20 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-
-import {
-    Edit as IconEdit,
-    SearchNormal1
-} from "iconsax-react";
-
-import useToast from "@/hooks/useToast";
-
 import apiRoles from "@/Api/apiPersonnel/apiRoles";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading";
 import PopupCustom from "@/components/UI/popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import useToast from "@/hooks/useToast";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Edit as IconEdit, SearchNormal1 } from "iconsax-react";
+import React, { useEffect, useState } from "react";
 import { MdClear } from "react-icons/md";
+import { useSelector } from "react-redux";
+
 const PopupRoles = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
 
@@ -133,7 +128,7 @@ const PopupRoles = React.memo((props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error);
+
             }
         })
         queryState({ onSending: false });

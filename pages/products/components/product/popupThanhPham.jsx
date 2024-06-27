@@ -462,7 +462,7 @@ const Popup_ThanhPham = React.memo((props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error)
+
             }
         });
         sOnSending(false);

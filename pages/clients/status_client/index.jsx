@@ -3,13 +3,11 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-
 import {
     Grid6,
     Edit as IconEdit
 } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
-
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -28,7 +26,6 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import Popup_status from "./components/popup";
-
 import apiStatus from "@/Api/apiClients/status/apiStatus";
 import apiComons from "@/Api/apiComon/apiComon";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -72,7 +69,7 @@ const Index = (props) => {
 
 
     const { isLoading, isFetching, refetch } = useQuery({
-        queryKey: ["client_status", limit, router.query?.page, isState.idBranch, isState.keySearch],
+        queryKey: ["api_client_status", limit, router.query?.page, isState.idBranch, isState.keySearch],
         queryFn: async () => {
             const params = {
                 search: isState.keySearch,
@@ -92,7 +89,7 @@ const Index = (props) => {
     })
 
     const { isLoading: loadingBranch } = useQuery({
-        queryKey: ["apiBranch"],
+        queryKey: ["api_branch"],
         queryFn: async () => {
 
             const { result } = await apiComons.apiBranchCombobox();

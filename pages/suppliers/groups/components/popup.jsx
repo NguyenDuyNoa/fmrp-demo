@@ -93,7 +93,6 @@ const Popup_groupKh = (props) => {
                 }
             },
             onError: (err) => {
-                isShow("error", err)
             }
         })
         queryState({ onSending: false });

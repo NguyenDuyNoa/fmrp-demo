@@ -1,3 +1,4 @@
+import apiComons from "@/Api/apiComon/apiComon";
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
@@ -32,8 +33,6 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { components } from "react-select";
 import { v4 as uuidv4 } from "uuid";
-import { _ServerInstance as Axios } from "/services/axios";
-import apiComons from "@/Api/apiComon/apiComon";
 const Index = (props) => {
     const router = useRouter();
 
@@ -219,7 +218,7 @@ const Index = (props) => {
         queryKey: ["api_tax"],
         queryFn: async () => {
 
-            const { rResult } = await apiSalesOrder.apiListTax();
+            const { rResult } = await apiComons.apiListTax();
 
             setDataTasxes(
                 rResult?.map((e) => ({
@@ -243,7 +242,7 @@ const Index = (props) => {
                 search: "",
                 branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null,
             }
-            const { data } = await apiSalesOrder.apiSearchClient({ params });
+            const { data } = await apiComons.apiSearchClient({ params });
 
             setDataCustomer(data?.clients?.map((e) => ({ label: e.name, value: e.id })));
 

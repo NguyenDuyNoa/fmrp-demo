@@ -1,14 +1,12 @@
+import apiGroup from "@/Api/apiClients/group/apiGroup";
+import useToast from "@/hooks/useToast";
+import { useMutation } from "@tanstack/react-query";
 import {
     Edit as IconEdit
 } from "iconsax-react";
 import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import PopupCustom from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import useToast from "@/hooks/useToast";
-import { useMutation } from "@tanstack/react-query";
-import apiGroup from "@/Api/apiClients/group/apiGroup";
 const Popup_groupKh = (props) => {
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
@@ -73,7 +71,7 @@ const Popup_groupKh = (props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error);
+
             }
         })
         queryState({ open: false });

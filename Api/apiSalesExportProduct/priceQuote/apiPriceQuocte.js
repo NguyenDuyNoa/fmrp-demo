@@ -24,14 +24,7 @@ const apiPriceQuocte = {
             throw error;
         }
     },
-    async apiSearchClients(params) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_client/searchClients?csrf_protection=true`, params);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
+
     async apiHandingStatus(id, stt, data) {
         try {
             const response = await axiosCustom('POST', `/api_web/Api_quotation/changeStatus/${id}/${stt}?csrf_protection=true`, data);
@@ -48,14 +41,7 @@ const apiPriceQuocte = {
             throw error;
         }
     },
-    async apiListTax() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_tax/tax?csrf_protection=true`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
+
     async apiContact(params) {
         try {
             const response = await axiosCustom('GET', `/api_web/api_client/contactCombobox/?csrf_protection=true`, params);

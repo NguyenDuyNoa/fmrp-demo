@@ -1,3 +1,26 @@
+import apiContact from "@/Api/apiClients/contact/apiContact";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import { Add, Trash as IconDelete, Minus, TableDocument } from "iconsax-react";
 import moment from "moment/moment";
 import Head from "next/head";
@@ -8,33 +31,8 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import Select from "react-select";
 import Popup from "reactjs-popup";
-import { v4 as uuidv4 } from "uuid";
-
-import { _ServerInstance as Axios } from "/services/axios";
-
-
-import Loading from "@/components/UI/loading";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { routerReturnSales } from "routers/sellingGoods";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
-import ButtonBack from "@/components/UI/button/buttonBack";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container } from "@/components/UI/common/layout";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import useFeature from "@/hooks/useConfigFeature";
-import useSetingServer from "@/hooks/useConfigNumber";
-import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
-import { formatMoment } from "@/utils/helpers/formatMoment";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { v4 as uuidv4 } from "uuid";
 
 const Index = (props) => {
     const router = useRouter();
@@ -42,12 +40,9 @@ const Index = (props) => {
     const id = router.query?.id;
 
     const initsFetching = {
-        onFetching: false,
-        onFetchingDetail: false,
         onFetchingCondition: false,
         onFetchingItemsAll: false,
         onFetchingClient: false,
-        onLoading: false,
         onLoadingChild: false,
         onFetchingWarehouser: false,
         onSending: false,
@@ -125,61 +120,53 @@ const Index = (props) => {
         router.query && resetAllStates();
     }, [router.query]);
 
-    const _ServerFetching = () => {
-        sFetchingData((e) => ({ ...e, onLoading: true }));
 
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                sDataSelect((e) => ({
-                    ...e,
-                    dataBranch: result?.map((e) => ({ label: e.name, value: e.id })),
-                }));
-                sFetchingData((e) => ({ ...e, onLoading: false }));
-            }
-        });
+    useQuery({
+        queryKey: ["api_branch"],
+        queryFn: async () => {
 
-        Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sDataSelect((e) => ({
-                    ...e,
-                    dataTasxes: rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        tax_rate: e.tax_rate,
-                    })),
-                }));
-                sFetchingData((e) => ({ ...e, onLoading: false }));
-            }
-        });
+            const { result } = await apiComons.apiBranchCombobox();
 
-        Axios(
-            "GET",
-            "/api_web/Api_return_order/comboboxHandlingSolution/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    sDataSelect((e) => ({
-                        ...e,
-                        dataTreatmentr: data?.map((e) => ({
-                            label: dataLang[e?.name] ? dataLang[e?.name] : e?.name,
-                            value: e?.id,
-                        })),
-                    }));
-                    sFetchingData((e) => ({ ...e, onLoading: false }));
-                }
-            }
-        );
+            sDataSelect((e) => ({ ...e, dataBranch: result?.map((e) => ({ label: e?.name, value: e?.id })), }));
 
-        sFetchingData((e) => ({ ...e, onFetching: false }));
-    };
+            return result
+        },
+    });
 
-    useEffect(() => {
-        fetChingData.onFetching && _ServerFetching();
-    }, [fetChingData.onFetching]);
+    useQuery({
+        queryKey: ["api_list_tax"],
+        queryFn: async () => {
 
+            const { rResult } = await apiComons.apiListTax({});
+
+            sDataSelect((e) => ({
+                ...e,
+                dataTasxes: rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    tax_rate: e.tax_rate,
+                })),
+            }));
+            return rResult
+        },
+    });
+
+    useQuery({
+        queryKey: ["api_list_solution"],
+        queryFn: async () => {
+
+            let data = await apiReturnSales.apiSolution();
+            sDataSelect((e) => ({
+                ...e,
+                dataTreatmentr: data?.map((e) => ({
+                    label: dataLang[e?.name] ? dataLang[e?.name] : e?.name,
+                    value: e?.id,
+                })),
+            }));
+
+            return data
+        },
+    });
 
     const options = dataSelect.dataItems?.map((e) => ({
         label: `${e.name}
@@ -193,155 +180,124 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetchingDetailPage = () => {
-        Axios("GET", `/api_web/Api_return_order/getDetail/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let rResult = response.data;
 
-                sListData(
-                    rResult?.items.map((e) => {
-                        const child = e?.child.map((ce) => ({
-                            id: Number(ce?.id),
-                            idChildBackEnd: Number(ce?.id),
-                            disabledDate:
-                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                            warehouse: {
-                                label: ce?.location_name,
-                                value: ce?.location_warehouses_id,
-                                warehouse_name: ce?.warehouse_name,
-                            },
-                            quantityDelivered: e?.item?.quantity_create,
-                            quantityPay: e?.item?.quantity_returned,
-                            quantityLeft: e?.item?.quantity_left,
-                            unit: e?.item?.unit_name,
-                            quantity: Number(ce?.quantity),
-                            price: Number(ce?.price),
-                            discount: Number(ce?.discount_percent),
-                            tax: {
-                                tax_rate: ce?.tax_rate || "0",
-                                value: ce?.tax_id || "0",
-                                label: ce?.tax_name || "Miễn thuế",
-                            },
-                            note: ce?.note,
-                        }));
-                        return {
-                            id: e?.item?.id,
-                            idParenBackend: e?.item?.id,
-                            matHang: {
-                                e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                    }</span>`,
-                                value: e.item?.id,
-                            },
-                            child: child,
-                        };
-                    })
-                );
-                sIdChange({
-                    code: rResult.code,
-                    date: moment(rResult?.date).toDate(),
-                    idBranch: {
-                        label: rResult?.branch_name,
-                        value: rResult?.branch_id,
+    const { isFetching } = useQuery({
+        queryKey: ["api_page_detail", id],
+        queryFn: () => {
+            _ServerFetchingDetailPage()
+        },
+        enabled: !!id
+    })
+    const _ServerFetchingDetailPage = async () => {
+        const rResult = await apiReturnSales.apiPageDetail(id);
+        sListData(
+            rResult?.items.map((e) => {
+                const child = e?.child.map((ce) => ({
+                    id: Number(ce?.id),
+                    idChildBackEnd: Number(ce?.id),
+                    disabledDate:
+                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                    warehouse: {
+                        label: ce?.location_name,
+                        value: ce?.location_warehouses_id,
+                        warehouse_name: ce?.warehouse_name,
                     },
-                    idClient: {
-                        label: rResult?.client_name,
-                        value: rResult?.client_id,
+                    quantityDelivered: e?.item?.quantity_create,
+                    quantityPay: e?.item?.quantity_returned,
+                    quantityLeft: e?.item?.quantity_left,
+                    unit: e?.item?.unit_name,
+                    quantity: Number(ce?.quantity),
+                    price: Number(ce?.price),
+                    discount: Number(ce?.discount_percent),
+                    tax: {
+                        tax_rate: ce?.tax_rate || "0",
+                        value: ce?.tax_id || "0",
+                        label: ce?.tax_name || "Miễn thuế",
                     },
-                    idTreatment: {
-                        label: dataLang[rResult?.handling_solution] || rResult?.handling_solution,
-                        value: rResult?.handling_solution,
+                    note: ce?.note,
+                }));
+                return {
+                    id: e?.item?.id,
+                    idParenBackend: e?.item?.id,
+                    matHang: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
+                        value: e.item?.id,
                     },
-                    note: rResult?.note,
-                });
-            }
-            sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
+                    child: child,
+                };
+            })
+        );
+        sIdChange({
+            code: rResult.code,
+            date: moment(rResult?.date).toDate(),
+            idBranch: {
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            },
+            idClient: {
+                label: rResult?.client_name,
+                value: rResult?.client_id,
+            },
+            idTreatment: {
+                label: dataLang[rResult?.handling_solution] || rResult?.handling_solution,
+                value: rResult?.handling_solution,
+            },
+            note: rResult?.note,
         });
     };
 
-    useEffect(() => {
-        fetChingData.onFetchingDetail && _ServerFetchingDetailPage();
-    }, [fetChingData.onFetchingDetail]);
 
-    useEffect(() => {
-        id && sFetchingData((e) => ({ ...e, onFetchingDetail: true }));
-    }, [id]);
-
-    const _ServerFetching_ItemsAll = () => {
-        Axios(
-            "POST",
-            "/api_web/Api_return_order/getDeliveriItems?csrf_protection=true",
-            {
-                params: {
-                    "filter[client_id]": idChange.idClient !== null ? +idChange.idClient.value : null,
-                    "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-                    sDataSelect((e) => ({
-                        ...e,
-                        dataItems: result,
-                    }));
-                }
+    const _ServerFetching_ItemsAll = async () => {
+        const { data: { result } } = await apiReturnSales.apiDeliveriItems({
+            params: {
+                "filter[client_id]": idChange.idClient !== null ? +idChange.idClient.value : null,
+                "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
             }
-        );
+        });
+        sDataSelect((e) => ({
+            ...e,
+            dataItems: result,
+        }));
 
         sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
     };
 
-    const _ServerFetching_Client = () => {
-        sFetchingData((e) => ({ ...e, onLoading: true }));
-        Axios(
-            "GET",
-            "/api_web/api_client/client_option/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idChange.idBranch != null ? idChange.idBranch.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult } = response.data;
-
-                    sDataSelect((e) => ({
-                        ...e,
-                        dataClient: rResult?.map((e) => ({ label: e.name, value: e.id })),
-                    }));
-                    sFetchingData((e) => ({ ...e, onLoading: false }));
-                }
+    const _ServerFetching_Client = async () => {
+        const { rResult } = await apiContact.apiClientContact({
+            params: {
+                "filter[branch_id]": idChange.idBranch != null ? idChange.idBranch.value : null,
             }
-        );
+        })
+
+        sDataSelect((e) => ({
+            ...e,
+            dataClient: rResult?.map((e) => ({ label: e.name, value: e.id })),
+        }));
+
         sFetchingData((e) => ({ ...e, onFetchingClient: false }));
     };
 
-    const _ServerFetching_Warehouse = () => {
-        Axios(
-            "GET",
-            "/api_web/api_warehouse/Getcomboboxlocation/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idChange.idBranch ? idChange.idBranch?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let result = response.data.rResult;
-                    sDataSelect((e) => ({
-                        ...e,
-                        dataWarehouse: result?.map((e) => ({
-                            label: e?.name,
-                            value: e?.id,
-                            warehouse_name: e?.warehouse_name,
-                        })),
-                    }));
-                }
+    const _ServerFetching_Warehouse = async () => {
+        const { rResult } = await apiReturnSales.apiComboboxLocation({
+            params: {
+                "filter[branch_id]": idChange.idBranch ? idChange.idBranch?.value : null,
             }
-        );
+        });
+
+        sDataSelect((e) => ({
+            ...e,
+            dataWarehouse: rResult?.map((e) => ({
+                label: e?.name,
+                value: e?.id,
+                warehouse_name: e?.warehouse_name,
+            })),
+        }));
+
         sFetchingData((e) => ({ ...e, onFetchingWarehouser: false }));
     };
 
@@ -446,10 +402,6 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        router.query && sFetchingData((e) => ({ ...e, onFetching: true }));
-    }, [router.query]);
-
-    useEffect(() => {
         if (idChange.idBranch !== null) sErrors((prevErrors) => ({ ...prevErrors, errBranch: false }));
 
         if (idChange.idClient !== null) sErrors((prevErrors) => ({ ...prevErrors, errClient: false }));
@@ -475,8 +427,6 @@ const Index = (props) => {
     }, [fetChingData.onFetchingWarehouser]);
 
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataSelect.dataTasxes];
-
-
 
     const _DataValueItem = (value) => {
         const newChild = {
@@ -545,7 +495,7 @@ const Index = (props) => {
         const newData = listData
             .map((e) => {
                 if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.id !== childId);
+                    const newChild = e.child?.filter((ce) => ce?.id != childId);
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -559,7 +509,7 @@ const Index = (props) => {
         const newData = listData
             .map((e) => {
                 if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.warehouse !== null);
+                    const newChild = e.child?.filter((ce) => ce?.warehouse != null);
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -591,37 +541,28 @@ const Index = (props) => {
                         validateQuantity(parentId, childId, type);
 
                         break;
-
                     case "decrease":
                         sErrors((e) => ({ ...e, errSurvive: false }));
 
                         ce.quantity = Number(ce?.quantity) - 1;
-
                         break;
-
                     case "price":
                         sErrors((e) => ({ ...e, errSurvivePrice: false }));
 
                         ce.price = Number(value?.value);
-
                         break;
-
                     case "discount":
                         ce.discount = Number(value?.value);
                         break;
-
                     case "note":
                         ce.note = value?.target.value;
                         break;
-
                     case "warehouse":
                         ce.warehouse = value;
                         break;
-
                     case "tax":
                         ce.tax = value;
                         break;
-
                     default:
                 }
 
@@ -664,10 +605,10 @@ const Index = (props) => {
     };
 
     const _HandleChangeValue = (parentId, value) => {
-        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
+        const checkData = listData?.some((e) => e?.matHang?.value == value?.value);
         if (!checkData) {
             const newData = listData?.map((e) => {
-                if (e?.id === parentId) {
+                if (e?.id == parentId) {
                     const { parent } = _DataValueItem(value);
                     return parent;
                 } else {
@@ -752,14 +693,11 @@ const Index = (props) => {
         const checkChildItem = (childItem, property) => {
             switch (property) {
                 case "warehouse":
-                    return (
-                        childItem.warehouse === null ||
-                        (id && (!childItem.warehouse?.label || !childItem.warehouse?.warehouse_name))
-                    );
+                    return childItem.warehouse == null || (id && (!childItem.warehouse?.label || !childItem.warehouse?.warehouse_name))
                 case "quantity":
-                    return childItem.quantity === null || childItem.quantity === "" || childItem.quantity == 0;
+                    return childItem.quantity == null || childItem.quantity == "" || childItem.quantity == 0;
                 case "price":
-                    return childItem.price === null || childItem.price === "" || childItem.price == 0;
+                    return childItem.price == null || childItem.price === "" || childItem.price == 0;
                 default:
                     return false;
             }
@@ -777,15 +715,7 @@ const Index = (props) => {
 
         const isEmpty = listData?.length == 0;
 
-        if (
-            !idChange.idClient ||
-            !idChange.idTreatment ||
-            !idChange.idBranch ||
-            hasNullWarehouse ||
-            hasNullQuantity ||
-            hasNullPrice ||
-            isEmpty
-        ) {
+        if (!idChange.idClient || !idChange.idTreatment || !idChange.idBranch || hasNullWarehouse || hasNullQuantity || hasNullPrice || isEmpty) {
             sErrors((e) => ({
                 ...e,
                 errClient: !idChange.idClient,
@@ -839,36 +769,21 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
             });
         });
-        await Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_return_order/return_order/${id}?csrf_protection=true`
-                : "/api_web/Api_return_order/return_order/?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
 
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message] || message}` || message);
+        const { isSuccess, message } = await apiReturnSales.apiHandingReturnSales(id, formData);
 
-                        resetAllStates();
+        if (isSuccess) {
+            isShow("success", `${dataLang[message] || message}` || message);
 
-                        sListData([]);
+            resetAllStates();
 
-                        router.push(routerReturnSales.home);
-                    } else {
-                        isShow("error", `${dataLang[message] || message}` || message);
-                    }
-                }
+            sListData([]);
 
-                sFetchingData((e) => ({ ...e, onSending: false }));
-            }
-        );
+            router.push(routerReturnSales.home);
+        } else {
+            isShow("error", `${dataLang[message] || message}` || message);
+        }
+        sFetchingData((e) => ({ ...e, onSending: false }));
     };
 
     useEffect(() => {
@@ -879,9 +794,7 @@ const Index = (props) => {
         <React.Fragment>
             <Head>
                 <title>
-                    {id
-                        ? dataLang?.returnSales_edit || "returnSales_edit"
-                        : dataLang?.returnSales_add || "returnSales_add"}
+                    {id ? dataLang?.returnSales_edit || "returnSales_edit" : dataLang?.returnSales_add || "returnSales_add"}
                 </title>
             </Head>
             <Container className="!h-auto">
@@ -973,7 +886,6 @@ const Index = (props) => {
                                         options={dataSelect.dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idChange.idBranch}
-                                        isLoading={idChange.idBranch != null ? false : fetChingData.onLoading}
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
@@ -1029,7 +941,6 @@ const Index = (props) => {
                                         options={dataSelect.dataClient}
                                         onChange={_HandleChangeInput.bind(this, "idClient")}
                                         value={idChange.idClient}
-                                        isLoading={fetChingData.onLoading}
                                         placeholder={dataLang?.returnSales_client || "returnSales_client"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
@@ -1086,11 +997,6 @@ const Index = (props) => {
                                     <Select
                                         options={dataSelect.dataTreatmentr}
                                         onChange={_HandleChangeInput.bind(this, "treatment")}
-                                        isLoading={
-                                            idChange.idBranch || idChange.idClient != null
-                                                ? false
-                                                : fetChingData.onLoading
-                                        }
                                         value={idChange.idTreatment}
                                         isClearable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
@@ -1300,7 +1206,7 @@ const Index = (props) => {
                     </div>
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
-                            {fetChingData.onFetchingDetail ? (
+                            {isFetching ? (
                                 <Loading className="h-10 w-full" color="#0f4f9e" />
                             ) : (
                                 <>

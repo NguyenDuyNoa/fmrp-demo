@@ -73,7 +73,7 @@ const Popup_status = (props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error);
+
             }
         })
         queryState({ onSending: false });

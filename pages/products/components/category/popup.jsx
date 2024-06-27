@@ -3,9 +3,7 @@ import PopupCustom from "@/components/UI/popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import useToast from "@/hooks/useToast";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-    Edit as IconEdit
-} from "iconsax-react";
+import { Edit as IconEdit } from "iconsax-react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Select from "react-select";
@@ -89,11 +87,10 @@ const Popup_ThanhPham = React.memo((props) => {
                     props.onRefreshSub && props.onRefreshSub();
                 } else {
                     isShow("error", props.dataLang[message] || message);
-
                 }
             },
             onError: (error) => {
-                isShow("error", error);
+
             }
         })
         sOnSending(false);
@@ -128,7 +125,7 @@ const Popup_ThanhPham = React.memo((props) => {
     }, [branch?.length > 0]);
 
     useQuery({
-        queryKey: ["detail_category"],
+        queryKey: ["api_detail_category"],
         queryFn: async () => {
             const list = await apiCategory.apiDetailCategory(props?.id);
             sName(list?.name);
@@ -147,7 +144,7 @@ const Popup_ThanhPham = React.memo((props) => {
     })
 
     useQuery({
-        queryKey: ["detail_options_category", branch],
+        queryKey: ["api_detail_options_category", branch],
         queryFn: async () => {
             const params = {
                 "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
@@ -166,7 +163,7 @@ const Popup_ThanhPham = React.memo((props) => {
     })
 
     useQuery({
-        queryKey: ["detail_category_option", branch],
+        queryKey: ["api_detail_category_option", branch],
         queryFn: async () => {
             const { rResult } = await apiCategory.apiOptionCategory({});
             sDataOption(

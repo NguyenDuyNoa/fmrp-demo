@@ -1,28 +1,15 @@
-import useActionRole from "@/hooks/useRole";
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-
-import {
-    Grid6,
-    Edit as IconEdit
-} from "iconsax-react";
-import { Tooltip } from "react-tippy";
-
-import Popup_dskh from "./components/popup/popupAdd";
-import Popup_chitiet from "./components/popup/popupDetail";
-
+import apiClient from "@/Api/apiClients/client/apiClient";
+import apiComons from "@/Api/apiComon/apiComon";
 import { BtnAction } from "@/components/UI/BtnAction";
+import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
@@ -32,18 +19,26 @@ import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import TabFilter from "@/components/UI/TabFilter";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-
-import apiClient from "@/Api/apiClients/client/apiClient";
-import apiComons from "@/Api/apiComon/apiComon";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 import { useQuery } from "@tanstack/react-query";
+import {
+    Grid6,
+    Edit as IconEdit
+} from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Tooltip } from "react-tippy";
+import Popup_dskh from "./components/popup/popupAdd";
+import Popup_chitiet from "./components/popup/popupDetail";
 const Index = (props) => {
     const isShow = useToast();
 
@@ -91,7 +86,7 @@ const Index = (props) => {
 
 
     const { isLoading, isFetching, refetch } = useQuery({
-        queryKey: ["clients", limit, router.query?.page, router.query?.tab, isState.idBranch, isState.keySearch],
+        queryKey: ["api_clients", limit, router.query?.page, router.query?.tab, isState.idBranch, isState.keySearch],
         queryFn: async () => {
             const url = `/api_web/${router.query?.tab === "0" || router.query?.tab === "-1" ? "api_client/client?csrf_protection=true" : "api_client/client/?csrf_protection=true"}`
 
@@ -117,7 +112,7 @@ const Index = (props) => {
     });
 
     const { isPending: isPendingBranch } = useQuery({
-        queryKey: ["clients_branch"],
+        queryKey: ["api_branch"],
         queryFn: async () => {
             const { result } = await apiComons.apiBranchCombobox();
             queryState({ listBr: result?.map((e) => ({ label: e.name, value: e.id })) });
@@ -127,7 +122,7 @@ const Index = (props) => {
     });
 
     const { isPending, refetch: refetchGroup } = useQuery({
-        queryKey: ["clients_group", limit, router.query?.page, router.query?.tab, isState.idBranch, isState.keySearch],
+        queryKey: ["api_group", limit, router.query?.page, router.query?.tab, isState.idBranch, isState.keySearch],
         queryFn: async () => {
 
             const params = {
@@ -146,7 +141,7 @@ const Index = (props) => {
     });
 
     const { } = useQuery({
-        queryKey: ["clients_province"],
+        queryKey: ["api_province"],
         queryFn: async () => {
             const { rResult, output } = await apiComons.apiListProvince();
             queryState({ listSelectCt: rResult });

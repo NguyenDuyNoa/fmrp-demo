@@ -1,97 +1,57 @@
-import { useRef, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-import {
-    SearchNormal1 as IconSearch
-} from "iconsax-react";
-
-
-import vi from "date-fns/locale/vi";
-import { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-registerLocale("vi", vi);
-
-
-import Loading from "components/UI/loading";
-import PopupCustom from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import Swal from "sweetalert2";
-
-import { useEffect } from "react";
-
+import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import ImageErrors from "components/UI/imageErrors";
+import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import vi from "date-fns/locale/vi";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
+import { useState } from "react";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import PopupCustom from "/components/UI/popup";
+import { reTryQuery } from "@/configs/configRetryQuery";
+registerLocale("vi", vi);
 
 const PopupDetail = (props) => {
-    const scrollAreaRef = useRef(null);
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-    const [data, sData] = useState();
-    const [onFetching, sOnFetching] = useState(false);
+    const dataSeting = useSetingServer()
 
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
+    const [open, sOpen] = useState(false);
+
+    const _ToggleModal = (e) => sOpen(e);
+
+    const [data, sData] = useState();
+
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
 
-    const _ServerFetching_detailOrder = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
+    const { isFetching } = useQuery({
+        queryKey: ["api_detail_return_order", props?.id],
+        queryFn: async () => {
+            const db = await apiReturnSales.apiDetailReturnOrder(props?.id)
 
-    useEffect(() => {
-        (onFetching && _ServerFetching_detailOrder()) || (onFetching && _ServerFetching());
-    }, [open]);
+            sData(db);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
+            return db
+        },
+        ...reTryQuery,
 
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetching(false);
-        });
-    };
+        enabled: open && !!props?.id
+    })
+
+
 
     return (
         <>
@@ -161,14 +121,12 @@ const PopupDetail = (props) => {
                                             <div className="flex flex-wrap  gap-2 items-center">
                                                 {(data?.handling_solution === "pay_down" && (
                                                     <div className="cursor-default min-w-[135px] min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-1 border  rounded-2xl">
-                                                        {props.dataLang[data?.handling_solution] ||
-                                                            data?.handling_solution}
+                                                        {props.dataLang[data?.handling_solution] || data?.handling_solution}
                                                     </div>
                                                 )) ||
                                                     (data?.handling_solution === "debt_reduction" && (
                                                         <div className="cursor-default min-w-[135px] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-1 border   rounded-2xl">
-                                                            {props.dataLang[data?.handling_solution] ||
-                                                                data?.handling_solution}
+                                                            {props.dataLang[data?.handling_solution] || data?.handling_solution}
                                                         </div>
                                                     ))}
                                             </div>
@@ -241,7 +199,7 @@ const PopupDetail = (props) => {
                                             {props.dataLang?.import_from_note || "import_from_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <>

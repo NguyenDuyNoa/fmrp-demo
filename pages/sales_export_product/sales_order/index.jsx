@@ -1,7 +1,6 @@
 import vi from "date-fns/locale/vi";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-
 import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
@@ -9,10 +8,8 @@ import { useRouter } from "next/router";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
-
 import PopupDetailQuote from "../price_quote/components/PopupDetailQuote";
 import PopupDetailProduct from "./components/PopupDetailProduct";
-
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -20,7 +17,6 @@ import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
-
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -30,7 +26,6 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { routerSalesOrder } from "@/routers/sellingGoods";
 import formatMoney from "@/utils/helpers/formatMoney";
-
 import apiComons from "@/Api/apiComon/apiComon";
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
@@ -236,7 +231,7 @@ const Index = (props) => {
         queryKey: ["api_search_clients"],
         queryFn: async () => {
 
-            const { data } = await apiSalesOrder.apiSearchClient({});
+            const { data } = await apiComons.apiSearchClient({});
 
             sInitData((e) => ({
                 ...e,
@@ -251,7 +246,7 @@ const Index = (props) => {
 
 
     const handleSearchApi = debounce(async (value) => {
-        const { data } = await apiSalesOrder.apiSearchClient({
+        const { data } = await apiComons.apiSearchClient({
             params: {
                 search: value ? value : "",
             }
@@ -468,7 +463,6 @@ const Index = (props) => {
                 refetchFilterBar()
             },
             onError: (error) => {
-                isShow("error", error);
             },
         })
 

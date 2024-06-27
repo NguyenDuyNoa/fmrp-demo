@@ -77,7 +77,7 @@ const Popup_dskh = (props) => {
     }, [isState.open]);
 
     const { isLoading } = useQuery({
-        queryKey: ["apiDetailClient", props?.id],
+        queryKey: ["api_detail_lient", props?.id],
         queryFn: async () => {
             const db = await apiClient.apiDetailClient(props?.id);
             queryState({
@@ -140,7 +140,7 @@ const Popup_dskh = (props) => {
     });
 
     const { isLoading: isLoadingChar } = useQuery({
-        queryKey: ["getstaffInBrard", isState.valueBr?.length > 0],
+        queryKey: ["api_char", isState.valueBr?.length > 0],
         queryFn: async () => {
 
             const params = {
@@ -162,7 +162,7 @@ const Popup_dskh = (props) => {
     })
 
     const { isLoading: isLoadingGroup } = useQuery({
-        queryKey: ["getGroup", isState.valueBr?.length > 0],
+        queryKey: ["api_client_group", isState.valueBr?.length > 0],
         queryFn: async () => {
 
             const params = {
@@ -184,7 +184,7 @@ const Popup_dskh = (props) => {
 
 
     const { isLoading: isLoadingDis } = useQuery({
-        queryKey: ["getDis", isState.valueCt],
+        queryKey: ["api_district", isState.valueCt],
         queryFn: async () => {
 
             const params = {
@@ -234,7 +234,7 @@ const Popup_dskh = (props) => {
 
 
     const { isLoading: isLoadingWar } = useQuery({
-        queryKey: ["getDis", isState.valueDitrict],
+        queryKey: ["api_ward", isState.valueDitrict],
         queryFn: async () => {
 
             const params = {
@@ -324,7 +324,7 @@ const Popup_dskh = (props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error);
+
             },
         })
         queryState({ onSending: false });

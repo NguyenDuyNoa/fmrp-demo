@@ -1,70 +1,40 @@
-import { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-
-import vi from "date-fns/locale/vi";
-import { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-registerLocale("vi", vi);
-
-
-import Loading from "components/UI/loading";
-import PopupCustom from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import Swal from "sweetalert2";
-
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import { useEffect } from "react";
+import Loading from "components/UI/loading";
+import vi from "date-fns/locale/vi";
+import { useEffect, useState } from "react";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import PopupCustom from "/components/UI/popup";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+registerLocale("vi", vi);
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
-    const [onFetching, sOnFetching] = useState(false);
-    const [open, sOpen] = useState(false);
+
     const [data, sData] = useState([]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
+    const dataSeting = useSetingServer()
+
+    const [open, sOpen] = useState(false);
+
+    const [onFetching, sOnFetching] = useState(false);
+
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
-
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetching(false);
-        });
-    };
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
 
     useEffect(() => {
         open && sOnFetching(true);
+
         setTimeout(() => {
             sOnFetching(false);
         }, 800);
@@ -72,7 +42,9 @@ const Popup_status = (props) => {
 
     useEffect(() => {
         sData([]);
+
         sOpen(false);
+
         if (props?.data_export?.length > 0) {
             setTimeout(() => {
                 sOpen(true);
@@ -104,8 +76,7 @@ const Popup_status = (props) => {
                                 {props.dataLang?.import_ballot || "import_ballot"}
                             </h4>
                             <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang?.purchase_order_purchase_from_item ||
-                                    "purchase_order_purchase_from_item"}
+                                {props.dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}
                             </h4>
                             <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-semibold text-center whitespace-nowrap">
                                 {props.dataLang?.PDF_house || "PDF_house"}
@@ -171,8 +142,7 @@ const Popup_status = (props) => {
                                                             ) : (
                                                                 ""
                                                             )}
-                                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                                dataProductExpiry.is_enable === "1" ? (
+                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                 <div className="flex">
                                                                     <div className="flex gap-1 items-center italic font-normal text-[12px]">
                                                                         <h6>Lot: </h6>

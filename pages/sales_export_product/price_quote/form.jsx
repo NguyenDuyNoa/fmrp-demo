@@ -1,18 +1,3 @@
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { Add, Trash as IconDelete, Minus } from "iconsax-react";
-import moment from "moment";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import { BsCalendarEvent } from "react-icons/bs";
-import { MdClear } from "react-icons/md";
-import { NumericFormat } from "react-number-format";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
 import apiContact from "@/Api/apiClients/contact/apiContact";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
@@ -24,16 +9,29 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { routerPriceQuote } from "@/routers/sellingGoods";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import { debounce } from "lodash";
+import moment from "moment";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import { NumericFormat } from "react-number-format";
 
 const Index = (props) => {
     const router = useRouter();
@@ -259,7 +257,7 @@ const Index = (props) => {
     }
 
     useQuery({
-        queryKey: ["price_quote_branch"],
+        queryKey: ["api_price_quote_branch"],
         queryFn: async () => {
 
             const { result } = await apiComons.apiBranchCombobox();
@@ -271,10 +269,10 @@ const Index = (props) => {
     });
 
     useQuery({
-        queryKey: ["price_quote_tax"],
+        queryKey: ["api_price_quote_tax"],
         queryFn: async () => {
 
-            const { rResult } = await apiPriceQuocte.apiListTax();
+            const { rResult } = await apiComons.apiListTax({});
 
             sDataTasxes(
                 rResult?.map((e) => ({

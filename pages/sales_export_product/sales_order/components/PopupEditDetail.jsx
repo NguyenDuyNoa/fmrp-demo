@@ -166,7 +166,6 @@ const Popup_EditDetail = (props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error);
             },
         })
     };

@@ -2,7 +2,6 @@ import apiContact from "@/Api/apiClients/contact/apiContact";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
-import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
@@ -198,7 +197,7 @@ const Index = (props) => {
         queryKey: ["api_tax"],
         queryFn: async () => {
 
-            const { rResult } = await apiPriceQuocte.apiListTax();
+            const { rResult } = await apiComons.apiListTax({});
 
             sDataTasxes(
                 rResult?.map((e) => ({

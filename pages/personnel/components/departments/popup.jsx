@@ -88,7 +88,7 @@ const Popup_phongban = (props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error);
+
             },
         })
         sOnSending(false);

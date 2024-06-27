@@ -35,7 +35,7 @@ const PopupDetailQuote = (props) => {
     };
 
     const { isFetching } = useQuery({
-        queryKey: ["detail_quote", props?.id],
+        queryKey: ["api_detail_quote", props?.id],
         queryFn: async () => {
 
             const db = await apiPriceQuocte.apiDetailQuote(props?.id);

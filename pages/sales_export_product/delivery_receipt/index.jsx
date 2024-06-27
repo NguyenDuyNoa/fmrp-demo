@@ -1,20 +1,17 @@
-import { Grid6 } from "iconsax-react";
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-import { useSelector } from "react-redux";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
+import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
     Container,
     ContainerBody,
@@ -32,31 +29,31 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import PopupDetailProduct from "../sales_order/components/PopupDetailProduct";
-import PopupDetail from "./components/PopupDetail";
-
-import useSetingServer from "@/hooks/useConfigNumber";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import useActionRole from "@/hooks/useRole";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
-import apiComons from "@/Api/apiComon/apiComon";
-import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
-import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { useQuery } from "@tanstack/react-query";
+import { Grid6 } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import { useSelector } from "react-redux";
 import { routerDeliveryReceipt } from "routers/sellingGoods";
+import PopupDetailProduct from "../sales_order/components/PopupDetailProduct";
+import PopupDetail from "./components/PopupDetail";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -119,7 +116,7 @@ const Index = (props) => {
     }, []);
 
     const { isFetching, refetch } = useQuery({
-        queryKey: ['list_deleivery',
+        queryKey: ['api_list_deleivery',
             limit,
             router.query?.page, router.query?.tab,
             isState.idBranch,
@@ -158,7 +155,7 @@ const Index = (props) => {
 
 
     const { refetch: refetchFilterBar } = useQuery({
-        queryKey: ['list_deleivery',
+        queryKey: ['api_list_filter_bar',
             limit,
             router.query?.page, router.query?.tab,
             isState.idBranch,
@@ -224,7 +221,7 @@ const Index = (props) => {
         queryKey: ["api_search_client"],
         queryFn: async () => {
 
-            const { data } = await apiPriceQuocte.apiSearchClients({})
+            const { data } = await apiComons.apiSearchClient({})
 
             queryState({ listCustomer: convertArray(data?.clients) });
 
@@ -234,7 +231,7 @@ const Index = (props) => {
 
 
     const handleSearchApiClient = debounce(async (value) => {
-        const { data } = await apiPriceQuocte.apiSearchClients({
+        const { data } = await apiComons.apiSearchClient({
             params: {
                 search: value ? value : "",
             }
@@ -421,9 +418,7 @@ const Index = (props) => {
 
         if (isSuccess) {
             isShow(alert_type, dataLang[message] || message);
-            setTimeout(() => {
-                refetch();
-            }, 300);
+            refetch();
         } else {
             isShow(alert_type, dataLang[message] || message);
         }

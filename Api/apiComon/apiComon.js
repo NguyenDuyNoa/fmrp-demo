@@ -63,5 +63,22 @@ const apiComons = {
             throw error;
         }
     },
+    async apiSearchClient(params) {
+        try {
+            const response = await axiosCustom('GET', `/api_web/api_client/searchClients?csrf_protection=true`, params);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async apiListTax(params) {
+        try {
+            const response = await axiosCustom('GET', `/api_web/Api_tax/tax?csrf_protection=true`, params);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
 }
 export default apiComons

@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-
 import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import PopupCustom from "@/components/UI/popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import useToast from "@/hooks/useToast";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-    Edit as IconEdit
-} from "iconsax-react";
+import { Edit as IconEdit } from "iconsax-react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Select from "react-select";
 
 const Popup_NVL = React.memo((props) => {
@@ -115,7 +112,7 @@ const Popup_NVL = React.memo((props) => {
                 }
             },
             onError: (error) => {
-                isShow("error", error);
+
             }
         });
         sOnSending(false);

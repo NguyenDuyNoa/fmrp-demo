@@ -16,10 +16,12 @@ import Select from "react-select";
 import { _ServerInstance as Axios } from "/services/axios";
 const Popup_Bom = React.memo((props) => {
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+
     const [isOpen, sIsOpen] = useState(false);
 
     const isShow = useToast();

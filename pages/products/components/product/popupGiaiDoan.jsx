@@ -5,12 +5,7 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useDragAndDrop from "@/hooks/useDragAndDrop";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
-import {
-    I3Square,
-    Add as IconAdd,
-    Trash as IconDelete,
-    Maximize4 as IconMax
-} from "iconsax-react";
+import { I3Square, Add as IconAdd, Trash as IconDelete, Maximize4 as IconMax } from "iconsax-react";
 import React, { useEffect, useRef, useState } from "react";
 import { DragDropContext, Draggable, Droppable, } from 'react-beautiful-dnd';
 import { useSelector } from "react-redux";

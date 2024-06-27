@@ -271,7 +271,7 @@ const Popup_dsnd = (props) => {
                 }
             },
             onError: (err) => {
-                isShow("error", err);
+
             }
         })
         queryState({ onSending: false });

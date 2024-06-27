@@ -1,32 +1,18 @@
-import Loading from "components/UI/loading";
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import Pagination from "/components/UI/pagination";
-
-import OnResetData from "@/components/UI/btnResetData/btnReset";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import {
-    Grid6,
-    Edit as IconEdit
-} from "iconsax-react";
-import "react-phone-input-2/lib/style.css";
-import Popup_groupKh from "./components/popup";
-
 import apiGroup from "@/Api/apiClients/group/apiGroup";
 import apiComons from "@/Api/apiComon/apiComon";
 import { BtnAction } from "@/components/UI/BtnAction";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import { RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import { reTryQuery } from "@/configs/configRetryQuery";
@@ -37,7 +23,16 @@ import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useQuery } from "@tanstack/react-query";
+import Loading from "components/UI/loading";
+import { Grid6, Edit as IconEdit } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
+import Popup_groupKh from "./components/popup";
+import Pagination from "/components/UI/pagination";
 const Index = (props) => {
     const router = useRouter();
 
@@ -68,7 +63,7 @@ const Index = (props) => {
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
     const { isLoading: loadingGroup, isFetching, refetch } = useQuery({
-        queryKey: ["apiGroup", limit, router.query?.page, isState.idBranch, isState.keySearch],
+        queryKey: ["api_list_group", limit, router.query?.page, isState.idBranch, isState.keySearch],
         queryFn: async () => {
             const params = {
                 search: isState.keySearch,
@@ -89,7 +84,7 @@ const Index = (props) => {
     })
 
     const { isLoading } = useQuery({
-        queryKey: ["apiBranch"],
+        queryKey: ["api_branch"],
         queryFn: async () => {
 
             const { result } = await apiComons.apiBranchCombobox();

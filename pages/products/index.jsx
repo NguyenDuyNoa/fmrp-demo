@@ -1,16 +1,14 @@
-import {
-    Grid6,
-    TickCircle as IconTick
-} from "iconsax-react";
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import ModalImage from "react-modal-image";
-import { useDispatch, useSelector } from "react-redux";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiCategory from "@/Api/apiProducts/category/apiCategory";
+import apiProducts from "@/Api/apiProducts/products/apiProducts";
+import apiVariant from "@/Api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -21,31 +19,25 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import Popup_ThanhPham from "./components/product/popupThanhPham";
-
-import Popup_ThongTin from "./components/product/popupThongtin";
-
-import apiComons from "@/Api/apiComon/apiComon";
-import apiProducts from "@/Api/apiProducts/products/apiProducts";
-import apiVariant from "@/Api/apiSettings/apiVariant";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import useSetingServer from "@/hooks/useConfigNumber";
-import usePagination from "@/hooks/usePagination";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
-import apiCategory from "@/Api/apiProducts/category/apiCategory";
+import { Grid6, TickCircle as IconTick } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import ModalImage from "react-modal-image";
+import { useDispatch, useSelector } from "react-redux";
+import Popup_ThanhPham from "./components/product/popupThanhPham";
+import Popup_ThongTin from "./components/product/popupThongtin";
 const Index = (props) => {
     const dataLang = props.dataLang;
 

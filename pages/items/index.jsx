@@ -1,36 +1,9 @@
-import dynamic from "next/dynamic";
-import Head from "next/head";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
-import PopupCustom from "@/components/UI/popup";
-import { debounce } from "lodash";
-
-import {
-    Grid6,
-    Edit as IconEdit,
-    UserEdit as IconUserEdit
-} from "iconsax-react";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import OnResetData from "@/components/UI/btnResetData/btnReset";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-
 import apiComons from "@/Api/apiComon/apiComon";
 import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import apiItems from "@/Api/apiMaterial/items/apiItems";
 import apiVariant from "@/Api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -39,8 +12,16 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import PopupCustom from "@/components/UI/popup";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -55,8 +36,17 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
+import { Grid6, Edit as IconEdit, UserEdit as IconUserEdit } from "iconsax-react";
+import { debounce } from "lodash";
+import dynamic from "next/dynamic";
+import Head from "next/head";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
+import { useDispatch, useSelector } from "react-redux";
 import Popup_NVL from "./components/items/popupNvl";
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false, });
 const Index = (props) => {
     const dataLang = props.dataLang;
 

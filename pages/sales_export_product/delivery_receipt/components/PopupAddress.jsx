@@ -66,8 +66,6 @@ const PopupAddress = (props) => {
                     }
                 },
                 onError: (error) => {
-                    isShow("error", error);
-
                 }
             });
         }

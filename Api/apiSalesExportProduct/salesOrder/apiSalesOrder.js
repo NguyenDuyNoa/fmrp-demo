@@ -24,14 +24,6 @@ const apiSalesOrder = {
             throw error;
         }
     },
-    async apiSearchClient(params) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_client/searchClients?csrf_protection=true`, params);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
     async apiHandingStatus(id, stt, data) {
         try {
             const response = await axiosCustom('POST', `/api_web/Api_sale_order/confirm/${id}/${stt}?csrf_protection=true`, data);
@@ -108,14 +100,6 @@ const apiSalesOrder = {
     async apiHanDingKeepStook(data) {
         try {
             const response = await axiosCustom('POST', `/api_web/Api_sale_order/AddKeepStockOrder?csrf_protection=true`, data);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
-    async apiListTax() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_tax/tax?csrf_protection=true`);
             return response.data
         } catch (error) {
             throw error;
