@@ -168,7 +168,7 @@ const Popup_ThanhPham = React.memo((props) => {
     useQuery({
         queryKey: ["detail_category_option", branch],
         queryFn: async () => {
-            const { rResult } = await apiCategory.apiOptionCategory();
+            const { rResult } = await apiCategory.apiOptionCategory({});
             sDataOption(
                 rResult.map((x) => ({
                     label: x.name,

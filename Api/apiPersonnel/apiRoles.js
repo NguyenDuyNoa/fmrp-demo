@@ -2,7 +2,7 @@ import { _ServerInstance as axiosCustom } from "@/services/axios";
 const apiRoles = {
     async apiListRoles(params) {
         try {
-            const response = await axiosCustom('GET', `/api_web/api_staff/department/?csrf_protection=true`, params);
+            const response = await axiosCustom('GET', `/api_web/api_staff/position/?csrf_protection=true`, params);
             return response.data
         } catch (error) {
             throw error;

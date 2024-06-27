@@ -16,14 +16,6 @@ const apiSuppliers = {
             throw error;
         }
     },
-    async apiListProvinceSuppliers() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_address/province?limit=0`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
 
     async apiDetailSuppliers(id) {
         try {
@@ -41,22 +33,7 @@ const apiSuppliers = {
             throw error;
         }
     },
-    async apiDistricSuppliers(param) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_address/district?limit=0`, param);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
-    async apiWardSuppliers(param) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_address/ward?limit=0`, param);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
+
     async apiHandingSuppliers(data, id) {
         try {
             const response = await axiosCustom('POST', id ? `/api_web/api_supplier/supplier/${id}?csrf_protection=true` : "/api_web/api_supplier/supplier/?csrf_protection=true", data);

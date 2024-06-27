@@ -16,31 +16,7 @@ const apiProducts = {
             throw error;
         }
     },
-    async apiUnitProducts() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_unit/unit/?csrf_protection=true`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
-    async apiVariationProducts() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_variation/variation?csrf_protection=true`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
 
-    async apiCategoryOptionProducts(params) {
-        try {
-            const response = await axiosCustom('GET', `api_web/api_product/categoryOption/?csrf_protection=true`, params || undefined);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
     async apiStageProducts() {
         try {
             const response = await axiosCustom('GET', `/api_web/api_product/stage/?csrf_protection=true`);

@@ -149,7 +149,7 @@ const Index = (props) => {
     const _ServerFetching_filter = async () => {
         try {
             const { result: listBr } = await apiComons.apiBranchCombobox();
-            const { rResult: listCode } = await apiPurchases.apiComboboxPurchases()
+            const { rResult: listCode } = await apiPurchases.apiListPurchases({})
             const { rResult: listUser } = await apiPurchases.apiStaffOptionPurchases()
             queryState({
                 listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],

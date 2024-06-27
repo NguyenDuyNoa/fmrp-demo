@@ -1,4 +1,5 @@
 
+import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import apiItems from "@/Api/apiMaterial/items/apiItems";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
@@ -490,7 +491,7 @@ const Popup_NVL = React.memo((props) => {
     const { } = useQuery({
         queryKey: ['api_detail_category_option', branch],
         queryFn: async () => {
-            const { rResult } = await apiItems.apiCategoryOptionItems({
+            const { rResult } = await apiCategory.apiCategoryOptionCategory({
                 params: {
                     "branch_id[]": branch_id.length > 0 ? branch_id : -1,
                 },

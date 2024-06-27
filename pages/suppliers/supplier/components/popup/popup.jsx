@@ -11,6 +11,7 @@ import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiComons from "@/Api/apiComon/apiComon";
 import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
@@ -182,7 +183,7 @@ const Popup_dsncc = (props) => {
         provinceid: isState.valueCt ? isState.valueCt?.value : -1,
       }
 
-      const { rResult } = await apiSuppliers.apiDistricSuppliers({ params: params });
+      const { rResult } = await apiComons.apiDistric({ params: params });
 
       queryState({ dataDitrict: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
 
@@ -200,7 +201,7 @@ const Popup_dsncc = (props) => {
         districtid: isState.valueDitrict ? isState.valueDitrict?.value : -1,
       }
 
-      const { rResult } = await apiSuppliers.apiWardSuppliers({ params: params });
+      const { rResult } = await apiComons.apiWWard({ params: params });
 
       queryState({ dataWar: rResult?.map((e) => ({ label: e.name, value: e.wardid })) || [] });
 

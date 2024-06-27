@@ -10,14 +10,6 @@ const apiLocationWarehouse = {
             throw error;
         }
     },
-    async apiListWarehouse(param) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_warehouse/warehouse/?csrf_protection=true`, param);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
     async apiHandingStatus(id, data) {
         try {
             const response = await axiosCustom('POST', `/api_web/api_warehouse/locationStatus/${id}?csrf_protection=true`, data);

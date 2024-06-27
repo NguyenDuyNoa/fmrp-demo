@@ -8,9 +8,9 @@ const apiCategory = {
             throw error;
         }
     },
-    async apiCategoryOptionCategory() {
+    async apiCategoryOptionCategory(prams) {
         try {
-            const response = await axiosCustom('GET', `/api_web/api_material/categoryOption?csrf_protection=true`);
+            const response = await axiosCustom('GET', `/api_web/api_material/categoryOption?csrf_protection=true`, prams);
             return response.data
         } catch (error) {
             throw error;

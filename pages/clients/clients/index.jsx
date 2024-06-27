@@ -43,7 +43,7 @@ import { reTryQuery } from "@/configs/configRetryQuery";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 const Index = (props) => {
     const isShow = useToast();
 
@@ -148,7 +148,7 @@ const Index = (props) => {
     const { } = useQuery({
         queryKey: ["clients_province"],
         queryFn: async () => {
-            const { rResult, output } = await apiClient.apiListProvinceClient();
+            const { rResult, output } = await apiComons.apiListProvince();
             queryState({ listSelectCt: rResult });
             return rResult
         },

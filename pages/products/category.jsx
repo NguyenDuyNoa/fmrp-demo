@@ -117,7 +117,7 @@ const Index = (props) => {
         queryKey: ["api_category_option"],
         queryFn: async () => {
             try {
-                const { rResult } = await apiCategory.apiOptionCategory();
+                const { rResult } = await apiCategory.apiOptionCategory({});
                 sDataCategoryOption(
                     rResult.map((e) => ({
                         label: `${e.name + " " + "(" + e.code + ")"}`,

@@ -1,31 +1,22 @@
-import Head from "next/head";
-import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import React, { useState, useRef, useEffect } from "react";
-import ModalImage from "react-modal-image";
+import { useEffect, useState } from "react";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import Select, { components } from "react-select";
+import Select from "react-select";
 
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
+    Edit as IconEdit
 } from "iconsax-react";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
-import PopupCustom from "@/components/UI/popup";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import useToast from "@/hooks/useToast";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import PopupCustom from "@/components/UI/popup";
+import useToast from "@/hooks/useToast";
 
 const Popup_kho = (props) => {
     const [open, sOpen] = useState(false);

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import PopupCustom from "/components/UI/popup";
 
 import apiClient from "@/Api/apiClients/client/apiClient";
+import apiComons from "@/Api/apiComon/apiComon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
@@ -190,7 +191,7 @@ const Popup_dskh = (props) => {
                 provinceid: isState.valueCt?.value ? isState.valueCt?.value : -1,
             }
 
-            const { rResult } = await apiClient.apiDistricClient({ params: params })
+            const { rResult } = await apiComons.apiDistric({ params: params })
 
             queryState({
                 dataDitrict: rResult?.map((e) => ({
@@ -240,7 +241,7 @@ const Popup_dskh = (props) => {
                 districtid: isState.valueDitrict?.value ? isState.valueDitrict?.value : -1,
             }
 
-            const { rResult } = await apiClient.apiWWarClient({ params: params })
+            const { rResult } = await apiComons.apiWWard({ params: params })
 
             queryState({
                 dataWar: rResult?.map((e) => ({

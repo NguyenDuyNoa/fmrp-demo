@@ -32,10 +32,12 @@ const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 import Header from "./components/header";
 
 // const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
+import apiContact from "@/Api/apiClients/contact/apiContact";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import FilterHeader from "./components/fillter/filterHeader";
+import apiCategory from "@/Api/apiProducts/category/apiCategory";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -171,10 +173,10 @@ const Index = (props) => {
     };
     const _ServerFetching_filter = async () => {
         try {
-            const { rResult: client } = await apiProductionPlan.apiClientOption();
-            const { rResult: productGroup } = await apiProductionPlan.apiCategoryOption();
+            const { rResult: client } = await apiContact.apiClientContact({});
+            const { rResult: productGroup } = await apiCategory.apiOptionCategory({});
             const { result: listBr } = await apiComons.apiBranchCombobox();
-            const { data } = await apiProductionPlan.apiSearchProductsVariant({
+            const { data } = await apiComons.apiSearchProductsVariant({
                 params: { "filter[branch_id]": 0 },
             });
             updateData({
@@ -194,7 +196,7 @@ const Index = (props) => {
 
     const _HandleSeachApi = debounce(async (inputValue) => {
         try {
-            const { data } = await apiProductionPlan.apiSearchProductsVariant({
+            const { data } = await apiComons.apiSearchProductsVariant({
                 params: {
                     "filter[branch_id]": 0,
                 },

@@ -142,7 +142,7 @@ const Index = (props) => {
     const { } = useQuery({
         queryKey: ["apiProvince"],
         queryFn: async () => {
-            const { rResult } = await apiSuppliers.apiListProvinceSuppliers()
+            const { rResult } = await apiComons.apiListProvince()
 
             queryState({ listSelectCt: rResult?.map((e) => ({ label: e.name, value: e.provinceid })) });
 

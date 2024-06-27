@@ -32,9 +32,10 @@ import ContainerPagination from "@/components/UI/common/ContainerPagination/Cont
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
@@ -42,7 +43,6 @@ import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useQuery } from "@tanstack/react-query";
-import { reTryQuery } from "@/configs/configRetryQuery";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -134,7 +134,7 @@ const Index = (props) => {
         queryKey: ["categoryOption"],
         queryFn: async () => {
 
-            const { rResult } = await apiCategory.apiCategoryOptionCategory();
+            const { rResult } = await apiCategory.apiCategoryOptionCategory({});
             sDataOption(
                 rResult.map((x) => ({
                     label: `${x.name + " " + "(" + x.code + ")"}`,

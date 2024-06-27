@@ -34,13 +34,6 @@ const apiWarehouse = {
             throw error;
         }
     },
-    async apiVariation() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_variation/variation?csrf_protection=true`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
+
 }
 export default apiWarehouse

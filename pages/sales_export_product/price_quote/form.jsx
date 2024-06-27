@@ -13,6 +13,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiContact from "@/Api/apiClients/contact/apiContact";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import ButtonBack from "@/components/UI/button/buttonBack";
@@ -292,7 +293,7 @@ const Index = (props) => {
         queryKey: ["price_quote_client", idBranch],
         queryFn: async () => {
 
-            const { rResult } = await apiPriceQuocte.apiClientOption({
+            const { rResult } = await apiContact.apiClientContact({
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch?.value : null,
                 }

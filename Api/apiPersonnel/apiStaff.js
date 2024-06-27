@@ -1,13 +1,6 @@
 import { _ServerInstance as axiosCustom } from "@/services/axios";
 const apiSatff = {
-    async apiListDepartment() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_staff/department/?csrf_protection=true`,);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
+
     async apiListStaff(params) {
         try {
             const response = await axiosCustom('GET', `/api_web/api_staff/staff/?csrf_protection=true`, params);

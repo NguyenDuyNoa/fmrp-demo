@@ -16,14 +16,6 @@ const apiClient = {
             throw error;
         }
     },
-    async apiListProvinceClient() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_address/province?limit=0`,);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
     async apiDetailClient(id) {
         try {
             const response = await axiosCustom('GET', `/api_web/api_client/client/${id}?csrf_protection=true`,);
@@ -43,22 +35,6 @@ const apiClient = {
     async apiGroupClient(prams) {
         try {
             const response = await axiosCustom('GET', `/api_web/Api_client/group?csrf_protection=true`, prams);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
-    async apiDistricClient(prams) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_address/district?limit=0`, prams);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
-    async apiWWarClient(prams) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/Api_address/ward?limit=0`, prams);
             return response.data
         } catch (error) {
             throw error;

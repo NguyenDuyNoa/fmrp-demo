@@ -1,3 +1,4 @@
+import apiCategory from "@/Api/apiProducts/category/apiCategory";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
@@ -392,7 +393,7 @@ const Popup_ThanhPham = React.memo((props) => {
                 "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : -1,
                 // "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
             }
-            const { rResult } = await apiProducts.apiCategoryOptionProducts({ params });
+            const { rResult } = await apiCategory.apiOptionCategory({ params });
             sDataCategory(
                 rResult.map((e) => ({
                     label: `${e.name + " " + "(" + e.code + ")"}`,

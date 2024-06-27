@@ -17,6 +17,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -96,7 +97,7 @@ const Location = (props) => {
             "filter[is_system]": 2,
         };
         try {
-            const { rResult } = await apiLocationWarehouse.apiListWarehouse({ params: params });
+            const { rResult } = await apiWarehouse.apiListWarehouse({ params: params });
             queryState({
                 listWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })),
                 onFetchingWarehouse: false,

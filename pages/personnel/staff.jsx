@@ -33,6 +33,7 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
 import apiComons from "@/Api/apiComon/apiComon";
+import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -89,7 +90,7 @@ const Index = (props) => {
     useQuery({
         queryKey: ["api_department"],
         queryFn: async () => {
-            const { rResult } = await apiSatff.apiListDepartment();
+            const { rResult } = await apiDepartments.apiListDepartment({});
             queryState({ room: rResult });
             return rResult
         },

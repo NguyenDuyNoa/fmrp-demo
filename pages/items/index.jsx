@@ -27,18 +27,21 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 
 import apiComons from "@/Api/apiComon/apiComon";
+import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import apiItems from "@/Api/apiMaterial/items/apiItems";
+import apiVariant from "@/Api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useFeature from "@/hooks/useConfigFeature";
@@ -54,7 +57,6 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
 import ModalImage from "react-modal-image";
 import Popup_NVL from "./components/items/popupNvl";
-import { reTryQuery } from "@/configs/configRetryQuery";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -135,13 +137,13 @@ const Index = (props) => {
     const { } = useQuery({
         queryKey: ['api_branch_categor_variation'],
         queryFn: async () => {
-            const { rResult: unit } = await apiItems.apiUnitItems()
+            const { rResult: unit } = await apiComons.apiUnit({})
 
             const { result } = await apiComons.apiBranchCombobox();
 
-            const { rResult: categoryOption } = await apiItems.apiCategoryOptionItems()
+            const { rResult: categoryOption } = await apiCategory.apiCategoryOptionCategory({})
 
-            const { rResult: variation } = await apiItems.apiVariationItems()
+            const { rResult: variation } = await apiVariant.apiListVariant({})
 
             const array = result.map((e) => ({ label: e.name, value: e.id }))
 

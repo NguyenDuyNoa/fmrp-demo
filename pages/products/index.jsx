@@ -35,6 +35,7 @@ import Popup_ThongTin from "./components/product/popupThongtin";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
+import apiVariant from "@/Api/apiSettings/apiVariant";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -44,6 +45,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import usePagination from "@/hooks/usePagination";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
+import apiCategory from "@/Api/apiProducts/category/apiCategory";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -167,7 +169,7 @@ const Index = (props) => {
                 })),
             });
 
-            const { rResult: unit } = await apiProducts.apiUnitProducts();
+            const { rResult: unit } = await apiComons.apiUnit({});
             dispatch({
                 type: "unit_finishedProduct/update",
                 payload: unit?.map((e) => ({
@@ -176,7 +178,7 @@ const Index = (props) => {
                 })),
             });
 
-            const { rResult: variationProducts } = await apiProducts.apiVariationProducts();
+            const { rResult: variationProducts } = await apiVariant.apiListVariant({});
             dispatch({
                 type: "variant_NVL/update",
                 payload: variationProducts?.rResult?.map((e) => ({
@@ -187,7 +189,7 @@ const Index = (props) => {
             });
 
 
-            const { rResult: categoryOption } = await apiProducts.apiCategoryOptionProducts();
+            const { rResult: categoryOption } = await apiCategory.apiOptionCategory({});
             sDataCategory(
                 categoryOption.map((e) => ({
                     label: `${e.name + " " + "(" + e.code + ")"}`,

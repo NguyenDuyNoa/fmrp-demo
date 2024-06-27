@@ -56,14 +56,6 @@ const apiPriceQuocte = {
             throw error;
         }
     },
-    async apiClientOption(params) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_client/client_option/?csrf_protection=true`, params);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
-    },
     async apiContact(params) {
         try {
             const response = await axiosCustom('GET', `/api_web/api_client/contactCombobox/?csrf_protection=true`, params);

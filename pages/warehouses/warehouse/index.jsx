@@ -35,6 +35,7 @@ import Pagination from "@/components/UI/pagination";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiVariant from "@/Api/apiSettings/apiVariant";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
@@ -109,7 +110,7 @@ const Index = (props) => {
     // fetch list biến thể
     const fetchFilterVariationWarehouse = async () => {
         try {
-            const { rResult } = await apiWarehouse.apiVariation();
+            const { rResult } = await apiVariant.apiListVariant({});
             const options = rResult?.flatMap(({ option }) => option) ?? [];
             queryKeyIsState({
                 listVariant: options?.map(({ id, name }) => ({
