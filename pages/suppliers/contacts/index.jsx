@@ -1,17 +1,12 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-
-
 import apiContact from "@/Api/apiClients/contact/apiContact";
 import apiComons from "@/Api/apiComon/apiComon";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -31,6 +26,9 @@ import {
     Grid6
 } from "iconsax-react";
 import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Pagination from "/components/UI/pagination";
 
@@ -68,7 +66,7 @@ const Index = (props) => {
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const { isLoading, isFetching, refetch } = useQuery({
-        queryKey: ["supplier_contact", limit, router.query?.page, isState.idBranch, isState.idSupplier, isState.keySearch],
+        queryKey: ["api_supplier_contact", limit, router.query?.page, isState.idBranch, isState.idSupplier, isState.keySearch],
         queryFn: async () => {
             const params = {
                 search: isState.keySearch,
@@ -91,7 +89,7 @@ const Index = (props) => {
 
 
     const { data } = useQuery({
-        queryKey: ["apiBranch"],
+        queryKey: ["api_branch"],
         queryFn: async () => {
 
             const { result } = await apiComons.apiBranchCombobox();

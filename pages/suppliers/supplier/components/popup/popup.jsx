@@ -1,23 +1,20 @@
-import { Edit as IconEdit } from "iconsax-react";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { v4 as uuidv4 } from "uuid";
-
-import ButtonAdd from "../button/buttonAdd";
-import FormContact from "../form/formContact";
-import FormInfo from "../form/formInfo";
-
-import useActionRole from "@/hooks/useRole";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
 import apiComons from "@/Api/apiComon/apiComon";
 import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import useActionRole from "@/hooks/useRole";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Edit as IconEdit } from "iconsax-react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+import ButtonAdd from "../button/buttonAdd";
+import FormContact from "../form/formContact";
+import FormInfo from "../form/formInfo";
 
 const Popup_dsncc = (props) => {
   const dataLang = props.dataLang;
@@ -82,7 +79,7 @@ const Popup_dsncc = (props) => {
   }, [isState.open]);
 
   const { } = useQuery({
-    queryKey: ["supplier_detail", props?.id],
+    queryKey: ["api_supplier_detail", props?.id],
     queryFn: async () => {
       const db = await apiSuppliers.apiDetailSuppliers(props?.id);
       queryState({
@@ -131,9 +128,8 @@ const Popup_dsncc = (props) => {
     enabled: isState.open && !!props?.id
   })
 
-
   const { } = useQuery({
-    queryKey: ["supplier_group", isState.valueBr?.length > 0],
+    queryKey: ["api_supplier_group", isState.valueBr?.length > 0],
     queryFn: async () => {
 
       const params = {
@@ -147,7 +143,6 @@ const Popup_dsncc = (props) => {
       return rResult
     },
   })
-
 
   useEffect(() => {
     isState.valueBr?.length == 0 && queryState({ valueGr: [], dataGroup: [] });
@@ -169,11 +164,6 @@ const Popup_dsncc = (props) => {
       dataDitrict: []
     })
   }, [isState.valueCt])
-
-
-
-
-
 
   const { } = useQuery({
     queryKey: ["api_district", isState.valueCt],
