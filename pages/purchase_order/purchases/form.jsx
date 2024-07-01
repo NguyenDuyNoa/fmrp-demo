@@ -1,23 +1,3 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import {
-    Add,
-    Trash as IconDelete,
-    Minus
-} from "iconsax-react";
-import Select from "react-select";
-
-import moment from "moment/moment";
-
-import DatePicker from "react-datepicker";
-import { BsCalendarEvent } from "react-icons/bs";
-import { MdClear } from "react-icons/md";
-
-
-import { routerPurchases } from "routers/buyImportGoods";
-
 import apiComons from "@/Api/apiComon/apiComon";
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import ButtonBack from "@/components/UI/button/buttonBack";
@@ -26,6 +6,7 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES } from "@/constants/changeStatus/changeStatus";
 import { TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -36,7 +17,18 @@ import { useToggle } from "@/hooks/useToggle";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import { debounce } from "lodash";
+import moment from "moment/moment";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import Select from "react-select";
+import { routerPurchases } from "routers/buyImportGoods";
 
 const Index = (props) => {
     const router = useRouter();
@@ -48,10 +40,6 @@ const Index = (props) => {
     const isShow = useToast();
 
     const statusExprired = useStatusExprired();
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
 
     const [data, sData] = useState([]);
 
@@ -85,8 +73,6 @@ const Index = (props) => {
 
     const dataSeting = useSetingServer()
 
-    const [onFetchingItem, sOnFetchingItem] = useState(false)
-
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
     useEffect(() => {
@@ -109,46 +95,36 @@ const Index = (props) => {
             ghichu: "",
         },
     ]);
+
     const slicedArr = option.slice(1);
 
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
 
     sortedArr.unshift(option[0]);
 
-    const _ServerFetching = async () => {
-        try {
-            const { result: listBr } = await apiComons.apiBranchCombobox();
-            // Axios(
-            //     "GET",
-            //     `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            //     {
-            //         params: {
-            //             limit: 0,
-            //         },
-            //     },
-            //     (err, response) => {
-            //         if (!err) {
-            //             let { rResult } = response.data;
-            //             sListBr(rResult);
-            //         }
-            //     }
-            // );
-            sListBr(listBr);
-            sOnFetching(false);
-        } catch (error) {
+    useQuery({
+        queryKey: ['api_branch'],
+        queryFn: async () => {
+            const { result } = await apiComons.apiBranchCombobox();
 
-        }
-    };
+            sListBr(result);
 
+            return result
+        },
+        ...reTryQuery,
+    })
 
+    useQuery({
+        queryKey: ["api_items_variant", idBranch],
+        queryFn: async () => {
+            let form = new FormData()
 
-    const _ServerFetchingItem = async () => {
-        let form = new FormData()
-        if (idBranch != null) {
-            [+idBranch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
-        }
-        try {
-            const { result } = await apiPurchases.apiItemsVariantPurchases(form)
+            if (idBranch != null) {
+                [+idBranch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+            }
+
+            const { data: { result } } = await apiPurchases.apiItemsVariantPurchases(form);
+
             sData(
                 result?.map((e) => ({
                     label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
@@ -156,28 +132,20 @@ const Index = (props) => {
                     e,
                 }))
             );
-            sOnFetchingItem(false)
-        } catch (error) {
 
-        }
-    }
-
-    useEffect(() => {
-        onFetchingItem && _ServerFetchingItem()
-    }, [onFetchingItem])
-
-    useEffect(() => {
-        sOnFetchingItem(true)
-    }, [idBranch])
+            return result
+        },
+        ...reTryQuery,
+    })
 
 
 
-    const _ServerFetchingDetail = async () => {
-        const rResult = await apiPurchases.apiDetailPagePurchases(id)
-        try {
+    useQuery({
+        queryKey: ["api_detail_page_purchases", id],
+        queryFn: async () => {
+            const rResult = await apiPurchases.apiDetailPagePurchases(id)
             sCode(rResult?.code);
             sNamePromis(rResult?.name);
-            // setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
             sStartDate(moment(rResult?.date).toDate());
             sNote(rResult?.note);
             sIdBranch({
@@ -207,14 +175,15 @@ const Index = (props) => {
             }
             setTotalSoluong(totalQuantity);
             setTotalQty(rResult?.items?.length);
-        } catch (error) {
-
-        }
-        sOnFetchingDetail(false);
-    };
+            return rResult
+        },
+        ...reTryQuery,
+        enabled: !!id
+    })
 
     const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
-    const branch_id = idBranch?.value;
+
+
     const _HandleDelete = (id) => {
         if (id === option[0].id) {
             return isShow("error", `${"Mặc định hệ thống, không xóa"}`);
@@ -336,15 +305,17 @@ const Index = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const checkData = newDataOption?.some((e) => e?.soluong == 0 || e?.soluong == "");
-        if (namePromis?.length == 0 || selectedDate?.length == 0 || branch_id == null || checkData) {
+        const hasValue = namePromis?.length == 0 || selectedDate?.length == 0 || idBranch == null
+        if (hasValue || checkData) {
             namePromis?.length == 0 && sErrName(true);
             selectedDate?.length == 0 && sErrDate(true);
-            branch_id == null && sErrBranch(true);
+            idBranch == null && sErrBranch(true);
             isShow("error", `${props.dataLang?.required_field_null}`);
         } else {
             sOnSending(true);
         }
     };
+
     const dataOption = sortedArr?.map((e) => {
         return {
             data: e?.mathang?.value,
@@ -352,6 +323,7 @@ const Index = (props) => {
             ghichu: e.ghichu,
         };
     });
+
     const newDataOption = dataOption?.filter((e) => e?.data !== undefined);
 
     const _ServerSending = async () => {
@@ -359,7 +331,7 @@ const Index = (props) => {
         formData.append("code", code);
         formData.append("name", namePromis);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
-        formData.append("branch_id", branch_id);
+        formData.append("branch_id", idBranch?.value);
         formData.append("note", note);
         newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][item]`, item?.data);
@@ -402,6 +374,7 @@ const Index = (props) => {
         }
         sOnSending(false);
     };
+
     const _HandleSeachApi = debounce(async (inputValue) => {
         let form = new FormData()
         if (idBranch != null) {
@@ -409,7 +382,7 @@ const Index = (props) => {
         }
         form.append("term", inputValue)
         try {
-            const { result } = await apiPurchases.apiItemsVariantPurchases(form)
+            const { data: { result } } = await apiPurchases.apiItemsVariantPurchases(form);
             sData(
                 result?.map((e) => ({
                     label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
@@ -435,22 +408,7 @@ const Index = (props) => {
 
     useEffect(() => {
         sErrBranch(false);
-    }, [branch_id != null]);
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    useEffect(() => {
-        router.query && sOnFetching(true);
-    }, [router.query]);
-
-    useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetail();
-    }, [onFetchingDetail]);
-    useEffect(() => {
-        id && sOnFetchingDetail(true);
-    }, []);
+    }, [idBranch != null]);
 
     // };
     const formatNumber = (number) => {
@@ -464,7 +422,6 @@ const Index = (props) => {
                     {id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}
                 </title>
             </Head>
-            {/* <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'> */}
             <Container className="!h-auto">
                 {statusExprired ? (
                     <EmptyExprired />
@@ -474,8 +431,7 @@ const Index = (props) => {
                             {dataLang?.purchase_purchase || "purchase_purchase"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6> {id ? dataLang?.purchase_edit || "purchase_edit"
-                            : dataLang?.purchase_add || "purchase_add"}</h6>
+                        <h6> {id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}</h6>
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
@@ -515,14 +471,6 @@ const Index = (props) => {
                                         {dataLang?.purchase_day || "purchase_day"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    {/* <input
-                                value={selectedDate}              
-                                onChange={_HandleChangeInput.bind(this, "date")}
-                                name="fname"                      
-                                type="datetime-local"
-                                placeholder={dataLang?.purchase_err_Name_sytem || "purchase_err_Name_sytem"}
-                                className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                                {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>} */}
                                     <div className="custom-date-picker flex flex-row">
                                         <DatePicker
                                             blur
@@ -738,8 +686,7 @@ const Index = (props) => {
                                                                         {"-"}
                                                                         <div className="flex items-center gap-1">
                                                                             <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {dataLang?.purchase_survive || "purchase_survive"}
-                                                                                :
+                                                                                {dataLang?.purchase_survive || "purchase_survive"}  :
                                                                             </h5>
                                                                             <h5 className=" font-normal text-black 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                                 {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}

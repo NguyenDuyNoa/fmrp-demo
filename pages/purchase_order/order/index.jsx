@@ -1,30 +1,14 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import { useSelector } from "react-redux";
-
-import {
-    Grid6
-} from "iconsax-react";
-
-import "react-datepicker/dist/react-datepicker.css";
-
-import { _ServerInstance as Axios } from "/services/axios";
-
-import { useEffect } from "react";
-import Popup_chitietThere from "../detaiCommon";
-import Popup_chitiet from "./components/popup";
-
-import { routerOrder } from "routers/buyImportGoods";
-
+import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
 import { BtnAction } from "@/components/UI/BtnAction";
+import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import {
     Container,
     ContainerBody,
@@ -32,9 +16,6 @@ import {
     ContainerTable,
     ContainerTotal,
 } from "@/components/UI/common/layout";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -43,20 +24,30 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import TabFilter from "@/components/UI/TabFilter";
-
+import { reTryQuery } from "@/configs/configRetryQuery";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
-
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import usePagination from "@/hooks/usePagination";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
+import { Grid6 } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import { useSelector } from "react-redux";
+import { routerOrder } from "routers/buyImportGoods";
+import Popup_chitietThere from "../detaiCommon";
+import Popup_chitiet from "./components/popup";
+import { _ServerInstance as Axios } from "/services/axios";
+import apiComons from "@/Api/apiComon/apiComon";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -75,9 +66,7 @@ const Index = (props) => {
     const initalState = {
         data: [],
         dataExcel: [],
-        onFetching: false,
         onFetching_filter: false,
-        onFetchingGr: false,
         keySearch: "",
         listBr: [],
         listCode: [],
@@ -114,75 +103,84 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
-        queryState({ onFetching_filter: true, onFetchingGr: true });
+        queryState({ onFetching_filter: true });
     }, []);
 
-    const _ServerFetching = () => {
-        const tabPage = router.query?.tab;
-        Axios(
-            "GET",
-            `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": isState.valueBr != null ? isState.valueBr?.value : null,
-                    "filter[id]": isState.valueCode != null ? isState.valueCode?.value : null,
-                    "filter[status_bar]": tabPage ?? null,
-                    "filter[supplier_id]": isState.valueSupplier ? isState.valueSupplier.value : null,
-                    "filter[order_type]": isState.valueOrderType ? isState.valueOrderType.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output, rTotal } = response.data;
-                    queryState({ data: rResult, dataExcel: rResult });
-                    sTotalItems(output);
-                    sTotal(rTotal);
-                }
-                queryState({
-                    onFetching: false,
-                });
-            }
-        );
-    };
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_purchase_order/filterBar/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    "filter[branch_id]": isState.valueBr != null ? isState.valueBr?.value : null,
-                    "filter[id]": isState.valueCode != null ? isState.valueCode?.value : null,
-                    "filter[supplier_id]": isState.valueSupplier ? isState.valueSupplier.value : null,
-                    "filter[order_type]": isState.valueOrderType ? isState.valueOrderType.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const data = response.data;
-                    queryState({ listDs: data });
-                }
-                queryState({ onFetchingGr: false });
-            }
-        );
-    };
+
+    const params = {
+        search: isState.keySearch,
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[branch_id]": isState.valueBr != null ? isState.valueBr?.value : null,
+        "filter[id]": isState.valueCode != null ? isState.valueCode?.value : null,
+        "filter[status_bar]": router.query?.tab ?? null,
+        "filter[supplier_id]": isState.valueSupplier ? isState.valueSupplier.value : null,
+        "filter[order_type]": isState.valueOrderType ? isState.valueOrderType.value : null,
+        "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+        "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+    }
+
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["api_list_order",
+            limit,
+            isState.keySearch,
+            router.query?.page,
+            router.query?.tab,
+            isState.valueCode,
+            isState.valueBr,
+            isState.valueSupplier,
+            isState.valueOrderType,
+            isState.valueDate.endDate,
+            isState.valueDate.startDate,
+        ],
+        queryFn: async () => {
+            const { rResult, output, rTotal } = await apiOrder.apiListOrder({ params });
+
+            queryState({ data: rResult, dataExcel: rResult });
+
+            sTotalItems(output);
+
+            sTotal(rTotal);
+
+            return rResult
+        },
+        ...reTryQuery
+    })
+
+    useQuery({
+        queryKey: ["api_list_filter_bar",
+            limit,
+            isState.keySearch,
+            router.query?.page,
+            router.query?.tab,
+            isState.valueCode,
+            isState.valueBr,
+            isState.valueSupplier,
+            isState.valueOrderType,
+            isState.valueDate.endDate,
+            isState.valueDate.startDate,
+        ],
+        queryFn: async () => {
+            const data = await apiOrder.apiListFilterBar({ params });
+            queryState({ listDs: data });
+            return data
+        },
+        ...reTryQuery
+    })
+
+
+    useQuery({
+        queryKey: ["api_comboboxs_other"],
+        queryFn: async () => {
+            const { result: listBr } = await apiComons.apiBranchCombobox();
+            queryState({ listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [] });
+
+            return { listBr }
+        },
+        ...reTryQuery
+    })
 
     const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
-            }
-        });
-
         Axios("GET", `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 const { rResult } = response.data;
@@ -208,30 +206,10 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
-
-    useEffect(() => {
-        isState.onFetchingGr && _ServerFetching_group();
-    }, [isState.onFetchingGr]);
-
-    useEffect(() => {
         isState.onFetching_filter && _ServerFetching_filter();
     }, [isState.onFetching_filter]);
 
-    useEffect(() => {
-        queryState({ onFetching: true, onFetchingGr: true });
-    }, [
-        limit,
-        router.query?.page,
-        router.query?.tab,
-        isState.valueCode,
-        isState.valueBr,
-        isState.valueSupplier,
-        isState.valueOrderType,
-        isState.valueDate.endDate,
-        isState.valueDate.startDate,
-    ]);
+
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -241,7 +219,6 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
 
     const formatNumber = (number) => {
@@ -435,7 +412,7 @@ const Index = (props) => {
                             {isState.listDs &&
                                 isState.listDs.map((e) => {
                                     return (
-                                        <div>
+                                        <div key={e?.id}>
                                             <TabFilter
                                                 style={{
                                                     backgroundColor: "#e2f0fe",
@@ -468,19 +445,14 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_table_branch ||
-                                                            "purchase_order_table_branch",
+                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
                                                 ]}
                                                 onChange={(e) => queryState({ valueBr: e })}
                                                 value={isState.valueBr}
-                                                placeholder={
-                                                    dataLang?.purchase_order_table_branch ||
-                                                    "purchase_order_table_branch"
-                                                }
+                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                                 hideSelectedOptions={false}
                                                 isClearable={true}
                                                 colSpan={1}
@@ -489,18 +461,14 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_table_code ||
-                                                            "purchase_order_table_code",
+                                                        label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listCode,
                                                 ]}
                                                 onChange={(e) => queryState({ valueCode: e })}
                                                 value={isState.valueCode}
-                                                placeholder={
-                                                    dataLang?.purchase_order_table_code || "purchase_order_table_code"
-                                                }
+                                                placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
                                                 hideSelectedOptions={false}
                                                 isClearable={true}
                                                 colSpan={1}
@@ -509,19 +477,14 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_table_supplier ||
-                                                            "purchase_order_table_supplier",
+                                                        label: dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listSupplier,
                                                 ]}
                                                 onChange={(e) => queryState({ valueSupplier: e })}
                                                 value={isState.valueSupplier}
-                                                placeholder={
-                                                    dataLang?.purchase_order_table_supplier ||
-                                                    "purchase_order_table_supplier"
-                                                }
+                                                placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                                 hideSelectedOptions={false}
                                                 isClearable={true}
                                                 isSearchable={true}
@@ -553,7 +516,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
@@ -585,8 +548,7 @@ const Index = (props) => {
                                 <div className="w-full">
                                     <HeaderTable gridCols={12}>
                                         <ColumnTable colSpan={1} textAlign="center">
-                                            {dataLang?.purchase_order_table_dayvoucers ||
-                                                "purchase_order_table_dayvoucers"}
+                                            {dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_code || "purchase_order_table_code"}
@@ -595,8 +557,7 @@ const Index = (props) => {
                                             {dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_ordertype ||
-                                                "purchase_order_table_ordertype"}
+                                            {dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_number || "purchase_order_table_number"}
@@ -608,12 +569,10 @@ const Index = (props) => {
                                             {dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_intoMoney ||
-                                                "purchase_order_table_intoMoney"}
+                                            {dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_importStatus ||
-                                                "purchase_order_table_importStatus"}
+                                            {dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_note || "purchase_order_note"}
@@ -622,11 +581,10 @@ const Index = (props) => {
                                             {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_operations ||
-                                                "purchase_order_table_operations"}
+                                            {dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
@@ -708,7 +666,7 @@ const Index = (props) => {
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className=" flex justify-center">
                                                         <BtnAction
-                                                            onRefresh={_ServerFetching.bind(this)}
+                                                            onRefresh={refetch.bind(this)}
                                                             dataLang={dataLang}
                                                             id={e?.id}
                                                             status={e?.import_status}

@@ -1,28 +1,3 @@
-import Head from "next/head";
-import React, { useEffect, useState } from "react";
-
-import { Grid6 } from "iconsax-react";
-
-import { useRouter } from "next/router";
-
-import dayjs from "dayjs";
-import "dayjs/locale/vi";
-import "react-datepicker/dist/react-datepicker.css";
-
-
-dayjs.locale("vi");
-
-import Popup_chitiet from "./components/popup";
-
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
-import { routerPurchases } from "routers/buyImportGoods";
-
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
 import apiComons from "@/Api/apiComon/apiComon";
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import { BtnAction } from "@/components/UI/BtnAction";
@@ -43,7 +18,11 @@ import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComp
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -51,10 +30,24 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
+import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
+import { routerPurchases } from "routers/buyImportGoods";
+import Popup_chitiet from "./components/popup";
+dayjs.locale("vi");
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -77,11 +70,9 @@ const Index = (props) => {
     const initialData = {
         data: [],
         dataExcel: [],
-        onFetching: false,
         onFetchingBranch: false,
         onFetchingCode: false,
         onFetchingUser: false,
-        onFetchingFilter: false,
         onFetchingGroup: false,
         onSending: false,
         keySearch: "",
@@ -117,15 +108,28 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "" },
         });
-        queryState({ onFetchingFilter: true });
     }, []);
-    const _ServerFetching = async () => {
-        try {
+
+
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["api_List_purchases",
+            limit,
+            isState.keySearch,
+            router.query?.page,
+            router.query?.tab,
+            isState.idBranch,
+            isState.idCode,
+            isState.idUser,
+            isState.valueDate.endDate,
+            isState.valueDate.startDate,
+        ],
+        queryFn: async () => {
             const { output, rResult } = await apiPurchases.apiListPurchases({
                 params: {
                     search: isState.keySearch,
@@ -139,32 +143,50 @@ const Index = (props) => {
                     "filter[end_date]": isState.valueDate?.endDate,
                 },
             })
-            queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
+
+            queryState({ data: rResult || [], dataExcel: rResult || [] });
+
             sTotalItems(output);
-        } catch (error) {
 
-        }
-    };
+            return rResult
+        },
+        ...reTryQuery
+    })
 
-    const _ServerFetching_filter = async () => {
-        try {
+
+    useQuery({
+        queryKey: ["api_combobox_other"],
+        queryFn: async () => {
             const { result: listBr } = await apiComons.apiBranchCombobox();
+
             const { rResult: listCode } = await apiPurchases.apiListPurchases({})
+
             const { rResult: listUser } = await apiPurchases.apiStaffOptionPurchases()
+
             queryState({
                 listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
                 listCode: listCode?.map((e) => ({ label: e.code, value: e.id || [] })),
                 listUser: listUser?.map((e) => ({ label: e.name, value: e.staffid })) || [],
-                onFetchingFilter: false
             });
-        } catch (error) {
 
-        }
+            return { listBr, listCode, listUser }
+        },
+        ...reTryQuery
+    })
 
-    };
-
-    const _ServerFetching_group = async () => {
-        try {
+    const { refetch: refetchGroup } = useQuery({
+        queryKey: ["api_list_group",
+            limit,
+            isState.keySearch,
+            router.query?.page,
+            router.query?.tab,
+            isState.idBranch,
+            isState.idCode,
+            isState.idUser,
+            isState.valueDate.endDate,
+            isState.valueDate.startDate,
+        ],
+        queryFn: async () => {
             const data = await apiPurchases.apiGroupPurchases({
                 params: {
                     limit: 0,
@@ -176,11 +198,13 @@ const Index = (props) => {
                     "filter[end_date]": isState.valueDate?.endDate,
                 },
             })
-            queryState({ listDs: data || [], onFetchingGroup: false });
-        } catch (error) {
 
-        }
-    };
+            queryState({ listDs: data || [], onFetchingGroup: false });
+
+            return data
+        },
+        ...reTryQuery
+    })
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -190,33 +214,7 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
-
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
-
-    useEffect(() => {
-        isState.onFetchingGroup && _ServerFetching_group();
-    }, [isState.onFetchingGroup]);
-
-    useEffect(() => {
-        isState.onFetchingFilter && _ServerFetching_filter();
-    }, [isState.onFetchingFilter]);
-
-    useEffect(() => {
-        queryState({ onFetching: true, onFetchingGroup: true });
-    }, [
-        limit,
-        router.query?.page,
-        router.query?.tab,
-        isState.idBranch,
-        isState.idCode,
-        isState.idUser,
-        isState.valueDate.endDate,
-        isState.valueDate.startDate,
-    ]);
 
     const _ToggleStatus = () => {
         const index = isState.data.findIndex((x) => x.id === isId);
@@ -227,25 +225,28 @@ const Index = (props) => {
         handleQueryId({ status: false, active: newStatus });
     };
 
-    const _ServerSending = async (id, newStatus) => {
-        try {
-
-            const { isSuccess, message } = await apiPurchases.apiHandingStatusPurchases(id, newStatus)
-
-            if (isSuccess) {
-                isShow("success", `${dataLang[message]}`);
-            } else {
-                isShow("error", `${dataLang[message]}`);
-            }
-
-            queryState({ onSending: false });
-
-            await _ServerFetching();
-
-            await _ServerFetching_group();
-        } catch (error) {
-
+    const handingStatus = useMutation({
+        mutationFn: (data) => {
+            return apiPurchases.apiHandingStatusPurchases(data.id, data.newStatus)
         }
+    })
+
+    const _ServerSending = async (id, newStatus) => {
+        handingStatus.mutate({ id, newStatus }, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", `${dataLang[message]}`);
+                } else {
+                    isShow("error", `${dataLang[message]}`);
+                }
+                queryState({ onSending: false });
+                refetch()
+                refetchGroup()
+            },
+            onError: () => {
+
+            }
+        })
     };
 
     useEffect(() => {
@@ -492,7 +493,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             <div className="flex space-x-2 items-center justify-end">
                                                 {role == true || checkExport ? (
                                                     <div className={``}>
@@ -559,7 +560,7 @@ const Index = (props) => {
                                             {dataLang?.purchase_action || "purchase_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
@@ -628,8 +629,8 @@ const Index = (props) => {
                                                             className="pl-2 py-2.5 flex space-x-2 justify-center"
                                                         >
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
+                                                                onRefreshGroup={refetchGroup.bind(this)}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 order={e?.order_status}

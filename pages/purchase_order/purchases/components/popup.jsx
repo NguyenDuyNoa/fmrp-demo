@@ -1,10 +1,3 @@
-import {
-    TickCircle
-} from "iconsax-react";
-import { useEffect, useState } from "react";
-import ModalImage from "react-modal-image";
-import PopupCustom from "/components/UI/popup";
-
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
@@ -12,36 +5,43 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import NoData from "@/components/UI/noData/nodata";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
+import { TickCircle } from "iconsax-react";
+import { useState } from "react";
+import ModalImage from "react-modal-image";
+import PopupCustom from "/components/UI/popup";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [data, sData] = useState();
-    const [onFetching, sOnFetching] = useState(false);
+
     const dataSeting = useSetingServer()
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-    const _ServerFetching_detailUser = async () => {
-        try {
+
+    const { isFetching } = useQuery({
+        queryKey: ['api_detail_purchases', props?.id],
+        queryFn: async () => {
             const db = await apiPurchases.apiDetailPurchases(props?.id);
             sData(db);
-            sOnFetching(false);
-        } catch (error) {
+            return db
+        },
+        ...reTryQuery,
+        enabled: open && !!props?.id
+    })
 
-        }
-    };
-    useEffect(() => {
-        onFetching && _ServerFetching_detailUser();
-    }, [open]);
 
     let listQty = data?.items;
+
     let totalQuantity = 0;
+
     for (let i = 0; i < listQty?.length; i++) {
         totalQuantity += parseInt(listQty[i].quantity);
     }
@@ -53,10 +53,7 @@ const Popup_chitiet = (props) => {
     return (
         <>
             <PopupCustom
-                title={
-                    props.dataLang?.purchase_detail_title ||
-                    "purchase_detail_title"
-                }
+                title={props.dataLang?.purchase_detail_title || "purchase_detail_title"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -99,9 +96,7 @@ const Popup_chitiet = (props) => {
 
                                     <div className="col-span-2 mx-auto">
                                         <div className="my-4 font-semibold text-[13px]">
-                                            {props.dataLang
-                                                ?.purchase_orderStatus ||
-                                                "purchase_orderStatus"}
+                                            {props.dataLang?.purchase_orderStatus || "purchase_orderStatus"}
                                         </div>
                                         <div className="flex flex-wrap  gap-2 items-center justify-start">
                                             {(data?.order_status?.status ===
@@ -193,7 +188,7 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.purchase_note || "purchase_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading
                                             className="max-h-28"
                                             color="#0f4f9e"
@@ -208,16 +203,10 @@ const Popup_chitiet = (props) => {
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center mx-auto">
-                                                                {e?.item
-                                                                    ?.images !=
-                                                                    null ? (
+                                                                {e?.item?.images != null ? (
                                                                     <ModalImage
-                                                                        small={
-                                                                            e?.item?.images
-                                                                        }
-                                                                        large={
-                                                                            e?.item?.images
-                                                                        }
+                                                                        small={e?.item?.images}
+                                                                        large={e?.item?.images}
                                                                         alt="Product Image"
                                                                         className="object-cover rounded w-[50px] h-[60px]"
                                                                     />
@@ -255,21 +244,10 @@ const Popup_chitiet = (props) => {
                                                                 {formatNumber(e?.quantity_create)}
                                                             </h6>
                                                             <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-center">
-                                                                {Number(
-                                                                    e?.quantity_left
-                                                                ) < 0
-                                                                    ? "Đặt dư" +
-                                                                    " " +
-                                                                    formatNumber(Number(Math.abs(e?.quantity_left)))
-                                                                    : formatNumber(e?.quantity_left)
-                                                                }
+                                                                {Number(e?.quantity_left) < 0 ? "Đặt dư" + " " + formatNumber(Number(Math.abs(e?.quantity_left))) : formatNumber(e?.quantity_left)}
                                                             </h6>
                                                             <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left">
-                                                                <ExpandableContent
-                                                                    content={
-                                                                        e?.note ?? ''
-                                                                    }
-                                                                />
+                                                                <ExpandableContent content={e?.note ?? ''} />
                                                             </h6>
                                                         </div>
                                                     ))}

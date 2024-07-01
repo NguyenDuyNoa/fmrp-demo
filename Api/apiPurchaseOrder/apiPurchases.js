@@ -43,7 +43,7 @@ const apiPurchases = {
     },
     async apiDetailPurchases(id) {
         try {
-            const response = await axiosCustom('POST', `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`,);
+            const response = await axiosCustom('GET', `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`,);
             return response.data
         } catch (error) {
             throw error;
