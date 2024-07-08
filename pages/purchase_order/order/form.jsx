@@ -143,74 +143,78 @@ const Index = (props) => {
 
     const _ServerFetchingDetail = async () => {
 
-        const rResult = await apiOrder.apiDetailOrder(id);
+        try {
+            const rResult = await apiOrder.apiDetailOrder(id);
 
-        const itemlast = [{ mathang: null }];
+            const itemlast = [{ mathang: null }];
 
-        const item = itemlast?.concat(
-            rResult?.item?.map((e) => ({
-                purchases_order_item_id: e?.purchases_order_item_id,
-                id: e.purchases_order_item_id,
-                mathang: {
-                    e: e?.item,
-                    label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
-                    value: e.item?.id,
-                },
-                soluong: Number(e?.quantity),
-                dongia: Number(e?.price),
-                chietkhau: Number(e?.discount_percent),
-                thue: { tax_rate: e?.tax_rate, value: e?.tax_id },
-                donvitinh: e.item?.unit_name,
-                dongiasauck: Number(e?.price_after_discount),
-                note: e?.note,
-                thanhtien:
-                    Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
-            }))
-        );
+            const item = itemlast?.concat(
+                rResult?.item?.map((e) => ({
+                    purchases_order_item_id: e?.purchases_order_item_id,
+                    id: e.purchases_order_item_id,
+                    mathang: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
+                        value: e.item?.id,
+                    },
+                    soluong: Number(e?.quantity),
+                    dongia: Number(e?.price),
+                    chietkhau: Number(e?.discount_percent),
+                    thue: { tax_rate: e?.tax_rate, value: e?.tax_id },
+                    donvitinh: e.item?.unit_name,
+                    dongiasauck: Number(e?.price_after_discount),
+                    note: e?.note,
+                    thanhtien:
+                        Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
+                }))
+            );
 
-        sOption(item);
+            sOption(item);
 
-        sCode(rResult?.code);
+            sCode(rResult?.code);
 
-        sIdStaff({
-            label: rResult?.staff_name,
-            value: rResult.staff_id,
-        });
+            sIdStaff({
+                label: rResult?.staff_name,
+                value: rResult.staff_id,
+            });
 
-        sIdBranch({
-            label: rResult?.branch_name,
-            value: rResult?.branch_id,
-        });
+            sIdBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
 
-        sIdSupplier({
-            label: rResult?.supplier_name,
-            value: rResult?.supplier_id,
-        });
+            sIdSupplier({
+                label: rResult?.supplier_name,
+                value: rResult?.supplier_id,
+            });
 
-        sStartDate(moment(rResult?.date).toDate());
+            sStartDate(moment(rResult?.date).toDate());
 
-        sDelivery_dateNew(moment(rResult?.delivery_date).toDate());
+            sDelivery_dateNew(moment(rResult?.delivery_date).toDate());
 
-        sLoai(rResult?.order_type);
+            sLoai(rResult?.order_type);
 
-        sIdPurchases(
-            rResult?.purchases?.map((e) => ({
-                label: e.code,
-                value: e.id,
-            }))
-        );
+            sIdPurchases(
+                rResult?.purchases?.map((e) => ({
+                    label: e.code,
+                    value: e.id,
+                }))
+            );
 
-        sHidden(rResult?.order_type === "1" ? true : false);
+            sHidden(rResult?.order_type === "1" ? true : false);
 
-        sOnFetchingItemsAll(rResult?.order_type === "0" ? true : false);
+            sOnFetchingItemsAll(rResult?.order_type === "0" ? true : false);
 
-        if (rResult?.order_type === "1") {
-            refetchItems();
+            if (rResult?.order_type === "1") {
+                refetchItems();
+            }
+
+            sNote(rResult?.note);
+
+        } catch (error) {
+
         }
-
-        sNote(rResult?.note);
-
     };
 
 
@@ -522,18 +526,26 @@ const Index = (props) => {
 
             form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "");
 
-            const { data } = await apiOrder.apiSearchProductItems(form);
+            try {
+                const { data } = await apiOrder.apiSearchProductItems(form);
 
-            sDataItems(data?.result);
+                sDataItems(data?.result);
+            } catch (error) {
+
+            }
         } else {
-            const { data } = await apiOrder.apiSearchItems({
-                params: {
-                    branch_id: idBranch != null ? +idBranch?.value : "",
-                    purchase_order_id: id,
-                }
-            });
+            try {
+                const { data } = await apiOrder.apiSearchItems({
+                    params: {
+                        branch_id: idBranch != null ? +idBranch?.value : "",
+                        purchase_order_id: id,
+                    }
+                });
 
-            sDataItems(data?.result);
+                sDataItems(data?.result);
+            } catch (error) {
+
+            }
         }
         sOnFetchingItemsAll(false);
     };
@@ -887,38 +899,42 @@ const Index = (props) => {
             formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
             formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
         });
-        const { isSuccess, message } = await apiOrder.apiHandingOrder(id, formData);
-        if (isSuccess) {
-            isShow("success", dataLang[message] || message);
-            sCode("");
-            sStartDate(new Date());
-            sDelivery_dateNew(new Date());
-            sIdStaff(null);
-            sIdSupplier(null);
-            sIdBranch(null);
-            sLoai("0");
-            sIdPurchases([]);
-            sNote("");
-            sErrBranch(false);
-            sErrDate(false);
-            sErrPurchase(false);
-            sErrSupplier(false);
-            sOption([
-                {
-                    id: Date.now(),
-                    mathang: null,
-                    donvitinh: "",
-                    soluong: 0,
-                    note: "",
-                },
-            ]);
-            router.push(routerOrder.home);
-        } else {
-            if (tongTienState.tongTien == 0) {
-                isShow("error", `Chưa nhập thông tin mặt hàng`);
+        try {
+            const { isSuccess, message } = await apiOrder.apiHandingOrder(id, formData);
+            if (isSuccess) {
+                isShow("success", dataLang[message] || message);
+                sCode("");
+                sStartDate(new Date());
+                sDelivery_dateNew(new Date());
+                sIdStaff(null);
+                sIdSupplier(null);
+                sIdBranch(null);
+                sLoai("0");
+                sIdPurchases([]);
+                sNote("");
+                sErrBranch(false);
+                sErrDate(false);
+                sErrPurchase(false);
+                sErrSupplier(false);
+                sOption([
+                    {
+                        id: Date.now(),
+                        mathang: null,
+                        donvitinh: "",
+                        soluong: 0,
+                        note: "",
+                    },
+                ]);
+                router.push(routerOrder.home);
             } else {
-                isShow("error", dataLang[message] || message);
+                if (tongTienState.tongTien == 0) {
+                    isShow("error", `Chưa nhập thông tin mặt hàng`);
+                } else {
+                    isShow("error", dataLang[message] || message);
+                }
             }
+        } catch (error) {
+
         }
         sOnSending(false);
     };

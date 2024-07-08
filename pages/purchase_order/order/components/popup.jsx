@@ -17,9 +17,13 @@ import ModalImage from "react-modal-image";
 import PopupCustom from "/components/UI/popup";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [data, sData] = useState();
+
     const dataSeting = useSetingServer()
+
     const formatNumber = (num) => {
         return formatNumberConfig(+num, dataSeting);
     };
