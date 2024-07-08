@@ -1,51 +1,42 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import DatePicker from "react-datepicker";
-import { BsCalendarEvent } from "react-icons/bs";
-import { MdClear } from "react-icons/md";
-
-import { Add, Trash as IconDelete, Minus } from "iconsax-react";
-import moment from "moment/moment";
-import { NumericFormat } from "react-number-format";
-import Select, { components } from "react-select";
-import Swal from "sweetalert2";
-import { v4 as uuidv4 } from "uuid";
-
-import { _ServerInstance as Axios } from "/services/axios";
-
-import Loading from "@/components/UI/loading";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { routerImport } from "routers/buyImportGoods";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiImport from "@/Api/apiPurchaseOrder/apiImport";
+import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SelectCore } from "@/utils/lib/Select";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import { debounce } from "lodash";
+import moment from "moment/moment";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import { NumericFormat } from "react-number-format";
+import Select, { components } from "react-select";
+import { routerImport } from "routers/buyImportGoods";
+import { v4 as uuidv4 } from "uuid";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Index = (props) => {
     const router = useRouter();
@@ -60,21 +51,7 @@ const Index = (props) => {
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
-    const [onFetching, sOnFetching] = useState(false);
-
     const statusExprired = useStatusExprired();
-
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-
-    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
-
-    const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
-
-    const [onFetchingTheOrder, sOnFetchingTheOrder] = useState(false);
-
-    const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
-
-    const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
@@ -145,166 +122,119 @@ const Index = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-            }
-        });
-        Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sDataTasxes(
-                    rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        tax_rate: e.tax_rate,
-                    }))
-                );
-            }
-        });
+    useQuery({
+        queryKey: ['api_other'],
+        queryFn: async () => {
+            const { result } = await apiComons.apiBranchCombobox();
 
-        sOnFetching(false);
-    };
+            const { rResult } = await apiComons.apiListTax();
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
+            sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
 
-    useEffect(() => {
-        id && sOnFetchingCondition(true);
-    }, []);
+            sDataTasxes(
+                rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    tax_rate: e.tax_rate,
+                }))
+            );
 
-    const _ServerFetchingDetailPage = () => {
-        Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let rResult = response.data;
-                sListData(
-                    rResult?.items.map((e) => ({
-                        id: e?.item?.id,
-                        matHang: {
-                            e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
-                            value: e.item?.id,
+            return { result, rResult };
+        },
+        enabled: !!router.query
+    })
+
+    const { isFetching } = useQuery({
+        queryKey: ['api_detail_page_import', id],
+        queryFn: async () => {
+            const rResult = await apiImport.apiDetailPageImport(id);
+            sListData(
+                rResult?.items.map((e) => ({
+                    id: e?.item?.id,
+                    matHang: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
+                        value: e.item?.id,
+                    },
+                    child: e?.child.map((ce) => ({
+                        id: Number(ce?.id),
+                        disabledDate:
+                            (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                            (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                            (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                            (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                        kho: {
+                            label: ce?.location_name,
+                            value: ce?.location_warehouses_id,
+                            warehouse_name: ce?.warehouse_name,
                         },
-                        child: e?.child.map((ce) => ({
-                            id: Number(ce?.id),
-                            disabledDate:
-                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                            kho: {
-                                label: ce?.location_name,
-                                value: ce?.location_warehouses_id,
-                                warehouse_name: ce?.warehouse_name,
-                            },
-                            serial: ce?.serial == null ? "" : ce?.serial,
-                            lot: ce?.lot == null ? "" : ce?.lot,
-                            date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                            donViTinh: e?.item?.unit_name,
-                            amount: Number(ce?.quantity),
-                            price: Number(ce?.price),
-                            chietKhau: Number(ce?.discount_percent),
-                            tax: {
-                                tax_rate: ce?.tax_rate,
-                                value: ce?.tax_id,
-                                label: ce?.tax_name,
-                            },
-                            note: ce?.note,
-                        })),
-                    }))
-                );
-                sCode(rResult?.code);
-                sIdBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
-                });
-                sIdSupplier({
-                    label: rResult?.supplier_name,
-                    value: rResult?.supplier_id,
-                });
-                sIdTheOrder({
-                    label: rResult?.purchase_order_code,
-                    value: rResult?.purchase_order_id,
-                });
-                // sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
-                sStartDate(moment(rResult?.date).toDate());
-                sNote(rResult?.note);
-            }
-            sOnFetchingDetail(false);
-        });
-    };
-    useEffect(() => {
-        // onFetchingDetail && _ServerFetchingDetail()
-        //new
-        onFetchingDetail && _ServerFetchingDetailPage();
-    }, [onFetchingDetail]);
+                        serial: ce?.serial == null ? "" : ce?.serial,
+                        lot: ce?.lot == null ? "" : ce?.lot,
+                        date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                        donViTinh: e?.item?.unit_name,
+                        amount: Number(ce?.quantity),
+                        price: Number(ce?.price),
+                        chietKhau: Number(ce?.discount_percent),
+                        tax: {
+                            tax_rate: ce?.tax_rate,
+                            value: ce?.tax_id,
+                            label: ce?.tax_name,
+                        },
+                        note: ce?.note,
+                    })),
+                }))
+            );
+            sCode(rResult?.code);
+            sIdBranch({ label: rResult?.branch_name, value: rResult?.branch_id });
+            sIdSupplier({ label: rResult?.supplier_name, value: rResult?.supplier_id, });
+            sIdTheOrder({ label: rResult?.purchase_order_code, value: rResult?.purchase_order_id, });
+            sStartDate(moment(rResult?.date).toDate());
+            sNote(rResult?.note);
+            return rResult
+        },
+        enabled: !!id
+    })
 
-    useEffect(() => {
-        id &&
-            JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}" &&
-            sOnFetchingDetail(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) !== "{}" &&
-        JSON.stringify(dataProductExpiry) !== "{}" &&
-        JSON.stringify(dataProductSerial) !== "{}",
-    ]);
 
-    const _ServerFetching_TheOrder = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true",
-            {
+    useQuery({
+        queryKey: ['api_not_stock', idSupplier],
+        queryFn: async () => {
+            const db = await apiImport.apiNotStockCombobox('GET', {
                 params: {
                     "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
                     import_id: id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sDataThe_order(
-                        db?.map((e) => ({ label: e?.code, value: e?.id })) || {
-                            label: db?.code,
-                            value: db?.id,
-                        }
-                    );
                 }
-            }
-        );
-        sOnFetchingTheOrder(false);
-    };
+            });
+            sDataThe_order(
+                db?.map((e) => ({ label: e?.code, value: e?.id })) || {
+                    label: db?.code,
+                    value: db?.id,
+                }
+            );
+            return db
+        },
+        enabled: !!idSupplier
+    })
 
-    useEffect(() => {
-        (idSupplier === null && sDataThe_order([])) || sIdTheOrder(null);
-    }, []);
-
-    const _ServerFetching_Supplier = () => {
-        Axios(
-            "GET",
-            "/api_web/api_supplier/supplier/?csrf_protection=true",
-            {
+    useQuery({
+        queryKey: ['api_supplier', idBranch],
+        queryFn: async () => {
+            const { rResult } = await apiSuppliers.apiListSuppliers({
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response?.data;
-                    sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
                 }
-            }
-        );
-        sOnFetchingSupplier(false);
-    };
+            });
+            sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
+            return rResult
+        },
+        enabled: !!idBranch
+    })
+
 
     useEffect(() => {
         (idBranch === null && sDataSupplier([])) || sIdSupplier(null);
+        (idSupplier === null && sDataThe_order([])) || sIdTheOrder(null);
     }, []);
 
     const resetValue = () => {
@@ -483,7 +413,6 @@ const Index = (props) => {
                 item?.matHang.e?.text_type === "products" &&
                 item.child?.some((childItem) => childItem.serial === "" || childItem.serial == null)
         );
-        // const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => (childItem.lot === '')));
         const hasNullLot = listData.some((item) =>
             item.child?.some((childItem) => !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null))
         );
@@ -494,8 +423,6 @@ const Index = (props) => {
         const checkNumber = listData.some((item) =>
             item.child?.some((childItem) => childItem.price == "" || childItem.price == 0 || childItem.amount == "" || childItem.amount == 0)
         );
-
-        // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
         if (
             idSupplier == null ||
             idBranch == null ||
@@ -505,7 +432,6 @@ const Index = (props) => {
             ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullLot) ||
             ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullDate) || checkNumber
         ) {
-            // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
             idSupplier == null && sErrSupplier(true);
             idBranch == null && sErrBranch(true);
             idTheOrder == null && sErrTheOrder(true);
@@ -544,77 +470,40 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetching_ItemsAll = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_purchase_order/searchItemsVariant/?csrf_protection=true",
-            {
+    useQuery({
+        queryKey: ["api_search_items", idTheOrder],
+        queryFn: async () => {
+            const { data } = await apiImport.apiSearchItems({
                 params: {
                     "filter[purchase_order_id]": idTheOrder ? idTheOrder?.value : null,
                     import_id: id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { result } = response?.data?.data;
-                    sDataItems(result);
                 }
-            }
-        );
-        sOnFetchingItemsAll(false);
-    };
+            });
+            sDataItems(data?.result)
+            return data?.result
+        },
+        enabled: !!idTheOrder
+    })
 
-    const _ServerFetching_Warehouse = () => {
-        Axios(
-            "GET",
-            "/api_web/api_warehouse/Getcomboboxlocation/?csrf_protection=true",
-            {
+    useQuery({
+        queryKey: ["api_warehouse", idBranch],
+        queryFn: async () => {
+            const { rResult } = await apiReturnSales.apiComboboxLocation({
                 params: {
-                    "filter[branch_id]": idBranch.value,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var result = response?.data?.rResult;
-                    sDataWarehouse(
-                        result?.map((e) => ({
-                            label: e?.name,
-                            value: e?.id,
-                            warehouse_name: e?.warehouse_name,
-                        }))
-                    );
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
                 }
-            }
-        );
-        sOnFetchingWarehouse(false);
-    };
-    useEffect(() => {
-        onFetchingItemsAll && _ServerFetching_ItemsAll();
-    }, [onFetchingItemsAll]);
+            });
+            sDataWarehouse(rResult?.map((e) => ({
+                label: e?.name,
+                value: e?.id,
+                warehouse_name: e?.warehouse_name,
+            }))
+            );
+            return rResult
+        },
+        enabled: !!idBranch
+    })
 
-    useEffect(() => {
-        onFetchingWarehouser && _ServerFetching_Warehouse();
-    }, [onFetchingWarehouser]);
-
-    useEffect(() => {
-        router.query && sOnFetching(true);
-    }, [router.query]);
-
-    useEffect(() => {
-        idTheOrder != null && sOnFetchingItemsAll(true);
-    }, [idTheOrder]);
-
-    useEffect(() => {
-        idBranch != null && sOnFetchingWarehouse(true);
-    }, [idBranch]);
-
-    useEffect(() => {
-        onFetchingTheOrder && _ServerFetching_TheOrder();
-    }, [onFetchingTheOrder]);
-
-    useEffect(() => {
-        onFetchingSupplier && _ServerFetching_Supplier();
-    }, [onFetchingSupplier]);
 
     useEffect(() => {
         (idBranch == null && sIdTheOrder(null)) ||
@@ -622,14 +511,6 @@ const Index = (props) => {
             (idBranch == null && sDataWarehouse([]));
     }, [idBranch]);
 
-    useEffect(() => {
-        idBranch != null && sOnFetchingSupplier(true);
-    }, [idBranch]);
-
-
-    useEffect(() => {
-        idSupplier != null && sOnFetchingTheOrder(true);
-    }, [idSupplier]);
 
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
 
@@ -826,8 +707,14 @@ const Index = (props) => {
         sStartDate(date);
     };
 
+    const handingImport = useMutation({
+        mutationFn: (data) => {
+            return apiImport.apiHandingImport(id, data);
+        }
+    })
+
     const _ServerSending = () => {
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append("code", code);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch.value);
@@ -840,26 +727,11 @@ const Index = (props) => {
             formData.append(`items[${index}][purchase_order_item_id]`, item?.matHang?.e?.purchase_order_item_id);
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
-                {
-                    id &&
-                        formData.append(
-                            `items[${index}][child][${childIndex}][row_id]`,
-                            typeof childItem?.id == "number" ? childItem?.id : 0
-                        );
-                }
+                { id && formData.append(`items[${index}][child][${childIndex}][row_id]`, typeof childItem?.id == "number" ? childItem?.id : 0); }
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
-                formData.append(
-                    `items[${index}][child][${childIndex}][serial]`,
-                    childItem?.serial === null ? "" : childItem?.serial
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][lot]`,
-                    childItem?.lot === null ? "" : childItem?.lot
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][expiration_date]`,
-                    childItem?.date === null ? "" : formatMoment(childItem?.date, FORMAT_MOMENT.DATE_TIME_LONG)
-                );
+                formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
+                formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
+                formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : formatMoment(childItem?.date, FORMAT_MOMENT.DATE_TIME_LONG));
                 formData.append(`items[${index}][child][${childIndex}][unit_name]`, childItem?.donViTinh);
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
                 formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
@@ -868,47 +740,32 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.chietKhau);
             });
         });
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_import/import/${id}?csrf_protection=true`
-                : "/api_web/Api_import/import/?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", dataLang[message] || message);
-
-                        sCode("");
-                        sStartDate(new Date());
-                        sIdSupplier(null);
-                        sIdBranch(null);
-                        sIdTheOrder(null);
-                        sNote("");
-                        sErrBranch(false);
-                        sErrDate(false);
-                        sErrTheOrder(false);
-                        sErrSupplier(false);
-                        // sOption([{id: Date.now(), mathang: null}])
-                        //new
-                        sListData([]);
-                        router.push(routerImport.home);
+        handingImport.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", dataLang[message] || message);
+                    sCode("");
+                    sStartDate(new Date());
+                    sIdSupplier(null);
+                    sIdBranch(null);
+                    sIdTheOrder(null);
+                    sNote("");
+                    sErrBranch(false);
+                    sErrDate(false);
+                    sErrTheOrder(false);
+                    sErrSupplier(false);
+                    sListData([]);
+                    router.push(routerImport.home);
+                } else {
+                    if (tongTienState.tongTien == 0) {
+                        isShow("error", `Chưa nhập thông tin mặt hàng`);
                     } else {
-                        if (tongTienState.tongTien == 0) {
-                            isShow("success", `Chưa nhập thông tin mặt hàng`);
-                        } else {
-                            isShow("success", dataLang[message] || message);
-                        }
+                        isShow("error", dataLang[message] || message);
                     }
                 }
-                sOnSending(false);
             }
-        );
+        });
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -989,23 +846,18 @@ const Index = (props) => {
             };
             sListData([newData, ...listData]);
         } else {
-            Toast.fire({
-                title: `${"Mặt hàng đã được chọn"}`,
-                icon: "error",
-            });
+            isShow("error", "Mặt hàng đã được chọn");
         }
     };
 
     const _HandleDeleteChild = (parentId, childId) => {
-        const newData = listData
-            .map((e) => {
-                if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.id !== childId);
-                    return { ...e, child: newChild };
-                }
-                return e;
-            })
-            .filter((e) => e.child?.length > 0);
+        const newData = listData.map((e) => {
+            if (e.id === parentId) {
+                const newChild = e.child?.filter((ce) => ce?.id !== childId);
+                return { ...e, child: newChild };
+            }
+            return e;
+        }).filter((e) => e.child?.length > 0);
         sListData([...newData]);
     };
 
@@ -1140,33 +992,23 @@ const Index = (props) => {
         }
     };
 
-    const _HandleSeachApi = debounce((inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true`,
-            {
+    const _HandleSeachApi = debounce(async (inputValue) => {
+        try {
+            const db = apiImport.apiNotStockCombobox('POST', {
                 data: {
                     term: inputValue,
                 },
                 params: {
                     "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
                     import_id: id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    console.log(response?.data);
-                    let db = response?.data
-                    sDataThe_order(
-                        db?.map((e) => ({ label: e?.code, value: e?.id })) || {
-                            label: db?.code,
-                            value: db?.id,
-                        }
-                    );
-                    // sDataItems(data);
                 }
-            }
-        );
+            })
+            sDataThe_order(db?.map((e) => ({ label: e?.code, value: e?.id })) || {
+                label: db?.code,
+                value: db?.id,
+            });
+        } catch (error) {
+        }
     }, 500)
 
     return (
@@ -1203,8 +1045,7 @@ const Index = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione ||
-                                    "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
@@ -1216,9 +1057,7 @@ const Index = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
-                                        placeholder={
-                                            dataLang?.purchase_order_system_default || "purchase_order_system_default"
-                                        }
+                                        placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
@@ -1260,7 +1099,7 @@ const Index = (props) => {
                                         {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
@@ -1316,15 +1155,14 @@ const Index = (props) => {
                                         {dataLang?.import_supplier || "import_supplier"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataSupplier}
                                         onChange={_HandleChangeInput.bind(this, "supplier")}
                                         value={idSupplier}
                                         placeholder={dataLang?.import_supplier || "import_supplier"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errSupplier ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         // components={{ MultiValue }}
@@ -1374,7 +1212,7 @@ const Index = (props) => {
                                         {dataLang?.import_the_orders || "import_the_orders"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         onInputChange={(event) => {
                                             _HandleSeachApi(event)
                                         }}
@@ -1386,8 +1224,7 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_the_orders || "import_the_orders"}
-                                        className={`${errTheOrder ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errTheOrder ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         // components={{ MultiValue }}
                                         style={{
@@ -1654,9 +1491,7 @@ const Index = (props) => {
                                             {props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}
                                         </h4>
                                     </>
-                                ) : (
-                                    ""
-                                )}
+                                ) : ""}
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
                                 </h4>
@@ -1689,7 +1524,7 @@ const Index = (props) => {
                     </div>
                     <div className="grid grid-cols-12 items-center gap-1 py-2">
                         <div className="col-span-2">
-                            <Select
+                            <SelectCore
                                 options={options}
                                 value={null}
                                 onChange={_HandleAddParent.bind(this)}
@@ -1793,18 +1628,16 @@ const Index = (props) => {
                                     ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
                                         ? "grid-cols-13"
                                         : dataMaterialExpiry?.is_enable == "1"
-                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                            : "grid-cols-11"
+                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]" : "grid-cols-11"
                                     : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
                                         ? "grid-cols-12"
                                         : dataMaterialExpiry?.is_enable == "1"
-                                            ? "grid-cols-12"
-                                            : "grid-cols-10"
+                                            ? "grid-cols-12" : "grid-cols-10"
                                     } grid  divide-x border-t border-b border-r border-l`}
                             >
                                 <div className="col-span-1">
                                     {" "}
-                                    <Select
+                                    <SelectCore
                                         classNamePrefix="customDropdowDefault"
                                         placeholder="Kho - vị trí kho"
                                         className="3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
@@ -1918,7 +1751,7 @@ const Index = (props) => {
                     </div>
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px]">
-                            {onFetchingDetail ? (
+                            {isFetching ? (
                                 <Loading className="h-60" color="#0f4f9e" />
                             ) : (
                                 <>
@@ -1929,7 +1762,7 @@ const Index = (props) => {
                                         >
                                             <div className="col-span-2 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-5 mt-5">
-                                                    <Select
+                                                    <SelectCore
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
@@ -2053,7 +1886,7 @@ const Index = (props) => {
                                                     {e?.child?.map((ce) => (
                                                         <React.Fragment key={ce?.id?.toString()}>
                                                             <div className="flex justify-center border-t border-l  h-full p-1 flex-col items-center ">
-                                                                <Select
+                                                                <SelectCore
                                                                     options={warehouse}
                                                                     value={ce?.kho}
                                                                     onChange={_HandleChangeChild.bind(
@@ -2062,13 +1895,7 @@ const Index = (props) => {
                                                                         ce?.id,
                                                                         "kho"
                                                                     )}
-                                                                    className={`${(errWarehouse && ce?.kho == null) ||
-                                                                        (errWarehouse &&
-                                                                            (ce?.kho?.label == null ||
-                                                                                ce?.kho?.warehouse_name == null))
-                                                                        ? "border-red-500 border"
-                                                                        : ""
-                                                                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    className={`${(errWarehouse && ce?.kho == null) || (errWarehouse && (ce?.kho?.label == null || ce?.kho?.warehouse_name == null)) ? "border-red-500 border" : ""}  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={"Kho - vị trí kho"}
                                                                     menuPortalTarget={document.body}
                                                                     formatOptionLabel={(option) => {
@@ -2077,9 +1904,7 @@ const Index = (props) => {
                                                                                 option?.label) && (
                                                                                 <div className="z-[999]">
                                                                                     <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                                                                                        {dataLang?.import_Warehouse ||
-                                                                                            "import_Warehouse"}
-                                                                                        : {option?.warehouse_name}
+                                                                                        {dataLang?.import_Warehouse || "import_Warehouse"}  : {option?.warehouse_name}
                                                                                     </h2>
                                                                                     <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
                                                                                         {option?.label}
@@ -2119,13 +1944,7 @@ const Index = (props) => {
                                                                             disabled={
                                                                                 e?.matHang?.e?.text_type != "products"
                                                                             }
-                                                                            className={`border ${e?.matHang?.e?.text_type != "products"
-                                                                                ? "bg-gray-50"
-                                                                                : errSerial &&
-                                                                                    (ce?.serial == "" ||
-                                                                                        ce?.serial == null)
-                                                                                    ? "border-red-500"
-                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                                            className={`border ${e?.matHang?.e?.text_type != "products" ? "bg-gray-50" : errSerial && (ce?.serial == "" || ce?.serial == null) ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                                                                                 //  && !ce?.disabledDate
                                                                                 //   ? ""
                                                                                 //   : ce?.disabledDate ? "" : ""
@@ -2144,8 +1963,7 @@ const Index = (props) => {
                                                             ) : (
                                                                 ""
                                                             )}
-                                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                                dataProductExpiry.is_enable === "1" ? (
+                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                 <>
                                                                     <div className=" col-span-1  ">
                                                                         <div className="flex justify-center  h-full p-0.5 flex-col items-center">
@@ -2158,13 +1976,7 @@ const Index = (props) => {
                                                                             <input
                                                                                 value={ce?.lot}
                                                                                 disabled={ce?.disabledDate}
-                                                                                className={`border ${ce?.disabledDate
-                                                                                    ? "bg-gray-50"
-                                                                                    : errLot &&
-                                                                                        (ce?.lot == "" ||
-                                                                                            ce?.lot == null)
-                                                                                        ? "border-red-500"
-                                                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                className={`border ${ce?.disabledDate ? "bg-gray-50" : errLot && (ce?.lot == "" || ce?.lot == null) ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                                                     //  && !ce?.disabledDate
                                                                                     //   ? ""
                                                                                     //   : ce?.disabledDate ? "" : ""
@@ -2172,16 +1984,10 @@ const Index = (props) => {
                                                                                 // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
 
                                                                                 // className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded w-[100%] "appearance-none focus:outline-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal    focus:outline-none"`}
-                                                                                onChange={_HandleChangeChild.bind(
-                                                                                    this,
-                                                                                    e?.id,
-                                                                                    ce?.id,
-                                                                                    "lot"
-                                                                                )}
+                                                                                onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
                                                                             />
                                                                         </div>
                                                                     </div>
-
                                                                     <div className=" col-span-1  ">
                                                                         <div className="custom-date-picker flex justify-center h-full p-0.5 flex-col items-center w-full">
                                                                             {/* <input type='date'
@@ -2206,16 +2012,8 @@ const Index = (props) => {
                                                                                                 date
                                                                                             )
                                                                                         }
-                                                                                        placeholder={
-                                                                                            dataLang?.price_quote_system_default ||
-                                                                                            "price_quote_system_default"
-                                                                                        }
-                                                                                        className={`border ${ce?.disabledDate
-                                                                                            ? "bg-gray-50"
-                                                                                            : errDateList &&
-                                                                                                ce?.date == null
-                                                                                                ? "border-red-500"
-                                                                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                        placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                                                                        className={`border ${ce?.disabledDate ? "bg-gray-50" : errDateList && ce?.date == null ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                                                             //  && !ce?.disabledDate
                                                                                             //   ? ""
                                                                                             //   : ce?.disabledDate ? "" : ""
@@ -2249,12 +2047,7 @@ const Index = (props) => {
                                                             <div className="flex items-center justify-center  h-full p-0.5">
                                                                 <button
                                                                     className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                    onClick={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "decrease"
-                                                                    )}
+                                                                    onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}
                                                                 >
                                                                     <Minus
                                                                         className="2xl:scale-100 xl:scale-100 scale-50"
@@ -2262,24 +2055,14 @@ const Index = (props) => {
                                                                     />
                                                                 </button>
                                                                 <InPutNumericFormat
-                                                                    onValueChange={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "amount"
-                                                                    )}
+                                                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
                                                                     value={ce?.amount}
                                                                     isAllowed={isAllowedNumber}
                                                                     className={`${ce?.amount == 0 && 'border-red-500' || ce?.amount == "" && 'border-red-500'} appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200`}
                                                                 />
                                                                 <button
                                                                     className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                    onClick={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "increase"
-                                                                    )}
+                                                                    onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}
                                                                 >
                                                                     <Add
                                                                         className="2xl:scale-100 xl:scale-100 scale-50"
@@ -2289,27 +2072,16 @@ const Index = (props) => {
                                                             </div>
                                                             <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                 <InPutMoneyFormat
-                                                                    className={`
-                                                                    ${ce?.price == 0 && 'border-red-500' || ce?.price == "" && 'border-red-500'} 
+                                                                    className={`${ce?.price == 0 && 'border-red-500' || ce?.price == "" && 'border-red-500'} 
                                                                     appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b border-gray-200 h-fit`}
-                                                                    onValueChange={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "price"
-                                                                    )}
+                                                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
                                                                     value={ce?.price}
                                                                 />
                                                             </div>
                                                             <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                 <InPutNumericFormat
                                                                     className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b border-gray-200"
-                                                                    onValueChange={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "chietKhau"
-                                                                    )}
+                                                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "chietKhau")}
                                                                     value={ce?.chietKhau}
                                                                     isAllowed={isAllowedDiscount}
                                                                 />
@@ -2317,25 +2089,15 @@ const Index = (props) => {
                                                             {/* <div>{ce?.priceAfter}</div> */}
                                                             <div className="col-span-1  text-right flex items-center justify-end  h-full p-0.5">
                                                                 <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                    {formatMoney(
-                                                                        Number(ce?.price) *
-                                                                        (1 - Number(ce?.chietKhau) / 100)
-                                                                    )}
+                                                                    {formatMoney(Number(ce?.price) * (1 - Number(ce?.chietKhau) / 100))}
                                                                 </h3>
                                                             </div>
                                                             <div className=" flex flex-col items-center p-0.5 h-full justify-center">
-                                                                <Select
+                                                                <SelectCore
                                                                     options={taxOptions}
                                                                     value={ce?.tax}
-                                                                    onChange={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "tax"
-                                                                    )}
-                                                                    placeholder={
-                                                                        dataLang?.import_from_tax || "import_from_tax"
-                                                                    }
+                                                                    onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "tax")}
+                                                                    placeholder={dataLang?.import_from_tax || "import_from_tax"}
                                                                     className={`  3xl:text-[12px] 2xl:text-[10px] p-1 xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                                                                     menuPortalTarget={document.body}
                                                                     style={{
@@ -2364,23 +2126,13 @@ const Index = (props) => {
                                                             </div>
                                                             {/* <div>{ce?.thanhTien}</div> */}
                                                             <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                {formatMoney(
-                                                                    ce?.price *
-                                                                    (1 - Number(ce?.chietKhau) / 100) *
-                                                                    (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                                                    Number(ce?.amount)
-                                                                )}
+                                                                {formatMoney(ce?.price * (1 - Number(ce?.chietKhau) / 100) * (1 + Number(ce?.tax?.tax_rate) / 100) * Number(ce?.amount))}
                                                             </div>
                                                             {/* <div>{ce?.note}</div> */}
                                                             <div className="col-span-1  flex items-center justify-center  h-full p-0.5">
                                                                 <input
                                                                     value={ce?.note}
-                                                                    onChange={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "note"
-                                                                    )}
+                                                                    onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
                                                                     placeholder="Ghi chú"
                                                                     type="text"
                                                                     className="  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
@@ -2389,11 +2141,7 @@ const Index = (props) => {
                                                             <div className=" h-full p-0.5 flex flex-col items-center justify-center ">
                                                                 <button
                                                                     title="Xóa"
-                                                                    onClick={_HandleDeleteChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id
-                                                                    )}
+                                                                    onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
                                                                     className=" text-red-500 flex flex-col justify-center items-center"
                                                                 >
                                                                     <IconDelete />
@@ -2424,7 +2172,7 @@ const Index = (props) => {
                         </div>
                         <div className="col-span-2 flex items-center gap-2 ">
                             <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
-                            <Select
+                            <SelectCore
                                 options={taxOptions}
                                 onChange={_HandleChangeInput.bind(this, "thuetong")}
                                 value={thuetong}
@@ -2577,9 +2325,7 @@ const Index = (props) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =
                                                     Number(childItem?.price * (1 - childItem?.chietKhau / 100)) *
-                                                    (isNaN(childItem?.tax?.tax_rate)
-                                                        ? 0
-                                                        : Number(childItem?.tax?.tax_rate) / 100) *
+                                                    (isNaN(childItem?.tax?.tax_rate) ? 0 : Number(childItem?.tax?.tax_rate) / 100) *
                                                     Number(childItem?.amount);
                                                 return childAccumulator + product;
                                             }, 0);
@@ -2601,10 +2347,7 @@ const Index = (props) => {
                                     {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                                                const product =
-                                                    Number(childItem?.price * (1 - childItem?.chietKhau / 100)) *
-                                                    (1 + Number(childItem?.tax?.tax_rate) / 100) *
-                                                    Number(childItem?.amount);
+                                                const product = Number(childItem?.price * (1 - childItem?.chietKhau / 100)) * (1 + Number(childItem?.tax?.tax_rate) / 100) * Number(childItem?.amount);
                                                 return childAccumulator + product;
                                             }, 0);
                                             return accumulator + childTotal;

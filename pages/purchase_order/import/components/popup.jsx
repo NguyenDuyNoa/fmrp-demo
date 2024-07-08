@@ -1,17 +1,4 @@
-import { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-
-import "react-datepicker/dist/react-datepicker.css";
-
-
-import Loading from "components/UI/loading";
-import PopupCustom from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-
-
-
+import apiImport from "@/Api/apiPurchaseOrder/apiImport";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -19,15 +6,21 @@ import { TagSingle } from "@/components/UI/common/Tag/TagSingle";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import NoData from "@/components/UI/noData/nodata";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import ImageErrors from "components/UI/imageErrors";
+import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
-import { useEffect } from "react";
+import { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import PopupCustom from "/components/UI/popup";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -35,15 +28,10 @@ const Popup_chitiet = (props) => {
 
     const [data, sData] = useState();
 
-    const [onFetching, sOnFetching] = useState(false);
-
     const dataSeting = useSetingServer()
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting)
@@ -53,33 +41,21 @@ const Popup_chitiet = (props) => {
         return formatMoneyConfig(+number, dataSeting)
     };
 
-    const _ServerFetching_detailOrder = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    const db = response.data;
-
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        (onFetching && _ServerFetching_detailOrder())
-    }, [open]);
-
+    const { isFetching } = useQuery({
+        queryKey: ['api_detail_import', props?.id],
+        queryFn: async () => {
+            const db = await apiImport.apiDetailImport(props?.id);
+            sData(db);
+            return db
+        },
+        enabled: open && !!props?.id,
+        ...reTryQuery
+    })
 
     return (
         <>
             <PopupCustom
-                title={
-                    props.dataLang?.import_detail_title || "import_detail_title"
-                }
+                title={props.dataLang?.import_detail_title || "import_detail_title"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -235,7 +211,7 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.import_from_note || "import_from_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading
                                             className="max-h-28"
                                             color="#0f4f9e"

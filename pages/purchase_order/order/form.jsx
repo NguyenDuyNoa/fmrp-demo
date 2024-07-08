@@ -10,6 +10,7 @@ import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyForma
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -446,6 +447,7 @@ const Index = (props) => {
 
             return { result, rResult };
         },
+        ...reTryQuery
     })
 
     useQuery({
@@ -457,6 +459,7 @@ const Index = (props) => {
 
             return rResult;
         },
+        ...reTryQuery,
         enabled: !!idBranch
     })
 
@@ -474,6 +477,7 @@ const Index = (props) => {
 
             return rResult;
         },
+        ...reTryQuery,
         enabled: !!idSupplier
     })
 
@@ -491,6 +495,7 @@ const Index = (props) => {
 
             return db
         },
+        ...reTryQuery,
         enabled: !!loai == "1"
     })
 
@@ -508,6 +513,7 @@ const Index = (props) => {
 
             return data
         },
+        ...reTryQuery,
         enabled: idPurchases?.length > 0
     })
 
@@ -517,6 +523,7 @@ const Index = (props) => {
         queryFn: async () => {
             _ServerFetching_ItemsAll();
         },
+        ...reTryQuery,
         enabled: !!onFetchingItemsAll
     })
 

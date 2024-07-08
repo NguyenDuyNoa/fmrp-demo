@@ -46,5 +46,11 @@ const apiComons = {
         return response.data
 
     },
+    // phương thức xử lý
+    async apiListTreatment(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true`, params);
+        return response.data
+
+    },
 }
 export default apiComons

@@ -1,29 +1,4 @@
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-
-
-import vi from "date-fns/locale/vi";
-import { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-registerLocale("vi", vi);
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import Loading from "components/UI/loading";
-import PopupCustom from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import { useEffect } from "react";
-
-import ImageErrors from "components/UI/imageErrors";
-import ExpandableContent from "components/UI/more";
-
-
+import apiReturns from "@/Api/apiPurchaseOrder/apiReturns";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -36,6 +11,18 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
+import ImageErrors from "components/UI/imageErrors";
+import Loading from "components/UI/loading";
+import ExpandableContent from "components/UI/more";
+import vi from "date-fns/locale/vi";
+import { useState } from "react";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import PopupCustom from "/components/UI/popup";
+import { reTryQuery } from "@/configs/configRetryQuery";
+registerLocale("vi", vi);
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -43,16 +30,9 @@ const Popup_chitiet = (props) => {
 
     const [data, sData] = useState();
 
-    const [onFetching, sOnFetching] = useState(false);
-
     const dataSeting = useSetingServer()
 
-
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
-
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -62,25 +42,17 @@ const Popup_chitiet = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     }
 
-    const _ServerFetching_detailOrder = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
+    const { isFetching } = useQuery({
+        queryKey: ["api_detail_return", props?.id],
+        queryFn: async () => {
+            const db = await apiReturns.apiDetailReturns(props?.id);
+            sData(db);
+            return db
+        },
+        enabled: open && !!props?.id,
+        ...reTryQuery
+    })
 
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        (onFetching && _ServerFetching_detailOrder())
-    }, [open]);
 
     return (
         <>
@@ -225,7 +197,7 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.import_from_note || "import_from_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading
                                             className="max-h-28"
                                             color="#0f4f9e"

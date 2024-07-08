@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -12,6 +9,8 @@ import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
