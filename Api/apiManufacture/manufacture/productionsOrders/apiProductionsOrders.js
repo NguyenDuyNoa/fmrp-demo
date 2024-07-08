@@ -1,88 +1,51 @@
 import { _ServerInstance as axiosCustom } from "@/services/axios";
 const apiProductionsOrders = {
     async apiProductionOrders(page, limit, param) {
-        try {
-            // Danh sách LSX tổng
-            const response = await axiosCustom('GET', `api_web/api_manufactures/getProductionOrders?page=${page}&limit=${limit}`, param);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        // Danh sách LSX tổng
+        const response = await axiosCustom('GET', `api_web/api_manufactures/getProductionOrders?page=${page}&limit=${limit}`, param);
+        return response.data
     },
     async apiDetailProductionOrders(id) {
-        try {
-            // api chi tiết danh sách LSX tổng
-            const response = await axiosCustom('GET', `/api_web/api_manufactures/getDetailProductionOrder/${id}`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        // api chi tiết danh sách LSX tổng
+        const response = await axiosCustom('GET', `/api_web/api_manufactures/getDetailProductionOrder/${id}`);
+        return response.data
     },
     // bộ lọc lsx
     async apiComboboxProductionOrders(param) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_manufactures/searchPO`, param);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        const response = await axiosCustom('GET', `/api_web/api_manufactures/searchPO`, param);
+        return response.data
     },
     // bộ lọc lsx chi tiết
     async apiComboboxProductionOrdersDetail() {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_manufactures/searchPODetail`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        const response = await axiosCustom('GET', `/api_web/api_manufactures/searchPODetail`);
+        return response.data
     },
     // api chi tiết lsx
     async apiItemOrdersDetail(id) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_manufactures/getPOD/${id}`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        const response = await axiosCustom('GET', `/api_web/api_manufactures/getPOD/${id}`);
+        return response.data
     },
     // Tình hình xuất NVL danh sách giữ liệu
     async apiExportSituation(id) {
-        try {
-            const response = await axiosCustom('GET', `/api_web/api_manufactures/getListBomPOD/${id}`);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        const response = await axiosCustom('GET', `/api_web/api_manufactures/getListBomPOD/${id}`);
+        return response.data
     },
     // api đổi trạng thái sản xuất
     async apiAgreeProcess(data) {
-        try {
-            const response = await axiosCustom('POST', `/api_web/api_manufactures/agreeProcess`, data);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/agreeProcess`, data);
+        return response.data
     },
     // Lấy dữ liệu trước khi nhập sản xuất
 
     async apiDataProducts(data) {
-        try {
-            const response = await axiosCustom('POST', `/api_web/api_manufactures/getDataProducts`, data);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/getDataProducts`, data);
+        return response.data
     },
     // lấy combobox kho của NVL/BTP xuất
     async apiDataWarehousePo(data) {
-        try {
-            const response = await axiosCustom('POST', `/api_web/api_manufactures/searchWarehousePOD`, data);
-            return response.data
-        } catch (error) {
-            throw error;
-        }
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/searchWarehousePOD`, data);
+        return response.data
     },
-    // /api_web/api_manufactures/searchWarehousePOD
 
 }
 export default apiProductionsOrders

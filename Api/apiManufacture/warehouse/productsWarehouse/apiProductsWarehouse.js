@@ -52,9 +52,7 @@ const apiProductsWarehouse = {
         return response.data
     },
     async apiHandingProdcutsWarehouse(id, data) {
-        const response = await axiosCustom('POST', id
-            ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true`
-            : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`, data);
+        const response = await axiosCustom('POST', id ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true` : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`, data);
         return response.data
     },
 
