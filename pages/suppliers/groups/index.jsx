@@ -33,6 +33,7 @@ import React, { useState } from "react";
 import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import Popup_groupKh from "./components/popup";
+import { reTryQuery } from "@/configs/configRetryQuery";
 const Index = (props) => {
     const router = useRouter();
 
@@ -80,6 +81,7 @@ const Index = (props) => {
 
             queryState({ data: rResult, data_ex: rResult });
         },
+        ...reTryQuery
     })
 
 

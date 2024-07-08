@@ -31,6 +31,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Pagination from "/components/UI/pagination";
+import { reTryQuery } from "@/configs/configRetryQuery";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -84,9 +85,9 @@ const Index = (props) => {
             queryState({ data: rResult, data_ex: rResult });
 
             return rResult
-        }
+        },
+        ...reTryQuery
     })
-
 
     const { data } = useQuery({
         queryKey: ["api_branch"],

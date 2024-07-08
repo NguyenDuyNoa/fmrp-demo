@@ -1,25 +1,23 @@
 import { useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import ModalImage from "react-modal-image";
-
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
-
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import ModalImage from "react-modal-image";
 const Popup_chitietThere = (props) => {
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
@@ -49,16 +47,11 @@ const Popup_chitietThere = (props) => {
     const _ServerFetching_detailThere = () => {
         Axios(
             "GET",
-            `${(props?.type == "import" &&
-                `/api_web/Api_import/import/${props?.id}?csrf_protection=true`) ||
-            (props?.type == "service" &&
-                `/api_web/Api_service/service/${props?.id}?csrf_protection=true`) ||
-            (props?.type == "deposit" &&
-                `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`) ||
-            (props?.type == "1" &&
-                `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`) ||
-            (props?.type == "typePo" &&
-                `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`)
+            `${(props?.type == "import" && `/api_web/Api_import/import/${props?.id}?csrf_protection=true`) ||
+            (props?.type == "service" && `/api_web/Api_service/service/${props?.id}?csrf_protection=true`) ||
+            (props?.type == "deposit" && `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`) ||
+            (props?.type == "1" && `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`) ||
+            (props?.type == "typePo" && `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`)
             }`,
             {},
             (err, response) => {
@@ -111,8 +104,7 @@ const Popup_chitietThere = (props) => {
                                                     {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                                 </h3>
                                                 <h3 className=" text-[13px]  font-medium">
-                                                    {data?.date != null
-                                                        ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
+                                                    {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                 </h3>
                                             </div>
                                             <div className="my-4 font-semibold grid grid-cols-2">
@@ -139,18 +131,13 @@ const Popup_chitietThere = (props) => {
                                                     {props.dataLang?.import_payment_status || "import_payment_status"}
                                                 </h3>
                                                 <div className="flex flex-wrap  gap-2 items-center justify-center">
-                                                    {(data?.status_pay ===
-                                                        "not_spent" && (
-                                                            <TagColorSky className={'!py-1'} name={"Chưa chi"} />
+                                                    {(data?.status_pay === "not_spent" && (<TagColorSky className={'!py-1'} name={"Chưa chi"} />)) ||
+                                                        (data?.status_pay === "spent_part" && (
+                                                            <TagColorOrange className={'!py-1'} name={`Chi 1 phần (${formatNumber(data?.amount_paid)})`} />
                                                         )) ||
-                                                        (data?.status_pay ===
-                                                            "spent_part" && (
-                                                                <TagColorOrange className={'!py-1'} name={`Chi 1 phần (${formatNumber(data?.amount_paid)})`} />
-                                                            )) ||
-                                                        (data?.status_pay ===
-                                                            "spent" && (
-                                                                <TagColorLime name={'Đã chi đủ'} />
-                                                            ))}
+                                                        (data?.status_pay === "spent" && (
+                                                            <TagColorLime name={'Đã chi đủ'} />
+                                                        ))}
                                                 </div>
                                             </div>
                                             <div className="my-4 font-medium grid grid-cols-2">
@@ -179,9 +166,7 @@ const Popup_chitietThere = (props) => {
                                                     <div className="relative">
                                                         <ImageErrors
                                                             src={
-                                                                data
-                                                                    ?.staff_create
-                                                                    ?.profile_image
+                                                                data?.staff_create?.profile_image
                                                             }
                                                             width={25}
                                                             height={25}
@@ -277,15 +262,9 @@ const Popup_chitietThere = (props) => {
                                                                             ?.images !=
                                                                             null ? (
                                                                             <ModalImage
-                                                                                small={
-                                                                                    e
-                                                                                        ?.item
-                                                                                        ?.images
-                                                                                }
+                                                                                small={e?.item?.images}
                                                                                 large={
-                                                                                    e
-                                                                                        ?.item
-                                                                                        ?.images
+                                                                                    e?.item?.images
                                                                                 }
                                                                                 alt="Product Image"
                                                                                 className="custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto"
@@ -305,9 +284,7 @@ const Popup_chitietThere = (props) => {
                                                                     <h6 className="text-[13px]  px-2 py-0.5 col-span-2 text-left">
                                                                         <h6 className="font-medium">
                                                                             {
-                                                                                e
-                                                                                    ?.item
-                                                                                    ?.name
+                                                                                e?.item?.name
                                                                             }
                                                                         </h6>
                                                                         <div className="flex-col items-center font-oblique flex-wrap">
@@ -377,8 +354,7 @@ const Popup_chitietThere = (props) => {
                                                                         {formatMoney(e?.amount)}
                                                                     </h6>
                                                                     <h6 className="text-[13px] font-medium   py-0.5 col-span-1 text-left ml-3.5">
-                                                                        {e?.note !=
-                                                                            undefined ? (
+                                                                        {e?.note != undefined ? (
                                                                             <ExpandableContent
                                                                                 content={e?.note}
                                                                             />

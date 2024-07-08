@@ -1,21 +1,7 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import ModalImage from "react-modal-image";
-
-import { Grid6, Edit as IconEdit } from "iconsax-react";
-
-import { debounce } from "lodash";
-import { useSelector } from "react-redux";
-
-import Popup_kho from "./components/popup";
-
-import useSetingServer from "@/hooks/useConfigNumber";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import useActionRole from "@/hooks/useRole";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
+import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiVariant from "@/Api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -31,17 +17,25 @@ import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-
-import apiComons from "@/Api/apiComon/apiComon";
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
-import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiVariant from "@/Api/apiSettings/apiVariant";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { PopupParent } from "@/utils/lib/Popup";
+import { Grid6, Edit as IconEdit } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import ModalImage from "react-modal-image";
+import { useSelector } from "react-redux";
+import Popup_kho from "./components/popup";
 
 const Index = (props) => {
     const dataLang = props.dataLang;

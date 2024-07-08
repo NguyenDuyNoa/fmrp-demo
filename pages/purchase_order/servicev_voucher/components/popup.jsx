@@ -62,8 +62,6 @@ const Popup_servie = (props) => {
 
     const _HandleCloseModal = () => sOpen(false);
 
-    const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
-
     const [onSending, sOnSending] = useState(false);
 
     const [option, sOption] = useState([

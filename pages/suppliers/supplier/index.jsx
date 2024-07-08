@@ -33,6 +33,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Popup_chitiet from "./components/popup/detail";
 import Popup_dsncc from "./components/popup/popup";
+import { reTryQuery } from "@/configs/configRetryQuery";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -98,6 +99,7 @@ const Index = (props) => {
 
             queryState({ data: rResult, data_ex: rResult });
         },
+        ...reTryQuery
     })
 
     const { data } = useQuery({

@@ -35,6 +35,7 @@ import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useQuery } from "@tanstack/react-query";
+import { reTryQuery } from "@/configs/configRetryQuery";
 
 const Index = (props) => {
     const isShow = useToast();
@@ -85,7 +86,8 @@ const Index = (props) => {
             queryState({ data: rResult || [], data_ex: rResult || [] });
 
             return rResult
-        }
+        },
+        ...reTryQuery
     })
 
     const { isLoading: loadingBranch } = useQuery({
