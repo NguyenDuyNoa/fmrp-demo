@@ -1,25 +1,7 @@
-import {
-    Grid6
-} from "iconsax-react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
-
-import { _ServerInstance as Axios } from "/services/axios";
-
-import Popup_chitiet from "./components/detail";
-import Popup_servie from "./components/popup";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
+import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
 import { BtnAction } from "@/components/UI/BtnAction";
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
-
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -41,7 +23,10 @@ import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComp
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -53,8 +38,19 @@ import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
+import vi from "date-fns/locale/vi";
+import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
+import Popup_servie from "./components/popup";
+import Popup_detail from "./components/popup_detail";
+registerLocale("vi", vi);
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -78,7 +74,6 @@ const Index = (props) => {
 
     const initialState = {
         onFetching: false,
-        onFetchingFilter: false,
         onFetchingGroup: false,
         data: [],
         dataExcel: [],
@@ -110,107 +105,83 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
-        queryState({ onFetchingFilter: true, onFetchingGroup: true });
+        queryState({ onFetchingGroup: true });
     }, []);
 
-    const _ServerFetching = () => {
-        const tabPage = router.query?.tab;
-        Axios(
-            "GET",
-            `/api_web/Api_service/service/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[status_bar]": tabPage ? tabPage : null,
-                    "filter[id]": isState.valueCode != null ? isState.valueCode?.value : null,
-                    "filter[branch_id]": isState.valueBr != null ? isState.valueBr.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data;
-                    sTotalItems(output);
-                    sTotal(rTotal);
-                    queryState({ data: rResult, dataExcel: rResult });
-                }
-                queryState({ onFetching: false });
-            }
-        );
-    };
 
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { result } = response?.data;
-                queryState({ listBr: result?.map((e) => ({ label: e.name, value: e.id })) });
-            }
-        });
+    const params = {
+        search: isState.keySearch,
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[status_bar]": router.query?.tab ? router.query?.tab : null,
+        "filter[id]": isState.valueCode != null ? isState.valueCode?.value : null,
+        "filter[branch_id]": isState.valueBr != null ? isState.valueBr.value : null,
+        "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+        "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+    }
 
-        Axios("GET", `/api_web/Api_service/serviceCombobox/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { result } = response?.data;
-                queryState({ listCode: result?.map((e) => ({ label: e?.code, value: e?.id })) });
-            }
-        });
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["servicev_voucher", { ...params }],
+        queryFn: async () => {
+            const { rResult, output, rTotal } = await apiServiceVoucher.apiListServiceVoucher({ params });
+            sTotalItems(output);
+            sTotal(rTotal);
+            queryState({ data: rResult, dataExcel: rResult });
+            return rResult
+        },
+        enabled: !!router.query?.tab,
+        ...reTryQuery
+    })
 
-        Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response?.data;
-                queryState({ listUser: rResult });
-            }
-        });
-        queryState({ onFetchingFilter: false });
-    };
+    useQuery({
+        queryKey: ["servicev_voucher_filter"],
+        queryFn: async () => {
+            const { result: listBr } = await apiComons.apiBranchCombobox();
 
-    useEffect(() => {
-        isState.onFetchingFilter && _ServerFetching_filter();
-    }, [isState.onFetchingFilter]);
+            const { result: listCode } = await apiServiceVoucher.apiServiceCombobox('GET');
 
-    const _HandleSeachApi = debounce((inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
-            {
+            const { rResult: listUser } = await apiPurchases.apiStaffOptionPurchases();
+
+            queryState({
+                listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
+                listCode: listCode?.map((e) => ({ label: e?.code, value: e?.id })) || [],
+                listUser: listUser || []
+            });
+            return { listBr, listCode, listUser }
+        },
+        ...reTryQuery
+    })
+
+    const _HandleSeachApi = debounce(async (inputValue) => {
+        try {
+            const { isSuccess, result } = await apiServiceVoucher.apiServiceCombobox('POST', {
                 data: {
-                    term: inputValue,
+                    term: inputValue
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, result } = response?.data;
-                    queryState({ listCode: result?.map((e) => ({ label: e?.code, value: e?.id })) });
-                }
-            }
-        );
+            });
+
+            queryState({ listCode: result?.map((e) => ({ label: e?.code, value: e?.id })) });
+        } catch (error) {
+
+        }
     }, 500);
 
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_service/filterBar/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    "filter[id]": isState.valueCode != null ? isState.valueCode?.value : null,
-                    "filter[branch_id]": isState.valueBr != null ? isState.valueBr.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    queryState({ listDs: data });
-                }
-                queryState({ onFetchingGroup: false });
-            }
-        );
-    };
+    const { refetch: refetchFilter } = useQuery({
+        queryKey: ["servicev_voucher_filterbar", {
+            ...params,
+            limit: 0,
+            page: undefined,
+            "filter[status_bar]": undefined
+        }],
+        queryFn: async () => {
+            const data = await apiServiceVoucher.apiFilterBar();
+            queryState({ listDs: data });
+            return data
+        },
+        enabled: !!router.query?.tab
+    })
+
+
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -220,29 +191,8 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
 
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
-
-    useEffect(() => {
-        isState.onFetchingGroup && _ServerFetching_group();
-    }, [isState.onFetchingGroup]);
-
-    useEffect(() => {
-        queryState({ onFetching: true, onFetchingGroup: true });
-    }, [limit, router.query?.page, router.query?.tab, isState.valueBr, isState.valueCode, isState.valueDate]);
-
-    // const formatNumber = (number) => {
-    //     if (!number && number !== 0) return 0;
-    //     const integerPart = Math.floor(number);
-    //     const decimalPart = number - integerPart;
-    //     const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-    //     const roundedNumber = integerPart + roundedDecimalPart;
-    //     return roundedNumber.toLocaleString("en");
-    // };
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -377,21 +327,6 @@ const Index = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        {/* <div className="flex justify-between">
-                            <h2 className="text-2xl text-[#52575E] capitalize">
-                                {dataLang?.serviceVoucher_title_lits || "serviceVoucher_title_lits"}
-                            </h2>
-                            <div className="flex justify-end items-center">
-                                <Popup_servie
-                                    onRefreshGroup={_ServerFetching_group.bind(this)}
-                                    onRefresh={_ServerFetching.bind(this)}
-                                    dataLang={dataLang}
-                                    className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                >
-                                    {dataLang?.serviceVoucher_create_new || "serviceVoucher_create_new"}
-                                </Popup_servie>
-                            </div>
-                        </div> */}
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.serviceVoucher_title_lits || "serviceVoucher_title_lits"}
@@ -399,8 +334,8 @@ const Index = (props) => {
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
                                     <Popup_servie
-                                        onRefreshGroup={_ServerFetching_group.bind(this)}
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefreshGroup={refetchFilter.bind(this)}
+                                        onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
@@ -418,24 +353,22 @@ const Index = (props) => {
                             </div>
                         </div>
                         <ContainerFilterTab>
-                            {isState.listDs &&
-                                isState.listDs.map((e) => {
-                                    return (
-                                        <div>
-                                            <TabFilter
-                                                backgroundColor="#e2f0fe"
-                                                dataLang={dataLang}
-                                                key={e.id}
-                                                onClick={_HandleSelectTab.bind(this, `${e.id}`)}
-                                                total={e.count}
-                                                active={e.id}
-                                                className={"text-[#0F4F9E] "}
-                                            >
-                                                {dataLang[e?.name] || e?.name}
-                                            </TabFilter>
-                                        </div>
-                                    );
-                                })}
+                            {isState.listDs && isState.listDs.map((e) => {
+                                return (
+                                    <div key={e?.id}>
+                                        <TabFilter
+                                            backgroundColor="#e2f0fe"
+                                            dataLang={dataLang}
+                                            onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                            total={e?.count}
+                                            active={e?.id}
+                                            className={"text-[#0F4F9E] "}
+                                        >
+                                            {dataLang[e?.name] || e?.name}
+                                        </TabFilter>
+                                    </div>
+                                );
+                            })}
                         </ContainerFilterTab>
                         <ContainerTable>
                             <div className="xl:space-y-3 space-y-2">
@@ -451,8 +384,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.serviceVoucher_branch || "serviceVoucher_branch",
+                                                        label: dataLang?.serviceVoucher_branch || "serviceVoucher_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
@@ -470,18 +402,13 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.serviceVoucher_voucher_code ||
-                                                            "serviceVoucher_voucher_code",
+                                                        label: dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listCode,
                                                 ]}
                                                 onChange={(e) => queryState({ valueCode: e })}
-                                                placeholder={
-                                                    dataLang?.serviceVoucher_voucher_code ||
-                                                    "serviceVoucher_voucher_code"
-                                                }
+                                                placeholder={dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}
                                                 isClearable={true}
                                                 colSpan={2}
                                             />
@@ -494,7 +421,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
@@ -544,8 +471,7 @@ const Index = (props) => {
                                             {dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.serviceVoucher_status_of_spending ||
-                                                "serviceVoucher_status_of_spending"}
+                                            {dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_note || "serviceVoucher_note"}
@@ -557,7 +483,7 @@ const Index = (props) => {
                                             {dataLang?.serviceVoucher_operation || "serviceVoucher_operation"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
@@ -565,12 +491,10 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={12} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>
-                                                            <Popup_chitiet
+                                                            <Popup_detail
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out px-2 col-span-1 text-center text-[#0F4F9E]  cursor-pointer"
                                                                 name={e?.code}
@@ -597,15 +521,9 @@ const Index = (props) => {
                                                                 <TagColorSky name={"Chưa chi"} />
                                                             )) ||
                                                                 (e?.status_pay === "spent_part" && (
-                                                                    <TagColorOrange
-                                                                        name={`Chi 1 phần (${formatNumber(
-                                                                            e?.amount_paid
-                                                                        )})`}
-                                                                    />
+                                                                    <TagColorOrange name={`Chi 1 phần (${formatNumber(e?.amount_paid)})`} />
                                                                 )) ||
-                                                                (e?.status_pay === "spent" && (
-                                                                    <TagColorLime name={"Đã chi đủ"} />
-                                                                ))}
+                                                                (e?.status_pay === "spent" && (<TagColorLime name={"Đã chi đủ"} />))}
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={1}
@@ -619,8 +537,8 @@ const Index = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex justify-center">
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
+                                                                onRefreshGroup={refetchFilter.bind(this)}
                                                                 dataLang={dataLang}
                                                                 status_pay={e?.status_pay}
                                                                 type="servicev_voucher"

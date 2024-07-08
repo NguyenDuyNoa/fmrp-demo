@@ -1,16 +1,4 @@
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import Loading from "components/UI/loading";
-import PopupCustom from "/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-
+import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -21,20 +9,22 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from "@tanstack/react-query";
 import ImageErrors from "components/UI/imageErrors";
+import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
-import { useEffect } from "react";
+import { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import PopupCustom from "/components/UI/popup";
 
-const Popup_chitiet = (props) => {
+const Popup_detail = (props) => {
     const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-    const [data, sData] = useState();
-    const [onFetching, sOnFetching] = useState(false);
-    const dataSeting = useSetingServer();
 
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
+    const _ToggleModal = (e) => sOpen(e);
+
+    const [data, sData] = useState();
+
+    const dataSeting = useSetingServer();
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -44,29 +34,21 @@ const Popup_chitiet = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     }
 
-    const _ServerFetching_detailUser = () => {
-        Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    const db = response.data;
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
+    const { isFetching } = useQuery({
+        queryKey: ["detail_service", props?.id],
+        queryFn: async () => {
+            const res = await apiServiceVoucher.apiDetailService(props?.id);
+            sData(res);
+            return res
+        },
+        enabled: open && !!props?.id,
+    })
 
-    useEffect(() => {
-        onFetching && _ServerFetching_detailUser();
-    }, [open]);
 
     return (
         <>
             <PopupCustom
-                title={
-                    props.dataLang?.serviceVoucher_service_voucher_details || "serviceVoucher_service_voucher_details"
-                }
+                title={props.dataLang?.serviceVoucher_service_voucher_details || "serviceVoucher_service_voucher_details"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -86,8 +68,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null
-                                                    ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-2 items-center font-medium grid grid-cols-2">
@@ -112,17 +93,14 @@ const Popup_chitiet = (props) => {
                                                 </div>
                                                 <h6 className="capitalize">
                                                     {
-                                                        data?.staff_create
-                                                            ?.full_name
+                                                        data?.staff_create?.full_name
                                                     }
                                                 </h6>
                                             </div>
                                         </div>{" "}
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.serviceVoucher_voucher_code ||
-                                                    "serviceVoucher_voucher_code"}
+                                                {props.dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium text-blue-600">
                                                 {data?.code}
@@ -131,25 +109,18 @@ const Popup_chitiet = (props) => {
                                     </div>
                                     <div className="col-span-2 mx-auto">
                                         <div className="my-4 font-semibold text-[13px]">
-                                            {props.dataLang
-                                                ?.serviceVoucher_status_of_spending ||
-                                                "serviceVoucher_status_of_spending"}
+                                            {props.dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}
                                         </div>
                                         <div className="flex flex-wrap  gap-2 items-center justify-center">
-                                            {(data?.status_pay ===
-                                                "not_spent" && (
-                                                    <TagColorSky className={'!py-1'} name={"Chưa chi"} />
+                                            {(data?.status_pay === "not_spent" && (
+                                                <TagColorSky className={'!py-1'} name={"Chưa chi"} />
+                                            )) ||
+                                                (data?.status_pay === "spent_part" && (
+                                                    <TagColorOrange name={`Chi 1 phần ${formatNumber(data?.amount_paid)}`} />
                                                 )) ||
-                                                (data?.status_pay ===
-                                                    "spent_part" && (
-                                                        <TagColorOrange name={`Chi 1 phần ${formatNumber(
-                                                            data?.amount_paid
-                                                        )}`} />
-                                                    )) ||
-                                                (data?.status_pay ===
-                                                    "spent" && (
-                                                        <TagColorLime className={'!py-1'} name={"Đã chi đủ"} />
-                                                    ))}
+                                                (data?.status_pay === "spent" && (
+                                                    <TagColorLime className={'!py-1'} name={"Đã chi đủ"} />
+                                                ))}
                                         </div>
                                     </div>
 
@@ -202,18 +173,14 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading
                                             className="max-h-28"
                                             color="#0f4f9e"
                                         />
                                     ) : data?.item?.length > 0 ? (
                                         <>
-                                            <ScrollArea
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                                speed={1}
-                                                smoothScrolling={true}
-                                            >
+                                            <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden">
                                                 <div className="divide-y divide-slate-200 min:h-[300px] h-[100%] max:h-[400px]">
                                                     {data?.item?.map((e) => (
                                                         <div
@@ -230,8 +197,7 @@ const Popup_chitiet = (props) => {
                                                                 {formatMoney(e?.price)}
                                                             </h6>
                                                             <h6 className="text-[13px]  px-2 py-0.5 col-span-1  font-medium text-center">
-                                                                {e?.discount_percent +
-                                                                    "%"}
+                                                                {e?.discount_percent + "%"}
                                                             </h6>
                                                             <h6 className="text-[13px]  px-2 py-0.5 col-span-2  font-medium text-center">
                                                                 {formatMoney(e?.price_after_discount)}
@@ -245,27 +211,20 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px]  px-2 py-0.5 col-span-2  font-medium text-left">
                                                                 {e?.note !=
                                                                     undefined ? (
-                                                                    <ExpandableContent
-                                                                        content={
-                                                                            e?.note
-                                                                        }
-                                                                    />
-                                                                ) : (
-                                                                    ""
-                                                                )}
+                                                                    <ExpandableContent content={e?.note} />
+                                                                ) : ""}
                                                             </h6>
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </ScrollArea>
+                                            </Customscrollbar>
                                         </>
                                     ) : (
                                         <NoData />
                                     )}
                                 </div>
                                 <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
-                                    {props.dataLang?.purchase_total ||
-                                        "purchase_total"}
+                                    {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
                                 <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
                                     <div className="col-span-7">
@@ -345,4 +304,4 @@ const Popup_chitiet = (props) => {
         </>
     );
 };
-export default Popup_chitiet;
+export default Popup_detail;

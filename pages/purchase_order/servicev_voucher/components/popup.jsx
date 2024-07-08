@@ -1,29 +1,10 @@
-import {
-    Add,
-    Trash as IconDelete,
-    Minus
-} from "iconsax-react";
-import { useEffect, useRef, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-
-import DatePicker, { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { BsCalendarEvent } from "react-icons/bs";
-import { MdClear } from "react-icons/md";
-import Select from "react-select";
-
-import vi from "date-fns/locale/vi";
-import moment from "moment/moment";
-registerLocale("vi", vi);
-
-import PopupCustom from "@/components/UI/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import { v4 as uuidv4 } from "uuid";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -33,13 +14,24 @@ import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SelectCore } from "@/utils/lib/Select";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import vi from "date-fns/locale/vi";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
+import moment from "moment/moment";
+import { useEffect, useState } from "react";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
+import Select from "react-select";
+import { v4 as uuidv4 } from "uuid";
+registerLocale("vi", vi);
 const Popup_servie = (props) => {
     let id = props?.id;
 
     const dataLang = props.dataLang;
-
-    const scrollAreaRef = useRef(null);
 
     const [open, sOpen] = useState(false);
 
@@ -69,10 +61,6 @@ const Popup_servie = (props) => {
     };
 
     const _HandleCloseModal = () => sOpen(false);
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
 
     const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
 
@@ -111,10 +99,6 @@ const Popup_servie = (props) => {
     const [chietkhautong, sChietkhautong] = useState(0);
 
     const [thuetong, sThuetong] = useState(0);
-
-    const [tab, sTab] = useState(0);
-
-    const _HandleSelectTab = (e) => sTab(e);
 
     const [dataTasxes, sDataTasxes] = useState([]);
 
@@ -156,106 +140,77 @@ const Popup_servie = (props) => {
         open && sErrBranch(false);
         open && sErrSupplier(false);
         open && sErrService(false);
-        props?.id && sOnFetchingDetail(true);
     }, [open]);
 
-    const _ServerFetching_detailUser = () => {
-        Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var db = response.data;
-                sDate(moment(db?.date).toDate());
-                sCode(db?.code);
-                sValueBr({ label: db?.branch_name, value: db?.branch_id });
-                sNote(db?.note);
-                sValueSupplier({
-                    label: db?.supplier_name,
-                    value: db?.suppliers_id,
-                });
-                sOption(
-                    db?.item?.map((e) => ({
-                        id: e?.id,
-                        idData: e?.id,
-                        dichvu: e?.name,
-                        soluong: Number(e?.quantity),
-                        dongia: Number(e?.price),
-                        chietkhau: Number(e?.discount_percent),
-                        dongiasauck: Number(e?.price) * (1 - Number(e?.discount_percent) / 100),
-                        thue: {
-                            label: e?.tax_name ? e?.tax_name : "Miễn thuế",
-                            value: e?.tax_id,
-                            tax_rate: Number(e?.tax_rate),
-                        },
-                        thanhtien: Number(e?.amount),
-                        ghichu: e?.note,
-                    }))
-                );
-            }
-            sOnFetchingDetail(false);
-        });
-    };
+    useQuery({
+        queryKey: ['api_detail_service', id],
+        queryFn: async () => {
+            const db = await apiServiceVoucher.apiDetailService(id);
+            sDate(moment(db?.date).toDate());
+            sCode(db?.code);
+            sValueBr({ label: db?.branch_name, value: db?.branch_id });
+            sNote(db?.note);
+            sValueSupplier({
+                label: db?.supplier_name,
+                value: db?.suppliers_id,
+            });
+            sOption(
+                db?.item?.map((e) => ({
+                    id: e?.id,
+                    idData: e?.id,
+                    dichvu: e?.name,
+                    soluong: Number(e?.quantity),
+                    dongia: Number(e?.price),
+                    chietkhau: Number(e?.discount_percent),
+                    dongiasauck: Number(e?.price) * (1 - Number(e?.discount_percent) / 100),
+                    thue: {
+                        label: e?.tax_name ? e?.tax_name : "Miễn thuế",
+                        value: e?.tax_id,
+                        tax_rate: Number(e?.tax_rate),
+                    },
+                    thanhtien: Number(e?.amount),
+                    ghichu: e?.note,
+                }))
+            );
+            return db
+        },
+        enabled: open && !!id
+    })
 
-    useEffect(() => {
-        onFetchingDetail && props?.id && _ServerFetching_detailUser();
-    }, [open]);
+    useQuery({
+        queryKey: ["api_combobox_branch_taxt"],
+        queryFn: async () => {
+            const { result: branch } = await apiComons.apiBranchCombobox();
+            const { rResult: tax } = await apiComons.apiListTax();
 
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { isSuccess, result } = response.data;
-                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-            }
-        });
-        Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data;
-                sDataTasxes(
-                    rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        tax_rate: e.tax_rate,
-                    }))
-                );
-            }
-        });
-        sOnFetching(false);
-    };
+            sDataBranch(branch?.map((e) => ({ label: e.name, value: e.id })));
+            sDataTasxes(
+                tax?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    tax_rate: e.tax_rate,
+                })))
+
+            return { branch, tax }
+        },
+        enabled: open
+    })
 
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    useEffect(() => {
-        open && sOnFetching(true);
-    }, [open]);
-
-    const _ServerFetching_Supplier = () => {
-        Axios(
-            "GET",
-            "/api_web/api_supplier/supplier/?csrf_protection=true",
-            {
+    useQuery({
+        queryKey: ["api_combobox_supplier", valueBr],
+        queryFn: async () => {
+            const { rResult } = await apiSuppliers.apiListSuppliers({
                 params: {
                     "filter[branch_id]": valueBr != null ? valueBr.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
                 }
-            }
-        );
-        sOnFetchingSupplier(false);
-    };
-
-    useEffect(() => {
-        onFetchingSupplier && _ServerFetching_Supplier();
-    }, [onFetchingSupplier]);
-
-    useEffect(() => {
-        valueBr != null && sOnFetchingSupplier(true);
-    }, [valueBr]);
+            });
+            sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
+            return rResult
+        },
+        enabled: !!valueBr
+    })
 
     // add option form
     const _HandleAddNew = () => {
@@ -490,15 +445,6 @@ const Popup_servie = (props) => {
         sOption(newOption); // cập nhật lại mảng
     };
 
-    // const formatNumber = (num) => {
-    //   if (!num && num !== 0) return 0;
-    //   const roundedNum = parseFloat(num.toFixed(2));
-    //   return roundedNum.toLocaleString("en", {
-    //     minimumFractionDigits: 2,
-    //     maximumFractionDigits: 2,
-    //     useGrouping: true
-    //   });
-    // };
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -553,8 +499,14 @@ const Popup_servie = (props) => {
         setTongTienState(tongTien);
     }, [option]);
 
+    const handingService = useMutation({
+        mutationFn: (data) => {
+            return apiServiceVoucher.apiHandingService(id, data);
+        },
+    });
+
     const _ServerSending = () => {
-        var formData = new FormData();
+        const formData = new FormData();
         formData.append("code", code);
         formData.append("date", formatMoment(date, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", valueBr.value);
@@ -569,52 +521,41 @@ const Popup_servie = (props) => {
             formData.append(`items[${index}][tax_id]`, item?.thue?.value != undefined ? item?.thue?.value : "");
             formData.append(`items[${index}][note]`, item?.ghichu ? item?.ghichu : "");
         });
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_service/service/${id}?csrf_protection=true`
-                : "/api_web/Api_service/service/?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", dataLang[message] || message);
-                        sDate(new Date());
-                        sCode("");
-                        sValueBr(null);
-                        sValueSupplier(null);
-                        sNote("");
-                        sErrBranch(false);
-                        sErrService(false);
-                        sErrSupplier(false);
-                        sOption([
-                            {
-                                id: Date.now(),
-                                idData: "",
-                                dichvu: "",
-                                soluong: 1,
-                                dongia: 0,
-                                chietkhau: 0,
-                                dongiasauck: 0,
-                                thue: 0,
-                                thanhtien: 0,
-                            },
-                        ]);
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshGr && props.onRefreshGr();
-                        sOpen(false);
-                    } else {
-                        isShow("error", dataLang[message] || message);
-                    }
+        handingService.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", dataLang[message] || message);
+                    sDate(new Date());
+                    sCode("");
+                    sValueBr(null);
+                    sValueSupplier(null);
+                    sNote("");
+                    sErrBranch(false);
+                    sErrService(false);
+                    sErrSupplier(false);
+                    sOption([
+                        {
+                            id: Date.now(),
+                            idData: "",
+                            dichvu: "",
+                            soluong: 1,
+                            dongia: 0,
+                            chietkhau: 0,
+                            dongiasauck: 0,
+                            thue: 0,
+                            thanhtien: 0,
+                        },
+                    ]);
+                    props.onRefresh && props.onRefresh();
+                    props.onRefreshGr && props.onRefreshGr();
+                    sOpen(false);
+                } else {
+                    isShow("error", dataLang[message] || message);
                 }
-                sOnSending(false);
-            }
-        );
+            },
+        });
+
+        sOnSending(false);
     };
     useEffect(() => {
         onSending && _ServerSending();
@@ -623,16 +564,8 @@ const Popup_servie = (props) => {
     return (
         <>
             <PopupCustom
-                title={
-                    props.id
-                        ? `${props.dataLang?.serviceVoucher_edit || "serviceVoucher_edit"}`
-                        : `${props.dataLang?.serviceVoucher_add || "serviceVoucher_add"}`
-                }
-                button={
-                    props.id
-                        ? props.dataLang?.serviceVoucher_edit_votes || "serviceVoucher_edit_votes"
-                        : `${props.dataLang?.branch_popup_create_new}`
-                }
+                title={props.id ? `${props.dataLang?.serviceVoucher_edit || "serviceVoucher_edit"}` : `${props.dataLang?.serviceVoucher_add || "serviceVoucher_add"}`}
+                button={props.id ? props.dataLang?.serviceVoucher_edit_votes || "serviceVoucher_edit_votes" : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={_HandleOpenModal.bind(this)}
                 open={open}
                 onClose={_HandleCloseModal.bind(this)}
@@ -832,8 +765,7 @@ const Popup_servie = (props) => {
                                             name="optionEmail"
                                             placeholder="Dịch vụ"
                                             type="text"
-                                            className={`${errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"
-                                                } placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
+                                            className={`${errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"} placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
                                         />
                                     </div>
                                     <div className="col-span-2 flex items-center justify-center">
@@ -846,9 +778,7 @@ const Popup_servie = (props) => {
                                                 <Minus className="scale-70" size="16" />
                                             </button>
                                             <InPutNumericFormat
-                                                className={`${(e?.soluong == 0 && "border-red-500") ||
-                                                    (e?.soluong == "" && "border-red-500")
-                                                    } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                className={`${(e?.soluong == 0 && "border-red-500") || (e?.soluong == "" && "border-red-500")} appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong", e)}
                                                 value={e?.soluong}
                                                 isAllowed={isAllowedNumber}
@@ -866,22 +796,13 @@ const Popup_servie = (props) => {
                                         <InPutMoneyFormat
                                             value={e?.dongia}
                                             onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia", index)}
-                                            className={`
-                                            ${(e?.dongia == 0 && "border-red-500") ||
-                                                (e?.dongia == "" && "border-red-500")
-                                                }
-                                            appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none border-b-2 border-gray-200`}
+                                            className={`${(e?.dongia == 0 && "border-red-500") || (e?.dongia == "" && "border-red-500")} appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none border-b-2 border-gray-200`}
                                         />
                                     </div>
                                     <div className="col-span-1 text-center flex items-center justify-center">
                                         <InPutNumericFormat
                                             value={e?.chietkhau}
-                                            onValueChange={_HandleChangeInputOption.bind(
-                                                this,
-                                                e?.id,
-                                                "chietkhau",
-                                                index
-                                            )}
+                                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau", index)}
                                             className="appearance-none text-center py-1 px-1 font-normal w-[90%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12px] border-gray-200"
                                             isAllowed={isAllowedDiscount}
                                         />
@@ -892,7 +813,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="col-span-2 flex justify-center items-center">
-                                        <Select
+                                        <SelectCore
                                             closeMenuOnSelect={true}
                                             placeholder={props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}
                                             options={taxOptions}
@@ -981,7 +902,7 @@ const Popup_servie = (props) => {
                                 <h2 className="w-[30%] 2xl:text-[12px] xl:text-[13px] text-[12px]">
                                     {dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}
                                 </h2>
-                                <Select
+                                <SelectCore
                                     closeMenuOnSelect={true}
                                     placeholder={dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}
                                     options={taxOptions}
@@ -1071,8 +992,7 @@ const Popup_servie = (props) => {
                                 <div className="flex justify-between ">
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
                                         <h3>
-                                            {dataLang?.purchase_order_detail_money_after_discount ||
-                                                "purchase_order_detail_money_after_discount"}
+                                            {dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
@@ -1082,8 +1002,7 @@ const Popup_servie = (props) => {
                                 <div className="flex justify-between ">
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
                                         <h3>
-                                            {dataLang?.purchase_order_detail_tax_money ||
-                                                "purchase_order_detail_tax_money"}
+                                            {dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
@@ -1093,8 +1012,7 @@ const Popup_servie = (props) => {
                                 <div className="flex justify-between ">
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
                                         <h3>
-                                            {dataLang?.purchase_order_detail_into_money ||
-                                                "purchase_order_detail_into_money"}
+                                            {dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
