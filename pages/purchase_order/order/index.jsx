@@ -1,4 +1,6 @@
+import apiComons from "@/Api/apiComon/apiComon";
 import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -34,7 +36,6 @@ import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
 import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
@@ -46,8 +47,6 @@ import { useSelector } from "react-redux";
 import { routerOrder } from "routers/buyImportGoods";
 import Popup_chitietThere from "../detaiCommon";
 import Popup_chitiet from "./components/popup";
-import { _ServerInstance as Axios } from "/services/axios";
-import apiComons from "@/Api/apiComon/apiComon";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -66,7 +65,6 @@ const Index = (props) => {
     const initalState = {
         data: [],
         dataExcel: [],
-        onFetching_filter: false,
         keySearch: "",
         listBr: [],
         listCode: [],
@@ -103,7 +101,6 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
-        queryState({ onFetching_filter: true });
     }, []);
 
 
@@ -120,19 +117,8 @@ const Index = (props) => {
         "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
     }
 
-    const { isFetching, refetch } = useQuery({
-        queryKey: ["api_list_order",
-            limit,
-            isState.keySearch,
-            router.query?.page,
-            router.query?.tab,
-            isState.valueCode,
-            isState.valueBr,
-            isState.valueSupplier,
-            isState.valueOrderType,
-            isState.valueDate.endDate,
-            isState.valueDate.startDate,
-        ],
+    const { isFetching, isLoading, refetch } = useQuery({
+        queryKey: ["api_list_order", { ...params }],
         queryFn: async () => {
             const { rResult, output, rTotal } = await apiOrder.apiListOrder({ params });
 
@@ -144,27 +130,18 @@ const Index = (props) => {
 
             return rResult
         },
+        enabled: !!router.query?.tab,
         ...reTryQuery
     })
 
     useQuery({
-        queryKey: ["api_list_filter_bar",
-            limit,
-            isState.keySearch,
-            router.query?.page,
-            router.query?.tab,
-            isState.valueCode,
-            isState.valueBr,
-            isState.valueSupplier,
-            isState.valueOrderType,
-            isState.valueDate.endDate,
-            isState.valueDate.startDate,
-        ],
+        queryKey: ["api_list_filter_bar", { ...params }],
         queryFn: async () => {
             const data = await apiOrder.apiListFilterBar({ params });
             queryState({ listDs: data });
             return data
         },
+        enabled: !!router.query?.tab,
         ...reTryQuery
     })
 
@@ -173,43 +150,24 @@ const Index = (props) => {
         queryKey: ["api_comboboxs_other"],
         queryFn: async () => {
             const { result: listBr } = await apiComons.apiBranchCombobox();
-            queryState({ listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [] });
 
-            return { listBr }
+            const { rResult: listCode } = await apiOrder.apiListOrder()
+
+            const { rResult: listSupplier } = await apiSuppliers.apiListSuppliers()
+
+            const listOrderType = await apiOrder.apiListOrderType()
+
+            queryState({
+                listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
+                listCode: listCode?.map((e) => ({ label: e.code, value: e.id })) || [],
+                listSupplier: listSupplier?.map((e) => ({ label: e.name, value: e.id })) || [],
+                listOrderType: listOrderType?.map((e) => ({ label: dataLang[e?.name], value: e.id })) || [],
+            })
+
+            return { listBr, listCode, listSupplier, listOrderType }
         },
         ...reTryQuery
     })
-
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                queryState({ listCode: rResult?.map((e) => ({ label: e.code, value: e.id })) || [] });
-            }
-        });
-
-        Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const db = response.data.rResult;
-                queryState({ listSupplier: db?.map((e) => ({ label: e.name, value: e.id })) || [] });
-            }
-        });
-
-        Axios("GET", "/api_web/Api_purchase_order/order_type_option/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const data = response.data;
-                queryState({ listOrderType: data?.map((e) => ({ label: dataLang[e?.name], value: e.id })) });
-            }
-        });
-
-        queryState({ onFetching_filter: false });
-    };
-
-    useEffect(() => {
-        isState.onFetching_filter && _ServerFetching_filter();
-    }, [isState.onFetching_filter]);
-
-
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -220,10 +178,6 @@ const Index = (props) => {
             },
         });
     }, 500);
-
-    const formatNumber = (number) => {
-        return formatNumberConfig(+number, dataSeting);
-    };
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
@@ -414,9 +368,7 @@ const Index = (props) => {
                                     return (
                                         <div key={e?.id}>
                                             <TabFilter
-                                                style={{
-                                                    backgroundColor: "#e2f0fe",
-                                                }}
+                                                style={{ backgroundColor: "#e2f0fe" }}
                                                 dataLang={dataLang}
                                                 key={e.id}
                                                 onClick={_HandleSelectTab.bind(this, `${e.id}`)}

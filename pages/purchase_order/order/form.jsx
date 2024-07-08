@@ -1,29 +1,7 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import DatePicker from "react-datepicker";
-import { BsCalendarEvent } from "react-icons/bs";
-import { MdClear } from "react-icons/md";
-
-import {
-    Add,
-    Trash as IconDelete,
-    Minus
-} from "iconsax-react";
-
-import moment from "moment/moment";
-import Select from "react-select";
-
-import { _ServerInstance as Axios } from "/services/axios";
-
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { routerOrder } from "routers/buyImportGoods";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
+import apiComons from "@/Api/apiComon/apiComon";
+import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
@@ -31,14 +9,30 @@ import { Container } from "@/components/UI/common/layout";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SelectCore } from "@/utils/lib/Select";
+import { useQuery } from "@tanstack/react-query";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import { debounce } from "lodash";
+import moment from "moment/moment";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import Select from "react-select";
+import { routerOrder } from "routers/buyImportGoods";
 const Index = (props) => {
     const router = useRouter();
 
@@ -52,19 +46,7 @@ const Index = (props) => {
 
     const dataLang = props?.dataLang;
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingPurcher, sOnFetchingPurcher] = useState(false);
-
-    const [onFetchingItems, sOnFetchingItems] = useState(false);
-
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
-
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-
-    const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
-
-    const [onFetchingStaff, sOnFetchingStaff] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
@@ -109,15 +91,9 @@ const Index = (props) => {
 
     const [dataBranch, sDataBranch] = useState([]);
 
-    const [dataId, sDataId] = useState([]);
-
     const [startDate, sStartDate] = useState(new Date());
 
-    const [effectiveDate, sEffectiveDate] = useState(null);
-
     const [delivery_dateNew, sDelivery_dateNew] = useState(new Date());
-
-    const [effectiveDateNew, sEffectiveDateNew] = useState(null);
 
     const [code, sCode] = useState("");
 
@@ -141,8 +117,6 @@ const Index = (props) => {
 
     const [errStaff, sErrStaff] = useState(false);
 
-    const [errDateDelivery, sErrDateDelivery] = useState(false);
-
     const [errPurchase, sErrPurchase] = useState(false);
 
     const [errBranch, sErrBranch] = useState(false);
@@ -153,7 +127,6 @@ const Index = (props) => {
         router.query && sErrDate(false);
         router.query && sErrSupplier(false);
         router.query && sErrStaff(false);
-        router.query && sErrDateDelivery(false);
         router.query && sErrPurchase(false);
         router.query && sErrBranch(false);
         router.query && sNote("");
@@ -161,88 +134,86 @@ const Index = (props) => {
         router.query && sDelivery_dateNew(new Date());
     }, [router.query]);
 
-    const _ServerFetchingDetail = () => {
-        Axios("GET", `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let rResult = response.data;
 
-                const itemlast = [{ mathang: null }];
+    useQuery({
+        queryKey: ["detail_order", id],
+        queryFn: () => _ServerFetchingDetail(),
+        enabled: !!id
+    })
 
-                const item = itemlast?.concat(
-                    rResult?.item?.map((e) => ({
-                        purchases_order_item_id: e?.purchases_order_item_id,
-                        id: e.purchases_order_item_id,
-                        mathang: {
-                            e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
-                            value: e.item?.id,
-                        },
-                        soluong: Number(e?.quantity),
-                        dongia: Number(e?.price),
-                        chietkhau: Number(e?.discount_percent),
-                        thue: { tax_rate: e?.tax_rate, value: e?.tax_id },
-                        donvitinh: e.item?.unit_name,
-                        dongiasauck: Number(e?.price_after_discount),
-                        note: e?.note,
-                        thanhtien:
-                            Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
-                    }))
-                );
+    const _ServerFetchingDetail = async () => {
 
-                sOption(item);
+        const rResult = await apiOrder.apiDetailOrder(id);
 
-                sCode(rResult?.code);
+        const itemlast = [{ mathang: null }];
 
-                sIdStaff({
-                    label: rResult?.staff_name,
-                    value: rResult.staff_id,
-                });
+        const item = itemlast?.concat(
+            rResult?.item?.map((e) => ({
+                purchases_order_item_id: e?.purchases_order_item_id,
+                id: e.purchases_order_item_id,
+                mathang: {
+                    e: e?.item,
+                    label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                        }</span>`,
+                    value: e.item?.id,
+                },
+                soluong: Number(e?.quantity),
+                dongia: Number(e?.price),
+                chietkhau: Number(e?.discount_percent),
+                thue: { tax_rate: e?.tax_rate, value: e?.tax_id },
+                donvitinh: e.item?.unit_name,
+                dongiasauck: Number(e?.price_after_discount),
+                note: e?.note,
+                thanhtien:
+                    Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
+            }))
+        );
 
-                sIdBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
-                });
+        sOption(item);
 
-                sIdSupplier({
-                    label: rResult?.supplier_name,
-                    value: rResult?.supplier_id,
-                });
+        sCode(rResult?.code);
 
-                sStartDate(moment(rResult?.date).toDate());
-
-                sDelivery_dateNew(moment(rResult?.delivery_date).toDate());
-
-                sLoai(rResult?.order_type);
-
-                sIdPurchases(
-                    rResult?.purchases?.map((e) => ({
-                        label: e.code,
-                        value: e.id,
-                    }))
-                );
-
-                sHidden(rResult?.order_type === "1" ? true : false);
-
-                sOnFetchingItemsAll(rResult?.order_type === "0" ? true : false);
-
-                sOnFetchingItems(rResult?.order_type === "1" ? true : false);
-
-                sNote(rResult?.note);
-
-                sDataId(item?.map((e) => ({ id: e?.id })));
-            }
-            sOnFetchingDetail(false);
+        sIdStaff({
+            label: rResult?.staff_name,
+            value: rResult.staff_id,
         });
+
+        sIdBranch({
+            label: rResult?.branch_name,
+            value: rResult?.branch_id,
+        });
+
+        sIdSupplier({
+            label: rResult?.supplier_name,
+            value: rResult?.supplier_id,
+        });
+
+        sStartDate(moment(rResult?.date).toDate());
+
+        sDelivery_dateNew(moment(rResult?.delivery_date).toDate());
+
+        sLoai(rResult?.order_type);
+
+        sIdPurchases(
+            rResult?.purchases?.map((e) => ({
+                label: e.code,
+                value: e.id,
+            }))
+        );
+
+        sHidden(rResult?.order_type === "1" ? true : false);
+
+        sOnFetchingItemsAll(rResult?.order_type === "0" ? true : false);
+
+        if (rResult?.order_type === "1") {
+            refetchItems();
+        }
+
+        sNote(rResult?.note);
+
     };
 
-    useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetail();
-    }, [onFetchingDetail]);
 
-    useEffect(() => {
-        id && sOnFetchingDetail(true);
-    }, []);
 
     const resetValue = () => {
         if (isKeyState?.type === "loai") {
@@ -254,7 +225,9 @@ const Index = (props) => {
 
             sOnFetchingItemsAll(isKeyState?.value.target.value === "0" && true);
 
-            sOnFetchingItems(isKeyState?.value.target.value === "1" && true);
+            if (isKeyState?.value.target.value === "1") {
+                refetchItems();
+            }
 
             sThuetong("");
 
@@ -381,7 +354,6 @@ const Index = (props) => {
 
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
-            sEffectiveDate(null);
         }
         if (type === "startDate") {
             sStartDate(new Date());
@@ -393,7 +365,6 @@ const Index = (props) => {
 
     const handleClearDateNew = (type) => {
         if (type === "effectiveDateNew") {
-            sEffectiveDateNew(null);
         }
         if (type === "delivery_dateNew") {
             sDelivery_dateNew(new Date());
@@ -452,233 +423,154 @@ const Index = (props) => {
         });
     }, [chietkhautong]);
 
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sDataBranch(rResult?.map((e) => ({ label: e.name, value: e.id })));
-            }
-        });
+    useQuery({
+        queryKey: ["dataBranchendTax"],
+        queryFn: async () => {
+            const { result } = await apiComons.apiBranchCombobox();
 
-        Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sDataTasxes(
-                    rResult?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                        tax_rate: e.tax_rate,
-                    }))
-                );
-            }
-        });
+            const { rResult } = await apiComons.apiListTax();
 
-        sOnFetching(false);
-    };
+            sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
 
-    const _ServerFetching_Supplier = () => {
-        Axios(
-            "GET",
-            "/api_web/api_supplier/supplier/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let db = response.data.rResult;
-                    sDataSupplier(db?.map((e) => ({ label: e.name, value: e.id })));
-                }
-            }
-        );
-        sOnFetchingSupplier(false);
-    };
-    const _ServerFetching_Staff = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_staff/staffOption?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult } = response.data;
-                    sDataStaff(
-                        rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.staffid,
-                        }))
-                    );
-                }
-            }
-        );
-        sOnFetchingStaff(false);
-    };
+            sDataTasxes(
+                rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                    tax_rate: e.tax_rate,
+                }))
+            );
 
-    useEffect(() => {
-        (idBranch === null && sDataSupplier([])) ||
-            sIdSupplier(null) ||
-            (idBranch === null && sDataStaff([])) ||
-            sIdStaff(null);
-    }, []);
+            return { result, rResult };
+        },
+    })
 
-    useEffect(() => {
-        onFetchingSupplier && _ServerFetching_Supplier();
-    }, [onFetchingSupplier]);
+    useQuery({
+        queryKey: ["dataSupplier", idBranch],
+        queryFn: async () => {
+            const { rResult } = await apiSuppliers.apiListSuppliers({ params: { "filter[branch_id]": idBranch != null ? idBranch.value : null } })
 
-    useEffect(() => {
-        onFetchingStaff && _ServerFetching_Staff();
-    }, [onFetchingStaff]);
+            sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
 
-    useEffect(() => {
-        idBranch != null && sOnFetchingSupplier(true);
-    }, [idBranch]);
+            return rResult;
+        },
+        enabled: !!idBranch
+    })
 
-    useEffect(() => {
-        idSupplier != null && sOnFetchingStaff(true);
-    }, [idSupplier]);
+    useQuery({
+        queryKey: ["dataStaffOption", idSupplier],
+        queryFn: async () => {
+            const { rResult } = await apiPurchases.apiStaffOptionPurchases({ params: { "filter[branch_id]": idBranch != null ? idBranch.value : null } })
 
-    const _ServerFetching_Purcher = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true",
-            {
+            sDataStaff(
+                rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.staffid,
+                }))
+            );
+
+            return rResult;
+        },
+        enabled: !!idSupplier
+    })
+
+    useQuery({
+        queryKey: ["dataOptionNotComplete", loai],
+        queryFn: async () => {
+            const db = await apiOrder.apiOptionNotComplete({
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch?.value : -1,
                     purchase_order_id: id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sDataPurchases(
-                        db?.map((e) => {
-                            return { label: e.code, value: e.id };
-                        })
-                    );
                 }
-            }
-        );
-        sOnFetchingPurcher(false);
-    };
+            })
 
-    const _ServerFetching_Items = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
-            {
+            sDataPurchases(db?.map((e) => { return { label: e.code, value: e.id } }));
+
+            return db
+        },
+        enabled: !!loai == "1"
+    })
+
+    const { refetch: refetchItems } = useQuery({
+        queryKey: ["dataItemsVariant", idPurchases],
+        queryFn: async () => {
+            const { data } = await apiOrder.apiSearchItems({
                 params: {
                     branch_id: idBranch != null ? +idBranch?.value : "",
                     "filter[purchases_id]": idPurchases?.length > 0 ? idPurchases.map((e) => e.value) : -1,
                     purchase_order_id: id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { result } = response.data.data;
-                    sDataItems(result);
                 }
-            }
-        );
-        sOnFetchingItems(false);
-    };
-    useEffect(() => {
-        onFetchingItems && _ServerFetching_Items();
-    }, [onFetchingItems]);
+            });
+            sDataItems(data.result);
 
-    useEffect(() => {
-        idPurchases?.length > 0 && _ServerFetching_Items();
-    }, [idPurchases]);
+            return data
+        },
+        enabled: idPurchases?.length > 0
+    })
 
-    const _ServerFetching_ItemsAll = () => {
+
+    useQuery({
+        queryKey: ["dataItemsVariantAll", onFetchingItemsAll],
+        queryFn: async () => {
+            _ServerFetching_ItemsAll();
+        },
+        enabled: !!onFetchingItemsAll
+    })
+
+    const _ServerFetching_ItemsAll = async () => {
         if (loai == "0") {
             let form = new FormData();
+
             form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "");
-            Axios(
-                "POST",
-                `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
-                {
-                    data: form,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response?.data.data;
-                        sDataItems(result);
-                    }
-                }
-            );
+
+            const { data } = await apiOrder.apiSearchProductItems(form);
+
+            sDataItems(data?.result);
         } else {
-            Axios(
-                "GET",
-                "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
-                {
-                    params: {
-                        branch_id: idBranch != null ? +idBranch?.value : "",
-                        purchase_order_id: id,
-                    },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response.data.data;
-                        sDataItems(result);
-                    }
+            const { data } = await apiOrder.apiSearchItems({
+                params: {
+                    branch_id: idBranch != null ? +idBranch?.value : "",
+                    purchase_order_id: id,
                 }
-            );
+            });
+
+            sDataItems(data?.result);
         }
         sOnFetchingItemsAll(false);
     };
 
-    useEffect(() => {
-        onFetchingItemsAll && _ServerFetching_ItemsAll();
-    }, [onFetchingItemsAll]);
 
     const options = dataItems?.map((e) => ({
         label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
         value: e.id,
         e,
     }));
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-    useEffect(() => {
-        onFetchingPurcher && _ServerFetching_Purcher();
-    }, [onFetchingPurcher]);
-
-    useEffect(() => {
-        router.query && sOnFetching(true);
-    }, [router.query]);
 
     useEffect(() => {
         const check = () => {
             sOnFetchingItemsAll(true);
         };
 
+        if (!idBranch) {
+            sDataSupplier([])
+            sIdSupplier(null)
+            sDataStaff([])
+            sIdStaff(null)
+            sIdPurchases([])
+        }
+
         if (loai == "1") {
             idBranch != null && check();
             idPurchases?.length == 0 && sDataItems([]);
-            idBranch != null && sOnFetchingPurcher(true);
+            idBranch != null && refetchItems();
         } else {
             idBranch == null && sDataItems([]);
             idBranch != null && check();
         }
+
     }, [idBranch]);
 
-    useEffect(() => {
-        if (loai == "1") {
-            sOnFetchingPurcher(true);
-        }
-    }, [loai]);
 
     useEffect(() => {
-        idBranch == null && sIdPurchases([]);
-    }, [idBranch]);
-
-    useEffect(() => {
-        idPurchases?.length > 0 && sOnFetchingItems(true);
         idPurchases?.length == 0 && sDataItems([]);
     }, [idPurchases]);
 
@@ -707,18 +599,16 @@ const Index = (props) => {
             if (idSupplier == null || idStaff == null || idBranch == null || check) {
                 idSupplier == null && sErrSupplier(true);
                 idStaff == null && sErrStaff(true);
-                idBranch == null && sErrBranch(true) && sErrDateDelivery(true);
+                idBranch == null && sErrBranch(true)
                 isShow("error", `${dataLang?.required_field_null}`);
             } else {
                 sOnSending(true);
             }
         } else {
             if (idSupplier == null || idStaff == null || idBranch == null || idPurchases?.length == 0 || check) {
-                // selectedDate == null && sErrDate(true)
                 idSupplier == null && sErrSupplier(true);
                 idStaff == null && sErrStaff(true);
                 idBranch == null && sErrBranch(true);
-                // delivery_date == null && sErrDateDelivery(true)
                 idPurchases?.length == 0 && sErrPurchase(true);
                 isShow("error", `${dataLang?.required_field_null}`);
             } else {
@@ -743,43 +633,17 @@ const Index = (props) => {
         sErrPurchase(false);
     }, [idPurchases?.length > 0]);
 
-    const _HandleSeachApi = debounce((inputValue) => {
+    const _HandleSeachApi = debounce(async (inputValue) => {
         if (loai === "0" && idBranch != null) {
-            // Axios("POST", `/api_web/Api_purchases/searchItemsVariant?csrf_protection=true`,
-            //     // Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
-            //     {
-            //         data: {
-            //             branch_id: idBranch != null ? +idBranch?.value : "",
-            //             term: inputValue,
-            //         },
-            //         params: {
-            //             purchase_order_id: id,
-            //         },
-            //     },
-            //     (err, response) => {
-            //         if (!err) {
-            //             var { result } = response?.data.data;
-            //             sDataItems(result);
-            //         }
-            //     }
-            // );
             let form = new FormData();
+
             form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "");
+
             form.append(`term`, inputValue);
-            Axios(
-                "POST",
-                `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
-                {
-                    data: form,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response?.data.data;
-                        sDataItems(result);
-                    }
-                }
-            );
+
+            const { data } = await apiOrder.apiSearchProductItems(form)
+
+            sDataItems(data?.result);
         } else {
             return;
         }
@@ -798,7 +662,7 @@ const Index = (props) => {
     };
 
     const _HandleChangeInputOption = (id, type, index3, value) => {
-        var index = option.findIndex((x) => x.id === id);
+        const index = option.findIndex((x) => x.id === id);
         if (type == "mathang") {
             if (option[index].mathang) {
                 option[index].mathang = value;
@@ -991,7 +855,7 @@ const Index = (props) => {
         setTongTienState(tongTien);
     }, [option]);
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
@@ -1023,57 +887,42 @@ const Index = (props) => {
             formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
             formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
         });
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`
-                : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", dataLang[message] || message);
-                        sCode("");
-                        sStartDate(new Date());
-                        sDelivery_dateNew(new Date());
-                        sIdStaff(null);
-                        sIdSupplier(null);
-                        sIdBranch(null);
-                        sLoai("0");
-                        sIdPurchases([]);
-                        sNote("");
-                        sErrBranch(false);
-                        sErrDate(false);
-                        sErrDateDelivery(false);
-                        sErrPurchase(false);
-                        sErrSupplier(false);
-                        sOption([
-                            {
-                                id: Date.now(),
-                                mathang: null,
-                                donvitinh: "",
-                                soluong: 0,
-                                note: "",
-                            },
-                        ]);
-                        router.push(routerOrder.home);
-                    } else {
-                        if (tongTienState.tongTien == 0) {
-                            isShow("error", `Chưa nhập thông tin mặt hàng`);
-                        } else {
-                            isShow("error", dataLang[message] || message);
-                        }
-                    }
-                }
-                sOnSending(false);
+        const { isSuccess, message } = await apiOrder.apiHandingOrder(id, formData);
+        if (isSuccess) {
+            isShow("success", dataLang[message] || message);
+            sCode("");
+            sStartDate(new Date());
+            sDelivery_dateNew(new Date());
+            sIdStaff(null);
+            sIdSupplier(null);
+            sIdBranch(null);
+            sLoai("0");
+            sIdPurchases([]);
+            sNote("");
+            sErrBranch(false);
+            sErrDate(false);
+            sErrPurchase(false);
+            sErrSupplier(false);
+            sOption([
+                {
+                    id: Date.now(),
+                    mathang: null,
+                    donvitinh: "",
+                    soluong: 0,
+                    note: "",
+                },
+            ]);
+            router.push(routerOrder.home);
+        } else {
+            if (tongTienState.tongTien == 0) {
+                isShow("error", `Chưa nhập thông tin mặt hàng`);
+            } else {
+                isShow("error", dataLang[message] || message);
             }
-        );
+        }
+        sOnSending(false);
     };
+
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
@@ -1082,9 +931,7 @@ const Index = (props) => {
         <React.Fragment>
             <Head>
                 <title>
-                    {id
-                        ? dataLang?.purchase_order_edit_order || "purchase_order_edit_order"
-                        : dataLang?.purchase_order_add_order || "purchase_order_add_order"}
+                    {id ? dataLang?.purchase_order_edit_order || "purchase_order_edit_order" : dataLang?.purchase_order_add_order || "purchase_order_add_order"}
                 </title>
             </Head>
             <Container className="!h-auto">
@@ -1110,8 +957,7 @@ const Index = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione ||
-                                    "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-12 gap-3 items-center mt-2">
                                 <div className="col-span-3">
@@ -1123,9 +969,7 @@ const Index = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
-                                        placeholder={
-                                            dataLang?.purchase_order_system_default || "purchase_order_system_default"
-                                        }
+                                        placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                     />
                                 </div>
@@ -1135,7 +979,7 @@ const Index = (props) => {
                                         {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
@@ -1143,8 +987,7 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         style={{
@@ -1187,7 +1030,7 @@ const Index = (props) => {
                                         {dataLang?.purchase_order_table_supplier}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataSupplier}
                                         onChange={_HandleChangeInput.bind(this, "supplier")}
                                         value={idSupplier}
@@ -1245,7 +1088,7 @@ const Index = (props) => {
                                         {dataLang?.purchase_order_staff || "purchase_order_staff"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataStaff}
                                         onChange={_HandleChangeInput.bind(this, "staff")}
                                         value={idStaff}
@@ -1299,8 +1142,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-3 relative">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.purchase_order_detail_day_vouchers ||
-                                            "purchase_order_detail_day_vouchers"}{" "}
+                                        {dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <div className="custom-date-picker flex flex-row">
@@ -1333,8 +1175,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-3 relative">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.purchase_order_detail_delivery_date ||
-                                            "purchase_order_detail_delivery_date"}{" "}
+                                        {dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <div className="custom-date-picker flex flex-row">
@@ -1344,9 +1185,7 @@ const Index = (props) => {
                                             placeholderText="DD/MM/YYYY"
                                             dateFormat="dd/MM/yyyy"
                                             onSelect={(date) => _HandleChangeInput("delivery_dateNew", date)}
-                                            placeholder={
-                                                dataLang?.price_quote_system_default || "price_quote_system_default"
-                                            }
+                                            placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
                                             className={`${"focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                         />
                                         {delivery_dateNew && (
@@ -1396,8 +1235,7 @@ const Index = (props) => {
                                                 for="default-radio-2"
                                                 className="ml-2 cursor-pointer text-sm font-normal text-gray-900 dark:text-gray-300"
                                             >
-                                                {dataLang?.purchase_order_according_to_YCMH ||
-                                                    "purchase_order_according_to_YCMH"}
+                                                {dataLang?.purchase_order_according_to_YCMH || "purchase_order_according_to_YCMH"}
                                             </label>
                                         </div>
                                     </div>
@@ -1405,23 +1243,18 @@ const Index = (props) => {
                                 {hidden && (
                                     <div className="col-span-3">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                            {dataLang?.purchase_order_purchase_requisition_form ||
-                                                "purchase_order_purchase_requisition_form"}{" "}
+                                            {dataLang?.purchase_order_purchase_requisition_form || "purchase_order_purchase_requisition_form"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             options={fakeDataPurchases}
                                             components={{ MultiValue }}
                                             onChange={_HandleChangeInput.bind(this, "purchases")}
                                             value={idPurchases}
-                                            placeholder={
-                                                dataLang?.purchase_order_purchase_requisition_form ||
-                                                "purchase_order_purchase_requisition_form"
-                                            }
+                                            placeholder={dataLang?.purchase_order_purchase_requisition_form || "purchase_order_purchase_requisition_form"}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${errPurchase ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                            className={`${errPurchase ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -1470,8 +1303,7 @@ const Index = (props) => {
                         </div>
                     </div>
                     <h2 className="font-normal bg-[#ECF0F4] p-2  ">
-                        {dataLang?.purchase_order_purchase_item_information ||
-                            "purchase_order_purchase_item_information"}
+                        {dataLang?.purchase_order_purchase_item_information || "purchase_order_purchase_item_information"}
                     </h2>
                     <div className="pr-2">
                         <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
@@ -1491,8 +1323,7 @@ const Index = (props) => {
                                 {dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}
                             </h4>
                             <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]">
-                                {dataLang?.purchase_order_detail_after_discount ||
-                                    "purchase_order_detail_after_discount"}
+                                {dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}
                             </h4>
                             <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                 {dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}
@@ -1515,20 +1346,11 @@ const Index = (props) => {
                                     {sortedArr.map((e, index) => (
                                         <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
                                             <div className="col-span-3   my-auto">
-                                                <Select
-                                                    onInputChange={(event) => {
-                                                        _HandleSeachApi(event)
-                                                    }}
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: option.label,
-                                                    }}
+                                                <SelectCore
+                                                    onInputChange={(event) => { _HandleSeachApi(event) }}
+                                                    dangerouslySetInnerHTML={{ __html: option.label }}
                                                     options={options}
-                                                    onChange={_HandleChangeInputOption.bind(
-                                                        this,
-                                                        e?.id,
-                                                        "mathang",
-                                                        index
-                                                    )}
+                                                    onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang", index)}
                                                     value={e?.mathang}
                                                     formatOptionLabel={(option) => (
                                                         <div className="flex items-center  justify-between py-2">
@@ -1581,14 +1403,11 @@ const Index = (props) => {
                                                                             <>
                                                                                 <h5>-</h5>
                                                                                 <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                    {dataLang?.purchase_survive ||
-                                                                                        "purchase_survive"}
+                                                                                    {dataLang?.purchase_survive || "purchase_survive"}
                                                                                     :
                                                                                 </h5>
                                                                                 <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                    {option.e?.qty_warehouse
-                                                                                        ? option.e?.qty_warehouse
-                                                                                        : "0"}
+                                                                                    {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
                                                                                 </h5>
                                                                             </>
                                                                         )}
@@ -1603,14 +1422,11 @@ const Index = (props) => {
                                                                             </h5>
                                                                             {"-"}
                                                                             <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {dataLang?.purchase_survive ||
-                                                                                    "purchase_survive"}
+                                                                                {dataLang?.purchase_survive || "purchase_survive"}
                                                                                 :
                                                                             </h5>
                                                                             <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {option.e?.qty_warehouse
-                                                                                    ? option.e?.qty_warehouse
-                                                                                    : "0"}
+                                                                                {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
                                                                             </h5>
                                                                         </div>
                                                                     )}
@@ -1683,9 +1499,7 @@ const Index = (props) => {
                                                         isAllowed={isAllowedNumber}
                                                         className={`
                                                         ${index === 0 ? "cursor-default" : "cursor-text"} 
-                                                        ${(e?.soluong == 0 && "border-red-500") ||
-                                                            (e?.soluong == "" && "border-red-500")
-                                                            } 
+                                                        ${(e?.soluong == 0 && "border-red-500") || (e?.soluong == "" && "border-red-500")} 
                                                         appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                     />
                                                     <button
@@ -1700,17 +1514,9 @@ const Index = (props) => {
                                             <div className="col-span-1 text-center flex items-center justify-center">
                                                 <InPutMoneyFormat
                                                     value={index === 0 ? 1 : e?.dongia}
-                                                    onValueChange={_HandleChangeInputOption.bind(
-                                                        this,
-                                                        e?.id,
-                                                        "dongia",
-                                                        index
-                                                    )}
+                                                    onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia", index)}
                                                     readOnly={index === 0 ? readOnlyFirst : false}
-                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"}
-                                                ${(e?.dongia == 0 && "border-red-500") ||
-                                                        (e?.dongia == "" && "border-red-500")
-                                                        } 
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"}   ${(e?.dongia == 0 && "border-red-500") || (e?.dongia == "" && "border-red-500")} 
                                                 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                             </div>
@@ -1844,7 +1650,7 @@ const Index = (props) => {
                         </div>
                         <div className="col-span-2 flex items-center gap-2">
                             <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
-                            <Select
+                            <SelectCore
                                 options={taxOptions}
                                 onChange={_HandleChangeInput.bind(this, "thuetong")}
                                 value={thuetong}
@@ -1940,8 +1746,7 @@ const Index = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_money_after_discount ||
-                                        "purchase_order_detail_money_after_discount"}
+                                    {dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}
                                 </h3>
                             </div>
                             <div className="font-normal">

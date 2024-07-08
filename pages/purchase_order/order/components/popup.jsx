@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import PopupCustom from "/components/UI/popup";
-
+import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -10,20 +8,18 @@ import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { default as formatMoneyConfig, default as formatNumberConfig } from "@/utils/helpers/formatMoney";
+import { useQuery } from "@tanstack/react-query";
 import ImageErrors from "components/UI/imageErrors";
 import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
+import { useState } from "react";
 import ModalImage from "react-modal-image";
-import { _ServerInstance as Axios } from "/services/axios";
+import PopupCustom from "/components/UI/popup";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
-    const [onFetching, sOnFetching] = useState(false);
     const dataSeting = useSetingServer()
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
     const formatNumber = (num) => {
         return formatNumberConfig(+num, dataSeting);
     };
@@ -32,25 +28,15 @@ const Popup_chitiet = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     }
 
-    const _ServerFetching_detailUser = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching_detailUser();
-    }, [open]);
+    const { isFetching } = useQuery({
+        queryKey: ["apiDetailOrder", props?.id],
+        queryFn: async () => {
+            const data = await apiOrder.apiDetailOrder(props?.id)
+            sData(data);
+            return data
+        },
+        enabled: open && !!props?.id
+    })
 
     return (
         <>
@@ -65,9 +51,6 @@ const Popup_chitiet = (props) => {
                 classNameBtn={props?.className}
             >
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-                {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
-                {/* <div className="mt-4 space-x-5 w-[999px]">         */}
-                {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px] 2xl:max-h-[750px] max-h-[600px] 2xl:overflow-visible xl:overflow-y-auto overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">         */}
                 <div className=" space-x-5 w-[1150px] h-auto">
                     <div>
                         <div className="w-[1150px]">
@@ -118,18 +101,15 @@ const Popup_chitiet = (props) => {
                                             {"Trạng thái nhập hàng"}
                                         </div>
                                         <div className="flex items-center">
-                                            {(data?.import_status ===
-                                                "not_stocked" && (
-                                                    <TagColorSky className={'!py-1'} name={props.dataLang?.stocked_part || "stocked_part"} />
+                                            {(data?.import_status === "not_stocked" && (
+                                                <TagColorSky className={'!py-1'} name={props.dataLang?.stocked_part || "stocked_part"} />
+                                            )) ||
+                                                (data?.import_status === "stocked_part" && (
+                                                    <TagColorOrange className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                 )) ||
-                                                (data?.import_status ===
-                                                    "stocked_part" && (
-                                                        <TagColorOrange className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
-                                                    )) ||
-                                                (data?.import_status ===
-                                                    "stocked" && (
-                                                        <TagColorLime className={'!py-0.5'} name={props.dataLang[data?.import_status] || data?.import_status} />
-                                                    ))}
+                                                (data?.import_status === "stocked" && (
+                                                    <TagColorLime className={'!py-0.5'} name={props.dataLang[data?.import_status] || data?.import_status} />
+                                                ))}
                                         </div>
                                         <div className="my-4 font-medium text-[13px]">
                                             {props.dataLang
@@ -150,12 +130,6 @@ const Popup_chitiet = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">
-                                        {/* <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                        {data?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
-                          data?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
-                          data?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
-                         }
-                        </div> */}
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
@@ -168,15 +142,10 @@ const Popup_chitiet = (props) => {
                                             <h3 className="col-span-1 text-[13px] font-medium">
                                                 {props.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
-                                            {/* <h3 className="col-span-1 text-[13px] font-normal">
-                                                {data?.user_create_name}
-                                            </h3> */}
                                             <div className="flex items-center gap-2">
                                                 <div className="relative">
                                                     <ImageErrors
-                                                        src={
-                                                            data?.staff_create?.profile_image
-                                                        }
+                                                        src={data?.staff_create?.profile_image}
                                                         width={25}
                                                         height={25}
                                                         defaultSrc="/user-placeholder.jpg"
@@ -248,7 +217,7 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.purchase_order_note || "purchase_order_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading
                                             className="max-h-28"
                                             color="#0f4f9e"
@@ -265,20 +234,10 @@ const Popup_chitiet = (props) => {
                                                             key={e.id?.toString()}
                                                         >
                                                             <h6 className="text-[13px] mx-auto   py-0.5 col-span-1  rounded-md text-center">
-                                                                {e?.item
-                                                                    ?.images !=
-                                                                    null ? (
+                                                                {e?.item?.images != null ? (
                                                                     <ModalImage
-                                                                        small={
-                                                                            e
-                                                                                ?.item
-                                                                                ?.images
-                                                                        }
-                                                                        large={
-                                                                            e
-                                                                                ?.item
-                                                                                ?.images
-                                                                        }
+                                                                        small={e?.item?.images}
+                                                                        large={e?.item?.images}
                                                                         alt="Product Image"
                                                                         className="custom-modal-image object-cover rounded w-[50px] h-[60px]"
                                                                     />
@@ -316,22 +275,15 @@ const Popup_chitiet = (props) => {
                                                                 {formatMoney(e?.price_after_discount)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center ">
-                                                                {formatNumber(
-                                                                    e?.tax_rate
-                                                                ) + "%"}
+                                                                {formatNumber(e?.tax_rate) + "%"}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-right mr-3.5">
                                                                 {formatMoney(e?.amount)}
                                                             </h6>
 
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left ml-3.5 ">
-                                                                {e?.note !=
-                                                                    undefined ? (
-                                                                    <ExpandableContent
-                                                                        content={
-                                                                            e?.note
-                                                                        }
-                                                                    />
+                                                                {e?.note != undefined ? (
+                                                                    <ExpandableContent content={e?.note} />
                                                                 ) : (
                                                                     ""
                                                                 )}

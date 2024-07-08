@@ -1,34 +1,16 @@
-import React, { useRef, useState } from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import ModalImage from "react-modal-image";
-import "react-datepicker/dist/react-datepicker.css";
-
-
-import PopupCustom from "/components/UI/popup";
-import Loading from "components/UI/loading";
-
-import Swal from "sweetalert2";
-
-import { useEffect } from "react";
-import { routerOrder } from "routers/buyImportGoods";
-import NoData from "@/components/UI/noData/nodata";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { useSelector } from "react-redux";
+import NoData from "@/components/UI/noData/nodata";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import Loading from "components/UI/loading";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import { BiEdit } from "react-icons/bi";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { useSelector } from "react-redux";
+import { routerOrder } from "routers/buyImportGoods";
+import PopupCustom from "/components/UI/popup";
 
 const Popup_TableValidateEdit = (props) => {
     const router = useRouter();
@@ -45,12 +27,9 @@ const Popup_TableValidateEdit = (props) => {
     const handleClick = () => {
         if (role || checkEdit) {
             if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
-                        (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
-                        }`,
-                });
+                isShow('error', `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
+                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")}
+                    `)
             } else {
                 router.push(`${routerOrder.form}?id=${props.id}`);
             }

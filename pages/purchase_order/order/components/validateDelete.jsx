@@ -1,28 +1,15 @@
-import React, { useRef, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-
-import PopupCustom from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import Swal from "sweetalert2";
-
-import { useEffect } from "react";
-import NoData from "@/components/UI/noData/nodata";
+import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
+import NoData from "@/components/UI/noData/nodata";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
+import Loading from "components/UI/loading";
+import { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import { RiDeleteBin6Line } from "react-icons/ri";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { useSelector } from "react-redux";
+import PopupCustom from "/components/UI/popup";
 
 const Popup_TableValidateDelete = (props) => {
     const _ToggleModal = (e) => props.handleQueryId({ status: e });
@@ -37,29 +24,17 @@ const Popup_TableValidateDelete = (props) => {
     useEffect(() => {
         props.isOpenValidate && _HandleDelete();
     }, [props.isOpenValidate]);
-    const _HandleDelete = () => {
-        Axios(
-            "DELETE",
-            `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: props.dataLang[message],
-                        });
-                        props.onRefresh && props.onRefresh();
-                    } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: props.dataLang[message],
-                        });
-                    }
-                }
+
+    const _HandleDelete = async () => {
+        try {
+            const { isSuccess, message } = await apiOrder.apiDeleteOrder(props?.id)
+            if (isSuccess) {
+                isShow("success", props.dataLang[message] || message);
+                props.onRefresh && props.onRefresh();
+            } else {
+                isShow("error", props.dataLang[message] || message);
             }
-        );
+        } catch (error) { }
         props.handleQueryId({ status: false });
     };
 
@@ -87,7 +62,6 @@ const Popup_TableValidateDelete = (props) => {
                             {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
                         </div>
                     </div>}
-                // onClickOpen={_ToggleModal.bind(this, true)}
                 open={props.isOpen && props.data?.payment_code?.length > 0}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props?.className}
@@ -98,8 +72,7 @@ const Popup_TableValidateDelete = (props) => {
                         <div className="w-[400px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <h2 className="font-normal bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props?.dataLang?.purchase_order_detail_general_informatione ||
-                                        "purchase_order_detail_general_informatione"}
+                                    {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                                 </h2>
                                 <div className="w-[100%] lx:w-[110%] ">
                                     <div className="grid grid-cols-12 sticky top-0 bg-slate-100  z-10">
