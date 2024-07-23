@@ -44,6 +44,14 @@ const Client = (props) => {
 
     const router = useRouter();
 
+    const initalState = {
+        tabPage: router.query?.tab,
+        keySearch: "",
+        data: {},
+        data_ex: [],
+        idBranch: null
+    };
+
     const { handleTab: _HandleSelectTab } = useTab("0");
 
     const { paginate } = usePagination();
@@ -53,14 +61,6 @@ const Client = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "client_customers");
-
-    const initalState = {
-        tabPage: router.query?.tab,
-        keySearch: "",
-        data: {},
-        data_ex: [],
-        idBranch: null
-    };
 
     const [isState, setIsState] = useState(initalState);
 

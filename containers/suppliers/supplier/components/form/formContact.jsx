@@ -12,9 +12,8 @@ const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
                 onChange={(value) => _OnChangeOption(e?.idFe, "full_name", value)}
                 name="optionVariant"
                 type="text"
-                className={`${
-                    e.full_name == "" ? "border-red-500" : ""
-                } focus:border-[#92BFF7]  disabled:bg-gray-300 border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                className={`${e.full_name == "" ? "border-red-500" : ""
+                    } focus:border-[#92BFF7]  disabled:bg-gray-300 border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
             />
             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.suppliers_supplier_phone}</label>{" "}
             <span className="text-red-500 px-1">*</span>
@@ -25,9 +24,8 @@ const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
                 onChange={(value) => _OnChangeOption(e?.idFe, "phone_number", value)}
                 name="fname"
                 type="number"
-                className={`${
-                    e.phone_number == "" ? "border-red-500" : ""
-                } focus:border-[#92BFF7]  disabled:bg-gray-300 border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                className={`${e.phone_number == "" ? "border-red-500" : ""
+                    } focus:border-[#92BFF7]  disabled:bg-gray-300 border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
             />
             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.suppliers_supplier_email}</label>
             <input

@@ -1,4 +1,7 @@
+import apiComons from "@/Api/apiComon/apiComon";
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { BtnAction } from "@/components/UI/BtnAction";
+import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -6,7 +9,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
@@ -22,60 +25,89 @@ import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
+import { useQuery } from "@tanstack/react-query";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import "react-phone-input-2/lib/style.css";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import Popup_status from "./components/popup";
-import { useStatusClient } from "./hooks/useStatusClient";
+import Popup_chitiet from "./components/popup/detail";
+import Popup_dsncc from "./components/popup/popup";
+import { useSupplierList } from "./hooks/useSupplierList";
+import { useSupplierGroup } from "./hooks/useSupplierGroup";
+import { useProvinceList } from "@/hooks/common/useProvinceList";
 
-
-const initilaState = {
-    idBranch: [],
+const initalState = {
     keySearch: "",
-    onFetching: false,
-    onFetchingBranch: false,
+    idBranch: null,
 };
-const Index = (props) => {
+
+const Supplier = (props) => {
+    const dataLang = props.dataLang;
+
     const isShow = useToast();
 
     const router = useRouter();
 
-    const dataLang = props.dataLang;
-
-    const { paginate } = usePagination();
+    const tabPage = router.query?.tab;
 
     const statusExprired = useStatusExprired();
 
-    const [isState, sIsState] = useState(initilaState);
-
-    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
-
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkExport, checkEdit, checkAdd } = useActionRole(auth, "client_status");
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "suppliers");
+
+    const [isState, setIsState] = useState(initalState);
+
+    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
+
+    const { paginate } = usePagination();
 
     const params = {
         search: isState.keySearch,
         limit: limit,
         page: router.query?.page || 1,
+        "filter[supplier_group_id]": tabPage !== "0" ? (tabPage !== "-1" ? tabPage : -1) : null,
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
-    const { data: listBr = [] } = useBranchList({});
+    const { data, isFetching, isLoading, refetch } = useSupplierList(params, updateTotalItems)
 
-    const { data, isLoading, isFetching, refetch } = useStatusClient(params, updateTotalItems)
+    const { data: listBr = [] } = useBranchList({})
+
+    const { data: listGroup, refetch: refetchGroup } = useSupplierGroup(params)
+
+    const { data: listProvince } = useProvinceList({})
+
+    const _HandleSelectTab = (e) => {
+        router.push({
+            pathname: router.route,
+            query: { tab: e },
+        });
+    };
+
+    useEffect(() => {
+        router.push({
+            pathname: router.route,
+            query: { tab: router.query?.tab ? router.query?.tab : 0 },
+        });
+    }, []);
+
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
-        router.replace("/clients/status_client");
+        router.replace({
+            pathname: router.route,
+            query: {
+                tab: router.query?.tab,
+            },
+        });
     }, 500);
 
+    //excel
     const multiDataSet = [
         {
             columns: [
@@ -88,7 +120,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.client_group_statusclient}`,
+                    title: `${dataLang?.suppliers_supplier_code} `,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -96,7 +128,47 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.client_group_colorcode}`,
+                    title: `${dataLang?.suppliers_supplier_name}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.suppliers_supplier_reper}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.suppliers_supplier_taxcode}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.suppliers_supplier_phone}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.suppliers_supplier_adress}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.suppliers_supplier_group}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -111,12 +183,28 @@ const Index = (props) => {
                         font: { bold: true },
                     },
                 },
+                {
+                    title: `${dataLang?.suppliers_supplier_date}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
             ],
-            data: isState.data_ex?.map((e) => [
+            data: data?.rResult?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
+                { value: `${e.code ? e.code : ""}` },
                 { value: `${e.name ? e.name : ""}` },
-                { value: `${e.color ? e.color : ""}` },
+                { value: `${e.representative ? e.representative : ""}` },
+                { value: `${e.tax_code ? e.tax_code : ""}` },
+                { value: `${e.phone_number ? e.phone_number : ""}` },
+                { value: `${e.address ? e.address : ""}` },
+                {
+                    value: `${e.supplier_group ? e.supplier_group?.map((i) => i.name) : ""}`,
+                },
                 { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
+                { value: `${e.date_create ? e.date_create : ""}` },
             ]),
         },
     ];
@@ -124,31 +212,36 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.client_group_statusclient}</title>
+                <title>{dataLang?.suppliers_supplier_title}</title>
             </Head>
-
             <Container>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.client_group_client || "client_group_client"}</h6>
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.suppliers_supplier_title || "suppliers_supplier_title"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.client_group_statusclient || "client_group_statusclient"}</h6>
+                        <h6>{dataLang?.suppliers_supplier_title || "suppliers_supplier_title"}</h6>
                     </div>
                 )}
                 <ContainerBody>
-                    <div className="space-y-3 h-full overflow-hidden">
+                    <div className="space-y-0.5 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.client_group_statusctitle}
+                                {dataLang?.suppliers_supplier_title}
                             </h2>
-                            <div className="flex justify-end items-center">
+                            <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
-                                    <Popup_status
+                                    <Popup_dsncc
+                                        listProvince={listProvince}
                                         listBr={listBr}
+                                        isState={isState}
                                         onRefresh={refetch.bind(this)}
+                                        onRefreshGroup={refetchGroup.bind(this)}
                                         dataLang={dataLang}
+                                        nameModel={"suppliers"}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
                                 ) : (
@@ -164,6 +257,26 @@ const Index = (props) => {
                                 )}
                             </div>
                         </div>
+                        <ContainerFilterTab>
+                            {listGroup &&
+                                listGroup?.map((e) => {
+                                    return (
+                                        <div>
+                                            <TabFilter
+                                                backgroundColor="#e2f0fe"
+                                                key={e.id}
+                                                onClick={_HandleSelectTab.bind(this, `${e.id}`)}
+                                                total={e.count}
+                                                active={e.id}
+                                                className={`text-[#0F4F9E]`}
+                                            >
+                                                {dataLang[e.name] || e.name}
+                                            </TabFilter>
+                                        </div>
+                                    );
+                                })}
+                        </ContainerFilterTab>
+
                         <ContainerTable>
                             <div className="xl:space-y-3 space-y-2">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
@@ -195,14 +308,14 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData onClick={() => refetch()} sOnFetching={(e) => { }} />
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
-                                                            filename="Trạng thái khách hàng"
-                                                            title="Ttkh"
+                                                            filename="Danh sách nhà cung cấp"
+                                                            title="Dsncc"
                                                             dataLang={dataLang}
                                                         />
                                                     )}
@@ -223,22 +336,31 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar className="min:h-[200px] 3xl:h-[90%] 2xl:h-[85%] xl:h-[82%] lg:h-[88%] max:h-[400px] pb-2">
+                            <Customscrollbar>
                                 <div className="w-full">
-                                    <HeaderTable gridCols={12}>
-                                        <ColumnTable colSpan={4} textAlign="center">
-                                            {dataLang?.client_group_statusclient || "client_group_statusclient"}
+                                    <HeaderTable gridCols={8} display={"grid"}>
+                                        <ColumnTable colSpan={1} textAlign="center">
+                                            {dataLang?.suppliers_supplier_code || "suppliers_supplier_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign="center">
-                                            {dataLang?.client_group_colorcode || "client_group_colorcode"}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.suppliers_supplier_name || "suppliers_supplier_name"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign="center">
-                                            {dataLang?.client_group_color || "client_group_color"}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.suppliers_supplier_taxcode || "suppliers_supplier_taxcode"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign="center">
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.suppliers_supplier_phone || "suppliers_supplier_phone"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.suppliers_supplier_adress || "suppliers_supplier_adress"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.suppliers_supplier_group || "suppliers_supplier_group"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.client_list_brand || "client_list_brand"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign="center">
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -246,44 +368,81 @@ const Index = (props) => {
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                 {data?.rResult?.map((e) => (
-                                                    <RowTable gridCols={12} key={e.id.toString()}>
-                                                        <RowItemTable colSpan={4} textAlign="left">
-                                                            {e.name}
+                                                    <RowTable gridCols={8} key={e.id.toString()}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
+                                                            {e.code}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign="center">
-                                                            {e.color}
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
+                                                            <Popup_chitiet
+                                                                dataLang={dataLang}
+                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5 col-span-1   rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear"
+                                                                name={e.name}
+                                                                id={e?.id}
+                                                            />
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
+                                                            {e.tax_code}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
+                                                            {e.phone_number}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
+                                                            {e.address}
                                                         </RowItemTable>
                                                         <RowItemTable
-                                                            colSpan={2}
-                                                            textAlign="center"
-                                                            backgroundColor={e.color}
-                                                            className="rounded-md py-1"
+                                                            colSpan={1}
+                                                            className="flex justify-start flex-wrap "
                                                         >
-                                                            {e.color}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={2}>
-                                                            <span className="flex flex-wrap justify-start gap-2">
-                                                                {e?.branch?.map((e) => (
-                                                                    <TagBranch key={e?.id}>{e?.name}</TagBranch>
-                                                                ))}
-                                                            </span>
+                                                            {e.supplier_group?.map((h) => {
+                                                                return (
+                                                                    <span
+                                                                        key={h.id}
+                                                                        style={{ backgroundColor: "#e2f0fe" }}
+                                                                        className={`text-[#0F4F9E]  mr-2 mb-1 w-fit 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] px-2 rounded-md py-0.5`}
+                                                                    >
+                                                                        {h.name}
+                                                                    </span>
+                                                                );
+                                                            })}
                                                         </RowItemTable>
                                                         <RowItemTable
-                                                            colSpan={2}
+                                                            colSpan={1}
+                                                            className="flex items-center gap-1 flex-wrap"
+                                                        >
+                                                            {e.branch?.map((i) => (
+                                                                <TagBranch key={i}>{i.name}</TagBranch>
+                                                            ))}
+                                                        </RowItemTable>
+                                                        <RowItemTable
+                                                            colSpan={1}
                                                             className="space-x-2 text-center flex items-center justify-center"
                                                         >
                                                             {role == true || checkEdit ? (
-                                                                <Popup_status
-                                                                    listBr={listBr}
-                                                                    sValueBr={e.branch}
+                                                                <Popup_dsncc
                                                                     onRefresh={refetch.bind(this)}
                                                                     className="xl:text-base text-xs "
+                                                                    isState={isState}
                                                                     dataLang={dataLang}
+                                                                    listProvince={listProvince}
+                                                                    listBr={listBr}
                                                                     name={e.name}
-                                                                    color={e.color}
-                                                                    id={e.id}
+                                                                    representative={e.representative}
+                                                                    code={e.code}
+                                                                    tax_code={e.tax_code}
+                                                                    phone_number={e.phone_number}
+                                                                    address={e.address}
+                                                                    date_incorporation={e.date_incorporation}
+                                                                    note={e.note}
+                                                                    email={e.email}
+                                                                    website={e.website}
+                                                                    debt_begin={e.debt_begin}
+                                                                    city={e.city}
+                                                                    district={e.district}
+                                                                    ward={e.ward}
+                                                                    id={e?.id}
+                                                                    nameModel={"contacts_suppliers"}
                                                                 />
                                                             ) : (
                                                                 <IconEdit
@@ -295,10 +454,10 @@ const Index = (props) => {
                                                             )}
                                                             <BtnAction
                                                                 onRefresh={refetch.bind(this)}
-                                                                onRefreshGroup={() => { }}
+                                                                onRefreshGroup={refetchGroup.bind(this)}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
-                                                                type="client_status"
+                                                                type="suppliers"
                                                             />
                                                         </RowItemTable>
                                                     </RowTable>
@@ -329,4 +488,4 @@ const Index = (props) => {
     );
 };
 
-export default Index;
+export default Supplier;

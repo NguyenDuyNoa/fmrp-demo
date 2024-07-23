@@ -1,9 +1,10 @@
-import apiComons from "@/Api/apiComon/apiComon";
 import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { useDistrictList } from "@/hooks/common/useDistrictList";
+import { useWardList } from "@/hooks/common/useWardList";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
@@ -12,6 +13,7 @@ import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
+import { useSupplierGroupSupplier } from "../../hooks/useSupplierGroupSupplier";
 import ButtonAdd from "../button/buttonAdd";
 import FormContact from "../form/formContact";
 import FormInfo from "../form/formInfo";
@@ -43,11 +45,8 @@ const Popup_dsncc = (props) => {
     debt_begin: "",
     valueBr: [],
     dataBr: [],
-    dataGroup: [],
     dataCity: [],
-    dataWar: [],
     valueCt: null,
-    dataDitrict: [],
     valueDitrict: null,
     valueWa: null,
     valueGr: [],
@@ -70,15 +69,15 @@ const Popup_dsncc = (props) => {
   useEffect(() => {
     if (isState.open) {
       queryState({
-        dataBr: props?.isState?.listBr || [],
-        dataCity: props?.isState?.listSelectCt || [],
+        dataBr: props?.listBr || [],
+        dataCity: props?.listProvince || [],
       })
     } else {
       sIsState(initalState)
     }
   }, [isState.open]);
 
-  const { } = useQuery({
+  useQuery({
     queryKey: ["api_supplier_detail", props?.id],
     queryFn: async () => {
       const db = await apiSuppliers.apiDetailSuppliers(props?.id);
@@ -128,30 +127,19 @@ const Popup_dsncc = (props) => {
     enabled: isState.open && !!props?.id
   })
 
-  const { } = useQuery({
-    queryKey: ["api_supplier_group", isState.valueBr?.length > 0],
-    queryFn: async () => {
+  const { data: dataGroup } = useSupplierGroupSupplier(isState.valueBr)
 
-      const params = {
-        "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr?.map((e) => e.value) : -1,
-      }
+  const { data: dataDitrict } = useDistrictList(isState.valueCt)
 
-      const { rResult } = await apiSuppliers.apiGroupSuppliers({ params: params });
-
-      queryState({ dataGroup: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
-
-      return rResult
-    },
-  })
+  const { data: dataWar } = useWardList(isState.valueDitrict)
 
   useEffect(() => {
-    isState.valueBr?.length == 0 && queryState({ valueGr: [], dataGroup: [] });
+    isState.valueBr?.length == 0 && queryState({ valueGr: [] });
   }, [isState.valueBr])
 
   useEffect(() => {
     isState.valueDitrict == null && queryState({
       valueWa: null,
-      dataWar: []
     })
   }, [isState.valueDitrict])
 
@@ -159,46 +147,9 @@ const Popup_dsncc = (props) => {
   useEffect(() => {
     isState.valueCt == null && queryState({
       valueWa: null,
-      dataWar: [],
       valueDitrict: null,
-      dataDitrict: []
     })
   }, [isState.valueCt])
-
-  const { } = useQuery({
-    queryKey: ["api_district", isState.valueCt],
-    queryFn: async () => {
-
-      const params = {
-        provinceid: isState.valueCt ? isState.valueCt?.value : -1,
-      }
-
-      const { rResult } = await apiComons.apiDistric({ params: params });
-
-      queryState({ dataDitrict: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
-
-      return rResult
-    },
-  })
-
-
-
-  const { } = useQuery({
-    queryKey: ["api_ward", isState.valueDitrict],
-    queryFn: async () => {
-
-      const params = {
-        districtid: isState.valueDitrict ? isState.valueDitrict?.value : -1,
-      }
-
-      const { rResult } = await apiComons.apiWWard({ params: params });
-
-      queryState({ dataWar: rResult?.map((e) => ({ label: e.name, value: e.wardid })) || [] });
-
-      return rResult
-    },
-  })
-
 
   const handingSupplier = useMutation({
     mutationFn: async (data) => {
@@ -349,7 +300,16 @@ const Popup_dsncc = (props) => {
               <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
 
               >
-                <FormInfo isState={isState} queryState={queryState} dataLang={dataLang}></FormInfo>
+                <FormInfo
+                  dataWar={dataWar}
+                  dataGroup={dataGroup}
+                  isState={isState}
+                  queryState={queryState}
+                  dataLang={dataLang}
+                  dataDitrict={dataDitrict}
+                >
+
+                </FormInfo>
               </Customscrollbar>
             )}
             {isState.tab === 1 && (

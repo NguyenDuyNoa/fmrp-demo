@@ -3,7 +3,7 @@ import Select from "react-select";
 import { NumericFormat } from "react-number-format";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import useToast from "@/hooks/useToast";
-const FormInfo = ({ isState, queryState, dataLang }) => {
+const FormInfo = ({ isState, dataGroup, dataDitrict, dataWar, queryState, dataLang }) => {
   const isShow = useToast()
   return (
     <div className="w-[50vw]  p-2  ">
@@ -143,7 +143,7 @@ const FormInfo = ({ isState, queryState, dataLang }) => {
           <Select
             placeholder={dataLang?.suppliers_supplier_group}
             noOptionsMessage={() => "Không có dữ liệu"}
-            options={isState.dataGroup}
+            options={dataGroup}
             value={isState.valueGr}
             onChange={(e) => queryState({ valueGr: e })}
             isSearchable={true}
@@ -248,7 +248,7 @@ const FormInfo = ({ isState, queryState, dataLang }) => {
             </label>
             <Select
               placeholder={dataLang?.suppliers_supplier_district}
-              options={isState.dataDitrict}
+              options={dataDitrict}
               value={isState.valueDitrict}
               onChange={(e) => queryState({ valueDitrict: e })}
               isSearchable={true}
@@ -286,7 +286,7 @@ const FormInfo = ({ isState, queryState, dataLang }) => {
             </label>
             <Select
               placeholder={dataLang?.suppliers_supplier_wards}
-              options={isState.dataWar}
+              options={dataWar}
               value={isState.valueWa}
               onChange={(e) => queryState({ valueWa: e })}
               isSearchable={true}

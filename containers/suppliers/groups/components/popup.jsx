@@ -1,12 +1,20 @@
 import apiGroups from "@/Api/apiSuppliers/groups/apiGroups";
+import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
 import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useRef, useState } from "react";
 import "react-phone-input-2/lib/style.css";
 import Select from "react-select";
-import PopupCustom from "/components/UI/popup";
 
+const initialData = {
+    name: "",
+    errInput: false,
+    errInputBr: false,
+    valueBr: [],
+    listBr: [],
+    onSending: false,
+}
 
 const Popup_groupKh = (props) => {
     const [open, sOpen] = useState(false);
@@ -20,14 +28,6 @@ const Popup_groupKh = (props) => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
-    const initialData = {
-        name: "",
-        errInput: false,
-        errInputBr: false,
-        valueBr: [],
-        listBr: [],
-        onSending: false,
-    }
 
     const [isState, sIsState] = useState(initialData)
 
@@ -36,7 +36,7 @@ const Popup_groupKh = (props) => {
     useEffect(() => {
         if (props?.id) {
             queryState({
-                listBr: props?.isState?.listBr || [],
+                listBr: props?.listBr || [],
                 name: props?.name,
                 valueBr: props?.sValueBr?.map((e) => ({
                     label: e.name,
@@ -48,7 +48,7 @@ const Popup_groupKh = (props) => {
                 return {
                     ...prev,
                     ...initialData,
-                    listBr: props?.isState?.listBr || [],
+                    listBr: props?.listBr || [],
                 }
             });
         }
