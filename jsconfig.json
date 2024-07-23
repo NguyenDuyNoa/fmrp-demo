@@ -2,17 +2,16 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            // "@/components/*": ["components/*"],
-            // "@/hooks/*": ["hooks/*"],
-            // "@/constants/*": ["constants/*"],
-            // "@/pages/*": ["pages/*"],
-            // "@/configs/*": ["configs/*"],
-            // "@/routers/*": ["routers/*"],
-            // "@/utils/*": ["utils/*"],
-            // "@/utils/lib*": ["utils/lib*"],
-            // "@/services/*": ["services/*"],
-            // "@/Api/*": ["Api/*"]
-
+            "@/components/*": ["components/*"],
+            "@/hooks/*": ["hooks/*"],
+            "@/constants/*": ["constants/*"],
+            "@/pages/*": ["pages/*"],
+            "@/configs/*": ["configs/*"],
+            "@/routers/*": ["routers/*"],
+            "@/utils/*": ["utils/*"],
+            "@/utils/lib*": ["utils/lib*"],
+            "@/services/*": ["services/*"],
+            "@/Api/*": ["Api/*"],
             "@/*": ["./*"]
         }
     }
