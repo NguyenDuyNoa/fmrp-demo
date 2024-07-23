@@ -4,15 +4,17 @@ import ContainerPagination from "@/components/UI/common/ContainerPagination/Cont
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { RowItemTable, RowTable } from "@/components/UI/common/Table";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranchList";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
@@ -20,7 +22,6 @@ import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import Loading from "components/UI/loading";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
@@ -28,24 +29,25 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
-import Popup_groupKh from "./components/popup";
-import { useGroupClientList } from "./hooks/useGroupClientList";
-import Pagination from "/components/UI/pagination";
-const GroupClient = (props) => {
+import Popup_status from "./components/popup";
+import { useStatusClient } from "./hooks/useStatusClient";
+
+const Index = (props) => {
+    const isShow = useToast();
+
     const router = useRouter();
+
+    const dataLang = props.dataLang;
 
     const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
-    const dataLang = props.dataLang;
-
-    const isShow = useToast();
-
     const initilaState = {
-        keySearch: "",
-        onFetchingBranch: false,
         idBranch: [],
+        keySearch: "",
+        onFetching: false,
+        onFetchingBranch: false,
     };
 
     const [isState, sIsState] = useState(initilaState);
@@ -54,7 +56,7 @@ const GroupClient = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkExport, checkEdit, checkAdd } = useActionRole(auth, "client_group");
+    const { checkExport, checkEdit, checkAdd } = useActionRole(auth, "client_status");
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
@@ -65,13 +67,13 @@ const GroupClient = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
-    const { data, isLoading: loadingGroup, isFetching, refetch } = useGroupClientList(params, updateTotalItems);
-
     const { data: listBr = [] } = useBranchList({});
+
+    const { data, isLoading, isFetching, refetch } = useStatusClient(params, updateTotalItems)
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
-        router.replace("/clients/groups");
+        router.replace("/clients/status_client");
     }, 500);
 
     const multiDataSet = [
@@ -86,7 +88,7 @@ const GroupClient = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.client_group_name}`,
+                    title: `${dataLang?.client_group_statusclient}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -110,11 +112,11 @@ const GroupClient = (props) => {
                     },
                 },
             ],
-            data: data?.rResult?.map((e) => [
+            data: isState.data_ex?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
                 { value: `${e.name ? e.name : ""}` },
                 { value: `${e.color ? e.color : ""}` },
-                { value: `${e.branch ? e.branch?.map((i) => i.name).join(", ") : ""}`, },
+                { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
             ]),
         },
     ];
@@ -122,8 +124,9 @@ const GroupClient = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.client_groupuser_title}</title>
+                <title>{dataLang?.client_group_statusclient}</title>
             </Head>
+
             <Container>
                 {statusExprired ? (
                     <EmptyExprired />
@@ -131,18 +134,18 @@ const GroupClient = (props) => {
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">{dataLang?.client_group_client || "client_group_client"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.client_groupuser_title || "client_groupuser_title"}</h6>
+                        <h6>{dataLang?.client_group_statusclient || "client_group_statusclient"}</h6>
                     </div>
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-full overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.client_groupuser || "client_groupuser"}
+                                {dataLang?.client_group_statusctitle}
                             </h2>
                             <div className="flex justify-end items-center">
                                 {role == true || checkAdd ? (
-                                    <Popup_groupKh
+                                    <Popup_status
                                         listBr={listBr}
                                         onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
@@ -165,11 +168,11 @@ const GroupClient = (props) => {
                             <div className="xl:space-y-3 space-y-2">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
-                                        <div className="grid grid-cols-5">
+                                        <div className="grid grid-cols-9 gap-2">
                                             <SearchComponent
                                                 dataLang={dataLang}
                                                 onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                colSpan={1}
+                                                colSpan={2}
                                             />
                                             <SelectComponent
                                                 options={[
@@ -183,7 +186,7 @@ const GroupClient = (props) => {
                                                 onChange={(e) => queryState({ idBranch: e })}
                                                 value={isState.idBranch}
                                                 placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
-                                                colSpan={2}
+                                                colSpan={3}
                                                 components={{ MultiValue }}
                                                 isMulti={true}
                                                 closeMenuOnSelect={false}
@@ -198,8 +201,8 @@ const GroupClient = (props) => {
                                                     {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
-                                                            filename="Nhóm khách hàng"
-                                                            title="Nkh"
+                                                            filename="Trạng thái khách hàng"
+                                                            title="Ttkh"
                                                             dataLang={dataLang}
                                                         />
                                                     )}
@@ -221,50 +224,49 @@ const GroupClient = (props) => {
                                 </div>
                             </div>
                             <Customscrollbar className="min:h-[200px] 3xl:h-[90%] 2xl:h-[85%] xl:h-[82%] lg:h-[88%] max:h-[400px] pb-2">
-                                <div className="w-[100%] lg:w-[100%] ">
-                                    <div className="grid grid-cols-12 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center">
-                                            {dataLang?.client_group_name}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_group_colorcode}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_group_color}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_list_brand}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.branch_popup_properties}
-                                        </h4>
-                                    </div>
-                                    {(loadingGroup || isFetching) ? (
+                                <div className="w-full">
+                                    <HeaderTable gridCols={12}>
+                                        <ColumnTable colSpan={4} textAlign="center">
+                                            {dataLang?.client_group_statusclient || "client_group_statusclient"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign="center">
+                                            {dataLang?.client_group_colorcode || "client_group_colorcode"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign="center">
+                                            {dataLang?.client_group_color || "client_group_color"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign="center">
+                                            {dataLang?.client_list_brand || "client_list_brand"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign="center">
+                                            {dataLang?.branch_popup_properties || "branch_popup_properties"}
+                                        </ColumnTable>
+                                    </HeaderTable>
+                                    {(isLoading || isFetching) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                 {data?.rResult?.map((e) => (
                                                     <RowTable gridCols={12} key={e.id.toString()}>
-                                                        <RowItemTable colSpan={4} textAlign={"left"}>
+                                                        <RowItemTable colSpan={4} textAlign="left">
                                                             {e.name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={"center"}>
+                                                        <RowItemTable colSpan={2} textAlign="center">
                                                             {e.color}
                                                         </RowItemTable>
                                                         <RowItemTable
-                                                            backgroundColor={e.color}
                                                             colSpan={2}
-                                                            textAlign={"center"}
-                                                            className={"py-1 rounded-md"}
+                                                            textAlign="center"
+                                                            backgroundColor={e.color}
+                                                            className="rounded-md py-1"
                                                         >
-                                                            {" "}
                                                             {e.color}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2}>
-                                                            <span className="flex items-center flex-wrap justify-start gap-2">
+                                                            <span className="flex flex-wrap justify-start gap-2">
                                                                 {e?.branch?.map((e) => (
-                                                                    <TagBranch key={e.id}>{e.name}</TagBranch>
+                                                                    <TagBranch key={e?.id}>{e?.name}</TagBranch>
                                                                 ))}
                                                             </span>
                                                         </RowItemTable>
@@ -273,11 +275,11 @@ const GroupClient = (props) => {
                                                             className="space-x-2 text-center flex items-center justify-center"
                                                         >
                                                             {role == true || checkEdit ? (
-                                                                <Popup_groupKh
-                                                                    onRefresh={refetch.bind(this)}
-                                                                    className="xl:text-base text-xs "
+                                                                <Popup_status
                                                                     listBr={listBr}
                                                                     sValueBr={e.branch}
+                                                                    onRefresh={refetch.bind(this)}
+                                                                    className="xl:text-base text-xs "
                                                                     dataLang={dataLang}
                                                                     name={e.name}
                                                                     color={e.color}
@@ -296,7 +298,7 @@ const GroupClient = (props) => {
                                                                 onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
-                                                                type="client_group"
+                                                                type="client_status"
                                                             />
                                                         </RowItemTable>
                                                     </RowTable>
@@ -327,4 +329,4 @@ const GroupClient = (props) => {
     );
 };
 
-export default GroupClient;
+export default Index;
