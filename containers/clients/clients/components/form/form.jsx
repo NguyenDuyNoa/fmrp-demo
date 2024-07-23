@@ -1,11 +1,8 @@
-import React from "react";
-import { IconDelete } from "iconsax-react";
-import Link from "next/link";
-import Select, { components } from "react-select";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import useToast from "@/hooks/useToast";
+import Select from "react-select";
 
-const Form = ({ dataLang, isState, queryState }) => {
+const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict, dataChar }) => {
   const isShow = useToast()
   return (
     <div className="w-[50vw]  p-2 ">
@@ -164,7 +161,7 @@ const Form = ({ dataLang, isState, queryState }) => {
           <Select
             closeMenuOnSelect={false}
             placeholder={dataLang?.client_popup_char}
-            options={isState.listChar}
+            options={dataChar}
             isSearchable={true}
             onChange={(e) => queryState({ valueChar: e })}
             isMulti
@@ -201,7 +198,7 @@ const Form = ({ dataLang, isState, queryState }) => {
           <Select
             placeholder={dataLang?.client_list_group}
             noOptionsMessage={() => "Không có dữ liệu"}
-            options={isState.dataGroup}
+            options={dataGroup}
             //hihi
             value={isState.valueGr}
             onChange={(e) => queryState({ valueGr: e })}
@@ -317,7 +314,7 @@ const Form = ({ dataLang, isState, queryState }) => {
             </label>
             <Select
               placeholder={dataLang?.client_popup_district}
-              options={isState.dataDitrict}
+              options={dataDitrict}
               value={isState.valueDitrict}
               onChange={(e) => queryState({ valueDitrict: e })}
               isSearchable={true}
@@ -354,7 +351,7 @@ const Form = ({ dataLang, isState, queryState }) => {
             </label>
             <Select
               placeholder={dataLang?.client_popup_wards}
-              options={isState.dataWar}
+              options={dataWard}
               value={isState.valueWa}
               onChange={(e) => queryState({ valueWa: e })}
               isSearchable={true}

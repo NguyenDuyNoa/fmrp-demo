@@ -1,23 +1,24 @@
-import { useEffect, useState } from "react";
-
-import { v4 as uuidv4 } from "uuid";
-import PopupCustom from "/components/UI/popup";
-
 import apiClient from "@/Api/apiClients/client/apiClient";
-import apiComons from "@/Api/apiComon/apiComon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { useDistrictList } from "@/hooks/common/useDistrictList";
+import { useWardList } from "@/hooks/common/useWardList";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Add as IconAdd, Trash as IconDelete, Edit as IconEdit } from "iconsax-react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+import { useClientChar } from "../../hooks/useClientChar";
+import { useClientGroupClient } from "../../hooks/useClientGroupClient";
 import ButtoonAdd from "../button/buttonAdd";
 import Form from "../form/form";
 import FormContactInfo from "../form/formContactInfo";
 import FormContactDelivery from "../form/formDelivery";
+import PopupCustom from "/components/UI/popup";
 
 const Popup_dskh = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
@@ -48,16 +49,12 @@ const Popup_dskh = (props) => {
         debt_limit_day: "",
         valueBr: [],
         dataBr: [],
-        dataGroup: [],
         dataCity: [],
-        dataWar: [],
         valueCt: null,
-        dataDitrict: [],
         valueDitrict: null,
         valueWa: null,
         valueGr: [],
         valueChar: [],
-        listChar: [],
         errInputName: false,
     };
 
@@ -72,11 +69,11 @@ const Popup_dskh = (props) => {
     useEffect(() => {
         queryState({
             dataBr: props?.listBr || [],
-            dataCity: props?.listSelectCt?.map((e) => ({ label: e?.name, value: e?.provinceid })),
+            dataCity: props?.listSelectCt || [],
         });
     }, [isState.open]);
 
-    const { isLoading } = useQuery({
+    useQuery({
         queryKey: ["api_detail_lient", props?.id],
         queryFn: async () => {
             const db = await apiClient.apiDetailClient(props?.id);
@@ -139,120 +136,34 @@ const Popup_dskh = (props) => {
         enabled: isState.open && props?.id ? true : false
     });
 
-    const { isLoading: isLoadingChar } = useQuery({
-        queryKey: ["api_char", isState.valueBr?.length > 0],
-        queryFn: async () => {
+    const { data: dataDitrict } = useDistrictList(isState.valueCt)
 
-            const params = {
-                "brach_id[]": isState.valueBr?.map((e) => e.value),
-                staffid: isState.valueBr ? isState.valueBr?.map((e) => e.value) : -1,
-            }
+    const { data: dataWard } = useWardList(isState.valueDitrict)
 
-            let db = await apiClient.apiCharClient({ params: params })
+    const { data: dataGroup } = useClientGroupClient(isState.valueBr)
 
-            queryState({
-                listChar: db?.map((e) => ({
-                    label: e.name,
-                    value: e.staffid,
-                })),
-            });
-
-            return db
-        },
-    })
-
-    const { isLoading: isLoadingGroup } = useQuery({
-        queryKey: ["api_client_group", isState.valueBr?.length > 0],
-        queryFn: async () => {
-
-            const params = {
-                "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr?.map((e) => e.value) : -1,
-            }
-
-            const { rResult } = await apiClient.apiGroupClient({ params: params })
-
-            queryState({
-                dataGroup: rResult?.map((e) => ({
-                    label: e.name,
-                    value: e.id,
-                })),
-            });
-
-            return rResult
-        },
-    })
-
-
-    const { isLoading: isLoadingDis } = useQuery({
-        queryKey: ["api_district", isState.valueCt],
-        queryFn: async () => {
-
-            const params = {
-                provinceid: isState.valueCt?.value ? isState.valueCt?.value : -1,
-            }
-
-            const { rResult } = await apiComons.apiDistric({ params: params })
-
-            queryState({
-                dataDitrict: rResult?.map((e) => ({
-                    label: e.name,
-                    value: e.districtid,
-                })),
-            });
-
-            return rResult
-        },
-    })
+    const { data: dataChar } = useClientChar(isState)
 
     useEffect(() => {
         isState.valueBr?.length == 0 &&
             queryState({
-                dataGroup: [],
                 valueGr: [],
-                listChar: [],
                 valueChar: [],
             });
     }, [isState.valueBr]);
 
     useEffect(() => {
         isState.valueDitrict == null &&
-            queryState({
-                valueWa: null,
-                dataWar: [],
-            });
+            queryState({ valueWa: null });
     }, [isState.valueDitrict]);
 
     useEffect(() => {
         isState.valueCt == null &&
             queryState({
                 valueWa: null,
-                dataWar: [],
                 valueDitrict: null,
-                dataDitrict: [],
             });
     }, [isState.valueCt]);
-
-
-    const { isLoading: isLoadingWar } = useQuery({
-        queryKey: ["api_ward", isState.valueDitrict],
-        queryFn: async () => {
-
-            const params = {
-                districtid: isState.valueDitrict?.value ? isState.valueDitrict?.value : -1,
-            }
-
-            const { rResult } = await apiComons.apiWWard({ params: params })
-
-            queryState({
-                dataWar: rResult?.map((e) => ({
-                    label: e.name,
-                    value: e.wardid,
-                })),
-            });
-            return rResult
-        },
-    })
-
 
 
     const addClient = useMutation({
@@ -471,7 +382,15 @@ const Popup_dskh = (props) => {
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         {tab === 0 && (
                             <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]">
-                                <Form dataLang={props.dataLang} isState={isState} queryState={queryState} />
+                                <Form
+                                    dataLang={props.dataLang}
+                                    dataGroup={dataGroup}
+                                    dataWard={dataWard}
+                                    dataDitrict={dataDitrict}
+                                    isState={isState}
+                                    queryState={queryState}
+                                    dataChar={dataChar}
+                                />
                             </Customscrollbar>
                         )}
                         {tab === 1 && (

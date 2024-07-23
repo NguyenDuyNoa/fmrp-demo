@@ -1,5 +1,3 @@
-import apiClient from "@/Api/apiClients/client/apiClient";
-import apiComons from "@/Api/apiComon/apiComon";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -19,26 +17,26 @@ import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import { reTryQuery } from "@/configs/configRetryQuery";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranchList";
+import { useProvinceList } from "@/hooks/common/useProvinceList";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useTab from "@/hooks/useTab";
 import useToast from "@/hooks/useToast";
-import { useQuery } from "@tanstack/react-query";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Tooltip } from "react-tippy";
 import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
-import useTab from "@/hooks/useTab";
+import { useClientGroup } from "./hooks/useClientGroup";
 import { useClientList } from "./hooks/useClientList";
-import { useBranchList } from "@/hooks/common/useBranchList";
 const Client = (props) => {
     const isShow = useToast();
 
@@ -56,14 +54,11 @@ const Client = (props) => {
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "client_customers");
 
-
     const initalState = {
         tabPage: router.query?.tab,
         keySearch: "",
         data: {},
         data_ex: [],
-        listDs: [],
-        listSelectCt: [],
         idBranch: null
     };
 
@@ -83,35 +78,11 @@ const Client = (props) => {
 
     const { data, isLoading, isFetching, refetch } = useClientList(params, updateTotalItems);
 
+    const { data: listGroup, refetch: refetchGroup } = useClientGroup(params);
+
     const { data: listBr } = useBranchList({});
 
-    const { refetch: refetchGroup } = useQuery({
-        queryKey: ["api_group", { ...params }],
-        queryFn: async () => {
-
-            const params = {
-                limit: 0,
-                search: isState.keySearch,
-                "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
-            }
-
-            const { rResult, output } = await apiClient.apiListGroupClient({ params: params });
-
-            queryState({ listDs: rResult })
-
-            return rResult
-        },
-        ...reTryQuery
-    });
-
-    const { } = useQuery({
-        queryKey: ["api_province"],
-        queryFn: async () => {
-            const { rResult, output } = await apiComons.apiListProvince();
-            queryState({ listSelectCt: rResult });
-            return rResult
-        },
-    });
+    const { data: listSelectCt } = useProvinceList({});
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -237,6 +208,7 @@ const Client = (props) => {
             ]),
         },
     ];
+
     return (
         <React.Fragment>
             <Head>
@@ -262,7 +234,7 @@ const Client = (props) => {
                                 {role == true || checkAdd ? (
                                     <Popup_dskh
                                         listBr={listBr || []}
-                                        listSelectCt={isState.listSelectCt}
+                                        listSelectCt={listSelectCt}
                                         onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"client_contact"}
@@ -282,8 +254,8 @@ const Client = (props) => {
                             </div>
                         </div>
                         <ContainerFilterTab>
-                            {isState.listDs &&
-                                isState.listDs.map((e) => {
+                            {listGroup &&
+                                listGroup.map((e) => {
                                     return (
                                         <div key={e.id}>
                                             <TabFilter
@@ -483,10 +455,10 @@ const Client = (props) => {
                                                         {role == true || checkEdit ? (
                                                             <Popup_dskh
                                                                 listBr={listBr || []}
-                                                                listSelectCt={isState.listSelectCt}
+                                                                listSelectCt={listSelectCt}
                                                                 onRefresh={refetch.bind(this)}
                                                                 className="xl:text-base text-xs "
-                                                                listDs={isState.listDs}
+                                                                listDs={listGroup}
                                                                 dataLang={dataLang}
                                                                 name={e.name}
                                                                 representative={e.representative}

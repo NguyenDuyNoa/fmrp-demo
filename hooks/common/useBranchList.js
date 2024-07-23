@@ -2,7 +2,7 @@ import apiComons from "@/Api/apiComon/apiComon";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { useQuery } from "@tanstack/react-query";
 
-export const useBranchList = (param) => {
+export const useBranchList = (param, value = null) => {
     return useQuery({
         queryKey: ["api_branch_list", param],
         queryFn: async () => {
