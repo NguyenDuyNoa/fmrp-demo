@@ -25,7 +25,7 @@ import Pagination from "@/components/UI/pagination";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import PopupBranch from "./components/popupBranch";
-import apiBranch from "@/Api/apiSettings/apiBranch";
+import apiBranch from "@/api/apiSettings/apiBranch";
 const Index = (props) => {
     const router = useRouter();
 

@@ -38,7 +38,7 @@ import NoData from "@/components/UI/noData/nodata";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import { useDispatch } from "react-redux";
-import apiCategory from "@/Api/apiSettings/apiCategory";
+import apiCategory from "@/api/apiSettings/apiCategory";
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
         {level == 1 && <span>--</span>}

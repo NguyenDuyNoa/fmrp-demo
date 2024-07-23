@@ -1,4 +1,4 @@
-import apiGroups from "@/Api/apiSuppliers/groups/apiGroups";
+import apiGroups from "@/api/apiSuppliers/groups/apiGroups";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
 import { Edit as IconEdit } from "iconsax-react";

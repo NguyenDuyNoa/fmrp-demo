@@ -27,10 +27,10 @@ import { Grid6 } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import PopupCategoryErrors from "./components/popup";
-import apiCategoryDetailErrors from "@/Api/apiManufacture/qc/categoryDetailErrors/apiCategoryDetailErrors";
+import apiCategoryDetailErrors from "@/api/apiManufacture/qc/categoryDetailErrors/apiCategoryDetailErrors";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import apiComons from "@/Api/apiComon/apiComon";
+import apiComons from "@/api/apiComon/apiComon";
 
 const Index = (props) => {
     const router = useRouter();

@@ -26,8 +26,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
+import apiComons from "@/api/apiComon/apiComon";
+import apiExportToOther from "@/api/apiManufacture/warehouse/exportToOther/apiExportToOther";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

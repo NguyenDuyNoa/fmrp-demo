@@ -17,6 +17,10 @@ const apiWarehouse = {
         const response = await axiosCustom('GET', `/api_web/api_warehouse/location/?csrf_protection=true&filter[warehouse_id]=${id}`);
         return response.data
     },
+    async apiNameWarehouse(id) {
+        const response = await axiosCustom('GET', `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`);
+        return response.data
+    },
 
 }
 export default apiWarehouse

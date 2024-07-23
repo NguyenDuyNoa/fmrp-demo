@@ -31,8 +31,8 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { Grid6 } from "iconsax-react";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
+import apiComons from "@/api/apiComon/apiComon";
+import apiInternalPlan from "@/api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

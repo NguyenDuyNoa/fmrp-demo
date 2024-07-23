@@ -24,8 +24,8 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { debounce } from "lodash";
 import { useSelector } from "react-redux";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
+import apiComons from "@/api/apiComon/apiComon";
+import apiRecall from "@/api/apiManufacture/warehouse/recall/apiRecall";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";

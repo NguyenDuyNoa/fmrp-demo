@@ -23,8 +23,8 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiProductsWarehouse from "@/Api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
+import apiComons from "@/api/apiComon/apiComon";
+import apiProductsWarehouse from "@/api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { routerProductsWarehouse } from "@/routers/manufacture";

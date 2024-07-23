@@ -1,6 +1,6 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
-import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
+import apiComons from "@/api/apiComon/apiComon";
+import apiServiceVoucher from "@/api/apiPurchaseOrder/apiServicevVoucher";
+import apiSuppliers from "@/api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";

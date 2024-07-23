@@ -20,7 +20,7 @@ import {
     getdataDetail,
     postData,
     postdataListTypeofDoc,
-} from "Api/apiReceipts/api";
+} from "@/api/apiReceipts/api";
 import configSelectPopup from "configs/configSelectPopup";
 import { debounce } from "lodash";
 import moment from "moment/moment";

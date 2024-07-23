@@ -1,6 +1,6 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiReturns from "@/Api/apiPurchaseOrder/apiReturns";
-import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
+import apiComons from "@/api/apiComon/apiComon";
+import apiReturns from "@/api/apiPurchaseOrder/apiReturns";
+import apiSuppliers from "@/api/apiSuppliers/suppliers/apiSuppliers";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";

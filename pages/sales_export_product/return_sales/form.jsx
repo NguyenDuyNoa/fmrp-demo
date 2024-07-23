@@ -1,6 +1,6 @@
-import apiContact from "@/Api/apiClients/contact/apiContact";
-import apiComons from "@/Api/apiComon/apiComon";
-import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
+import apiContact from "@/api/apiClients/contact/apiContact";
+import apiComons from "@/api/apiComon/apiComon";
+import apiReturnSales from "@/api/apiSalesExportProduct/returnSales/apiReturnSales";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";

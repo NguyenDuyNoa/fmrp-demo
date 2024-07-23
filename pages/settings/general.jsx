@@ -10,9 +10,9 @@ import useToast from "@/hooks/useToast";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
-import apiComons from "@/Api/apiComon/apiComon";
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
-import apiGeneral from "@/Api/apiSettings/apiGeneral";
+import apiComons from "@/api/apiComon/apiComon";
+import apiDashboard from "@/api/apiDashboard/apiDashboard";
+import apiGeneral from "@/api/apiSettings/apiGeneral";
 
 const Index = (props) => {
     const dataLang = props.dataLang;

@@ -1,5 +1,5 @@
-import apiContact from "@/Api/apiClients/contact/apiContact";
-import apiComons from "@/Api/apiComon/apiComon";
+import apiContact from "@/api/apiClients/contact/apiContact";
+import apiComons from "@/api/apiComon/apiComon";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";

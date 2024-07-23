@@ -1,4 +1,4 @@
-import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
+import apiPurchases from "@/api/apiPurchaseOrder/apiPurchases";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";

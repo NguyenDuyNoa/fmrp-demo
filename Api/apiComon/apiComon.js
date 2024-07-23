@@ -1,8 +1,8 @@
 import { _ServerInstance as axiosCustom } from "@/services/axios";
 
 const apiComons = {
-    async apiBranchCombobox() {
-        const response = await axiosCustom('GET', `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,);
+    async apiBranchCombobox(param) {
+        const response = await axiosCustom('GET', `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, param);
         return response.data
     },
     async apiSearchProductsVariant(params) {

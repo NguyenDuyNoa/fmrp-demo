@@ -1,4 +1,4 @@
-import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
+import apiServiceVoucher from "@/api/apiPurchaseOrder/apiServicevVoucher";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -35,7 +35,7 @@ const Popup_detail = (props) => {
     }
 
     const { isFetching } = useQuery({
-        queryKey: ["detail_service", props?.id],
+        queryKey: ["api_detail_service", props?.id],
         queryFn: async () => {
             const res = await apiServiceVoucher.apiDetailService(props?.id);
             sData(res);

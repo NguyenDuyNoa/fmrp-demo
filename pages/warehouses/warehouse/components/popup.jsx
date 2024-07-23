@@ -1,24 +1,14 @@
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import Select from "react-select";
-
-import {
-    Edit as IconEdit
-} from "iconsax-react";
-
-
-import apiComons from "@/Api/apiComon/apiComon";
-import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiComons from "@/api/apiComon/apiComon";
+import apiWarehouse from "@/api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
+import { SelectCore } from "@/utils/lib/Select";
+import { useMutation } from "@tanstack/react-query";
+import { Edit as IconEdit } from "iconsax-react";
+import { useEffect, useState } from "react";
 
-const Popup_kho = (props) => {
+const PopupWarehouse = (props) => {
     const [open, sOpen] = useState(false);
 
     const isShow = useToast();
@@ -68,12 +58,10 @@ const Popup_kho = (props) => {
         );
     }, [open]);
 
-    const checkId =
-        props?.id &&
-        props.branch?.reduce((obj, e) => {
-            obj.value = Number(e.id);
-            return obj;
-        }, {});
+    const checkId = props?.id && props.branch?.reduce((obj, e) => {
+        obj.value = Number(e.id);
+        return obj;
+    }, {});
     const branch_id = valueBr?.value || checkId?.value;
 
     const _HandleChangeInput = (type, value) => {
@@ -102,6 +90,12 @@ const Popup_kho = (props) => {
         }
     }, [open]);
 
+    const handingWarehous = useMutation({
+        mutationFn: ({ url, data }) => {
+            return apiWarehouse.apiHandingWarehouse(url, data)
+        }
+    })
+
     const _ServerSending = async () => {
         const id = props.id;
         let data = new FormData();
@@ -110,29 +104,29 @@ const Popup_kho = (props) => {
         data.append("address", address);
         data.append("note", note);
         data.append("branch_id[]", branch_id);
-        const url = props.id
-            ? `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`
-            : "/api_web/api_warehouse/warehouse/?csrf_protection=true";
-        try {
-            const { isSuccess, message } = await apiWarehouse.apiHandingWarehouse(url, data);
-            if (isSuccess) {
-                isShow("success", `${props.dataLang[message]}` || message);
-                sErrInputCode(false);
-                sErrInputName(false);
-                sErrInputAddress(false);
-                sName("");
-                sCode("");
-                sAddress("");
-                sNote("");
-                sErrInputBr(false);
-                sValueBr([]);
-                props.onRefresh && props.onRefresh();
-                props.onRefreshGroup && props.onRefreshGroup();
-                sOpen(false);
-            } else {
-                isShow("error", `${props.dataLang[message]}` || message);
+        const url = id ? `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true` : "/api_web/api_warehouse/warehouse/?csrf_protection=true";
+        handingWarehous.mutate({ url, data }, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", `${props.dataLang[message]}` || message);
+                    sErrInputCode(false);
+                    sErrInputName(false);
+                    sErrInputAddress(false);
+                    sName("");
+                    sCode("");
+                    sAddress("");
+                    sNote("");
+                    sErrInputBr(false);
+                    sValueBr([]);
+                    props.onRefresh && props.onRefresh();
+                    props.onRefreshGroup && props.onRefreshGroup();
+                    sOpen(false);
+                } else {
+                    isShow("error", `${props.dataLang[message]}` || message);
+                }
             }
-        } catch (error) { }
+        });
+
         sOnSending(false);
     };
     //da up date
@@ -155,15 +149,15 @@ const Popup_kho = (props) => {
 
     useEffect(() => {
         sErrInputCode(false);
-    }, [code.length > 0]);
+    }, [code?.length > 0]);
 
     useEffect(() => {
         sErrInputName(false);
-    }, [name.length > 0]);
+    }, [name?.length > 0]);
 
     useEffect(() => {
         sErrInputAddress(false);
-    }, [address.length > 0]);
+    }, [address?.length > 0]);
 
     useEffect(() => {
         sErrInputBr(false);
@@ -264,7 +258,7 @@ const Popup_kho = (props) => {
                                                 {props.dataLang?.client_list_brand}{" "}
                                                 <span className="text-red-500">*</span>
                                             </label>
-                                            <Select
+                                            <SelectCore
                                                 //  closeMenuOnSelect={false}
                                                 placeholder={props.dataLang?.client_list_brand}
                                                 options={brandpOpt}
@@ -349,4 +343,4 @@ const Popup_kho = (props) => {
     );
 };
 
-export default Popup_kho;
+export default PopupWarehouse;

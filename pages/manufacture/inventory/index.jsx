@@ -37,8 +37,8 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import NoData from "@/components/UI/noData/nodata";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
+import apiComons from "@/api/apiComon/apiComon";
+import apiInventory from "@/api/apiManufacture/warehouse/inventory/apiInventory";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

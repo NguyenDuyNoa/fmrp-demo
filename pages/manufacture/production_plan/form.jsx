@@ -16,8 +16,8 @@ import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
 import { routerPproductionPlan } from "@/routers/manufacture";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
+import apiComons from "@/api/apiComon/apiComon";
+import apiProductionPlan from "@/api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";

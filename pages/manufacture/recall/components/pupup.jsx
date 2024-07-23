@@ -15,7 +15,7 @@ import Loading from "components/UI/loading";
 
 import { useEffect } from "react";
 
-import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
+import apiRecall from "@/api/apiManufacture/warehouse/recall/apiRecall";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";

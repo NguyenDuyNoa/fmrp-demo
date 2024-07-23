@@ -1,6 +1,6 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
-import apiSatff from "@/Api/apiPersonnel/apiStaff";
+import apiComons from "@/api/apiComon/apiComon";
+import apiDepartments from "@/api/apiPersonnel/apiDepartments";
+import apiSatff from "@/api/apiPersonnel/apiStaff";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

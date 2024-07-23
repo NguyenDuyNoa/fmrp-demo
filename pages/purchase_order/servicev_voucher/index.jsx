@@ -1,6 +1,6 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
-import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
+import apiComons from "@/api/apiComon/apiComon";
+import apiPurchases from "@/api/apiPurchaseOrder/apiPurchases";
+import apiServiceVoucher from "@/api/apiPurchaseOrder/apiServicevVoucher";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -134,7 +134,7 @@ const Index = (props) => {
     })
 
     useQuery({
-        queryKey: ["servicev_voucher_filter"],
+        queryKey: ["api_servicev_voucher_filter"],
         queryFn: async () => {
             const { result: listBr } = await apiComons.apiBranchCombobox();
 
@@ -167,7 +167,7 @@ const Index = (props) => {
     }, 500);
 
     const { refetch: refetchFilter } = useQuery({
-        queryKey: ["servicev_voucher_filterbar", {
+        queryKey: ["api_servicev_voucher_filterbar", {
             ...params,
             limit: 0,
             page: undefined,

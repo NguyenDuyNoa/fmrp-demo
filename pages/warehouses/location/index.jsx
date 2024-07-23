@@ -1,5 +1,5 @@
-import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import apiWarehouse from "@/api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiLocationWarehouse from "@/api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -17,6 +17,7 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -26,13 +27,14 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useQuery } from "@tanstack/react-query";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import Popup_Vitrikho from "./components/popup";
+import PopupLocationWarehouse from "./components/popup";
 const Location = (props) => {
     const dataLang = props.dataLang;
 
@@ -44,13 +46,11 @@ const Location = (props) => {
 
     const initialState = {
         keySearch: "",
-        onFetching: false,
         data: [],
         data_ex: [],
         valueWarehouse: null,
         listWarehouse: [],
         onSending: null,
-        onFetchingWarehouse: false,
     };
 
     const { paginate } = usePagination();
@@ -73,50 +73,37 @@ const Location = (props) => {
 
     const [active, sActive] = useState(null);
 
-    const _HandleFresh = () => { };
+    const params = {
+        search: isState.keySearch,
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[warehouse_id]": isState.valueWarehouse ? isState.valueWarehouse?.value : null,
+    };
 
-    const _ServerFetching = async () => {
-        const params = {
-            search: isState.keySearch,
-            limit: limit,
-            page: router.query?.page || 1,
-            "filter[warehouse_id]": isState.valueWarehouse ? isState.valueWarehouse?.value : null,
-        };
-        try {
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["api_list_location_warehouse", { ...params }],
+        queryFn: async () => {
             const { rResult, output } = await apiLocationWarehouse.apiLocationWarehouse({ params: params });
             sTotalItems(output);
-            queryState({ data: rResult, data_ex: rResult, onFetching: false });
-        } catch (error) { }
-    };
-    const _ServerFetching_kho = async () => {
-        const params = {
-            limit: 0,
-            "filter[is_system]": 2,
-        };
-        try {
+            queryState({ data: rResult, data_ex: rResult });
+            return rResult
+        },
+        ...reTryQuery
+    })
+
+    useQuery({
+        queryKey: ["api_list_warehouse"],
+        queryFn: async () => {
+            const params = {
+                limit: 0,
+                "filter[is_system]": 2,
+            };
             const { rResult } = await apiWarehouse.apiListWarehouse({ params: params });
-            queryState({
-                listWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })),
-                onFetchingWarehouse: false,
-            });
-        } catch (error) { }
-    };
-
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
-
-    useEffect(() => {
-        isState.onFetchingWarehouse && _ServerFetching_kho();
-    }, [isState.onFetchingWarehouse]);
-
-    useEffect(() => {
-        queryState({ onFetchingWarehouse: true });
-    }, []);
-
-    useEffect(() => {
-        queryState({ onFetching: true });
-    }, [limit, router.query?.page, isState.valueWarehouse]);
+            queryState({ listWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })), });
+            return rResult
+        },
+        ...reTryQuery
+    })
 
     // 1true 0 fal
     const handleDelete = async () => {
@@ -148,7 +135,7 @@ const Location = (props) => {
             } else {
                 isShow("error", `${dataLang[message] || message}`);
             }
-            await _ServerFetching();
+            await refetch()
         } catch (error) { }
         queryState({ onSending: false });
     };
@@ -172,7 +159,6 @@ const Location = (props) => {
                 page: router.query?.page,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
     //excel
     const multiDataSet = [
@@ -266,10 +252,10 @@ const Location = (props) => {
                             </h2>
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
-                                    <Popup_Vitrikho
+                                    <PopupLocationWarehouse
                                         // listKho={listKho}
                                         isState={isState}
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
@@ -318,7 +304,7 @@ const Location = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
@@ -370,7 +356,7 @@ const Location = (props) => {
                                             {dataLang?.branch_popup_properties}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
@@ -420,8 +406,8 @@ const Location = (props) => {
                                                             className="space-x-2 text-center flex items-center justify-center"
                                                         >
                                                             {role == true || checkEdit ? (
-                                                                <Popup_Vitrikho
-                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                <PopupLocationWarehouse
+                                                                    onRefresh={refetch.bind(this)}
                                                                     warehouse_name={e.warehouse_name}
                                                                     warehouse_id={e.warehouse_id}
                                                                     isState={isState}
@@ -440,7 +426,7 @@ const Location = (props) => {
                                                                 />
                                                             )}
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
                                                                 onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}

@@ -1,7 +1,7 @@
 import PopupCustom from "@/components/UI/popup";
 import { memo, useState } from "react";
 
-import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
+import apiProductionsOrders from "@/api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import ButtonCancel from "@/components/UI/button/buttonCancel";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";

@@ -5,7 +5,7 @@ import ModalImage from "react-modal-image";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 
-import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
+import apiInventory from "@/api/apiManufacture/warehouse/inventory/apiInventory";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";

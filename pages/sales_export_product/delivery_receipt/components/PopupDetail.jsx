@@ -14,7 +14,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
+import apiDeliveryReceipt from "@/api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import NoData from "@/components/UI/noData/nodata";

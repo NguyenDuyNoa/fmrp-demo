@@ -1,19 +1,17 @@
-import { Edit as IconEdit } from "iconsax-react";
-import { useEffect, useRef, useState } from "react";
-import Select from "react-select";
-
-import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import apiLocationWarehouse from "@/api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
-
-const Popup_Vitrikho = (props) => {
+import { SelectCore } from "@/utils/lib/Select";
+import { useMutation } from "@tanstack/react-query";
+import { Edit as IconEdit } from "iconsax-react";
+import { useEffect, useRef, useState } from "react";
+const PopupLocationWarehouse = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
 
     const scrollAreaRef = useRef(null);
-
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
@@ -23,7 +21,7 @@ const Popup_Vitrikho = (props) => {
 
     const [onSending, sOnSending] = useState(false);
 
-    const [khoOpt, sListkho] = useState([]);
+    const [listWarehouse, sListwarehouse] = useState([]);
 
     const [name, sName] = useState("");
 
@@ -33,18 +31,18 @@ const Popup_Vitrikho = (props) => {
 
     const [errInputName, sErrInputName] = useState(false);
 
-    const [errInputKho, sErrInputKho] = useState(false);
+    const [errInputWarehouse, sErrInputWarehouse] = useState(false);
 
-    const [valuekho, sValuekho] = useState(null);
+    const [valueWarehouse, sValueWarehouse] = useState(null);
 
     useEffect(() => {
-        sErrInputKho(false);
+        sErrInputWarehouse(false);
         sErrInputCode(false);
         sErrInputName(false);
         sName(props.name ? props.name : "");
         sCode(props.code ? props.code : "");
-        sListkho(props.isState.listWarehouse || []);
-        sValuekho(
+        sListwarehouse(props.isState.listWarehouse || []);
+        sValueWarehouse(
             props.id
                 ? {
                     label: props.warehouse_name,
@@ -57,37 +55,49 @@ const Popup_Vitrikho = (props) => {
     const _HandleChangeInput = (type, value) => {
         if (type == "name") {
             sName(value.target?.value);
-        } else if (type == "valuekho") {
-            sValuekho(value);
+        } else if (type == "valueWarehouse") {
+            sValueWarehouse(value);
         } else if (type == "code") {
             sCode(value.target?.value);
         }
     };
+
+    const handingLocation = useMutation({
+        mutationFn: ({ url, data }) => {
+            return apiLocationWarehouse.apiHandingLocation(url, data);
+        }
+    })
+
     const _ServerSending = async () => {
         const id = props.id;
+
         let data = new FormData();
+
         data.append("name", name ? name : "");
+
         data.append("code", code ? code : "");
-        data.append("warehouse_id", valuekho?.value ? valuekho?.value : "");
-        const url = props.id
-            ? `/api_web/api_warehouse/location/${id}?csrf_protection=true`
-            : "/api_web/api_warehouse/location/?csrf_protection=true";
-        try {
-            const { isSuccess, message } = await apiLocationWarehouse.apiHandingLocation(url, data);
-            if (isSuccess) {
-                isShow("success", `${props.dataLang[message]}`);
-                props.onRefresh && props.onRefresh();
-                sOpen(false);
-                sErrInputCode(false);
-                sErrInputName(false);
-                sErrInputKho(false);
-                sName("");
-                sCode("");
-                sValuekho(null);
-            } else {
-                isShow("error", `${props.dataLang[message]}`);
+
+        data.append("warehouse_id", valueWarehouse?.value ? valueWarehouse?.value : "");
+
+        const url = id ? `/api_web/api_warehouse/location/${id}?csrf_protection=true` : "/api_web/api_warehouse/location/?csrf_protection=true";
+
+        handingLocation.mutate({ url, data }, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", `${props.dataLang[message]}`);
+                    props.onRefresh && props.onRefresh();
+                    sOpen(false);
+                    sErrInputCode(false);
+                    sErrInputName(false);
+                    sErrInputWarehouse(false);
+                    sName("");
+                    sCode("");
+                    sValueWarehouse(null);
+                } else {
+                    isShow("error", `${props.dataLang[message]}`);
+                }
             }
-        } catch (error) { }
+        })
         sOnSending(false);
     };
 
@@ -98,14 +108,14 @@ const Popup_Vitrikho = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (code.length == 0 || valuekho?.length == 0 || name.length == 0 || valuekho == null) {
+        if (code.length == 0 || valueWarehouse?.length == 0 || name.length == 0 || valueWarehouse == null) {
             code?.length == 0 && sErrInputCode(true);
 
             name?.length == 0 && sErrInputName(true);
 
-            valuekho?.length == 0 && sErrInputKho(true);
+            valueWarehouse?.length == 0 && sErrInputWarehouse(true);
 
-            valuekho == null && sErrInputKho(true);
+            valueWarehouse == null && sErrInputWarehouse(true);
 
             isShow("error", `${props.dataLang?.required_field_null}`);
         } else {
@@ -122,8 +132,8 @@ const Popup_Vitrikho = (props) => {
     }, [name?.length > 0]);
 
     useEffect(() => {
-        sErrInputKho(false);
-    }, [valuekho?.length > 0, valuekho != null]);
+        sErrInputWarehouse(false);
+    }, [valueWarehouse?.length > 0, valueWarehouse != null]);
 
     return (
         <>
@@ -195,13 +205,13 @@ const Popup_Vitrikho = (props) => {
                                                 {props.dataLang?.warehouses_localtion_ware}{" "}
                                                 <span className="text-red-500">*</span>
                                             </label>
-                                            <Select
+                                            <SelectCore
                                                 placeholder={props.dataLang?.warehouses_localtion_ware}
-                                                options={khoOpt}
+                                                options={listWarehouse}
                                                 isSearchable={true}
-                                                onChange={_HandleChangeInput.bind(this, "valuekho")}
+                                                onChange={_HandleChangeInput.bind(this, "valueWarehouse")}
                                                 noOptionsMessage={() => "Không có dữ liệu"}
-                                                value={valuekho}
+                                                value={valueWarehouse}
                                                 maxMenuHeight="200px"
                                                 isClearable={true}
                                                 menuPortalTarget={document.body}
@@ -225,10 +235,10 @@ const Popup_Vitrikho = (props) => {
                                                         },
                                                     }),
                                                 }}
-                                                className={`${errInputKho ? "border-red-500" : "border-transparent"
+                                                className={`${errInputWarehouse ? "border-red-500" : "border-transparent"
                                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             />
-                                            {errInputKho && (
+                                            {errInputWarehouse && (
                                                 <label className="mb-2  text-[14px] text-red-500">
                                                     {props.dataLang?.warehouses_localtion_errWare}
                                                 </label>
@@ -260,4 +270,4 @@ const Popup_Vitrikho = (props) => {
         </>
     );
 };
-export default Popup_Vitrikho;
+export default PopupLocationWarehouse;

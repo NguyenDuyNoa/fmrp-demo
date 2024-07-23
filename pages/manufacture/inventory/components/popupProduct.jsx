@@ -23,7 +23,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 
-import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
+import apiInventory from "@/api/apiManufacture/warehouse/inventory/apiInventory";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
 const Popup_Product = React.memo((props) => {

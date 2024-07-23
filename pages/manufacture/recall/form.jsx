@@ -21,8 +21,8 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { routerRecall } from "@/routers/manufacture";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
+import apiComons from "@/api/apiComon/apiComon";
+import apiRecall from "@/api/apiManufacture/warehouse/recall/apiRecall";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";

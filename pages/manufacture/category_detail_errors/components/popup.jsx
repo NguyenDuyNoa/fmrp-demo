@@ -2,7 +2,7 @@ import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useState } from "react";
 import PopupCustom from "/components/UI/popup";
 
-import apiCategoryDetailErrors from "@/Api/apiManufacture/qc/categoryDetailErrors/apiCategoryDetailErrors";
+import apiCategoryDetailErrors from "@/api/apiManufacture/qc/categoryDetailErrors/apiCategoryDetailErrors";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import useToast from "@/hooks/useToast";
 import { debounce } from "lodash";

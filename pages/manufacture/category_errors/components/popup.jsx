@@ -2,8 +2,8 @@ import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useState } from "react";
 import PopupCustom from "/components/UI/popup";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiCategoryErrors from "@/Api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
+import apiComons from "@/api/apiComon/apiComon";
+import apiCategoryErrors from "@/api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import useToast from "@/hooks/useToast";
 import { Controller, useForm } from "react-hook-form";

@@ -1,4 +1,4 @@
-import apiGroup from "@/Api/apiClients/group/apiGroup";
+import apiGroup from "@/api/apiClients/group/apiGroup";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
 import {

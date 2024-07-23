@@ -1,132 +1,97 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import {
-    House2,
-    Grid6 as IconExcel,
-    SearchNormal1 as IconSearch,
-    Refresh2
-} from "iconsax-react";
-import Swal from "sweetalert2";
-
+import apiWarehouse from "@/api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiVariant from "@/api/apiSettings/apiVariant";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useQuery } from "@tanstack/react-query";
+import Loading from "components/UI/loading";
+import { House2, Grid6 as IconExcel, SearchNormal1 as IconSearch, Refresh2 } from "iconsax-react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 import ReactExport from "react-data-export";
 import ModalImage from "react-modal-image";
 import "react-phone-input-2/lib/style.css";
 import Select, { components } from "react-select";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import Pagination from "/components/UI/pagination";
+import NoData from "@/components/UI/noData/nodata";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
     const router = useRouter();
-    const { paginate } = usePagination();
-    const dataLang = props.dataLang;
     const id = router.query.slug;
+    const dataLang = props.dataLang;
     const [data, sData] = useState([]);
-    const [data_ex, sData_ex] = useState([]);
-    const [onFetching, sOnFetching] = useState(true);
-
-    const [keySearch, sKeySearch] = useState("");
-    const [limit, sLimit] = useState(15);
-    const [totalItem, sTotalItem] = useState([]);
-
+    const { paginate } = usePagination();
     const [title, sTitle] = useState("");
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
+    const [data_ex, sData_ex] = useState([]);
+    const statusExprired = useStatusExprired();
+    const [keySearch, sKeySearch] = useState("");
+    const [variant, sListVariant] = useState([]);
     const [location, sListLocation] = useState([]);
     const [idLocation, sIdLocation] = useState(null);
-    const [variant, sListVariant] = useState([]);
     const [idVariantMain, sIdVariantMain] = useState(null);
     const [idVariantSub, sIdVariantSub] = useState(null);
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems();
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_warehouse/warehouse_detail/${id}?csrf_protection=true`,
-            {
-                params: {
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[location_id]": idLocation?.value ? idLocation?.value : null,
-                    "filter[variation_option_id_1]": idVariantMain?.value ? idVariantMain?.value : null,
-                    "filter[variation_option_id_2]": idVariantSub?.value ? idVariantSub?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult, output } = response.data;
-                    sData(rResult);
-                    sTotalItem(output);
-                    sData_ex(rResult);
-                }
-                sOnFetching(false);
-            }
-        );
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-        });
-        Axios("GET", `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var { name } = response.data;
-                sTitle(name);
-            }
-        });
-    };
 
-    const _ServerFetching_localtion = () => {
-        Axios(
-            "GET",
-            `/api_web/api_warehouse/location/?csrf_protection=true&filter[warehouse_id]=${id}`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListLocation(rResult.map((e) => ({ label: e.name, value: e.id })));
-                }
-                sOnFetching(false);
-            }
-        );
-    };
-    const _ServerFetching_Variation = () => {
-        Axios("GET", `/api_web/Api_variation/variation?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data ?? {};
-                const options = rResult?.flatMap(({ option }) => option) ?? [];
-                sListVariant(
-                    options?.map(({ id, name }) => ({
-                        label: name,
-                        value: id,
-                    }))
-                );
-            }
-            sOnFetching(false);
-        });
-    };
+    const params = {
+        search: keySearch,
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[location_id]": idLocation?.value ? idLocation?.value : null,
+        "filter[variation_option_id_1]": idVariantMain?.value ? idVariantMain?.value : null,
+        "filter[variation_option_id_2]": idVariantSub?.value ? idVariantSub?.value : null,
+    }
+
+    const { isFetching, refetch } = useQuery({
+        queryKey: ['api_detail_warehouse', { ...params }],
+        queryFn: async () => {
+            const { rResult, output } = await apiWarehouse.apiWarehouseDetail(id, { params: params })
+            const { name } = await apiWarehouse.apiNameWarehouse(id)
+            sTitle(name);
+            sData(rResult);
+            sTotalItem(output);
+            sData_ex(rResult);
+            return rResult
+        },
+        ...reTryQuery
+    })
+
+
+    useQuery({
+        queryKey: ['api_location', { ...params }],
+        queryFn: async () => {
+            const { rResult, } = await apiWarehouse.apiLocationWarehouse(id, { params: params })
+            sListLocation(rResult.map((e) => ({ label: e.name, value: e.id })));
+            return rResult
+        },
+        ...reTryQuery
+    })
+
+
+    useQuery({
+        queryKey: ['api_variation', { ...params }],
+        queryFn: async () => {
+            const { rResult } = await apiVariant.apiListVariant(id, { params: params })
+            const options = rResult?.flatMap(({ option }) => option) ?? [];
+            sListVariant(options?.map(({ id, name }) => ({
+                label: name,
+                value: id,
+            }))
+            );
+            return rResult
+        },
+        ...reTryQuery
+    })
+
 
     const onchang_filter = (type, value) => {
         if (type == "location") {
@@ -138,20 +103,6 @@ const Index = (props) => {
         }
     };
 
-    useEffect(() => {
-        setTimeout(() => {
-            (onFetching && _ServerFetching()) ||
-                (onFetching && _ServerFetching_localtion()) ||
-                (onFetching && _ServerFetching_Variation());
-        }, 500);
-    }, [onFetching]);
-    useEffect(() => {
-        sOnFetching(true) ||
-            (keySearch && sOnFetching(true)) ||
-            (idLocation?.length > 0 && sOnFetching(true)) ||
-            (idVariantMain?.length > 0 && sOnFetching(true)) ||
-            (idVariantSub?.length > 0 && sOnFetching(true));
-    }, [limit, router.query?.page, idLocation, idVariantMain, idVariantSub]);
 
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);
@@ -160,23 +111,15 @@ const Index = (props) => {
                 slug: router.query.slug,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
     };
 
-    const newResult = data_ex
-        ?.map((item) => {
-            const detail = item.detail || [];
-            return detail.map((detailItem) => ({
-                ...item,
-                detail: detailItem,
-            }));
-        })
-        .flat();
+    const newResult = data_ex?.map((item) => {
+        const detail = item.detail || [];
+        return detail.map((detailItem) => ({
+            ...item,
+            detail: detailItem,
+        }));
+    }).flat();
 
     const multiDataSet = [
         {
@@ -329,10 +272,6 @@ const Index = (props) => {
         const integerPart = Math.floor(number);
         return integerPart.toLocaleString("en");
     };
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
-    const statusExprired = useStatusExprired();
 
     return (
         <React.Fragment>
@@ -393,9 +332,7 @@ const Index = (props) => {
                                                     options={[
                                                         {
                                                             value: "",
-                                                            label:
-                                                                dataLang?.warehouses_detail_filterWare ||
-                                                                "warehouses_detail_filterWare",
+                                                            label: dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare",
                                                             isDisabled: true,
                                                         },
                                                         ...location,
@@ -404,10 +341,7 @@ const Index = (props) => {
                                                     value={idLocation}
                                                     hideSelectedOptions={false}
                                                     isClearable={true}
-                                                    placeholder={
-                                                        dataLang?.warehouses_detail_filterWare ||
-                                                        "warehouses_detail_filterWare"
-                                                    }
+                                                    placeholder={dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare"}
                                                     className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                     isSearchable={true}
                                                     noOptionsMessage={() => "Không có dữ liệu"}
@@ -451,9 +385,7 @@ const Index = (props) => {
                                                     options={[
                                                         {
                                                             value: "",
-                                                            label:
-                                                                dataLang?.warehouses_detail_filterMain ||
-                                                                "warehouses_detail_filterMain",
+                                                            label: dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain",
                                                             isDisabled: true,
                                                         },
                                                         ...variant,
@@ -462,10 +394,7 @@ const Index = (props) => {
                                                     value={idVariantMain}
                                                     hideSelectedOptions={false}
                                                     isClearable={true}
-                                                    placeholder={
-                                                        dataLang?.warehouses_detail_filterMain ||
-                                                        "warehouses_detail_filterMain"
-                                                    }
+                                                    placeholder={dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain"}
                                                     className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                     isSearchable={true}
                                                     noOptionsMessage={() => "Không có dữ liệu"}
@@ -509,9 +438,7 @@ const Index = (props) => {
                                                     options={[
                                                         {
                                                             value: "",
-                                                            label:
-                                                                dataLang?.warehouses_detail_filterSub ||
-                                                                "warehouses_detail_filterSub",
+                                                            label: dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub",
                                                             isDisabled: true,
                                                         },
                                                         ...variant,
@@ -520,10 +447,7 @@ const Index = (props) => {
                                                     value={idVariantSub}
                                                     hideSelectedOptions={false}
                                                     isClearable={true}
-                                                    placeholder={
-                                                        dataLang?.warehouses_detail_filterSub ||
-                                                        "warehouses_detail_filterSub"
-                                                    }
+                                                    placeholder={dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub"}
                                                     className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                     isSearchable={true}
                                                     noOptionsMessage={() => "Không có dữ liệu"}
@@ -563,7 +487,7 @@ const Index = (props) => {
                                         </div>
                                         <div className="flex space-x-2 items-center justify-end col-span-2">
                                             <button
-                                                onClick={_HandleFresh.bind(this)}
+                                                onClick={refetch.bind(this)}
                                                 type="button"
                                                 className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                             >
@@ -635,8 +559,7 @@ const Index = (props) => {
                                                 {dataLang?.warehouses_detail_plu || "warehouses_detail_plu"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_productname ||
-                                                    "warehouses_detail_productname"}
+                                                {dataLang?.warehouses_detail_productname || "warehouses_detail_productname"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
                                                 {dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}
@@ -652,8 +575,7 @@ const Index = (props) => {
                                                     {"Serial"}
                                                 </h4>
                                             )}
-                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                dataProductExpiry.is_enable === "1" ? (
+                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                 <>
                                                     <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
                                                         {"Lot"}
@@ -672,7 +594,7 @@ const Index = (props) => {
                                                 {dataLang?.warehouses_detail_value || "warehouses_detail_value"}
                                             </h4>
                                         </div>
-                                        {onFetching ? (
+                                        {(isFetching) ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
@@ -839,19 +761,7 @@ const Index = (props) => {
                                                     </div>
                                                 ))}
                                             </div>
-                                        ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
-                                                    </div>
-                                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        Không tìm thấy các mục
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 "></div>
-                                                </div>
-                                            </div>
-                                        )}
+                                        ) : <NoData />}
                                     </div>
                                 </div>
                             </div>

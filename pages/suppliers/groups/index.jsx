@@ -1,5 +1,5 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiGroups from "@/Api/apiSuppliers/groups/apiGroups";
+import apiComons from "@/api/apiComon/apiComon";
+import apiGroups from "@/api/apiSuppliers/groups/apiGroups";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

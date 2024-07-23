@@ -1,4 +1,4 @@
-import apiStatus from "@/Api/apiClients/status/apiStatus";
+import apiStatus from "@/api/apiClients/status/apiStatus";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
 import {

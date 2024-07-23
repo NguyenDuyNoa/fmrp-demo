@@ -1,32 +1,5 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-
-import { Grid6 } from "iconsax-react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-
-import LinkWarehouse from "../components/linkWarehouse";
-import Popup_status from "../components/popupStatus";
-import Popup_chitiet from "./components/pupup";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
-import useSetingServer from "@/hooks/useConfigNumber";
-import useActionRole from "@/hooks/useRole";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-
-import { routerWarehouseTransfer } from "routers/manufacture";
-
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-
-import apiComons from "@/Api/apiComon/apiComon";
-import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
+import apiComons from "@/api/apiComon/apiComon";
+import apiWarehouseTransfer from "@/api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -56,10 +29,31 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { reTryQuery } from "@/configs/configRetryQuery";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { useQuery } from "@tanstack/react-query";
+import { Grid6 } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import { useSelector } from "react-redux";
+import { routerWarehouseTransfer } from "routers/manufacture";
+import LinkWarehouse from "../components/linkWarehouse";
+import Popup_status from "../components/popupStatus";
+import PopupDetail from "./components/pupup";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -77,13 +71,10 @@ const Index = (props) => {
     const initialState = {
         data: [],
         dataExcel: [],
-        onFetching: false,
-        onFetching_filter: false,
-        onFetchingGroup: false,
         onSending: false,
         keySearch: "",
         listBr: [],
-        lisCode: [],
+        listCode: [],
         idExportWarehouse: null,
         idReceivingWarehouse: null,
         dataWarehouse: [],
@@ -116,6 +107,7 @@ const Index = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkExport } = useActionRole(auth, "warehouseTransfer");
+
     const _HandleSelectTab = (e) => {
         router.push({
             pathname: router.route,
@@ -128,68 +120,79 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
-        queryState({ onFetching_filter: true });
     }, []);
 
-    const _ServerFetching = async () => {
-        try {
-            const tabPage = router.query?.tab;
-            const params = {
-                search: isState.keySearch,
-                limit: limit,
-                page: router.query?.page || 1,
-                "filter[status_bar]": tabPage ?? null,
-                "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                "filter[warehouses_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
-                "filter[warehouses_to]":
-                    isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
-            };
+    const params = {
+        search: isState.keySearch,
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[status_bar]": router.query?.tab ?? null,
+        "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+        "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+        "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+        "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+        "filter[warehouses_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
+        "filter[warehouses_to]": isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
+    };
+
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["api_warehouse_transfer", { ...params }],
+        queryFn: async () => {
             const { rResult, output, rTotal } = await apiWarehouseTransfer.apiListTransfer({ params: params });
+
             sTotalItems(output);
+
             sTotal(rTotal);
-            queryState({ data: rResult, dataExcel: rResult, onFetching: false });
-        } catch (error) { }
-    };
 
-    const _ServerFetching_group = async () => {
-        try {
-            const params = {
-                limit: 0,
-                search: isState.keySearch,
-                "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                "filter[warehouses_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
-                "filter[warehouses_to]":
-                    isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
-            };
-            const db = await apiWarehouseTransfer.apiTransferFilterBar({ params: params });
-            queryState({ listDs: db || [], onFetchingGroup: false });
-        } catch (error) { }
-    };
+            queryState({ data: rResult, dataExcel: rResult });
 
-    const _ServerFetching_filter = async () => {
-        try {
+            return rResult;
+        },
+        ...reTryQuery
+    })
+
+    const { refetch: refetchFilterBar } = useQuery({
+        queryKey: ["api_warehouse_transfer_filterbar", { ...params }],
+        queryFn: async () => {
+            const db = await apiWarehouseTransfer.apiTransferFilterBar({
+                params: {
+                    ...params,
+                    limit: 0,
+                }
+            });
+            queryState({ listDs: db || [] });
+            return db;
+        },
+        ...reTryQuery
+    })
+
+
+    useQuery({
+        queryKey: ["api_warehouse_transfer_filter"],
+        queryFn: async () => {
             const { result: listBr } = await apiComons.apiBranchCombobox();
+
             const { result: listCode } = await apiWarehouseTransfer.apiTransferCombobox("GET");
+
             const data = await apiWarehouseTransfer.apiWarehouseComboboxFindBranch();
+
             const db = data?.map((e) => ({
                 label: e?.warehouse_name,
                 value: e?.id,
             }));
+
             queryState({
                 listCode: listCode?.map((e) => ({ label: e.code, value: e.id })) || [],
                 listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
                 dataWarehouse: db || [],
                 dataReceivingWarehouse: db || [],
-                onFetching_filter: false,
             });
-        } catch (error) { }
-    };
+
+            return { listBr, listCode, dataWarehouse: db, dataReceivingWarehouse: db };
+        },
+        ...reTryQuery
+    })
+
 
     const _HandleSeachApi = debounce(async (inputValue) => {
         try {
@@ -198,36 +201,9 @@ const Index = (props) => {
                     term: inputValue,
                 },
             });
-            queryState({ lisCode: listCode?.map((e) => ({ label: e.code, value: e.id })) || [] });
+            queryState({ listCode: listCode?.map((e) => ({ label: e.code, value: e.id })) || [] });
         } catch (error) { }
     }, 500);
-
-    useEffect(() => {
-        isState.onFetching_filter && _ServerFetching_filter();
-    }, [isState.onFetching_filter]);
-
-    useEffect(() => {
-        isState.onFetching && _ServerFetching();
-    }, [isState.onFetching]);
-
-    useEffect(() => {
-        isState.onFetchingGroup && _ServerFetching_group();
-    }, [isState.onFetchingGroup]);
-
-    useEffect(() => {
-        queryState({ onFetching: true, onFetchingGroup: true });
-    }, [
-        limit,
-        router.query?.page,
-        router.query?.tab,
-        isState.idBranch,
-        isState.valueDate.endDate,
-        isState.valueDate.startDate,
-        isState.idSupplier,
-        isState.idCode,
-        isState.idExportWarehouse,
-        isState.idReceivingWarehouse,
-    ]);
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
@@ -241,7 +217,6 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true });
     }, 500);
 
     const multiDataSet = [
@@ -385,7 +360,6 @@ const Index = (props) => {
                 checkedpost: isKeyState?.checkedUn,
             };
             sCheckedWare(dataChecked);
-            // queryState({ data: [...isState.data] })
         }
 
         handleQueryId({ status: false });
@@ -412,8 +386,8 @@ const Index = (props) => {
 
             if (isSuccess) {
                 isShow(alert_type, dataLang[message] || message);
-                await _ServerFetching();
-                await _ServerFetching_group();
+                await refetch()
+                await refetchFilterBar()
             } else {
                 isShow("error", dataLang[message] || message);
             }
@@ -485,25 +459,24 @@ const Index = (props) => {
                         </div>
 
                         <ContainerFilterTab>
-                            {isState.listDs &&
-                                isState.listDs.map((e) => {
-                                    return (
-                                        <div>
-                                            <TabFilter
-                                                style={{
-                                                    backgroundColor: "#e2f0fe",
-                                                }}
-                                                dataLang={dataLang}
-                                                key={e.id}
-                                                onClick={_HandleSelectTab.bind(this, `${e.id}`)}
-                                                total={e.count}
-                                                active={e.id}
-                                            >
-                                                {dataLang[e?.name] || e?.name}
-                                            </TabFilter>
-                                        </div>
-                                    );
-                                })}
+                            {isState.listDs && isState.listDs.map((e) => {
+                                return (
+                                    <div key={e?.id}>
+                                        <TabFilter
+                                            style={{
+                                                backgroundColor: "#e2f0fe",
+                                            }}
+                                            dataLang={dataLang}
+                                            key={e?.id}
+                                            onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                            total={e?.count}
+                                            active={e?.id}
+                                        >
+                                            {dataLang[e?.name] || e?.name}
+                                        </TabFilter>
+                                    </div>
+                                );
+                            })}
                         </ContainerFilterTab>
                         <ContainerTable>
                             <div className="xl:space-y-3 space-y-2">
@@ -520,19 +493,14 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_table_branch ||
-                                                            "purchase_order_table_branch",
+                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
                                                 ]}
                                                 onChange={(e) => queryState({ idBranch: e })}
                                                 value={isState.idBranch}
-                                                placeholder={
-                                                    dataLang?.purchase_order_table_branch ||
-                                                    "purchase_order_table_branch"
-                                                }
+                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                                 isClearable={true}
                                                 colSpan={1}
                                             />
@@ -544,18 +512,14 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_table_code ||
-                                                            "purchase_order_table_code",
+                                                        label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
                                                         isDisabled: true,
                                                     },
-                                                    ...isState.lisCode,
+                                                    ...isState.listCode,
                                                 ]}
                                                 onChange={(e) => queryState({ idCode: e })}
                                                 value={isState.idCode}
-                                                placeholder={
-                                                    dataLang?.purchase_order_table_code || "purchase_order_table_code"
-                                                }
+                                                placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
                                                 isClearable={true}
                                             />
                                             <SelectComponent
@@ -563,19 +527,14 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.warehouseTransfer_transferWarehouse ||
-                                                            "warehouseTransfer_transferWarehouse",
+                                                        label: dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.dataWarehouse,
                                                 ]}
                                                 onChange={(e) => queryState({ idExportWarehouse: e })}
                                                 value={isState.idExportWarehouse}
-                                                placeholder={
-                                                    dataLang?.warehouseTransfer_transferWarehouse ||
-                                                    "warehouseTransfer_transferWarehouse"
-                                                }
+                                                placeholder={dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
                                                 isClearable={true}
                                             />
                                             <SelectComponent
@@ -607,16 +566,13 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
                                                         <ExcelFileComponent
                                                             dataLang={dataLang}
-                                                            filename={
-                                                                dataLang?.warehouseTransfer_list ||
-                                                                "warehouseTransfer_list"
-                                                            }
+                                                            filename={dataLang?.warehouseTransfer_list || "warehouseTransfer_list"}
                                                             title="DSCK"
                                                             multiDataSet={multiDataSet}
                                                         />
@@ -648,16 +604,13 @@ const Index = (props) => {
                                             {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouseTransfer_transferWarehouse ||
-                                                "warehouseTransfer_transferWarehouse"}
+                                            {dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouseTransfer_receivingWarehouse ||
-                                                "warehouseTransfer_receivingWarehouse"}
+                                            {dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.production_warehouse_Total_value ||
-                                                "production_warehouse_Total_value"}
+                                            {dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}
@@ -678,7 +631,7 @@ const Index = (props) => {
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isState.onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
@@ -689,7 +642,7 @@ const Index = (props) => {
                                                             {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <Popup_chitiet
+                                                            <PopupDetail
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
                                                                 name={e?.code}
@@ -732,16 +685,8 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} className={"flex items-center gap-2"}>
                                                             <div className="relative">
                                                                 <ModalImage
-                                                                    small={
-                                                                        e?.staff_create?.profile_image
-                                                                            ? e?.staff_create?.profile_image
-                                                                            : "/user-placeholder.jpg"
-                                                                    }
-                                                                    large={
-                                                                        e?.staff_create?.profile_image
-                                                                            ? e?.staff_create?.profile_image
-                                                                            : "/user-placeholder.jpg"
-                                                                    }
+                                                                    small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
+                                                                    large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
                                                                     className="h-6 w-6 rounded-full object-cover "
                                                                 >
                                                                     <div className="">
@@ -775,8 +720,8 @@ const Index = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex justify-center">
                                                             <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                                onRefresh={refetch.bind(this)}
+                                                                onRefreshGroup={refetchFilterBar.bind(this)}
                                                                 dataLang={dataLang}
                                                                 warehouseman_id={e?.warehouseman_id}
                                                                 status_pay={e?.status_pay}

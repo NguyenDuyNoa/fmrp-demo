@@ -7,7 +7,7 @@ import { Edit as IconEdit } from "iconsax-react";
 
 import useToast from "@/hooks/useToast";
 
-import apiFinance from "@/Api/apiSettings/apiFinance";
+import apiFinance from "@/api/apiSettings/apiFinance";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import PopupCustom from "@/components/UI/popup";

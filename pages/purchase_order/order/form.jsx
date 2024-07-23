@@ -1,7 +1,7 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
-import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
-import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
+import apiComons from "@/api/apiComon/apiComon";
+import apiOrder from "@/api/apiPurchaseOrder/apiOrder";
+import apiPurchases from "@/api/apiPurchaseOrder/apiPurchases";
+import apiSuppliers from "@/api/apiSuppliers/suppliers/apiSuppliers";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
@@ -429,7 +429,7 @@ const Index = (props) => {
     }, [chietkhautong]);
 
     useQuery({
-        queryKey: ["dataBranchendTax"],
+        queryKey: ["api_data_branchend_tax"],
         queryFn: async () => {
             const { result } = await apiComons.apiBranchCombobox();
 
@@ -451,7 +451,7 @@ const Index = (props) => {
     })
 
     useQuery({
-        queryKey: ["dataSupplier", idBranch],
+        queryKey: ["api_data_supplier", idBranch],
         queryFn: async () => {
             const { rResult } = await apiSuppliers.apiListSuppliers({ params: { "filter[branch_id]": idBranch != null ? idBranch.value : null } })
 
@@ -464,7 +464,7 @@ const Index = (props) => {
     })
 
     useQuery({
-        queryKey: ["dataStaffOption", idSupplier],
+        queryKey: ["api_data_staff_option", idSupplier],
         queryFn: async () => {
             const { rResult } = await apiPurchases.apiStaffOptionPurchases({ params: { "filter[branch_id]": idBranch != null ? idBranch.value : null } })
 
@@ -482,7 +482,7 @@ const Index = (props) => {
     })
 
     useQuery({
-        queryKey: ["dataOptionNotComplete", loai],
+        queryKey: ["api_data_option_not_complete", loai],
         queryFn: async () => {
             const db = await apiOrder.apiOptionNotComplete({
                 params: {
@@ -500,7 +500,7 @@ const Index = (props) => {
     })
 
     const { refetch: refetchItems } = useQuery({
-        queryKey: ["dataItemsVariant", idPurchases],
+        queryKey: ["api_data_items_variant", idPurchases],
         queryFn: async () => {
             const { data } = await apiOrder.apiSearchItems({
                 params: {
@@ -519,7 +519,7 @@ const Index = (props) => {
 
 
     useQuery({
-        queryKey: ["dataItemsVariantAll", onFetchingItemsAll],
+        queryKey: ["api_dataItems_variantAll", onFetchingItemsAll],
         queryFn: async () => {
             _ServerFetching_ItemsAll();
         },

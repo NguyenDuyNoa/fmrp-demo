@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import PopupCustom from "/components/UI/popup";
 
-import apiClient from "@/Api/apiClients/client/apiClient";
-import apiComons from "@/Api/apiComon/apiComon";
+import apiClient from "@/api/apiClients/client/apiClient";
+import apiComons from "@/api/apiComon/apiComon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";

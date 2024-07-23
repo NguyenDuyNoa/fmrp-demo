@@ -10,7 +10,7 @@ import { ListBtn_Setting } from "./information";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-import apiVariant from "@/Api/apiSettings/apiVariant";
+import apiVariant from "@/api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";

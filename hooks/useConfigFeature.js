@@ -4,11 +4,11 @@ import { useSelector } from "react-redux";
 const useFeature = () => {
     const feature = useSelector((state) => state?.feature);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState(feature?.dataMaterialExpiry || {});
 
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const [dataProductExpiry, sDataProductExpiry] = useState(feature?.dataProductExpiry || {});
 
-    const [dataProductSerial, sDataProductSerial] = useState({});
+    const [dataProductSerial, sDataProductSerial] = useState(feature?.dataProductSerial || {});
 
 
     useEffect(() => {

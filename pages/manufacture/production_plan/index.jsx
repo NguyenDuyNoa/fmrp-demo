@@ -32,12 +32,12 @@ const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 import Header from "./components/header";
 
 // const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
-import apiContact from "@/Api/apiClients/contact/apiContact";
-import apiComons from "@/Api/apiComon/apiComon";
-import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
+import apiContact from "@/api/apiClients/contact/apiContact";
+import apiComons from "@/api/apiComon/apiComon";
+import apiProductionPlan from "@/api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import FilterHeader from "./components/fillter/filterHeader";
-import apiCategory from "@/Api/apiProducts/category/apiCategory";
+import apiCategory from "@/api/apiProducts/category/apiCategory";
 
 const Index = (props) => {
     const dataLang = props.dataLang;

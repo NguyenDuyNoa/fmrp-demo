@@ -1,7 +1,6 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
-import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiVariant from "@/Api/apiSettings/apiVariant";
+import apiComons from "@/api/apiComon/apiComon";
+import apiWarehouse from "@/api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiVariant from "@/api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -17,8 +16,10 @@ import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
+import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
@@ -28,14 +29,15 @@ import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { PopupParent } from "@/utils/lib/Popup";
+import { useQuery } from "@tanstack/react-query";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
-import Popup_kho from "./components/popup";
+import PopupWarehouse from "./components/popup";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -54,13 +56,12 @@ const Index = (props) => {
 
     const { checkAdd, checkExport, checkEdit } = useActionRole(auth, "warehouse");
 
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial, } = useFeature();
+
     const [data_ex, sData_ex] = useState([]);
 
     const initialState = {
         idWarehouse: "",
-        dataProductSerial: {},
-        dataMaterialExpiry: {},
-        dataProductExpiry: {},
         dataWarehouse: [],
         dataWarehouseDetail: [],
         limitItemWarehouseDetail: 10,
@@ -87,136 +88,121 @@ const Index = (props) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-    const fetchListBranchWarehouse = async () => {
-        try {
+    const convertArray = (arr) => {
+        return arr?.map((e) => ({ label: e?.name, value: e?.id })) || []
+    }
+
+    const { refetch: refetchBranchWarehouse } = useQuery({
+        queryKey: ["api_list_branch_warehouse"],
+        queryFn: async () => {
             const { result } = await apiComons.apiBranchCombobox();
-            queryKeyIsState({ listBranchWarehouse: result?.map((e) => ({ label: e.name, value: e.id })) || [] });
-        } catch (error) { }
-    };
 
-    const fetchFilterLocationWarehouse = async () => {
-        try {
+            queryKeyIsState({ listBranchWarehouse: convertArray(result) });
+
+            return result
+        },
+        enabled: false,
+        ...reTryQuery
+    });
+
+
+    const { refetch: refetchFilterLocationWarehouse } = useQuery({
+        queryKey: ["api_list_location_warehouse", isState.idWarehouse],
+        queryFn: async () => {
             const { rResult } = await apiWarehouse.apiLocationWarehouse(isState.idWarehouse);
-            queryKeyIsState({ listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })) });
-        } catch (error) { }
-    };
 
-    // fetch list biến thể
-    const fetchFilterVariationWarehouse = async () => {
-        try {
+            queryKeyIsState({ listLocationWarehouse: convertArray(rResult) });
+
+            return rResult
+        },
+        enabled: !!isState.idWarehouse,
+        ...reTryQuery
+    });
+
+
+    const { refetch: refetchFilterVariationWarehouse } = useQuery({
+        queryKey: ["api_listVariant_warehouse"],
+        queryFn: async () => {
             const { rResult } = await apiVariant.apiListVariant({});
+
             const options = rResult?.flatMap(({ option }) => option) ?? [];
-            queryKeyIsState({
-                listVariant: options?.map(({ id, name }) => ({
-                    label: name,
-                    value: id,
-                })),
-            });
-        } catch (error) { }
-    };
+
+            queryKeyIsState({ listVariant: convertArray(options) });
+
+            return rResult
+        },
+        enabled: false,
+        ...reTryQuery
+    });
+
 
     const handleOpenSelect = (type) => {
         if (type === "branch" && isState?.listBranchWarehouse?.length === 0) {
-            fetchListBranchWarehouse();
-        } else if (
-            type === "locationWarehouse" &&
-            isState?.listLocationWarehouse?.length === 0 &&
-            isState.idWarehouse
-        ) {
+            refetchBranchWarehouse();
+        } else if (type === "locationWarehouse" && isState?.listLocationWarehouse?.length === 0 && isState.idWarehouse) {
             // fetch list vị trí kho theo từng kho
-            fetchFilterLocationWarehouse();
+            refetchFilterLocationWarehouse();
         } else if (type === "mainVariation" && isState?.listVariant?.length === 0) {
-            fetchFilterVariationWarehouse();
+            refetchFilterVariationWarehouse();
         } else if (type === "subVariation") {
         }
     };
 
     // fetch danh sách kho
-    const fetchDataListWarehouse = async () => {
-        const param = {
-            limit: undefined,
-            page: router.query?.page || 1,
-            "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch.map((e) => e.value) : null,
-        };
-        queryKeyIsState({ isLoading: true });
-        try {
+
+    const param = {
+        limit: undefined,
+        page: router.query?.page || 1,
+        "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch.map((e) => e.value) : null,
+    };
+
+    const { isFetching, refetch } = useQuery({
+        queryKey: ["api_data_warehouse", param, isState.idBranch],
+        queryFn: async () => {
             const { rResult, output } = await apiWarehouse.apiListWarehouse({ param: param });
-            if (rResult.length > 0) {
+
+            if (rResult?.length > 0) {
                 queryKeyIsState({ idWarehouse: rResult[0].id });
             } else {
                 queryKeyIsState({ idWarehouse: null, dataWarehouseDetail: [] });
             }
+
             queryKeyIsState({ dataWarehouse: rResult });
+
             sTotalItems(output);
+
             sData_ex(rResult);
-            setTimeout(() => {
-                queryKeyIsState({ isLoading: false });
-            }, 500);
-        } catch (error) { }
-    };
 
-    useEffect(() => {
-        fetchDataListWarehouse();
-    }, [isState.idBranch]);
-
-    useEffect(() => {
-        if (isState.idWarehouse) {
-            fetchFilterLocationWarehouse();
-        }
-    }, [isState.idWarehouse]);
-
-    // fetch data ẩn hiện cột trong table
-    const fetchDataOnOffCol = async () => {
-        try {
-            const fature = await apiDashboard.apiFeature();
-            queryKeyIsState({
-                dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
-                dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
-                dataProductSerial: fature.find((x) => x.code == "product_serial"),
-            });
-        } catch (error) { }
-    };
+            return rResult
+        },
+        ...reTryQuery
+    })
 
     // fetch data chi tiết của kho
-    const fetchDataWarehouseDetail = async () => {
-        const params = {
-            search: isState.keySearchItem,
-            limit: isState.limitItemWarehouseDetail,
-            page: router.query?.page || 1,
-            "filter[location_id]": isState.idLocationWarehouse?.value ? isState.idLocationWarehouse?.value : null,
-            "filter[variation_option_id_1]": isState.idVariantMain?.value ? isState.idVariantMain?.value : null,
-            "filter[variation_option_id_2]": isState.idVariantSub?.value ? isState.idVariantSub?.value : null,
-        };
-        queryKeyIsState({ isLoading: true });
-        try {
+    const params = {
+        search: isState.keySearchItem,
+        limit: isState.limitItemWarehouseDetail,
+        page: router.query?.page || 1,
+        "filter[location_id]": isState.idLocationWarehouse?.value ? isState.idLocationWarehouse?.value : null,
+        "filter[variation_option_id_1]": isState.idVariantMain?.value ? isState.idVariantMain?.value : null,
+        "filter[variation_option_id_2]": isState.idVariantSub?.value ? isState.idVariantSub?.value : null,
+    };
+
+    const { refetch: refetchWarehouseDetail, isFetching: isFetchingWarehouseDetail } = useQuery({
+        queryKey: ["api_data_warehouse_detail", params, isState.idWarehouse],
+        queryFn: async () => {
             const { rResult, output } = await apiWarehouse.apiWarehouseDetail(isState.idWarehouse, { params: params });
             queryKeyIsState({
                 dataWarehouseDetail: rResult,
                 dataWarehouseExcel: rResult,
                 totalItemWarehouseDetail: output,
             });
-            setTimeout(() => {
-                queryKeyIsState({
-                    isLoading: false,
-                });
-            }, 500);
-        } catch (error) { }
-    };
+            return rResult
+        },
+        enabled: !!isState.idWarehouse,
+        ...reTryQuery
+    })
 
-    useEffect(() => {
-        if (isState.idWarehouse) {
-            fetchDataWarehouseDetail();
-            fetchDataOnOffCol();
-        }
-    }, [
-        isState.limitItemWarehouseDetail,
-        isState.idWarehouse,
-        isState.idLocationWarehouse,
-        isState.idVariantSub,
-        isState.idVariantMain,
-        isState.keySearchItem,
-        router.query?.page,
-    ]);
 
     const onChangeFilter = (type, value) => {
         if (type == "branch") {
@@ -329,15 +315,13 @@ const Index = (props) => {
     //         ]),
     //     },
     // ];
-    const newResult = isState.dataWarehouseExcel
-        ?.map((item) => {
-            const detail = item.detail || [];
-            return detail.map((detailItem) => ({
-                ...item,
-                detail: detailItem,
-            }));
-        })
-        .flat();
+    const newResult = isState.dataWarehouseExcel?.map((item) => {
+        const detail = item.detail || [];
+        return detail.map((detailItem) => ({
+            ...item,
+            detail: detailItem,
+        }));
+    }).flat();
 
     const multiDataSet = [
         {
@@ -454,28 +438,13 @@ const Index = (props) => {
                     value: `${e?.detail.option_name_2 ? e?.detail.option_name_2 : ""}`,
                 },
                 {
-                    value: `${isState?.dataProductSerial.is_enable === "1"
-                        ? e?.detail.serial != null
-                            ? e?.detail.serial
-                            : ""
-                        : ""
-                        }`,
+                    value: `${dataProductSerial?.is_enable === "1" ? e?.detail.serial != null ? e?.detail.serial : "" : ""}`,
                 },
                 {
-                    value: `${isState?.dataMaterialExpiry.is_enable === "1"
-                        ? e?.detail.lot != null
-                            ? e?.detail.lot
-                            : ""
-                        : ""
-                        }`,
+                    value: `${dataMaterialExpiry?.is_enable === "1" ? e?.detail.lot != null ? e?.detail.lot : "" : ""}`,
                 },
                 {
-                    value: `${isState?.dataMaterialExpiry.is_enable === "1"
-                        ? e?.detail.expiration_date != null
-                            ? e?.detail.expiration_date
-                            : ""
-                        : ""
-                        }`,
+                    value: `${dataMaterialExpiry?.is_enable === "1" ? e?.detail.expiration_date != null ? e?.detail.expiration_date : "" : ""}`,
                 },
                 {
                     value: `${e?.detail.quantity != null ? e?.detail.quantity : ""}`,
@@ -495,10 +464,6 @@ const Index = (props) => {
         });
     };
 
-    const handleRefresh = () => {
-        fetchDataWarehouseDetail();
-        fetchDataOnOffCol();
-    };
 
     return (
         <React.Fragment>
@@ -524,9 +489,9 @@ const Index = (props) => {
                             </h2>
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
-                                    <Popup_kho
-                                        onRefresh={fetchDataListWarehouse.bind(this)}
-                                        onRefreshGroup={fetchDataWarehouseDetail.bind(this)}
+                                    <PopupWarehouse
+                                        W onRefresh={refetch.bind(this)}
+                                        onRefreshGroup={refetchWarehouseDetail.bind(this)}
                                         dataLang={dataLang}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
@@ -577,9 +542,7 @@ const Index = (props) => {
                                             options={[
                                                 {
                                                     value: "",
-                                                    label:
-                                                        dataLang?.warehouses_detail_filterWare ||
-                                                        "warehouses_detail_filterWare",
+                                                    label: dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare",
                                                     isDisabled: true,
                                                 },
                                                 ...isState.listLocationWarehouse,
@@ -589,9 +552,7 @@ const Index = (props) => {
                                             value={isState.idLocationWarehouse}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            placeholder={
-                                                dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare"
-                                            }
+                                            placeholder={dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare"}
                                             className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
                                             isSearchable={true}
                                             colSpan={1}
@@ -600,9 +561,7 @@ const Index = (props) => {
                                             options={[
                                                 {
                                                     value: "",
-                                                    label:
-                                                        dataLang?.warehouses_detail_filterMain ||
-                                                        "warehouses_detail_filterMain",
+                                                    label: dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain",
                                                     isDisabled: true,
                                                 },
                                                 ...isState.listVariant,
@@ -612,9 +571,7 @@ const Index = (props) => {
                                             value={isState.idVariantMain}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            placeholder={
-                                                dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain"
-                                            }
+                                            placeholder={dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain"}
                                             className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
                                             isSearchable={true}
                                             colSpan={1}
@@ -624,9 +581,7 @@ const Index = (props) => {
                                             options={[
                                                 {
                                                     value: "",
-                                                    label:
-                                                        dataLang?.warehouses_detail_filterSub ||
-                                                        "warehouses_detail_filterSub",
+                                                    label: dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub",
                                                     isDisabled: true,
                                                 },
                                                 ...isState.listVariant,
@@ -636,9 +591,7 @@ const Index = (props) => {
                                             value={isState.idVariantSub}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            placeholder={
-                                                dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub"
-                                            }
+                                            placeholder={dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub"}
                                             className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
@@ -649,7 +602,13 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                     <div className="flex justify-end gap-2 space-x-2 items-center">
-                                        <OnResetData sOnFetching={() => handleRefresh()} />
+                                        <OnResetData
+                                            sOnFetching={() => { }}
+                                            onClick={() => {
+                                                refetch()
+                                                refetchWarehouseDetail()
+                                            }}
+                                        />
                                         {role == true || checkExport ? (
                                             <div className={``}>
                                                 {data_ex?.length > 0 && (
@@ -727,15 +686,15 @@ const Index = (props) => {
                                             {isState.idWarehouse === item.id && item.is_system == 0 && (
                                                 <div className="ml-2 flex items-center gap-2  rounded-md bg-gray-200 3xl:py-3 py-2 px-4">
                                                     {role == true || checkEdit ? (
-                                                        <Popup_kho
-                                                            dataLang={dataLang}
+                                                        <PopupWarehouse
+                                                            W dataLang={dataLang}
                                                             id={item?.id}
                                                             name={item?.name}
                                                             code={item?.code}
                                                             address={item?.address}
                                                             note={item?.note}
                                                             branch={item?.branch}
-                                                            onRefresh={fetchDataListWarehouse.bind(this)}
+                                                            onRefresh={refetch.bind(this)}
                                                         />
                                                     ) : (
                                                         <IconEdit
@@ -744,8 +703,8 @@ const Index = (props) => {
                                                         />
                                                     )}
                                                     <BtnAction
-                                                        onRefresh={fetchDataListWarehouse.bind(this)}
-                                                        onRefreshGroup={fetchDataWarehouseDetail.bind(this)}
+                                                        onRefresh={refetch.bind(this)}
+                                                        onRefreshGroup={refetchWarehouseDetail.bind(this)}
                                                         dataLang={dataLang}
                                                         id={item?.id}
                                                         type="warehouse"
@@ -760,19 +719,9 @@ const Index = (props) => {
                                     {/* header table */}
                                     <HeaderTable
                                         gridCols={
-                                            isState.dataProductSerial.is_enable == "1"
-                                                ? isState.dataMaterialExpiry.is_enable !=
-                                                    isState.dataProductExpiry.is_enable
-                                                    ? 10
-                                                    : isState.dataMaterialExpiry.is_enable == "1"
-                                                        ? 10
-                                                        : 8
-                                                : isState.dataMaterialExpiry.is_enable !=
-                                                    isState.dataProductExpiry.is_enable
-                                                    ? 9
-                                                    : isState.dataMaterialExpiry.is_enable == "1"
-                                                        ? 9
-                                                        : 7
+                                            dataProductSerial?.is_enable == "1" ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable ? 10
+                                                : dataMaterialExpiry?.is_enable == "1" ? 10 : 8
+                                                : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable ? 9 : dataMaterialExpiry?.is_enable == "1" ? 9 : 7
                                         }
                                     >
                                         <ColumnTable colSpan={2} textAlign={"center"}>
@@ -787,13 +736,12 @@ const Index = (props) => {
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}
                                         </ColumnTable>
-                                        {isState.dataProductSerial.is_enable === "1" && (
+                                        {dataProductSerial?.is_enable === "1" && (
                                             <ColumnTable colSpan={1} textAlign={"center"}>
                                                 {"Serial"}
                                             </ColumnTable>
                                         )}
-                                        {isState.dataMaterialExpiry.is_enable === "1" ||
-                                            isState.dataProductExpiry.is_enable === "1" ? (
+                                        {dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1" ? (
                                             <>
                                                 <ColumnTable colSpan={1} textAlign={"center"}>
                                                     {"Lot"}
@@ -813,7 +761,7 @@ const Index = (props) => {
                                         </ColumnTable>
                                     </HeaderTable>
                                     {/* data table */}
-                                    {isState.isLoading ? (
+                                    {(isFetching || isFetchingWarehouseDetail) ? (
                                         <Loading
                                             className="3xl:max-h-[560px] 3xl:h-[560px] 2xl:max-h-[400px] 2xl:h-[400px] max-h-[400px] h-[400px]"
                                             color="#0f4f9e"
@@ -823,19 +771,9 @@ const Index = (props) => {
                                             {isState?.dataWarehouseDetail &&
                                                 isState?.dataWarehouseDetail?.map((e) => (
                                                     <div
-                                                        className={`${isState?.dataProductSerial.is_enable == "1"
-                                                            ? isState?.dataMaterialExpiry.is_enable !=
-                                                                isState?.dataProductExpiry.is_enable
-                                                                ? "grid-cols-10"
-                                                                : isState?.dataMaterialExpiry.is_enable == "1"
-                                                                    ? "grid-cols-10"
-                                                                    : "grid-cols-8"
-                                                            : isState?.dataMaterialExpiry.is_enable !=
-                                                                isState?.dataProductExpiry.is_enable
-                                                                ? "grid-cols-9"
-                                                                : isState?.dataMaterialExpiry.is_enable == "1"
-                                                                    ? "grid-cols-9"
-                                                                    : "grid-cols-7"
+                                                        className={`${dataProductSerial?.is_enable == "1" ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable ? "grid-cols-10"
+                                                            : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-10" : "grid-cols-8"
+                                                            : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable ? "grid-cols-9" : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-9" : "grid-cols-7"
                                                             }  grid hover:bg-slate-50 px-2`}
                                                     >
                                                         <RowItemTable
@@ -920,35 +858,35 @@ const Index = (props) => {
                                                         </RowItemTable>
 
                                                         <div
-                                                            className={` grid ${isState.dataProductSerial.is_enable == "1"
-                                                                ? isState.dataMaterialExpiry.is_enable !=
-                                                                    isState.dataProductExpiry.is_enable
+                                                            className={` grid ${dataProductSerial?.is_enable == "1"
+                                                                ? dataMaterialExpiry?.is_enable !=
+                                                                    dataProductExpiry?.is_enable
                                                                     ? "col-span-8"
-                                                                    : isState.dataMaterialExpiry.is_enable == "1"
+                                                                    : dataMaterialExpiry?.is_enable == "1"
                                                                         ? "col-span-8"
                                                                         : "col-span-6"
-                                                                : isState.dataMaterialExpiry.is_enable !=
-                                                                    isState.dataProductExpiry.is_enable
+                                                                : dataMaterialExpiry?.is_enable !=
+                                                                    dataProductExpiry?.is_enable
                                                                     ? "col-span-7"
-                                                                    : isState.dataMaterialExpiry.is_enable == "1"
+                                                                    : dataMaterialExpiry?.is_enable == "1"
                                                                         ? "col-span-7"
                                                                         : "col-span-5"
                                                                 }`}
                                                         >
                                                             {e?.detail.map((item) => (
                                                                 <div
-                                                                    className={`grid ${isState.dataProductSerial.is_enable == "1"
-                                                                        ? isState.dataMaterialExpiry.is_enable !=
-                                                                            isState.dataProductExpiry.is_enable
+                                                                    className={`grid ${dataProductSerial?.is_enable == "1"
+                                                                        ? dataMaterialExpiry?.is_enable !=
+                                                                            dataProductExpiry?.is_enable
                                                                             ? "grid-cols-8"
                                                                             : isState.dataMaterialExpiry
                                                                                 .is_enable == "1"
                                                                                 ? "grid-cols-8"
                                                                                 : "grid-cols-6"
-                                                                        : isState.dataMaterialExpiry.is_enable !=
-                                                                            isState.dataProductExpiry.is_enable
+                                                                        : dataMaterialExpiry?.is_enable !=
+                                                                            dataProductExpiry?.is_enable
                                                                             ? "grid-cols-7"
-                                                                            : isState.dataMaterialExpiry.is_enable ==
+                                                                            : dataMaterialExpiry?.is_enable ==
                                                                                 "1"
                                                                                 ? "grid-cols-7"
                                                                                 : " grid-cols-5"
@@ -977,7 +915,7 @@ const Index = (props) => {
                                                                             ? "-"
                                                                             : item.option_name_2}
                                                                     </RowItemTable>
-                                                                    {isState.dataProductSerial.is_enable === "1" ? (
+                                                                    {dataProductSerial?.is_enable === "1" ? (
                                                                         <RowItemTable
                                                                             colSpan={1}
                                                                             className="border-b py-3"
@@ -990,8 +928,8 @@ const Index = (props) => {
                                                                     ) : (
                                                                         ""
                                                                     )}
-                                                                    {isState.dataMaterialExpiry.is_enable === "1" ||
-                                                                        isState.dataProductExpiry.is_enable === "1" ? (
+                                                                    {dataMaterialExpiry?.is_enable === "1" ||
+                                                                        dataProductExpiry?.is_enable === "1" ? (
                                                                         <>
                                                                             <RowItemTable
                                                                                 colSpan={1}

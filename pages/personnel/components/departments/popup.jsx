@@ -1,4 +1,4 @@
-import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
+import apiDepartments from "@/api/apiPersonnel/apiDepartments";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";

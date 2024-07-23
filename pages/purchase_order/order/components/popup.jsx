@@ -1,4 +1,4 @@
-import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
+import apiOrder from "@/api/apiPurchaseOrder/apiOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -33,7 +33,7 @@ const Popup_chitiet = (props) => {
     }
 
     const { isFetching } = useQuery({
-        queryKey: ["apiDetailOrder", props?.id],
+        queryKey: ["api_detail_order", props?.id],
         queryFn: async () => {
             const data = await apiOrder.apiDetailOrder(props?.id)
             sData(data);

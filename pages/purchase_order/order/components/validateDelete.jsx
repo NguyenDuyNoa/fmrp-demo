@@ -1,4 +1,4 @@
-import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
+import apiOrder from "@/api/apiPurchaseOrder/apiOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";

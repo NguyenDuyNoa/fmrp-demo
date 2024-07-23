@@ -1,7 +1,7 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiCategory from "@/Api/apiMaterial/category/apiCategory";
-import apiItems from "@/Api/apiMaterial/items/apiItems";
-import apiVariant from "@/Api/apiSettings/apiVariant";
+import apiComons from "@/api/apiComon/apiComon";
+import apiCategory from "@/api/apiMaterial/category/apiCategory";
+import apiItems from "@/api/apiMaterial/items/apiItems";
+import apiVariant from "@/api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

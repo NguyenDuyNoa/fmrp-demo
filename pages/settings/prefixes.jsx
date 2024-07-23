@@ -9,7 +9,7 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import Swal from "sweetalert2";
-import apiPrefix from "@/Api/apiSettings/apiPrefix";
+import apiPrefix from "@/api/apiSettings/apiPrefix";
 
 const Toast = Swal.mixin({
     toast: true,

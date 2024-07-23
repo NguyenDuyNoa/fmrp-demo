@@ -1,4 +1,4 @@
-import apiProducts from "@/Api/apiProducts/products/apiProducts";
+import apiProducts from "@/api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";

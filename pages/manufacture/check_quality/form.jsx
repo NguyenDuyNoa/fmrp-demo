@@ -27,8 +27,8 @@ import { SelectCore } from "@/utils/lib/Select";
 
 import { routerQc } from "@/routers/manufacture";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
+import apiComons from "@/api/apiComon/apiComon";
+import apiInternalPlan from "@/api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";

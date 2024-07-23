@@ -13,7 +13,7 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import apiInformation from "@/Api/apiSettings/apiInformation";
+import apiInformation from "@/api/apiSettings/apiInformation";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
