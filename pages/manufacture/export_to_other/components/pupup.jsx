@@ -3,7 +3,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 
 
-import apiExportToOther from "@/api/apiManufacture/warehouse/exportToOther/apiExportToOther";
+import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";

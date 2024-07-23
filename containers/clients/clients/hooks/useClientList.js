@@ -1,4 +1,4 @@
-import apiClient from "@/api/apiClients/client/apiClient";
+import apiClient from "@/Api/apiClients/client/apiClient";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { useQuery } from "@tanstack/react-query";
 

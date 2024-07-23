@@ -1,4 +1,4 @@
-import apiCategory from "@/api/apiMaterial/category/apiCategory";
+import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import PopupCustom from "@/components/UI/popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import useToast from "@/hooks/useToast";

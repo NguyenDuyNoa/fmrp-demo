@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import apiMaterialsPlanning from "@/api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
+import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";

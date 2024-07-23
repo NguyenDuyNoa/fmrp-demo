@@ -30,8 +30,8 @@ import { MdAdd } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
-import apiMaterialsPlanning from "@/api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
-import apiComons from "@/api/apiComon/apiComon";
+import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
+import apiComons from "@/Api/apiComon/apiComon";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 
 const MainTable = ({ dataLang }) => {

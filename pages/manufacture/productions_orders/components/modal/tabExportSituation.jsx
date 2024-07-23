@@ -1,5 +1,5 @@
 // tình hình xuất NVL
-import apiProductionsOrders from '@/api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders';
+import apiProductionsOrders from '@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders';
 import OnResetData from '@/components/UI/btnResetData/btnReset';
 import { ContainerTotal } from '@/components/UI/common/layout';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';

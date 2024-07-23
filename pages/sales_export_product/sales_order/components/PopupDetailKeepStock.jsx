@@ -1,6 +1,6 @@
 // Danh sách dữ kho
 
-import apiSalesOrder from "@/api/apiSalesExportProduct/salesOrder/apiSalesOrder";
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";

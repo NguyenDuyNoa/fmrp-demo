@@ -1,4 +1,4 @@
-import apiDeliveryReceipt from "@/api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
+import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";

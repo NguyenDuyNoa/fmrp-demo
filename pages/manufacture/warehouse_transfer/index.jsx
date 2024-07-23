@@ -1,5 +1,5 @@
-import apiComons from "@/api/apiComon/apiComon";
-import apiWarehouseTransfer from "@/api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";

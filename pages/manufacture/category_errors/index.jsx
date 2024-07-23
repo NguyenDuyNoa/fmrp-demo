@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Pagination from "/components/UI/pagination";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiCategoryErrors from "@/api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiCategoryErrors from "@/Api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

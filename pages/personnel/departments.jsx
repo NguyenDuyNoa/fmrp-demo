@@ -29,8 +29,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiDepartments from "@/api/apiPersonnel/apiDepartments";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
 import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";

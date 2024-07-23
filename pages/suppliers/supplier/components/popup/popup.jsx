@@ -1,5 +1,5 @@
-import apiComons from "@/api/apiComon/apiComon";
-import apiSuppliers from "@/api/apiSuppliers/suppliers/apiSuppliers";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";

@@ -1,5 +1,5 @@
-import apiWarehouse from "@/api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiVariant from "@/api/apiSettings/apiVariant";
+import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiVariant from "@/Api/apiSettings/apiVariant";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";

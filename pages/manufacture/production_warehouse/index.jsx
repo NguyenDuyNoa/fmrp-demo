@@ -27,8 +27,8 @@ import { useToggle } from "@/hooks/useToggle";
 
 import { routerProductionWarehouse } from "@/routers/manufacture";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiProductionWarehouse from "@/api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";

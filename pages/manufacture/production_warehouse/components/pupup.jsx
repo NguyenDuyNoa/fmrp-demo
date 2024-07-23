@@ -13,7 +13,7 @@ import PopupCustom from "@/components/UI/popup";
 
 import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
 
-import apiProductionWarehouse from "@/api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
+import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

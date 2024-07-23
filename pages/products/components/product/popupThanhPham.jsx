@@ -1,5 +1,5 @@
-import apiCategory from "@/api/apiProducts/category/apiCategory";
-import apiProducts from "@/api/apiProducts/products/apiProducts";
+import apiCategory from "@/Api/apiProducts/category/apiCategory";
+import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";

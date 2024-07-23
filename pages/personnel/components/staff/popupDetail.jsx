@@ -1,4 +1,4 @@
-import apiSatff from "@/api/apiPersonnel/apiStaff";
+import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

@@ -1,7 +1,7 @@
-import apiComons from "@/api/apiComon/apiComon";
-import apiOrder from "@/api/apiPurchaseOrder/apiOrder";
-import apiPurchases from "@/api/apiPurchaseOrder/apiPurchases";
-import apiSuppliers from "@/api/apiSuppliers/suppliers/apiSuppliers";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
+import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";

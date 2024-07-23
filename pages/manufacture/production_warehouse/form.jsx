@@ -27,8 +27,8 @@ import { routerProductionWarehouse } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiProductionWarehouse from "@/api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

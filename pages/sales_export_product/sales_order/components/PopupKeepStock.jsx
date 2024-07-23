@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { NumericFormat } from "react-number-format";
 
-import apiSalesOrder from "@/api/apiSalesExportProduct/salesOrder/apiSalesOrder";
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";

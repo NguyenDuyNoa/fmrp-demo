@@ -50,8 +50,8 @@ import { useToggle } from "@/hooks/useToggle";
 
 import { routerProductsWarehouse } from "@/routers/manufacture";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiProductsWarehouse from "@/api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductsWarehouse from "@/Api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

@@ -11,9 +11,9 @@ import FilterHeader from "../header/filterHeader";
 
 import TabItem from "./tabItem";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiMaterialsPlanning from "@/api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
-import apiProductionsOrders from "@/api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
+import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { reTryQuery } from "@/configs/configRetryQuery";

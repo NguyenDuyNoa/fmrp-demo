@@ -48,8 +48,8 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiExportToOther from "@/api/apiManufacture/warehouse/exportToOther/apiExportToOther";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

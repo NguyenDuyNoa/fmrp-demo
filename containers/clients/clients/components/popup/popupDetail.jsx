@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import apiClient from "@/api/apiClients/client/apiClient";
+import apiClient from "@/Api/apiClients/client/apiClient";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";

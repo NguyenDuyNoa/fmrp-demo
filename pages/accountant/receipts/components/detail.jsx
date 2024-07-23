@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import { getdataDetail } from "../../../../api/apiReceipts/api";
+import { getdataDetail } from "../../../../Api/apiReceipts/api";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";

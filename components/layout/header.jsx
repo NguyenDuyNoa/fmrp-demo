@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Dropdown, DropdownThongBao } from "../UI/dropdown";
 
-import apiDashboard from "@/api/apiDashboard/apiDashboard";
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import useToast from "@/hooks/useToast";
 import { CookieCore } from "@/utils/lib/cookie";

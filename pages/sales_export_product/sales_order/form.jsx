@@ -1,5 +1,5 @@
-import apiComons from "@/api/apiComon/apiComon";
-import apiSalesOrder from "@/api/apiSalesExportProduct/salesOrder/apiSalesOrder";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";

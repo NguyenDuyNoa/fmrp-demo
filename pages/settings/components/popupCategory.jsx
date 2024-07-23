@@ -11,8 +11,8 @@ import PopupCustom from "@/components/UI/popup";
 
 import useToast from "@/hooks/useToast";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiCategory from "@/api/apiSettings/apiCategory";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiCategory from "@/Api/apiSettings/apiCategory";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">

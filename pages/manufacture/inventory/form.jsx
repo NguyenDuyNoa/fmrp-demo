@@ -21,9 +21,9 @@ import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericF
 import NoData from "@/components/UI/noData/nodata";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 
-import apiComons from "@/api/apiComon/apiComon";
-import apiDashboard from "@/api/apiDashboard/apiDashboard";
-import apiInventory from "@/api/apiManufacture/warehouse/inventory/apiInventory";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
+import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { isAllowedNumber } from "@/utils/helpers/common";

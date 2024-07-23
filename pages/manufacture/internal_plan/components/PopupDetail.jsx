@@ -1,4 +1,4 @@
-import apiInternalPlan from "@/api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
+import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorRed } from "@/components/UI/common/Tag/TagStatus";

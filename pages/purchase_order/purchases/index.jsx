@@ -1,5 +1,5 @@
-import apiComons from "@/api/apiComon/apiComon";
-import apiPurchases from "@/api/apiPurchaseOrder/apiPurchases";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";

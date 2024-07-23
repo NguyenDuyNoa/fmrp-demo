@@ -11,7 +11,7 @@
             // "@/utils/*": ["utils/*"],
             // "@/utils/lib*": ["utils/lib*"],
             // "@/services/*": ["services/*"],
-            "@/api/*": ["/api/*"],
+            "@/Api/*": ["Api/*"],
             "@/*": ["./*"]
         }
     }

@@ -1,4 +1,4 @@
-import apiRoles from "@/api/apiPersonnel/apiRoles";
+import apiRoles from "@/Api/apiPersonnel/apiRoles";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading";
 import PopupCustom from "@/components/UI/popup";

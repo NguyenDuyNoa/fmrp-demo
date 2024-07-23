@@ -11,7 +11,7 @@ import "../styles/globals.scss";
 
 import LoginPage from "@/components/UI/login/login";
 import { Lexend_Deca } from "@next/font/google";
-import apiDashboard from "@/api/apiDashboard/apiDashboard";
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 

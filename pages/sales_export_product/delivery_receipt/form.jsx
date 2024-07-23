@@ -1,7 +1,7 @@
-import apiContact from "@/api/apiClients/contact/apiContact";
-import apiComons from "@/api/apiComon/apiComon";
-import apiPurchases from "@/api/apiPurchaseOrder/apiPurchases";
-import apiDeliveryReceipt from "@/api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
+import apiContact from "@/Api/apiClients/contact/apiContact";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
+import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";

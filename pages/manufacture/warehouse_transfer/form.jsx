@@ -1,5 +1,5 @@
-import apiComons from "@/api/apiComon/apiComon";
-import apiWarehouseTransfer from "@/api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";

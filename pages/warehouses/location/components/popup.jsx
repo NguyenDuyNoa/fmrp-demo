@@ -1,4 +1,4 @@
-import apiLocationWarehouse from "@/api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";

@@ -1,5 +1,5 @@
-import apiWarehouse from "@/api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiLocationWarehouse from "@/api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

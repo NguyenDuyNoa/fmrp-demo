@@ -1,4 +1,4 @@
-import apiComons from "@/api/apiComon/apiComon";
+import apiComons from "@/Api/apiComon/apiComon";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { useQuery } from "@tanstack/react-query";
 

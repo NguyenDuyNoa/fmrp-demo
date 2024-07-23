@@ -1,6 +1,6 @@
-import apiComons from "@/api/apiComon/apiComon";
-import apiWarehouse from "@/api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiVariant from "@/api/apiSettings/apiVariant";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiVariant from "@/Api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
