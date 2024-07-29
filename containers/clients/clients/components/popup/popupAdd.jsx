@@ -12,8 +12,8 @@ import { Add as IconAdd, Trash as IconDelete, Edit as IconEdit } from "iconsax-r
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
-import { useClientChar } from "../../hooks/useClientChar";
-import { useClientGroupClient } from "../../hooks/useClientGroupClient";
+import { useClientChar } from "../../../../../pages/clients/_hooks/useClientChar";
+import { useClientGroupClient } from "../../../../../pages/clients/_hooks/useClientGroupClient";
 import ButtoonAdd from "../button/buttonAdd";
 import Form from "../form/form";
 import FormContactInfo from "../form/formContactInfo";
