@@ -39,7 +39,7 @@ const initilaState = {
     onFetching: false,
     onFetchingBranch: false,
 };
-const Index = (props) => {
+const StatusClient = (props) => {
     const isShow = useToast();
 
     const router = useRouter();
@@ -329,4 +329,4 @@ const Index = (props) => {
     );
 };
 
-export default Index;
+export default StatusClient;
