@@ -27,7 +27,6 @@ const Popup_phongban = (props) => {
 
     const [valueBr, sValueBr] = useState([]);
 
-
     useEffect(() => {
         sErrInputBr(false);
         sErrInput(false);

@@ -10,6 +10,22 @@ import React, { useEffect, useState } from "react";
 import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
 
+
+const initalState = {
+    open: false,
+    dataOption: [],
+    onSending: false,
+    name: "",
+    position: "",
+    department: "",
+    valueBranch: [],
+    errBranch: false,
+    errName: false,
+    errDepartment: false,
+    tab: 0,
+    dataPower: [],
+    valueSearch: ""
+}
 const PopupRoles = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
 
@@ -18,22 +34,6 @@ const PopupRoles = React.memo((props) => {
     const dataOptPosition = useSelector((state) => state.position_staff);
 
     const isShow = useToast();
-
-    const initalState = {
-        open: false,
-        dataOption: [],
-        onSending: false,
-        name: "",
-        position: "",
-        department: "",
-        valueBranch: [],
-        errBranch: false,
-        errName: false,
-        errDepartment: false,
-        tab: 0,
-        dataPower: [],
-        valueSearch: ""
-    }
 
     const [isState, setIsState] = useState(initalState)
 
@@ -61,7 +61,6 @@ const PopupRoles = React.memo((props) => {
                             };
                         });
                     }
-
                     transformedChild[childKey] = {
                         name: childName,
                         permissions: transformedPermissions
@@ -181,6 +180,7 @@ const PopupRoles = React.memo((props) => {
         },
         enabled: isState.open && !!props?.id
     })
+
     const { isFetching } = useQuery({
         queryKey: ["api_position_option"],
         queryFn: async () => {

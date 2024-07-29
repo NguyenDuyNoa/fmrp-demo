@@ -1,6 +1,7 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import PopupCustom from "@/components/UI/popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import useToast from "@/hooks/useToast";
@@ -18,8 +19,38 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
-import PopupCustom from "/components/UI/popup";
 
+
+const initialData = {
+    open: false,
+    onFetching: false,
+    onSending: false,
+    onFetching_Manage: false,
+    errInput: false,
+    errInputBr: false,
+    errInputPas: false,
+    errInputManage: false,
+    name: "",
+    code: "",
+    password: "",
+    phone_number: "",
+    email: "",
+    admin: "0",
+    valueBr: [],
+    dataDepar: [],
+    brandpOpt: [],
+    room: [],
+    tab: 0,
+    thumb: null,
+    isDeleteThumb: false,
+    dataOption: [],
+    typePassword: false,
+    thumbFile: null,
+    idPos: null,
+    manage: [],
+    valueManage: [],
+    valueSearch: "",
+};
 const Popup_dsnd = (props) => {
     const isShow = useToast();
 
@@ -28,37 +59,6 @@ const Popup_dsnd = (props) => {
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
-    };
-
-    const initialData = {
-        open: false,
-        onFetching: false,
-        onSending: false,
-        onFetching_Manage: false,
-        errInput: false,
-        errInputBr: false,
-        errInputPas: false,
-        errInputManage: false,
-        name: "",
-        code: "",
-        password: "",
-        phone_number: "",
-        email: "",
-        admin: "0",
-        valueBr: [],
-        dataDepar: [],
-        brandpOpt: [],
-        room: [],
-        tab: 0,
-        thumb: null,
-        isDeleteThumb: false,
-        dataOption: [],
-        typePassword: false,
-        thumbFile: null,
-        idPos: null,
-        manage: [],
-        valueManage: [],
-        valueSearch: "",
     };
 
     const [isState, setIsState] = useState(initialData);
@@ -121,7 +121,7 @@ const Popup_dsnd = (props) => {
         isState.idPos == null && queryState({ manage: [], valueManage: [] });
     }, [isState.idPos]);
 
-    const { } = useQuery({
+    useQuery({
         queryKey: ["api_handle_detail_staff"],
         queryFn: async () => {
             const db = await apiSatff.apiDetailStaff(props?.id)

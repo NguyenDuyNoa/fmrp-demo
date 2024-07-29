@@ -1,16 +1,15 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "components/UI/loading";
-import {
-    Image as IconImage
-} from "iconsax-react";
+import { Image as IconImage } from "iconsax-react";
 import Image from "next/image";
 import { useState } from "react";
-import PopupCustom from "/components/UI/popup";
+import { useStaffDetail } from "../../hooks/staff/useStaffDetail";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -20,20 +19,9 @@ const Popup_chitiet = (props) => {
 
     const _HandleSelectTab = (e) => sTab(e);
 
-    const [data, sData] = useState();
-
     const [dataRole, sDataRole] = useState([])
 
-    const { isFetching } = useQuery({
-        queryKey: ["api_detail_staff"],
-        queryFn: async () => {
-            const db = await apiSatff.apiDetailStaff(props?.id)
-            sData(db);
-            return db
-        },
-        enabled: !!open && !!props?.id
-    })
-
+    const { data, isFetching } = useStaffDetail(open, props?.id);
 
     useQuery({
         queryKey: ["api_permissionsStaff"],

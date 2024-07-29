@@ -1,3 +1,6 @@
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
+import apiRoles from "@/Api/apiPersonnel/apiRoles";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -17,79 +20,84 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { useBranchList } from "@/hooks/common/useBranchList";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
+import { useQuery } from "@tanstack/react-query";
 import { Grid6, ArrowDown2 as IconDown, Edit as IconEdit, Minus as IconMinus } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Popup_NVL from "./components/category/popup";
-import { useItemCategoryCombobox } from "../../hooks/common/useItemCategoryCombobox";
-import { useItemCategoryList } from "./hooks/category/useItemCategoryList";
+import PopupRoles from "./components/roles/popupRoles";
+import { useRolesList } from "./hooks/roles/useRolesList";
+import { usePositionLits } from "@/hooks/common/usePositionLits";
+import { useBranchList } from "@/hooks/common/useBranchList";
+import { useDepartmentList } from "./hooks/departments/useDepartmentList";
 
-const ItemCategory = (props) => {
+const PersonnelRoles = (props) => {
     const dataLang = props.dataLang;
-
-    const router = useRouter();
-
-    const { paginate } = usePagination();
-
-    const isShow = useToast();
 
     const statusExprired = useStatusExprired();
 
-    const [idCategory, sIdCategory] = useState(null);
+    const { paginate } = usePagination();
+
+    const router = useRouter();
+
+    const isShow = useToast();
+
+    const dispatch = useDispatch();
 
     const [idBranch, sIdBranch] = useState(null);
 
-    const _HandleFilterOpt = (type, value) => {
-        if (type == "category") {
-            sIdCategory(value);
-        } else if (type == "branch") {
-            sIdBranch(value);
-        }
-    };
+    const [idPosition, sIdPosition] = useState(null);
 
     const [keySearch, sKeySearch] = useState("");
 
-    const {
-        limit,
-        updateLimit: sLimit,
-        totalItems: totalItems,
-        updateTotalItems: sTotalItems,
-    } = useLimitAndTotalItems();
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, "material_category");
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "personnel_roles");
 
     const params = {
         search: keySearch,
         limit: limit,
         page: router.query?.page || 1,
-        "filter[id]": idCategory?.value ? idCategory?.value : null,
+        "filter[position_id]": idPosition?.value ? idPosition?.value : null,
         "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
     }
 
-    const { data, isFetching, isLoading, refetch } = useItemCategoryList(params, sTotalItems);
+    const { data: dataBranchOption = [] } = useBranchList({});
 
+    const { data, isFetching, refetch } = useRolesList(params, sTotalItems);
 
-    const { data: listBr = [] } = useBranchList();
+    const { data: dataDepartmentOption = [] } = useDepartmentList({}, undefined)
 
-    const { data: dataOpt = [], refetch: refetchOpt } = useItemCategoryCombobox();
+    const { refetch: refetchPosition, data: dataPositionOption = [] } = usePositionLits();
+
+    const _HandleFilterOpt = (type, value) => {
+        if (type == "position") {
+            sIdPosition(value);
+        } else if (type == "branch") {
+            sIdBranch(value);
+        }
+    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
     }, 500);
 
-    //excel
+
+    //Set data cho bộ lọc chi nhánh
+    const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
+
+    const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
+
     const multiDataSet = [
         {
             columns: [
@@ -102,23 +110,32 @@ const ItemCategory = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.category_material_group_code}`,
-                    width: { wpx: 100 },
+                    title: `${dataLang?.category_personnel_position_name || "category_personnel_position_name"}`,
+                    width: { wpx: 150 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
                         font: { bold: true },
                     },
                 },
                 {
-                    title: `${dataLang?.category_material_group_name}`,
-                    width: { wch: 40 },
+                    title: `${dataLang?.category_personnel_position_amount || "category_personnel_position_amount"}`,
+                    width: { wch: 30 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
                         font: { bold: true },
                     },
                 },
                 {
-                    title: `${dataLang?.client_popup_note}`,
+                    title: `${dataLang?.category_personnel_position_department || "category_personnel_position_department"
+                        }`,
+                    width: { wch: 30 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.client_list_brand || "client_list_brand"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -126,24 +143,20 @@ const ItemCategory = (props) => {
                     },
                 },
             ],
-            data: data?.rResult?.map((e) => [
+            data: data?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
-                { value: `${e.code}` },
                 { value: `${e.name}` },
-                { value: `${e.note}` },
+                { value: `${e.name}` },
+                { value: `${e.department_name}` },
+                { value: `${JSON.stringify(e.branch.map((e) => e.name))}` },
             ]),
         },
     ];
 
-    //Set data cho bộ lọc chi nhánh
-    const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-
-    const options = listBr?.filter((x) => !hiddenOptions.includes(x.value));
-
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.header_category_material_group}</title>
+                <title>{dataLang?.header_category_personnel_position || "header_category_personnel_position"}</title>
             </Head>
             <Container>
                 {statusExprired ? (
@@ -151,25 +164,24 @@ const ItemCategory = (props) => {
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.header_category_material || "header_category_material"}
+                            {dataLang?.header_category_personnel || "header_category_personnel"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.header_category_material_group || "header_category_material_group"}</h6>
+                        <h6>{dataLang?.header_category_personnel_position || "header_category_personnel_position"}</h6>
                     </div>
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.category_material_group_title}
+                                {dataLang?.category_personnel_position_title || "category_personnel_position_title"}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
-                                    <Popup_NVL
-                                        onRefresh={refetch.bind(this)}
-                                        onRefreshOpt={refetchOpt.bind(this)}
+                                    <PopupRoles
                                         dataLang={dataLang}
-                                        data={data?.rResult}
+                                        onRefresh={refetch.bind(this)}
+                                        onRefreshSub={refetchPosition.bind(this)}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
                                 ) : (
@@ -204,7 +216,6 @@ const ItemCategory = (props) => {
                                                     },
                                                     ...options,
                                                 ]}
-                                                isClearable={true}
                                                 onChange={_HandleFilterOpt.bind(this, "branch")}
                                                 value={idBranch}
                                                 placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
@@ -217,31 +228,31 @@ const ItemCategory = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.category_material_group_code || "category_material_group_code",
+                                                        label: dataLang?.category_personnel_position_name || "category_personnel_position_name",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataOpt,
+                                                    ...dataPositionOption,
                                                 ]}
-                                                isClearable={true}
-                                                onChange={_HandleFilterOpt.bind(this, "category")}
-                                                value={idCategory}
-                                                placeholder={dataLang?.category_material_group_code || "category_material_group_code"}
-                                                colSpan={3}
                                                 formatOptionLabel={SelectOptionLever}
+                                                onChange={_HandleFilterOpt.bind(this, "position")}
+                                                value={idPosition}
+                                                placeholder={dataLang?.category_personnel_position_name}
+                                                colSpan={3}
                                             />
                                         </div>
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={() => { }} />
-
+                                            <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
-                                                    {data?.rResult?.length > 0 && (
+                                                    {data?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
-                                                            filename="Nhóm nvl"
-                                                            title="Hiii"
+                                                            filename={
+                                                                dataLang?.header_category_personnel_position || "header_category_personnel_position"
+                                                            }
+                                                            title="DSCV"
                                                             dataLang={dataLang}
                                                         />
                                                     )}
@@ -261,49 +272,49 @@ const ItemCategory = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <Customscrollbar className="min:h-[200px] h-[90%] max:h-[650px]o pb-2">
-                                <div className="w-full">
-                                    <HeaderTable gridCols={11} display={"grid"}>
-                                        <ColumnTable colSpan={1} />
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.category_material_group_code || "category_material_group_code"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={3} textAlign={"center"}>
-                                            {dataLang?.category_material_group_name || "category_material_group_name"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.client_popup_note || "client_popup_note"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.price_quote_branch || "price_quote_branch"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.branch_popup_properties || "branch_popup_properties"}
-                                        </ColumnTable>
-                                    </HeaderTable>
-                                    <div className="divide-y divide-slate-200">
-                                        {(isFetching || isLoading) ? (
-                                            <Loading />
-                                        ) : data?.rResult?.length > 0 ? (
-                                            data?.rResult?.map((e) => (
-                                                <Items
-                                                    onRefresh={refetch.bind(this)}
-                                                    onRefreshOpt={refetchOpt.bind(this)}
-                                                    dataLang={dataLang}
-                                                    key={e.id}
-                                                    data={e}
-                                                />
-                                            ))
-                                        ) : (
-                                            <NoData />
-                                        )}
+                                <Customscrollbar className="min:h-[500px] h-[91%] max:h-[800px] overflow-y-auto pb-2">
+                                    <div className="w-full">
+                                        <HeaderTable gridCols={10} display={"grid"}>
+                                            <ColumnTable colSpan={1} />
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                {dataLang?.category_personnel_position_name || "category_personnel_position_name"}
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                {dataLang?.category_personnel_position_amount || "category_personnel_position_amount"}
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                {dataLang?.category_personnel_position_department || "category_personnel_position_department"}
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                {dataLang?.client_list_brand || "client_list_brand"}
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={1} textAlign={"center"}>
+                                                {dataLang?.branch_popup_properties || "branch_popup_properties"}
+                                            </ColumnTable>
+                                        </HeaderTable>
+                                        <div className="divide-y divide-slate-200">
+                                            {isFetching ? (
+                                                <Loading className="h-80" color="#0f4f9e" />
+                                            ) : data?.length > 0 ? (
+                                                data.map((e) => (
+                                                    <Item
+                                                        onRefresh={refetch.bind(this)}
+                                                        onRefreshSub={refetchPosition.bind(this)}
+                                                        dataLang={dataLang}
+                                                        key={e.id}
+                                                        data={e}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <NoData />
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </Customscrollbar>
+                                </Customscrollbar>
+                            </div>
                         </ContainerTable>
                     </div>
-                    {data?.rResult?.length != 0 && (
+                    {data?.length != 0 && (
                         <ContainerPagination>
                             <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
@@ -320,24 +331,24 @@ const ItemCategory = (props) => {
     );
 };
 
-const Items = React.memo((props) => {
-    const isShow = useToast();
-
+const Item = React.memo((props) => {
     const [hasChild, sHasChild] = useState(false);
 
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkEdit } = useActionRole(auth, "material_category");
+    const { checkEdit } = useActionRole(auth, "personnel_roles");
+
+    const isShow = useToast();
 
     useEffect(() => {
         sHasChild(false);
     }, [props.data?.children?.length == null]);
 
     return (
-        <div key={props.data?.id}>
-            <RowTable gridCols={11}>
+        <div>
+            <RowTable gridCols={10}>
                 <RowItemTable colSpan={1} className="flex justify-center">
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
@@ -350,29 +361,26 @@ const Items = React.memo((props) => {
                     </button>
                 </RowItemTable>
                 <RowItemTable colSpan={2} textAlign={"left"}>
-                    {props.data?.code}
-                </RowItemTable>
-                <RowItemTable colSpan={3} textAlign={"left"}>
                     {props.data?.name}
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={"left"}>
-                    {props.data?.note}
+                <RowItemTable colSpan={2} textAlign={"center"}>
+                    Thành viên
                 </RowItemTable>
                 <RowItemTable colSpan={2} textAlign={"left"}>
-                    <span className="flex gap-2 flex-wrap justify-start ">
-                        {props.data?.branch?.map((e) => (
-                            <TagBranch>{e.name}</TagBranch>
-                        ))}
-                    </span>
+                    {props.data?.department_name}
                 </RowItemTable>
-                <RowItemTable colSpan={1} className="flex justify-center space-x-2">
+                <RowItemTable colSpan={2} className="flex items-center justify-start gap-1 flex-wrap">
+                    {props?.data?.branch?.map((i) => (
+                        <TagBranch key={i}>{i.name}</TagBranch>
+                    ))}
+                </RowItemTable>
+                <RowItemTable colSpan={1} className="flex justify-center space-x-2 px-2">
                     {role == true || checkEdit ? (
-                        <Popup_NVL
+                        <PopupRoles
                             onRefresh={props.onRefresh}
-                            onRefreshOpt={props.onRefreshOpt}
+                            onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
-                            data={props.data}
-                            dataOption={props.dataOption}
+                            id={props.data?.id}
                         />
                     ) : (
                         <IconEdit className="cursor-pointer" onClick={() => isShow("warning", WARNING_STATUS_ROLE)} />
@@ -382,7 +390,7 @@ const Items = React.memo((props) => {
                         onRefreshGroup={props.onRefreshOpt}
                         dataLang={props.dataLang}
                         id={props.data?.id}
-                        type="material_category"
+                        type="personnel_roles"
                     />
                 </RowItemTable>
             </RowTable>
@@ -391,7 +399,7 @@ const Items = React.memo((props) => {
                     {props.data?.children?.map((e) => (
                         <ItemsChild
                             onRefresh={props.onRefresh}
-                            onRefreshOpt={props.onRefreshOpt}
+                            onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
                             key={e.id}
                             data={e}
@@ -399,7 +407,7 @@ const Items = React.memo((props) => {
                             children={e?.children?.map((e) => (
                                 <ItemsChild
                                     onRefresh={props.onRefresh}
-                                    onRefreshOpt={props.onRefreshOpt}
+                                    onRefreshSub={props.onRefreshSub}
                                     dataLang={props.dataLang}
                                     key={e.id}
                                     data={e}
@@ -407,7 +415,7 @@ const Items = React.memo((props) => {
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
                                             onRefresh={props.onRefresh}
-                                            onRefreshOpt={props.onRefreshOpt}
+                                            onRefreshSub={props.onRefreshSub}
                                             dataLang={props.dataLang}
                                             key={e.id}
                                             data={e}
@@ -426,11 +434,14 @@ const Items = React.memo((props) => {
 
 const ItemsChild = React.memo((props) => {
     const isShow = useToast();
+
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-    const { checkEdit } = useActionRole(auth, "material_category");
+
+    const { checkEdit } = useActionRole(auth, "personnel_roles");
+
     return (
         <React.Fragment key={props.data?.id}>
-            <RowTable gridCols={11}>
+            <RowTable gridCols={10}>
                 {props.data?.level == "3" && (
                     <RowItemTable colSpan={1} className="h-full flex justify-center items-center pl-24">
                         <IconDown className="rotate-45" />
@@ -453,26 +464,26 @@ const ItemsChild = React.memo((props) => {
                     </RowItemTable>
                 )}
                 <RowItemTable colSpan={2} textAlign={"left"}>
-                    {props.data?.code}
-                </RowItemTable>
-                <RowItemTable colSpan={3} textAlign={"left"}>
                     {props.data?.name}
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={"left"}>
-                    {props.data?.note}
+                <RowItemTable colSpan={2} textAlign={"center"}>
+                    0
                 </RowItemTable>
-                <RowItemTable colSpan={2} className="gap-2 flex flex-wrap px-2">
-                    {props.data?.branch.map((e) => (
-                        <TagBranch key={e?.id}>{e.name}</TagBranch>
+                <RowItemTable colSpan={2} textAlign={"left"}>
+                    {props.data?.department_name}
+                </RowItemTable>
+                <RowItemTable colSpan={2} className="flex gap-1 flex-wrap">
+                    {props.data.branch?.map((i) => (
+                        <TagBranch key={i}>{i.name}</TagBranch>
                     ))}
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2">
                     {role == true || checkEdit ? (
-                        <Popup_NVL
+                        <PopupRoles
                             onRefresh={props.onRefresh}
-                            onRefreshOpt={props.onRefreshOpt}
+                            onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
-                            data={props.data}
+                            id={props.data?.id}
                         />
                     ) : (
                         <IconEdit className="cursor-pointer" onClick={() => isShow("warning", WARNING_STATUS_ROLE)} />
@@ -482,7 +493,7 @@ const ItemsChild = React.memo((props) => {
                         onRefreshGroup={props.onRefreshOpt}
                         dataLang={props.dataLang}
                         id={props.data?.id}
-                        type="material_category"
+                        type="personnel_roles"
                     />
                 </RowItemTable>
             </RowTable>
@@ -491,4 +502,4 @@ const ItemsChild = React.memo((props) => {
     );
 });
 
-export default ItemCategory;
+export default PersonnelRoles;
