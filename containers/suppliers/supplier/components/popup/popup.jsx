@@ -18,41 +18,40 @@ import ButtonAdd from "../button/buttonAdd";
 import FormContact from "../form/formContact";
 import FormInfo from "../form/formInfo";
 
+const initalState = {
+  open: false,
+  onSending: false,
+  onFetching: false,
+  onFetchingDis: false,
+  onFetchingWar: false,
+  onFetchingChar: false,
+  onFetchingBr: false,
+  onFetchingGr: false,
+  errInput: false,
+  errInputBr: false,
+  option: [],
+  name: "",
+  code: "",
+  tax_code: "",
+  representative: "",
+  phone_number: "",
+  address: "",
+  date_incorporation: "",
+  email: "",
+  note: "",
+  debt_begin: "",
+  valueBr: [],
+  dataBr: [],
+  dataCity: [],
+  valueCt: null,
+  valueDitrict: null,
+  valueWa: null,
+  valueGr: [],
+  errInputName: false,
+  tab: 0
+}
 const Popup_dsncc = (props) => {
   const dataLang = props.dataLang;
-
-  const initalState = {
-    open: false,
-    onSending: false,
-    onFetching: false,
-    onFetchingDis: false,
-    onFetchingWar: false,
-    onFetchingChar: false,
-    onFetchingBr: false,
-    onFetchingGr: false,
-    errInput: false,
-    errInputBr: false,
-    option: [],
-    name: "",
-    code: "",
-    tax_code: "",
-    representative: "",
-    phone_number: "",
-    address: "",
-    date_incorporation: "",
-    email: "",
-    note: "",
-    debt_begin: "",
-    valueBr: [],
-    dataBr: [],
-    dataCity: [],
-    valueCt: null,
-    valueDitrict: null,
-    valueWa: null,
-    valueGr: [],
-    errInputName: false,
-    tab: 0
-  }
 
   const [isState, sIsState] = useState(initalState);
 
@@ -143,7 +142,6 @@ const Popup_dsncc = (props) => {
     })
   }, [isState.valueDitrict])
 
-
   useEffect(() => {
     isState.valueCt == null && queryState({
       valueWa: null,
@@ -156,7 +154,6 @@ const Popup_dsncc = (props) => {
       return apiSuppliers.apiHandingSuppliers(data, props?.id)
     }
   })
-
 
   //post db
   const _ServerSending = () => {
@@ -201,8 +198,7 @@ const Popup_dsncc = (props) => {
           isShow("error", props?.dataLang[message] || message);
         }
       },
-      onError: (err) => {
-      }
+      onError: (err) => { }
     })
     queryState({ onSending: false });
   };
@@ -267,11 +263,7 @@ const Popup_dsncc = (props) => {
   return (
     <>
       <PopupCustom
-        title={
-          props.id
-            ? `${props.dataLang?.suppliers_supplier_edit}`
-            : `${props.dataLang?.suppliers_supplier_add}`
-        }
+        title={props.id ? `${props.dataLang?.suppliers_supplier_edit}` : `${props.dataLang?.suppliers_supplier_add}`}
         button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
         onClickOpen={() => queryState({ open: true })}
         open={isState.open}
@@ -297,9 +289,7 @@ const Popup_dsncc = (props) => {
         <div className="mt-4">
           <form onSubmit={_HandleSubmit.bind(this)} className="">
             {isState.tab === 0 && (
-              <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
-
-              >
+              <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 <FormInfo
                   dataWar={dataWar}
                   dataGroup={dataGroup}

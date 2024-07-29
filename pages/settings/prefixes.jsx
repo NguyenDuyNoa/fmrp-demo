@@ -1,25 +1,17 @@
-import Head from "next/head";
-import React, { useEffect, useState } from "react";
-
-import { ListBtn_Setting } from "./information";
-import { _ServerInstance as Axios } from "/services/axios";
-
+import apiPrefix from "@/Api/apiSettings/apiPrefix";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import Head from "next/head";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import apiPrefix from "@/Api/apiSettings/apiPrefix";
+import { ListBtn_Setting } from "./information";
+import useToast from "@/hooks/useToast";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Index = (props) => {
+    const isShow = useToast();
     const dataLang = props.dataLang;
     const statusExprired = useStatusExprired()
     const [onFetching, sOnFetching] = useState(false);
@@ -63,15 +55,9 @@ const Index = (props) => {
             const { isSuccess, message } = await apiPrefix.apiHandingPrefix(formData)
 
             if (isSuccess) {
-                Toast.fire({
-                    icon: "success",
-                    title: dataLang[message] || message,
-                });
+                isShow("success", dataLang[message] || message);
             } else {
-                Toast.fire({
-                    icon: "error",
-                    title: dataLang[message] || message,
-                });
+                isShow("error", dataLang[message] || message);
             }
         } catch (error) {
 

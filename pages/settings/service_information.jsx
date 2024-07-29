@@ -1,34 +1,30 @@
-import Head from "next/head";
-import React, { useEffect, useState } from "react";
-
-import { ListBtn_Setting } from "./information";
-
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { Clock as IconClock, Money2 as IconMoney, Refresh as IconRefresh } from "iconsax-react";
+import Head from "next/head";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { ListBtn_Setting } from "./information";
 
+const initialPackage = {
+    title: "Dùng thử",
+    package: "Start Up",
+    idPackageService: 1,
+    idStatus: 1,
+    status: "Sắp hết hạn",
+    member: "10 người",
+    capacity: 3213211,
+    expDate: "12/12/2023"
+}
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const statusExprired = useStatusExprired()
 
     const auth = useSelector((state) => state?.auth);
-
-    const initialPackage = {
-        title: "Dùng thử",
-        package: "Start Up",
-        idPackageService: 1,
-        idStatus: 1,
-        status: "Sắp hết hạn",
-        member: "10 người",
-        capacity: 3213211,
-        expDate: "12/12/2023"
-    }
-
 
     const [listPackage, setListPackage] = useState(initialPackage);
 

@@ -13,11 +13,7 @@ import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-    Trash as IconDelete,
-    GalleryEdit as IconEditImg,
-    Image as IconImage
-} from "iconsax-react";
+import { Trash as IconDelete, GalleryEdit as IconEditImg, Image as IconImage } from "iconsax-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { BiEdit } from "react-icons/bi";

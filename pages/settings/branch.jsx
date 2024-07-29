@@ -1,15 +1,4 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import { ListBtn_Setting } from "./information";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import "react-phone-input-2/lib/style.css";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-
+import apiBranch from "@/Api/apiSettings/apiBranch";
 import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -24,8 +13,14 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import "react-phone-input-2/lib/style.css";
 import PopupBranch from "./components/popupBranch";
-import apiBranch from "@/Api/apiSettings/apiBranch";
+import { ListBtn_Setting } from "./information";
 const Index = (props) => {
     const router = useRouter();
 

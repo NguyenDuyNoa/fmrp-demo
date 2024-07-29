@@ -59,8 +59,8 @@ const SuppliersGroups = (props) => {
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
     const params = {
-        search: isState.keySearch,
         limit: limit,
+        search: isState.keySearch,
         page: router.query?.page || 1,
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }

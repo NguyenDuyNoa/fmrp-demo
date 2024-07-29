@@ -5,7 +5,7 @@ import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useQuery } from "@tanstack/react-query";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading";
 import { Image as IconImage } from "iconsax-react";
 import Image from "next/image";
 import { useState } from "react";

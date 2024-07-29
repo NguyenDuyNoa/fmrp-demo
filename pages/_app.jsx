@@ -1,19 +1,15 @@
-import Head from "next/head";
-import React, { useEffect, useState } from "react";
-import { Provider, useDispatch, useSelector } from "react-redux";
-
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import Layout from "@/components/layout";
-import store from "/services/redux";
-
-import "react-datepicker/dist/react-datepicker.css";
-import "sweetalert2/src/sweetalert2.scss";
-import "../styles/globals.scss";
-
 import LoginPage from "@/components/UI/login/login";
 import { Lexend_Deca } from "@next/font/google";
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import Head from "next/head";
+import React, { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import "sweetalert2/src/sweetalert2.scss";
+import "../styles/globals.scss";
+import store from "/services/redux";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],

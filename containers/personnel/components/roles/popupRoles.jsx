@@ -115,6 +115,7 @@ const PopupRoles = React.memo((props) => {
         isState.valueBranch.forEach((e) => formData.append("branch_id[]", e?.value));
         const utf8Bytes = JSON.stringify(transformedResult)
         formData.append("permissions", utf8Bytes);
+
         handingRoles.mutate(formData, {
             onSuccess: ({ isSuccess, message }) => {
                 if (isSuccess) {
@@ -126,12 +127,9 @@ const PopupRoles = React.memo((props) => {
                     isShow("error", props.dataLang[message] || message);
                 }
             },
-            onError: (error) => {
-
-            }
+            onError: (error) => { }
         })
         queryState({ onSending: false });
-
     };
 
     useEffect(() => {
@@ -399,9 +397,7 @@ const PopupRoles = React.memo((props) => {
                                         value={isState.position}
                                         onChange={(value) => queryState({ position: value })}
                                         isClearable={true}
-                                        placeholder={
-                                            props.dataLang?.category_personnel_position_manage_position || "category_personnel_position_manage_position"
-                                        }
+                                        placeholder={props.dataLang?.category_personnel_position_manage_position || "category_personnel_position_manage_position"}
                                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none p-0"
                                         isSearchable={true}
                                         {...styleSelect}
@@ -428,7 +424,6 @@ const PopupRoles = React.memo((props) => {
 
                                 </div>
                                 <div className="space-y-2 max-h-[500px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-
                                     <div className={`grid grid-cols-1`}>
                                         {isState.dataPower?.map((e) => {
                                             return (

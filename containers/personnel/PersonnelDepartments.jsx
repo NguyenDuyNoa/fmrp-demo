@@ -1,4 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -16,13 +15,12 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranchList";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-import { useQuery } from "@tanstack/react-query";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
@@ -32,7 +30,6 @@ import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import Popup_phongban from "./components/departments/popup";
 import { useDepartmentList } from "./hooks/departments/useDepartmentList";
-import { useBranchList } from "@/hooks/common/useBranchList";
 
 
 const initalState = {

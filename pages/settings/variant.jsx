@@ -1,15 +1,3 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import { ListBtn_Setting } from "./information";
-
-
-
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import useStatusExprired from "@/hooks/useStatusExprired";
-
 import apiVariant from "@/Api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -24,8 +12,15 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import PopupVariant from "./components/popupVariant";
+import { ListBtn_Setting } from "./information";
 
 const Index = (props) => {
     const router = useRouter();

@@ -1,18 +1,13 @@
-import Head from "next/head";
-import React, { useEffect, useState } from "react";
-
-import { ListBtn_Setting } from "./information";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
+import apiGeneral from "@/Api/apiSettings/apiGeneral";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
-import apiComons from "@/Api/apiComon/apiComon";
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
-import apiGeneral from "@/Api/apiSettings/apiGeneral";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import Head from "next/head";
+import React, { useEffect, useState } from "react";
+import { ListBtn_Setting } from "./information";
 
 const Index = (props) => {
     const dataLang = props.dataLang;

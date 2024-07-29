@@ -1,6 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
-import apiRoles from "@/Api/apiPersonnel/apiRoles";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -20,23 +17,22 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranchList";
+import { usePositionLits } from "@/hooks/common/usePositionLits";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import { useQuery } from "@tanstack/react-query";
 import { Grid6, ArrowDown2 as IconDown, Edit as IconEdit, Minus as IconMinus } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import PopupRoles from "./components/roles/popupRoles";
-import { useRolesList } from "./hooks/roles/useRolesList";
-import { usePositionLits } from "@/hooks/common/usePositionLits";
-import { useBranchList } from "@/hooks/common/useBranchList";
 import { useDepartmentList } from "./hooks/departments/useDepartmentList";
+import { useRolesList } from "./hooks/roles/useRolesList";
 
 const PersonnelRoles = (props) => {
     const dataLang = props.dataLang;
@@ -48,8 +44,6 @@ const PersonnelRoles = (props) => {
     const router = useRouter();
 
     const isShow = useToast();
-
-    const dispatch = useDispatch();
 
     const [idBranch, sIdBranch] = useState(null);
 

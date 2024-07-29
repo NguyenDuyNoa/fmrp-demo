@@ -1,8 +1,6 @@
-import React from "react";
-import Select from "react-select";
-import { NumericFormat } from "react-number-format";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import useToast from "@/hooks/useToast";
+import Select from "react-select";
 const FormInfo = ({ isState, dataGroup, dataDitrict, dataWar, queryState, dataLang }) => {
   const isShow = useToast()
   return (

@@ -38,9 +38,7 @@ const Popup_Products = React.memo((props) => {
 
     const [errCode, sErrCode] = useState(false);
 
-    const params = {
-        "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
-    }
+    const params = { "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0 }
 
     const { data: dataOption = [] } = useProductCategoryDetailOptions(open, params, props?.id)
 

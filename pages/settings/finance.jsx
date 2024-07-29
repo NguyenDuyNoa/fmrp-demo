@@ -1,14 +1,3 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import { ListBtn_Setting } from "./information";
-
-//daupdate
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-
 import apiFinance from "@/Api/apiSettings/apiFinance";
 import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -25,8 +14,14 @@ import Pagination from "@/components/UI/pagination";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useStatusExprired from "@/hooks/useStatusExprired";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import PopupFinance from "./components/popupFinance";
+import { ListBtn_Setting } from "./information";
 
 const Index = (props) => {
     const dataLang = props.dataLang;

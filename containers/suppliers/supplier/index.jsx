@@ -1,5 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -20,12 +18,12 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranchList";
+import { useProvinceList } from "@/hooks/common/useProvinceList";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import { useQuery } from "@tanstack/react-query";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
@@ -34,9 +32,8 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Popup_chitiet from "./components/popup/detail";
 import Popup_dsncc from "./components/popup/popup";
-import { useSupplierList } from "./hooks/useSupplierList";
 import { useSupplierGroup } from "./hooks/useSupplierGroup";
-import { useProvinceList } from "@/hooks/common/useProvinceList";
+import { useSupplierList } from "./hooks/useSupplierList";
 
 const initalState = {
     keySearch: "",

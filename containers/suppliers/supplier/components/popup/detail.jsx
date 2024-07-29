@@ -1,14 +1,13 @@
-import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import { useQuery } from "@tanstack/react-query";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import { useState } from "react";
-import PopupCustom from "/components/UI/popup";
+import { usseSupplierDetail } from "../../hooks/usseSupplierDetail";
 
 const Popup_chitiet = (props) => {
   const [open, sOpen] = useState(false);
@@ -25,16 +24,7 @@ const Popup_chitiet = (props) => {
     return roundedNumber.toLocaleString("en");
   };
 
-  const { isLoading, isFetching, data } = useQuery({
-    queryKey: ["api_supplier_detail", props?.id],
-    queryFn: async () => {
-      const db = await apiSuppliers.apiDetailSuppliers(props?.id);
-
-      return db
-    },
-    enabled: (!!props?.id && open),
-  })
-
+  const { isLoading, isFetching, data } = usseSupplierDetail(open, props?.id);
 
   return (
     <>

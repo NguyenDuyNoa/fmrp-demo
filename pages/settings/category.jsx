@@ -1,28 +1,4 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useRef, useState } from "react";
-
-import Select from "react-select";
-import { ListBtn_Setting } from "./information";
-import { _ServerInstance as Axios } from "/services/axios";
-
-import {
-    CloseCircle,
-    ArrowDown2 as IconDown,
-    Edit as IconEdit,
-    Minus as IconMinus,
-    TickCircle
-} from "iconsax-react";
-
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
-import PopupCustom from "@/components/UI/popup";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
+import apiCategory from "@/Api/apiSettings/apiCategory";
 import { BtnAction } from "@/components/UI/BtnAction";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -33,22 +9,23 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
+import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { CloseCircle, ArrowDown2 as IconDown, Minus as IconMinus, TickCircle } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import apiCategory from "@/Api/apiSettings/apiCategory";
-const CustomSelectOption = ({ value, label, level, code }) => (
-    <div className="flex space-x-2 truncate">
-        {level == 1 && <span>--</span>}
-        {level == 2 && <span>----</span>}
-        {level == 3 && <span>------</span>}
-        {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
-    </div>
-);
 import PopupCategory from "./components/popupCategory";
+import { ListBtn_Setting } from "./information";
+import { _ServerInstance as Axios } from "@/services/axios";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
