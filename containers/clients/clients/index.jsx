@@ -35,8 +35,8 @@ import { useSelector } from "react-redux";
 import { Tooltip } from "react-tippy";
 import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
-import { useClientGroup } from "../../../pages/clients/_hooks/useClientGroup";
-import { useClientList } from "../../../pages/clients/_hooks/useClientList";
+import { useClientGroup } from "./hooks/useClientGroup";
+import { useClientList } from "./hooks/useClientList";
 const Client = (props) => {
     const isShow = useToast();
 

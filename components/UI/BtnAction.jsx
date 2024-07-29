@@ -50,7 +50,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import useActionRole from "@/hooks/useRole";
 import Popup_Bom from "@/pages/products/components/product/popupBom";
 import Popup_GiaiDoan from "@/pages/products/components/product/popupGiaiDoan";
-import Popup_ThanhPham from "@/pages/products/components/product/popupThanhPham";
+import Popup_Products from "@/pages/products/components/product/popupThanhPham";
 import { useSelector } from "react-redux";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -461,7 +461,7 @@ export const BtnAction = React.memo((props) => {
                                         bom={props?.bom}
                                         className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                                     />
-                                    <Popup_ThanhPham
+                                    <Popup_Products
                                         onRefresh={props.onRefresh}
                                         dataProductExpiry={props.dataProductExpiry}
                                         dataLang={props.dataLang}

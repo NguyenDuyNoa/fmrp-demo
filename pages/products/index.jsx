@@ -36,8 +36,8 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { useDispatch, useSelector } from "react-redux";
-import Popup_ThanhPham from "./components/product/popupThanhPham";
-import Popup_ThongTin from "./components/product/popupThongtin";
+import Popup_Products from "./components/product/popupThanhPham";
+import Popup_Detail from "./components/product/popupThongtin";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -353,7 +353,7 @@ const Index = (props) => {
                             </h2>
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ?
-                                    <Popup_ThanhPham
+                                    <Popup_Products
                                         onRefresh={refetch.bind(this)}
                                         dataProductExpiry={dataProductExpiry}
                                         dataLang={dataLang}
@@ -559,7 +559,7 @@ const Index = (props) => {
                                                             {e?.category_name}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'left'}>
-                                                            <Popup_ThongTin
+                                                            <Popup_Detail
                                                                 id={e?.id}
                                                                 dataProductExpiry={dataProductExpiry}
                                                                 dataLang={dataLang}
@@ -567,10 +567,10 @@ const Index = (props) => {
                                                                 <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none">
                                                                     {e?.code}
                                                                 </button>
-                                                            </Popup_ThongTin>
+                                                            </Popup_Detail>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2} textAlign={'left'} className="flex flex-col items-start justify-start">
-                                                            <Popup_ThongTin
+                                                            <Popup_Detail
                                                                 id={e?.id}
                                                                 dataProductExpiry={dataProductExpiry}
                                                                 dataLang={dataLang}
@@ -578,7 +578,7 @@ const Index = (props) => {
                                                                 <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none  text-left">
                                                                     {e?.name}
                                                                 </button>
-                                                            </Popup_ThongTin>
+                                                            </Popup_Detail>
                                                             <h6 className="flex gap-1 items-center">
                                                                 <span
                                                                     className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed 2xl:text-[10px] text-[9px]

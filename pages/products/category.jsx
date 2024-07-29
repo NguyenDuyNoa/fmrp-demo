@@ -37,7 +37,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Popup_ThanhPham from "./components/category/popup";
+import Popup_Products from "./components/category/popup";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -244,7 +244,7 @@ const Index = (props) => {
                             </h2>
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
-                                    <Popup_ThanhPham
+                                    <Popup_Products
                                         onRefresh={refetch.bind(this)}
                                         onRefreshSub={refetchSup.bind(this)}
                                         dataLang={dataLang}
@@ -455,7 +455,7 @@ const Item = React.memo((props) => {
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2 px-2">
                     {role == true || checkEdit ? (
-                        <Popup_ThanhPham
+                        <Popup_Products
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
@@ -557,7 +557,7 @@ const ItemsChild = React.memo((props) => {
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2">
                     {role == true || checkEdit ? (
-                        <Popup_ThanhPham
+                        <Popup_Products
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}

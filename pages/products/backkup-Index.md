@@ -49,6 +49,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
+
 <div className="flex space-x-2 truncate">
 {level == 1 && <span>--</span>}
 {level == 2 && <span>----</span>}
@@ -461,7 +462,7 @@ const dataLang = props.dataLang;
                     <div className="flex justify-between items-center">
                         <h2 className="xl:text-3xl text-xl font-medium ">{dataLang?.list_finishedProduct_title}</h2>
                         <div className="flex space-x-3 items-center">
-                            <Popup_ThanhPham
+                            <Popup_Products
                                 onRefresh={_ServerFetching.bind(this)}
                                 dataProductExpiry={dataProductExpiry}
                                 dataLang={dataLang}
@@ -868,7 +869,7 @@ const dataLang = props.dataLang;
                                                     {e?.category_name}
                                                 </h6>
                                                 <div className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  w-[10%]">
-                                                    <Popup_ThongTin
+                                                    <Popup_Detail
                                                         id={e?.id}
                                                         dataProductExpiry={dataProductExpiry}
                                                         dataLang={dataLang}
@@ -876,7 +877,7 @@ const dataLang = props.dataLang;
                                                         <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none">
                                                             {e?.code}
                                                         </button>
-                                                    </Popup_ThongTin>
+                                                    </Popup_Detail>
                                                 </div>
                                                 <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[10%]">
                                                     {e?.name}
@@ -1070,7 +1071,7 @@ const isShow = useToast();
                                 {props.dataLang?.bom_design_finishedProduct}
                             </button>
                         )}
-                        <Popup_ThanhPham
+                        <Popup_Products
                             onRefresh={props.onRefresh}
                             dataProductExpiry={props.dataProductExpiry}
                             dataLang={props.dataLang}
@@ -1102,7 +1103,7 @@ const isShow = useToast();
 
 });
 
-const Popup_ThanhPham = React.memo((props) => {
+const Popup_Products = React.memo((props) => {
 const dataOptBranch = useSelector((state) => state.branch);
 
     const dataOptType = useSelector((state) => state.type_finishedProduct);
@@ -2549,7 +2550,7 @@ const dataOptBranch = useSelector((state) => state.branch);
 
 });
 
-const Popup_ThongTin = React.memo((props) => {
+const Popup_Detail = React.memo((props) => {
 const [open, sOpen] = useState(false);
 const \_ToggleModal = (e) => sOpen(e);
 

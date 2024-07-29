@@ -1,5 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -19,12 +17,12 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranchList";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import { useQuery } from "@tanstack/react-query";
 import { Grid6, ArrowDown2 as IconDown, Edit as IconEdit, Minus as IconMinus } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
@@ -32,9 +30,8 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Popup_NVL from "./components/category/popup";
-import { useItemCategoryList } from "./hooks/category/useItemCategoryList";
-import { useBranchList } from "@/hooks/common/useBranchList";
 import { useItemCategoryCombobox } from "./hooks/category/useItemCategoryCombobox";
+import { useItemCategoryList } from "./hooks/category/useItemCategoryList";
 
 const ItemCategory = (props) => {
     const dataLang = props.dataLang;

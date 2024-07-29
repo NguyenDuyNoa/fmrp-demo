@@ -2,17 +2,15 @@ import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import PopupCustom from "@/components/UI/popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import useToast from "@/hooks/useToast";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Edit as IconEdit } from "iconsax-react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Select from "react-select";
+import { useItemCategoryOptoptions } from "../../hooks/category/useItemCategoryOptoptions";
 
 const Popup_NVL = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
-
-    const [dataOption, sDataOption] = useState([]);
-
     const isShow = useToast();
 
     const [open, sOpen] = useState(false);
@@ -31,6 +29,8 @@ const Popup_NVL = React.memo((props) => {
     const [errCode, sErrCode] = useState(false);
     const [errName, sErrName] = useState(false);
     const [idCategory, sIdCategory] = useState(null);
+
+    const { data: dataOption = [] } = useItemCategoryOptoptions(open, props.data?.id)
 
     useEffect(() => {
         open && sCode(props.data?.code ? props.data?.code : "");
@@ -62,22 +62,6 @@ const Popup_NVL = React.memo((props) => {
             sBranch(value);
         }
     };
-
-    const { } = useQuery({
-        queryKey: ['api_detail_category_option', props.data?.id],
-        queryFn: async () => {
-            const { rResult } = await apiCategory.apiDetailCategoryOptionCategory(props.data?.id);
-            sDataOption(
-                rResult.map((e) => ({
-                    label: e.name + " " + "(" + e.code + ")",
-                    value: e.id,
-                    level: e.level,
-                }))
-            );
-            return rResult
-        },
-        enabled: open,
-    })
 
 
     const handingCategory = useMutation({
@@ -150,11 +134,7 @@ const Popup_NVL = React.memo((props) => {
 
     return (
         <PopupCustom
-            title={
-                props.data?.id
-                    ? `${props.dataLang?.category_material_group_edit}`
-                    : `${props.dataLang?.category_material_group_addnew}`
-            }
+            title={props.data?.id ? `${props.dataLang?.category_material_group_edit}` : `${props.dataLang?.category_material_group_addnew}`}
             button={props.data?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}

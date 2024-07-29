@@ -1,5 +1,4 @@
 
-import apiCategory from "@/Api/apiMaterial/category/apiCategory";
 import apiItems from "@/Api/apiMaterial/items/apiItems";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
@@ -12,16 +11,12 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-    Trash as IconDelete,
-    Edit as IconEdit,
-    GalleryEdit as IconEditImg,
-    Image as IconImage
-} from "iconsax-react";
+import { Trash as IconDelete, Edit as IconEdit, GalleryEdit as IconEditImg, Image as IconImage } from "iconsax-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Select from "react-select";
+import { useItemCategoryOptions } from "../../hooks/items/useItemCategoryOptions";
 const Popup_NVL = React.memo((props) => {
     const dataOptUnit = useSelector((state) => state.unit_NVL);
 
@@ -53,8 +48,6 @@ const Popup_NVL = React.memo((props) => {
     const [branch, sBranch] = useState([]);
 
     const branch_id = branch.map((e) => e.value);
-
-    const [dataOptGr, sDataOptGr] = useState([]);
 
     const [groupId, sGroupId] = useState();
 
@@ -113,9 +106,14 @@ const Popup_NVL = React.memo((props) => {
 
     const [dataVariantSending, sDataVariantSending] = useState([]);
 
+    const { data: dataOptGr = [] } = useItemCategoryOptions({
+        params: {
+            "branch_id[]": branch_id.length > 0 ? branch_id : -1,
+        }
+    })
+
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
-        // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
         prevVariantMain === undefined && sOptSelectedVariantMain([]);
         !variantMain && sOptSelectedVariantMain([]);
         if (variantMain === variantSub && variantSub != null && variantMain != null) {
@@ -126,7 +124,6 @@ const Popup_NVL = React.memo((props) => {
 
     useEffect(() => {
         sOptVariantSub(dataOptVariant?.find((e) => e.value == variantSub)?.option);
-        // variantSub && optSelectedVariantSub?.length === 0 && sOptSelectedVariantSub([])
         prevVariantSub === undefined && sOptSelectedVariantSub([]);
         !variantSub && sOptSelectedVariantSub([]);
         if (variantSub === variantMain && variantSub != null && variantMain != null) {
@@ -487,31 +484,10 @@ const Popup_NVL = React.memo((props) => {
     }, [branch.length > 0]);
 
 
-
-    const { } = useQuery({
-        queryKey: ['api_detail_category_option', branch],
-        queryFn: async () => {
-            const { rResult } = await apiCategory.apiCategoryOptionCategory({
-                params: {
-                    "branch_id[]": branch_id.length > 0 ? branch_id : -1,
-                },
-            })
-            sDataOptGr(
-                rResult.map((e) => ({
-                    label: e.name + " " + "(" + e.code + ")",
-                    value: e.id,
-                    level: e.level,
-                }))
-            );
-            return rResult
-        }
-    })
-
     const { isLoading, isFetching } = useQuery({
         queryKey: ['api_detail_items', props?.id],
         queryFn: async () => {
             const data = await apiItems.apiDetailItems(props?.id);
-            console.log("data", data);
             sName(data?.name);
             sCode(data?.code);
             sNote(data?.note);

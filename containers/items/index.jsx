@@ -1,7 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiCategory from "@/Api/apiMaterial/category/apiCategory";
-import apiItems from "@/Api/apiMaterial/items/apiItems";
-import apiVariant from "@/Api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -22,9 +18,11 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupCustom from "@/components/UI/popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranchList";
+import { useUnitList } from "@/hooks/common/useUnitList";
+import { useVariantList } from "@/hooks/common/useVariantList";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
@@ -35,7 +33,6 @@ import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useQuery } from "@tanstack/react-query";
 import { Grid6, Edit as IconEdit, UserEdit as IconUserEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import dynamic from "next/dynamic";
@@ -44,8 +41,11 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Popup_NVL from "./components/items/popupNvl";
+import { useItemCategoryOptions } from "./hooks/items/useItemCategoryOptions";
+import { useItemDetail } from "./hooks/items/useItemDetail";
+import { useItemList } from "./hooks/items/useItemList";
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false, });
 const Items = (props) => {
     const dataLang = props.dataLang;
@@ -56,29 +56,47 @@ const Items = (props) => {
 
     const isShow = useToast();
 
-    const dispatch = useDispatch();
-
     const feature = useFeature()
-
-    const [data, sData] = useState([]);
 
     const dataSeting = useSetingServer()
 
     const statusExprired = useStatusExprired();
 
-    //Bộ lọc Danh mục
-    const [dataCateOption, sDataCateOption] = useState([]);
-
     const [idCategory, sIdCategory] = useState(null);
-    //Bộ lọc Chi nhánh
-    const [dataBranchOption, sDataBranchOption] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
-
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'materials');
+
+    const [keySearch, sKeySearch] = useState("");
+
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+
+    const { } = useUnitList()
+
+    const { } = useVariantList()
+
+    const { data: dataCateOption = [] } = useItemCategoryOptions({})
+
+    const { data: dataBranchOption = [] } = useBranchList()
+
+    const params = {
+        search: keySearch,
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[category_id]": idCategory?.value ? idCategory?.value : null,
+        "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
+    }
+
+    const { isFetching, isLoading, refetch, data: dataItems } = useItemList(params, sTotalItems)
+
+    useEffect(() => {
+        sDataMaterialExpiry(feature?.dataProductSerial)
+    }, []);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting)
@@ -91,86 +109,6 @@ const Items = (props) => {
             sIdBranch(value);
         }
     };
-
-    const [keySearch, sKeySearch] = useState("");
-
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
-    const { isFetching, isLoading, refetch } = useQuery({
-        queryKey: ["api_material", limit, router.query?.page, idCategory, idBranch, keySearch],
-        queryFn: async () => {
-            const params = {
-                search: keySearch,
-                limit: limit,
-                page: router.query?.page || 1,
-                "filter[category_id]": idCategory?.value ? idCategory?.value : null,
-                "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
-            }
-
-            const { output, rResult } = await apiItems.apiListItems({ params: params });
-
-            sData(rResult);
-
-            sTotalItems(output);
-
-            return rResult
-        },
-        ...reTryQuery
-    })
-
-    useEffect(() => {
-        sDataMaterialExpiry(feature?.dataProductSerial)
-    }, []);
-
-    const { } = useQuery({
-        queryKey: ['api_branch_categor_variation'],
-        queryFn: async () => {
-            const { rResult: unit } = await apiComons.apiUnit({})
-
-            const { result } = await apiComons.apiBranchCombobox();
-
-            const { rResult: categoryOption } = await apiCategory.apiCategoryOptionCategory({})
-
-            const { rResult: variation } = await apiVariant.apiListVariant({})
-
-            const array = result.map((e) => ({ label: e.name, value: e.id }))
-
-            dispatch({
-                type: "unit_NVL/update",
-                payload: unit.map((e) => ({ label: e.unit, value: e.id })),
-            })
-
-            sDataBranchOption(array);
-
-            dispatch({
-                type: "branch/update",
-                payload: array,
-            });
-
-            sDataCateOption(
-                categoryOption.map((x) => ({
-                    label: `${x.name + " " + "(" + x.code + ")"}`,
-                    value: x.id,
-                    level: x.level,
-                    code: x.code,
-                    parent_id: x.parent_id,
-                }))
-            );
-
-            dispatch({
-                type: "variant_NVL/update",
-                payload: variation.map((e) => ({
-                    label: e.name,
-                    value: e.id,
-                    option: e.option,
-                })),
-            });
-        }
-    })
-
-
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
@@ -267,7 +205,7 @@ const Items = (props) => {
                     },
                 },
             ],
-            data: data.map((e) => [
+            data: dataItems?.rResult?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
                 { value: `${e.category_name}` },
                 { value: `${e.code}` },
@@ -375,7 +313,7 @@ const Items = (props) => {
                                         <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                         {(role == true || checkExport) ?
                                             <div className={``}>
-                                                {data?.length > 0 && (
+                                                {dataItems?.rResult?.length > 0 && (
                                                     <ExcelFileComponent
                                                         multiDataSet={multiDataSet}
                                                         filename="Danh sách nvl"
@@ -435,11 +373,11 @@ const Items = (props) => {
                                     <Loading className="h-80" color="#0f4f9e" />
                                 ) : (
                                     <React.Fragment>
-                                        {data.length == 0 && (
+                                        {dataItems?.rResult?.length == 0 && (
                                             <NoData />
                                         )}
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                            {data.map((e) => (
+                                            {dataItems?.rResult?.map((e) => (
                                                 <RowTable gridCols={13} key={e?.id ? e?.id.toString() : ""}>
                                                     <RowItemTable colSpan={1} className="select-none justify-center flex">
                                                         <div className="w-[48px] h-[48px] mx-auto">
@@ -464,7 +402,7 @@ const Items = (props) => {
                                                         {e?.category_name}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} textAlign={'left'}>
-                                                        <Popup_ThongTin
+                                                        <Popup_Detail
                                                             dataMaterialExpiry={dataMaterialExpiry}
                                                             id={e?.id}
                                                             dataLang={dataLang}
@@ -472,7 +410,7 @@ const Items = (props) => {
                                                             <button className=" text-[#0F4F9E] hover:opacity-70 w-fit outline-none">
                                                                 {e?.code}
                                                             </button>
-                                                        </Popup_ThongTin>
+                                                        </Popup_Detail>
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={2} textAlign={'left'}>
                                                         {e?.name}
@@ -525,7 +463,7 @@ const Items = (props) => {
                             </div>
                         </Customscrollbar>
                     </div>
-                    {data?.length != 0 && (
+                    {dataItems?.rResult?.length != 0 && (
                         <ContainerPagination>
                             <TitlePagination
                                 dataLang={dataLang}
@@ -546,7 +484,7 @@ const Items = (props) => {
 };
 
 
-const Popup_ThongTin = React.memo((props) => {
+const Popup_Detail = React.memo((props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
@@ -564,17 +502,7 @@ const Popup_ThongTin = React.memo((props) => {
 
     const _HandleSelectTab = (e) => sTab(e);
 
-    const [list, sList] = useState({});
-
-    const { isLoading, isFetching } = useQuery({
-        queryKey: ['api_detail_items', !!open],
-        queryFn: async () => {
-            const data = await apiItems.apiDetailItems(props.id);
-            sList(data);
-            return data
-        },
-        enabled: !!open,
-    })
+    const { isLoading, isFetching, data: list } = useItemDetail(open, props.id);
 
     useEffect(() => {
         open && sTab(0);
@@ -592,15 +520,13 @@ const Popup_ThongTin = React.memo((props) => {
                 <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                            }  px-4 py-2 outline-none font-medium`}
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.information || "information"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                            }  px-4 py-2 outline-none font-medium`}
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
@@ -634,24 +560,21 @@ const Popup_ThongTin = React.memo((props) => {
                                     </div>
                                     <div className="flex justify-between">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
-                                            {props.dataLang?.category_material_list_code ||
-                                                "category_material_list_code"}
+                                            {props.dataLang?.category_material_list_code || "category_material_list_code"}
                                             :
                                         </h5>
                                         <h6 className="w-[55%] text-right">{list?.code}</h6>
                                     </div>
                                     <div className="flex justify-between">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
-                                            {props.dataLang?.category_material_list_name ||
-                                                "category_material_list_name"}
+                                            {props.dataLang?.category_material_list_name || "category_material_list_name"}
                                             :
                                         </h5>
                                         <h6 className="w-[55%] text-right">{list?.name}</h6>
                                     </div>
                                     <div className="flex justify-between">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
-                                            {props.dataLang?.category_material_list_cost_price ||
-                                                "category_material_list_cost_price"}
+                                            {props.dataLang?.category_material_list_cost_price || "category_material_list_cost_price"}
                                             :
                                         </h5>
                                         <h6 className="w-[55%] text-right">
@@ -669,8 +592,7 @@ const Popup_ThongTin = React.memo((props) => {
                                     {props.dataMaterialExpiry?.is_enable === "1" ? (
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {props.dataLang?.category_material_list_expiry_date ||
-                                                    "category_material_list_expiry_date"}
+                                                {props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}
                                                 :
                                             </h5>
                                             <h6 className="w-[55%] text-right">
@@ -682,15 +604,13 @@ const Popup_ThongTin = React.memo((props) => {
                                     )}
                                     <div className="flex justify-between">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
-                                            {props.dataLang?.category_material_list_purchase_unit ||
-                                                "category_material_list_purchase_unit"}
+                                            {props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"}
                                             :
                                         </h5>
                                         <h6 className="w-[55%] text-right">{list?.unit}</h6>
                                     </div>
                                     <h5 className="text-slate-400 text-[15px] font-medium">
-                                        {props.dataLang?.category_material_list_converting_unit ||
-                                            "category_material_list_converting_unit"}
+                                        {props.dataLang?.category_material_list_converting_unit || "category_material_list_converting_unit"}
                                     </h5>
                                     <div className="flex justify-between">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
@@ -700,8 +620,7 @@ const Popup_ThongTin = React.memo((props) => {
                                     </div>
                                     <div className="flex justify-between">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
-                                            {props.dataLang?.category_material_list_converting_amount ||
-                                                "category_material_list_converting_amount"}
+                                            {props.dataLang?.category_material_list_converting_amount || "category_material_list_converting_amount"}
                                             :
                                         </h5>
                                         <h6 className="w-[55%] text-right">

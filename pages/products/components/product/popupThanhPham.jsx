@@ -24,7 +24,7 @@ import { BiEdit } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import Select from "react-select";
 
-const Popup_ThanhPham = React.memo((props) => {
+const Popup_Products = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
 
     const dataOptType = useSelector((state) => state.type_finishedProduct);
@@ -1437,4 +1437,4 @@ const Popup_ThanhPham = React.memo((props) => {
         </PopupCustom>
     );
 });
-export default Popup_ThanhPham
+export default Popup_Products

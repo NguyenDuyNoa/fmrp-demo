@@ -16,7 +16,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import Popup_Bom from "./popupBom";
 import Popup_GiaiDoan from "./popupGiaiDoan";
-const Popup_ThongTin = React.memo((props) => {
+const Popup_Detail = React.memo((props) => {
     const dataSeting = useSetingServer()
 
     const formatNumber = (number) => {
@@ -558,4 +558,4 @@ const Popup_ThongTin = React.memo((props) => {
     );
 });
 
-export default Popup_ThongTin
+export default Popup_Detail
