@@ -1,3 +1,4 @@
+import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
 import PopupCustom from "@/components/UI/popup";
@@ -5,14 +6,14 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useDragAndDrop from "@/hooks/useDragAndDrop";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
+import { useQuery } from "@tanstack/react-query";
 import { I3Square, Add as IconAdd, Trash as IconDelete, Maximize4 as IconMax } from "iconsax-react";
 import React, { useEffect, useRef, useState } from "react";
 import { DragDropContext, Draggable, Droppable, } from 'react-beautiful-dnd';
 import { useSelector } from "react-redux";
 import Select from "react-select";
 import { v4 as uddidV4 } from "uuid";
-import { _ServerInstance as Axios } from "/services/axios";
-const Popup_GiaiDoan = React.memo((props) => {
+const Popup_Stage = React.memo((props) => {
     const listCd = useSelector((state) => state.stage_finishedProduct);
 
     const isShow = useToast();
@@ -32,8 +33,6 @@ const Popup_GiaiDoan = React.memo((props) => {
     const { checkAdd, checkEdit } = useActionRole(auth, "products");
 
     const [onSending, sOnSending] = useState(false);
-
-    const [onFetching, sOnFetching] = useState(false);
 
     const [statusBtnAdd, sStatusBtnAdd] = useState(false);
 
@@ -64,7 +63,6 @@ const Popup_GiaiDoan = React.memo((props) => {
         isOpen && sListCdChosen([]);
         isOpen && sStatusBtnAdd(false);
         isOpen && sErrName(false);
-        isOpen && sOnFetching(true);
     }, [isOpen]);
 
     useEffect(() => {
@@ -75,36 +73,31 @@ const Popup_GiaiDoan = React.memo((props) => {
         }
     }, [option]);
 
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const data = response.data;
-                sOption(
-                    data.map((e) => ({
-                        id: `${e.id}`,
-                        name: { label: e.stage_name, value: e.stage_id },
-                        radio1: e.type !== "0" ? 1 : 0,
-                        radio2: e.final_stage !== "0" ? 1 : 0,
-                    }))
-                );
-                sListCdChosen(
-                    data.map((e) => ({
-                        label: e.stage_name,
-                        value: e.stage_id,
-                    }))
-                );
-            }
-            sOnFetching(false);
-        });
-    };
+    const { isFetching, isLoading } = useQuery({
+        queryKey: ["api_product_getDesignStages", props.id],
+        queryFn: async () => {
+            const data = await apiProducts.apiDataDesignStage(props.id);
+            sOption(
+                data.map((e) => ({
+                    id: `${e.id}`,
+                    name: { label: e.stage_name, value: e.stage_id },
+                    radio1: e.type !== "0" ? 1 : 0,
+                    radio2: e.final_stage !== "0" ? 1 : 0,
+                }))
+            );
+            sListCdChosen(
+                data.map((e) => ({
+                    label: e.stage_name,
+                    value: e.stage_id,
+                }))
+            );
+            return data;
+        },
+        enabled: isOpen && !!props.id,
+    })
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         const formData = new FormData();
-
         formData.append("product_id", props.id);
         if (option?.length > 0) {
             option.forEach((item, index) => {
@@ -113,27 +106,20 @@ const Popup_GiaiDoan = React.memo((props) => {
                 formData.append(`data[${index}][final_stage]`, item.radio2);
             });
         }
-        Axios(
-            "POST",
-            "/api_web/api_product/designStages?csrf_protection=true",
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message] || message);
-                        sIsOpen(false);
-                        props.onRefresh && props.onRefresh();
-                    } else {
-                        isShow("error", props.dataLang[message] || message);
-                    }
-                }
-                sOnSending(false);
+        try {
+            const { isSuccess, message } = await apiProducts.apiHandingStage(formData);
+            if (isSuccess) {
+                isShow("success", props.dataLang[message] || message);
+                sIsOpen(false);
+                props.onRefresh && props.onRefresh();
+            } else {
+                isShow("error", props.dataLang[message] || message);
             }
-        );
+        } catch (error) {
+
+        } finally {
+            sOnSending(false);
+        }
     };
 
     useEffect(() => {
@@ -162,16 +148,11 @@ const Popup_GiaiDoan = React.memo((props) => {
     useEffect(() => {
         isOpen &&
             listCdChosen &&
-            sListCdRest(
-                listCd?.filter(
-                    (item1) =>
-                        !listCdChosen.some((item2) => item1.label === item2?.label && item1.value === item2?.value)
-                )
-            );
+            sListCdRest(listCd?.filter((item1) => !listCdChosen.some((item2) => item1.label === item2?.label && item1.value === item2?.value)));
     }, [listCdChosen]);
 
     const handleDelete = (id) => {
-        const updatedData = items.filter((item) => item.id != id);
+        const updatedData = option.filter((item) => item.id != id);
         sOption(updatedData);
     };
 
@@ -200,14 +181,6 @@ const Popup_GiaiDoan = React.memo((props) => {
         sOption([...option]);
         sListCdChosen(option.map((e) => e.name));
     };
-
-    // const onDragEnd = (result) => {
-    //     if (!result.destination) return;
-    //     const items = Array.from(option);
-    //     const [reorderedItem] = items.splice(result.source.index, 1);
-    //     items.splice(result.destination.index, 0, reorderedItem);
-    //     sOption(items);
-    // };
 
     const DraggableItem = ({ value, index }) => {
         return (
@@ -381,7 +354,7 @@ const Popup_GiaiDoan = React.memo((props) => {
                         {props.dataLang?.branch_popup_properties}
                     </h4>
                 </div>
-                {onFetching ? (
+                {isFetching || isLoading ? (
                     <Loading className="h-96" color="#0f4f9e" />
                 ) : (
                     <>
@@ -421,4 +394,4 @@ const Popup_GiaiDoan = React.memo((props) => {
         </PopupCustom>
     );
 });
-export default Popup_GiaiDoan;
+export default Popup_Stage;

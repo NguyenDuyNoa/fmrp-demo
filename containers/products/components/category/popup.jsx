@@ -7,29 +7,43 @@ import { Edit as IconEdit } from "iconsax-react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Select from "react-select";
+import { useProductCategoryDetailOptions } from "../../hooks/category/useProductCategoryDetailOptions";
 
 const Popup_Products = React.memo((props) => {
     const isShow = useToast()
+
     const dataOptBranch = useSelector((state) => state.branch);
+
     const dataOptGroup = useSelector((state) => state.categoty_finishedProduct);
 
     const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
 
-    const [dataOption, sDataOption] = useState([]);
+    const _ToggleModal = (e) => sOpen(e);
 
     const [onSending, sOnSending] = useState(false);
 
     const [name, sName] = useState("");
+
     const [code, sCode] = useState("");
+
     const [note, sNote] = useState("");
+
     const [branch, sBranch] = useState([]);
 
     const [group, sGroup] = useState(null);
 
     const [errBranch, sErrBranch] = useState(false);
+
     const [errName, sErrName] = useState(false);
+
     const [errCode, sErrCode] = useState(false);
+
+    const params = {
+        "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
+    }
+
+    const { data: dataOption = [] } = useProductCategoryDetailOptions(open, params, props?.id)
+
 
     useEffect(() => {
         open && sErrBranch(false);
@@ -39,7 +53,6 @@ const Popup_Products = React.memo((props) => {
         open && sCode("");
         open && sNote("");
         open && sBranch([]);
-        open && sDataOption([]);
         open && sGroup(null);
 
     }, [open]);
@@ -143,40 +156,8 @@ const Popup_Products = React.memo((props) => {
         enabled: open && !!props?.id
     })
 
-    useQuery({
-        queryKey: ["api_detail_options_category", branch],
-        queryFn: async () => {
-            const params = {
-                "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
-            }
-            const { rResult } = await apiCategory.apiDetailOptionCategory(props?.id, { params });
-            sDataOption(
-                rResult.map((x) => ({
-                    label: x.name,
-                    value: x.id,
-                    level: x.level,
-                }))
-            );
-            return rResult
-        },
-        enabled: open && !!props?.id
-    })
 
-    useQuery({
-        queryKey: ["api_detail_category_option", branch],
-        queryFn: async () => {
-            const { rResult } = await apiCategory.apiOptionCategory({});
-            sDataOption(
-                rResult.map((x) => ({
-                    label: x.name,
-                    value: x.id,
-                    level: x.level,
-                }))
-            );
-            return rResult
-        },
-        enabled: open && !!props?.id
-    })
+
 
     return (
         <PopupCustom

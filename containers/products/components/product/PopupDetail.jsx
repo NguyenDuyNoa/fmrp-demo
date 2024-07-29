@@ -14,8 +14,10 @@ import { useQuery } from "@tanstack/react-query";
 import { SearchNormal1 as IconSearch, TickCircle as IconTick, UserEdit as IconUserEdit, } from "iconsax-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { useProductDetail } from "../../hooks/product/useProductDetail";
+import { useProductDetailStage } from "../../hooks/product/useProductDetailStage";
 import Popup_Bom from "./popupBom";
-import Popup_GiaiDoan from "./popupGiaiDoan";
+import Popup_GiaiDoan from "./popupStage";
 const Popup_Detail = React.memo((props) => {
     const dataSeting = useSetingServer()
 
@@ -39,36 +41,13 @@ const Popup_Detail = React.memo((props) => {
 
     const _HandleSelectTabBom = (e) => sTabBom(e);
 
-    const [list, sList] = useState({});
-
-    const [dataStage, sDataStage] = useState([]);
-
     const [dataBom, sDataBom] = useState([]);
 
     const [selectedListBom, sSelectedListBom] = useState([]);
 
-    const { isFetching } = useQuery({
-        queryKey: ["detail_product"],
-        queryFn: async () => {
-            const data = await apiProducts.apiDetailProducts(props.id)
-            sList({ ...data });
-            return data
-        },
-        enabled: !!open
-    })
+    const { data: list, isFetching } = useProductDetail(open, props.id)
 
-    const { isFetching: isFetchingStage } = useQuery({
-        queryKey: ["detail_stage_product"],
-        queryFn: async () => {
-            const data = await apiProducts.apiDetailStageProducts(props.id)
-
-            sDataStage(data);
-
-            return data
-        },
-        enabled: !!open
-    })
-
+    const { data: dataStage, isFetching: isFetchingStage } = useProductDetailStage(open, props.id)
 
     const { isFetching: isFetchingBom, refetch: refetchBom } = useQuery({
         queryKey: ["detail_bom_product"],
@@ -470,7 +449,6 @@ const Popup_Detail = React.memo((props) => {
                                                         type="edit"
                                                         onRefresh={props.onRefresh}
                                                         onRefreshBom={refetchBom}
-                                                    // className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
                                                     />
                                                 </div>
                                             </div>

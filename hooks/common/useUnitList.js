@@ -16,6 +16,11 @@ export const useUnitList = () => {
                 type: "unit_NVL/update",
                 payload: unit
             })
+
+            dispatch({
+                type: "unit_finishedProduct/update",
+                payload: unit
+            });
             return unit
         }
     })

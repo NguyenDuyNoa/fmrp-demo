@@ -29,6 +29,35 @@ const apiProducts = {
         const response = await axiosCustom('POST', id ? `/api_web/api_product/product/${id}?csrf_protection=true` : "/api_web/api_product/product/?csrf_protection=true", data);
         return response.data
     },
+    async apiDataDesignBomProducts() {
+        const response = await axiosCustom('GET', `/api_web/api_product/getDataDesignBom?csrf_protection=true`);
+        return response.data
+    },
+    async apiProductVariationOption(id) {
+        const response = await axiosCustom('GET', `/api_web/api_product/productVariationOption/${id}?csrf_protection=true`);
+        return response.data
+    },
+    async apiSearchItemsVariants(data) {
+        const response = await axiosCustom('POST', `/api_web/api_product/searchItemsVariants?csrf_protection=true`, data);
+        return response.data
+    },
+    async apiRowItem(data) {
+        const response = await axiosCustom('POST', `/api_web/api_product/rowItem?csrf_protection=true`, data);
+        return response.data
+    },
+    async apiHandingBom(data) {
+        const response = await axiosCustom('POST', `/api_web/api_product/designBOM?csrf_protection=true`, data);
+        return response.data
+    },
+    async apiDataDesignStage(id) {
+        const response = await axiosCustom('GET', `/api_web/api_product/getDesignStages/${id}?csrf_protection=true`);
+        return response.data
+    },
+    async apiHandingStage(data) {
+        const response = await axiosCustom('POST', `/api_web/api_product/designStages?csrf_protection=true`, data);
+        return response.data
+    },
+
 
 }
 

@@ -391,7 +391,6 @@ const Popup_Products = React.memo((props) => {
         queryFn: async () => {
             const params = {
                 "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : -1,
-                // "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
             }
             const { rResult } = await apiCategory.apiOptionCategory({ params });
             sDataCategory(

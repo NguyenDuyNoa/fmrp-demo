@@ -1,3 +1,4 @@
+import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
@@ -8,12 +9,13 @@ import PopupCustom from "@/components/UI/popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
+import { useQuery } from "@tanstack/react-query";
 import { AttachCircle, Add as IconAdd, Trash as IconDelete } from "iconsax-react";
 import { debounce } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Select from "react-select";
-import { _ServerInstance as Axios } from "/services/axios";
+
 const Popup_Bom = React.memo((props) => {
     const scrollAreaRef = useRef(null);
 
@@ -29,8 +31,6 @@ const Popup_Bom = React.memo((props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit } = useActionRole(auth, "products");
-
-    const [onFetching, sOnFetching] = useState(false);
 
     const [loadingData, sLoadingData] = useState(false);
 
@@ -84,7 +84,6 @@ const Popup_Bom = React.memo((props) => {
     const [errValue, sErrValue] = useState(false);
 
     useEffect(() => {
-        isOpen && props.type == "edit" && sOnFetching(true);
         isOpen && props?.id && sOnFetchingCd(true);
         isOpen && sLoadingData(false);
         isOpen && sErrValue(false);
@@ -92,104 +91,90 @@ const Popup_Bom = React.memo((props) => {
         sSelectedList({});
     }, [isOpen]);
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_product/getDesignBOM?csrf_protection=true`,
-            {
-                params: {
-                    id: props.id,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response.data;
-                    const newData = data?.variations?.map((e) => ({
-                        label: e?.name_variation,
-                        value: e?.product_variation_option_value_id,
-                        child: e?.items?.map((ce) => ({
-                            id: ce?.id,
-                            type: {
-                                label: ce?.str_type_item,
-                                value: ce?.type_item,
-                            },
-                            name: {
-                                label: ce?.item_name,
-                                value: ce?.item_id,
-                                product_variation: ce?.variation_name,
-                            },
-                            unit: {
-                                label: ce?.unit_name,
-                                value: ce?.unit_id,
-                            },
-                            norm: Number(ce?.quota),
-                            loss: Number(ce?.loss),
-                            stage: {
-                                label: ce?.stage_name,
-                                value: ce?.stage_id,
-                            },
-                        })),
-                    }));
-                    sDataSelectedVariant(newData);
-                    sCurrentData(newData);
-                }
-                setTimeout(() => sOnFetching(false), 1000);
-                return () => clearTimeout();
-            }
-        );
-    };
+    const { isFetching, isLoading, refetch } = useQuery({
+        queryKey: ["detail_bom_product", props.id],
+        queryFn: async () => {
+            const { data } = await apiProducts.apiDetailBomProducts({ params: { id: props.id } })
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
+            const newData = data?.variations?.map((e) => ({
+                label: e?.name_variation,
+                value: e?.product_variation_option_value_id,
+                child: e?.items?.map((ce) => ({
+                    id: ce?.id,
+                    type: {
+                        label: ce?.str_type_item,
+                        value: ce?.type_item,
+                    },
+                    name: {
+                        label: ce?.item_name,
+                        value: ce?.item_id,
+                        product_variation: ce?.variation_name,
+                    },
+                    unit: {
+                        label: ce?.unit_name,
+                        value: ce?.unit_id,
+                    },
+                    norm: Number(ce?.quota),
+                    loss: Number(ce?.loss),
+                    stage: {
+                        label: ce?.stage_name,
+                        value: ce?.stage_id,
+                    },
+                })),
+            }));
 
-    const _ServerFetchingCd = () => {
-        Axios("GET", "/api_web/api_product/getDataDesignBom?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const { data } = response.data;
-                sDataTypeCd(
-                    Object.entries(data.typeDesignBom).map(([key, value]) => ({
-                        label: value,
-                        value: key,
-                    }))
-                );
-                sDataCd(data.stages.map((e) => ({ label: e?.name, value: e?.id })));
-            }
-        });
-        Axios(
-            "GET",
-            `/api_web/api_product/productVariationOption/${props.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    const newData = rResult[0]?.product_variation?.includes("NONE")
-                        ? [
-                            {
-                                label: "Mặc định",
-                                value: rResult[0]?.id,
-                                child: [],
-                            },
-                        ]
-                        : rResult.map((e) => ({
-                            label: e?.product_variation,
-                            value: e?.id,
-                            child: [],
-                        }));
-                    const convertArr = newData?.map((e) => {
-                        if (e?.label == "(NONE)") {
-                            return {
-                                ...e,
-                                label: "Mặc định",
-                            };
-                        }
-                        return e;
-                    });
-                    sDataVariant(convertArr);
+            sDataSelectedVariant(newData);
+
+            sCurrentData(newData);
+
+            return data
+        },
+        enabled: isOpen && props.type == "edit"
+    })
+
+    const _ServerFetchingCd = async () => {
+        try {
+            const { data } = await apiProducts.apiDataDesignBomProducts()
+            sDataTypeCd(Object.entries(data.typeDesignBom).map(([key, value]) => ({
+                label: value,
+                value: key,
+            })));
+
+            sDataCd(data.stages.map((e) => ({ label: e?.name, value: e?.id })));
+
+            const { rResult } = await apiProducts.apiProductVariationOption(props.id)
+
+            const newData = rResult[0]?.product_variation?.includes("NONE")
+                ? [
+                    {
+                        label: "Mặc định",
+                        value: rResult[0]?.id,
+                        child: [],
+                    },
+                ]
+                : rResult.map((e) => ({
+                    label: e?.product_variation,
+                    value: e?.id,
+                    child: [],
+                }));
+
+            const convertArr = newData?.map((e) => {
+                if (e?.label == "(NONE)") {
+                    return {
+                        ...e,
+                        label: "Mặc định",
+                    };
                 }
-            }
-        );
-        sOnFetchingCd(false);
+                return e;
+            });
+
+            sDataVariant(convertArr);
+
+        } catch (error) {
+
+        } finally {
+            sOnFetchingCd(false);
+        }
     };
 
     useEffect(() => {
@@ -216,15 +201,13 @@ const Popup_Bom = React.memo((props) => {
 
     useEffect(() => {
         if (isOpen && dataSelectedVariant?.length == 0 && dataVariant?.length > 0) {
-            const newValue = dataVariant
-                ?.map((e) => {
-                    const checkValue = currentData.find((x) => x?.value == e?.value);
-                    if (checkValue?.value == e?.value) {
-                        return checkValue;
-                    }
-                    return e;
-                })
-                .filter((x) => x?.label == "(NONE)");
+            const newValue = dataVariant?.map((e) => {
+                const checkValue = currentData.find((x) => x?.value == e?.value);
+                if (checkValue?.value == e?.value) {
+                    return checkValue;
+                }
+                return e;
+            }).filter((x) => x?.label == "(NONE)");
             if (props.type == "edit") {
                 dataSelectedVariant.push({ ...newValue[0] });
                 _HandleAddNew(newValue[0]?.value);
@@ -304,50 +287,41 @@ const Popup_Bom = React.memo((props) => {
         sDataSelectedVariant(newData);
     };
 
-    const _HandleSeachApi = debounce((value, Idparent, type, id, name) => {
-        Axios(
-            "POST",
-            `/api_web/api_product/searchItemsVariants?csrf_protection=true`,
-            {
-                data: {
-                    term: value,
-                    type: type?.value,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const data = response?.data?.data.items;
-                    const getdata = data?.map((item) => ({
-                        label: item?.name,
-                        value: item?.id,
-                        product_variation: item?.product_variation,
-                    }));
-                    if (value) {
-                        const newDb = dataSelectedVariant.map((e) => {
-                            if (e?.value == Idparent) {
-                                return {
-                                    ...e,
-                                    child: e?.child?.map((x) => {
-                                        if (x.id == id) {
-                                            return {
-                                                ...x,
-                                                dataName: getdata,
-                                            };
-                                        }
-                                        return x;
-                                    }),
-                                };
-                            }
-                            return e;
-                        });
-                        sDataSelectedVariant([...newDb]);
+    const _HandleSeachApi = debounce(async (value, Idparent, type, id, name) => {
+        try {
+            const { data } = await apiProducts.apiSearchItemsVariants({ data: { term: value, type: type?.value } })
+
+            const getdata = data?.items?.map((item) => ({
+                label: item?.name,
+                value: item?.id,
+                product_variation: item?.product_variation,
+            }));
+
+            if (value) {
+                const newDb = dataSelectedVariant.map((e) => {
+                    if (e?.value == Idparent) {
+                        return {
+                            ...e,
+                            child: e?.child?.map((x) => {
+                                if (x.id == id) {
+                                    return {
+                                        ...x,
+                                        dataName: getdata,
+                                    };
+                                }
+                                return x;
+                            }),
+                        };
                     }
-                }
+                    return e;
+                });
+                sDataSelectedVariant([...newDb]);
             }
-        );
+        } catch (error) {
+        }
     }, 500);
 
-    const _HandleChangeItemBOM = (parentId, childId, type, value) => {
+    const _HandleChangeItemBOM = async (parentId, childId, type, value) => {
         const newData = dataSelectedVariant.map((parent) => {
             if (parent?.value === parentId) {
                 const newChild = parent?.child.map((child) => {
@@ -373,47 +347,36 @@ const Popup_Bom = React.memo((props) => {
                 const child = found.child.find((child) => child?.id === childId);
                 if (child) {
                     const type = child.type?.value;
-                    Axios(
-                        "POST",
-                        "/api_web/api_product/searchItemsVariants?csrf_protection=true",
-                        {
-                            data: {
-                                type: type,
-                            },
-                        },
-                        (err, response) => {
-                            if (!err) {
-                                const { data } = response.data;
-                                const updatedData = newData.map((parent) => {
-                                    if (parent?.value === parentId) {
-                                        const newChild = parent?.child.map((child) => {
-                                            if (child?.id === childId) {
-                                                return {
-                                                    ...child,
-                                                    name: null,
-                                                    unit: null,
-                                                    norm: 0,
-                                                    loss: 0,
-                                                    stage: null,
-                                                    dataName: data?.items
-                                                        ? data?.items.map((e) => ({
-                                                            label: e.name,
-                                                            value: e.id,
-                                                            product_variation: e?.product_variation,
-                                                        }))
-                                                        : [],
-                                                };
-                                            }
-                                            return child;
-                                        });
-                                        return { ...parent, child: newChild };
+                    try {
+                        const { data } = await apiProducts.apiSearchItemsVariants({ data: { type: type } })
+                        const updatedData = newData.map((parent) => {
+                            if (parent?.value === parentId) {
+                                const newChild = parent?.child.map((child) => {
+                                    if (child?.id === childId) {
+                                        return {
+                                            ...child,
+                                            name: null,
+                                            unit: null,
+                                            norm: 0,
+                                            loss: 0,
+                                            stage: null,
+                                            dataName: data?.items ? data?.items.map((e) => ({
+                                                label: e.name,
+                                                value: e.id,
+                                                product_variation: e?.product_variation,
+                                            })) : [],
+                                        };
                                     }
-                                    return parent;
+                                    return child;
                                 });
-                                sDataSelectedVariant(updatedData);
+                                return { ...parent, child: newChild };
                             }
-                        }
-                    );
+                            return parent;
+                        });
+                        sDataSelectedVariant(updatedData);
+                    } catch (error) {
+
+                    }
                 }
             }
         }
@@ -424,44 +387,39 @@ const Popup_Bom = React.memo((props) => {
                 if (child) {
                     const name = child.name?.value;
                     const type = child.type?.value;
-                    Axios(
-                        "POST",
-                        "/api_web/api_product/rowItem?csrf_protection=true",
-                        {
+                    try {
+                        const { data } = await apiProducts.apiRowItem({
                             data: {
                                 item_id: name,
                                 type: type,
                             },
-                        },
-                        (err, response) => {
-                            if (!err) {
-                                const { data } = response.data;
-                                const updatedData = newData.map((parent) => {
-                                    if (parent?.value === parentId) {
-                                        const newChild = parent.child.map((child) => {
-                                            if (child?.id === childId) {
-                                                return {
-                                                    ...child,
-                                                    name: value,
-                                                    unit: null,
-                                                    dataUnit: data?.units
-                                                        ? data?.units.map((e) => ({
-                                                            label: e.unit,
-                                                            value: e.unitid,
-                                                        }))
-                                                        : [],
-                                                };
-                                            }
-                                            return child;
-                                        });
-                                        return { ...parent, child: newChild };
+                        })
+                        const updatedData = newData.map((parent) => {
+                            if (parent?.value === parentId) {
+                                const newChild = parent.child.map((child) => {
+                                    if (child?.id === childId) {
+                                        return {
+                                            ...child,
+                                            name: value,
+                                            unit: null,
+                                            dataUnit: data?.units
+                                                ? data?.units.map((e) => ({
+                                                    label: e.unit,
+                                                    value: e.unitid,
+                                                }))
+                                                : [],
+                                        };
                                     }
-                                    return parent;
+                                    return child;
                                 });
-                                sDataSelectedVariant(updatedData);
+                                return { ...parent, child: newChild };
                             }
-                        }
-                    );
+                            return parent;
+                        });
+                        sDataSelectedVariant(updatedData);
+                    } catch (error) {
+
+                    }
                 }
             }
         }
@@ -494,53 +452,40 @@ const Popup_Bom = React.memo((props) => {
     useEffect(() => {
         if (checkEqual(currentData, dataSelectedVariant)) {
             dataSelectedVariant.forEach((e) => {
-                e?.child.forEach((ce) => {
+                e?.child.forEach(async (ce) => {
                     if (ce.name != null) {
-                        Axios(
-                            "POST",
-                            "/api_web/api_product/searchItemsVariants?csrf_protection=true",
-                            {
+                        try {
+                            const { data } = await apiProducts.apiSearchItemsVariants({
                                 data: {
-                                    type: ce.type.value,
-                                },
-                            },
-                            (err, response) => {
-                                if (!err) {
-                                    const { data } = response.data;
-                                    ce.dataName = data?.items.map((item) => ({
-                                        label: item?.name,
-                                        value: item?.id,
-                                        product_variation: item?.product_variation,
-                                    }));
+                                    type: type,
                                 }
-                            }
-                        );
+                            })
+                            ce.dataName = data?.items.map((item) => ({
+                                label: item?.name,
+                                value: item?.id,
+                                product_variation: item?.product_variation,
+                            }));
+                        } catch (error) {
+                        }
                     }
                     if (ce.unit != null) {
-                        Axios(
-                            "POST",
-                            "/api_web/api_product/rowItem?csrf_protection=true",
-                            {
+                        try {
+                            const { data } = await apiProducts.apiRowItem({
                                 data: {
-                                    item_id: ce?.name?.value,
+                                    item_id: ce?.unit?.value,
                                     type: ce?.type?.value,
                                 },
-                            },
-                            (err, response) => {
-                                if (!err) {
-                                    const { data } = response.data;
-                                    ce.dataUnit = data?.units.map((e) => ({
-                                        label: e?.unit,
-                                        value: e?.unitid,
-                                    }));
-                                }
-                            }
-                        );
+                            })
+                            ce.dataUnit = data?.units.map((e) => ({
+                                label: e?.unit,
+                                value: e?.unitid,
+                            }));
+                        } catch (error) {
+                        }
                     }
                 });
             });
         }
-        // props.type == "edit" &&
         const checkTab = dataSelectedVariant.some((x) => x.value == tab);
         if (checkTab) {
             return;
@@ -552,7 +497,8 @@ const Popup_Bom = React.memo((props) => {
         }
     }, [dataSelectedVariant]);
 
-    const _ServerSending = () => {
+
+    const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("product_id", props?.id);
         dataSelectedVariant.forEach((item, i) => {
@@ -567,28 +513,21 @@ const Popup_Bom = React.memo((props) => {
             });
         });
 
-        Axios(
-            "POST",
-            "/api_web/api_product/designBOM?csrf_protection=true",
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message] || message);
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshBom && props.onRefreshBom();
-                        sIsOpen(false);
-                        return;
-                    }
-                    isShow("error", props.dataLang[message] || message);
-                }
+        try {
+            const { isSuccess, message } = await apiProducts.apiHandingBom(formData)
+            if (isSuccess) {
+                isShow("success", props.dataLang[message] || message);
+                props.onRefresh && props.onRefresh();
+                props.onRefreshBom && props.onRefreshBom();
+                sIsOpen(false);
+                return;
             }
-        );
-        sOnSending(false);
+            isShow("error", props.dataLang[message] || message);
+        } catch (error) {
+        } finally {
+            sOnSending(false);
+        }
+
     };
 
     const _HandleSubmit = (e) => {
@@ -688,7 +627,7 @@ const Popup_Bom = React.memo((props) => {
                             />
                         </div>
                         <div className="flex items-center justify-end gap-2">
-                            <OnResetData sOnFetching={sOnFetching} />
+                            <OnResetData sOnFetching={() => { }} onClick={() => refetch()} />
                             <button
                                 onClick={_HandleApplyVariant.bind(this)}
                                 disabled={valueVariant?.length > 0 ? false : true}
@@ -742,7 +681,7 @@ const Popup_Bom = React.memo((props) => {
                         </HeaderTablePopup>
                         <Customscrollbar className="max-h-[250px]">
                             <div className="divide-y divide-slate-100 min:h-[170px]  max:h-[170px]">
-                                {onFetching || loadingData ? (
+                                {isLoading || isFetching || loadingData ? (
                                     <Loading className="h-40" color="#0f4f9e" />
                                 ) : (
                                     <>
@@ -761,18 +700,12 @@ const Popup_Bom = React.memo((props) => {
                                                             e.id,
                                                             "type"
                                                         )}
-                                                        placeholder={
-                                                            props.dataLang?.warehouses_detail_type ||
-                                                            "warehouses_detail_type"
-                                                        }
+                                                        placeholder={props.dataLang?.warehouses_detail_type || "warehouses_detail_type"}
                                                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
                                                         classNamePrefix="Select"
-                                                        className={`${errValue && e.type == null
-                                                            ? "border-red-500"
-                                                            : "border-transparent"
-                                                            } 
+                                                        className={`${errValue && e.type == null ? "border-red-500" : "border-transparent"} 
                                                         [&>div>div_div]:!whitespace-nowrap placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                         theme={(theme) => ({
                                                             ...theme,
@@ -930,10 +863,7 @@ const Popup_Bom = React.memo((props) => {
                                                             e.id,
                                                             "norm"
                                                         )}
-                                                        placeholder={
-                                                            props.dataLang?.norm_finishedProduct ||
-                                                            "norm_finishedProduct"
-                                                        }
+                                                        placeholder={props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                     />
                                                 </div>
@@ -954,9 +884,7 @@ const Popup_Bom = React.memo((props) => {
                                                             e.id,
                                                             "loss"
                                                         )}
-                                                        placeholder={`%${props.dataLang?.loss_finishedProduct ||
-                                                            "loss_finishedProduct"
-                                                            }`}
+                                                        placeholder={`%${props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}`}
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                     />
                                                 </div>
@@ -970,10 +898,7 @@ const Popup_Bom = React.memo((props) => {
                                                             e.id,
                                                             "stage"
                                                         )}
-                                                        placeholder={
-                                                            props.dataLang?.stage_usage_finishedProduct ||
-                                                            "stage_usage_finishedProduct"
-                                                        }
+                                                        placeholder={props.dataLang?.stage_usage_finishedProduct || "stage_usage_finishedProduct"}
                                                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}

@@ -48,9 +48,9 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useActionRole from "@/hooks/useRole";
-import Popup_Bom from "@/pages/products/components/product/popupBom";
-import Popup_GiaiDoan from "@/pages/products/components/product/popupGiaiDoan";
-import Popup_Products from "@/pages/products/components/product/popupThanhPham";
+import Popup_Bom from "@/containers/products/components/product/popupBom";
+import Popup_Stage from "@/containers/products/components/product/popupStage";
+import Popup_Products from "@/containers/products/components/product/popupProducts";
 import { useSelector } from "react-redux";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -442,7 +442,7 @@ export const BtnAction = React.memo((props) => {
 
                             {props.type == "products" && (
                                 <>
-                                    <Popup_GiaiDoan
+                                    <Popup_Stage
                                         dataLang={props.dataLang}
                                         id={props.id}
                                         name={props?.name}
