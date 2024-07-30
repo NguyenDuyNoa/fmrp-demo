@@ -10,6 +10,7 @@ export const useBranchList = (param, value = null) => {
         queryKey: ["api_branch_list", param],
         queryFn: async () => {
             const { result } = await apiComons.apiBranchCombobox();
+
             const newData = result?.map((e) => ({ label: e.name, value: e.id })) || []
 
             dispatch({ type: "branch/update", payload: newData });

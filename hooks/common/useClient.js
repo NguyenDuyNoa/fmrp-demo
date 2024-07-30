@@ -51,11 +51,8 @@ export const useClientByBranch = (value) => {
         queryKey: ["api_client_by_branch", value],
         queryFn: async () => {
 
-            const { rResult } = await apiContact.apiClientContact({
-                params: {
-                    "filter[branch_id]": value != null ? value?.value : null,
-                }
-            });
+            const { rResult } = await apiContact.apiClientContact({ params: { "filter[branch_id]": value != null ? value?.value : null } });
+
             return rResult?.map((e) => ({ label: e?.name, value: e?.id })) || [];
         },
         enabled: !!value,
