@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useSalesOrderDetail = (open, id) => {
     return useQuery({
-        queryKey: ["apidetail_sales_order", id],
+        queryKey: ["api_detail_sales_order", id],
         queryFn: async () => {
 
             const db = await apiSalesOrder.apiDetail(id)
