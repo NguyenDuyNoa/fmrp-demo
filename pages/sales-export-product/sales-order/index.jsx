@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
-import PopupDetailQuote from "../price-quote/components/PopupDetailQuote";
+import PopupDetailQuote from "@/containers/sales-export-product/price-quote/components/PopupDetailQuote";
 import PopupDetailProduct from "./components/PopupDetailProduct";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
