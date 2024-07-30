@@ -52,7 +52,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import { routerDeliveryReceipt } from "routers/sellingGoods";
-import PopupDetailProduct from "../sales-order/components/PopupDetailProduct";
+import PopupDetailProduct from "../../../containers/sales-export-product/sales-order/components/PopupDetailProduct";
 import PopupDetail from "./components/PopupDetail";
 const Index = (props) => {
     const dataLang = props.dataLang;

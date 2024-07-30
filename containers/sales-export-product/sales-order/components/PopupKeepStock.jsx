@@ -1,10 +1,5 @@
 // giữ kho
 
-import { Box1, Trash as IconDelete, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
-import { useEffect, useState } from "react";
-import ModalImage from "react-modal-image";
-import { NumericFormat } from "react-number-format";
-
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
@@ -24,8 +19,12 @@ import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Box1, Trash as IconDelete, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import { useEffect, useState } from "react";
+import ModalImage from "react-modal-image";
+import { NumericFormat } from "react-number-format";
 
-const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
+const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const initialFetch = {
         onSending: false,
         onFetchingWarehouse: false,
@@ -69,22 +68,22 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     }, [open]);
 
     const { isFetching: isFetchingDetailKeepStookOrder } = useQuery({
-        queryKey: ['detail_keep_stock_order', id, isIdWarehouse?.value],
+        queryKey: ['api_detail_keep_stock_order', id, isIdWarehouse?.value],
         queryFn: async () => {
             const db = await apiSalesOrder.apiDetailKeepStockOrder(id, { params: { "filter[warehouse_id]": isIdWarehouse?.value } })
-
             sData(db);
 
             sDataClone(db);
 
             return db
         },
-        enabled: open && !!isIdWarehouse,
+        enabled: open,
         ...reTryQuery
     })
 
+
     useQuery({
-        queryKey: ["warehouse_combobox_not_system"],
+        queryKey: ["api_warehouse_combobox_not_system"],
         queryFn: async () => {
             const db = await apiSalesOrder.apiWarehouseComboboxNotSystem()
 
@@ -92,7 +91,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
 
             return db
         },
-        enabled: open == true
+        enabled: open
     })
 
     const handleShow = (idParent, idChild) => {
@@ -686,4 +685,4 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         </>
     );
 };
-export default Popup_KeepStock;
+export default PopupKeepStock;

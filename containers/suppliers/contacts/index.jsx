@@ -39,22 +39,22 @@ const initalState = {
 const SuppliersContact = (props) => {
     const dataLang = props.dataLang;
 
+    const isShow = useToast();
+
     const router = useRouter();
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
-    const { paginate } = usePagination();
+    const [isState, sIsState] = useState(initalState);
+
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "suppliers");
     // const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'contacts_suppliers');
-
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
-
-    const isShow = useToast();
-
-    const [isState, sIsState] = useState(initalState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
@@ -66,7 +66,7 @@ const SuppliersContact = (props) => {
         "filter[supplier_id]": isState.idSupplier?.length > 0 ? isState.idSupplier?.map((e) => e.value) : "",
     }
 
-    const { data, isLoading, isFetching, refetch } = usseSuppilerContactList(params, updateTotalItems);
+    const { data, isLoading, isFetching, refetch } = usseSuppilerContactList(params);
 
     const { data: listBr = [] } = useBranchList({})
 
@@ -325,10 +325,10 @@ const SuppliersContact = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

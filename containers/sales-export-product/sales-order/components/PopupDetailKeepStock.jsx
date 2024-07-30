@@ -12,6 +12,8 @@ import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useWarehouseByBranch } from "@/hooks/common/useWarehouseByBranch";
+import { useWarehouseTranfer } from "@/hooks/common/useWarehouseTranfer";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -28,23 +30,14 @@ import { v4 as uuid } from "uuid";
 
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
 
-const Popup_DetailKeepStock = (props) => {
+const initialValues = {
+    idTranfer: null,
+    idWarehouse: null,
+    idStatus: null,
+};
+
+const PopupDetailKeepStock = (props) => {
     const { dataLang, id } = props;
-
-    const initialValues = {
-        idTranfer: null,
-        idWarehouse: null,
-        idStatus: null,
-    };
-
-    const initialDataFilters = {
-        tranfer: [],
-        warehouse: [],
-        status: [
-            { label: "Đã duyệt kho", value: "warehouse_confirmed" },
-            { label: "Chưa duyệt kho", value: "warehouse_unconfirmed" },
-        ],
-    };
 
     const [data, sData] = useState({});
 
@@ -55,8 +48,6 @@ const Popup_DetailKeepStock = (props) => {
     const [open, sOpen] = useState(false);
 
     const { isOpen, isId, handleQueryId } = useToggle();
-
-    const [dataFilter, sDataFilter] = useState(initialDataFilters);
 
     const { isValue, sIsValue, onChangeValue } = useChangeValue(initialValues);
 
@@ -71,6 +62,10 @@ const Popup_DetailKeepStock = (props) => {
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
+
+    const { data: dataWarehouse = [] } = useWarehouseByBranch()
+
+    const { data: dataWarehouseTranfer = [] } = useWarehouseTranfer();
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
@@ -98,32 +93,7 @@ const Popup_DetailKeepStock = (props) => {
 
             return db
         },
-        enabled: !!isValue && open
-    })
-
-    useQuery({
-        queryKey: ['api_list_transfer'],
-        queryFn: async () => {
-            const { result } = await apiSalesOrder.apiListTransferCombobox()
-
-            sDataFilter((prev) => ({
-                ...prev,
-                tranfer: result?.map(({ code, id }) => ({ label: code, value: id })),
-            }));
-            return result
-        }
-    })
-    useQuery({
-        queryKey: ['api_list_warehouse_combobox_find_branch'],
-        queryFn: async () => {
-            const data = await apiSalesOrder.apiWarehouseComboboxFindBranch()
-
-            sDataFilter((prev) => ({
-                ...prev,
-                warehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
-            }));
-            return data
-        }
+        enabled: open
     })
 
     const handleDeleteItem = async () => {
@@ -138,7 +108,6 @@ const Popup_DetailKeepStock = (props) => {
         }
         handleQueryId({ status: false });
     };
-
     const handleShowItem = (id) => {
         const newDb = {
             order: dataClone.order,
@@ -160,21 +129,24 @@ const Popup_DetailKeepStock = (props) => {
     const selectArray = [
         {
             id: uuid(),
-            options: dataFilter.tranfer,
+            options: dataWarehouseTranfer,
             value: isValue.idTranfer,
             placeholder: "Phiếu giữ kho",
             key: "idTranfer",
         },
         {
             id: uuid(),
-            options: dataFilter.warehouse,
+            options: dataWarehouse,
             value: isValue.idWarehouse,
             placeholder: "Kho chuyển",
             key: "idWarehouse",
         },
         {
             id: uuid(),
-            options: dataFilter.status,
+            options: [
+                { label: "Đã duyệt kho", value: "warehouse_confirmed" },
+                { label: "Chưa duyệt kho", value: "warehouse_unconfirmed" },
+            ],
             value: isValue.idStatus,
             placeholder: "Trạng thái",
             key: "idStatus",
@@ -569,4 +541,4 @@ const Popup_DetailKeepStock = (props) => {
         </>
     );
 };
-export default Popup_DetailKeepStock;
+export default PopupDetailKeepStock;

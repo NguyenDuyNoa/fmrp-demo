@@ -1,4 +1,3 @@
-import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -10,10 +9,10 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
+import { usePriceQuoteDetail } from "../hooks/usePriceQuoteDetail";
 
 
 const PopupDetailQuote = (props) => {
@@ -24,8 +23,6 @@ const PopupDetailQuote = (props) => {
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const [data, sData] = useState();
-
     const formatNumber = (num) => {
         return formatNumberConfig(+num, dataSeting)
     };
@@ -34,19 +31,7 @@ const PopupDetailQuote = (props) => {
         return formatMoneyConfig(+num, dataSeting);
     };
 
-    const { isFetching } = useQuery({
-        queryKey: ["api_detail_quote", props?.id],
-        queryFn: async () => {
-
-            const db = await apiPriceQuocte.apiDetailQuote(props?.id);
-
-            sData(db);
-
-            return db
-        },
-        enabled: open && !!props?.id
-    })
-
+    const { data, isFetching } = usePriceQuoteDetail(open, props?.id)
 
     return (
         <>

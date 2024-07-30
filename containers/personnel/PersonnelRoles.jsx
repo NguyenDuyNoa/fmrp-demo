@@ -51,7 +51,7 @@ const PersonnelRoles = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
@@ -67,7 +67,7 @@ const PersonnelRoles = (props) => {
 
     const { data: dataBranchOption = [] } = useBranchList({});
 
-    const { data, isFetching, refetch } = useRolesList(params, sTotalItems);
+    const { data, isFetching, refetch } = useRolesList(params);
 
     const { data: dataDepartmentOption = [] } = useDepartmentList({}, undefined)
 
@@ -137,7 +137,7 @@ const PersonnelRoles = (props) => {
                     },
                 },
             ],
-            data: data?.map((e) => [
+            data: data?.rResult?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
                 { value: `${e.name}` },
                 { value: `${e.name}` },
@@ -240,7 +240,7 @@ const PersonnelRoles = (props) => {
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
-                                                    {data?.length > 0 && (
+                                                    {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
                                                             filename={
@@ -289,8 +289,8 @@ const PersonnelRoles = (props) => {
                                         <div className="divide-y divide-slate-200">
                                             {isFetching ? (
                                                 <Loading className="h-80" color="#0f4f9e" />
-                                            ) : data?.length > 0 ? (
-                                                data.map((e) => (
+                                            ) : data?.rResult?.length > 0 ? (
+                                                data?.rResult.map((e) => (
                                                     <Item
                                                         onRefresh={refetch.bind(this)}
                                                         onRefreshSub={refetchPosition.bind(this)}
@@ -308,12 +308,12 @@ const PersonnelRoles = (props) => {
                             </div>
                         </ContainerTable>
                     </div>
-                    {data?.length != 0 && (
+                    {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

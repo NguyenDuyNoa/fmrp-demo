@@ -21,7 +21,7 @@ import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
@@ -39,25 +39,25 @@ const initilaState = {
     idBranch: [],
 };
 const GroupClient = (props) => {
+    const isShow = useToast();
+
     const router = useRouter();
+
+    const dataLang = props.dataLang;
 
     const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
-    const dataLang = props.dataLang;
-
-    const isShow = useToast();
-
     const [isState, sIsState] = useState(initilaState);
+
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkExport, checkEdit, checkAdd } = useActionRole(auth, "client_group");
-
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
     const params = {
         search: isState.keySearch,
@@ -66,7 +66,7 @@ const GroupClient = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
-    const { data, isLoading: loadingGroup, isFetching, refetch } = useGroupClientList(params, updateTotalItems);
+    const { data, isLoading: loadingGroup, isFetching, refetch } = useGroupClientList(params);
 
     const { data: listBr = [] } = useBranchList({});
 
@@ -313,10 +313,10 @@ const GroupClient = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

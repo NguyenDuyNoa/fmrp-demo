@@ -1,33 +1,26 @@
-import { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-import PopupCustom from "../../../../components/UI/popup";
-
-import { TickCircle } from "iconsax-react";
-import { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
-
-import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import NoData from "@/components/UI/noData/nodata";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoney from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useQuery } from "@tanstack/react-query";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading";
+import vi from "date-fns/locale/vi";
+import { TickCircle } from "iconsax-react";
+import { useState } from "react";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import { useSalesOrderDetail } from "../hooks/useSalesOrderDetail";
+registerLocale("vi", vi);
 
 const PopupDetailProduct = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
-    const [data, setData] = useState();
     const datatSetingFomart = useSetingServer()
 
     const formatNumber = (num) => {
@@ -39,19 +32,7 @@ const PopupDetailProduct = (props) => {
         return formatMoney(+num, datatSetingFomart)
     }
 
-    const { isFetching } = useQuery({
-        queryKey: ["detail_quote", props?.id],
-        queryFn: async () => {
-
-            const db = await apiSalesOrder.apiDetail(props?.id)
-
-            setData(db);
-
-            return db
-        },
-        enabled: open && !!props?.id,
-        ...reTryQuery
-    })
+    const { data, isFetching } = useSalesOrderDetail(open, props?.id)
 
 
     return (

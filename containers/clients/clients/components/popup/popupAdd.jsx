@@ -20,6 +20,35 @@ import FormContactInfo from "../form/formContactInfo";
 import FormContactDelivery from "../form/formDelivery";
 import PopupCustom from "/components/UI/popup";
 
+const initalState = {
+    open: false,
+    onSending: false,
+    errInput: false,
+    errInputBr: false,
+    option: [],
+    optionDelivery: [],
+    name: "",
+    code: "",
+    tax_code: "",
+    representative: "",
+    phone_number: "",
+    address: "",
+    date_incorporation: "",
+    email: "",
+    note: "",
+    debt_limit: "",
+    debt_limit_day: "",
+    valueBr: [],
+    dataBr: [],
+    dataCity: [],
+    valueCt: null,
+    valueDitrict: null,
+    valueWa: null,
+    valueGr: [],
+    valueChar: [],
+    errInputName: false,
+};
+
 const Popup_dskh = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
@@ -28,35 +57,6 @@ const Popup_dskh = (props) => {
     const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
     const isShow = useToast();
-
-    const initalState = {
-        open: false,
-        onSending: false,
-        errInput: false,
-        errInputBr: false,
-        option: [],
-        optionDelivery: [],
-        name: "",
-        code: "",
-        tax_code: "",
-        representative: "",
-        phone_number: "",
-        address: "",
-        date_incorporation: "",
-        email: "",
-        note: "",
-        debt_limit: "",
-        debt_limit_day: "",
-        valueBr: [],
-        dataBr: [],
-        dataCity: [],
-        valueCt: null,
-        valueDitrict: null,
-        valueWa: null,
-        valueGr: [],
-        valueChar: [],
-        errInputName: false,
-    };
 
     const [isState, sIsState] = useState(initalState);
 

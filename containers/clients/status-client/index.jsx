@@ -52,13 +52,13 @@ const StatusClient = (props) => {
 
     const [isState, sIsState] = useState(initilaState);
 
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
+
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkExport, checkEdit, checkAdd } = useActionRole(auth, "client_status");
-
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
     const params = {
         search: isState.keySearch,
@@ -69,7 +69,7 @@ const StatusClient = (props) => {
 
     const { data: listBr = [] } = useBranchList({});
 
-    const { data, isLoading, isFetching, refetch } = useStatusClient(params, updateTotalItems)
+    const { data, isLoading, isFetching, refetch } = useStatusClient(params)
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -314,10 +314,10 @@ const StatusClient = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

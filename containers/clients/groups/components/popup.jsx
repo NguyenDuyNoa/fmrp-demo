@@ -5,6 +5,17 @@ import { useMutation } from "@tanstack/react-query";
 import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
+const initilaState = {
+    open: false,
+    onSending: false,
+    listBr: [],
+    valueBr: [],
+    name: "",
+    color: "",
+    errInput: false,
+    errInputBr: false,
+    errInputName: false,
+}
 const Popup_groupKh = (props) => {
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
@@ -13,18 +24,6 @@ const Popup_groupKh = (props) => {
     };
 
     const isShow = useToast()
-
-    const initilaState = {
-        open: false,
-        onSending: false,
-        listBr: [],
-        valueBr: [],
-        name: "",
-        color: "",
-        errInput: false,
-        errInputBr: false,
-        errInputName: false,
-    }
 
     const [isState, sIsState] = useState(initilaState)
 

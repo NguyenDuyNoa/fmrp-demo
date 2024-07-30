@@ -22,9 +22,8 @@ import { BiEdit } from "react-icons/bi";
 import ModalImage from "react-modal-image";
 import { NumericFormat } from "react-number-format";
 
-const Popup_EditDetail = (props) => {
+const PopupEditDetail = (props) => {
     const { dataLang, id, dataClone, sIsFetchingParent } = props;
-
     const initialFetch = {
         onSending: false,
         onLoading: false,
@@ -419,4 +418,4 @@ const Popup_EditDetail = (props) => {
         </PopupCustom>
     );
 };
-export default Popup_EditDetail;
+export default PopupEditDetail;

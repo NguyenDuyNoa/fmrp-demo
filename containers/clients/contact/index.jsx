@@ -23,7 +23,7 @@ import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading";
 import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
@@ -52,7 +52,7 @@ const Contact = (props) => {
 
     const { checkExport } = useActionRole(auth, "client_customers");
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const [isState, sIsState] = useState(initilalState);
 
@@ -66,7 +66,7 @@ const Contact = (props) => {
         "filter[client_id]": isState.idClient?.length > 0 ? isState.idClient.map((e) => e.value) : null,
     }
 
-    const { data, isLoading, isFetching, refetch } = useContactList(params, updateTotalItems)
+    const { data, isLoading, isFetching, refetch } = useContactList(params)
 
     const { data: listBr = [] } = useBranchList({});
 
@@ -351,10 +351,10 @@ const Contact = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

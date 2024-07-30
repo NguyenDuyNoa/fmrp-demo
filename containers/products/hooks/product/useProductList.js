@@ -2,14 +2,12 @@ import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { useQuery } from "@tanstack/react-query";
 
-export const useProductList = (params, sTotalItems) => {
+export const useProductList = (params) => {
     return useQuery({
         queryKey: ["api_products", { ...params }],
         queryFn: async () => {
 
             const { output, rResult } = await apiProducts.apiListProducts({ params })
-
-            sTotalItems(output)
 
             return {
                 output,

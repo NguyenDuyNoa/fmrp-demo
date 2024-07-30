@@ -37,6 +37,11 @@ import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
 import { useClientGroup } from "./hooks/useClientGroup";
 import { useClientList } from "./hooks/useClientList";
+
+const initalState = {
+    keySearch: "",
+    idBranch: null
+};
 const Client = (props) => {
     const isShow = useToast();
 
@@ -44,19 +49,11 @@ const Client = (props) => {
 
     const router = useRouter();
 
-    const initalState = {
-        tabPage: router.query?.tab,
-        keySearch: "",
-        data: {},
-        data_ex: [],
-        idBranch: null
-    };
-
-    const { handleTab: _HandleSelectTab } = useTab("0");
-
     const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
+
+    const { handleTab: _HandleSelectTab } = useTab("0");
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
@@ -66,7 +63,7 @@ const Client = (props) => {
 
     const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const params = {
         search: isState.keySearch,
@@ -76,13 +73,13 @@ const Client = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
-    const { data, isLoading, isFetching, refetch } = useClientList(params, updateTotalItems);
-
-    const { data: listGroup, refetch: refetchGroup } = useClientGroup(params);
-
     const { data: listBr } = useBranchList({});
 
     const { data: listSelectCt } = useProvinceList({});
+
+    const { data: listGroup, refetch: refetchGroup } = useClientGroup(params);
+
+    const { data, isLoading, isFetching, refetch } = useClientList(params);
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -93,7 +90,6 @@ const Client = (props) => {
             },
         });
     }, 500);
-
 
     //excel
     const multiDataSet = [
@@ -505,10 +501,10 @@ const Client = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

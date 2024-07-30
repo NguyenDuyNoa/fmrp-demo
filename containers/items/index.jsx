@@ -50,39 +50,31 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false, });
 const Items = (props) => {
     const dataLang = props.dataLang;
 
-    const { paginate } = usePagination();
-
     const router = useRouter();
 
     const isShow = useToast();
 
     const feature = useFeature()
 
+    const { paginate } = usePagination();
+
     const dataSeting = useSetingServer()
 
     const statusExprired = useStatusExprired();
 
+    const [idBranch, sIdBranch] = useState(null);
+
+    const [keySearch, sKeySearch] = useState("");
+
     const [idCategory, sIdCategory] = useState(null);
 
-    const [idBranch, sIdBranch] = useState(null);
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems()
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'materials');
-
-    const [keySearch, sKeySearch] = useState("");
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
-    const { } = useUnitList()
-
-    const { } = useVariantList()
-
-    const { data: dataCateOption = [] } = useItemCategoryOptions({})
-
-    const { data: dataBranchOption = [] } = useBranchList()
 
     const params = {
         search: keySearch,
@@ -92,7 +84,15 @@ const Items = (props) => {
         "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
     }
 
-    const { isFetching, isLoading, refetch, data: dataItems } = useItemList(params, sTotalItems)
+    const { } = useUnitList()
+
+    const { } = useVariantList()
+
+    const { data: dataCateOption = [] } = useItemCategoryOptions({})
+
+    const { data: dataBranchOption = [] } = useBranchList()
+
+    const { isFetching, isLoading, refetch, data: dataItems } = useItemList(params)
 
     useEffect(() => {
         sDataMaterialExpiry(feature?.dataProductSerial)
@@ -467,11 +467,11 @@ const Items = (props) => {
                         <ContainerPagination>
                             <TitlePagination
                                 dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
+                                totalItems={dataItems?.output?.iTotalDisplayRecords}
                             />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                totalPosts={Number(dataItems?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

@@ -31,33 +31,31 @@ import { useSelector } from "react-redux";
 import Popup_phongban from "./components/departments/popup";
 import { useDepartmentList } from "./hooks/departments/useDepartmentList";
 
-
 const initalState = {
     keySearch: "",
     onFetchingBrand: false,
     valueBr: [],
 };
 const PersonnelDepartments = (props) => {
-    const router = useRouter();
-
     const dataLang = props.dataLang;
 
-    const { paginate } = usePagination();
+    const router = useRouter();
 
     const isShow = useToast();
 
+    const { paginate } = usePagination();
+
     const statusExprired = useStatusExprired();
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems();
+    const [isState, sIsState] = useState(initalState);
+
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "department");
 
-    const [isState, sIsState] = useState(initalState);
-
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
-
 
     const params = {
         search: isState.keySearch,
@@ -66,7 +64,7 @@ const PersonnelDepartments = (props) => {
         "filter[branch_id]": isState.valueBr?.length > 0 ? isState.valueBr.map((e) => e.value) : null,
     }
 
-    const { data, isFetching, refetch } = useDepartmentList(params, sTotalItem);
+    const { data, isFetching, refetch } = useDepartmentList(params);
 
     const { data: listBranch = [] } = useBranchList();
 
@@ -303,10 +301,10 @@ const PersonnelDepartments = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

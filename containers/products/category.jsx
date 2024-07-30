@@ -44,17 +44,17 @@ const ProductsCategory = (props) => {
 
     const statusExprired = useStatusExprired();
 
+    const [keySearch, sKeySearch] = useState("");
+
     const [idBranch, sIdBranch] = useState(null);
 
     const [idCategory, sIdCategory] = useState(null);
 
-    const [keySearch, sKeySearch] = useState("");
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkExport } = useActionRole(auth, "category_products");
-
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const params = {
         search: keySearch,
@@ -66,9 +66,9 @@ const ProductsCategory = (props) => {
 
     const { data: dataBranchOption = [] } = useBranchList()
 
-    const { data: dataCategoryOption, refetch: refetchSup } = useItemCategoryCombobox()
+    const { data, isFetching, refetch } = useProductCategory(params)
 
-    const { data, isFetching, refetch } = useProductCategory(params, sTotalItems)
+    const { data: dataCategoryOption, refetch: refetchSup } = useItemCategoryCombobox()
 
     const _HandleFilterOpt = (type, value) => {
         if (type == "category") {
@@ -243,7 +243,7 @@ const ProductsCategory = (props) => {
                                             <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
-                                                    {data?.length > 0 && (
+                                                    {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
                                                             filename={dataLang?.header_category_finishedProduct_group || "header_category_finishedProduct_group"}
@@ -292,8 +292,8 @@ const ProductsCategory = (props) => {
                                     <div className="divide-y divide-slate-200">
                                         {isFetching ? (
                                             <Loading />
-                                        ) : data?.length > 0 ? (
-                                            data.map((e) => (
+                                        ) : data?.rResult?.length > 0 ? (
+                                            data?.rResult?.map((e) => (
                                                 <Item
                                                     onRefresh={refetch.bind(this)}
                                                     onRefreshSub={refetchSup.bind(this)}
@@ -312,10 +312,10 @@ const ProductsCategory = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination className="flex space-x-5 my-2 items-center">
-                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

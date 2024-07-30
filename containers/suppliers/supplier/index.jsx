@@ -23,12 +23,13 @@ import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useTab from "@/hooks/useTab";
 import useToast from "@/hooks/useToast";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Popup_chitiet from "./components/popup/detail";
 import Popup_dsncc from "./components/popup/popup";
@@ -49,19 +50,21 @@ const Supplier = (props) => {
 
     const tabPage = router.query?.tab;
 
+    const { paginate } = usePagination();
+
     const statusExprired = useStatusExprired();
+
+    const { handleTab: _HandleSelectTab } = useTab("0")
+
+    const [isState, setIsState] = useState(initalState);
+
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
+
+    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "suppliers");
-
-    const [isState, setIsState] = useState(initalState);
-
-    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
-
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
-
-    const { paginate } = usePagination();
 
     const params = {
         search: isState.keySearch,
@@ -71,28 +74,13 @@ const Supplier = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
-    const { data, isFetching, isLoading, refetch } = useSupplierList(params, updateTotalItems)
+    const { data, isFetching, isLoading, refetch } = useSupplierList(params)
 
     const { data: listBr = [] } = useBranchList({})
 
     const { data: listGroup, refetch: refetchGroup } = useSupplierGroup(params)
 
     const { data: listProvince } = useProvinceList({})
-
-    const _HandleSelectTab = (e) => {
-        router.push({
-            pathname: router.route,
-            query: { tab: e },
-        });
-    };
-
-    useEffect(() => {
-        router.push({
-            pathname: router.route,
-            query: { tab: router.query?.tab ? router.query?.tab : 0 },
-        });
-    }, []);
-
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -470,10 +458,10 @@ const Supplier = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

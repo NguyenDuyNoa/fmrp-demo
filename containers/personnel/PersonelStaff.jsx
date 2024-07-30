@@ -69,12 +69,7 @@ const PersonelStaff = (props) => {
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
-    const {
-        limit,
-        updateLimit: sLimit,
-        totalItems: totalItem,
-        updateTotalItems: sTotalItems,
-    } = useLimitAndTotalItems();
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
@@ -90,7 +85,7 @@ const PersonelStaff = (props) => {
 
     const { data: listBranch = [] } = useBranchList();
 
-    const { data, isFetching, isLoading, refetch } = useStaffList(params, sTotalItems);
+    const { data, isFetching, isLoading, refetch } = useStaffList(params);
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -233,7 +228,7 @@ const PersonelStaff = (props) => {
                     },
                 },
             ],
-            data: data?.map((e) => [
+            data: data?.rResult?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
                 { value: `${e.full_name ? e.full_name : ""}` },
                 { value: `${e.code ? e.code : ""}` },
@@ -345,7 +340,7 @@ const PersonelStaff = (props) => {
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role ? (
                                                 <div className={``}>
-                                                    {isState.data_ex?.length > 0 && (
+                                                    {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
                                                             filename="Danh sách người dùng"
@@ -406,10 +401,10 @@ const PersonelStaff = (props) => {
                                     </HeaderTable>
                                     {(isFetching || isLoading) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
-                                    ) : data?.length > 0 ? (
+                                    ) : data?.rResult?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
-                                                {data?.map((e) => (
+                                                {data?.rResult?.map((e) => (
                                                     <RowTable gridCols={13} key={e?.id}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <div className="w-[60px] h-[60px] mx-auto">
@@ -527,12 +522,12 @@ const PersonelStaff = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    {data?.length != 0 && (
+                    {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

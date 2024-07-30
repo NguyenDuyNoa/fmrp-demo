@@ -42,21 +42,21 @@ const SuppliersGroups = (props) => {
 
     const isShow = useToast();
 
-    const statusExprired = useStatusExprired();
-
     const dataLang = props.dataLang;
 
     const { paginate } = usePagination();
 
+    const statusExprired = useStatusExprired();
+
     const [isState, sIsState] = useState(initialData);
+
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "suppliers_groups");
-
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
     const params = {
         limit: limit,
@@ -65,7 +65,7 @@ const SuppliersGroups = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
-    const { data, isLoading, isFetching, refetch } = useSupplierGroupList(params, updateTotalItems)
+    const { data, isLoading, isFetching, refetch } = useSupplierGroupList(params)
 
     const { data: listBr } = useBranchList({})
 
@@ -290,10 +290,10 @@ const SuppliersGroups = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

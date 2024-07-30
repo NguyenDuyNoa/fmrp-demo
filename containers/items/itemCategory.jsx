@@ -28,9 +28,9 @@ import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Popup_NVL from "./components/category/popup";
+import { useSelector } from "react-redux";
 import { useItemCategoryCombobox } from "../../hooks/common/useItemCategoryCombobox";
+import Popup_NVL from "./components/category/popup";
 import { useItemCategoryList } from "./hooks/category/useItemCategoryList";
 
 const ItemCategory = (props) => {
@@ -48,22 +48,9 @@ const ItemCategory = (props) => {
 
     const [idBranch, sIdBranch] = useState(null);
 
-    const _HandleFilterOpt = (type, value) => {
-        if (type == "category") {
-            sIdCategory(value);
-        } else if (type == "branch") {
-            sIdBranch(value);
-        }
-    };
-
     const [keySearch, sKeySearch] = useState("");
 
-    const {
-        limit,
-        updateLimit: sLimit,
-        totalItems: totalItems,
-        updateTotalItems: sTotalItems,
-    } = useLimitAndTotalItems();
+    const { limit, updateLimit: sLimit, } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
@@ -77,17 +64,24 @@ const ItemCategory = (props) => {
         "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
     }
 
-    const { data, isFetching, isLoading, refetch } = useItemCategoryList(params, sTotalItems);
-
-
     const { data: listBr = [] } = useBranchList();
 
     const { data: dataOpt = [], refetch: refetchOpt } = useItemCategoryCombobox();
+
+    const { data, isFetching, isLoading, refetch } = useItemCategoryList(params);
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
     }, 500);
+
+    const _HandleFilterOpt = (type, value) => {
+        if (type == "category") {
+            sIdCategory(value);
+        } else if (type == "branch") {
+            sIdBranch(value);
+        }
+    };
 
     //excel
     const multiDataSet = [
@@ -305,10 +299,10 @@ const ItemCategory = (props) => {
                     </div>
                     {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

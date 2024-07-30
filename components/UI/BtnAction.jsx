@@ -24,8 +24,8 @@ import {
     routerRecall,
     routerWarehouseTransfer,
 } from "@/routers/manufacture";
-import Popup_DetailKeepStock from "@/pages/sales-export-product/sales-order/components/PopupDetailKeepStock";
-import Popup_KeepStock from "@/pages/sales-export-product/sales-order/components/PopupKeepStock";
+import PopupDetailKeepStock from "@/containers/sales-export-product/sales-order/components/PopupDetailKeepStock";
+import PopupKeepStock from "@/containers/sales-export-product/sales-order/components/PopupKeepStock";
 import PopupConfim from "./popupConfim/popupConfim";
 
 ///Đơn đặt hàng PO
@@ -564,7 +564,7 @@ export const BtnAction = React.memo((props) => {
                             {props.type == "sales_product" && (
                                 <>
                                     {role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1 ? (
-                                        <Popup_KeepStock {...props} {...shareProps} />
+                                        <PopupKeepStock {...props} {...shareProps} />
                                     ) : (
                                         <button
                                             onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
@@ -587,7 +587,7 @@ export const BtnAction = React.memo((props) => {
                             {props.type == "sales_product" && (
                                 <>
                                     {role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1 ? (
-                                        <Popup_DetailKeepStock {...props} {...shareProps} />
+                                        <PopupDetailKeepStock {...props} {...shareProps} />
                                     ) : (
                                         <button
                                             onClick={() => isShow("warning", WARNING_STATUS_ROLE)}

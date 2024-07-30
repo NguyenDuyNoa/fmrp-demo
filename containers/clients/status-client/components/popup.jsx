@@ -6,6 +6,18 @@ import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 
+const initilaState = {
+    open: false,
+    onSending: false,
+    listBr: [],
+    valueBr: [],
+    name: "",
+    color: "",
+    errInput: false,
+    errInputBr: false,
+    errInputName: false,
+    errInputColor: false,
+}
 
 const Popup_status = (props) => {
     const scrollAreaRef = useRef(null);
@@ -15,19 +27,6 @@ const Popup_status = (props) => {
     };
 
     const isShow = useToast()
-
-    const initilaState = {
-        open: false,
-        onSending: false,
-        listBr: [],
-        valueBr: [],
-        name: "",
-        color: "",
-        errInput: false,
-        errInputBr: false,
-        errInputName: false,
-        errInputColor: false,
-    }
 
     const [isState, sIsState] = useState(initilaState)
 

@@ -1,18 +1,16 @@
 import { useRef, useState } from "react";
-
-import apiClient from "@/Api/apiClients/client/apiClient";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import { useQuery } from "@tanstack/react-query";
-import ImageErrors from "components/UI/imageErrors";
-import Loading from "components/UI/loading";
+import ImageErrors from "@/components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
 import { Tooltip } from "react-tippy";
+import { usseClientDetail } from "../../hooks/usseClientDetail";
 import TableContact from "../table/tableContact";
 import TableDelivery from "../table/tableDelivery";
-import PopupCustom from "/components/UI/popup";
+import PopupCustom from "@/components/UI/popup";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -29,17 +27,7 @@ const Popup_chitiet = (props) => {
 
     const _HandleSelectTab = (index) => sTab(index);
 
-    const [data, sData] = useState();
-
-    const { isLoading } = useQuery({
-        queryKey: ["detailUser", props?.id],
-        enabled: open,
-        queryFn: async () => {
-            const db = await apiClient.apiDetailClient(props?.id)
-            sData(db);
-            return db
-        },
-    })
+    const { data, isLoading } = usseClientDetail(open, props?.id);
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;

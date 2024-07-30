@@ -270,15 +270,15 @@ const PriceQuote = (props) => {
     ];
     // chuyen doi trang thai don bao gia
     const handleDelete = () => {
-        const index = isState.data.findIndex((x) => x.id === isId);
+        const index = dataPriceQuote?.rResult.findIndex((x) => x.id === isId);
 
         let newStatus = "";
 
-        if (isState.data[index].status === "not_confirmed") {
+        if (dataPriceQuote?.rResult[index].status === "not_confirmed") {
             newStatus = "confirmed";
-        } else if (isState.data[index].status === "confirmed") {
+        } else if (dataPriceQuote?.rResult[index].status === "confirmed") {
             newStatus = "not_confirmed";
-        } else if (isState.data[index].status === "no_confirmed") {
+        } else if (dataPriceQuote?.rResult[index].status === "no_confirmed") {
             newStatus = "confirmed";
         }
 
@@ -288,9 +288,9 @@ const PriceQuote = (props) => {
     };
 
     const handleNoconfim = () => {
-        const index = isState.data.findIndex((x) => x.id === isId);
+        const index = dataPriceQuote?.rResult.findIndex((x) => x.id === isId);
 
-        const newStatus = isState.data[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
+        const newStatus = dataPriceQuote?.rResult[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
 
         _ServerPostStatus(isId, newStatus);
 
@@ -298,9 +298,9 @@ const PriceQuote = (props) => {
     };
 
     const handleToggleOrdered = (id) => {
-        const index = isState.data.findIndex((x) => x.id === id);
+        const index = dataPriceQuote?.rResult.findIndex((x) => x.id === id);
 
-        if (isState.data[index].status === "ordered") {
+        if (dataPriceQuote?.rResult[index].status === "ordered") {
             isShow("error", `${dataLang?.no_change_status_when_order || "no_change_status_when_order"}`);
         }
     };
@@ -322,9 +322,9 @@ const PriceQuote = (props) => {
             onSuccess: ({ isSuccess }) => {
                 if (isSuccess !== false) {
                     isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
+                    refetch();
+                    refetchFilter();
                 }
-                refetch();
-                refetchFilter();
             },
             onError: (err) => {
             },

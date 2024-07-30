@@ -27,6 +27,7 @@ import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useTab from "@/hooks/useTab";
 import useToast from "@/hooks/useToast";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Grid6, TickCircle as IconTick } from "iconsax-react";
@@ -38,41 +39,30 @@ import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import Popup_Detail from "./components/product/PopupDetail";
 import Popup_Products from "./components/product/popupProducts";
+import { useCategoryOptions } from "./hooks/product/useCategoryOptions";
 import { useProductList } from "./hooks/product/useProductList";
 const Products = (props) => {
     const dataLang = props.dataLang;
 
-    const router = useRouter();
+    const isShow = useToast()
 
-    const { paginate } = usePagination();
+    const router = useRouter();
 
     const feature = useFeature()
 
-    const statusExprired = useStatusExprired();
+    const { paginate } = usePagination();
 
     const dataSeting = useSetingServer()
 
-    useEffect(() => {
-        router.push({
-            pathname: `${router.pathname}`,
-            query: { tab: router.query?.tab ? router.query?.tab : "all" },
-        });
-    }, []);
+    const statusExprired = useStatusExprired();
 
-    const _HandleSelectTab = (e) => {
-        router.push({
-            pathname: `${router.pathname}`,
-            query: { tab: e },
-        });
-    };
+    const { handleTab: _HandleSelectTab } = useTab()
 
-    const isShow = useToast()
-
-    const [openDetail, sOpenDetail] = useState(false);
+    const [keySearch, sKeySearch] = useState("");
 
     const [idBranch, sIdBranch] = useState(null);
-    //Bộ lọc Danh mục
-    const [dataCategory, sDataCategory] = useState([]);
+
+    const [openDetail, sOpenDetail] = useState(false);
 
     const [valueCategory, sValueCategory] = useState(null);
 
@@ -80,13 +70,12 @@ const Products = (props) => {
 
     const [dataProductExpiry, sDataProductExpiry] = useState({});
 
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems()
+
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkExport } = useActionRole(auth, 'products');
 
-    const [keySearch, sKeySearch] = useState("");
-
-    const { limit, updateLimit: sLimit, totalItems: totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const params = {
         search: keySearch,
@@ -106,9 +95,11 @@ const Products = (props) => {
 
     const { data: dataProductType } = useProductTypeProducts()
 
+    const { data: dataCategory = [] } = useCategoryOptions({});
+
     const { data: dataBranchOption = [] } = useBranchList();
 
-    const { data, isFetching, refetch } = useProductList(params, sTotalItems);
+    const { data, isFetching, refetch } = useProductList(params);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting)
@@ -591,11 +582,11 @@ const Products = (props) => {
                         <ContainerPagination>
                             <TitlePagination
                                 dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
+                                totalItems={data?.output?.iTotalDisplayRecords}
                             />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
