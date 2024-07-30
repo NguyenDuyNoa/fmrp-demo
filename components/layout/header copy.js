@@ -13,6 +13,7 @@ import { Tooltip } from "react-tippy";
 import "react-tippy/dist/tippy.css";
 import Expirred from "components/UI/expired";
 import PopupModelTime from "components/UI/modelTime";
+import { useRouterCustom } from "@/hooks/useRouterCustom";
 const Header = () => {
     const auth = useSelector((state) => state.auth?.permissions_current);
     console.log(auth);
@@ -40,7 +41,7 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Trạng thái khách hàng",
-                            link: "/clients/status_client",
+                            link: "/clients/status-client",
                         },
                         {
                             hidden: 0,
@@ -164,13 +165,13 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Báo giá",
-                            link: "/sales_export_product/price_quote",
+                            link: "/sales-export-product/price_quote",
                         },
                         {
                             hidden: 0,
                             disble: 0,
                             name: "Đơn hàng bán",
-                            link: "/sales_export_product/sales_order",
+                            link: "/sales-export-product/sales-order",
                         },
                     ],
                 },
@@ -187,13 +188,13 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Phiếu giao hàng",
-                            link: "/sales_export_product/delivery_receipt",
+                            link: "/sales-export-product/delivery-receipt",
                         },
                         {
                             hidden: 0,
                             disble: 0,
                             name: "Trả lại hàng bán",
-                            link: "/sales_export_product/return_sales",
+                            link: "/sales-export-product/return-sales",
                         },
                     ],
                 },
@@ -213,19 +214,19 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Yêu cầu mua hàng",
-                            link: "/purchase_order/purchases",
+                            link: "/purchase-order/purchases",
                         },
                         {
                             hidden: 0,
                             disble: 0,
                             name: "Đơn đặt hàng",
-                            link: "/purchase_order/order"
+                            link: "/purchase-order/order"
                         },
                         {
                             hidden: 0,
                             disble: 0,
                             name: "Phiếu dịch vụ",
-                            link: "/purchase_order/servicev_voucher",
+                            link: "/purchase-order/servicev_voucher",
                         },
                     ],
                 },
@@ -242,13 +243,13 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Nhập hàng",
-                            link: "/purchase_order/import"
+                            link: "/purchase-order/import"
                         },
                         {
                             hidden: 0,
                             disble: 0,
                             name: "Trả hàng",
-                            link: "/purchase_order/returns"
+                            link: "/purchase-order/returns"
                         },
                     ],
                 },
@@ -290,21 +291,21 @@ const Header = () => {
                     disble: 0,
                     title: "Chuyển kho",
                     img: "/icon/header/kho/chuyenkho.png",
-                    link: "/manufacture/warehouse_transfer",
+                    link: "/manufacture/warehouse-transfer",
                 },
                 {
                     hidden: 0,
                     disble: 0,
                     title: "Xuất kho sản xuất",
                     img: "/icon/header/kho/xuatkho.png",
-                    link: "/manufacture/production_warehouse",
+                    link: "/manufacture/production-warehouse",
                 },
                 {
                     hidden: 0,
                     disble: 0,
                     title: "Nhập kho thành phẩm",
                     img: "/icon/header/kho/nhapkho.png",
-                    link: "/manufacture/products_warehouse",
+                    link: "/manufacture/products-warehouse",
                 },
                 {
                     hidden: 0,
@@ -318,7 +319,7 @@ const Header = () => {
                     disble: 0,
                     title: "Xuất kho khác",
                     img: "/icon/header/kho/xuatkho.png",
-                    link: "/manufacture/export_to_other",
+                    link: "/manufacture/export-to-other",
                 },
                 {
                     hidden: 0,
@@ -337,28 +338,28 @@ const Header = () => {
                     disble: 0,
                     title: "Kế hoạch nội bộ",
                     img: "/icon/header/kho/kehoach.png",
-                    link: "/manufacture/internal_plan",
+                    link: "/manufacture/internal-plan",
                 },
                 {
                     hidden: 0,
                     disble: 0,
                     title: "Kế hoạch sản xuất",
                     img: "/icon/header/kho/kehoach.png",
-                    link: "/manufacture/production_plan",
+                    link: "/manufacture/production-plan",
                 },
                 {
                     hidden: 0,
                     disble: 0,
                     title: "Kế hoạch NVL",
                     img: "/icon/header/kho/kehoach.png",
-                    link: "/manufacture/materials_planning",
+                    link: "/manufacture/materials-planning",
                 },
                 {
                     hidden: 0,
                     disble: 0,
                     title: "Điều độ sản xuất",
                     img: "/icon/header/kho/dieudo.png",
-                    link: "/manufacture/production_smoothing",
+                    link: "/manufacture/production-smoothing",
                 },
                 {
                     title: "Sản xuất",
@@ -368,7 +369,7 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Tổng quan sản xuất",
-                            link: "/manufacture/production_overview"
+                            link: "/manufacture/production-overview"
                         },
                         {
                             hidden: 0,
@@ -390,7 +391,7 @@ const Header = () => {
                 {
                     title: "Lịch sản xuất",
                     img: "/icon/header/kho/lich.png",
-                    link: "/manufacture/production_schedule",
+                    link: "/manufacture/production-schedule",
                     hidden: 0,
                     disble: 0,
                 },
@@ -905,7 +906,7 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Công nợ khách hàng",
-                            link: "/accountant/customer_debt"
+                            link: "/accountant/customer-debt"
                         },
                     ],
                 },
@@ -928,7 +929,7 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Công nợ nhà cung cấp",
-                            link: "/accountant/debt_suppliers",
+                            link: "/accountant/debt-suppliers",
                         },
                     ],
                 },
@@ -1317,7 +1318,8 @@ const Header = () => {
 const DropdownAvatar = React.memo(() => {
     const auth = useSelector((state) => state.auth);
 
-    const router = useRouter();
+    const router = useRouterCustom();
+
     const dispatch = useDispatch();
 
     const [onSending, sOnSending] = useState(false);

@@ -1,5 +1,5 @@
 // Yêu cầu mua hàng
-const url = "/purchase_order";
+const url = "/purchase-order";
 
 const routerPurchases = {
     home: `${url}/purchases?tab=`,

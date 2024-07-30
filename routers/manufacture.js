@@ -3,33 +3,33 @@ const url = "/manufacture";
 
 // Kế hoạch sản xuất
 const routerPproductionPlan = {
-    home: `${url}/production_plan`,
-    form: `${url}/production_plan/form`,
+    home: `${url}/production-plan`,
+    form: `${url}/production-plan/form`,
 };
 
 // Kế hoạch nội bộ
 
 const routerInternalPlan = {
-    home: `${url}/internal_plan`,
-    form: `${url}/internal_plan/form`,
+    home: `${url}/internal-plan`,
+    form: `${url}/internal-plan/form`,
 };
 
 // chuyển kho
 
 const routerWarehouseTransfer = {
-    home: `${url}/warehouse_transfer`,
-    form: `${url}/warehouse_transfer/form`,
+    home: `${url}/warehouse-transfer`,
+    form: `${url}/warehouse-transfer/form`,
 };
 ///Xuất kho sản xuất
 const routerProductionWarehouse = {
-    home: `${url}/production_warehouse`,
-    form: `${url}/production_warehouse/form`,
+    home: `${url}/production-warehouse`,
+    form: `${url}/production-warehouse/form`,
 };
 
 /// Nhập kho thành phẩm
 const routerProductsWarehouse = {
-    home: `${url}/products_warehouse`,
-    form: `${url}/products_warehouse/form`,
+    home: `${url}/products-warehouse`,
+    form: `${url}/products-warehouse/form`,
 };
 
 /// Thu hồi nguyên vật liệu
@@ -41,8 +41,8 @@ const routerRecall = {
 // Xuất kho khác
 
 const routerExportToOther = {
-    home: `${url}/export_to_other`,
-    form: `${url}/export_to_other/form`,
+    home: `${url}/export-to-other`,
+    form: `${url}/export-to-other/form`,
 };
 
 // kiểm kê kho
@@ -53,8 +53,8 @@ const routerInventory = {
 
 //qc
 const routerQc = {
-    home: `${url}/check_quality`,
-    form: `${url}/check_quality/form`,
+    home: `${url}/check-quality`,
+    form: `${url}/check-quality/form`,
 }
 
 export {

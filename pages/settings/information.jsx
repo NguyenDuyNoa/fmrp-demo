@@ -402,7 +402,7 @@ const ListBtn_Setting = React.memo((props) => {
                 <Btn_Setting url="/settings" isActive="/settings/information">
                     {props.dataLang?.list_btn_seting_information}
                 </Btn_Setting>
-                <Btn_Setting url="/settings/service_information" isActive="/settings/service_information">
+                <Btn_Setting url="/settings/service-information" isActive="/settings/service-information">
                     {props.dataLang?.list_btn_seting_services}
                 </Btn_Setting>
                 <Btn_Setting url="/settings/branch" isActive="/settings/branch">

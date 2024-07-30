@@ -30,7 +30,7 @@ const Expirred = () => {
     }, [data]);
 
     const _HandleExtend = () => {
-        router.push("/settings/service_information");
+        router.push("/settings/service-information");
     };
 
     useEffect(() => {

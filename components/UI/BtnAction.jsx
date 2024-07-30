@@ -24,13 +24,13 @@ import {
     routerRecall,
     routerWarehouseTransfer,
 } from "@/routers/manufacture";
-import Popup_DetailKeepStock from "@/pages/sales_export_product/sales_order/components/PopupDetailKeepStock";
-import Popup_KeepStock from "@/pages/sales_export_product/sales_order/components/PopupKeepStock";
+import Popup_DetailKeepStock from "@/pages/sales-export-product/sales-order/components/PopupDetailKeepStock";
+import Popup_KeepStock from "@/pages/sales-export-product/sales-order/components/PopupKeepStock";
 import PopupConfim from "./popupConfim/popupConfim";
 
 ///Đơn đặt hàng PO
-import Popup_TableValidateDelete from "@/pages/purchase_order/order/components/validateDelete";
-import Popup_TableValidateEdit from "@/pages/purchase_order/order/components/validateEdit";
+import Popup_TableValidateDelete from "@/pages/purchase-order/order/components/validateDelete";
+import Popup_TableValidateEdit from "@/pages/purchase-order/order/components/validateEdit";
 
 import { useSetData } from "@/hooks/useSetData";
 import useToast from "@/hooks/useToast";
@@ -38,7 +38,7 @@ import { useToggle } from "@/hooks/useToggle";
 
 import PopupCustom from "@/components/UI/popup";
 
-import Popup_servie from "@/pages/purchase_order/servicev_voucher/components/popup";
+import Popup_servie from "@/pages/purchase-order/servicev-voucher/components/popup";
 
 import Popup_dspc from "@/pages/accountant/payment/components/popup";
 import Popup_dspt from "@/pages/accountant/receipts/components/popup";
