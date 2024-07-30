@@ -1,4 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
@@ -8,10 +7,16 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useBranchList } from "@/hooks/common/useBranchList";
+import { useClientComboboxByBranch } from "@/hooks/common/useClientComboboxByBranch";
+import { useContactCombobox } from "@/hooks/common/useContactCombobox";
+import { useStaffComboboxByBranch } from "@/hooks/common/useStaffComboboxByBranch";
+import { useTaxList } from "@/hooks/common/useTaxList";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
@@ -33,16 +38,18 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { components } from "react-select";
 import { v4 as uuidv4 } from "uuid";
+import { useSalesOrderQuotaByBranch } from "./hooks/useSalesOrderQuotaByBranch";
+
 const SalesOrderForm = (props) => {
     const router = useRouter();
+
+    const isShow = useToast();
 
     const dataSeting = useSetingServer();
 
     const id = router.query?.id;
 
     const dataLang = props?.dataLang;
-
-    const isShow = useToast();
 
     const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
 
@@ -54,19 +61,7 @@ const SalesOrderForm = (props) => {
 
     const [option, setOption] = useState([]);
 
-    const [dataCustomer, setDataCustomer] = useState([]);
-
-    const [dataPersonContact, setDataContactPerson] = useState([]);
-
-    const [dataStaffs, setDataStaffs] = useState([]);
-
-    const [dataQuotes, setDataQuotes] = useState([]);
-
     const [dataItems, setDataItems] = useState([]);
-
-    const [dataTasxes, setDataTasxes] = useState([]);
-
-    const [dataBranch, setDataBranch] = useState([]);
 
     const statusExprired = useStatusExprired();
 
@@ -110,13 +105,30 @@ const SalesOrderForm = (props) => {
 
     const [itemsAll, setItemsAll] = useState([]);
 
-    const [tongTienState, setTongTienState] = useState({
+    const [isTotalMoney, setIsTotalMoney] = useState({
         totalPrice: 0,
         totalDiscountPrice: 0,
         totalDiscountAfterPrice: 0,
         totalTax: 0,
         totalAmount: 0,
     });
+
+    const params = {
+        "filter[branch_id]": branch !== null ? +branch?.value : null,
+        "filter[client_id]": customer !== null ? +customer?.value : null,
+    }
+
+    const { data: dataTasxes = [] } = useTaxList();
+
+    const { data: dataBranch = [] } = useBranchList();
+
+    const { data: dataQuotes, refetch: refetchQuote } = useSalesOrderQuotaByBranch(params)
+
+    const { data: dataPersonContact = [] } = useContactCombobox({ client_id: customer != null ? customer.value : null });
+
+    const { data: dataStaffs = [] } = useStaffComboboxByBranch({ branch_id: branch != null ? [+branch?.value]?.map((e) => e) : null });
+
+    const { data: dataCustomer = [] } = useClientComboboxByBranch({ search: "", branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null, });
 
     useEffect(() => {
         router.query && setErrDate(false);
@@ -127,24 +139,19 @@ const SalesOrderForm = (props) => {
         router.query && setStartDate(new Date());
         router.query && setDeliveryDate(null);
         router.query && setNote("");
-
     }, [id, router.query]);
 
     // Fetch edit
-    const { } = useQuery({
+    useQuery({
         queryKey: ["api_detail_sale_order", id],
         queryFn: async () => {
             const rResult = await apiSalesOrder.apiDetail(id)
-
             const items = rResult?.items?.map((e) => ({
                 price_quote_order_item_id: e?.id,
                 id: e.id,
                 item: {
                     e: e?.item,
-                    label: `${e.item?.item_name} <span style={{display: none}}>${
-                        // e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
+                    label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
                     value: e.item?.id,
                 },
                 quantity: +e?.quantity,
@@ -162,164 +169,26 @@ const SalesOrderForm = (props) => {
             setCodeProduct(rResult?.code);
             setContactPerson(
                 rResult?.contact_name !== null && rResult?.contact_name !== "0"
-                    ? {
-                        label: rResult?.contact_name,
-                        value: rResult?.contact_id,
-                    }
+                    ? { label: rResult?.contact_name, value: rResult?.contact_id, }
                     : null
             );
-            setBranch({
-                label: rResult?.branch_name,
-                value: rResult?.branch_id,
-            });
-            setStaff({
-                label: rResult?.staff_name,
-                value: rResult?.staff_id,
-            });
-            setCustomer({
-                label: rResult?.client_name,
-                value: rResult?.client_id,
-            });
+            setBranch({ label: rResult?.branch_name, value: rResult?.branch_id, });
+            setStaff({ label: rResult?.staff_name, value: rResult?.staff_id, });
+            setCustomer({ label: rResult?.client_name, value: rResult?.client_id, });
             setStartDate(moment(rResult?.date).toDate());
-            // setDeliveryDate(moment(rResult?.validity).toDate())
             setNote(rResult?.note);
+
             if (rResult?.quote_id !== "0" && rResult?.quote_code !== null) {
                 setTypeOrder("1");
                 setHidden(true);
-                setQuote({
-                    label: rResult?.quote_code,
-                    value: rResult?.quote_id,
-                });
+                setQuote({ label: rResult?.quote_code, value: rResult?.quote_id, });
             }
-
             return rResult
         },
-
         ...reTryQuery,
-
         enabled: !!id,
     })
 
-    useQuery({
-        queryKey: ["api_branch"],
-        queryFn: async () => {
-
-            const { result } = await apiComons.apiBranchCombobox();
-
-            setDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-
-            return result
-        },
-
-        ...reTryQuery
-    });
-
-    useQuery({
-        queryKey: ["api_tax"],
-        queryFn: async () => {
-
-            const { rResult } = await apiComons.apiListTax();
-
-            setDataTasxes(
-                rResult?.map((e) => ({
-                    label: e.name,
-                    value: e.id,
-                    tax_rate: e.tax_rate,
-                }))
-            );
-
-            return rResult
-        },
-
-        ...reTryQuery
-    });
-
-    // fetch Customer
-    useQuery({
-        queryKey: ["api_search_clients", branch],
-        queryFn: async () => {
-            const params = {
-                search: "",
-                branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null,
-            }
-            const { data } = await apiComons.apiSearchClient({ params });
-
-            setDataCustomer(data?.clients?.map((e) => ({ label: e.name, value: e.id })));
-
-            return data
-        },
-
-        ...reTryQuery
-    })
-
-    useQuery({
-        queryKey: ["api_search_contact", customer],
-        queryFn: async () => {
-            const params = {
-                client_id: customer != null ? customer.value : null,
-            }
-
-            const { data } = await apiSalesOrder.apiSearchContact({ params });
-
-            setDataContactPerson(
-                data?.contacts.map((e) => ({
-                    label: e?.full_name,
-                    value: e?.id,
-                }))
-            );
-
-            return data
-        },
-
-        ...reTryQuery
-    })
-
-    useQuery({
-        queryKey: ["api_taff_branch", branch],
-        queryFn: async () => {
-            const params = {
-                branch_id: branch != null ? [+branch?.value]?.map((e) => e) : null,
-            }
-
-            const data = await apiSalesOrder.apiStaffBranch({ params });
-
-            setDataStaffs(
-                data?.staffs?.map((e) => ({
-                    label: e?.full_name,
-                    value: e?.staffid,
-                }))
-            );
-
-            return data
-        },
-
-        ...reTryQuery
-    })
-
-    const { refetch: refetchQuote } = useQuery({
-        queryKey: ["api_quotation", branch],
-        queryFn: async () => {
-            const params = {
-                "filter[branch_id]": branch !== null ? +branch?.value : null,
-                "filter[client_id]": customer !== null ? +customer?.value : null,
-            }
-
-            const { result } = await apiSalesOrder.apiQuotationNotOrdered({ params });
-
-            setDataQuotes(
-                result?.map((e) => ({
-                    label: e.reference_no,
-                    value: e.id,
-                }))
-            );
-
-            return result
-        },
-
-        enabled: !!branch,
-
-        ...reTryQuery
-    })
 
     // fetch items
     const handleFetchingItemsAll = async () => {
@@ -328,43 +197,57 @@ const SalesOrderForm = (props) => {
         if (branch != null) {
             [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
         }
+        try {
+            const { data: { result } } = await apiSalesOrder.apiItems(form);
 
-        const { data: { result } } = await apiSalesOrder.apiItems(form);
+            setDataItems(result);
 
-        setDataItems(result);
+            setOnFetchingItemsAll(false);
+        } catch (error) {
 
-        setOnFetchingItemsAll(false);
+        }
     };
 
     const handleFetchingItem = async () => {
         let form = new FormData();
-        // form.append("branch_id", branch != null ? [+branch?.value]?.map((e) => e) : null)
         if (branch != null) {
             [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
         }
         if (typeOrder === "1") {
             if (quote && quote.value !== null) {
-                const { data: { result } } = await apiSalesOrder.apiQuotaItems({
-                    params: {
-                        "filter[quote_id]": quote !== null ? +quote?.value : null,
-                    }
-                })
-                setDataItems(result);
+                try {
+                    const { data: { result } } = await apiSalesOrder.apiQuotaItems({
+                        params: {
+                            "filter[quote_id]": quote !== null ? +quote?.value : null,
+                        }
+                    })
+                    setDataItems(result);
 
-                setOnFetchingItem(false);
+                    setOnFetchingItem(false);
+                } catch (error) {
+
+                }
             } else {
+                try {
+                    const { data: { result } } = await apiSalesOrder.apiItems(form);
+
+                    setDataItems(result);
+
+                    setOnFetchingItem(false);
+                } catch (error) {
+
+                }
+            }
+        } else if (typeOrder === "0") {
+            try {
                 const { data: { result } } = await apiSalesOrder.apiItems(form);
 
                 setDataItems(result);
 
                 setOnFetchingItem(false);
+            } catch (error) {
+
             }
-        } else if (typeOrder === "0") {
-            const { data: { result } } = await apiSalesOrder.apiItems(form);
-
-            setDataItems(result);
-
-            setOnFetchingItem(false);
         }
     };
 
@@ -426,12 +309,7 @@ const SalesOrderForm = (props) => {
     }, [totalDiscount]);
 
     useEffect(() => {
-        (branch === null && setDataCustomer([])) ||
-            setCustomer(null) ||
-            setDataContactPerson([]) ||
-            setContactPerson(null) ||
-            setDataStaffs([]) ||
-            setStaff(null);
+        setCustomer(null) || setContactPerson(null) || setStaff(null);
     }, []);
 
     useEffect(() => {
@@ -513,9 +391,7 @@ const SalesOrderForm = (props) => {
     const resetValue = () => {
         if (status == "customer") {
             setCustomer(isId);
-            setDataContactPerson([]);
             setContactPerson(null);
-            setDataQuotes([]);
             setQuote(null);
             setOption([]);
 
@@ -525,12 +401,8 @@ const SalesOrderForm = (props) => {
             setBranch(isId);
             setOption([]);
             setCustomer(null);
-            setDataCustomer([]);
-            setDataContactPerson([]);
             setContactPerson(null);
-            setDataStaffs([]);
             setStaff(null);
-            setDataQuotes([]);
             setQuote(null);
         }
         if (status == "typeOrder") {
@@ -564,9 +436,7 @@ const SalesOrderForm = (props) => {
                 handleQueryId({ status: true, id: value, idChild: type });
             } else {
                 setCustomer(value);
-                setDataContactPerson([]);
                 setContactPerson(null);
-                setDataQuotes([]);
                 setQuote(null);
             }
         } else if (type === "branch") {
@@ -575,12 +445,8 @@ const SalesOrderForm = (props) => {
             } else if (value !== branch) {
                 setBranch(value);
                 setCustomer(null);
-                setDataCustomer([]);
-                setDataContactPerson([]);
                 setContactPerson(null);
-                setDataStaffs([]);
                 setStaff(null);
-                setDataQuotes([]);
                 setQuote(null);
                 setOption([]);
             }
@@ -901,7 +767,7 @@ const SalesOrderForm = (props) => {
 
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
 
-    const tinhTongTien = (option) => {
+    const totalMoney = (option) => {
         const totalPrice = option.reduce((acc, item) => {
             const totalPrice = item?.price * item?.quantity;
             return acc + totalPrice;
@@ -939,8 +805,8 @@ const SalesOrderForm = (props) => {
     };
 
     useEffect(() => {
-        const totalPrice = tinhTongTien(option);
-        setTongTienState(totalPrice);
+        const totalPrice = totalMoney(option);
+        setIsTotalMoney(totalPrice);
     }, [option]);
 
     const dataOption = option?.map((e) => {
@@ -996,7 +862,7 @@ const SalesOrderForm = (props) => {
 
     // handle submit
     const handleSubmit = async () => {
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append("code", codeProduct);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", branch?.value ? branch?.value : "");
@@ -1007,52 +873,50 @@ const SalesOrderForm = (props) => {
         formData.append("quote_id", typeOrder === "1" ? quote?.value : "");
         newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
-            formData.append(
-                `items[${index}][id]`,
-                item?.price_quote_order_item_id != undefined ? item?.price_quote_order_item_id : ""
-            );
+            formData.append(`items[${index}][id]`, item?.price_quote_order_item_id != undefined ? item?.price_quote_order_item_id : "");
             formData.append(`items[${index}][quantity]`, item?.quantity.toString());
             formData.append(`items[${index}][price]`, item?.price);
             formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
             formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
             formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
-            formData.append(
-                `items[${index}][delivery_date]`,
-                item?.delivery_date != undefined ? formatMoment(item?.delivery_date, FORMAT_MOMENT.DATE_TIME_LONG) : ""
-            );
+            formData.append(`items[${index}][delivery_date]`, item?.delivery_date != undefined ? formatMoment(item?.delivery_date, FORMAT_MOMENT.DATE_TIME_LONG) : "");
         });
 
         if (
-            tongTienState?.totalPrice > 0 &&
-            tongTienState?.totalDiscountPrice >= 0 &&
-            tongTienState?.totalDiscountAfterPrice > 0 &&
-            tongTienState?.totalTax >= 0 &&
-            tongTienState?.totalAmount > 0
+            isTotalMoney?.totalPrice > 0 &&
+            isTotalMoney?.totalDiscountPrice >= 0 &&
+            isTotalMoney?.totalDiscountAfterPrice > 0 &&
+            isTotalMoney?.totalTax >= 0 &&
+            isTotalMoney?.totalAmount > 0
         ) {
-            const { isSuccess, message } = await apiSalesOrder.apiHandingSalesOrder(id, formData);
-            if (isSuccess) {
-                isShow("success", `${dataLang[message]}` || message);
-                setCodeProduct("");
-                setStartDate(new Date());
-                setDeliveryDate(new Date());
-                setContactPerson(null);
-                setStaff(null);
-                setCustomer(null);
-                setBranch(null);
-                setErrQuote(null);
-                setNote("");
-                setErrBranch(false);
-                setErrDate(false);
-                setErrDeliveryDate(false);
-                sErrCustomer(false);
-                setErrStaff(false);
-                setErrQuote(false);
-                setOption([]);
-                router.push(routerSalesOrder.home);
-            } else {
-                isShow("error", `${dataLang[message]}` || message);
+            try {
+                const { isSuccess, message } = await apiSalesOrder.apiHandingSalesOrder(id, formData);
+                if (isSuccess) {
+                    isShow("success", `${dataLang[message]}` || message);
+                    setCodeProduct("");
+                    setStartDate(new Date());
+                    setDeliveryDate(new Date());
+                    setContactPerson(null);
+                    setStaff(null);
+                    setCustomer(null);
+                    setBranch(null);
+                    setErrQuote(null);
+                    setNote("");
+                    setErrBranch(false);
+                    setErrDate(false);
+                    setErrDeliveryDate(false);
+                    sErrCustomer(false);
+                    setErrStaff(false);
+                    setErrQuote(false);
+                    setOption([]);
+                    router.push(routerSalesOrder.home);
+                } else {
+                    isShow("error", `${dataLang[message]}` || message);
+                }
+                setOnSending(false);
+            } catch (error) {
+
             }
-            setOnSending(false);
         } else {
             isShow(
                 "error",
@@ -1541,9 +1405,7 @@ const SalesOrderForm = (props) => {
                                         options={dataStaffs}
                                         onChange={(value) => handleOnChangeInput("staff", value)}
                                         value={staff}
-                                        placeholder={
-                                            dataLang?.sales_product_select_staff_in_charge || "sales_product_select_staff_in_charge"
-                                        }
+                                        placeholder={dataLang?.sales_product_select_staff_in_charge || "sales_product_select_staff_in_charge"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={`${errStaff ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
@@ -1834,9 +1696,7 @@ const SalesOrderForm = (props) => {
                                             onChange={(value) => handleAddParent(value)}
                                             value={null}
                                             formatOptionLabel={selectItemsLabel}
-                                            placeholder={
-                                                dataLang?.sales_product_select_item || "sales_product_select_item"
-                                            }
+                                            placeholder={dataLang?.sales_product_select_item || "sales_product_select_item"}
                                             hideSelectedOptions={false}
                                             className={`cursor-pointer rounded-md bg-white  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                             isSearchable={true}
@@ -2061,8 +1921,7 @@ const SalesOrderForm = (props) => {
                                                         }
                                                     }}
                                                     allowNegative={false}
-                                                    className={`${(e?.quantity == 0 && "border-red-500") ||
-                                                        (e?.quantity == "" && "border-red-500")
+                                                    className={`${(e?.quantity == 0 && "border-red-500") || (e?.quantity == "" && "border-red-500")
                                                         } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                                 <button
@@ -2081,8 +1940,7 @@ const SalesOrderForm = (props) => {
                                                 }
                                                 isAllowed={isAllowedNumber}
                                                 allowNegative={false}
-                                                className={`${(e?.price == 0 && "border-red-500") ||
-                                                    (e?.price == "" && "border-red-500")
+                                                className={`${(e?.price == 0 && "border-red-500") || (e?.price == "" && "border-red-500")
                                                     } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
                                         </div>
@@ -2318,7 +2176,7 @@ const SalesOrderForm = (props) => {
                                 <h3>{dataLang?.price_quote_total || "price_quote_total"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2326,7 +2184,7 @@ const SalesOrderForm = (props) => {
                                 <h3>{dataLang?.sales_product_discount || "sales_product_discount"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalDiscountPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalDiscountPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2337,7 +2195,7 @@ const SalesOrderForm = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalDiscountAfterPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalDiscountAfterPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2345,7 +2203,7 @@ const SalesOrderForm = (props) => {
                                 <h3>{dataLang?.sales_product_total_tax || "sales_product_total_tax"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalTax)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalTax)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2353,7 +2211,7 @@ const SalesOrderForm = (props) => {
                                 <h3>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalAmount)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalAmount)}</h3>
                             </div>
                         </div>
                         <div className="space-x-2">
@@ -2381,40 +2239,5 @@ const SalesOrderForm = (props) => {
     );
 };
 
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        // <div style={style} title={title}>{label}</div>
-        <div style={style} title={title}>
-            + {length}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 0;
-
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 
 export default SalesOrderForm;

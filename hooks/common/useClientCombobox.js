@@ -9,10 +9,9 @@ export const useClientCombobox = (search) => {
             const { data } = await apiComons.apiSearchClient({
                 params: {
                     search: search ? search : "",
-                    limit: 0
+                    limit: 0,
                 }
             })
-
             return data?.clients?.map((e) => ({ label: e.name, value: e.id }))
         }
     })

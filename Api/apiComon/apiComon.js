@@ -52,5 +52,13 @@ const apiComons = {
         return response.data
 
     },
+    async apiSearchContact(params) {
+        const response = await axiosCustom('GET', `/api_web/api_client/searchContact?csrf_protection=true`, params);
+        return response.data
+    },
+    async apiStaffBranch(params) {
+        const response = await axiosCustom('GET', `/api_web/api_client/getStaffBranch?csrf_protection=true`, params);
+        return response.data
+    },
 }
 export default apiComons

@@ -22,13 +22,13 @@ import { BiEdit } from "react-icons/bi";
 import ModalImage from "react-modal-image";
 import { NumericFormat } from "react-number-format";
 
+const initialFetch = {
+    onSending: false,
+    onLoading: false,
+    onFetchingCondition: false,
+};
 const PopupEditDetail = (props) => {
     const { dataLang, id, dataClone, sIsFetchingParent } = props;
-    const initialFetch = {
-        onSending: false,
-        onLoading: false,
-        onFetchingCondition: false,
-    };
 
     const dataSeting = useSetingServer()
 
@@ -93,7 +93,6 @@ const PopupEditDetail = (props) => {
             isShow("error", "Mặt hàng đã giao không thể xóa");
             return data.items;
         }
-
         isShow("success", "Xóa mặt hàng thành công");
         const newItem = data.items?.filter((e) => e.id !== isId);
         sData({ ...data, items: newItem });
@@ -116,8 +115,6 @@ const PopupEditDetail = (props) => {
                     );
                 })
             );
-
-
             sData({ ...data, items: [...filteredItems] });
         }
     };

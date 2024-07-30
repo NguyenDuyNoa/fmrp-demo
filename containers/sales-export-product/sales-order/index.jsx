@@ -59,15 +59,13 @@ const initialValue = {
     idBranch: null,
     idQuoteCode: null,
     idCustomer: null,
-    valueDate: {
-        startDate: null,
-        endDate: null,
-    },
+    valueDate: { startDate: null, endDate: null, },
     keySearchClient: "",
     keySearchCode: ""
 };
 const SalesOrder = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
 
     const isShow = useToast();
@@ -132,9 +130,7 @@ const SalesOrder = (props) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-            },
+            query: { tab: router.query?.tab, },
         });
     }, 500);
 
@@ -308,10 +304,7 @@ const SalesOrder = (props) => {
             onSuccess: ({ isSuccess, message }) => {
 
                 if (isSuccess) {
-                    isShow(
-                        "success",
-                        `${dataLang?.change_status_when_order || "change_status_when_order"}` || message
-                    );
+                    isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}` || message);
                     refetch()
                     refetchFilterBar()
                 } else {
@@ -321,7 +314,6 @@ const SalesOrder = (props) => {
             onError: (error) => {
             },
         })
-
     };
 
     return (
@@ -614,14 +606,12 @@ const SalesOrder = (props) => {
                                                                         name={dataLang[e?.status_payment] || e?.status_payment}
                                                                     />
                                                                 )) ||
-                                                                    (["payment_partially_paid"].includes(
-                                                                        e?.status_payment
-                                                                    ) && (
-                                                                            <TagColorOrange
-                                                                                className={""}
-                                                                                name={`${dataLang[e?.status_payment] || e?.status_payment} (${formatNumber(e?.total_payment)})`}
-                                                                            />
-                                                                        )) ||
+                                                                    (["payment_partially_paid"].includes(e?.status_payment) && (
+                                                                        <TagColorOrange
+                                                                            className={""}
+                                                                            name={`${dataLang[e?.status_payment] || e?.status_payment} (${formatNumber(e?.total_payment)})`}
+                                                                        />
+                                                                    )) ||
                                                                     (["payment_paid"].includes(e?.status_payment) && (
                                                                         <TagColorLime
                                                                             name={dataLang[e?.status_payment] || e?.status_payment}
@@ -650,48 +640,45 @@ const SalesOrder = (props) => {
                                                                                     className="relative"
                                                                                     key={`process-${i}`}
                                                                                 >
-                                                                                    {![
-                                                                                        "keep_stock",
-                                                                                        "import_outsourcing",
-                                                                                    ].includes(item?.code) && (
-                                                                                            <>
-                                                                                                <div className="flex items-center">
+                                                                                    {!["keep_stock", "import_outsourcing",].includes(item?.code) && (
+                                                                                        <>
+                                                                                            <div className="flex items-center">
+                                                                                                <div
+                                                                                                    className={`${item?.active ? `h-2 w-2 rounded-full bg-green-500` : `h-2 w-2 rounded-full bg-gray-400`} `}
+                                                                                                />
+                                                                                                {!isValueDelivery && (
                                                                                                     <div
-                                                                                                        className={`${item?.active ? `h-2 w-2 rounded-full bg-green-500` : `h-2 w-2 rounded-full bg-gray-400`} `}
+                                                                                                        className={`${item?.active ? `w-full bg-green-500 h-0.5 ` : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`}`}
                                                                                                     />
-                                                                                                    {!isValueDelivery && (
-                                                                                                        <div
-                                                                                                            className={`${item?.active ? `w-full bg-green-500 h-0.5 ` : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`}`}
-                                                                                                        />
-                                                                                                    )}
-                                                                                                </div>
-                                                                                                <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
-                                                                                                    <div
-                                                                                                        className={`${item?.active
-                                                                                                            ? "text-green-500"
-                                                                                                            : "text-slate-500"
-                                                                                                            } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                    >
-                                                                                                        <div className="flex justify-center items-center w-full gap-1">
-                                                                                                            <h6>
-                                                                                                                {
-                                                                                                                    dataLang[item?.name]
-                                                                                                                }
-                                                                                                            </h6>
-                                                                                                            {isValueDelivery && (
-                                                                                                                <h6
-                                                                                                                    className={`${item?.active &&
-                                                                                                                        isValueDelivery
-                                                                                                                        ? "text-green-500"
-                                                                                                                        : "text-orange-500"
-                                                                                                                        } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
-                                                                                                                >{`(${dataLang[item?.status] || item?.status})`}</h6>
-                                                                                                            )}
-                                                                                                        </div>
+                                                                                                )}
+                                                                                            </div>
+                                                                                            <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
+                                                                                                <div
+                                                                                                    className={`${item?.active
+                                                                                                        ? "text-green-500"
+                                                                                                        : "text-slate-500"
+                                                                                                        } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                                                                                >
+                                                                                                    <div className="flex justify-center items-center w-full gap-1">
+                                                                                                        <h6>
+                                                                                                            {
+                                                                                                                dataLang[item?.name]
+                                                                                                            }
+                                                                                                        </h6>
+                                                                                                        {isValueDelivery && (
+                                                                                                            <h6
+                                                                                                                className={`${item?.active &&
+                                                                                                                    isValueDelivery
+                                                                                                                    ? "text-green-500"
+                                                                                                                    : "text-orange-500"
+                                                                                                                    } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                                                                            >{`(${dataLang[item?.status] || item?.status})`}</h6>
+                                                                                                        )}
                                                                                                     </div>
                                                                                                 </div>
-                                                                                            </>
-                                                                                        )}
+                                                                                            </div>
+                                                                                        </>
+                                                                                    )}
                                                                                     <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
                                                                                         {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
                                                                                         {isValue && item?.reference && item?.reference.slice(0, isExpanded ? item?.reference?.length : 2).map((ci, index) => (
@@ -770,5 +757,4 @@ const SalesOrder = (props) => {
         </React.Fragment>
     );
 };
-
 export default SalesOrder;

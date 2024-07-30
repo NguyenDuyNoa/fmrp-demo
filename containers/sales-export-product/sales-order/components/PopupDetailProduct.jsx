@@ -20,7 +20,9 @@ registerLocale("vi", vi);
 
 const PopupDetailProduct = (props) => {
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const datatSetingFomart = useSetingServer()
 
     const formatNumber = (num) => {

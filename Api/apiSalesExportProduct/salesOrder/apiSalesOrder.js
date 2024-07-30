@@ -53,14 +53,7 @@ const apiSalesOrder = {
         const response = await axiosCustom('POST', `/api_web/Api_sale_order/AddKeepStockOrder?csrf_protection=true`, data);
         return response.data
     },
-    async apiSearchContact(params) {
-        const response = await axiosCustom('GET', `/api_web/api_client/searchContact?csrf_protection=true`, params);
-        return response.data
-    },
-    async apiStaffBranch(params) {
-        const response = await axiosCustom('GET', `/api_web/api_client/getStaffBranch?csrf_protection=true`, params);
-        return response.data
-    },
+
     async apiQuotationNotOrdered(params) {
         const response = await axiosCustom('GET', `/api_web/Api_quotation/quotationNotOrderedCombobox/?csrf_protection=true`, params);
         return response.data
