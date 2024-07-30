@@ -1,14 +1,19 @@
-import apiContact from "@/Api/apiClients/contact/apiContact";
+import apiComons from "@/Api/apiComon/apiComon";
 import { useQuery } from "@tanstack/react-query";
 
-export const useClientCombobox = () => {
+export const useClientCombobox = (search) => {
     return useQuery({
-        queryKey: ["api_client_combobox"],
+        queryKey: ["api_client_combobox", search],
         queryFn: async () => {
 
-            const { rResult } = await apiContact.apiClientContact({ params: { limit: 0 } });
+            const { data } = await apiComons.apiSearchClient({
+                params: {
+                    search: search ? search : "",
+                    limit: 0
+                }
+            })
 
-            return rResult?.map((e) => ({ label: e.name, value: e.id }))
+            return data?.clients?.map((e) => ({ label: e.name, value: e.id }))
         }
     })
 

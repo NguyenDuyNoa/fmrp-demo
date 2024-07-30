@@ -12,7 +12,7 @@ import {
     styleMarginChildTotal,
     styles,
     uppercaseTextHeaderTabel,
-} from "@/configs/stylePdf/style";
+} from "@/configs/style-Pdf/style";
 
 import {
     lineHeght,
@@ -23,7 +23,7 @@ import {
     titleFooter,
     titleHeader,
     titleValue,
-} from "@/configs/stylePdf/receiptsEndPayment";
+} from "@/configs/style-Pdf/receiptsEndPayment";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";

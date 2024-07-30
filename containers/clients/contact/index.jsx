@@ -70,7 +70,7 @@ const Contact = (props) => {
 
     const { data: listBr = [] } = useBranchList({});
 
-    const { data: listClientCombobox = [] } = useClientCombobox({ limit: 0 })
+    const { data: listClientCombobox = [] } = useClientCombobox()
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
