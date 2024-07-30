@@ -65,8 +65,7 @@ const PopupAddress = (props) => {
                         isShow("error", props.dataLang[message] || message);
                     }
                 },
-                onError: (error) => {
-                }
+                onError: (error) => { }
             });
         }
     };
@@ -138,9 +137,7 @@ const PopupAddress = (props) => {
                             country={"vn"}
                             value={phone}
                             onChange={(value) => handleOnChangeInput("phone", value)}
-                            inputProps={{
-                                autoFocus: true,
-                            }}
+                            inputProps={{ autoFocus: true }}
                             inputStyle={{
                                 width: "100%",
                                 border: errPhone ? "" : "1px solid #d0d5dd",
@@ -171,13 +168,9 @@ const PopupAddress = (props) => {
                         <button
                             type="submit"
                             disabled={loading ? true : false}
-                            className={`${loading ? "disabled:opacity-75" : ""
-                                } button font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow flex justify-center items-center gap-2`}
-                        // className={`motion-reduce:hidden animate-spin button  font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow`}
+                            className={`${loading ? "disabled:opacity-75" : ""} button font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow flex justify-center items-center gap-2`}
                         >
-                            <AiOutlineLoading3Quarters
-                                className={`${loading ? "motion-reduce:hidden animate-spin visible" : "hidden"}`}
-                            />
+                            <AiOutlineLoading3Quarters className={`${loading ? "motion-reduce:hidden animate-spin visible" : "hidden"}`} />
                             <span>{props.dataLang?.btn_save || "btn_save"}</span>
                         </button>
                     </div>

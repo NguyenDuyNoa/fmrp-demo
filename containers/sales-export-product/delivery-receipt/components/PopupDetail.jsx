@@ -1,44 +1,34 @@
-import PopupCustom from "@/components/UI/popup";
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-import { TickCircle } from "iconsax-react";
-import { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import Loading from "@/components/UI/loading";
+import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from '@/utils/helpers/formatMoney';
 import formatNumberConfig from '@/utils/helpers/formatnumber';
-import { useQuery } from "@tanstack/react-query";
-import Loading from "components/UI/loading";
-import ExpandableContent from "components/UI/more";
+import vi from "date-fns/locale/vi";
+import { TickCircle } from "iconsax-react";
+import dynamic from "next/dynamic";
+import { useState } from "react";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import { useDeliveryReceipDetail } from "../hooks/useDeliveryReceipDetail";
+registerLocale("vi", vi);
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false, });
 
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const [data, setData] = useState();
-
     const dataSeting = useSetingServer();
 
-    const { dataMaterialExpiry, dataProductSerial, dataProductExpiry } = useFeature()
+    const { dataMaterialExpiry, dataProductSerial } = useFeature()
 
     const formatNumber = (num) => {
         return formatNumberConfig(+num, dataSeting)
@@ -47,20 +37,7 @@ const PopupDetail = (props) => {
         return formatMoneyConfig(+num, dataSeting)
     };
 
-    const { isFetching } = useQuery({
-        queryKey: ["api_delivery_detail", props?.id],
-        queryFn: async () => {
-
-            const db = await apiDeliveryReceipt.apiDetail(props?.id)
-
-            setData(db);
-
-            return db
-        },
-        ...reTryQuery,
-        enabled: open && !!props?.id
-    })
-
+    const { data, isFetching } = useDeliveryReceipDetail()
 
     return (
         <>
@@ -240,9 +217,7 @@ const PopupDetail = (props) => {
                                                                             small="/no_img.png"
                                                                             large="/no_img.png"
                                                                             className="w-full h-full rounded object-contain p-1"
-                                                                        >
-                                                                            {" "}
-                                                                        </ModalImage>
+                                                                        />
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -261,9 +236,7 @@ const PopupDetail = (props) => {
                                                                                 {e.serial == null || e.serial == "" ? "-" : e.serial}
                                                                             </h6>
                                                                         </div>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
+                                                                    ) : ""}
                                                                     {dataMaterialExpiry.is_enable === "1" ? (
                                                                         <>
                                                                             <div className="flex gap-0.5">
@@ -279,9 +252,7 @@ const PopupDetail = (props) => {
                                                                                 </h6>
                                                                             </div>
                                                                         </>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
+                                                                    ) : ""}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -314,9 +285,7 @@ const PopupDetail = (props) => {
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-left">
                                                         {e?.note_item != undefined ? (
                                                             <ExpandableContent content={e?.note_item} />
-                                                        ) : (
-                                                            ""
-                                                        )}
+                                                        ) : ""}
                                                     </h6>
                                                 </div>
                                             ))}

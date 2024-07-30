@@ -104,7 +104,7 @@ const PriceQuoteForm = (props) => {
 
     const statusExprired = useStatusExprired();
 
-    const [tongTienState, setTongTienState] = useState({
+    const [totalMoney, setTotalmoney] = useState({
         tongTien: 0,
         tienChietKhau: 0,
         tongTienSauCK: 0,
@@ -561,7 +561,7 @@ const PriceQuoteForm = (props) => {
 
     useEffect(() => {
         const tongTien = tinhTongTien(option);
-        setTongTienState(tongTien);
+        setTotalmoney(tongTien);
     }, [option]);
 
     const dataOption = sortedArr?.map((e) => {
@@ -606,11 +606,11 @@ const PriceQuoteForm = (props) => {
         });
 
         if (
-            tongTienState?.tongTien > 0 &&
-            tongTienState?.tienChietKhau >= 0 &&
-            tongTienState?.tongTienSauCK > 0 &&
-            tongTienState?.tienThue >= 0 &&
-            tongTienState?.tongThanhTien > 0
+            totalMoney?.tongTien > 0 &&
+            totalMoney?.tienChietKhau >= 0 &&
+            totalMoney?.tongTienSauCK > 0 &&
+            totalMoney?.tienThue >= 0 &&
+            totalMoney?.tongThanhTien > 0
         ) {
             handingPriceQuote.mutate(formData, {
                 onSuccess: ({ isSuccess, message }) => {
@@ -1281,7 +1281,7 @@ const PriceQuoteForm = (props) => {
                                 <h3>{dataLang?.price_quote_total || "price_quote_total"}</h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.tongTien)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(totalMoney.tongTien)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -1289,7 +1289,7 @@ const PriceQuoteForm = (props) => {
                                 <h3>{dataLang?.price_quote_total_discount || "price_quote_total_discount"}</h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.tienChietKhau)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(totalMoney.tienChietKhau)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -1299,7 +1299,7 @@ const PriceQuoteForm = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.tongTienSauCK)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(totalMoney.tongTienSauCK)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -1307,7 +1307,7 @@ const PriceQuoteForm = (props) => {
                                 <h3>{dataLang?.price_quote_tax_money || "price_quote_tax_money"}</h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.tienThue)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(totalMoney.tienThue)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -1315,7 +1315,7 @@ const PriceQuoteForm = (props) => {
                                 <h3>{dataLang?.price_quote_into_money || "price_quote_into_money"}</h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatMoney(tongTienState.tongThanhTien)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(totalMoney.tongThanhTien)}</h3>
                             </div>
                         </div>
                         <div className="space-x-2">

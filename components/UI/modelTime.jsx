@@ -3,7 +3,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import { Verify } from "iconsax-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import PopupCustom from "/components/UI/popup";
+import PopupCustom from "@/components/UI/popup";
 
 const PopupModelTime = (props) => {
     const [open, sOpen] = useState(false);

@@ -40,6 +40,10 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/api_client/searchClients?csrf_protection=true`, params);
         return response.data
     },
+    async apiSearcClientFilterByBranch(params) {
+        const response = await axiosCustom('GET', `/api_web/api_client/client_option/?csrf_protection=true`, params);
+        return response.data
+    },
 
     async apiListTax(params) {
         const response = await axiosCustom('GET', `/api_web/Api_tax/tax?csrf_protection=true`, params);

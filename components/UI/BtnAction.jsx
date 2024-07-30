@@ -1,57 +1,38 @@
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import Popup from "reactjs-popup";
-
-import { _ServerInstance as Axios } from "services/axios";
-
-import { ArrowDown2, Box1, BoxSearch, Trash } from "iconsax-react";
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
-
-import FilePDF from "./FilePDF";
-
-import { routerImport, routerOrder, routerPurchases, routerReturns } from "@/routers/buyImportGoods";
-import { routerDeliveryReceipt, routerPriceQuote, routerReturnSales, routerSalesOrder } from "@/routers/sellingGoods";
-
-import {
-    routerExportToOther,
-    routerInternalPlan,
-    routerProductionWarehouse,
-    routerProductsWarehouse,
-    routerRecall,
-    routerWarehouseTransfer,
-} from "@/routers/manufacture";
-import PopupDetailKeepStock from "@/containers/sales-export-product/sales-order/components/PopupDetailKeepStock";
-import PopupKeepStock from "@/containers/sales-export-product/sales-order/components/PopupKeepStock";
-import PopupConfim from "./popupConfim/popupConfim";
-
-///Đơn đặt hàng PO
-import Popup_TableValidateDelete from "@/pages/purchase-order/order/components/validateDelete";
-import Popup_TableValidateEdit from "@/pages/purchase-order/order/components/validateEdit";
-
-import { useSetData } from "@/hooks/useSetData";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
 import PopupCustom from "@/components/UI/popup";
-
-import Popup_servie from "@/pages/purchase-order/servicev-voucher/components/popup";
-
-import Popup_dspc from "@/pages/accountant/payment/components/popup";
-import Popup_dspt from "@/pages/accountant/receipts/components/popup";
-
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import Popup_Bom from "@/containers/products/components/product/popupBom";
+import Popup_Products from "@/containers/products/components/product/popupProducts";
+import Popup_Stage from "@/containers/products/components/product/popupStage";
+import PopupDetailKeepStock from "@/containers/sales-export-product/sales-order/components/PopupDetailKeepStock";
+import PopupKeepStock from "@/containers/sales-export-product/sales-order/components/PopupKeepStock";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useActionRole from "@/hooks/useRole";
-import Popup_Bom from "@/containers/products/components/product/popupBom";
-import Popup_Stage from "@/containers/products/components/product/popupStage";
-import Popup_Products from "@/containers/products/components/product/popupProducts";
+import { useSetData } from "@/hooks/useSetData";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import Popup_dspc from "@/pages/accountant/payment/components/popup";
+import Popup_dspt from "@/pages/accountant/receipts/components/popup";
+import Popup_TableValidateDelete from "@/pages/purchase-order/order/components/validateDelete";
+import Popup_TableValidateEdit from "@/pages/purchase-order/order/components/validateEdit";
+import Popup_servie from "@/pages/purchase-order/servicev-voucher/components/popup";
+import { routerImport, routerOrder, routerPurchases, routerReturns } from "@/routers/buyImportGoods";
+import { routerExportToOther, routerInternalPlan, routerProductionWarehouse, routerProductsWarehouse, routerRecall, routerWarehouseTransfer, } from "@/routers/manufacture";
+import { routerDeliveryReceipt, routerPriceQuote, routerReturnSales, routerSalesOrder } from "@/routers/sellingGoods";
+import { ArrowDown2, Box1, BoxSearch, Trash } from "iconsax-react";
+import { useRouter } from "next/router";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import React, { useEffect, useState } from "react";
+import { BiEdit } from "react-icons/bi";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { VscFilePdf } from "react-icons/vsc";
 import { useSelector } from "react-redux";
+import Popup from "reactjs-popup";
+import { _ServerInstance as Axios } from "services/axios";
+import FilePDF from "./FilePDF";
+import PopupConfim from "./popupConfim/popupConfim";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -125,7 +106,6 @@ export const BtnAction = React.memo((props) => {
 
     const handleDelete = () => {
         //Báo giá
-
         const initialApiDelete = {
             category_detail_errors: `api_web/Api_category_error/deleteDetailError/${props.id}?csrf_protection=true`,
             category_errors: `api_web/Api_category_error/deleteCategoryError/${props.id}?csrf_protection=true`,
@@ -386,12 +366,7 @@ export const BtnAction = React.memo((props) => {
             ) : (
                 <Popup
                     trigger={
-                        <button
-                            className={
-                                `
-                            flex space-x-1 items-center bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-sm xl:!text-xs text-[9px]                                                                        
-                            ` + props.className
-                            }
+                        <button className={` flex space-x-1 items-center bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-sm xl:!text-xs text-[9px] ` + props.className}
                         >
                             <span>{props.dataLang?.btn_action || "btn_action"}</span>
                             <ArrowDown2 size={12} />
@@ -473,20 +448,6 @@ export const BtnAction = React.memo((props) => {
                             )}
 
                             {props.type == "receipts" && (
-                                // <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
-                                //     <BiEdit
-                                //         size={20}
-                                //         className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                //     />
-                                //     <Popup_dspt
-                                //         onRefresh={props.onRefresh}
-                                //         dataLang={props.dataLang}
-                                //         id={props?.id}
-                                //         className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
-                                //     >
-                                //         {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                                //     </Popup_dspt>
-                                // </div>
                                 <Popup_dspt
                                     onRefresh={props.onRefresh}
                                     dataLang={props.dataLang}
@@ -497,20 +458,6 @@ export const BtnAction = React.memo((props) => {
                                 </Popup_dspt>
                             )}
                             {props.type == "payment" && (
-                                // <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
-                                //     <BiEdit
-                                //         size={20}
-                                //         className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                //     />
-                                //     <Popup_dspc
-                                //         onRefresh={props.onRefresh}
-                                //         dataLang={props.dataLang}
-                                //         id={props?.id}
-                                //         className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                                //         >
-                                //         {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                                //     </Popup_dspc>
-                                // </div>
                                 <Popup_dspc
                                     onRefresh={props.onRefresh}
                                     dataLang={props.dataLang}
@@ -531,8 +478,7 @@ export const BtnAction = React.memo((props) => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }
                                     }}
-                                    className={`
-                                group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                    className={` group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                 >
                                     <BiEdit
                                         size={20}
@@ -543,9 +489,7 @@ export const BtnAction = React.memo((props) => {
                                     </p>
                                 </button>
                             )}
-                            {["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(
-                                props?.type
-                            ) ? (
+                            {["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(props?.type) ? (
                                 <Popup_Pdf
                                     dataLang={props.dataLang}
                                     props={props}
@@ -628,8 +572,7 @@ export const BtnAction = React.memo((props) => {
                                                 }
                                             }}
                                             className={` group transition-all ease-in-out flex items-center 
-                                                ${(props.type == "products" && "justify-start") ||
-                                                    props.type == "sales_product"
+                                                ${(props.type == "products" && "justify-start") || props.type == "sales_product"
                                                     ? ""
                                                     : "justify-center"
                                                 }  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
@@ -639,8 +582,7 @@ export const BtnAction = React.memo((props) => {
                                                 className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                                             />
                                             <p className="group-hover:text-[#f87171]">
-                                                {props.dataLang?.purchase_order_table_delete ||
-                                                    "purchase_order_table_delete"}
+                                                {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
                                             </p>
                                         </button>
                                     }

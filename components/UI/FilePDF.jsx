@@ -1,19 +1,3 @@
-import moment from "moment";
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-import React, { useEffect, useState } from "react";
-import { VscFilePdf } from "react-icons/vsc";
-import { _ServerInstance as Axios } from "services/axios";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
-import {
-    bottomForm,
-    styleMarginChild,
-    styleMarginChildTotal,
-    styles,
-    uppercaseTextHeaderTabel,
-} from "@/configs/style-Pdf/style";
-
 import {
     lineHeght,
     styleForm,
@@ -24,10 +8,24 @@ import {
     titleHeader,
     titleValue,
 } from "@/configs/style-Pdf/receiptsEndPayment";
+import {
+    bottomForm,
+    styleMarginChild,
+    styleMarginChildTotal,
+    styles,
+    uppercaseTextHeaderTabel,
+} from "@/configs/style-Pdf/style";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import moment from "moment";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import React, { useEffect, useState } from "react";
+import { VscFilePdf } from "react-icons/vsc";
+import { _ServerInstance as Axios } from "services/axios";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const FilePDF = ({
     props,

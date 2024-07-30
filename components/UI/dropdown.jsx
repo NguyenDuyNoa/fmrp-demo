@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-
-import Popup from "reactjs-popup";
-import { Tooltip } from "react-tippy";
-
-import Loading from "./loading";
-
-import { Lexend_Deca } from "@next/font/google";
-import { useSelector } from "react-redux";
-import { Cd, SearchNormal1, TickCircle } from "iconsax-react";
 import useToast from "@/hooks/useToast";
+import { Lexend_Deca } from "@next/font/google";
+import { Cd, SearchNormal1, TickCircle } from "iconsax-react";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Tooltip } from "react-tippy";
+import Popup from "reactjs-popup";
+import Loading from "./loading";
 import Zoom from "./zoomElement/zoomElement";
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -42,11 +39,10 @@ export const Dropdown = (props) => {
                     <div className="bg-white 2xl:py-2 lg:py-0.5 px-0.5 rounded-lg justify-between flex divide-x divide-[#DDDDE2]">
                         {props.data?.map((e, i) => (
                             <div
-                                className={`${
-                                    e.title
-                                        ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5"
-                                        : "px-1"
-                                } 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
+                                className={`${e.title
+                                    ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5"
+                                    : "px-1"
+                                    } 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
                                 key={i}
                             >
                                 {e.title && (
@@ -425,17 +421,15 @@ const TabFilters = React.memo((props) => {
         <button
             style={props.style}
             onClick={props.onClick}
-            className={`${props.tab == props.active && "bg-blue-400 text-white"} ${
-                props.className
-            } justify-center 3xl:text-[12px] xxl:text-[11px]  2xl:text-[8.5px] xl:text-[8px] lg:text-[7.5px] text-[9px] flex  items-center rounded-md px-2 py-1 outline-none relative`}
+            className={`${props.tab == props.active && "bg-blue-400 text-white"} ${props.className
+                } justify-center 3xl:text-[12px] xxl:text-[11px]  2xl:text-[8.5px] xl:text-[8px] lg:text-[7.5px] text-[9px] flex  items-center rounded-md px-2 py-1 outline-none relative`}
         >
             {props.children}
             {!props.checkStt && (
                 <span
-                    className={`${
-                        props?.sub?.length > 0 &&
+                    className={`${props?.sub?.length > 0 &&
                         "absolute 3xl:w-[20px] 2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[20px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[10px] 2xl:text-[9px] xl:text-[9px] lg:text-[9px] text-[9px] top-0 right-0 bg-[#ff6f00]  3xl:translate-x-[30%] 2xl:translate-x-2.5 xl:translate-x-2 lg:translate-x-[40%] 3xl:-translate-y-[50%] 2xl:-translate-y-2  xl:-translate-y-[40%] lg:-translate-y-[40%] text-white rounded-full text-center items-center flex justify-center"
-                    } `}
+                        } `}
                 >
                     {/* {props?.total > 0 && props?.total} */}
                     {props?.sub?.length > 0 && props?.sub?.length}
