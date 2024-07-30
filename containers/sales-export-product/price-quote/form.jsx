@@ -12,7 +12,8 @@ import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranchList";
-import { useTaxList } from "@/hooks/common/useTaxList";
+import { useClientByBranch } from "@/hooks/common/useClient";
+import { useTaxList } from "@/hooks/common/useStaff";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
@@ -32,7 +33,6 @@ import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
-import { usePriceQuoteClientByBranch } from "./hooks/usePriceQuoteClientByBranch";
 import { usePriceQuoteContactByClient } from "./hooks/usePriceQuoteContactByClient";
 
 const PriceQuoteForm = (props) => {
@@ -124,7 +124,7 @@ const PriceQuoteForm = (props) => {
 
     const { data: dataPersonContact } = usePriceQuoteContactByClient(idCustomer);
 
-    const { data: dataCustomer } = usePriceQuoteClientByBranch(idBranch);
+    const { data: dataCustomer } = useClientByBranch(idBranch);
 
     useEffect(() => {
         router.query && sErrDate(false);

@@ -13,10 +13,7 @@ import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranchList";
-import { useClientComboboxByBranch } from "@/hooks/common/useClientComboboxByBranch";
 import { useContactCombobox } from "@/hooks/common/useContactCombobox";
-import { useStaffComboboxByBranch } from "@/hooks/common/useStaffComboboxByBranch";
-import { useTaxList } from "@/hooks/common/useTaxList";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
@@ -39,6 +36,8 @@ import { MdClear } from "react-icons/md";
 import { components } from "react-select";
 import { v4 as uuidv4 } from "uuid";
 import { useSalesOrderQuotaByBranch } from "./hooks/useSalesOrderQuotaByBranch";
+import { useClientComboboxByBranch } from "@/hooks/common/useClient";
+import { useStaffComboboxByBranch, useTaxList } from "@/hooks/common/useStaff";
 
 const SalesOrderForm = (props) => {
     const router = useRouter();

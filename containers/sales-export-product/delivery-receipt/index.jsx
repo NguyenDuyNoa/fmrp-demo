@@ -25,7 +25,6 @@ import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranchList";
-import { useClientCombobox } from "@/hooks/common/useClientCombobox";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
@@ -50,6 +49,7 @@ import PopupDetail from "./components/PopupDetail";
 import { useDeliveryReceipCombobox } from "./hooks/useDeliveryReceipCombobox";
 import { useDeliveryReceiptFilterbar } from "./hooks/useDeliveryReceiptFilterbar";
 import { useDeliveryReceiptList } from "./hooks/useDeliveryReceiptList";
+import { useClientCombobox } from "@/hooks/common/useClient";
 
 const initialState = {
     keySearch: "",

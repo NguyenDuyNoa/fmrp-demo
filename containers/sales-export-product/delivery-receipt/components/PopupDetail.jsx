@@ -37,7 +37,7 @@ const PopupDetail = (props) => {
         return formatMoneyConfig(+num, dataSeting)
     };
 
-    const { data, isFetching } = useDeliveryReceipDetail()
+    const { data, isFetching } = useDeliveryReceipDetail(open, props?.id);
 
     return (
         <>

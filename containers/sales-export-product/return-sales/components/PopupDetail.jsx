@@ -1,4 +1,3 @@
-import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -8,7 +7,6 @@ import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useQuery } from "@tanstack/react-query";
 import ImageErrors from "components/UI/imageErrors";
 import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
@@ -18,8 +16,8 @@ import { useState } from "react";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
+import { useReturnSalesDetail } from "../hooks/useReturnSalesDetail";
 import PopupCustom from "/components/UI/popup";
-import { reTryQuery } from "@/configs/configRetryQuery";
 registerLocale("vi", vi);
 
 const PopupDetail = (props) => {
@@ -29,28 +27,13 @@ const PopupDetail = (props) => {
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const [data, sData] = useState();
-
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-    const { isFetching } = useQuery({
-        queryKey: ["api_detail_return_order", props?.id],
-        queryFn: async () => {
-            const db = await apiReturnSales.apiDetailReturnOrder(props?.id)
-
-            sData(db);
-
-            return db
-        },
-        ...reTryQuery,
-
-        enabled: open && !!props?.id
-    })
-
+    const { data, isFetching } = useReturnSalesDetail(open, props?.id)
 
 
     return (

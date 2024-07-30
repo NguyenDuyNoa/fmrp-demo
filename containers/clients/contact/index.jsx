@@ -16,7 +16,6 @@ import Pagination from "@/components/UI/pagination";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranchList";
-import { useClientCombobox } from "@/hooks/common/useClientCombobox";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
@@ -31,6 +30,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useContactList } from "./hooks/useContactList";
+import { useClientCombobox } from "@/hooks/common/useClient";
 
 const initilalState = {
     keySearch: "",

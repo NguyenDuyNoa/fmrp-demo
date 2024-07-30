@@ -20,10 +20,7 @@ const apiReturnSales = {
         const response = await axiosCustom('GET', `/api_web/Api_return_order/return_order/${id}?csrf_protection=true`);
         return response.data
     },
-    async apiSolution() {
-        const response = await axiosCustom('GET', `/api_web/Api_return_order/comboboxHandlingSolution/?csrf_protection=true`);
-        return response.data
-    },
+
     async apiPageDetail(id) {
         const response = await axiosCustom('GET', `/api_web/Api_return_order/getDetail/${id}?csrf_protection=true`);
         return response.data

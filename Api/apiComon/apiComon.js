@@ -64,5 +64,10 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/api_client/getStaffBranch?csrf_protection=true`, params);
         return response.data
     },
+    // phuong thuc xu ly
+    async apiSolution() {
+        const response = await axiosCustom('GET', `/api_web/Api_return_order/comboboxHandlingSolution/?csrf_protection=true`);
+        return response.data
+    },
 }
 export default apiComons
