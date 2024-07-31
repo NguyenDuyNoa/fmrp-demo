@@ -49,7 +49,7 @@ import PopupDetail from "./components/PopupDetail";
 import { useDeliveryReceipCombobox } from "./hooks/useDeliveryReceipCombobox";
 import { useDeliveryReceiptFilterbar } from "./hooks/useDeliveryReceiptFilterbar";
 import { useDeliveryReceiptList } from "./hooks/useDeliveryReceiptList";
-import { useClientCombobox } from "@/hooks/common/useClient";
+import { useClientCombobox } from "@/hooks/common/useClients";
 
 const initialState = {
     keySearch: "",

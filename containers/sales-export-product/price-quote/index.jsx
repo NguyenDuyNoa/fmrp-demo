@@ -49,7 +49,7 @@ import PopupDetailQuote from "./components/PopupDetailQuote";
 import { usePriceQuocteListFilterbar } from "./hooks/usePriceQuocteListFilterbar";
 import { usePriceQuoteCombobox } from "./hooks/usePriceQuoteCombobox";
 import { usePriceQuoteList } from "./hooks/usePriceQuoteList";
-import { useClientCombobox } from "@/hooks/common/useClient";
+import { useClientCombobox } from "@/hooks/common/useClients";
 registerLocale("vi", vi);
 
 const initData = {

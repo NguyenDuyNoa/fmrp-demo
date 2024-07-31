@@ -30,7 +30,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useContactList } from "./hooks/useContactList";
-import { useClientCombobox } from "@/hooks/common/useClient";
+import { useClientCombobox } from "@/hooks/common/useClients";
 
 const initilalState = {
     keySearch: "",

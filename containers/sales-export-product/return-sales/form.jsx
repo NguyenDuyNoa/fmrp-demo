@@ -10,7 +10,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranch";
-import { useClientByBranch } from "@/hooks/common/useClient";
+import { useClientByBranch } from "@/hooks/common/useClients";
 import { useSolutionList } from "@/hooks/common/useSolutions";
 import { useWarehouseComboboxlocation } from "@/hooks/common/useWarehouses";
 import useFeature from "@/hooks/useConfigFeature";
