@@ -21,7 +21,7 @@ const apiSatff = {
         return response.data
     },
     async apiHandingStaff(id, data) {
-        const response = await axiosCustom('POST', id ? `/api_web/api_staff/getPermissionsStaff/${id}?csrf_protection=true` : `/api_web/api_staff/getPermissionsStaff?csrf_protection=true`, data);
+        const response = await axiosCustom('POST', id ? `/api_web/api_staff/staff/${id}?csrf_protection=true` : `/api_web/api_staff/staff?csrf_protection=true`, data);
         return response.data
     },
     async apiManageStaff(id) {

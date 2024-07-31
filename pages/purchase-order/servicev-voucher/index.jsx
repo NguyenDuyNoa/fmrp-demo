@@ -140,7 +140,7 @@ const Index = (props) => {
 
             const { result: listCode } = await apiServiceVoucher.apiServiceCombobox('GET');
 
-            const { rResult: listUser } = await apiPurchases.apiStaffOptionPurchases();
+            const { rResult: listUser } = await apiComons.apiStaffOption({});
 
             queryState({
                 listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],

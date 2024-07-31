@@ -52,7 +52,7 @@ import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import { routerImport } from "routers/buyImportGoods";
-import Popup_chitietThere from "../detaiCommon";
+import Popup_chitietThere from "../../../containers/purchase-order/components/PopupDetailThere";
 import Popup_chitiet from "./components/popup";
 import Popup_status from "./components/popupStatus";
 

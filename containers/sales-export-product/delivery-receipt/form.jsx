@@ -38,9 +38,9 @@ import { v4 as uuidv4 } from "uuid";
 import PopupAddress from "./components/PopupAddress";
 import { useDeliveryReceipItemAll } from "./hooks/useDeliveryReceipItemAll";
 import { useDeliveryReceipPerson } from "./hooks/useDeliveryReceipPerson";
-import { useDeliveryReceipStaff } from "./hooks/useDeliveryReceipStaff";
 import { useClientComboboxByFilterBranch } from "@/hooks/common/useClients";
 import { useTaxList } from "@/hooks/common/useTaxs";
+import { useStaffOptions } from "@/hooks/common/useStaffs";
 const DeliveryReceiptForm = (props) => {
     const router = useRouter();
 
@@ -127,9 +127,9 @@ const DeliveryReceiptForm = (props) => {
 
     const { data: dataBranch = [] } = useBranchList()
 
-    const { data: dataContactPerson = [] } = useDeliveryReceipPerson({ "filter[client_id]": idClient != null ? idClient.value : null })
+    const { data: dataStaff = [] } = useStaffOptions({ "filter[branch_id]": idBranch !== null ? +idBranch?.value : null })
 
-    const { data: dataStaff = [] } = useDeliveryReceipStaff({ "filter[branch_id]": idBranch !== null ? +idBranch?.value : null })
+    const { data: dataContactPerson = [] } = useDeliveryReceipPerson({ "filter[client_id]": idClient != null ? idClient.value : null })
 
     const { data: dataClient = [] } = useClientComboboxByFilterBranch(idBranch, { "filter[branch_id]": idBranch != null ? idBranch.value : null, })
 

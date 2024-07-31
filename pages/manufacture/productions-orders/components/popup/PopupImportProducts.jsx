@@ -1,6 +1,3 @@
-import PopupCustom from "@/components/UI/popup";
-import { memo, useState } from "react";
-
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import ButtonCancel from "@/components/UI/button/buttonCancel";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
@@ -8,6 +5,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
+import PopupCustom from "@/components/UI/popup";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -15,6 +13,7 @@ import { SelectCore } from "@/utils/lib/Select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash as IconDelete } from "iconsax-react";
 import Image from "next/image";
+import { memo, useState } from "react";
 import { FaBox } from "react-icons/fa";
 import { RiBox3Fill } from "react-icons/ri";
 const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...props }) => {
@@ -26,6 +25,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             bom: [],
         },
         dtPoi: {},
+        dtPois: {},
         warehouseImport: [],
         warehouseExport: [],
         idWarehouseExport: [],
@@ -48,7 +48,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 return apiProductionsOrders.apiAgreeProcess(data)
             }
             if (type == "end_production") {
-
+                return apiProductionsOrders.apiAgreeProcess(data)
             }
         }
     })
@@ -75,9 +75,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                         label: e?.name
                     }
                 }),
-                dtPoi: {
-                    ...data?.product?.dtPoi,
-                },
+                dtPois: data?.product?.dtPois,
+                dtPoi: data?.dtPoi,
                 item: {
                     ...data?.product?.item,
                     quantityDefault: data?.product?.item?.quantity,
@@ -96,7 +95,6 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
         },
         enabled: isState.open && type === 'end_production' ? true : false,
     })
-
 
     const handChangeQuantityParent = (value) => {
         queryState({
@@ -133,14 +131,66 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             handingPopup.mutate(formData, {
                 onSuccess: ({ isSuccess, message }) => {
                     isShow("success", message)
+
+                    queryState({ open: false })
+
                     queryClient.invalidateQueries('apiItemOrdersDetail');
                 },
                 onError: (error) => {
-
                 },
             })
         }
-        queryState({ open: false })
+
+
+        if (type == "end_production") {
+            formData.append("warehouse_import_id", isState.idWarehouseImport?.value ?? "")
+            formData.append("warehouse_export_id", isState.idWarehouseExport?.value ?? "")
+
+            formData.append("products[item][poi_id]", isState?.item?.poi_id)
+            formData.append("products[item][product_id]", isState?.item?.product_id)
+            formData.append("products[item][item_code]", isState?.item?.item_code)
+            formData.append("products[item][item_name]", isState?.item?.item_name)
+            formData.append("products[item][item_variation_id]", isState?.item?.item_variation_id)
+            formData.append("products[item][type_products]", isState?.item?.type_products)
+            formData.append("products[item][quantity]", isState?.item?.quantity)
+            formData.append("products[item][item_image]", isState?.item?.item_image)
+            formData.append("products[item][product_variation]", isState?.item?.product_variation)
+            formData.append("products[item][quantity_enter]", isState?.item?.quantity_enter)
+
+            isState.item?.bom?.forEach((e, index) => {
+                formData.append(`products[item][bom][${index}][type_products]`, e?.type_products)
+                formData.append(`products[item][bom][${index}][type_item]`, e?.type_item)
+                formData.append(`products[item][bom][${index}][item_id]`, e?.item_id)
+                formData.append(`products[item][bom][${index}][item_variation_option_value_id]`, e?.item_variation_option_value_id)
+                formData.append(`products[item][bom][${index}][item_code]`, e?.item_code)
+                formData.append(`products[item][bom][${index}][item_name]`, e?.item_name)
+                formData.append(`products[item][bom][${index}][unit_name]`, e?.unit_name)
+                formData.append(`products[item][bom][${index}][unit_name_primary]`, e?.unit_name_primary)
+                formData.append(`products[item][bom][${index}][quota]`, e?.quota)
+                formData.append(`products[item][bom][${index}][loss]`, e?.loss)
+                formData.append(`products[item][bom][${index}][quota_exchange]`, e?.quota_exchange)
+                formData.append(`products[item][bom][${index}][quantity_total_quota]`, e?.quantity_total_quota)
+                formData.append(`products[item][bom][${index}][quantity_quota_primary]`, e?.quantity_quota_primary)
+                formData.append(`products[item][bom][${index}][images]`, e?.image)
+                formData.append(`products[item][bom][${index}][product_variation]`, e?.product_variation)
+                formData.append(`products[item][bom][${index}][quantity_enter]`, e?.quantity)
+                formData.append(`products[item][bom][${index}][quantity_warehouse]`, e?.quantity_warehouse)
+            })
+
+            formData.append("products[dtPois][pois_id]", isState?.dtPois?.pois_id)
+            formData.append("products[dtPois][stage_id]", isState?.dtPois?.branch_id)
+            formData.append("products[dtPois][number]", isState?.dtPois?.number)
+            formData.append("products[dtPois][final_stage]", isState?.dtPois?.final_stage)
+            formData.append("products[dtPois][bom_id]", isState?.dtPois?.bom_id)
+            formData.append("products[dtPois][name_stage]", isState?.dtPois?.name_stage)
+
+            formData.append("dtPoi[poi_id]", isState?.dtPoi?.poi_id)
+            formData.append("dtPoi[branch_id]", isState?.dtPoi?.branch_id)
+            formData.append("dtPoi[reference_no_po]", isState?.dtPoi?.reference_no_po)
+            formData.append("dtPoi[pp_id]", isState?.dtPoi?.pp_id)
+            handingPopup.mutate(formData, {})
+        }
+        // queryState({ open: false })
     }
 
     return (
@@ -393,7 +443,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                     </div>
                                                     <div className="w-full flex flex-col gap-1">
                                                         <h1 className="text-base font-medium">{e.item_name}</h1>
-                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">{e.item_code} - Tồn kho: <span className="text-black font-medium">{formanumber(0)}</span></h1>
+                                                        <h1 className="2xl:text-sm text-xs font-medium text-black/60">{e.item_code} - Tồn kho: <span className="text-black font-medium">{formanumber(e?.quantity_warehouse)}</span></h1>
                                                         <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(0)}</span> Kg</h1>
                                                         {/* <h1 className="2xl:text-sm text-xs font-medium text-black/60">Đã giữ kho: <span className="text-black font-medium">{formanumber(e.quantity_total_quota)}</span> Kg</h1> */}
                                                         <div className="flex items-center justify-between gap-2">

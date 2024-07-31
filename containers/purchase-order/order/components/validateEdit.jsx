@@ -1,41 +1,36 @@
-import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
+import PopupCustom from "@/components/UI/popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
-import Loading from "components/UI/loading";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import "react-datepicker/dist/react-datepicker.css";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { BiEdit } from "react-icons/bi";
 import { useSelector } from "react-redux";
-import PopupCustom from "/components/UI/popup";
+import { routerOrder } from "routers/buyImportGoods";
 
-const Popup_TableValidateDelete = (props) => {
-    const _ToggleModal = (e) => props.handleQueryId({ status: e });
-    const [onFetching, sOnFetching] = useState(false);
+const Popup_TableValidateEdit = (props) => {
+    const router = useRouter();
+
+    const isShow = useToast()
+
+    const _ToggleModal = (e) => props.sIsOpenValidate(e);
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkDelete, checkEdit } = useActionRole(auth, props?.type);
-
-    const isShow = useToast()
-
-    useEffect(() => {
-        props.isOpenValidate && _HandleDelete();
-    }, [props.isOpenValidate]);
-
-    const _HandleDelete = async () => {
-        try {
-            const { isSuccess, message } = await apiOrder.apiDeleteOrder(props?.id)
-            if (isSuccess) {
-                isShow("success", props.dataLang[message] || message);
-                props.onRefresh && props.onRefresh();
+    const handleClick = () => {
+        if (role || checkEdit) {
+            if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
+                isShow('error', `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
+                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")}`)
             } else {
-                isShow("error", props.dataLang[message] || message);
+                router.push(`${routerOrder.form}?id=${props.id}`);
             }
-        } catch (error) { }
-        props.handleQueryId({ status: false });
+        } else {
+            isShow('warning', WARNING_STATUS_ROLE)
+        }
     };
 
     return (
@@ -43,26 +38,18 @@ const Popup_TableValidateDelete = (props) => {
             <PopupCustom
                 title={props.dataLang?.purchase_order_title || "purchase_order_title"}
                 button={
-                    <div
-                        onClick={() => {
-                            if (role || checkDelete) {
-                                _ToggleModal(true)
-                            } else {
-                                isShow("warning", WARNING_STATUS_ROLE);
-                            }
-                        }}
-                        className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
-                        <RiDeleteBin6Line
+                    <div onClick={handleClick.bind(this)} className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded">
+                        <BiEdit
                             size={20}
-                            className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
+                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
                         />
-                        <div
-                            className="group-hover:text-[#f87171]"
-                        >
-                            {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                        </div>
-                    </div>}
-                open={props.isOpen && props.data?.payment_code?.length > 0}
+                        <button type="button">
+                            {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                        </button>
+                    </div>
+                }
+                onClickOpen={_ToggleModal.bind(this, true)}
+                open={props.isOpenValidate && props.data?.payment_code?.length > 0}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props?.className}
             >
@@ -72,7 +59,8 @@ const Popup_TableValidateDelete = (props) => {
                         <div className="w-[400px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <h2 className="font-normal bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
+                                    {props?.dataLang?.purchase_order_detail_general_informatione ||
+                                        "purchase_order_detail_general_informatione"}
                                 </h2>
                                 <div className="w-[100%] lx:w-[110%] ">
                                     <div className="grid grid-cols-12 sticky top-0 bg-slate-100  z-10">
@@ -83,9 +71,7 @@ const Popup_TableValidateDelete = (props) => {
                                             {"Mã phiếu chi"}
                                         </h4>
                                     </div>
-                                    {onFetching ? (
-                                        <Loading className="max-h-28" color="#0f4f9e" />
-                                    ) : props.data?.payment_code?.length > 0 ? (
+                                    {props.data?.payment_code?.length > 0 ? (
                                         <>
                                             <Customscrollbar
                                                 className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]"
@@ -119,4 +105,4 @@ const Popup_TableValidateDelete = (props) => {
         </>
     );
 };
-export default Popup_TableValidateDelete;
+export default Popup_TableValidateEdit;

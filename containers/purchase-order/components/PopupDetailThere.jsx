@@ -18,7 +18,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ModalImage from "react-modal-image";
-const Popup_chitietThere = (props) => {
+const PopupDetailThere = (props) => {
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
     const [open, sOpen] = useState(false);
@@ -1594,4 +1594,4 @@ const Popup_chitietThere = (props) => {
         </>
     );
 };
-export default Popup_chitietThere;
+export default PopupDetailThere;

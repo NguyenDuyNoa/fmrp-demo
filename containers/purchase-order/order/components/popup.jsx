@@ -1,26 +1,23 @@
-import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import ImageErrors from "@/components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
+import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { default as formatMoneyConfig, default as formatNumberConfig } from "@/utils/helpers/formatMoney";
-import { useQuery } from "@tanstack/react-query";
-import ImageErrors from "components/UI/imageErrors";
-import Loading from "components/UI/loading";
-import ExpandableContent from "components/UI/more";
 import { useState } from "react";
 import ModalImage from "react-modal-image";
-import PopupCustom from "/components/UI/popup";
-const Popup_chitiet = (props) => {
+import { useOrderDetail } from "../hooks/useOrderDetail";
+const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
-
-    const [data, sData] = useState();
 
     const dataSeting = useSetingServer()
 
@@ -32,22 +29,12 @@ const Popup_chitiet = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     }
 
-    const { isFetching } = useQuery({
-        queryKey: ["api_detail_order", props?.id],
-        queryFn: async () => {
-            const data = await apiOrder.apiDetailOrder(props?.id)
-            sData(data);
-            return data
-        },
-        enabled: open && !!props?.id
-    })
+    const { data, isFetching } = useOrderDetail(open, props?.id)
 
     return (
         <>
             <PopupCustom
-                title={
-                    props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title"
-                }
+                title={props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -379,4 +366,4 @@ const Popup_chitiet = (props) => {
     );
 };
 
-export default Popup_chitiet;
+export default PopupDetail;

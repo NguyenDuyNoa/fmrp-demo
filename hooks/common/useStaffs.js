@@ -16,15 +16,16 @@ export const useStaffComboboxByBranch = (params) => {
     })
 
 }
-
-export const useStaffOptions = () => {
+/// nhân viên 
+export const useStaffOptions = (params = {}) => {
     return useQuery({
-        queryKey: ["api_staff_options"],
+        queryKey: ["api_staff_options", { ...params }],
         queryFn: async () => {
 
-            const { rResult } = await apiComons.apiStaffOptionPurchases()
+            const { rResult } = await apiComons.apiStaffOption({ params })
 
             return rResult?.map((e) => ({ label: e.name, value: e.staffid })) || []
         },
     })
 }
+
