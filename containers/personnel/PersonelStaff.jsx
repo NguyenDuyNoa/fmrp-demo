@@ -21,8 +21,8 @@ import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLev
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
-import { useBranchList } from "@/hooks/common/useBranchList";
-import { usePositionLits } from "@/hooks/common/usePositionLits";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { usePositionLits } from "@/hooks/common/usePositions";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useStatusExprired from "@/hooks/useStatusExprired";

@@ -1,7 +1,7 @@
 import apiComons from "@/Api/apiComon/apiComon";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { useQuery } from "@tanstack/react-query";
-
+/// danh sách nhân viên theo chii nhánh
 export const useStaffComboboxByBranch = (params) => {
     return useQuery({
         queryKey: ["api_taff_branch", { ...params }],
@@ -14,23 +14,5 @@ export const useStaffComboboxByBranch = (params) => {
 
         ...reTryQuery
     })
-
-}
-
-export const useTaxList = () => {
-    return useQuery({
-        queryKey: ["api_tax"],
-        queryFn: async () => {
-
-            const { rResult } = await apiComons.apiListTax({});
-
-            return rResult?.map((e) => ({
-                label: e.name,
-                value: e.id,
-                tax_rate: e.tax_rate,
-            }))
-        },
-        ...reTryQuery
-    });
 
 }

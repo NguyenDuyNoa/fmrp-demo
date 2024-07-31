@@ -3,8 +3,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { useDistrictList } from "@/hooks/common/useDistrictList";
-import { useWardList } from "@/hooks/common/useWardList";
+import { useDistrictList } from "@/hooks/common/useAddress";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
@@ -17,6 +16,7 @@ import { useSupplierGroupSupplier } from "../../hooks/useSupplierGroupSupplier";
 import ButtonAdd from "../button/buttonAdd";
 import FormContact from "../form/formContact";
 import FormInfo from "../form/formInfo";
+import { useWardList } from "@/hooks/common/useAddress";
 
 const initalState = {
   open: false,

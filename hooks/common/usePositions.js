@@ -1,7 +1,7 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-
+// danh sách chức vụ
 export const usePositionLits = () => {
     const dispatch = useDispatch();
     return useQuery({

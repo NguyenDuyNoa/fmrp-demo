@@ -10,7 +10,7 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import { useBranchList } from "@/hooks/common/useBranchList";
+import { useBranchList } from "@/hooks/common/useBranch";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
@@ -40,7 +40,7 @@ import { useDeliveryReceipItemAll } from "./hooks/useDeliveryReceipItemAll";
 import { useDeliveryReceipPerson } from "./hooks/useDeliveryReceipPerson";
 import { useDeliveryReceipStaff } from "./hooks/useDeliveryReceipStaff";
 import { useClientComboboxByFilterBranch } from "@/hooks/common/useClient";
-import { useTaxList } from "@/hooks/common/useStaff";
+import { useTaxList } from "@/hooks/common/useTaxs";
 const DeliveryReceiptForm = (props) => {
     const router = useRouter();
 

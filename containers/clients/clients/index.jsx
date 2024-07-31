@@ -18,8 +18,7 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { useBranchList } from "@/hooks/common/useBranchList";
-import { useProvinceList } from "@/hooks/common/useProvinceList";
+import { useBranchList } from "@/hooks/common/useBranch";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
@@ -37,6 +36,7 @@ import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
 import { useClientGroup } from "./hooks/useClientGroup";
 import { useClientList } from "./hooks/useClientList";
+import { useProvinceList } from "@/hooks/common/useAddress";
 
 const initalState = {
     keySearch: "",

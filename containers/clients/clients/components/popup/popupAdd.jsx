@@ -2,8 +2,7 @@ import apiClient from "@/Api/apiClients/client/apiClient";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { useDistrictList } from "@/hooks/common/useDistrictList";
-import { useWardList } from "@/hooks/common/useWardList";
+import { useDistrictList } from "@/hooks/common/useAddress";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
@@ -18,7 +17,8 @@ import ButtoonAdd from "../button/buttonAdd";
 import Form from "../form/form";
 import FormContactInfo from "../form/formContactInfo";
 import FormContactDelivery from "../form/formDelivery";
-import PopupCustom from "/components/UI/popup";
+import PopupCustom from "@/components/UI/popup";
+import { useWardList } from "@/hooks/common/useAddress";
 
 const initalState = {
     open: false,

@@ -11,9 +11,8 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import { useBranchList } from "@/hooks/common/useBranchList";
+import { useBranchList } from "@/hooks/common/useBranch";
 import { useClientByBranch } from "@/hooks/common/useClient";
-import { useTaxList } from "@/hooks/common/useStaff";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
@@ -34,6 +33,7 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
 import { usePriceQuoteContactByClient } from "./hooks/usePriceQuoteContactByClient";
+import { useTaxList } from "@/hooks/common/useTaxs";
 
 const PriceQuoteForm = (props) => {
     const router = useRouter();

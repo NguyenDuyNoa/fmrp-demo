@@ -2,6 +2,8 @@ import apiContact from "@/Api/apiClients/contact/apiContact";
 import apiComons from "@/Api/apiComon/apiComon";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { useQuery } from "@tanstack/react-query";
+/// danh sách khách hàng đổ hết nhưng có ajax
+
 export const useClientCombobox = (search) => {
     return useQuery({
         queryKey: ["api_client_combobox", search],
@@ -18,7 +20,7 @@ export const useClientCombobox = (search) => {
     })
 }
 
-
+// danh sách khách hàng đổ hết nhưng có chi nhánh mới hiện sử dụng trong form đơn hàng bán
 export const useClientComboboxByBranch = (params) => {
     return useQuery({
         queryKey: ["api_search_clients_by_branch", { ...params }],
@@ -33,7 +35,7 @@ export const useClientComboboxByBranch = (params) => {
         ...reTryQuery
     })
 }
-
+// danh sách khách hàng đổ theo chi nhánh sử dụng trong form phiếu giao hàng
 export const useClientComboboxByFilterBranch = (id, params) => {
     return useQuery({
         queryKey: ["api_search_clients_by_branch_filter", { ...params }],
@@ -46,6 +48,7 @@ export const useClientComboboxByFilterBranch = (id, params) => {
     })
 }
 
+// danh sách khách hàng đổ theo chi nhánh có id mới chạy sử dụng báo giá, trả lại hàng
 export const useClientByBranch = (value) => {
     return useQuery({
         queryKey: ["api_client_by_branch", value],

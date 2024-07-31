@@ -9,11 +9,10 @@ import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import { useBranchList } from "@/hooks/common/useBranchList";
+import { useBranchList } from "@/hooks/common/useBranch";
 import { useClientByBranch } from "@/hooks/common/useClient";
-import { useSolutionList } from "@/hooks/common/useSolutionList";
-import { useTaxList } from "@/hooks/common/useStaff";
-import { useWarehouseComboboxlocation } from "@/hooks/common/useWarehouse";
+import { useSolutionList } from "@/hooks/common/useSolutions";
+import { useWarehouseComboboxlocation } from "@/hooks/common/useWarehouses";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
@@ -37,6 +36,7 @@ import Popup from "reactjs-popup";
 import { routerReturnSales } from "routers/sellingGoods";
 import { v4 as uuidv4 } from "uuid";
 import { useReturnSalesItems } from "./hooks/useReturnSalesItems";
+import { useTaxList } from "@/hooks/common/useTaxs";
 
 const initsFetching = {
     onFetchingCondition: false,

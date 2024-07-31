@@ -12,7 +12,7 @@ import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import { useWarehouseByBranch, useWarehouseTranfer } from "@/hooks/common/useWarehouse";
+import { useWarehouseByBranch, useWarehouseTranfer } from "@/hooks/common/useWarehouses";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";

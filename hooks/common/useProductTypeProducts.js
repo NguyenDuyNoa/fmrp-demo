@@ -1,7 +1,7 @@
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-
+// danh sách thành phẩm type thành phẩm
 export const useProductTypeProducts = () => {
     const dispatch = useDispatch();
     return useQuery({

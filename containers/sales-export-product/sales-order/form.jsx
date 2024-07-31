@@ -12,8 +12,8 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import { useBranchList } from "@/hooks/common/useBranchList";
-import { useContactCombobox } from "@/hooks/common/useContactCombobox";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useContactCombobox } from "@/hooks/common/useContacts";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
@@ -37,7 +37,8 @@ import { components } from "react-select";
 import { v4 as uuidv4 } from "uuid";
 import { useSalesOrderQuotaByBranch } from "./hooks/useSalesOrderQuotaByBranch";
 import { useClientComboboxByBranch } from "@/hooks/common/useClient";
-import { useStaffComboboxByBranch, useTaxList } from "@/hooks/common/useStaff";
+import { useStaffComboboxByBranch } from "@/hooks/common/useStaffs";
+import { useTaxList } from "@/hooks/common/useTaxs";
 
 const SalesOrderForm = (props) => {
     const router = useRouter();
