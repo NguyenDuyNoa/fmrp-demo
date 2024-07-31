@@ -1,42 +1,28 @@
-import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import NoData from "@/components/UI/noData/nodata";
-import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useQuery } from "@tanstack/react-query";
 import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
 import { TickCircle } from "iconsax-react";
 import { useState } from "react";
 import ModalImage from "react-modal-image";
+import { usePurChasesDetail } from "../hooks/usePurChasesDetail";
 import PopupCustom from "/components/UI/popup";
-const Popup_chitiet = (props) => {
+const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const [data, sData] = useState();
-
     const dataSeting = useSetingServer()
 
-    const { isFetching } = useQuery({
-        queryKey: ['api_detail_purchases', props?.id],
-        queryFn: async () => {
-            const db = await apiPurchases.apiDetailPurchases(props?.id);
-            sData(db);
-            return db
-        },
-        ...reTryQuery,
-        enabled: open && !!props?.id
-    })
-
+    const { data, isFetching } = usePurChasesDetail(open, props?.data?.id);
 
     let listQty = data?.items;
 
@@ -307,4 +293,4 @@ const Popup_chitiet = (props) => {
         </>
     );
 };
-export default Popup_chitiet;
+export default PopupDetail;

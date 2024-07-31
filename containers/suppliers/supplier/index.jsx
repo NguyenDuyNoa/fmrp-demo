@@ -74,7 +74,7 @@ const Supplier = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
-    const { data, isFetching, isLoading, refetch } = useSupplierList(params)
+    const { data, isLoading, isFetching, refetch } = useSupplierList(params)
 
     const { data: listBr = [] } = useBranchList({})
 

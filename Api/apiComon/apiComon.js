@@ -69,5 +69,10 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/Api_return_order/comboboxHandlingSolution/?csrf_protection=true`);
         return response.data
     },
+    /// ng đề nghị
+    async apiStaffOptionPurchases() {
+        const response = await axiosCustom('GET', `/api_web/Api_staff/staffOption?csrf_protection=true`);
+        return response.data
+    },
 }
 export default apiComons

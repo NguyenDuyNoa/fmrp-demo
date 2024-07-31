@@ -1,6 +1,6 @@
 import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useReturnSalesFilterbar = (params) => {
     return useQuery({
@@ -9,6 +9,7 @@ export const useReturnSalesFilterbar = (params) => {
             const data = await apiReturnSales.apiListFilterBar({ params })
             return data
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 }

@@ -121,7 +121,7 @@ const PriceQuote = (props) => {
 
     const { data: dataPriceQuote, isLoading, isFetching, refetch } = usePriceQuoteList(params);
 
-    const { data: dataFilter, refetch: refetchFilter } = usePriceQuocteListFilterbar(paramsFilter, params)
+    const { data: dataFilter, refetch: refetchFilter } = usePriceQuocteListFilterbar(paramsFilter)
 
     const handleSearchClientsApi = debounce(async (value) => {
         queryState({ keySearchCient: value });

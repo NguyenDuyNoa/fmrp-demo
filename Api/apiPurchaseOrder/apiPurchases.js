@@ -9,10 +9,7 @@ const apiPurchases = {
         const response = await axiosCustom('GET', `/api_web/Api_purchases/purchases/?csrf_protection=true`);
         return response.data
     },
-    async apiStaffOptionPurchases() {
-        const response = await axiosCustom('GET', `/api_web/Api_staff/staffOption?csrf_protection=true`);
-        return response.data
-    },
+
     async apiGroupPurchases(param) {
         const response = await axiosCustom('GET', `/api_web/Api_purchases/purchasesFilterBar/?csrf_protection=true`, param);
         return response.data

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 /// danh sách nhân viên theo chii nhánh
 export const useStaffComboboxByBranch = (params) => {
     return useQuery({
-        queryKey: ["api_taff_branch", { ...params }],
+        queryKey: ["api_staff_branch", { ...params }],
         queryFn: async () => {
 
             const { data } = await apiComons.apiStaffBranch({ params });
@@ -15,4 +15,16 @@ export const useStaffComboboxByBranch = (params) => {
         ...reTryQuery
     })
 
+}
+
+export const useStaffOptions = () => {
+    return useQuery({
+        queryKey: ["api_staff_options"],
+        queryFn: async () => {
+
+            const { rResult } = await apiComons.apiStaffOptionPurchases()
+
+            return rResult?.map((e) => ({ label: e.name, value: e.staffid })) || []
+        },
+    })
 }

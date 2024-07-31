@@ -18,7 +18,7 @@ const Index = (props) => {
     return (
         <>
             <Head>
-                <title>{dataLang?.productions - orders || 'productions-orders'}</title>
+                <title>{dataLang?.productions_orders || 'productions_orders'}</title>
             </Head>
             <Container className={'relative'}>
                 {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}

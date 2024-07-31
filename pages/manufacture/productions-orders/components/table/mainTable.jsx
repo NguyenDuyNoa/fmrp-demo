@@ -624,7 +624,7 @@ const MainTable = ({ dataLang }) => {
                         <div className="flex items-center justify-between py-1 px-4 border-b">
                             <div className="">
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">
-                                    {dataLang?.productions - orders || "productions-orders"}
+                                    {dataLang?.productions_orders || "productions_orders"}
                                 </h1>
                                 <div className="flex items-center gap-2">
                                     <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
