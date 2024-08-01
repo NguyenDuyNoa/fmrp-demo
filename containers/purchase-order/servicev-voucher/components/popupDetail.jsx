@@ -17,7 +17,7 @@ import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import PopupCustom from "/components/UI/popup";
 
-const Popup_detail = (props) => {
+const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
@@ -304,4 +304,4 @@ const Popup_detail = (props) => {
         </>
     );
 };
-export default Popup_detail;
+export default PopupDetail;

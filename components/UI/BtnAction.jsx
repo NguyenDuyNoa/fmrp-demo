@@ -16,7 +16,7 @@ import Popup_dspc from "@/pages/accountant/payment/components/popup";
 import Popup_dspt from "@/pages/accountant/receipts/components/popup";
 import Popup_TableValidateDelete from "@/containers/purchase-order/order/components/validateDelete";
 import Popup_TableValidateEdit from "@/containers/purchase-order/order/components/validateEdit";
-import Popup_servie from "@/pages/purchase-order/servicev-voucher/components/popup";
+import Popup_servie from "@/containers/purchase-order/servicev-voucher/components/popup";
 import { routerImport, routerOrder, routerPurchases, routerReturns } from "@/routers/buyImportGoods";
 import { routerExportToOther, routerInternalPlan, routerProductionWarehouse, routerProductsWarehouse, routerRecall, routerWarehouseTransfer, } from "@/routers/manufacture";
 import { routerDeliveryReceipt, routerPriceQuote, routerReturnSales, routerSalesOrder } from "@/routers/sellingGoods";

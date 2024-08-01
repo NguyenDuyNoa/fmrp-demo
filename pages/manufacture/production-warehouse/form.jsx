@@ -235,9 +235,9 @@ const Index = (props) => {
         };
 
         try {
-            const { result } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("GET", { params: params });
+            const { data } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("GET", { params: params });
 
-            sDataItems(result);
+            sDataItems(data?.result);
 
             sOnFetchingItemsAll(false);
         } catch (error) { }
@@ -268,7 +268,7 @@ const Index = (props) => {
             return;
         } else {
             try {
-                const { result } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("POST", {
+                const { data } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("POST", {
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
                     },
@@ -276,7 +276,7 @@ const Index = (props) => {
                         term: inputValue,
                     },
                 });
-                sDataItems(result);
+                sDataItems(data?.result);
             } catch (error) { }
         }
     }, 500);

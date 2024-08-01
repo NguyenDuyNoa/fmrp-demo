@@ -210,12 +210,12 @@ const Index = (props) => {
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
-        const { result } = await apiProductsWarehouse.apiItemPoductWarehouse({
+        const { data } = await apiProductsWarehouse.apiItemPoductWarehouse({
             params: {
                 "filter[branch_id]": idBranch ? idBranch?.value : null,
             },
         });
-        sDataItems(result);
+        sDataItems(data?.result);
         sOnFetchingItemsAll(false);
     };
     const _ServerFetching_ExportWarehouse = async () => {
@@ -553,28 +553,24 @@ const Index = (props) => {
         }
     };
     const _HandleDeleteChild = (parentId, childId) => {
-        const newData = listData
-            .map((e) => {
-                if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.id !== childId);
-                    return { ...e, child: newChild };
-                }
-                return e;
-            })
-            .filter((e) => e.child?.length > 0);
+        const newData = listData.map((e) => {
+            if (e.id === parentId) {
+                const newChild = e.child?.filter((ce) => ce?.id !== childId);
+                return { ...e, child: newChild };
+            }
+            return e;
+        }).filter((e) => e.child?.length > 0);
         sListData([...newData]);
     };
 
     const _HandleDeleteAllChild = (parentId) => {
-        const newData = listData
-            .map((e) => {
-                if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.location !== null);
-                    return { ...e, child: newChild };
-                }
-                return e;
-            })
-            .filter((e) => e.child?.length > 0);
+        const newData = listData.map((e) => {
+            if (e.id === parentId) {
+                const newChild = e.child?.filter((ce) => ce?.location !== null);
+                return { ...e, child: newChild };
+            }
+            return e;
+        }).filter((e) => e.child?.length > 0);
         sListData([...newData]);
     };
 
@@ -972,9 +968,9 @@ const Index = (props) => {
                                         : "grid-cols-9"
                                 } */}
                             <div
-                                className={`${dataProductSerial.is_enable == "1"
+                                className={`${dataProductSerial?.is_enable == "1"
                                     ? "grid-cols-6"
-                                    : dataProductExpiry.is_enable == "1"
+                                    : dataProductExpiry?.is_enable == "1"
                                         ? "grid-cols-7"
                                         : "grid-cols-5"
                                     } grid `}
@@ -983,14 +979,14 @@ const Index = (props) => {
                                     {dataLang?.productsWarehouse_warehouseLocaImport ||
                                         "productsWarehouse_warehouseLocaImport"}
                                 </h4>
-                                {dataProductSerial.is_enable === "1" && (
+                                {dataProductSerial?.is_enable === "1" && (
                                     <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
                                         {"Serial"}
                                     </h4>
                                 )}
                                 {
                                     // dataMaterialExpiry.is_enable === "1" ||
-                                    dataProductExpiry.is_enable === "1" ? (
+                                    dataProductExpiry?.is_enable === "1" ? (
                                         <>
                                             <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
                                                 {"Lot"}
@@ -1110,9 +1106,9 @@ const Index = (props) => {
 
                         <div className="col-span-10">
                             <div
-                                className={`${dataProductSerial.is_enable == "1"
+                                className={`${dataProductSerial?.is_enable == "1"
                                     ? "grid-cols-6"
-                                    : dataProductExpiry.is_enable == "1"
+                                    : dataProductExpiry?.is_enable == "1"
                                         ? "grid-cols-7"
                                         : "grid-cols-5"
                                     } grid  divide-x border-t border-b border-r border-l`}
@@ -1145,7 +1141,7 @@ const Index = (props) => {
                                 )}
                                 {
                                     // dataMaterialExpiry.is_enable === "1" ||
-                                    dataProductExpiry.is_enable === "1" ? (
+                                    dataProductExpiry?.is_enable === "1" ? (
                                         <>
                                             <div className=" col-span-1 flex items-center">
                                                 <InPutNumericFormat
@@ -1330,9 +1326,9 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-10  items-center">
                                                 <div
-                                                    className={`${dataProductSerial.is_enable == "1"
+                                                    className={`${dataProductSerial?.is_enable == "1"
                                                         ? "grid-cols-6"
-                                                        : dataProductExpiry.is_enable == "1"
+                                                        : dataProductExpiry?.is_enable == "1"
                                                             ? "grid-cols-7"
                                                             : "grid-cols-5"
                                                         }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
@@ -1417,7 +1413,7 @@ const Index = (props) => {
                                                                     classNamePrefix="customDropdow"
                                                                 />
                                                             </div>
-                                                            {dataProductSerial.is_enable === "1" ? (
+                                                            {dataProductSerial?.is_enable === "1" ? (
                                                                 <div className=" col-span-1">
                                                                     <div className="flex justify-center  h-full p-1 flex-col items-center">
                                                                         <input
@@ -1448,7 +1444,7 @@ const Index = (props) => {
                                                             {
                                                                 // dataMaterialExpiry.is_enable ===
                                                                 //     "1" ||
-                                                                dataProductExpiry.is_enable === "1" ? (
+                                                                dataProductExpiry?.is_enable === "1" ? (
                                                                     <>
                                                                         <div className=" col-span-1  ">
                                                                             <div className="flex justify-center  h-full p-1 flex-col items-center">

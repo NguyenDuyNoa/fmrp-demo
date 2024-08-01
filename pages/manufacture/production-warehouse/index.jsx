@@ -1,36 +1,9 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-import { Grid6 } from "iconsax-react";
-
-import "react-datepicker/dist/react-datepicker.css";
-
-
-import ReactExport from "react-data-export";
-
-import LinkWarehouse from "../components/linkWarehouse";
-import Popup_chitiet from "./components/pupup";
-
-import { BtnAction } from "@/components/UI/BtnAction";
-import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import ImageErrors from "@/components/UI/imageErrors";
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
-import { routerProductionWarehouse } from "@/routers/manufacture";
-
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
+import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -50,7 +23,11 @@ import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComp
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ImageErrors from "@/components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -58,12 +35,22 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { routerProductionWarehouse } from "@/routers/manufacture";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import LinkWarehouse from "../components/linkWarehouse";
+import Popup_chitiet from "./components/pupup";
 
 const Index = (props) => {
     const dataLang = props.dataLang;

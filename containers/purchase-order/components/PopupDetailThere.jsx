@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
-
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -14,9 +11,11 @@ import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
+import { _ServerInstance as Axios } from "@/services/axios";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 const PopupDetailThere = (props) => {
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
@@ -56,7 +55,7 @@ const PopupDetailThere = (props) => {
             {},
             (err, response) => {
                 if (!err) {
-                    var db = response.data;
+                    const db = response.data;
 
                     sData(db);
                 }

@@ -104,6 +104,7 @@ const Index = (props) => {
     const [errWarehouse, sErrWarehouse] = useState(false);
 
     const [errLot, sErrLot] = useState(false);
+
     const [errSerial, sErrSerial] = useState(false);
 
     const [mathangAll, sMathangAll] = useState([]);
@@ -195,7 +196,7 @@ const Index = (props) => {
         },
         enabled: !!id
     })
-
+    console.log(idSupplier);
 
     useQuery({
         queryKey: ['api_not_stock', idSupplier],
@@ -232,11 +233,6 @@ const Index = (props) => {
     })
 
 
-    useEffect(() => {
-        (idBranch === null && sDataSupplier([])) || sIdSupplier(null);
-        (idSupplier === null && sDataThe_order([])) || sIdTheOrder(null);
-    }, []);
-
     const resetValue = () => {
         if (isKeyState?.type === "supplier") {
             sDataItems([]);
@@ -261,8 +257,6 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        sIdTheOrder(null);
-        sIdSupplier(null);
         sKhotong(null);
     }, [idBranch])
 

@@ -12,9 +12,12 @@ const useFeature = () => {
 
 
     useEffect(() => {
-        sDataMaterialExpiry(feature?.dataMaterialExpiry);
-        sDataProductExpiry(feature?.dataProductExpiry);
-        sDataProductSerial(feature?.dataProductSerial);
+        if (feature) {
+            sDataMaterialExpiry(feature?.dataMaterialExpiry?.is_enable ? feature?.dataMaterialExpiry : {});
+            sDataProductExpiry(feature?.dataProductExpiry?.is_enable ? feature?.dataProductExpiry : {});
+            sDataProductSerial(feature?.dataProductSerial?.is_enable ? feature?.dataProductSerial : {});
+        }
+
     }, [feature]);
 
 
