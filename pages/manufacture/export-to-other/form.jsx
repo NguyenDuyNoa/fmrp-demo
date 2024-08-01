@@ -269,13 +269,13 @@ const Index = (props) => {
 
     const _ServerFetching_ItemsAll = async () => {
         try {
-            const { result } = await apiExportToOther.apiItemComboboxExportToOther({
+            const { data } = await apiExportToOther.apiItemComboboxExportToOther({
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
                     "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
                 },
             });
-            sDataItems(result);
+            sDataItems(data?.result);
             sOnFetchingItemsAll(false);
         } catch (error) { }
     };

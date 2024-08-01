@@ -213,9 +213,7 @@ const Index = (props) => {
 
     const _ServerFetching_ItemsAll = async () => {
         try {
-            const {
-                data: { result },
-            } = await apiRecall.apiItemsRecall("GET", {
+            const { data: { result } } = await apiRecall.apiItemsRecall("GET", {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
                 },
@@ -248,9 +246,7 @@ const Index = (props) => {
             return;
         } else {
             try {
-                const {
-                    data: { result },
-                } = await apiRecall.apiItemsRecall("POST", {
+                const { data: { result } } = await apiRecall.apiItemsRecall("POST", {
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
                     },

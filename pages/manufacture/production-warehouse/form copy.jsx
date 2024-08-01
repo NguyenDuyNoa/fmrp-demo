@@ -1,23 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
-import ButtonBack from "@/components/UI/button/buttonBack";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container } from "@/components/UI/common/layout";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import Loading from "@/components/UI/loading";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import useFeature from "@/hooks/useConfigFeature";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-import { routerProductionWarehouse } from "@/routers/manufacture";
-import { isAllowedNumber } from "@/utils/helpers/common";
-import { formatMoment } from "@/utils/helpers/formatMoment";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
 import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import { debounce } from "lodash";
@@ -29,6 +9,32 @@ import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
+
+
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { routerProductionWarehouse } from "@/routers/manufacture";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Index = (props) => {
     const router = useRouter();
@@ -60,6 +66,8 @@ const Index = (props) => {
     const [code, sCode] = useState("");
 
     const [startDate, sStartDate] = useState(new Date());
+
+    const [effectiveDate, sEffectiveDate] = useState(null);
 
     const [note, sNote] = useState("");
 
@@ -149,7 +157,8 @@ const Index = (props) => {
                     idParenBackend: e?.item?.id,
                     matHang: {
                         e: e?.item,
-                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
                         value: e.item?.id,
                     },
                     child: e?.child.map((ce) => ({
@@ -196,7 +205,8 @@ const Index = (props) => {
                         numberOfConversions: +ce?.quantity_exchange,
                         note: ce?.note,
                     })),
-                })));
+                }))
+            );
         } catch (error) { }
         sOnFetchingDetail(false);
     };
@@ -315,6 +325,7 @@ const Index = (props) => {
     };
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
+            sEffectiveDate(null);
         }
         if (type === "startDate") {
             sStartDate(new Date());
