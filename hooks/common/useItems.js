@@ -28,7 +28,7 @@ export const useUnitList = () => {
     })
 }
 
-// ds biến thể
+// ds biến thể combobox
 export const useVariantList = () => {
     const dispatch = useDispatch()
     return useQuery({

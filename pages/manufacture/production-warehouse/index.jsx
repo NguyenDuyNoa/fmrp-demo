@@ -50,7 +50,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import LinkWarehouse from "../components/linkWarehouse";
-import Popup_chitiet from "./components/pupup";
+import PopupDetail from "./components/popup";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -580,12 +580,10 @@ const Index = (props) => {
                                             {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.production_warehouse_expWarehouse ||
-                                                "production_warehouse_expWarehouse"}
+                                            {dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.production_warehouse_Total_value ||
-                                                "production_warehouse_Total_value"}
+                                            {dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.production_warehouse_note || "production_warehouse_note"}
@@ -614,7 +612,7 @@ const Index = (props) => {
                                                             {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <Popup_chitiet
+                                                            <PopupDetail
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
                                                                 name={e?.code}

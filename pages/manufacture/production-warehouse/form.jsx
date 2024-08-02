@@ -137,7 +137,7 @@ const Index = (props) => {
                 rResult?.items.map((e) => ({
                     id: e?.item?.id,
                     idParenBackend: e?.item?.id,
-                    matHang: {
+                    item: {
                         e: e?.item,
                         label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
                         value: e.item?.id,
@@ -343,7 +343,7 @@ const Index = (props) => {
         formData.append("note", note);
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
-            formData.append(`items[${index}][item]`, item?.matHang?.value);
+            formData.append(`items[${index}][item]`, item?.item?.value);
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
                 formData.append(`items[${index}][child][${childIndex}][unit]`, childItem?.unit?.value);
@@ -422,13 +422,13 @@ const Index = (props) => {
     const _HandleAddParent = (value) => {
         sOnLoadingChild(true);
 
-        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
+        const checkData = listData?.some((e) => e?.item?.value === value?.value);
 
         if (!checkData) {
             const newData = {
                 id: Date.now(),
                 idParenBackend: null,
-                matHang: value,
+                item: value,
                 child: [
                     {
                         idChildBackEnd: null,
@@ -582,13 +582,13 @@ const Index = (props) => {
 
     const _HandleChangeValue = (parentId, value) => {
         sOnLoadingChild(true);
-        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
+        const checkData = listData?.some((e) => e?.item?.value === value?.value);
         if (!checkData) {
             const newData = listData?.map((e) => {
                 if (e?.id === parentId) {
                     return {
                         ...e,
-                        matHang: value,
+                        item: value,
                         child: [
                             {
                                 idChildBackEnd: null,
@@ -859,8 +859,7 @@ const Index = (props) => {
                         <div className="col-span-9">
                             <div className="grid grid-cols-8">
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                                    {'Kho - Vị trí kho xuất xuất'}
-                                    {/* {dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"} */}
+                                    {dataLang?.production_warehouse_location || "production_warehouse_location"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
@@ -998,7 +997,7 @@ const Index = (props) => {
                                     {" "}
                                     <SelectCore
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={'Kho - Vị trí kho xuất'}
+                                        placeholder={dataLang?.production_warehouse_location || 'production_warehouse_location'}
                                         // placeholder={dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"}
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
@@ -1060,7 +1059,7 @@ const Index = (props) => {
                                                 <div className="relative mt-5">
                                                     <SelectCore
                                                         options={options}
-                                                        value={e?.matHang}
+                                                        value={e?.item}
                                                         className=""
                                                         onInputChange={(event) => {
                                                             _HandleSeachApi(event);
@@ -1175,7 +1174,7 @@ const Index = (props) => {
                                                         }}
                                                     />
                                                     <button
-                                                        onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
+                                                        onClick={_HandleAddChild.bind(this, e?.id, e?.item)}
                                                         className="w-10 h-10 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-5 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
                                                     >
                                                         <Add className="" />
@@ -1183,7 +1182,7 @@ const Index = (props) => {
                                                 </div>
                                                 {e?.child?.filter((e) => e?.location == null)?.length >= 2 && (
                                                     <button
-                                                        onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
+                                                        onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.item)}
                                                         className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
                                                     >
                                                         <span className="absolute right-0 w-full h-full -mt-8 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
@@ -1251,7 +1250,7 @@ const Index = (props) => {
                                                                         //         </div>
                                                                         //     )
                                                                         // }
-                                                                        placeholder={"Kho - Vị trí kho xuất"}
+                                                                        placeholder={dataLang?.production_warehouse_location || 'production_warehouse_location'}
                                                                         formatOptionLabel={(option) => {
                                                                             return (
                                                                                 (option?.warehouse_name ||

@@ -5670,23 +5670,23 @@ const FilePDF = ({
                     columnGap: 2,
                 },
 
-                {
-                    text: [
-                        {
-                            text: `${props.dataLang?.production_warehouse_expWarehouse + ": " ||
-                                "production_warehouse_expWarehouse"
-                                } `,
-                            inline: true,
-                            fontSize: 10,
-                        },
-                        {
-                            text: `${data?.warehouse_name}`,
-                            bold: true,
-                            fontSize: 10,
-                        },
-                    ],
-                    margin: marginText,
-                },
+                // {
+                //     text: [
+                //         {
+                //             text: `${props.dataLang?.production_warehouse_expWarehouse + ": " ||
+                //                 "production_warehouse_expWarehouse"
+                //                 } `,
+                //             inline: true,
+                //             fontSize: 10,
+                //         },
+                //         {
+                //             text: `${data?.warehouse_name}`,
+                //             bold: true,
+                //             fontSize: 10,
+                //         },
+                //     ],
+                //     margin: marginText,
+                // },
                 {
                     text: [
                         {
@@ -5743,12 +5743,11 @@ const FilePDF = ({
                                     "headerTable",
                                     "center"
                                 ),
-                                uppercaseTextHeaderTabel(`${"VTX"}`, "headerTable", "center"),
+                                uppercaseTextHeaderTabel(`${"KX - VTX"}`, "headerTable", "center"),
                                 uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
+
                                 uppercaseTextHeaderTabel(
-                                    `${props?.dataLang?.production_warehouse_export_slPDF ||
-                                    "production_warehouse_export_slPDF"
-                                    }`,
+                                    `${props?.dataLang?.production_warehouse_export_slPDF || "production_warehouse_export_slPDF"}`,
                                     "headerTable",
                                     "center"
                                 ),
@@ -5870,9 +5869,7 @@ const FilePDF = ({
                                             stack: stackBt,
                                         },
                                         {
-                                            text: item?.warehouse_location?.location_name
-                                                ? `${item?.warehouse_location?.location_name}`
-                                                : "",
+                                            text: `${item?.warehouse_location?.warehouse_name} - ${item?.warehouse_location?.location_name}`,
                                             margin: marginTextTotal,
                                             fontSize: 10,
                                             alignment: "left",

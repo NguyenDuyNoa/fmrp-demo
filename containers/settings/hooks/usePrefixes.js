@@ -1,0 +1,15 @@
+import apiPrefix from "@/Api/apiSettings/apiPrefix"
+import { reTryQuery } from "@/configs/configRetryQuery"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
+
+export const usePrefixesList = () => {
+    return useQuery({
+        queryKey: ["api_prefixes"],
+        queryFn: async () => {
+            const { rResult } = await apiPrefix.apiListPrefix()
+            return { rResult }
+        },
+        placeholderData: keepPreviousData,
+        ...reTryQuery
+    })
+}
