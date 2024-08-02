@@ -201,8 +201,7 @@ const Index = (props) => {
                     idParenBackend: e?.item?.id,
                     matHang: {
                         e: e?.item,
-                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
                         value: e.item?.id,
                     },
                     child: e?.child.map((ce) => ({
@@ -302,7 +301,7 @@ const Index = (props) => {
             return;
         } else {
             try {
-                const { result } = await apiExportToOther.apiAjaxItemComboboxExportToOther({
+                const { data } = await apiExportToOther.apiAjaxItemComboboxExportToOther({
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
                         "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
@@ -311,7 +310,7 @@ const Index = (props) => {
                         term: inputValue,
                     },
                 });
-                sDataItems(result);
+                sDataItems(data?.result);
             } catch (error) { }
         }
     }, 500);

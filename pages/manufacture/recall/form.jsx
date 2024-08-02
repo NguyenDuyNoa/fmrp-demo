@@ -1,26 +1,3 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-
-import { Add, Trash as IconDelete, Minus } from "iconsax-react";
-
-import moment from "moment/moment";
-import DatePicker from "react-datepicker";
-import { BsCalendarEvent } from "react-icons/bs";
-import { MdClear } from "react-icons/md";
-import { NumericFormat } from "react-number-format";
-
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
-import Loading from "@/components/UI/loading";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-
-import { routerRecall } from "@/routers/manufacture";
-
 import apiComons from "@/Api/apiComon/apiComon";
 import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
 import ButtonBack from "@/components/UI/button/buttonBack";
@@ -28,14 +5,31 @@ import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { routerRecall } from "@/routers/manufacture";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
+import { debounce } from "lodash";
+import moment from "moment/moment";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useCallback, useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import { NumericFormat } from "react-number-format";
+import { v4 as uuidv4 } from "uuid";
 const Index = (props) => {
     const router = useRouter();
 
@@ -159,8 +153,7 @@ const Index = (props) => {
                     idParenBackend: e?.item?.id,
                     matHang: {
                         e: e?.item,
-                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
                         value: e.item?.id,
                     },
                     child: e?.child.map((ce) => ({
@@ -246,7 +239,7 @@ const Index = (props) => {
             return;
         } else {
             try {
-                const { data: { result } } = await apiRecall.apiItemsRecall("POST", {
+                const { data } = await apiRecall.apiItemsRecall("POST", {
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
                     },
@@ -255,7 +248,7 @@ const Index = (props) => {
                         term: inputValue,
                     },
                 });
-                sDataItems(result);
+                sDataItems(data?.result);
             } catch (error) { }
         }
     }, 500);

@@ -9,8 +9,8 @@ const apiReturns = {
         const response = await axiosCustom('GET', `/api_web/Api_return_supplier/filterBar/?csrf_protection=true`, param ? param : undefined);
         return response.data
     },
-    async apiReturnsSupplierCombobox(param) {
-        const response = await axiosCustom('GET', `/api_web/Api_return_supplier/returnsupplierCombobox/?csrf_protection=true`, param ? param : undefined);
+    async apiReturnsSupplierCombobox(method, param) {
+        const response = await axiosCustom(method, `/api_web/Api_return_supplier/returnsupplierCombobox/?csrf_protection=true`, param ? param : undefined);
         return response.data
     },
     async apiHandingStatus(data) {
@@ -25,8 +25,8 @@ const apiReturns = {
         const response = await axiosCustom('GET', `/api_web/Api_return_supplier/getDetail/${id}?csrf_protection=true`);
         return response.data
     },
-    async apiItemsReturn() {
-        const response = await axiosCustom('GET', `/api_web/Api_return_supplier/getImportItems/?csrf_protection=true`);
+    async apiItemsReturn(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_return_supplier/getImportItems/?csrf_protection=true`, params);
         return response.data
     },
     async apiQuantityStock(id, param) {

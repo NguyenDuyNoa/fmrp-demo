@@ -130,10 +130,6 @@ const Index = (props) => {
                 label: rResult?.branch_name,
                 value: rResult?.branch_id,
             });
-            sIdExportWarehouse({
-                label: rResult?.warehouse_name,
-                value: rResult?.warehouse_id,
-            });
             sCode(rResult?.code);
             sStartDate(moment(rResult?.date).toDate());
             sNote(rResult?.note);
@@ -344,7 +340,6 @@ const Index = (props) => {
         formData.append("code", code);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch?.value);
-        // formData.append("warehouse_id", idExportWarehouse?.value);
         formData.append("note", note);
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
@@ -358,27 +353,20 @@ const Index = (props) => {
             });
         });
         try {
-            const { isSuccess, message, item } = await apiProductionWarehouse.apiHangdingProductionWarehouse(
-                id ? id : undefined,
-                formData
-            );
+            const { isSuccess, message, item } = await apiProductionWarehouse.apiHangdingProductionWarehouse(id ? id : undefined, formData);
             if (isSuccess) {
                 isShow("success", `${dataLang[message]}` || message);
                 sCode("");
                 sStartDate(new Date());
                 sIdBranch(null);
-                sIdExportWarehouse(null);
                 sNote("");
                 sErrBranch(false);
                 sErrExportWarehouse(false);
                 sErrDate(false);
-                //new
                 sListData([]);
                 router.push(routerProductionWarehouse.home);
             } else {
-                handleCheckError(
-                    `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
-                );
+                handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
             }
         } catch (error) { }
         sOnSending(false);

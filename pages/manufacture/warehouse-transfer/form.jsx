@@ -55,6 +55,8 @@ const Index = (props) => {
 
     const [code, sCode] = useState("");
 
+    const [searchItems, sSearchItems] = useState("");
+
     const [startDate, sStartDate] = useState(new Date());
 
     const [effectiveDate, sEffectiveDate] = useState(null);
@@ -217,20 +219,24 @@ const Index = (props) => {
     })
 
     useQuery({
-        queryKey: ["api_items_all", idExportWarehouse],
+        queryKey: ["api_items_all", idBranch, idExportWarehouse, searchItems],
         queryFn: async () => {
-            const params = {
-                "filter[branch_id]": idBranch ? idBranch?.value : null,
-                "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-            };
-            const { data } = await apiWarehouseTransfer.apiGetSemiItems("GET", { params: params });
+            const { data } = await apiWarehouseTransfer.apiGetSemiItems(searchItems ? "POST" : "GET", {
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    "filter[warehouse_id]": searchItems ? undefined : idExportWarehouse ? idExportWarehouse?.value : null,
+                },
+                data: {
+                    term: searchItems,
+                },
+
+            });
             sDataItems(data?.result);
             return data
         },
         ...reTryQuery,
         enabled: !!idExportWarehouse
     })
-
 
     useQuery({
         queryKey: ["api_warehouse_combobox", idBranch],
@@ -257,7 +263,7 @@ const Index = (props) => {
     })
 
     useQuery({
-        queryKey: ["apilocation_combobox", idReceiveWarehouse],
+        queryKey: ["api_location_combobox", idReceiveWarehouse],
         queryFn: async () => {
             const params = {
                 "filter[warehouse_id]": idReceiveWarehouse ? idReceiveWarehouse?.value : null,
@@ -275,21 +281,23 @@ const Index = (props) => {
         enabled: !!idReceiveWarehouse
     })
 
+    console.log("optionsoptionsoptions", options);
     const _HandleSeachApi = debounce(async (inputValue) => {
         try {
             if (idBranch == null || idExportWarehouse == null || inputValue == "") {
                 return;
             } else {
-                const { data } = await apiWarehouseTransfer.apiGetSemiItems("POST", {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    },
+                sSearchItems(inputValue);
+                // const { data } = await apiWarehouseTransfer.apiGetSemiItems("POST", {
+                //     params: {
+                //         "filter[branch_id]": idBranch ? idBranch?.value : null,
+                //     },
 
-                    data: {
-                        term: inputValue,
-                    },
-                });
-                sDataItems(data?.result);
+                //     data: {
+                //         term: inputValue,
+                //     },
+                // });
+                // sDataItems(data?.result);
             }
         } catch (error) { }
     }, 500);
@@ -422,9 +430,9 @@ const Index = (props) => {
         idBranch == null && sDataWarehouse([]);
     }, [idBranch]);
 
-    useEffect(() => {
-        idExportWarehouse == null && sDataItems([]);
-    }, [idExportWarehouse]);
+    // useEffect(() => {
+    //     idExportWarehouse == null && sDataItems([]);
+    // }, [idExportWarehouse]);
 
 
     const formatNumber = (number) => {
@@ -433,10 +441,9 @@ const Index = (props) => {
 
     const handingWarehouseTransfer = useMutation({
         mutationFn: ({ url, data }) => {
-            return apiWarehouseTransfer.apiWarehouseTransfer(url, data);
+            return apiWarehouseTransfer.apiHandingTransfer(url, data);
         }
     })
-
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code);
@@ -445,7 +452,6 @@ const Index = (props) => {
         formData.append("warehouses_id", idExportWarehouse?.value);
         formData.append("warehouses_to", idReceiveWarehouse?.value);
         formData.append("note", note);
-
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
             formData.append(`items[${index}][item]`, item?.matHang?.value);
@@ -476,9 +482,7 @@ const Index = (props) => {
                     sListData([]);
                     router.push(routerWarehouseTransfer.home);
                 } else {
-                    handleCheckError(
-                        `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
-                    );
+                    handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
                 }
             }
         })
