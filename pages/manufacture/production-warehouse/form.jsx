@@ -397,7 +397,7 @@ const Index = (props) => {
     };
 
     const _ServerSending = async () => {
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append("code", code);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch?.value);
@@ -410,10 +410,7 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
                 formData.append(`items[${index}][child][${childIndex}][unit]`, childItem?.unit?.value);
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
-                formData.append(
-                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.location?.value || 0
-                );
+                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.exportQuantity);
             });
         });
@@ -544,28 +541,24 @@ const Index = (props) => {
     };
 
     const _HandleDeleteChild = (parentId, childId) => {
-        const newData = listData
-            .map((e) => {
-                if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.id !== childId);
-                    return { ...e, child: newChild };
-                }
-                return e;
-            })
-            .filter((e) => e.child?.length > 0);
+        const newData = listData.map((e) => {
+            if (e.id === parentId) {
+                const newChild = e.child?.filter((ce) => ce?.id !== childId);
+                return { ...e, child: newChild };
+            }
+            return e;
+        }).filter((e) => e.child?.length > 0);
         sListData([...newData]);
     };
 
     const _HandleDeleteAllChild = (parentId) => {
-        const newData = listData
-            .map((e) => {
-                if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.location !== null);
-                    return { ...e, child: newChild };
-                }
-                return e;
-            })
-            .filter((e) => e.child?.length > 0);
+        const newData = listData.map((e) => {
+            if (e.id === parentId) {
+                const newChild = e.child?.filter((ce) => ce?.location !== null);
+                return { ...e, child: newChild };
+            }
+            return e;
+        }).filter((e) => e.child?.length > 0);
         sListData([...newData]);
     };
 

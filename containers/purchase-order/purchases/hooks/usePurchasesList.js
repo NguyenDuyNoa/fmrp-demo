@@ -10,6 +10,7 @@ export const usePurchasesList = (params) => {
 
             return { output, rResult }
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 }

@@ -19,7 +19,7 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import PopupServie from "@/containers/purchase-order/servicev-voucher/components/popup";
+import PopupServieVoucher from "@/containers/purchase-order/servicev-voucher/components/popup";
 import PopupDetail from "@/containers/purchase-order/servicev-voucher/components/popupDetail";
 import { useBranchList } from "@/hooks/common/useBranch";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -44,7 +44,6 @@ import { useSelector } from "react-redux";
 import { useServiceVoucherCombobox } from "./hooks/useServiceVoucherCombobox";
 import { useServicevVoucherFilterbar } from "./hooks/useServicevVoucherFilterbar";
 import { useServicevVoucherList } from "./hooks/useServicevVoucherList";
-import { useServiceVoucherExcel } from "./hooks/useServiceVoucherExcel";
 registerLocale("vi", vi);
 
 const initialState = {
@@ -96,8 +95,6 @@ const ServicevVoucher = (props) => {
     const { data: listBr = [] } = useBranchList()
 
     const { data, isFetching, refetch } = useServicevVoucherList(params);
-
-    const a = useServiceVoucherExcel(dataLang, data);
 
     const { data: listCode = [] } = useServiceVoucherCombobox(isState.keySearchCode);
 
@@ -250,7 +247,7 @@ const ServicevVoucher = (props) => {
                             </h2>
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
-                                    <PopupServie
+                                    <PopupServieVoucher
                                         onRefreshGroup={refetchFilter.bind(this)}
                                         onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}

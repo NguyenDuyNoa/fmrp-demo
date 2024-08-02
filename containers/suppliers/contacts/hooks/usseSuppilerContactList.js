@@ -1,6 +1,6 @@
 import apiContact from "@/Api/apiSuppliers/contacts/apiContact";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const usseSuppilerContactList = (params) => {
     return useQuery({
@@ -11,6 +11,7 @@ export const usseSuppilerContactList = (params) => {
 
             return { rResult, output }
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 }

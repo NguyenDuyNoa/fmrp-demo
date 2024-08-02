@@ -1,12 +1,13 @@
-import apiComons from "@/Api/apiComon/apiComon";
 import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
-import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useSupplierList } from "@/containers/suppliers/supplier/hooks/useSupplierList";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useTaxList } from "@/hooks/common/useTaxs";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
@@ -28,7 +29,7 @@ import { useSelector } from "react-redux";
 import Select from "react-select";
 import { v4 as uuidv4 } from "uuid";
 registerLocale("vi", vi);
-const Popup_servie = (props) => {
+const PopupServieVoucher = (props) => {
     let id = props?.id;
 
     const dataLang = props.dataLang;
@@ -43,23 +44,6 @@ const Popup_servie = (props) => {
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "servicev_voucher");
 
-    const _HandleOpenModal = (e) => {
-        if (id) {
-            if (role || checkEdit) {
-                if (props?.status_pay != "not_spent") {
-                    sOpen(false);
-                    isShow("error", `${"Phiếu dịch vụ đã chi. Không thể sửa"}`);
-                } else {
-                    sOpen(true);
-                }
-            } else {
-                isShow("warning", WARNING_STATUS_ROLE);
-            }
-        } else {
-            sOpen(true);
-        }
-    };
-
     const _HandleCloseModal = () => sOpen(false);
 
     const [onSending, sOnSending] = useState(false);
@@ -68,14 +52,14 @@ const Popup_servie = (props) => {
         {
             id: Date.now(),
             idData: "",
-            dichvu: "",
-            soluong: 1,
-            dongia: 0,
-            chietkhau: 0,
-            dongiasauck: 0,
-            thue: 0,
-            thanhtien: 0,
-            ghichu: "",
+            service: "",
+            quantity: 1,
+            price: 0,
+            discount: 0,
+            affterPriceDiscount: 0,
+            tax: 0,
+            money: 0,
+            note: "",
         },
     ]);
     const slicedArr = option.slice(1);
@@ -94,15 +78,9 @@ const Popup_servie = (props) => {
 
     const [note, sNote] = useState("");
 
-    const [chietkhautong, sChietkhautong] = useState(0);
+    const [discount, sDiscount] = useState(0);
 
-    const [thuetong, sThuetong] = useState(0);
-
-    const [dataTasxes, sDataTasxes] = useState([]);
-
-    const [dataSupplier, sDataSupplier] = useState([]);
-
-    const [dataBranch, sDataBranch] = useState([]);
+    const [tax, sTax] = useState(0);
 
     const [errDate, sErrDate] = useState(false);
 
@@ -112,28 +90,60 @@ const Popup_servie = (props) => {
 
     const [errService, sErrService] = useState(false);
 
+    const [total, setTotal] = useState({
+        totalMoney: 0,
+        totalDiscount: 0,
+        totalAffterDiscount: 0,
+        totalTax: 0,
+        totalAmountMoney: 0,
+    });
+
+    const { data: dataBranch = [] } = useBranchList();
+
+    const { data: dataTasxes = [] } = useTaxList();
+
+    const { data: listSupplier } = useSupplierList({ "filter[branch_id]": valueBr != null ? valueBr.value : null, });
+
+    const dataSupplier = valueBr ? listSupplier?.rResult?.map((e) => ({ label: e.name, value: e.id })) : []
+
+    const _HandleOpenModal = (e) => {
+        if (id) {
+            if (role || checkEdit) {
+                if (props?.status_pay != "not_spent") {
+                    sOpen(false);
+                    isShow("error", `${"Phiếu dịch vụ đã chi. Không thể sửa"}`);
+                } else {
+                    sOpen(true);
+                }
+            } else {
+                isShow("warning", WARNING_STATUS_ROLE);
+            }
+        } else {
+            sOpen(true);
+        }
+    };
+
     useEffect(() => {
         open && sDate(new Date());
         open && sCode("");
         open && sValueBr(null);
         open && sValueSupplier(null);
-        open &&
-            sOption([
-                {
-                    id: Date.now(),
-                    idData: " ",
-                    dichvu: "",
-                    soluong: 1,
-                    dongia: 0,
-                    chietkhau: 0,
-                    dongiasauck: 0,
-                    thue: 0,
-                    thanhtien: 0,
-                    ghichu: "",
-                },
-            ]);
-        open && sThuetong(0);
-        open && sChietkhautong(0);
+        open && sOption([
+            {
+                id: Date.now(),
+                idData: " ",
+                service: "",
+                quantity: 1,
+                price: 0,
+                discount: 0,
+                affterPriceDiscount: 0,
+                tax: 0,
+                money: 0,
+                note: "",
+            },
+        ]);
+        open && sTax(0);
+        open && sDiscount(0);
         open && sNote("");
         open && sErrBranch(false);
         open && sErrSupplier(false);
@@ -156,18 +166,18 @@ const Popup_servie = (props) => {
                 db?.item?.map((e) => ({
                     id: e?.id,
                     idData: e?.id,
-                    dichvu: e?.name,
-                    soluong: Number(e?.quantity),
-                    dongia: Number(e?.price),
-                    chietkhau: Number(e?.discount_percent),
-                    dongiasauck: Number(e?.price) * (1 - Number(e?.discount_percent) / 100),
-                    thue: {
+                    service: e?.name,
+                    quantity: Number(e?.quantity),
+                    price: Number(e?.price),
+                    discount: Number(e?.discount_percent),
+                    affterPriceDiscount: Number(e?.price) * (1 - Number(e?.discount_percent) / 100),
+                    tax: {
                         label: e?.tax_name ? e?.tax_name : "Miễn thuế",
                         value: e?.tax_id,
                         tax_rate: Number(e?.tax_rate),
                     },
-                    thanhtien: Number(e?.amount),
-                    ghichu: e?.note,
+                    money: Number(e?.amount),
+                    note: e?.note,
                 }))
             );
             return db
@@ -175,40 +185,7 @@ const Popup_servie = (props) => {
         enabled: open && !!id
     })
 
-    useQuery({
-        queryKey: ["api_combobox_branch_taxt"],
-        queryFn: async () => {
-            const { result: branch } = await apiComons.apiBranchCombobox();
-            const { rResult: tax } = await apiComons.apiListTax();
-
-            sDataBranch(branch?.map((e) => ({ label: e.name, value: e.id })));
-            sDataTasxes(
-                tax?.map((e) => ({
-                    label: e.name,
-                    value: e.id,
-                    tax_rate: e.tax_rate,
-                })))
-
-            return { branch, tax }
-        },
-        enabled: open
-    })
-
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
-
-    useQuery({
-        queryKey: ["api_combobox_supplier", valueBr],
-        queryFn: async () => {
-            const { rResult } = await apiSuppliers.apiListSuppliers({
-                params: {
-                    "filter[branch_id]": valueBr != null ? valueBr.value : null,
-                }
-            });
-            sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
-            return rResult
-        },
-        enabled: !!valueBr
-    })
 
     // add option form
     const _HandleAddNew = () => {
@@ -217,14 +194,14 @@ const Popup_servie = (props) => {
             {
                 id: Date.now(),
                 idData: "",
-                dichvu: "",
-                soluong: 1,
-                dongia: 0,
-                chietkhau: 0,
-                dongiasauck: 0,
-                thue: 0,
-                thanhtien: 0,
-                ghichu: "",
+                service: "",
+                quantity: 1,
+                price: 0,
+                discount: 0,
+                affterPriceDiscount: 0,
+                tax: 0,
+                money: 0,
+                note: "",
             },
         ]);
     };
@@ -243,52 +220,52 @@ const Popup_servie = (props) => {
             sValueSupplier(value);
         } else if (type === "note") {
             sNote(value?.target.value);
-        } else if (type == "thuetong") {
-            sThuetong(value);
-        } else if (type == "chietkhautong") {
-            sChietkhautong(value?.value);
+        } else if (type == "tax") {
+            sTax(value);
+        } else if (type == "discount") {
+            sDiscount(value?.value);
         }
     };
 
     useEffect(() => {
-        if (thuetong == null) return;
+        if (tax == null) return;
         sOption((prevOption) => {
             const newOption = [...prevOption];
-            const thueValue = thuetong?.tax_rate || 0;
-            const chietKhauValue = chietkhautong || 0;
+            const taxValue = tax?.tax_rate || 0;
+            const chietKhauValue = discount || 0;
             newOption.forEach((item, index) => {
-                const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-                const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong;
-                item.thue = thuetong;
-                item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+                const affterPriceDiscount = item?.price * (1 - chietKhauValue / 100);
+                const money = affterPriceDiscount * (1 + taxValue / 100) * item.quantity;
+                item.tax = tax;
+                item.money = isNaN(money) ? 0 : money;
             });
             return newOption;
         });
-    }, [thuetong]);
+    }, [tax]);
 
     useEffect(() => {
-        if (chietkhautong == null) return;
+        if (discount == null) return;
         sOption((prevOption) => {
             const newOption = [...prevOption];
-            const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0;
-            const chietKhauValue = chietkhautong ? chietkhautong : 0;
+            const taxValue = tax?.tax_rate != undefined ? tax?.tax_rate : 0;
+            const chietKhauValue = discount ? discount : 0;
             newOption.forEach((item, index) => {
-                const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-                const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong;
-                item.thue = thuetong;
-                item.chietkhau = Number(chietkhautong);
-                item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
-                item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+                const affterPriceDiscount = item?.price * (1 - chietKhauValue / 100);
+                const money = affterPriceDiscount * (1 + taxValue / 100) * item.quantity;
+                item.tax = tax;
+                item.discount = Number(discount);
+                item.affterPriceDiscount = isNaN(affterPriceDiscount) ? 0 : affterPriceDiscount;
+                item.money = isNaN(money) ? 0 : money;
             });
             return newOption;
         });
-    }, [chietkhautong]);
+    }, [discount]);
     const _HandleSubmit = (e) => {
         e.preventDefault();
 
-        const hasNullLabel = option.some((item) => item.dichvu === "");
+        const hasNullLabel = option.some((item) => item.service === "");
         const check = option.some(
-            (item) => item.soluong == 0 || item.soluong == "" || item.dongia == 0 || item.dongia == ""
+            (item) => item.quantity == 0 || item.quantity == "" || item.price == 0 || item.price == ""
         );
         if (date == null || valueSupplier == null || valueBr == null || hasNullLabel || check) {
             date == null && sErrDate(true);
@@ -302,7 +279,7 @@ const Popup_servie = (props) => {
     };
 
     useEffect(() => {
-        option?.filter((e) => e.dichvu === "") && sErrService(false);
+        option?.filter((e) => e.service === "") && sErrService(false);
     }, [option]);
 
     useEffect(() => {
@@ -319,115 +296,115 @@ const Popup_servie = (props) => {
 
     const _HandleChangeInputOption = (id, type, index3, value) => {
         var index = option.findIndex((x) => x.id === id);
-        if (type === "dichvu") {
-            option[index].dichvu = value.target.value;
+        if (type === "service") {
+            option[index].service = value.target.value;
             if (value.target.value.length > 0 && index === option.length - 1) {
                 option.push({
                     id: uuidv4(),
                     idData: "",
-                    dichvu: "",
-                    soluong: 1,
-                    dongia: 0,
-                    chietkhau: chietkhautong ? chietkhautong : 0,
-                    dongiasauck: 0,
-                    thue: thuetong ? thuetong : 0,
-                    thanhtien: 0,
+                    service: "",
+                    quantity: 1,
+                    price: 0,
+                    discount: discount ? discount : 0,
+                    affterPriceDiscount: 0,
+                    tax: tax ? tax : 0,
+                    money: 0,
                 });
                 sOption([...option]);
             }
         } else if (type == "donvitinh") {
             option[index].donvitinh = value.target?.value;
-        } else if (type === "soluong") {
-            option[index].soluong = Number(value?.value);
-            if (option[index].thue?.tax_rate == undefined) {
-                const tien = Number(option[index].dongiasauck) * (1 + Number(0) / 100) * Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+        } else if (type === "quantity") {
+            option[index].quantity = Number(value?.value);
+            if (option[index].tax?.tax_rate == undefined) {
+                const tien = Number(option[index].affterPriceDiscount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             } else {
                 const tien =
-                    Number(option[index].dongiasauck) *
-                    (1 + Number(option[index].thue?.tax_rate) / 100) *
-                    Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+                    Number(option[index].affterPriceDiscount) *
+                    (1 + Number(option[index].tax?.tax_rate) / 100) *
+                    Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             }
             sOption([...option]);
-        } else if (type == "dongia") {
-            option[index].dongia = Number(value.value);
-            option[index].dongiasauck = +option[index].dongia * (1 - option[index].chietkhau / 100);
-            option[index].dongiasauck = +(Math.round(option[index].dongiasauck + "e+2") + "e-2");
-            if (option[index].thue?.tax_rate == undefined) {
-                const tien = Number(option[index].dongiasauck) * (1 + Number(0) / 100) * Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+        } else if (type == "price") {
+            option[index].price = Number(value.value);
+            option[index].affterPriceDiscount = +option[index].price * (1 - option[index].discount / 100);
+            option[index].affterPriceDiscount = +(Math.round(option[index].affterPriceDiscount + "e+2") + "e-2");
+            if (option[index].tax?.tax_rate == undefined) {
+                const tien = Number(option[index].affterPriceDiscount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             } else {
                 const tien =
-                    Number(option[index].dongiasauck) *
-                    (1 + Number(option[index].thue?.tax_rate) / 100) *
-                    Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+                    Number(option[index].affterPriceDiscount) *
+                    (1 + Number(option[index].tax?.tax_rate) / 100) *
+                    Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             }
-        } else if (type == "chietkhau") {
-            option[index].chietkhau = Number(value.value);
-            option[index].dongiasauck = +option[index].dongia * (1 - option[index].chietkhau / 100);
-            option[index].dongiasauck = +(Math.round(option[index].dongiasauck + "e+2") + "e-2");
-            if (option[index].thue?.tax_rate == undefined) {
-                const tien = Number(option[index].dongiasauck) * (1 + Number(0) / 100) * Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+        } else if (type == "discount") {
+            option[index].discount = Number(value.value);
+            option[index].affterPriceDiscount = +option[index].price * (1 - option[index].discount / 100);
+            option[index].affterPriceDiscount = +(Math.round(option[index].affterPriceDiscount + "e+2") + "e-2");
+            if (option[index].tax?.tax_rate == undefined) {
+                const tien = Number(option[index].affterPriceDiscount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             } else {
                 const tien =
-                    Number(option[index].dongiasauck) *
-                    (1 + Number(option[index].thue?.tax_rate) / 100) *
-                    Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+                    Number(option[index].affterPriceDiscount) *
+                    (1 + Number(option[index].tax?.tax_rate) / 100) *
+                    Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             }
-        } else if (type == "thue") {
-            option[index].thue = value;
-            if (option[index].thue?.tax_rate == undefined) {
-                const tien = Number(option[index].dongiasauck) * (1 + Number(0) / 100) * Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+        } else if (type == "tax") {
+            option[index].tax = value;
+            if (option[index].tax?.tax_rate == undefined) {
+                const tien = Number(option[index].affterPriceDiscount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             } else {
                 const tien =
-                    Number(option[index].dongiasauck) *
-                    (1 + Number(option[index].thue?.tax_rate) / 100) *
-                    Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+                    Number(option[index].affterPriceDiscount) *
+                    (1 + Number(option[index].tax?.tax_rate) / 100) *
+                    Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             }
-        } else if (type == "ghichu") {
-            option[index].ghichu = value?.target?.value;
+        } else if (type == "note") {
+            option[index].note = value?.target?.value;
         }
         sOption([...option]);
     };
 
     const handleIncrease = (id) => {
         const index = option.findIndex((x) => x.id === id);
-        const newQuantity = option[index].soluong + 1;
-        option[index].soluong = newQuantity;
-        if (option[index].thue?.tax_rate == undefined) {
-            const tien = Number(option[index].dongiasauck) * (1 + Number(0) / 100) * Number(option[index].soluong);
-            option[index].thanhtien = Number(tien.toFixed(2));
+        const newQuantity = option[index].quantity + 1;
+        option[index].quantity = newQuantity;
+        if (option[index].tax?.tax_rate == undefined) {
+            const tien = Number(option[index].affterPriceDiscount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+            option[index].money = Number(tien.toFixed(2));
         } else {
             const tien =
-                Number(option[index].dongiasauck) *
-                (1 + Number(option[index].thue?.tax_rate) / 100) *
-                Number(option[index].soluong);
-            option[index].thanhtien = Number(tien.toFixed(2));
+                Number(option[index].affterPriceDiscount) *
+                (1 + Number(option[index].tax?.tax_rate) / 100) *
+                Number(option[index].quantity);
+            option[index].money = Number(tien.toFixed(2));
         }
         sOption([...option]);
     };
 
     const handleDecrease = (id) => {
         const index = option.findIndex((x) => x.id === id);
-        const newQuantity = Number(option[index].soluong) - 1;
+        const newQuantity = Number(option[index].quantity) - 1;
         if (newQuantity >= 1) {
             // chỉ giảm số lượng khi nó lớn hơn hoặc bằng 1
-            option[index].soluong = Number(newQuantity);
-            if (option[index].thue?.tax_rate == undefined) {
-                const tien = Number(option[index].dongiasauck) * (1 + Number(0) / 100) * Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+            option[index].quantity = Number(newQuantity);
+            if (option[index].tax?.tax_rate == undefined) {
+                const tien = Number(option[index].affterPriceDiscount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             } else {
                 const tien =
-                    Number(option[index].dongiasauck) *
-                    (1 + Number(option[index].thue?.tax_rate) / 100) *
-                    Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
+                    Number(option[index].affterPriceDiscount) *
+                    (1 + Number(option[index].tax?.tax_rate) / 100) *
+                    Number(option[index].quantity);
+                option[index].money = Number(tien.toFixed(2));
             }
             sOption([...option]);
         } else {
@@ -452,49 +429,42 @@ const Popup_servie = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     };
 
-    const tinhTongTien = (option) => {
-        const tongTien = option?.reduce(
-            (accumulator, currentValue) => accumulator + currentValue?.dongia * currentValue?.soluong,
+    const caculateMoney = (option) => {
+        const totalMoney = option?.reduce(
+            (accumulator, currentValue) => accumulator + currentValue?.price * currentValue?.quantity,
             0
         );
 
-        const tienChietKhau = option?.reduce((acc, item) => {
-            const chiTiet = item?.dongia * (item?.chietkhau / 100) * item?.soluong;
-            return acc + chiTiet;
+        const totalDiscount = option?.reduce((acc, item) => {
+            const caculateMoney = item?.price * (item?.discount / 100) * item?.quantity;
+            return acc + caculateMoney;
         }, 0);
 
-        const tongTienSauCK = option?.reduce((acc, item) => {
-            const tienSauCK = item?.soluong * item?.dongiasauck;
-            return acc + tienSauCK;
+        const totalAffterDiscount = option?.reduce((acc, item) => {
+            const caculateMoney = item?.quantity * item?.affterPriceDiscount;
+            return acc + caculateMoney;
         }, 0);
 
-        const tienThue = option?.reduce((acc, item) => {
-            const tienThueItem =
-                item?.dongiasauck * (isNaN(item?.thue?.tax_rate) ? 0 : item?.thue?.tax_rate / 100) * item?.soluong;
-            return acc + tienThueItem;
+        const totalTax = option?.reduce((acc, item) => {
+            const caculateMoney =
+                item?.affterPriceDiscount * (isNaN(item?.tax?.tax_rate) ? 0 : item?.tax?.tax_rate / 100) * item?.quantity;
+            return acc + caculateMoney;
         }, 0);
 
-        const tongThanhTien = option?.reduce((acc, item) => acc + item?.thanhtien, 0);
+        const totalAmountMoney = option?.reduce((acc, item) => acc + item?.money, 0);
         return {
-            tongTien: tongTien || 0,
-            tienChietKhau: tienChietKhau || 0,
-            tongTienSauCK: tongTienSauCK || 0,
-            tienThue: tienThue || 0,
-            tongThanhTien: tongThanhTien || 0,
+            totalMoney: totalMoney || 0,
+            totalDiscount: totalDiscount || 0,
+            totalAffterDiscount: totalAffterDiscount || 0,
+            totalTax: totalTax || 0,
+            totalAmountMoney: totalAmountMoney || 0,
         };
     };
 
-    const [tongTienState, setTongTienState] = useState({
-        tongTien: 0,
-        tienChietKhau: 0,
-        tongTienSauCK: 0,
-        tienThue: 0,
-        tongThanhTien: 0,
-    });
 
     useEffect(() => {
-        const tongTien = tinhTongTien(option);
-        setTongTienState(tongTien);
+        const totalMoney = caculateMoney(option);
+        setTotal(totalMoney);
     }, [option]);
 
     const handingService = useMutation({
@@ -512,12 +482,12 @@ const Popup_servie = (props) => {
         formData.append("note", note);
         sortedArr.forEach((item, index) => {
             formData.append(`items[${index}][id]`, props?.id ? item?.idData : "");
-            formData.append(`items[${index}][name]`, item?.dichvu ? item?.dichvu : "");
-            formData.append(`items[${index}][price]`, item?.dongia ? item?.dongia : "");
-            formData.append(`items[${index}][quantity]`, item?.soluong ? item?.soluong : "");
-            formData.append(`items[${index}][discount_percent]`, item?.chietkhau ? item?.chietkhau : "");
-            formData.append(`items[${index}][tax_id]`, item?.thue?.value != undefined ? item?.thue?.value : "");
-            formData.append(`items[${index}][note]`, item?.ghichu ? item?.ghichu : "");
+            formData.append(`items[${index}][name]`, item?.service ? item?.service : "");
+            formData.append(`items[${index}][price]`, item?.price ? item?.price : "");
+            formData.append(`items[${index}][quantity]`, item?.quantity ? item?.quantity : "");
+            formData.append(`items[${index}][discount_percent]`, item?.discount ? item?.discount : "");
+            formData.append(`items[${index}][tax_id]`, item?.tax?.value != undefined ? item?.tax?.value : "");
+            formData.append(`items[${index}][note]`, item?.note ? item?.note : "");
         });
         handingService.mutate(formData, {
             onSuccess: ({ isSuccess, message }) => {
@@ -535,13 +505,13 @@ const Popup_servie = (props) => {
                         {
                             id: Date.now(),
                             idData: "",
-                            dichvu: "",
-                            soluong: 1,
-                            dongia: 0,
-                            chietkhau: 0,
-                            dongiasauck: 0,
-                            thue: 0,
-                            thanhtien: 0,
+                            service: "",
+                            quantity: 1,
+                            price: 0,
+                            discount: 0,
+                            affterPriceDiscount: 0,
+                            tax: 0,
+                            money: 0,
                         },
                     ]);
                     props.onRefresh && props.onRefresh();
@@ -758,12 +728,12 @@ const Popup_servie = (props) => {
                                 <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
                                     <div className="col-span-2  my-auto ">
                                         <textarea
-                                            value={e?.dichvu}
-                                            onChange={_HandleChangeInputOption.bind(this, e?.id, "dichvu", index)}
+                                            value={e?.service}
+                                            onChange={_HandleChangeInputOption.bind(this, e?.id, "service", index)}
                                             name="optionEmail"
                                             placeholder="Dịch vụ"
                                             type="text"
-                                            className={`${errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"} placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
+                                            className={`${errService && e?.service == "" ? "border-red-500" : "border-gray-300"} placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
                                         />
                                     </div>
                                     <div className="col-span-2 flex items-center justify-center">
@@ -776,9 +746,9 @@ const Popup_servie = (props) => {
                                                 <Minus className="scale-70" size="16" />
                                             </button>
                                             <InPutNumericFormat
-                                                className={`${(e?.soluong == 0 && "border-red-500") || (e?.soluong == "" && "border-red-500")} appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong", e)}
-                                                value={e?.soluong}
+                                                className={`${(e?.quantity == 0 && "border-red-500") || (e?.quantity == "" && "border-red-500")} appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "quantity", e)}
+                                                value={e?.quantity}
                                                 isAllowed={isAllowedNumber}
                                             />
                                             <button
@@ -792,22 +762,22 @@ const Popup_servie = (props) => {
                                     </div>
                                     <div className="col-span-1 text-center flex items-center justify-center">
                                         <InPutMoneyFormat
-                                            value={e?.dongia}
-                                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia", index)}
-                                            className={`${(e?.dongia == 0 && "border-red-500") || (e?.dongia == "" && "border-red-500")} appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none border-b-2 border-gray-200`}
+                                            value={e?.price}
+                                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, "price", index)}
+                                            className={`${(e?.price == 0 && "border-red-500") || (e?.price == "" && "border-red-500")} appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none border-b-2 border-gray-200`}
                                         />
                                     </div>
                                     <div className="col-span-1 text-center flex items-center justify-center">
                                         <InPutNumericFormat
-                                            value={e?.chietkhau}
-                                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau", index)}
+                                            value={e?.discount}
+                                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, "discount", index)}
                                             className="appearance-none text-center py-1 px-1 font-normal w-[90%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12px] border-gray-200"
                                             isAllowed={isAllowedDiscount}
                                         />
                                     </div>
                                     <div className="col-span-1 text-right flex items-center justify-end">
                                         <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12px]">
-                                            {formatNumber(e?.dongiasauck)}
+                                            {formatNumber(e?.affterPriceDiscount)}
                                         </h3>
                                     </div>
                                     <div className="col-span-2 flex justify-center items-center">
@@ -816,10 +786,10 @@ const Popup_servie = (props) => {
                                             placeholder={props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}
                                             options={taxOptions}
                                             isSearchable={true}
-                                            onChange={_HandleChangeInputOption.bind(this, e?.id, "thue", index)}
+                                            onChange={_HandleChangeInputOption.bind(this, e?.id, "tax", index)}
                                             LoadingIndicator
                                             noOptionsMessage={() => "Không có dữ liệu"}
-                                            value={e?.thue}
+                                            value={e?.tax}
                                             maxMenuHeight="200px"
                                             isClearable={true}
                                             menuPortalTarget={document.body}
@@ -856,13 +826,13 @@ const Popup_servie = (props) => {
                                     </div>
                                     <div className="col-span-1 text-right flex items-center justify-end">
                                         <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12px]">
-                                            {formatMoney(e?.thanhtien)}
+                                            {formatMoney(e?.money)}
                                         </h3>
                                     </div>
                                     <div className="col-span-1 flex items-center justify-center">
                                         <textarea
-                                            value={e?.ghichu}
-                                            onChange={_HandleChangeInputOption.bind(this, e?.id, "ghichu", index)}
+                                            value={e?.note}
+                                            onChange={_HandleChangeInputOption.bind(this, e?.id, "note", index)}
                                             name="optionEmail"
                                             placeholder="Ghi chú"
                                             type="text"
@@ -890,8 +860,8 @@ const Popup_servie = (props) => {
                                 <div className="col-span-1 text-center flex items-center justify-center">
                                     <InPutNumericFormat
                                         isAllowed={isAllowedDiscount}
-                                        value={chietkhautong}
-                                        onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
+                                        value={discount}
+                                        onValueChange={_HandleChangeInput.bind(this, "discount")}
                                         className=" text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
                                     />
                                 </div>
@@ -905,10 +875,10 @@ const Popup_servie = (props) => {
                                     placeholder={dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}
                                     options={taxOptions}
                                     isSearchable={true}
-                                    onChange={_HandleChangeInput.bind(this, "thuetong")}
+                                    onChange={_HandleChangeInput.bind(this, "tax")}
                                     LoadingIndicator
                                     noOptionsMessage={() => "Không có dữ liệu"}
-                                    value={thuetong}
+                                    value={tax}
                                     maxMenuHeight="200px"
                                     isClearable={true}
                                     menuPortalTarget={document.body}
@@ -973,7 +943,7 @@ const Popup_servie = (props) => {
                                         <h3>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tongTien)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(total.totalMoney)}</h3>
                                     </div>
                                 </div>
                                 <div className="flex justify-between ">
@@ -984,7 +954,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tienChietKhau)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(total.totalDiscount)}</h3>
                                     </div>
                                 </div>
                                 <div className="flex justify-between ">
@@ -994,7 +964,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tongTienSauCK)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(total.totalAffterDiscount)}</h3>
                                     </div>
                                 </div>
                                 <div className="flex justify-between ">
@@ -1004,7 +974,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tienThue)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(total.totalTax)}</h3>
                                     </div>
                                 </div>
                                 <div className="flex justify-between ">
@@ -1014,7 +984,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tongThanhTien)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(total.totalAmountMoney)}</h3>
                                     </div>
                                 </div>
                                 <div className="space-x-2">
@@ -1041,4 +1011,4 @@ const Popup_servie = (props) => {
         </>
     );
 };
-export default Popup_servie;
+export default PopupServieVoucher;

@@ -1,6 +1,6 @@
 import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useReturnSalesList = (params) => {
     return useQuery({
@@ -10,6 +10,7 @@ export const useReturnSalesList = (params) => {
 
             return { rResult, output, rTotal }
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 }

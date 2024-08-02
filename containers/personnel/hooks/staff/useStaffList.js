@@ -1,6 +1,6 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useStaffList = (params) => {
     return useQuery({
@@ -9,6 +9,7 @@ export const useStaffList = (params) => {
             const { rResult, output } = await apiSatff.apiListStaff({ params });
             return { rResult, output }
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 }

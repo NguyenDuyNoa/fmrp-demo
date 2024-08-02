@@ -1,6 +1,6 @@
 import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useOrderList = (params) => {
     return useQuery({
@@ -10,6 +10,7 @@ export const useOrderList = (params) => {
 
             return { rResult, output, rTotal }
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 }

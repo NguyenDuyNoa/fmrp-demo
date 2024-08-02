@@ -1,6 +1,6 @@
 import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useServicevVoucherList = (params) => {
     return useQuery({
@@ -10,6 +10,7 @@ export const useServicevVoucherList = (params) => {
 
             return { rResult, output, rTotal }
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 }

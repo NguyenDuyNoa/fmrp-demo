@@ -1,6 +1,6 @@
 import apiItems from "@/Api/apiMaterial/items/apiItems";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useItemList = (params) => {
     return useQuery({
@@ -9,6 +9,7 @@ export const useItemList = (params) => {
             const { output, rResult } = await apiItems.apiListItems({ params: params });
             return { output, rResult }
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 

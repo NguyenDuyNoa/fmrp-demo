@@ -1,6 +1,6 @@
 import apiClient from "@/Api/apiClients/client/apiClient";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useClientList = (params) => {
     return useQuery({
@@ -14,6 +14,7 @@ export const useClientList = (params) => {
 
             return { rResult, output }
         },
+        placeholderData: keepPreviousData,
         ...reTryQuery
     });
 }

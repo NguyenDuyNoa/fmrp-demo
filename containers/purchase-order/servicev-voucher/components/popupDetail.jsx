@@ -1,28 +1,25 @@
-import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import ImageErrors from "@/components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useQuery } from "@tanstack/react-query";
-import ImageErrors from "components/UI/imageErrors";
-import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { useServiceVoucherDetail } from "../hooks/useServiceVoucherDetail";
 import PopupCustom from "/components/UI/popup";
 
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
-
-    const [data, sData] = useState();
 
     const dataSeting = useSetingServer();
 
@@ -34,15 +31,7 @@ const PopupDetail = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     }
 
-    const { isFetching } = useQuery({
-        queryKey: ["api_detail_service", props?.id],
-        queryFn: async () => {
-            const res = await apiServiceVoucher.apiDetailService(props?.id);
-            sData(res);
-            return res
-        },
-        enabled: open && !!props?.id,
-    })
+    const { data, isFetching } = useServiceVoucherDetail(open, props?.id);
 
 
     return (
