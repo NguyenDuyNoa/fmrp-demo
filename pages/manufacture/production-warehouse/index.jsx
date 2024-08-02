@@ -569,7 +569,7 @@ const Index = (props) => {
                             </div>
                             <Customscrollbar>
                                 <div className="w-full">
-                                    <HeaderTable gridCols={10}>
+                                    <HeaderTable gridCols={9}>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                         </ColumnTable>
@@ -579,9 +579,9 @@ const Index = (props) => {
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {/* <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}
-                                        </ColumnTable>
+                                        </ColumnTable> */}
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                         </ColumnTable>
@@ -607,7 +607,7 @@ const Index = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                 {isState.data?.map((e) => (
-                                                    <RowTable gridCols={10} key={e.id.toString()}>
+                                                    <RowTable gridCols={9} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
@@ -622,11 +622,11 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {/* {formatNumber(e.total_price)} */}
                                                         </RowItemTable>
-                                                        <LinkWarehouse
+                                                        {/* <LinkWarehouse
                                                             colSpan={1}
                                                             warehouse_id={e?.warehouse_id}
                                                             warehouse_name={e?.warehouse_name}
-                                                        />
+                                                        /> */}
                                                         <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatNumber(e?.grand_total)}
                                                         </RowItemTable>
@@ -707,8 +707,8 @@ const Index = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <ContainerTotal className="!grid-cols-10">
-                        <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
+                    <ContainerTotal className="!grid-cols-9">
+                        <ColumnTable colSpan={3} textAlign={"center"} className="p-2">
                             {dataLang?.import_total || "import_total"}
                         </ColumnTable>
                         <ColumnTable colSpan={1} textAlign="right" className={"p-2 mr-1"}>

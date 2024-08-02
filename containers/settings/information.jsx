@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import LoadingItems from "/components/UI/loading";
 
-const Index = (props) => {
+const Information = (props) => {
     const dataLang = props.dataLang;
 
     const isShow = useToast();
@@ -451,4 +451,4 @@ const Btn_Setting = React.memo((props) => {
 });
 
 export { ListBtn_Setting };
-export default Index;
+export default Information;

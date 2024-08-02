@@ -1,8 +1,8 @@
 import Category from '@/containers/settings/category'
 import React from 'react'
 
-const category = (props) => {
+const Index = (props) => {
     return <Category {...props} />
 }
 
-export default category
+export default Index
