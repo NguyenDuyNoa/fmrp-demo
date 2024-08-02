@@ -67,7 +67,7 @@ const SuppliersGroups = (props) => {
 
     const { data, isLoading, isFetching, refetch } = useSupplierGroupList(params)
 
-    const { data: listBr } = useBranchList({})
+    const { data: listBr = [] } = useBranchList({})
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
