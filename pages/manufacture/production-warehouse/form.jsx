@@ -49,8 +49,6 @@ const Index = (props) => {
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
 
-    const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] = useState(false);
-
     const [onLoading, sOnLoading] = useState(false);
 
     const [onLoadingChild, sOnLoadingChild] = useState(false);
@@ -69,8 +67,6 @@ const Index = (props) => {
 
     const [dataItems, sDataItems] = useState([]);
 
-    const [dataWarehouse, sDataWarehouse] = useState([]);
-
     const statusExprired = useStatusExprired();
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
@@ -79,8 +75,6 @@ const Index = (props) => {
     const [listData, sListData] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
-
-    const [idExportWarehouse, sIdExportWarehouse] = useState(null);
 
     const [load, sLoad] = useState(false);
 
@@ -221,7 +215,6 @@ const Index = (props) => {
     const _ServerFetching_ItemsAll = async () => {
         const params = {
             "filter[branch_id]": idBranch ? idBranch?.value : null,
-            "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
         };
 
         try {
@@ -233,28 +226,11 @@ const Index = (props) => {
         } catch (error) { }
     };
 
-    const _ServerFetching_ExportWarehouse = async () => {
-        try {
-            const data = await apiProductionWarehouse.apiComboboxWarehouse({
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-                },
-            });
-            sDataWarehouse(
-                data?.map((e) => ({
-                    label: e?.warehouse_name,
-                    value: e?.id,
-                }))
-            );
-        } catch (error) { }
-        sOnFetchingExportWarehouse(false);
-    };
 
     // Khai báo biến để theo dõi timeout
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        if (idBranch == null || idExportWarehouse == null || inputValue == "") {
+        if (idBranch == null || inputValue == "") {
             return;
         } else {
             try {
@@ -275,14 +251,9 @@ const Index = (props) => {
         if (isKeyState?.type === "branch") {
             sDataItems([]);
             sListData([]);
-            sIdExportWarehouse(null);
             sIdBranch(isKeyState?.value);
         }
-        if (isKeyState?.type === "idExportWarehouse") {
-            sDataItems([]);
-            sListData([]);
-            sIdExportWarehouse(isKeyState?.value);
-        }
+
         handleQueryId({ status: false });
     };
 
@@ -300,16 +271,7 @@ const Index = (props) => {
                 }
             } else {
                 sDataItems([]);
-                sIdExportWarehouse(null);
                 sIdBranch(value);
-            }
-        } else if (type == "idExportWarehouse" && idExportWarehouse != value) {
-            if (listData?.length > 0) {
-                if (type === "idExportWarehouse" && idBranch != value) {
-                    handleQueryId({ status: true, initialKey: { type, value } });
-                }
-            } else {
-                sIdExportWarehouse(value);
             }
         }
     };
@@ -330,20 +292,12 @@ const Index = (props) => {
 
         const hasNullUnit = listData.some((item) => item.child?.some((childItem) => childItem.unit === null));
 
-        const hasNullQty = listData.some((item) =>
-            item.child?.some(
-                (childItem) =>
-                    childItem.exportQuantity === null ||
-                    childItem.exportQuantity === "" ||
-                    childItem.exportQuantity == 0
-            )
-        );
+        const hasNullQty = listData.some((item) => item.child?.some((childItem) => childItem.exportQuantity === null || childItem.exportQuantity === "" || childItem.exportQuantity == 0));
 
         const isEmpty = listData?.length === 0 ? true : false;
 
-        if (idBranch == null || hasNullKho || hasNullUnit || hasNullQty || isEmpty || idExportWarehouse == null) {
+        if (idBranch == null || hasNullKho || hasNullUnit || hasNullQty || isEmpty) {
             idBranch == null && sErrBranch(true);
-            idExportWarehouse == null && sErrExportWarehouse(true);
             hasNullKho && sErrWarehouse(true);
             hasNullUnit && sErrUnit(true);
             hasNullQty && sErrQty(true);
@@ -368,29 +322,18 @@ const Index = (props) => {
     }, [idBranch != null]);
 
     useEffect(() => {
-        sErrExportWarehouse(false);
-    }, [idExportWarehouse != null]);
-
-    useEffect(() => {
         router.query && sOnFetching(true);
     }, [router.query]);
 
     useEffect(() => {
-        onFetchingExportWarehouse && _ServerFetching_ExportWarehouse();
         onFetchingItemsAll && _ServerFetching_ItemsAll();
-    }, [onFetchingItemsAll, onFetchingExportWarehouse]);
+    }, [onFetchingItemsAll]);
 
     useEffect(() => {
-        idBranch != null && sOnFetchingExportWarehouse(true);
-        idBranch == null && sIdExportWarehouse(null);
-        idBranch == null && sDataWarehouse([]);
-        // sIdExportWarehouse(null);
+        idBranch != null && sOnFetchingItemsAll(true);
+        idBranch == null && sDataItems([]);
     }, [idBranch]);
 
-    useEffect(() => {
-        idExportWarehouse != null && sOnFetchingItemsAll(true);
-        idExportWarehouse == null && sDataItems([]);
-    }, [idExportWarehouse]);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -401,7 +344,7 @@ const Index = (props) => {
         formData.append("code", code);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch?.value);
-        formData.append("warehouse_id", idExportWarehouse?.value);
+        // formData.append("warehouse_id", idExportWarehouse?.value);
         formData.append("note", note);
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
@@ -598,7 +541,7 @@ const Index = (props) => {
                         .map((house) => house)
                         .some((i) => i?.location?.value === value?.value);
                     if (checkKho) {
-                        handleCheckError("Vị trí xuất đã được chọn");
+                        handleCheckError("Kho đã được chọn");
                     } else {
                         updatedChild.location = value;
                     }
@@ -607,7 +550,7 @@ const Index = (props) => {
                     updatedChild.exchangeValue = Number(value?.coefficient);
                 } else if (type === "increase") {
                     if (updatedChild.location == null) {
-                        handleCheckError("Vui lòng chọn vị trí trước");
+                        handleCheckError("Vui lòng chọn kho trước");
                     } else if (updatedChild.unit == null) {
                         handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (
@@ -622,7 +565,7 @@ const Index = (props) => {
                     }
                 } else if (type === "decrease") {
                     if (updatedChild.location == null) {
-                        handleCheckError("Vui lòng chọn vị trí trước");
+                        handleCheckError("Vui lòng chọn kho trước");
                     } else if (updatedChild.unit == null) {
                         handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (updatedChild.exportQuantity >= 2) {
@@ -758,7 +701,7 @@ const Index = (props) => {
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-10  gap-3 items-center mt-2">
+                            <div className="grid grid-cols-8  gap-3 items-center mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
@@ -865,65 +808,6 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.production_warehouse_expWarehouse ||
-                                            "production_warehouse_expWarehouse"}{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <SelectCore
-                                        options={dataWarehouse}
-                                        onChange={_HandleChangeInput.bind(this, "idExportWarehouse")}
-                                        isLoading={idBranch != null ? false : onLoading}
-                                        value={idExportWarehouse}
-                                        isClearable={true}
-                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        closeMenuOnSelect={true}
-                                        hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.production_warehouse_expWarehouse ||
-                                            "production_warehouse_expWarehouse"
-                                        }
-                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                        isSearchable={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menu: (provided) => ({
-                                                ...provided,
-                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
-                                    />
-                                    {errExportWarehouse && (
-                                        <label className="text-sm text-red-500">{"Vui lòng chọn kho"}</label>
-                                    )}
-                                </div>
-                                <div className="col-span-2 ">
-                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
                                     <SelectCore
@@ -987,22 +871,20 @@ const Index = (props) => {
                         <div className="col-span-9">
                             <div className="grid grid-cols-8">
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"}
+                                    {'Kho - Vị trí kho xuất xuất'}
+                                    {/* {dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"} */}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_export_quantity ||
-                                        "production_warehouse_export_quantity"}
+                                    {dataLang?.production_warehouse_export_quantity || "production_warehouse_export_quantity"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_exchange_value ||
-                                        "production_warehouse_exchange_value"}
+                                    {dataLang?.production_warehouse_exchange_value || "production_warehouse_exchange_value"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_amount_of_conversion ||
-                                        "production_warehouse_amount_of_conversion"}
+                                    {dataLang?.production_warehouse_amount_of_conversion || "production_warehouse_amount_of_conversion"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {dataLang?.production_warehouse_note || "production_warehouse_note"}
@@ -1128,9 +1010,8 @@ const Index = (props) => {
                                     {" "}
                                     <SelectCore
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={
-                                            dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"
-                                        }
+                                        placeholder={'Kho - Vị trí kho xuất'}
+                                        // placeholder={dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"}
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
@@ -1319,8 +1200,7 @@ const Index = (props) => {
                                                     >
                                                         <span className="absolute right-0 w-full h-full -mt-8 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                                                         <span className="relative text-xs">
-                                                            Xóa {e?.child?.filter((e) => e?.location == null)?.length}{" "}
-                                                            hàng chưa chọn vị trí
+                                                            Xóa {e?.child?.filter((e) => e?.location == null)?.length}{" "} hàng chưa chọn kho
                                                         </span>
                                                     </button>
                                                 )}
@@ -1351,40 +1231,66 @@ const Index = (props) => {
                                                                             ? "border-red-500 border"
                                                                             : ""
                                                                             }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                        placeholder={
-                                                                            onLoadingChild
-                                                                                ? ""
-                                                                                : dataLang?.production_warehouse_expLoca ||
-                                                                                "production_warehouse_expLoca"
-                                                                        }
-                                                                        noOptionsMessage={() =>
-                                                                            dataLang?.returns_nodata || "returns_nodata"
-                                                                        }
+                                                                        // placeholder={
+                                                                        //     onLoadingChild
+                                                                        //         ? ""
+                                                                        //         : dataLang?.production_warehouse_expLoca ||
+                                                                        //         "production_warehouse_expLoca"
+                                                                        // }
+                                                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                                                         menuPortalTarget={document.body}
-                                                                        formatOptionLabel={(option) =>
-                                                                            option?.label != null && (
-                                                                                <div className="">
-                                                                                    <div className="flex gap-1"></div>
-                                                                                    <div className="flex gap-1">
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                        // formatOptionLabel={(option) =>
+                                                                        //     option?.label != null && (
+                                                                        //         <div className="">
+                                                                        //             <div className="flex gap-1"></div>
+                                                                        //             <div className="flex gap-1">
+                                                                        //                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                        //                     {option?.label}
+                                                                        //                 </h2>
+                                                                        //             </div>
+                                                                        // <div className="flex gap-1">
+                                                                        //     {
+                                                                        //         <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                        //             {dataLang?.returns_survive ||
+                                                                        //                 "returns_survive"}
+                                                                        //             :
+                                                                        //         </h2>
+                                                                        //     }
+                                                                        //     <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
+                                                                        //         {formatNumber(option?.qty)}
+                                                                        //     </h2>
+                                                                        // </div>
+                                                                        //         </div>
+                                                                        //     )
+                                                                        // }
+                                                                        placeholder={"Kho - Vị trí kho xuất"}
+                                                                        formatOptionLabel={(option) => {
+                                                                            return (
+                                                                                (option?.warehouse_name ||
+                                                                                    option?.label) && (
+                                                                                    <div className="z-[999]">
+                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                                                                                            {dataLang?.import_Warehouse || "import_Warehouse"}  : {option?.warehouse_name}
+                                                                                        </h2>
+                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
                                                                                             {option?.label}
                                                                                         </h2>
-                                                                                    </div>
-                                                                                    <div className="flex gap-1">
-                                                                                        {
-                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                                {dataLang?.returns_survive ||
-                                                                                                    "returns_survive"}
-                                                                                                :
+                                                                                        <div className="flex gap-1">
+                                                                                            {
+                                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                                    {dataLang?.returns_survive ||
+                                                                                                        "returns_survive"}
+                                                                                                    :
+                                                                                                </h2>
+                                                                                            }
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
+                                                                                                {formatNumber(option?.qty)}
                                                                                             </h2>
-                                                                                        }
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
-                                                                                            {formatNumber(option?.qty)}
-                                                                                        </h2>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div>
-                                                                            )
-                                                                        }
+                                                                                )
+                                                                            );
+                                                                        }}
                                                                         style={{
                                                                             border: "none",
                                                                             boxShadow: "none",
@@ -1478,7 +1384,7 @@ const Index = (props) => {
                                                                         placeholder={
                                                                             (ce?.location == null ||
                                                                                 ce?.unit == null) &&
-                                                                            "Chọn vị trí và Đvt trước"
+                                                                            "Chọn kho và Đvt trước"
                                                                         }
                                                                         disabled={
                                                                             ce?.location == null || ce?.unit == null

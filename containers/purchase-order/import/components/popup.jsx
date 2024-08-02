@@ -1,37 +1,32 @@
-import apiImport from "@/Api/apiPurchaseOrder/apiImport";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagSingle } from "@/components/UI/common/Tag/TagSingle";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import ImageErrors from "@/components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useQuery } from "@tanstack/react-query";
-import ImageErrors from "components/UI/imageErrors";
-import Loading from "components/UI/loading";
-import ExpandableContent from "components/UI/more";
+import ExpandableContent from "@/components/UI/more";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
-import PopupCustom from "/components/UI/popup";
-const Popup_chitiet = (props) => {
+import { useImportDetail } from "../hooks/useImportDetail";
+const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const [data, sData] = useState();
-
     const dataSeting = useSetingServer()
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
-
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting)
@@ -41,16 +36,7 @@ const Popup_chitiet = (props) => {
         return formatMoneyConfig(+number, dataSeting)
     };
 
-    const { isFetching } = useQuery({
-        queryKey: ['api_detail_import', props?.id],
-        queryFn: async () => {
-            const db = await apiImport.apiDetailImport(props?.id);
-            sData(db);
-            return db
-        },
-        enabled: open && !!props?.id,
-        ...reTryQuery
-    })
+    const { data, isFetching } = useImportDetail(open, props?.id);
 
     return (
         <>
@@ -435,4 +421,4 @@ const Popup_chitiet = (props) => {
         </>
     );
 };
-export default Popup_chitiet;
+export default PopupDetail;

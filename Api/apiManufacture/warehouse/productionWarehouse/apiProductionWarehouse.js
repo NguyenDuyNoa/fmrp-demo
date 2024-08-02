@@ -36,7 +36,7 @@ const apiProductionWarehouse = {
         return response.data
     },
     async apiSemiItemsProductionWarehouse(method, param) {
-        const response = await axiosCustom(method, `/api_web/Api_stock/getSemiItems/?csrf_protection=true`, param);
+        const response = await axiosCustom(method, `/api_web/Api_stock/getItemsProduction`, param);
         return response.data
     },
 

@@ -12,7 +12,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 
-const Popup_status = (props) => {
+const PopupStatus = (props) => {
     const dataLang = props?.dataLang;
     const [onFetching, sOnFetching] = useState(false);
     const [open, sOpen] = useState(false);
@@ -99,8 +99,7 @@ const Popup_status = (props) => {
                                                         </h4>
                                                     </div>
                                                     <div className="flex items-center gap-1">
-                                                        {dataProductSerial.is_enable ===
-                                                            "1" ? (
+                                                        {dataProductSerial.is_enable === "1" ? (
                                                             <div className="flex gap-1 items-center italic font-normal text-[12px]">
                                                                 <h6>
                                                                     Serial:{" "}
@@ -163,4 +162,4 @@ const Popup_status = (props) => {
         </PopupCustom>
     );
 };
-export default Popup_status;
+export default PopupStatus;
