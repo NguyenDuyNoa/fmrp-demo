@@ -214,7 +214,6 @@ const Location = (props) => {
                             <div className="flex justify-end items-center gap-2">
                                 {role == true || checkAdd ? (
                                     <PopupLocationWarehouse
-                                        // listKho={listKho}
                                         isState={isState}
                                         dataWarehouse={dataWarehouse}
                                         onRefresh={refetch.bind(this)}
@@ -296,7 +295,6 @@ const Location = (props) => {
                                 </div>
                             </div>
                             <Customscrollbar className="min:h-[500px] 2xl:h-[88%] xl:h-[73%] h-[100%] max:h-[800px]">
-                                {/* <Customscrollbar className="min:h-[500px] 2xl:h-[85%] xl:h-[69%] h-[100%] max:h-[800px]"> */}
                                 <div className="w-full">
                                     <HeaderTable display={"grid"} gridCols={12}>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
@@ -321,85 +319,82 @@ const Location = (props) => {
                                     {isLoading ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
-                                                {data?.rResult?.map((e) => (
-                                                    <RowTable gridCols={12} key={e?.id?.toString()}>
-                                                        <RowItemTable colSpan={2} textAlign={"left"}>
-                                                            {e.warehouse_name}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={"left"}>
-                                                            {e.code}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={"left"}>
-                                                            {e.name}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={"center"}>
-                                                            <label
-                                                                htmlFor={e.id}
-                                                                className="relative inline-flex items-center cursor-pointer"
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    className="sr-only peer"
-                                                                    value={e.status}
-                                                                    id={e.id}
-                                                                    checked={e.status == "0" ? false : true}
-                                                                    onChange={() =>
-                                                                        handleQueryId({
-                                                                            initialKey: e.id,
-                                                                            status: true,
-                                                                        })
-                                                                    }
-                                                                />
-
-                                                                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                                            </label>
-                                                        </RowItemTable>
-                                                        {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.email}</h6>                 */}
-                                                        <RowItemTable colSpan={2} textAlign={"left"}>
-                                                            {e?.date_create != null
-                                                                ? formatMoment(e.date_create, FORMAT_MOMENT.TIME_SHORT)
-                                                                : ""}
-                                                        </RowItemTable>
-
-                                                        <RowItemTable
-                                                            colSpan={2}
-                                                            className="space-x-2 text-center flex items-center justify-center"
+                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
+                                            {data?.rResult?.map((e) => (
+                                                <RowTable gridCols={12} key={e?.id?.toString()}>
+                                                    <RowItemTable colSpan={2} textAlign={"left"}>
+                                                        {e.warehouse_name}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={2} textAlign={"left"}>
+                                                        {e.code}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={2} textAlign={"left"}>
+                                                        {e.name}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={2} textAlign={"center"}>
+                                                        <label
+                                                            htmlFor={e.id}
+                                                            className="relative inline-flex items-center cursor-pointer"
                                                         >
-                                                            {role == true || checkEdit ? (
-                                                                <PopupLocationWarehouse
-                                                                    onRefresh={refetch.bind(this)}
-                                                                    warehouse_name={e.warehouse_name}
-                                                                    warehouse_id={e.warehouse_id}
-                                                                    isState={isState}
-                                                                    className="xl:text-base text-xs "
-                                                                    dataLang={dataLang}
-                                                                    dataWarehouse={dataWarehouse}
-                                                                    name={e.name}
-                                                                    code={e.code}
-                                                                    id={e?.id}
-                                                                />
-                                                            ) : (
-                                                                <IconEdit
-                                                                    className="cursor-pointer"
-                                                                    onClick={() =>
-                                                                        isShow("warning", WARNING_STATUS_ROLE)
-                                                                    }
-                                                                />
-                                                            )}
-                                                            <BtnAction
-                                                                onRefresh={refetch.bind(this)}
-                                                                onRefreshGroup={() => { }}
-                                                                dataLang={dataLang}
-                                                                id={e?.id}
-                                                                type="warehouse_location"
+                                                            <input
+                                                                type="checkbox"
+                                                                className="sr-only peer"
+                                                                value={e.status}
+                                                                id={e.id}
+                                                                checked={e.status == "0" ? false : true}
+                                                                onChange={() =>
+                                                                    handleQueryId({
+                                                                        initialKey: e.id,
+                                                                        status: true,
+                                                                    })
+                                                                }
                                                             />
-                                                        </RowItemTable>
-                                                    </RowTable>
-                                                ))}
-                                            </div>
-                                        </>
+
+                                                            <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                                        </label>
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={2} textAlign={"left"}>
+                                                        {e?.date_create != null
+                                                            ? formatMoment(e.date_create, FORMAT_MOMENT.TIME_SHORT)
+                                                            : ""}
+                                                    </RowItemTable>
+
+                                                    <RowItemTable
+                                                        colSpan={2}
+                                                        className="space-x-2 text-center flex items-center justify-center"
+                                                    >
+                                                        {role == true || checkEdit ? (
+                                                            <PopupLocationWarehouse
+                                                                onRefresh={refetch.bind(this)}
+                                                                warehouse_name={e.warehouse_name}
+                                                                warehouse_id={e.warehouse_id}
+                                                                isState={isState}
+                                                                className="xl:text-base text-xs "
+                                                                dataLang={dataLang}
+                                                                dataWarehouse={dataWarehouse}
+                                                                name={e.name}
+                                                                code={e.code}
+                                                                id={e?.id}
+                                                            />
+                                                        ) : (
+                                                            <IconEdit
+                                                                className="cursor-pointer"
+                                                                onClick={() =>
+                                                                    isShow("warning", WARNING_STATUS_ROLE)
+                                                                }
+                                                            />
+                                                        )}
+                                                        <BtnAction
+                                                            onRefresh={refetch.bind(this)}
+                                                            onRefreshGroup={() => { }}
+                                                            dataLang={dataLang}
+                                                            id={e?.id}
+                                                            type="warehouse_location"
+                                                        />
+                                                    </RowItemTable>
+                                                </RowTable>
+                                            ))}
+                                        </div>
                                     ) : (
                                         <NoData />
                                     )}

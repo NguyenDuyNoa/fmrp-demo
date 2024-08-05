@@ -1,6 +1,6 @@
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
 import { reTryQuery } from "@/configs/configRetryQuery";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useWarehouseDetail = (id, params) => {
     return useQuery({
@@ -11,6 +11,7 @@ export const useWarehouseDetail = (id, params) => {
             return { rResult, output }
         },
         enabled: !!id,
+        placeholderData: keepPreviousData,
         ...reTryQuery
     })
 
