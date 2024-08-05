@@ -1,5 +1,5 @@
 import apiComons from "@/Api/apiComon/apiComon";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useTreatmentList = (dataLang) => {
@@ -15,7 +15,7 @@ export const useTreatmentList = (dataLang) => {
             }))
 
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

@@ -1,5 +1,5 @@
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useWarehouseLocation = (id) => {
@@ -11,6 +11,6 @@ export const useWarehouseLocation = (id) => {
             return rResult?.map((e) => ({ label: e?.name, value: e?.id })) || []
         },
         enabled: !!id,
-        ...reTryQuery
+        ...optionsQuery
     });
 }

@@ -1,5 +1,5 @@
 import apiCategory from "@/Api/apiSettings/apiCategory"
-import { reTryQuery } from "@/configs/configRetryQuery"
+import { optionsQuery } from "@/configs/optionsQuery"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 export const useCategoryList = (url, params) => {
@@ -10,7 +10,7 @@ export const useCategoryList = (url, params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }
 
@@ -25,7 +25,7 @@ export const useCostCombobox = (open, id) => {
                 level: e.level,
             }))
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

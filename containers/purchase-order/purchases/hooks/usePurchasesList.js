@@ -1,5 +1,5 @@
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const usePurchasesList = (params) => {
@@ -11,7 +11,7 @@ export const usePurchasesList = (params) => {
             return { output, rResult }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }
 
@@ -23,6 +23,6 @@ export const usePurchasesListCode = () => {
 
             return rResult?.map((e) => ({ label: e.code, value: e.id || [] }))
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }

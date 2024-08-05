@@ -6,7 +6,7 @@ import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranch";
@@ -181,7 +181,7 @@ const WarehouseTransferForm = (props) => {
             return rResult
         },
         enabled: !!id,
-        ...reTryQuery
+        ...optionsQuery
     })
 
     const resetValue = () => {

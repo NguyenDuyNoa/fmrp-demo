@@ -1,5 +1,5 @@
 import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 
@@ -21,6 +21,6 @@ export const useDepartmentList = (params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

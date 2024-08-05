@@ -1,5 +1,5 @@
 import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useWarehouseTransferTo = () => {
@@ -13,7 +13,7 @@ export const useWarehouseTransferTo = () => {
                 value: e?.id,
             }))
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

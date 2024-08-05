@@ -1,5 +1,5 @@
 import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const usePriceQuoteList = (params) => {
@@ -12,6 +12,6 @@ export const usePriceQuoteList = (params) => {
             return { rResult, output, rTotal }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery,
+        ...optionsQuery,
     });
 }

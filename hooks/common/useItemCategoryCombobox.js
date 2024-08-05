@@ -1,5 +1,5 @@
 import apiCategory from "@/Api/apiMaterial/category/apiCategory";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 
@@ -27,6 +27,6 @@ export const useItemCategoryCombobox = () => {
 
             return newData
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }

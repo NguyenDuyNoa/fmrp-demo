@@ -1,5 +1,5 @@
 import apiVariant from "@/Api/apiSettings/apiVariant"
-import { reTryQuery } from "@/configs/configRetryQuery"
+import { optionsQuery } from "@/configs/optionsQuery"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 export const useVariantList = (params) => {
@@ -10,6 +10,6 @@ export const useVariantList = (params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

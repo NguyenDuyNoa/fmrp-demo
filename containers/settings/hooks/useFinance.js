@@ -1,5 +1,5 @@
 import apiFinance from "@/Api/apiSettings/apiFinance";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 export const useFinanceList = (url, params) => {
@@ -10,6 +10,6 @@ export const useFinanceList = (url, params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

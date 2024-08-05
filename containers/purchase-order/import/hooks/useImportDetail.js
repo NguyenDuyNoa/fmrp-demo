@@ -1,5 +1,5 @@
 import apiImport from "@/Api/apiPurchaseOrder/apiImport";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useImportDetail = (open, id) => {
@@ -10,6 +10,6 @@ export const useImportDetail = (open, id) => {
             return db
         },
         enabled: open && !!id,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

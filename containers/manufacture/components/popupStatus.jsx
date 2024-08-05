@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
-
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
-
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useEffect, useState } from "react";
 
 const PopupStatus = (props) => {
     const dataLang = props?.dataLang;
@@ -39,13 +37,13 @@ const PopupStatus = (props) => {
     useEffect(() => {
         sData([]);
         sOpen(false);
-        if (props?.data_export?.length > 0) {
+        if (props?.dataExport?.length > 0) {
             setTimeout(() => {
                 sOpen(true);
-                sData(props?.data_export);
+                sData(props?.dataExport);
             }, 1000);
         }
-    }, [props?.data_export]);
+    }, [props?.dataExport]);
 
     return (
         <PopupCustom

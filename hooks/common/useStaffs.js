@@ -1,5 +1,5 @@
 import apiComons from "@/Api/apiComon/apiComon";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 /// danh sách nhân viên theo chii nhánh
 export const useStaffComboboxByBranch = (params) => {
@@ -12,7 +12,7 @@ export const useStaffComboboxByBranch = (params) => {
             return data?.staffs?.map((e) => ({ label: e.full_name, value: e.staffid }))
         },
 
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

@@ -5,7 +5,7 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRMATION_OF_CHANGES } from "@/constants/changeStatus/changeStatus";
 import { TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -140,7 +140,7 @@ const PurchasesForm = (props) => {
             setTotalQty(rResult?.items?.length);
             return rResult
         },
-        ...reTryQuery,
+        ...optionsQuery,
         enabled: !!id
     })
 

@@ -1,5 +1,5 @@
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 export const useProductionWarehouseFillterbar = (params) => {
@@ -10,6 +10,6 @@ export const useProductionWarehouseFillterbar = (params) => {
             return data
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

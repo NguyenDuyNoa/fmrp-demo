@@ -1,5 +1,5 @@
 import apiBranch from "@/Api/apiSettings/apiBranch"
-import { reTryQuery } from "@/configs/configRetryQuery"
+import { optionsQuery } from "@/configs/optionsQuery"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 export const useBranchPageList = (params) => {
@@ -10,6 +10,6 @@ export const useBranchPageList = (params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

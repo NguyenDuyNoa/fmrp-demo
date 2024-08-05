@@ -1,5 +1,5 @@
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const usePurchasesItems = (id, search) => {
@@ -20,6 +20,6 @@ export const usePurchasesItems = (id, search) => {
                 e,
             }))
         },
-        ...reTryQuery,
+        ...optionsQuery,
     })
 }

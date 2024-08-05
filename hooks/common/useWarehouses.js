@@ -1,7 +1,7 @@
 import apiComons from "@/Api/apiComon/apiComon";
 import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useWarehouseTranfer = () => {
@@ -12,7 +12,7 @@ export const useWarehouseTranfer = () => {
 
             return result?.map(({ code, id }) => ({ label: code, value: id }))
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }
 
@@ -41,7 +41,7 @@ export const useWarehouseComboboxlocation = (params) => {
             }))
 
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }
 

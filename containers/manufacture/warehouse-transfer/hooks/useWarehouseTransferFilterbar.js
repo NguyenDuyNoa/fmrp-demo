@@ -1,5 +1,5 @@
 import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useWarehouseTransferFilterbar = (params) => {
@@ -15,6 +15,6 @@ export const useWarehouseTransferFilterbar = (params) => {
             return db;
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

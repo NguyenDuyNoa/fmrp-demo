@@ -1,5 +1,5 @@
 import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useOrderByPurchase = (params, options) => {
@@ -10,7 +10,7 @@ export const useOrderByPurchase = (params, options) => {
 
             return db?.map((e) => { return { label: e.code, value: e.id } })
         },
-        ...reTryQuery,
+        ...optionsQuery,
         enabled: !!options == "1"
     })
 }

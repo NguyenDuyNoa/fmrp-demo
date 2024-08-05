@@ -1,5 +1,5 @@
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const usePurChasesDetail = (open, id) => {
@@ -10,7 +10,7 @@ export const usePurChasesDetail = (open, id) => {
 
             return db
         },
-        ...reTryQuery,
+        ...optionsQuery,
         enabled: open && !!id
     })
 }

@@ -1,5 +1,5 @@
 import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useServiceVoucherCombobox = (inputValue) => {
@@ -14,6 +14,6 @@ export const useServiceVoucherCombobox = (inputValue) => {
 
             return result?.map((e) => ({ label: e?.code, value: e?.id })) || []
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }

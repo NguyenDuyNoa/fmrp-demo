@@ -1,5 +1,5 @@
 import apiComons from "@/Api/apiComon/apiComon";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useTaxList = () => {
@@ -15,7 +15,7 @@ export const useTaxList = () => {
                 tax_rate: e.tax_rate,
             }))
         },
-        ...reTryQuery
+        ...optionsQuery
     });
 
 }

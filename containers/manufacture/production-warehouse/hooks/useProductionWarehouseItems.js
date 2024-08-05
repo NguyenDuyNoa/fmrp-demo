@@ -1,5 +1,5 @@
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query"
 
 export const useProductionWarehouseItems = ({ idBranch }) => {
@@ -24,6 +24,6 @@ export const useProductionWarehouseItems = ({ idBranch }) => {
             }));
         },
         enabled: !!idBranch,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

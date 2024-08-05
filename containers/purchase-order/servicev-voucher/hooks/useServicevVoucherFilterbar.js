@@ -1,5 +1,5 @@
 import apiServiceVoucher from "@/Api/apiPurchaseOrder/apiServicevVoucher";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useServicevVoucherFilterbar = (params) => {
@@ -11,6 +11,6 @@ export const useServicevVoucherFilterbar = (params) => {
             return data
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

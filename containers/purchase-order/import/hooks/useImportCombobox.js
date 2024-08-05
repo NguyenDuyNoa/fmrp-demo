@@ -1,5 +1,5 @@
 import apiImport from "@/Api/apiPurchaseOrder/apiImport";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useImportCombobox = (search) => {
@@ -15,7 +15,7 @@ export const useImportCombobox = (search) => {
 
             return result?.map((e) => ({ label: `${e.code}`, value: e.id })) || []
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

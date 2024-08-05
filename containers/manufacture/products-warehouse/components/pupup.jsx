@@ -20,7 +20,7 @@ import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 
-const Popup_chitiet = (props) => {
+const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
@@ -339,4 +339,4 @@ const Popup_chitiet = (props) => {
         </>
     );
 };
-export default Popup_chitiet;
+export default PopupDetail;

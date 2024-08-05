@@ -1,5 +1,5 @@
 import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 const fetChListCode = async (search) => {
@@ -15,6 +15,6 @@ export const useReturnSalesCombobox = (search) => {
     return useQuery({
         queryKey: ["api_search_return_order", search],
         queryFn: () => fetChListCode(search),
-        ...reTryQuery
+        ...optionsQuery
     });
 }

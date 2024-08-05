@@ -1,5 +1,5 @@
 import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 const fetchPriceQuote = async (search) => {
@@ -17,6 +17,6 @@ export const usePriceQuoteCombobox = (search) => {
     return useQuery({
         queryKey: ["api_search_price_quote", search],
         queryFn: () => fetchPriceQuote(search),
-        ...reTryQuery
+        ...optionsQuery
     });
 };

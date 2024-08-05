@@ -1,5 +1,5 @@
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query"
 
 export const useProductionWarehouseDetail = (open, id) => {
@@ -10,6 +10,6 @@ export const useProductionWarehouseDetail = (open, id) => {
             return data
         },
         enabled: open && !!id,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

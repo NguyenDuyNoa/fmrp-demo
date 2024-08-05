@@ -1,5 +1,5 @@
 import apiSuppliers from "@/Api/apiSuppliers/suppliers/apiSuppliers";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useSupplierList = (params) => {
@@ -13,6 +13,6 @@ export const useSupplierList = (params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

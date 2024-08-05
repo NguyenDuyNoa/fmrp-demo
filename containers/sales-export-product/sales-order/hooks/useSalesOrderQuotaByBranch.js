@@ -1,5 +1,5 @@
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useSalesOrderQuotaByBranch = (params) => {
@@ -13,6 +13,6 @@ export const useSalesOrderQuotaByBranch = (params) => {
                 value: e.id,
             }))
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }

@@ -8,7 +8,7 @@ import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyForma
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranch";
@@ -184,7 +184,7 @@ const PriceQuoteForm = (props) => {
             sNote(rResult?.note);
             return rResult
         },
-        ...reTryQuery,
+        ...optionsQuery,
         enabled: !!id
     })
     // onChange

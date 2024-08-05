@@ -1,5 +1,5 @@
 import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useDeliveryReceiptFilterbar = (params) => {
@@ -13,6 +13,6 @@ export const useDeliveryReceiptFilterbar = (params) => {
             return data?.status
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

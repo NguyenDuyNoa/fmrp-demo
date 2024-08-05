@@ -1,5 +1,5 @@
 import apiGroups from "@/Api/apiSuppliers/groups/apiGroups";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useSupplierGroupList = (params) => {
@@ -12,7 +12,7 @@ export const useSupplierGroupList = (params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 
 

@@ -1,5 +1,5 @@
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useProductList = (params) => {
@@ -19,6 +19,6 @@ export const useProductList = (params) => {
             }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

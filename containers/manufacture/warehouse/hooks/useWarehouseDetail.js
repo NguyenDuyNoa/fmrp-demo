@@ -1,5 +1,5 @@
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useWarehouseDetail = (id, params) => {
@@ -12,7 +12,7 @@ export const useWarehouseDetail = (id, params) => {
         },
         enabled: !!id,
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

@@ -1,5 +1,5 @@
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useSalesOrderDetail = (open, id) => {
@@ -12,7 +12,7 @@ export const useSalesOrderDetail = (open, id) => {
             return db
         },
         enabled: open && !!id,
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

@@ -7,7 +7,7 @@ import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyForma
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useSupplierList } from "@/containers/suppliers/supplier/hooks/useSupplierList";
@@ -196,7 +196,7 @@ const PurchaseReturnsForm = (props) => {
             return rResult
         },
         enabled: !!id,
-        ...reTryQuery
+        ...optionsQuery
     })
 
     const resetValue = () => {

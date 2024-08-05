@@ -1,5 +1,5 @@
 import apiDashboard from "@/Api/apiDashboard/apiDashboard";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { useDispatch } from "react-redux";
 
@@ -17,7 +17,7 @@ export const useAuththentication = (auth) => {
         },
         placeholderData: keepPreviousData,
         enabled: auth == null,
-        ...reTryQuery
+        ...optionsQuery
     })
 }
 
@@ -29,7 +29,7 @@ export const useLanguage = (lang) => {
             return res
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }
 
@@ -49,6 +49,6 @@ export const useSetings = () => {
             dispatch({ type: "setings/feature", payload: newData });
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

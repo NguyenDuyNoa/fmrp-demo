@@ -8,7 +8,7 @@ import Loading from "@/components/UI/loading";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
@@ -78,7 +78,7 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
             return db
         },
         enabled: open,
-        ...reTryQuery
+        ...optionsQuery
     })
 
 

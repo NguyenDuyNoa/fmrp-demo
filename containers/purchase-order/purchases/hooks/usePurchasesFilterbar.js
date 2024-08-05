@@ -1,5 +1,5 @@
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const usePurchasesFilterbar = (key) => {
@@ -26,7 +26,7 @@ export const usePurchasesFilterbar = (key) => {
             }))
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

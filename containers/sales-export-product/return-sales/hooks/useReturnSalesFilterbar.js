@@ -1,5 +1,5 @@
 import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useReturnSalesFilterbar = (params) => {
@@ -10,6 +10,6 @@ export const useReturnSalesFilterbar = (params) => {
             return data
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

@@ -1,5 +1,5 @@
 import apiStatus from "@/Api/apiClients/status/apiStatus";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useStatusClient = (prams) => {
@@ -12,6 +12,6 @@ export const useStatusClient = (prams) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

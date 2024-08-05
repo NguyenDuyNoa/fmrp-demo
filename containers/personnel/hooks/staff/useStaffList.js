@@ -1,5 +1,5 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useStaffList = (params) => {
@@ -10,6 +10,6 @@ export const useStaffList = (params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

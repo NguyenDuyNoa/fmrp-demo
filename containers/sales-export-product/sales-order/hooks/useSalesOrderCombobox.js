@@ -1,5 +1,5 @@
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useSalesOrderCombobox = (search) => {
@@ -15,7 +15,7 @@ export const useSalesOrderCombobox = (search) => {
 
             return data?.orders?.map(({ reference_no, id }) => ({ label: reference_no, value: id }))
         },
-        ...reTryQuery
+        ...optionsQuery
     });
 
 }

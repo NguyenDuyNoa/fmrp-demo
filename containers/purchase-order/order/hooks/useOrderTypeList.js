@@ -1,5 +1,5 @@
 import apiOrder from "@/Api/apiPurchaseOrder/apiOrder"
-import { reTryQuery } from "@/configs/configRetryQuery"
+import { optionsQuery } from "@/configs/optionsQuery"
 import { useQuery } from "@tanstack/react-query"
 
 export const useOrderTypeList = (dataLang) => {
@@ -11,6 +11,6 @@ export const useOrderTypeList = (dataLang) => {
 
             return listOrderType?.map((e) => ({ label: dataLang[e?.name], value: e.id })) || []
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }

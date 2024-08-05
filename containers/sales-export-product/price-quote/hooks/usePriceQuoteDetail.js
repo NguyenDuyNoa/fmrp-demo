@@ -1,5 +1,5 @@
 import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const usePriceQuoteDetail = (open, id) => {
@@ -12,6 +12,6 @@ export const usePriceQuoteDetail = (open, id) => {
             return db
         },
         enabled: open && !!id,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

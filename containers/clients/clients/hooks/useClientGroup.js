@@ -1,5 +1,5 @@
 import apiClient from "@/Api/apiClients/client/apiClient";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useClientGroup = (params) => {
@@ -16,6 +16,6 @@ export const useClientGroup = (params) => {
             return rResult || []
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     });
 }

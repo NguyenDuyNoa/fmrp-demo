@@ -3,7 +3,7 @@ import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useVariantList } from "@/hooks/common/useItems";
 import useFeature from "@/hooks/useConfigFeature";
@@ -55,7 +55,7 @@ const WarehouseSlug = (props) => {
             const { name } = await apiWarehouse.apiNameWarehouse(id)
             return { rResult, output, name }
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 
 
@@ -66,7 +66,7 @@ const WarehouseSlug = (props) => {
             sListLocation(rResult.map((e) => ({ label: e.name, value: e.id })));
             return rResult
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 
 

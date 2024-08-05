@@ -1,5 +1,5 @@
 import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useDeliveryReceipDetail = (open, id) => {
@@ -11,7 +11,7 @@ export const useDeliveryReceipDetail = (open, id) => {
 
             return db
         },
-        ...reTryQuery,
+        ...optionsQuery,
         enabled: open && !!id
     })
 

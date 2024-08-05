@@ -1,5 +1,5 @@
 import apiLogin from "@/Api/apiLogin/apiLogin";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useSetings } from "@/hooks/useAuth";
 import useToast from "@/hooks/useToast";
 import { CookieCore } from "@/utils/lib/cookie";
@@ -140,7 +140,7 @@ const LoginPage = React.memo((props) => {
         },
         placeholderData: keepPreviousData,
         enabled: !isState.isLogin,
-        ...reTryQuery
+        ...optionsQuery
     })
 
     const _HandleSelectStep = (e) => {

@@ -1,5 +1,5 @@
 import apiImport from "@/Api/apiPurchaseOrder/apiImport";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useImportList = (params) => {
@@ -11,6 +11,6 @@ export const useImportList = (params) => {
             return { rResult, output, rTotal }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

@@ -1,6 +1,6 @@
 import apiContact from "@/Api/apiClients/contact/apiContact";
 import apiComons from "@/Api/apiComon/apiComon";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 /// danh sách khách hàng đổ hết nhưng có ajax
 
@@ -32,7 +32,7 @@ export const useClientComboboxByBranch = (params) => {
 
             return data?.clients?.map((e) => ({ label: e.name, value: e.id }))
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }
 // danh sách khách hàng đổ theo chi nhánh sử dụng trong form phiếu giao hàng
@@ -44,7 +44,7 @@ export const useClientComboboxByFilterBranch = (id, params) => {
 
             return id ? rResult?.map((e) => ({ label: e.name, value: e.id })) : []
         },
-        ...reTryQuery
+        ...optionsQuery
     })
 }
 
@@ -59,6 +59,6 @@ export const useClientByBranch = (value) => {
             return rResult?.map((e) => ({ label: e?.name, value: e?.id })) || [];
         },
         enabled: !!value,
-        ...reTryQuery
+        ...optionsQuery
     });
 }

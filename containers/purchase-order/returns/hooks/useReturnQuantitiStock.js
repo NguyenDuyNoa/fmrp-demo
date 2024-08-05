@@ -1,5 +1,5 @@
 import apiReturns from "@/Api/apiPurchaseOrder/apiReturns";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useReturnQuantitiStock = (idParen, idBranch) => {
@@ -20,6 +20,6 @@ export const useReturnQuantitiStock = (idParen, idBranch) => {
             }))
         },
         enabled: !!idParen,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

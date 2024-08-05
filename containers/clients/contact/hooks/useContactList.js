@@ -1,5 +1,5 @@
 import apiContact from "@/Api/apiClients/contact/apiContact";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useContactList = (params) => {
@@ -12,6 +12,6 @@ export const useContactList = (params) => {
             return { rResult, output }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

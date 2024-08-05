@@ -8,7 +8,7 @@ import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import LinkWarehouse from "@/containers/manufacture/components/linkWarehouse";
 import useFeature from "@/hooks/useConfigFeature";

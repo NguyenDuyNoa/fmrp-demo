@@ -1,5 +1,5 @@
 import apiCategory from "@/Api/apiProducts/category/apiCategory";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useProductCategory = (params) => {
@@ -11,6 +11,6 @@ export const useProductCategory = (params) => {
             return { output, rResult }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

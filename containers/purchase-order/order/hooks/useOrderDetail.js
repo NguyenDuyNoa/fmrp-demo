@@ -1,5 +1,5 @@
 import apiOrder from "@/Api/apiPurchaseOrder/apiOrder"
-import { reTryQuery } from "@/configs/configRetryQuery"
+import { optionsQuery } from "@/configs/optionsQuery"
 import { useQuery } from "@tanstack/react-query"
 
 export const useOrderDetail = (open, id) => {
@@ -9,7 +9,7 @@ export const useOrderDetail = (open, id) => {
             const data = await apiOrder.apiDetailOrder(id)
             return data
         },
-        ...reTryQuery,
+        ...optionsQuery,
         enabled: open && !!id
     })
 }

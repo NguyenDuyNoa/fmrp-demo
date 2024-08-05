@@ -1,5 +1,5 @@
 import apiReturns from "@/Api/apiPurchaseOrder/apiReturns";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const useReturnItemsBySupplier = (idSupplier, params) => {
@@ -21,7 +21,7 @@ export const useReturnItemsBySupplier = (idSupplier, params) => {
             }));
         },
         enabled: !!idSupplier,
-        ...reTryQuery
+        ...optionsQuery
     })
 
 }

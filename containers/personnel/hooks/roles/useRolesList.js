@@ -1,5 +1,5 @@
 import apiRoles from "@/Api/apiPersonnel/apiRoles";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useRolesList = (params) => {
@@ -12,6 +12,6 @@ export const useRolesList = (params) => {
             return { output, rResult }
         },
         placeholderData: keepPreviousData,
-        ...reTryQuery
+        ...optionsQuery
     })
 }

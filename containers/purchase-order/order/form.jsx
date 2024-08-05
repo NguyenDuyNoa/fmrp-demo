@@ -7,7 +7,7 @@ import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyForma
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useSupplierList } from "@/containers/suppliers/supplier/hooks/useSupplierList";
@@ -440,7 +440,7 @@ const OrderForm = (props) => {
 
             return data
         },
-        ...reTryQuery,
+        ...optionsQuery,
         enabled: idPurchases?.length > 0
     })
 
@@ -449,7 +449,7 @@ const OrderForm = (props) => {
         queryFn: async () => {
             _ServerFetching_ItemsAll();
         },
-        ...reTryQuery,
+        ...optionsQuery,
         enabled: !!onFetchingItemsAll
     })
 

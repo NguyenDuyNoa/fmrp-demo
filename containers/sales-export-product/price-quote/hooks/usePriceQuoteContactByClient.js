@@ -1,5 +1,5 @@
 import apiPriceQuocte from "@/Api/apiSalesExportProduct/priceQuote/apiPriceQuocte";
-import { reTryQuery } from "@/configs/configRetryQuery";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
 export const usePriceQuoteContactByClient = (value) => {
@@ -19,6 +19,6 @@ export const usePriceQuoteContactByClient = (value) => {
             }))
         },
         enabled: !!value,
-        ...reTryQuery
+        ...optionsQuery
     });
 }
