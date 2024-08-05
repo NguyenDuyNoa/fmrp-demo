@@ -198,10 +198,7 @@ const PopupWarehouse = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_code}
                                                 name="fname"
                                                 type="text"
-                                                className={`${errInputCode
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${errInputCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -259,13 +256,10 @@ const PopupWarehouse = (props) => {
                                                 <span className="text-red-500">*</span>
                                             </label>
                                             <SelectCore
-                                                //  closeMenuOnSelect={false}
                                                 placeholder={props.dataLang?.client_list_brand}
                                                 options={brandpOpt}
                                                 isSearchable={true}
                                                 onChange={_HandleChangeInput.bind(this, "valueBr")}
-                                                // isMulti
-
                                                 noOptionsMessage={() => "Không có dữ liệu"}
                                                 value={valueBr}
                                                 maxMenuHeight="200px"
@@ -281,12 +275,6 @@ const PopupWarehouse = (props) => {
                                                         zIndex: 9999,
                                                         position: "absolute",
                                                     }),
-                                                    // control: base => ({
-                                                    //   ...base,
-                                                    //   border: '1px solid #d0d5dd',
-                                                    //   boxShadow: 'none',
-
-                                                    // })  ,
                                                     control: (provided) => ({
                                                         ...provided,
                                                         border: "1px solid #d0d5dd",

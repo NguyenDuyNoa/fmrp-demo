@@ -1,14 +1,17 @@
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiVariant from "@/Api/apiSettings/apiVariant";
+import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useVariantList } from "@/hooks/common/useItems";
 import useFeature from "@/hooks/useConfigFeature";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useQuery } from "@tanstack/react-query";
-import Loading from "components/UI/loading";
 import { House2, Grid6 as IconExcel, SearchNormal1 as IconSearch, Refresh2 } from "iconsax-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -16,10 +19,7 @@ import React, { useState } from "react";
 import ReactExport from "react-data-export";
 import ModalImage from "react-modal-image";
 import "react-phone-input-2/lib/style.css";
-import Select, { components } from "react-select";
-import Pagination from "/components/UI/pagination";
-import NoData from "@/components/UI/noData/nodata";
-
+import Select from "react-select";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -27,20 +27,15 @@ const WarehouseSlug = (props) => {
     const router = useRouter();
     const id = router.query.slug;
     const dataLang = props.dataLang;
-    const [data, sData] = useState([]);
     const { paginate } = usePagination();
-    const [title, sTitle] = useState("");
-    const [data_ex, sData_ex] = useState([]);
     const statusExprired = useStatusExprired();
     const [keySearch, sKeySearch] = useState("");
-    const [variant, sListVariant] = useState([]);
     const [location, sListLocation] = useState([]);
     const [idLocation, sIdLocation] = useState(null);
-    const [idVariantMain, sIdVariantMain] = useState(null);
     const [idVariantSub, sIdVariantSub] = useState(null);
+    const [idVariantMain, sIdVariantMain] = useState(null);
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems();
-
 
     const params = {
         search: keySearch,
@@ -51,16 +46,14 @@ const WarehouseSlug = (props) => {
         "filter[variation_option_id_2]": idVariantSub?.value ? idVariantSub?.value : null,
     }
 
-    const { isFetching, refetch } = useQuery({
+    const { data: listVariant = [] } = useVariantList(params);
+
+    const { data, isFetching, refetch } = useQuery({
         queryKey: ['api_detail_warehouse', { ...params }],
         queryFn: async () => {
             const { rResult, output } = await apiWarehouse.apiWarehouseDetail(id, { params: params })
             const { name } = await apiWarehouse.apiNameWarehouse(id)
-            sTitle(name);
-            sData(rResult);
-            sTotalItem(output);
-            sData_ex(rResult);
-            return rResult
+            return { rResult, output, name }
         },
         ...reTryQuery
     })
@@ -71,22 +64,6 @@ const WarehouseSlug = (props) => {
         queryFn: async () => {
             const { rResult, } = await apiWarehouse.apiLocationWarehouse(id, { params: params })
             sListLocation(rResult.map((e) => ({ label: e.name, value: e.id })));
-            return rResult
-        },
-        ...reTryQuery
-    })
-
-
-    useQuery({
-        queryKey: ['api_variation', { ...params }],
-        queryFn: async () => {
-            const { rResult } = await apiVariant.apiListVariant(id, { params: params })
-            const options = rResult?.flatMap(({ option }) => option) ?? [];
-            sListVariant(options?.map(({ id, name }) => ({
-                label: name,
-                value: id,
-            }))
-            );
             return rResult
         },
         ...reTryQuery
@@ -113,7 +90,7 @@ const WarehouseSlug = (props) => {
         });
     };
 
-    const newResult = data_ex?.map((item) => {
+    const newResult = data?.rResult?.map((item) => {
         const detail = item.detail || [];
         return detail.map((detailItem) => ({
             ...item,
@@ -276,7 +253,7 @@ const WarehouseSlug = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{title}</title>
+                <title>{data?.name}</title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
                 {statusExprired ? (
@@ -294,12 +271,11 @@ const WarehouseSlug = (props) => {
                             <div className="flex justify-between">
                                 <div className="flex items-center gap-2 ">
                                     <House2 size="32" color="#0F4F9E" />
-                                    <h2 className="text-2xl text-[#52575E]">{title}</h2>
+                                    <h2 className="text-2xl text-[#52575E]">{data?.name}</h2>
                                 </div>
                                 <div className="flex justify-end items-center">
                                     <button
                                         type="button"
-                                        // href={"/warehouses/warehouse"}
                                         onClick={() => router.back()}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                                     >
@@ -326,9 +302,7 @@ const WarehouseSlug = (props) => {
                                                 </form>
                                             </div>
                                             <div className="ml-1 col-span-1">
-                                                {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
                                                 <Select
-                                                    // options={options}
                                                     options={[
                                                         {
                                                             value: "",
@@ -346,7 +320,6 @@ const WarehouseSlug = (props) => {
                                                     isSearchable={true}
                                                     noOptionsMessage={() => "Không có dữ liệu"}
                                                     components={{ MultiValue }}
-                                                    // closeMenuOnSelect={false}
                                                     style={{
                                                         border: "none",
                                                         boxShadow: "none",
@@ -379,16 +352,14 @@ const WarehouseSlug = (props) => {
                                                 />
                                             </div>
                                             <div className="ml-1 col-span-1">
-                                                {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
                                                 <Select
-                                                    // options={options}
                                                     options={[
                                                         {
                                                             value: "",
                                                             label: dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain",
                                                             isDisabled: true,
                                                         },
-                                                        ...variant,
+                                                        ...listVariant,
                                                     ]}
                                                     onChange={onchang_filter.bind(this, "MainVariation")}
                                                     value={idVariantMain}
@@ -399,7 +370,6 @@ const WarehouseSlug = (props) => {
                                                     isSearchable={true}
                                                     noOptionsMessage={() => "Không có dữ liệu"}
                                                     components={{ MultiValue }}
-                                                    // closeMenuOnSelect={false}
                                                     style={{
                                                         border: "none",
                                                         boxShadow: "none",
@@ -432,16 +402,14 @@ const WarehouseSlug = (props) => {
                                                 />
                                             </div>
                                             <div className="ml-1 col-span-1">
-                                                {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
                                                 <Select
-                                                    // options={options}
                                                     options={[
                                                         {
                                                             value: "",
                                                             label: dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub",
                                                             isDisabled: true,
                                                         },
-                                                        ...variant,
+                                                        ...listVariant,
                                                     ]}
                                                     onChange={onchang_filter.bind(this, "SubVariation")}
                                                     value={idVariantSub}
@@ -497,9 +465,9 @@ const WarehouseSlug = (props) => {
                                                     color="green"
                                                 />
                                             </button>
-                                            {data_ex?.length > 0 && (
+                                            {newResult?.length > 0 && (
                                                 <ExcelFile
-                                                    filename={title}
+                                                    filename={data?.name}
                                                     title="Ctkh"
                                                     element={
                                                         <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
@@ -596,9 +564,9 @@ const WarehouseSlug = (props) => {
                                         </div>
                                         {(isFetching) ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : data?.rResult?.length > 0 ? (
                                             <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
-                                                {data?.map((e) => (
+                                                {data?.rResult?.map((e) => (
                                                     <div
                                                         className={`${dataProductSerial.is_enable == "1"
                                                             ? dataMaterialExpiry.is_enable !=
@@ -694,16 +662,12 @@ const WarehouseSlug = (props) => {
                                                                     <div className="col-span-1 border-r border-b">
                                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                             {" "}
-                                                                            {e.location_name == null
-                                                                                ? "-"
-                                                                                : e.location_name}
+                                                                            {e.location_name == null ? "-" : e.location_name}
                                                                         </h6>
                                                                     </div>
                                                                     <div className=" col-span-1 border-r border-b">
                                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
-                                                                            {e.option_name_1 == null
-                                                                                ? "-"
-                                                                                : e.option_name_1}
+                                                                            {e.option_name_1 == null ? "-" : e.option_name_1}
                                                                         </h6>
                                                                     </div>
                                                                     <div className=" col-span-1 border-r border-b">
@@ -724,14 +688,11 @@ const WarehouseSlug = (props) => {
                                                                     ) : (
                                                                         ""
                                                                     )}
-                                                                    {dataMaterialExpiry.is_enable === "1" ||
-                                                                        dataProductExpiry.is_enable === "1" ? (
+                                                                    {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                         <>
                                                                             <div className=" col-span-1 border-r border-b ">
                                                                                 <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
-                                                                                    {e.lot == null || e.lot == ""
-                                                                                        ? "-"
-                                                                                        : e.lot}
+                                                                                    {e.lot == null || e.lot == "" ? "-" : e.lot}
                                                                                 </h6>
                                                                             </div>
                                                                             <div className=" col-span-1 border-r border-b ">
@@ -745,9 +706,7 @@ const WarehouseSlug = (props) => {
                                                                     )}
                                                                     <div className=" col-span-1 border-r border-b ">
                                                                         <h6 className="xl:text-base text-sm  px-2 py-3  w-[full] text-red-500 font-medium text-center ">
-                                                                            {e.quantity
-                                                                                ? formatNumber(e?.quantity)
-                                                                                : "-"}
+                                                                            {e.quantity ? formatNumber(e?.quantity) : "-"}
                                                                         </h6>
                                                                     </div>
                                                                     <div className=" col-span-1 border-b">
@@ -766,15 +725,15 @@ const WarehouseSlug = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {data?.rResult?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                                    {dataLang?.display} {data?.output?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {data?.output?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                    totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -785,39 +744,5 @@ const WarehouseSlug = (props) => {
             </div>
         </React.Fragment>
     );
-};
-
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 3;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
 };
 export default WarehouseSlug;

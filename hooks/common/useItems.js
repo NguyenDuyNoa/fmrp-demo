@@ -29,13 +29,13 @@ export const useUnitList = () => {
 }
 
 // ds biến thể combobox
-export const useVariantList = () => {
+export const useVariantList = (params = undefined) => {
     const dispatch = useDispatch()
     return useQuery({
-        queryKey: ['api_variation'],
+        queryKey: ['api_variation', { ...params }],
         queryFn: async () => {
 
-            const { rResult } = await apiVariant.apiListVariant({})
+            const { rResult } = await apiVariant.apiListVariant({ params: params })
 
             const variation = rResult?.map((e) => ({
                 label: e.name,

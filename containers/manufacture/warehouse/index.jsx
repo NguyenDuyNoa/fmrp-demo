@@ -1,6 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiVariant from "@/Api/apiSettings/apiVariant";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -16,9 +13,10 @@ import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useVariantList } from "@/hooks/common/useItems";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
@@ -29,32 +27,26 @@ import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { PopupParent } from "@/utils/lib/Popup";
-import { useQuery } from "@tanstack/react-query";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import PopupWarehouse from "./components/popup";
-import { useBranchList } from "@/hooks/common/useBranch";
+import { useWarehouseDetail } from "./hooks/useWarehouseDetail";
+import { useWarehouseList } from "./hooks/useWarehouseList";
 import { useWarehouseLocation } from "./hooks/useWarehouseLocation";
 
 const initialState = {
     idWarehouse: "",
-    dataWarehouse: [],
-    dataWarehouseDetail: [],
     limitItemWarehouseDetail: 10,
-    totalItemWarehouseDetail: [],
-    dataWarehouseExcel: [],
     keySearchItem: "",
     idBranch: null,
     idLocationWarehouse: null,
-    listVariant: [],
     idVariantMain: null,
     idVariantSub: null,
-    isLoading: false,
 };
 
 const Warehouse = (props) => {
@@ -70,84 +62,25 @@ const Warehouse = (props) => {
 
     const statusExprired = useStatusExprired();
 
+    const [isState, setIsState] = useState(initialState);
+
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
+
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial, } = useFeature();
+
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkExport, checkEdit } = useActionRole(auth, "warehouse");
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial, } = useFeature();
-
-    const [data_ex, sData_ex] = useState([]);
-
-    const [isState, setIsState] = useState(initialState);
-
     const queryKeyIsState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
-    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
-
-    const { data: listBranch = [] } = useBranchList();
-
-    const { data: listLocationWarehouse = [] } = useWarehouseLocation(isState.idWarehouse);
-
-    const formatNumber = (number) => {
-        return formatNumberConfig(+number, dataSeting);
-    };
-
-    const convertArray = (arr) => {
-        return arr?.map((e) => ({ label: e?.name, value: e?.id })) || []
-    }
-
-    const { refetch: refetchFilterVariationWarehouse } = useQuery({
-        queryKey: ["api_listVariant_warehouse"],
-        queryFn: async () => {
-            const { rResult } = await apiVariant.apiListVariant({});
-
-            const options = rResult?.flatMap(({ option }) => option) ?? [];
-
-            queryKeyIsState({ listVariant: convertArray(options) });
-
-            return rResult
-        },
-        enabled: false,
-        ...reTryQuery
-    });
-
-    const handleOpenSelect = (type) => {
-        if (type === "mainVariation" && isState?.listVariant?.length === 0) {
-            refetchFilterVariationWarehouse();
-        } else if (type === "subVariation") {
-        }
-    };
-
-    // fetch danh sách kho
-
-    const param = {
+    const paramsWarehouse = {
         limit: undefined,
         page: router.query?.page || 1,
-        "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch.map((e) => e.value) : null,
+        "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch?.map((e) => e.value) : null,
     };
 
-    const { isFetching, refetch } = useQuery({
-        queryKey: ["api_data_warehouse", param, isState.idBranch],
-        queryFn: async () => {
-            const { rResult, output } = await apiWarehouse.apiListWarehouse({ param: param });
-
-            if (rResult?.length > 0) {
-                queryKeyIsState({ idWarehouse: rResult[0].id });
-            } else {
-                queryKeyIsState({ idWarehouse: null, dataWarehouseDetail: [] });
-            }
-
-            queryKeyIsState({ dataWarehouse: rResult });
-
-            sData_ex(rResult);
-
-            return rResult
-        },
-        ...reTryQuery
-    })
-
-    // fetch data chi tiết của kho
-    const params = {
+    const paramsDetail = {
         search: isState.keySearchItem,
         limit: isState.limitItemWarehouseDetail,
         page: router.query?.page || 1,
@@ -156,40 +89,37 @@ const Warehouse = (props) => {
         "filter[variation_option_id_2]": isState.idVariantSub?.value ? isState.idVariantSub?.value : null,
     };
 
-    const { refetch: refetchWarehouseDetail, isFetching: isFetchingWarehouseDetail } = useQuery({
-        queryKey: ["api_data_warehouse_detail", params, isState.idWarehouse],
-        queryFn: async () => {
-            const { rResult, output } = await apiWarehouse.apiWarehouseDetail(isState.idWarehouse, { params: params });
-            queryKeyIsState({
-                dataWarehouseDetail: rResult,
-                dataWarehouseExcel: rResult,
-                totalItemWarehouseDetail: output,
-            });
-            return rResult
-        },
-        enabled: !!isState.idWarehouse,
-        ...reTryQuery
-    })
+    const { data: listBranch = [] } = useBranchList();
 
+    const { data: listVariant = [] } = useVariantList();
+
+    const { data: listLocationWarehouse = [] } = useWarehouseLocation(isState.idWarehouse);
+
+    const { data: dataWarehouse, isFetching, refetch } = useWarehouseList(paramsWarehouse);
+
+    const { data, refetch: refetchWarehouseDetail, isFetching: isFetchingWarehouseDetail } = useWarehouseDetail(isState?.idWarehouse, paramsDetail);
+
+    useEffect(() => {
+        if (dataWarehouse?.rResult?.length > 0) {
+            queryKeyIsState({ idWarehouse: dataWarehouse?.rResult[0].id });
+        }
+    }, [dataWarehouse?.rResult])
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    };
 
     const onChangeFilter = (type, value) => {
         if (type == "branch") {
-            // fetch list chi nhánh kho
-            queryKeyIsState({
-                idBranch: value,
-            });
+            queryKeyIsState({ idBranch: value });
         } else if (type == "location") {
-            queryKeyIsState({
-                idLocationWarehouse: value,
-            });
+            queryKeyIsState({ idLocationWarehouse: value });
         } else if (type == "MainVariation") {
             queryKeyIsState({
                 idVariantMain: value,
             });
         } else if (type == "SubVariation") {
-            queryKeyIsState({
-                idVariantSub: value,
-            });
+            queryKeyIsState({ idVariantSub: value });
         }
         router.push({
             pathname: router.route,
@@ -202,93 +132,12 @@ const Warehouse = (props) => {
         router.replace(router.route);
     }, 500);
 
-    //excel
-    // const multiDataSet = [
-    //     {
-    //         columns: [
-    //             {
-    //                 title: "ID",
-    //                 width: { wch: 4 },
-    //                 style: {
-    //                     fill: { fgColor: { rgb: "C7DFFB" } },
-    //                     font: { bold: true },
-    //                 },
-    //             },
-    //             {
-    //                 title: `${dataLang?.Warehouse_code || "Warehouse_code"}`,
-    //                 width: { wpx: 100 },
-    //                 style: {
-    //                     fill: { fgColor: { rgb: "C7DFFB" } },
-    //                     font: { bold: true },
-    //                 },
-    //             },
-    //             {
-    //                 title: `${dataLang?.Warehouse_poppup_name || "Warehouse_poppup_name"}`,
-    //                 width: { wpx: 100 },
-    //                 style: {
-    //                     fill: { fgColor: { rgb: "C7DFFB" } },
-    //                     font: { bold: true },
-    //                 },
-    //             },
-    //             {
-    //                 title: `${dataLang?.Warehouse_total || "Warehouse_total"}`,
-    //                 width: { wch: 40 },
-    //                 style: {
-    //                     fill: { fgColor: { rgb: "C7DFFB" } },
-    //                     font: { bold: true },
-    //                 },
-    //             },
-    //             {
-    //                 title: `${dataLang?.Warehouse_inventory || "Warehouse_inventory"}`,
-    //                 width: { wch: 40 },
-    //                 style: {
-    //                     fill: { fgColor: { rgb: "C7DFFB" } },
-    //                     font: { bold: true },
-    //                 },
-    //             },
-    //             {
-    //                 title: `${dataLang?.Warehouse_poppup_address || "Warehouse_poppup_address"}`,
-    //                 width: { wch: 40 },
-    //                 style: {
-    //                     fill: { fgColor: { rgb: "C7DFFB" } },
-    //                     font: { bold: true },
-    //                 },
-    //             },
-    //             {
-    //                 title: `${dataLang?.client_popup_note || "client_popup_note"}`,
-    //                 width: { wch: 40 },
-    //                 style: {
-    //                     fill: { fgColor: { rgb: "C7DFFB" } },
-    //                     font: { bold: true },
-    //                 },
-    //             },
-    //             {
-    //                 title: `${dataLang?.Warehouse_factory || "Warehouse_factory"}`,
-    //                 width: { wch: 40 },
-    //                 style: {
-    //                     fill: { fgColor: { rgb: "C7DFFB" } },
-    //                     font: { bold: true },
-    //                 },
-    //             },
-    //         ],
-    //         data: data_ex?.map((e) => [
-    //             { value: `${e.id}`, style: { numFmt: "0" } },
-    //             { value: `${e.code ? e.code : ""}` },
-    //             { value: `${e.name ? e.name : ""}` },
-    //             { value: `${"Tổng mặt hàng "}` },
-    //             { value: `${"Tổng tồn kho"}` },
-    //             { value: `${e.address ? e.address : ""}` },
-    //             { value: `${e.note ? e.note : ""}` },
-    //             { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
-    //         ]),
-    //     },
-    // ];
-    const newResult = isState.dataWarehouseExcel?.map((item) => {
+    const newResult = data?.rResult?.map((item) => {
         const detail = item.detail || [];
         return detail.map((detailItem) => ({
             ...item,
             detail: detailItem,
-        }));
+        }))
     }).flat();
 
     const multiDataSet = [
@@ -495,7 +344,6 @@ const Warehouse = (props) => {
                                                 },
                                                 ...listBranch,
                                             ]}
-                                            onMenuOpen={() => handleOpenSelect("branch")}
                                             onChange={onChangeFilter.bind(this, "branch")}
                                             value={isState.idBranch}
                                             isMulti
@@ -515,7 +363,6 @@ const Warehouse = (props) => {
                                                 },
                                                 ...listLocationWarehouse,
                                             ]}
-                                            onMenuOpen={() => handleOpenSelect("locationWarehouse")}
                                             onChange={onChangeFilter.bind(this, "location")}
                                             value={isState.idLocationWarehouse}
                                             hideSelectedOptions={false}
@@ -532,9 +379,8 @@ const Warehouse = (props) => {
                                                     label: dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain",
                                                     isDisabled: true,
                                                 },
-                                                ...isState.listVariant,
+                                                ...listVariant,
                                             ]}
-                                            onMenuOpen={() => handleOpenSelect("mainVariation")}
                                             onChange={onChangeFilter.bind(this, "MainVariation")}
                                             value={isState.idVariantMain}
                                             hideSelectedOptions={false}
@@ -552,9 +398,8 @@ const Warehouse = (props) => {
                                                     label: dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub",
                                                     isDisabled: true,
                                                 },
-                                                ...isState.listVariant,
+                                                ...listVariant,
                                             ]}
-                                            onMenuOpen={() => handleOpenSelect("subVariation")}
                                             onChange={onChangeFilter.bind(this, "SubVariation")}
                                             value={isState.idVariantSub}
                                             hideSelectedOptions={false}
@@ -579,7 +424,7 @@ const Warehouse = (props) => {
                                         />
                                         {role == true || checkExport ? (
                                             <div className={``}>
-                                                {data_ex?.length > 0 && (
+                                                {dataWarehouse?.rResult?.length > 0 && (
                                                     <ExcelFileComponent
                                                         dataLang={dataLang}
                                                         filename="Danh sách kho"
@@ -606,8 +451,8 @@ const Warehouse = (props) => {
                         </div>
                         <div className="grid grid-cols-10">
                             <ul className="col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {isState.dataWarehouse &&
-                                    isState.dataWarehouse.map((item, index) => (
+                                {dataWarehouse?.rResult &&
+                                    dataWarehouse?.rResult?.map((item, index) => (
                                         <PopupParent
                                             trigger={
                                                 <div key={item.id} className="grid grid-cols-12 relative">
@@ -734,10 +579,10 @@ const Warehouse = (props) => {
                                             className="3xl:max-h-[560px] 3xl:h-[560px] 2xl:max-h-[400px] 2xl:h-[400px] max-h-[400px] h-[400px]"
                                             color="#0f4f9e"
                                         />
-                                    ) : isState?.dataWarehouseDetail && isState?.dataWarehouseDetail?.length > 0 ? (
+                                    ) : data?.rResult && data?.rResult?.length > 0 ? (
                                         <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
-                                            {isState?.dataWarehouseDetail &&
-                                                isState?.dataWarehouseDetail?.map((e) => (
+                                            {data?.rResult &&
+                                                data?.rResult?.map((e) => (
                                                     <div
                                                         className={`${dataProductSerial?.is_enable == "1" ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable ? "grid-cols-10"
                                                             : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-10" : "grid-cols-8"
@@ -952,19 +797,15 @@ const Warehouse = (props) => {
                             </div>
                         </div>
                     </div>
-                    {isState?.dataWarehouse?.length != 0 && (
+                    {dataWarehouse?.rResult?.length != 0 && (
                         <ContainerPagination className={"justify-end"}>
-                            {/* <h6 className='3xl:text-base text-sm'>
-                                {dataLang?.display} {isState?.totalItemWarehouseDetail?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                {isState?.totalItemWarehouseDetail?.iTotalRecords} {dataLang?.ingredient}
-                            </h6> */}
                             <TitlePagination
                                 dataLang={dataLang}
-                                totalItems={isState?.totalItemWarehouseDetail?.iTotalDisplayRecords}
+                                totalItems={data?.output?.iTotalDisplayRecords}
                             />
                             <Pagination
                                 postsPerPage={isState.limitItemWarehouseDetail}
-                                totalPosts={Number(isState?.totalItemWarehouseDetail?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                                 className="3xl:text-base text-sm"

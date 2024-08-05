@@ -1,4 +1,6 @@
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import ButtonCancel from "@/components/UI/button/buttonCancel";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
@@ -21,8 +23,6 @@ const PopupLocationWarehouse = (props) => {
 
     const [onSending, sOnSending] = useState(false);
 
-    const [listWarehouse, sListwarehouse] = useState([]);
-
     const [name, sName] = useState("");
 
     const [code, sCode] = useState("");
@@ -36,20 +36,12 @@ const PopupLocationWarehouse = (props) => {
     const [valueWarehouse, sValueWarehouse] = useState(null);
 
     useEffect(() => {
-        sErrInputWarehouse(false);
         sErrInputCode(false);
         sErrInputName(false);
+        sErrInputWarehouse(false);
         sName(props.name ? props.name : "");
         sCode(props.code ? props.code : "");
-        sListwarehouse(props.isState.listWarehouse || []);
-        sValueWarehouse(
-            props.id
-                ? {
-                    label: props.warehouse_name,
-                    value: props.warehouse_id,
-                }
-                : null
-        );
+        sValueWarehouse(props.id ? { label: props.warehouse_name, value: props.warehouse_id } : null);
     }, [open]);
 
     const _HandleChangeInput = (type, value) => {
@@ -84,7 +76,7 @@ const PopupLocationWarehouse = (props) => {
         handingLocation.mutate({ url, data }, {
             onSuccess: ({ isSuccess, message }) => {
                 if (isSuccess) {
-                    isShow("success", `${props.dataLang[message]}`);
+                    isShow("success", `${props.dataLang[message] || message}`);
                     props.onRefresh && props.onRefresh();
                     sOpen(false);
                     sErrInputCode(false);
@@ -93,12 +85,12 @@ const PopupLocationWarehouse = (props) => {
                     sName("");
                     sCode("");
                     sValueWarehouse(null);
+                    sOnSending(false);
                 } else {
                     isShow("error", `${props.dataLang[message]}`);
                 }
             }
         })
-        sOnSending(false);
     };
 
     //da up date
@@ -138,11 +130,7 @@ const PopupLocationWarehouse = (props) => {
     return (
         <>
             <PopupCustom
-                title={
-                    props.id
-                        ? `${props.dataLang?.warehouses_localtion_edit}`
-                        : `${props.dataLang?.warehouses_localtion_add}`
-                }
+                title={props.id ? `${props.dataLang?.warehouses_localtion_edit}` : `${props.dataLang?.warehouses_localtion_add}`}
                 button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -166,10 +154,7 @@ const PopupLocationWarehouse = (props) => {
                                                 placeholder={props.dataLang?.warehouses_localtion_code}
                                                 name="fname"
                                                 type="text"
-                                                className={`${errInputCode
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${errInputCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -207,7 +192,7 @@ const PopupLocationWarehouse = (props) => {
                                             </label>
                                             <SelectCore
                                                 placeholder={props.dataLang?.warehouses_localtion_ware}
-                                                options={listWarehouse}
+                                                options={props?.dataWarehouse}
                                                 isSearchable={true}
                                                 onChange={_HandleChangeInput.bind(this, "valueWarehouse")}
                                                 noOptionsMessage={() => "Không có dữ liệu"}
@@ -248,21 +233,13 @@ const PopupLocationWarehouse = (props) => {
                                 </div>
                             </div>
                         </Customscrollbar>
-
                         <div className="text-right mt-5 space-x-2">
-                            <button
-                                type="button"
-                                onClick={_ToggleModal.bind(this, false)}
-                                className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                            >
-                                {props.dataLang?.branch_popup_exit}
-                            </button>
-                            <button
-                                type="submit"
-                                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                            >
-                                {props.dataLang?.branch_popup_save}
-                            </button>
+                            <ButtonCancel dataLang={props.dataLang} onClick={_ToggleModal.bind(this, false)} />
+                            <ButtonSubmit
+                                dataLang={props.dataLang}
+                                loading={handingLocation.isPending}
+                                onClick={_HandleSubmit.bind(this)}
+                            />
                         </div>
                     </form>
                 </div>
