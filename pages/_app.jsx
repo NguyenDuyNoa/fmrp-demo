@@ -1,10 +1,10 @@
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import Layout from "@/components/layout";
 import LoginPage from "@/components/UI/login/login";
+import { useAuththentication, useLanguage, useSetings } from "@/hooks/useAuth";
 import { Lexend_Deca } from "@next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Head from "next/head";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import "sweetalert2/src/sweetalert2.scss";
@@ -37,88 +37,20 @@ const Default = (props) => {
 function MainPage({ Component, pageProps }) {
     const dispatch = useDispatch();
 
-    ///Language
+    const auth = useSelector((state) => state.auth);
+
     const langDefault = useSelector((state) => state.lang);
 
-    const [changeLang, sChangeLang] = useState(false);
+    const { data } = useLanguage(langDefault)
 
-    const [data, sData] = useState();
+    const { } = useSetings()
 
-    const [onSeting, sOnSeting] = useState(false);
+    const { } = useAuththentication(auth)
 
     useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
-
-    const _ServerLang = async () => {
-        try {
-            const res = await apiDashboard.apiLang(langDefault);
-            if (res) {
-                sData(res);
-                sChangeLang(false);
-            }
-        } catch (error) { }
-    };
-
-    const FetchSetingServer = async () => {
-        try {
-            const res = await apiDashboard.apiSettings();
-            dispatch({ type: "setings/server", payload: res?.settings });
-
-            const fature = await apiDashboard.apiFeature();
-            const newData = {
-                dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
-                dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
-                dataProductSerial: fature.find((x) => x.code == "product_serial"),
-            };
-            dispatch({ type: "setings/feature", payload: newData });
-            sOnSeting(false);
-        } catch (error) { }
-    };
-
-    useEffect(() => {
-        changeLang && _ServerLang();
-    }, [changeLang]);
-
-    useEffect(() => {
-        sOnSeting(true);
-    }, []);
-
-    useEffect(() => {
-        onSeting && FetchSetingServer();
-    }, [onSeting]);
-
-    useEffect(() => {
-        sChangeLang(true);
-    }, [langDefault]);
-    ////
-
-    const auth = useSelector((state) => state.auth);
-
-    const [onChecking, sOnChecking] = useState(false);
-
-    const ServerFetching = async () => {
-        try {
-            const { isSuccess, info } = await apiDashboard.apiAuthentication();
-            if (isSuccess) {
-                dispatch({ type: "auth/update", payload: info });
-            } else {
-                dispatch({ type: "auth/update", payload: false });
-            }
-            sOnChecking(false);
-        } catch (error) { }
-    };
-
-    useEffect(() => {
-        onChecking && ServerFetching();
-    }, [onChecking]);
-
-    useEffect(() => {
-        if (auth == null) {
-            sOnChecking(true);
-        }
-    }, [auth]);
 
     if (auth == null) {
         return <LoadingPage />;

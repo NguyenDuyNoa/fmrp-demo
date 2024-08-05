@@ -74,6 +74,11 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/Api_staff/staffOption?csrf_protection=true`, params);
         return response.data
     },
+    // vị trí nhạn kho,
+    async apiLocationWarehouseTo(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true`, params);
+        return response.data
+    },
 
 }
 export default apiComons

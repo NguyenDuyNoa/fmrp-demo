@@ -1,4 +1,4 @@
-import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
+import LinkWarehouse from "@/containers/manufacture/components/linkWarehouse";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";

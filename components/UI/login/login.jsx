@@ -1,47 +1,22 @@
+import apiLogin from "@/Api/apiLogin/apiLogin";
+import { reTryQuery } from "@/configs/configRetryQuery";
+import { useSetings } from "@/hooks/useAuth";
+import useToast from "@/hooks/useToast";
+import { CookieCore } from "@/utils/lib/cookie";
+import firebase from "@/utils/lib/Firebase";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { Eye as IconEye, EyeSlash as IconEyeSlash, More as IconMore } from "iconsax-react";
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-
-import "react-datepicker/dist/react-datepicker.css";
+import Popup from "reactjs-popup";
 import "sweetalert2/src/sweetalert2.scss";
 
-import { CookieCore } from "@/utils/lib/cookie";
-import { Eye as IconEye, EyeSlash as IconEyeSlash, More as IconMore } from "iconsax-react";
-import { useRouter } from "next/router";
-import Popup from "reactjs-popup";
-import Swal from "sweetalert2";
-import firebase from "@/utils/lib/Firebase";
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
-import apiLogin from "@/Api/apiLogin/apiLogin";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { reTryQuery } from "@/configs/configRetryQuery";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 const LoginPage = React.memo((props) => {
-    const dispatch = useDispatch();
-
-    const router = useRouter();
-
-    const {
-        register,
-        handleSubmit,
-        watch,
-        setValue,
-        formState: { errors },
-    } = useForm();
-
-    const dataLang = props.dataLang;
-
-    const data = useSelector((state) => state.availableLang);
-
     const initialState = {
         rememberMe: localStorage?.getItem("remembermeFMRP") ? localStorage?.getItem("remembermeFMRP") : false,
         onSending: false,
@@ -60,15 +35,25 @@ const LoginPage = React.memo((props) => {
         checkValidateOtp: false,
     };
 
-    const valueForm = watch();
+    const { } = useSetings();
+
+    const dataLang = props.dataLang;
+
+    const dispatch = useDispatch();
+
+    const router = useRouter();
+
+    const showToat = useToast();
 
     const [isState, sIsState] = useState(initialState);
 
+    const data = useSelector((state) => state.availableLang);
+
     const queryState = (key) => sIsState((pver) => ({ ...pver, ...key }));
 
-    const showToat = (type, mssg) => {
-        return Toast.fire({ icon: `${type}`, title: `${mssg}` });
-    };
+    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
+
+    const valueForm = watch();
 
     useEffect(() => {
         queryState({ sendOtp: true });
@@ -107,18 +92,14 @@ const LoginPage = React.memo((props) => {
         };
         const formattedPhone = formatPhoneNumber(phone);
 
-        await firebase
-            .auth()
-            .signInWithPhoneNumber(formattedPhone, appVerifier)
-            .then((res) => {
-                window.confirmationResult = res;
-                queryState({ checkOtp: true, sendOtp: false });
-                showToat("success", "Đã gửi OTP thành công");
-            })
-            .catch((error) => {
-                queryState({ checkOtp: false, sendOtp: true, countOtp: 30 });
-                showToat("error", "Gửi OTP thất bại");
-            });
+        await firebase.auth().signInWithPhoneNumber(formattedPhone, appVerifier).then((res) => {
+            window.confirmationResult = res;
+            queryState({ checkOtp: true, sendOtp: false });
+            showToat("success", "Đã gửi OTP thành công");
+        }).catch((error) => {
+            queryState({ checkOtp: false, sendOtp: true, countOtp: 30 });
+            showToat("error", "Gửi OTP thất bại");
+        });
     };
 
     useEffect(() => {
@@ -126,52 +107,28 @@ const LoginPage = React.memo((props) => {
             const timer = setTimeout(() => {
                 queryState({ countOtp: isState.countOtp - 1 });
             }, 1000);
-
             // Clean up the timer when the component is unmounted or count changes
             return () => clearTimeout(timer);
         }
     }, [isState.countOtp, isState.checkOtp]);
 
     const handleVeryfyOtp = (otp) => {
-        window.confirmationResult
-            .confirm(otp)
-            .then(() => {
-                showToat("success", "Xác thực thành công");
-                queryState({ checkOtp: false, countOtp: 0 });
-            })
-            .catch((error) => {
-                queryState({ checkOtp: true, countOtp: 30 });
-                showToat("error", "Xác thực thất bại");
-            });
+        window.confirmationResult.confirm(otp).then(() => {
+            showToat("success", "Xác thực thành công");
+            queryState({ checkOtp: false, countOtp: 0 });
+        }).catch((error) => {
+            queryState({ checkOtp: true, countOtp: 30 });
+            showToat("error", "Xác thực thất bại");
+        });
     };
 
     useEffect(() => {
         setupRecapcha();
     }, []);
 
-    const FetchSetingServer = async () => {
-        try {
-            const res = await apiDashboard.apiSettings();
-
-            dispatch({ type: "setings/server", payload: res?.settings });
-
-            const fature = await apiDashboard.apiFeature();
-
-            const newData = {
-                dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
-                dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
-                dataProductSerial: fature.find((x) => x.code == "product_serial"),
-            };
-
-            dispatch({ type: "setings/feature", payload: newData });
-        } catch (error) { }
-    };
-
     ///Đăng ký
-
     const _HandleIsLogin = (e) => {
         queryState({ isLogin: e });
-        // !e && queryState({ onFechingRegister: true });
     };
 
     useQuery({
@@ -181,11 +138,7 @@ const LoginPage = React.memo((props) => {
             queryState({ listMajor: res?.career, listPosition: res?.role_user });
             return res;
         },
-
-        initialData: keepPreviousData,
-
-        staleTime: 1000 * 60 * 5,
-
+        placeholderData: keepPreviousData,
         enabled: !isState.isLogin,
         ...reTryQuery
     })
@@ -209,7 +162,6 @@ const LoginPage = React.memo((props) => {
                 });
                 const { isSuccess, message, token, database_app } = res;
                 if (isSuccess) {
-                    FetchSetingServer();
                     dispatch({ type: "auth/update", payload: res.data?.data });
                     CookieCore.set("tokenFMRP", token, {
                         path: "/",

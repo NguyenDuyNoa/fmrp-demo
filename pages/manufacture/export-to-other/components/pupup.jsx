@@ -16,7 +16,7 @@ import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
-import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
+import LinkWarehouse from "@/containers/manufacture/components/linkWarehouse";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";

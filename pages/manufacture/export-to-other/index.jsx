@@ -7,8 +7,8 @@ import { useSelector } from "react-redux";
 
 import { Grid6 } from "iconsax-react";
 
-import LinkWarehouse from "../components/linkWarehouse";
-import Popup_status from "../components/popupStatus";
+import LinkWarehouse from "../../../containers/manufacture/components/linkWarehouse";
+import Popup_status from "../../../containers/manufacture/components/popupStatus";
 import Popup_chitiet from "./components/pupup";
 
 import useSetingServer from "@/hooks/useConfigNumber";

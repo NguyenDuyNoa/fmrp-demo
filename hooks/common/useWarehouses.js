@@ -1,3 +1,4 @@
+import apiComons from "@/Api/apiComon/apiComon";
 import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { reTryQuery } from "@/configs/configRetryQuery";
@@ -41,5 +42,25 @@ export const useWarehouseComboboxlocation = (params) => {
 
         },
         ...reTryQuery
+    })
+}
+
+
+export const useLocationByWarehouseTo = (id) => {
+    const params = {
+        "filter[warehouse_id]": id ? id?.value : null,
+    };
+    return useQuery({
+        queryKey: ["api_location_combobox", { ...params }],
+        queryFn: async () => {
+
+            const data = await apiComons.apiLocationWarehouseTo({ params: params });
+
+            return data?.map((e) => ({
+                label: e?.location_name,
+                value: e?.id,
+            }))
+        },
+        enabled: !!id
     })
 }

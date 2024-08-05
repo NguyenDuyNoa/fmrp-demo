@@ -49,7 +49,7 @@ import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
-import LinkWarehouse from "../components/linkWarehouse";
+import LinkWarehouse from "../../../containers/manufacture/components/linkWarehouse";
 import PopupDetail from "./components/popup";
 
 const Index = (props) => {

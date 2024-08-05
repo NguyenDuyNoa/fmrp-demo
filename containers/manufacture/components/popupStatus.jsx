@@ -12,7 +12,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
-const Popup_status = (props) => {
+const PopupStatus = (props) => {
     const dataLang = props?.dataLang;
 
     const [data, sData] = useState([]);
@@ -160,4 +160,4 @@ const Popup_status = (props) => {
         </PopupCustom>
     );
 };
-export default Popup_status;
+export default PopupStatus;

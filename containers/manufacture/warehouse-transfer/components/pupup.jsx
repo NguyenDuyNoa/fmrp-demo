@@ -10,41 +10,31 @@ import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import { reTryQuery } from "@/configs/configRetryQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import LinkWarehouse from "@/containers/manufacture/components/linkWarehouse";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
-import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
+import { useWarehouseTransferDetail } from "../hooks/useWarehouseTransferDetail";
 
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const [data, sData] = useState();
-
     const dataSeting = useSetingServer();
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
+    const { data, isFetching } = useWarehouseTransferDetail(open, props?.id);
+
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
-
-    const { isFetching } = useQuery({
-        queryKey: ['api_detail_warehouse_transfer', props?.id],
-        queryFn: async () => {
-            const data = await apiWarehouseTransfer.apiDetailTransfer(props?.id);
-            sData(data);
-            return data
-        },
-        enabled: open && !!props?.id,
-        ...reTryQuery
-    })
 
     return (
         <>
@@ -186,114 +176,112 @@ const PopupDetail = (props) => {
                                     {isFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
-                                        <>
-                                            <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]">
-                                                <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
-                                                    {data?.items?.map((e) => (
-                                                        <div
-                                                            className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
-                                                            key={e.id?.toString()}
-                                                        >
-                                                            <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
-                                                                <div className="flex items-center gap-2">
-                                                                    <div>
-                                                                        {e?.item?.images != null ? (
+                                        <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]">
+                                            <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
+                                                {data?.items?.map((e) => (
+                                                    <div
+                                                        className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
+                                                        key={e.id?.toString()}
+                                                    >
+                                                        <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
+                                                            <div className="flex items-center gap-2">
+                                                                <div>
+                                                                    {e?.item?.images != null ? (
+                                                                        <ModalImage
+                                                                            small={e?.item?.images}
+                                                                            large={e?.item?.images}
+                                                                            alt="Product Image"
+                                                                            className="custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-[50px] h-[60px] object-cover  mx-auto">
                                                                             <ModalImage
-                                                                                small={e?.item?.images}
-                                                                                large={e?.item?.images}
-                                                                                alt="Product Image"
-                                                                                className="custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto"
-                                                                            />
-                                                                        ) : (
-                                                                            <div className="w-[50px] h-[60px] object-cover  mx-auto">
-                                                                                <ModalImage
-                                                                                    small="/no_img.png"
-                                                                                    large="/no_img.png"
-                                                                                    className="w-full h-full rounded object-contain p-1"
-                                                                                >
-                                                                                    {" "}
-                                                                                </ModalImage>
+                                                                                small="/no_img.png"
+                                                                                large="/no_img.png"
+                                                                                className="w-full h-full rounded object-contain p-1"
+                                                                            >
+                                                                                {" "}
+                                                                            </ModalImage>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                <div>
+                                                                    <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                        {e?.item?.name}
+                                                                    </h6>
+                                                                    <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                        {e?.item?.product_variation}
+                                                                    </h6>
+                                                                    <div className="flex items-center font-oblique flex-wrap">
+                                                                        {dataProductSerial.is_enable === "1" ? (
+                                                                            <div className="flex gap-0.5">
+                                                                                <h6 className="text-[12px]">
+                                                                                    Serial:
+                                                                                </h6>
+                                                                                <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                                    {e?.item?.serial == null || e?.item?.serial == "" ? "-" : e?.item?.serial}
+                                                                                </h6>
                                                                             </div>
+                                                                        ) : (
+                                                                            ""
                                                                         )}
-                                                                    </div>
-                                                                    <div>
-                                                                        <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                            {e?.item?.name}
-                                                                        </h6>
-                                                                        <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                            {e?.item?.product_variation}
-                                                                        </h6>
-                                                                        <div className="flex items-center font-oblique flex-wrap">
-                                                                            {dataProductSerial.is_enable === "1" ? (
+                                                                        {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                                            <>
                                                                                 <div className="flex gap-0.5">
                                                                                     <h6 className="text-[12px]">
-                                                                                        Serial:
-                                                                                    </h6>
+                                                                                        Lot:
+                                                                                    </h6>{" "}
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e?.item?.serial == null || e?.item?.serial == "" ? "-" : e?.item?.serial}
+                                                                                        {e?.item?.lot == null || e?.item?.lot == "" ? "-" : e?.item?.lot}
                                                                                     </h6>
                                                                                 </div>
-                                                                            ) : (
-                                                                                ""
-                                                                            )}
-                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
-                                                                                <>
-                                                                                    <div className="flex gap-0.5">
-                                                                                        <h6 className="text-[12px]">
-                                                                                            Lot:
-                                                                                        </h6>{" "}
-                                                                                        <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e?.item?.lot == null || e?.item?.lot == "" ? "-" : e?.item?.lot}
-                                                                                        </h6>
-                                                                                    </div>
-                                                                                    <div className="flex gap-0.5">
-                                                                                        <h6 className="text-[12px]">
-                                                                                            Date:
-                                                                                        </h6>{" "}
-                                                                                        <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
-                                                                                        </h6>
-                                                                                    </div>
-                                                                                </>
-                                                                            ) : (
-                                                                                ""
-                                                                            )}
-                                                                        </div>
+                                                                                <div className="flex gap-0.5">
+                                                                                    <h6 className="text-[12px]">
+                                                                                        Date:
+                                                                                    </h6>{" "}
+                                                                                    <h6 className="text-[12px]  px-2   w-[full] text-center ">
+                                                                                        {e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                                    </h6>
+                                                                                </div>
+                                                                            </>
+                                                                        ) : (
+                                                                            ""
+                                                                        )}
                                                                     </div>
                                                                 </div>
+                                                            </div>
+                                                        </h6>
+                                                        <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
+                                                            <h6 className="font-medium">
+                                                                {e?.warehouse_location?.location_name}
                                                             </h6>
-                                                            <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
-                                                                <h6 className="font-medium">
-                                                                    {e?.warehouse_location?.location_name}
-                                                                </h6>
+                                                        </h6>
+                                                        <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
+                                                            <h6 className="font-medium">
+                                                                {e?.warehouse_location_to?.location_name}
                                                             </h6>
-                                                            <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
-                                                                <h6 className="font-medium">
-                                                                    {e?.warehouse_location_to?.location_name}
-                                                                </h6>
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
-                                                                {formatNumber(e?.warehouse_location?.quantity)}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
-                                                                {e?.item?.unit_name}
-                                                            </h6>
+                                                        </h6>
+                                                        <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
+                                                            {formatNumber(e?.warehouse_location?.quantity)}
+                                                        </h6>
+                                                        <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
+                                                            {e?.item?.unit_name}
+                                                        </h6>
 
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center ">
-                                                                {formatNumber(e?.quantity)} {e?.item?.unit_name}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
-                                                                {e?.note != undefined ? (
-                                                                    <ExpandableContent content={e?.note} />
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                            </h6>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </Customscrollbar>
-                                        </>
+                                                        <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center ">
+                                                            {formatNumber(e?.quantity)} {e?.item?.unit_name}
+                                                        </h6>
+                                                        <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
+                                                            {e?.note != undefined ? (
+                                                                <ExpandableContent content={e?.note} />
+                                                            ) : (
+                                                                ""
+                                                            )}
+                                                        </h6>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </Customscrollbar>
                                     ) : (
                                         <NoData />
                                     )}

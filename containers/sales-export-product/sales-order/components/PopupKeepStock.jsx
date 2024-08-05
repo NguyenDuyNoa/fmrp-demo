@@ -24,12 +24,12 @@ import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { NumericFormat } from "react-number-format";
 
+const initialFetch = {
+    onSending: false,
+    onFetchingWarehouse: false,
+    onFetchingCondition: false,
+};
 const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
-    const initialFetch = {
-        onSending: false,
-        onFetchingWarehouse: false,
-        onFetchingCondition: false,
-    };
     const dataSeting = useSetingServer()
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);

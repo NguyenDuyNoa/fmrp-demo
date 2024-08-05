@@ -9,8 +9,8 @@ import { Grid6 } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 
-import LinkWarehouse from "../components/linkWarehouse";
-import Popup_status from "../components/popupStatus";
+import LinkWarehouse from "../../../containers/manufacture/components/linkWarehouse";
+import Popup_status from "../../../containers/manufacture/components/popupStatus";
 import Popup_chitiet from "./components/pupup";
 
 import { BtnAction } from "@/components/UI/BtnAction";
