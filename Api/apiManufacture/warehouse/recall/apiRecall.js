@@ -9,14 +9,11 @@ const apiRecall = {
         const response = await axiosCustom('GET', `/api_web/Api_material_recall/filterBar/?csrf_protection=true`, param);
         return response.data
     },
-    async apiMaterialRecallCombobox() {
-        const response = await axiosCustom('GET', `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`);
+    async apiMaterialRecallCombobox(method, params) {
+        const response = await axiosCustom(method, `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`, params);
         return response.data
     },
-    async apiAjaxMaterialRecallCombobox(param) {
-        const response = await axiosCustom('POST', `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`, param);
-        return response.data
-    },
+
     async apiWarehouseCombobox() {
         const response = await axiosCustom('GET', `/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true`);
         return response.data

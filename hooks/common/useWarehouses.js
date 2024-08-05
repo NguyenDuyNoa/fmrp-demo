@@ -33,7 +33,7 @@ export const useWarehouseComboboxByManufacture = () => {
 export const useWarehouseComboboxByManufactureByBranch = (idBranch, idImportWarehouse) => {
     const params = {
         "filter[branch_id]": idBranch ? idBranch?.value : null,
-        "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : null
+        "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : undefined
     }
     return useQuery({
         queryKey: ['api_warehouse_combobox_manufacturer_branch', { ...params }],

@@ -9,12 +9,8 @@ const apiProductionWarehouse = {
         return response.data
     },
 
-    async apiCodeProductionWarehouse() {
-        const response = await axiosCustom('GET', `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`,);
-        return response.data
-    },
-    async apiAjaxCodeProductionWarehouse(data) {
-        const response = await axiosCustom('POST', `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`, data);
+    async apiCodeProductionWarehouse(method, data) {
+        const response = await axiosCustom(method, `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`, data);
         return response.data
     },
     async apiComboboxWarehouse(param) {

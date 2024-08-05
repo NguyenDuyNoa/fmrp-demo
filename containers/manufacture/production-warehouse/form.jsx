@@ -265,7 +265,9 @@ const ProductionWarehouseForm = (props) => {
             } else {
                 handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
             }
-        } catch (error) { }
+        } catch (error) {
+            throw error
+        }
     };
 
     useEffect(() => {

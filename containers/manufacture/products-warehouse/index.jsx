@@ -158,7 +158,7 @@ const ProductsWarehouse = (props) => {
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
         data.append("id", checkedWare?.id);
         try {
-            const { isSuccess, message, dataExport } = await apiProductsWarehouse.apiHandingStatusWarehouse(data);
+            const { isSuccess, message, data_export } = await apiProductsWarehouse.apiHandingStatusWarehouse(data);
 
             if (isSuccess) {
                 isShow("success", `${dataLang[message] || message}`);
@@ -172,8 +172,8 @@ const ProductsWarehouse = (props) => {
                 isShow("error", `${dataLang[message] || message}`);
             }
 
-            if (dataExport?.length > 0) {
-                queryState({ dataExport: dataExport });
+            if (data_export?.length > 0) {
+                queryState({ dataExport: data_export });
             }
         } catch (error) {
             throw error

@@ -25,6 +25,7 @@ import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranch";
+import { useWarehouseComboboxByManufacture } from "@/hooks/common/useWarehouses";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
@@ -45,16 +46,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import PopupDetail from "./components/popup";
+import { useProductionWarehouseCombobox } from "./hooks/useProductionWarehouseCombobox";
 import { useProductionWarehouseFillterbar } from "./hooks/useProductionWarehouseFillterbar";
 import { useProductionWarehouseList } from "./hooks/useProductionWarehouseList";
-
 
 const initialState = {
     onSending: false,
     keySearch: "",
-    lisCode: [],
+    keySearchCode: "",
     idExportWarehouse: null,
-    dataWarehouse: [],
     idCode: null,
     idSupplier: null,
     idBranch: null,
@@ -106,37 +106,15 @@ const ProductionWarehouse = (props) => {
 
     const { data, isFetching, refetch } = useProductionWarehouseList(params)
 
+    const { data: listWarehouse = [[]] } = useWarehouseComboboxByManufacture()
+
+    const { data: listCode = [] } = useProductionWarehouseCombobox(isState.keySearchCode)
+
     const { data: dataFillterbar, refetch: refetchFilterbar } = useProductionWarehouseFillterbar({ ...params, limit: 0, "filter[status_bar]": undefined })
 
-    const _ServerFetching_filter = async () => {
-        try {
-
-            const { result: exportProductionCombobox } = await apiProductionWarehouse.apiCodeProductionWarehouse();
-
-            const data = await apiProductionWarehouse.apiComboboxWarehouse();
-
-            queryState({
-                lisCode: exportProductionCombobox?.map((e) => ({ label: e.code, value: e.id })),
-                dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
-                onFetching_filter: false,
-            });
-        } catch (error) { }
-    };
-
     const _HandleSeachApi = debounce(async (inputValue) => {
-        try {
-            const { result } = await apiProductionWarehouse.apiAjaxCodeProductionWarehouse({
-                data: {
-                    term: inputValue,
-                },
-            });
-            queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) });
-        } catch (error) { }
+        queryState({ keySearchCode: inputValue });
     }, 500);
-
-    useEffect(() => {
-        isState.onFetching_filter && _ServerFetching_filter();
-    }, [isState.onFetching_filter]);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -178,19 +156,17 @@ const ProductionWarehouse = (props) => {
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
         data.append("id", checkedWare?.id);
         try {
-            const { isSuccess, message } = await apiProductionWarehouse.apiHangdingStatusWarehouse({
-                data: data,
-            });
+            const { isSuccess, message } = await apiProductionWarehouse.apiHangdingStatusWarehouse({ data: data });
 
             if (isSuccess) {
-                isShow("success", `${dataLang[message]}`);
+                isShow("success", `${dataLang[message] || message}`);
                 await refetch()
                 await refetchFilterbar();
+                queryState({ onSending: false });
             } else {
-                isShow("error", `${dataLang[message]}`);
+                isShow("error", `${dataLang[message] || message}`);
             }
         } catch (error) { }
-        queryState({ onSending: false });
     };
 
     useEffect(() => {
@@ -394,7 +370,7 @@ const ProductionWarehouse = (props) => {
                                                         label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
                                                         isDisabled: true,
                                                     },
-                                                    ...isState.lisCode,
+                                                    ...listCode,
                                                 ]}
                                                 onChange={(e) => queryState({ idCode: e })}
                                                 value={isState.idCode}
@@ -411,7 +387,7 @@ const ProductionWarehouse = (props) => {
                                                         label: dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse",
                                                         isDisabled: true,
                                                     },
-                                                    ...isState.dataWarehouse,
+                                                    ...listWarehouse,
                                                 ]}
                                                 onChange={(e) => queryState({ idExportWarehouse: e })}
                                                 value={isState.idExportWarehouse}
