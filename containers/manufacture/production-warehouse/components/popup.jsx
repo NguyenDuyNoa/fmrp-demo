@@ -1,4 +1,3 @@
-import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -13,46 +12,24 @@ import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
+import { useProductionWarehouseDetail } from "../hooks/useProductionWarehouseDetail";
 
 const PopupDetail = (props) => {
-    const [data, sData] = useState();
-
     const dataSeting = useSetingServer();
 
     const _ToggleModal = (e) => sOpen(e);
 
     const [open, sOpen] = useState(false);
 
-    const [onFetching, sOnFetching] = useState(false);
+    const { data, isFetching } = useProductionWarehouseDetail(open, props?.id);
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
-
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
-
-    const _ServerFetching_detailOrder = async () => {
-        try {
-            const data = await apiProductionWarehouse.apiDetailProductionWarehouse(props?.id);
-
-            sData(data);
-
-            sOnFetching(false);
-        } catch (error) { }
-    };
-
-    useEffect(() => {
-        setTimeout(() => {
-            onFetching && _ServerFetching_detailOrder();
-        }, 400);
-    }, [open]);
 
     return (
         <>
@@ -182,7 +159,7 @@ const PopupDetail = (props) => {
                                             {props.dataLang?.import_from_note || "import_from_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]">

@@ -1,4 +1,4 @@
-import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
+import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -10,7 +10,6 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -26,7 +25,6 @@ import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranch";
-import { useWarehouseByBranch } from "@/hooks/common/useWarehouses";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
@@ -35,8 +33,9 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useTab from "@/hooks/useTab";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import { routerProductionWarehouse } from "@/routers/manufacture";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
@@ -45,32 +44,29 @@ import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
-import { routerWarehouseTransfer } from "routers/manufacture";
-import LinkWarehouse from "../components/linkWarehouse";
-import PopupStatus from "../components/popupStatus";
-import PopupDetail from "./components/pupup";
-import { useWarehouseTransferCombobox } from "./hooks/useWarehouseTransferCombobox";
-import { useWarehouseTransferFilterbar } from "./hooks/useWarehouseTransferFilterbar";
-import { useWarehouseTransferList } from "./hooks/useWarehouseTransferList";
+import PopupDetail from "./components/popup";
+import { useProductionWarehouseFillterbar } from "./hooks/useProductionWarehouseFillterbar";
+import { useProductionWarehouseList } from "./hooks/useProductionWarehouseList";
+
 
 const initialState = {
     onSending: false,
     keySearch: "",
-    keySearchCode: "",
+    lisCode: [],
     idExportWarehouse: null,
-    idReceivingWarehouse: null,
+    dataWarehouse: [],
     idCode: null,
     idSupplier: null,
     idBranch: null,
-    valueDate: { startDate: null, endDate: null, },
-    dataExport: [],
+    valueDate: { startDate: null, endDate: null },
 };
-const WarehouseTransfer = (props) => {
+
+const ProductionWarehouse = (props) => {
     const dataLang = props.dataLang;
 
-    const isShow = useToast();
-
     const router = useRouter();
+
+    const isShow = useToast();
 
     const { paginate } = usePagination();
 
@@ -78,21 +74,21 @@ const WarehouseTransfer = (props) => {
 
     const statusExprired = useStatusExprired();
 
-    const { handleTab: _HandleSelectTab } = useTab('all');
+    const { handleTab: _HandleSelectTab } = useTab("all")
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
 
     const [checkedWare, sCheckedWare] = useState({});
 
     const [isState, sIsState] = useState(initialState);
 
-    const { limit, updateLimit: sLimit } = useLimitAndTotalItems()
-
-    const { isOpen, isKeyState, handleQueryId } = useToggle();
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const queryState = (key) => sIsState((prve) => ({ ...prve, ...key }));
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, "warehouseTransfer");
+    const { checkAdd, checkExport } = useActionRole(auth, "production_warehouse");
 
     const params = {
         search: isState.keySearch,
@@ -103,26 +99,47 @@ const WarehouseTransfer = (props) => {
         "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
         "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
         "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-        "filter[warehouses_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
-        "filter[warehouses_to]": isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
+        "filter[warehouse_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
     };
 
-    const { data: dataBranch = [] } = useBranchList();
+    const { data: listBranch = [] } = useBranchList()
 
-    const { data: dataWarehouse = [] } = useWarehouseByBranch()
+    const { data, isFetching, refetch } = useProductionWarehouseList(params)
 
-    const { data, isFetching, refetch } = useWarehouseTransferList(params);
+    const { data: dataFillterbar, refetch: refetchFilterbar } = useProductionWarehouseFillterbar({ ...params, limit: 0, "filter[status_bar]": undefined })
 
-    const { data: dataCode = [] } = useWarehouseTransferCombobox(isState.keySearchCode);
+    const _ServerFetching_filter = async () => {
+        try {
 
-    const { data: dataFilterbar, refetch: refetchFilterBar } = useWarehouseTransferFilterbar(params);
+            const { result: exportProductionCombobox } = await apiProductionWarehouse.apiCodeProductionWarehouse();
+
+            const data = await apiProductionWarehouse.apiComboboxWarehouse();
+
+            queryState({
+                lisCode: exportProductionCombobox?.map((e) => ({ label: e.code, value: e.id })),
+                dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
+                onFetching_filter: false,
+            });
+        } catch (error) { }
+    };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        queryState({ keySearchCode: inputValue });
+        try {
+            const { result } = await apiProductionWarehouse.apiAjaxCodeProductionWarehouse({
+                data: {
+                    term: inputValue,
+                },
+            });
+            queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) });
+        } catch (error) { }
     }, 500);
 
-    const formatMoney = (number) => {
-        return formatMoneyConfig(+number, dataSeting);
+    useEffect(() => {
+        isState.onFetching_filter && _ServerFetching_filter();
+    }, [isState.onFetching_filter]);
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -147,7 +164,6 @@ const WarehouseTransfer = (props) => {
             };
             sCheckedWare(dataChecked);
         }
-
         handleQueryId({ status: false });
     };
 
@@ -157,30 +173,24 @@ const WarehouseTransfer = (props) => {
             initialKey: { id, checkedUn, type, value },
         });
     };
-
     const _ServerSending = async () => {
         let data = new FormData();
-
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
-
         data.append("id", checkedWare?.id);
-
         try {
-            const { isSuccess, message, alert_type, dataExport } = await apiWarehouseTransfer.apiHandingStatusTransfer(data);
+            const { isSuccess, message } = await apiProductionWarehouse.apiHangdingStatusWarehouse({
+                data: data,
+            });
 
             if (isSuccess) {
-                isShow(alert_type, dataLang[message] || message);
+                isShow("success", `${dataLang[message]}`);
                 await refetch()
-                await refetchFilterBar()
-                queryState({ onSending: false });
+                await refetchFilterbar();
             } else {
-                isShow("error", dataLang[message] || message);
-            }
-
-            if (dataExport?.length > 0) {
-                queryState({ dataExport: dataExport });
+                isShow("error", `${dataLang[message]}`);
             }
         } catch (error) { }
+        queryState({ onSending: false });
     };
 
     useEffect(() => {
@@ -231,16 +241,7 @@ const WarehouseTransfer = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                {
-                    title: `${dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"
-                        }`,
+                    title: `${dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -249,14 +250,6 @@ const WarehouseTransfer = (props) => {
                 },
                 {
                     title: `${dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                {
-                    title: `${dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -301,14 +294,12 @@ const WarehouseTransfer = (props) => {
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${"Số LSX chi tiết"}` },
-                { value: `${e?.warehouses_id_name ? e?.warehouses_id_name : ""}` },
-                { value: `${e?.warehouses_to_name ? e?.warehouses_to_name : ""}` },
-                { value: `${e?.grand_total ? formatMoney(e?.grand_total) : ""}` },
-                { value: `${e?.order_id != 0 ? "Đã giữ kho" : "Chưa giữ kho"}`, },
+                { value: `${e?.warehouse_name ? e?.warehouse_name : ""}` },
+                { value: `${e?.grand_total ? formatNumber(e?.grand_total) : ""}`, },
                 { value: `${e?.note ? e?.note : ""}` },
                 { value: `${e?.staff_create?.full_name ? e?.staff_create?.full_name : ""}`, },
                 { value: `${e?.warehouseman_id === "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}`, },
-                { value: `${e?.branch_name_id ? e?.branch_name_id : ""}` },
+                { value: `${e?.branch_name ? e?.branch_name : ""}` },
             ]),
         },
     ];
@@ -316,26 +307,18 @@ const WarehouseTransfer = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.warehouseTransfer_title || "warehouseTransfer_title"}</title>
+                <title>{dataLang?.production_warehouse || "production_warehouse"} </title>
             </Head>
             <Container>
-                {isState.dataExport?.length > 0 && (
-                    <PopupStatus
-                        type="warehouseTransfer"
-                        className="hidden"
-                        dataExport={isState.dataExport}
-                        dataLang={dataLang}
-                    />
-                )}
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.warehouseTransfer_title || "warehouseTransfer_title"}
+                            {dataLang?.production_warehouse || "production_warehouse"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.warehouseTransfer_list || "warehouseTransfer_list"}</h6>
+                        <h6>{dataLang?.production_warehouse || "production_warehouse"}</h6>
                     </div>
                 )}
 
@@ -343,14 +326,14 @@ const WarehouseTransfer = (props) => {
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.warehouseTransfer_title || "warehouseTransfer_title"}
+                                {dataLang?.production_warehouse || "production_warehouse"}
                             </h2>
                             <ButtonAddNew
                                 onClick={() => {
                                     if (role) {
-                                        router.push(routerWarehouseTransfer.form);
+                                        router.push(routerProductionWarehouse.form);
                                     } else if (checkAdd) {
-                                        router.push(routerWarehouseTransfer.form);
+                                        router.push(routerProductionWarehouse.form);
                                     } else {
                                         isShow("warning", WARNING_STATUS_ROLE);
                                     }
@@ -360,15 +343,15 @@ const WarehouseTransfer = (props) => {
                         </div>
 
                         <ContainerFilterTab>
-                            {dataFilterbar && dataFilterbar?.map((e) => {
+                            {dataFillterbar && dataFillterbar?.map((e) => {
                                 return (
                                     <TabFilter
-                                        style={{ backgroundColor: "#e2f0fe" }}
+                                        backgroundColor="#e2f0fe"
                                         dataLang={dataLang}
-                                        key={e?.id}
-                                        onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                        total={e?.count}
-                                        active={e?.id}
+                                        key={e.id}
+                                        onClick={_HandleSelectTab.bind(this, e.id)}
+                                        total={e.count}
+                                        active={e.id}
                                     >
                                         {dataLang[e?.name] || e?.name}
                                     </TabFilter>
@@ -379,7 +362,7 @@ const WarehouseTransfer = (props) => {
                             <div className="xl:space-y-3 space-y-2">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                        <div className="grid grid-cols-6 gap-2">
+                                        <div className="grid grid-cols-5 gap-2">
                                             <SearchComponent
                                                 colSpan={1}
                                                 dataLang={dataLang}
@@ -393,7 +376,7 @@ const WarehouseTransfer = (props) => {
                                                         label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataBranch,
+                                                    ...listBranch,
                                                 ]}
                                                 onChange={(e) => queryState({ idBranch: e })}
                                                 value={isState.idBranch}
@@ -402,7 +385,6 @@ const WarehouseTransfer = (props) => {
                                                 colSpan={1}
                                             />
                                             <SelectComponent
-                                                colSpan={1}
                                                 onInputChange={(event) => {
                                                     _HandleSeachApi(event);
                                                 }}
@@ -412,42 +394,30 @@ const WarehouseTransfer = (props) => {
                                                         label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataCode,
+                                                    ...isState.lisCode,
                                                 ]}
                                                 onChange={(e) => queryState({ idCode: e })}
                                                 value={isState.idCode}
-                                                placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
+                                                placeholder={
+                                                    dataLang?.purchase_order_table_code || "purchase_order_table_code"
+                                                }
                                                 isClearable={true}
+                                                colSpan={1}
                                             />
                                             <SelectComponent
-                                                colSpan={1}
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse",
+                                                        label: dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataWarehouse,
+                                                    ...isState.dataWarehouse,
                                                 ]}
                                                 onChange={(e) => queryState({ idExportWarehouse: e })}
                                                 value={isState.idExportWarehouse}
-                                                placeholder={dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
+                                                placeholder={dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}
                                                 isClearable={true}
-                                            />
-                                            <SelectComponent
                                                 colSpan={1}
-                                                options={[
-                                                    {
-                                                        value: "",
-                                                        label: dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse",
-                                                        isDisabled: true,
-                                                    },
-                                                    ...dataWarehouse,
-                                                ]}
-                                                onChange={(e) => queryState({ idReceivingWarehouse: e })}
-                                                value={isState.idReceivingWarehouse}
-                                                placeholder={dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
-                                                isClearable={true}
                                             />
                                             <DateToDateComponent
                                                 colSpan={1}
@@ -459,14 +429,13 @@ const WarehouseTransfer = (props) => {
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
                                             <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
-
                                             {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             dataLang={dataLang}
-                                                            filename={dataLang?.warehouseTransfer_list || "warehouseTransfer_list"}
-                                                            title="DSCK"
+                                                            filename={"Danh sách xuất kho sản xuất"}
+                                                            title="DSXKSX"
                                                             multiDataSet={multiDataSet}
                                                         />
                                                     )}
@@ -489,7 +458,7 @@ const WarehouseTransfer = (props) => {
                             </div>
                             <Customscrollbar>
                                 <div className="w-full">
-                                    <HeaderTable gridCols={11} display={"grid"}>
+                                    <HeaderTable gridCols={9}>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                         </ColumnTable>
@@ -497,16 +466,13 @@ const WarehouseTransfer = (props) => {
                                             {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
+                                            {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
-                                        </ColumnTable>
+                                        {/* <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}
+                                        </ColumnTable> */}
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.production_warehouse_note || "production_warehouse_note"}
@@ -526,11 +492,11 @@ const WarehouseTransfer = (props) => {
                                     </HeaderTable>
                                     {isFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
-                                    ) : data?.rResult.length > 0 ? (
+                                    ) : data?.rResult?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                {data?.rResult.map((e) => (
-                                                    <RowTable gridCols={11} key={e.id.toString()}>
+                                                {data?.rResult?.map((e) => (
+                                                    <RowTable gridCols={9} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
@@ -542,44 +508,40 @@ const WarehouseTransfer = (props) => {
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-
-                                                        <LinkWarehouse
-                                                            colSpan={1}
-                                                            warehouse_id={e?.warehouses_id}
-                                                            warehouse_name={e?.warehouses_id_name}
-                                                        />
-                                                        <LinkWarehouse
-                                                            colSpan={1}
-                                                            warehouse_id={e?.warehouses_to}
-                                                            warehouse_name={e?.warehouses_to_name}
-                                                            color="text-green-600"
-                                                        />
-
-                                                        <RowItemTable colSpan={1} textAlign={"right"}>
-                                                            {formatMoney(e?.grand_total)}
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
+                                                            {/* {formatNumber(e.total_price)} */}
                                                         </RowItemTable>
-                                                        <RowItemTable
+                                                        {/* <LinkWarehouse
                                                             colSpan={1}
-                                                            className="mx-auto flex items-center justify-center"
-                                                        >
-                                                            {e?.order_id != 0 || e?.plan_id != 0 ? (
-                                                                <TagColorOrange name={"Đã giữ kho"} />
-                                                            ) : (
-                                                                <TagColorSky name={"Chưa giữ kho"} />
-                                                            )}
+                                                            warehouse_id={e?.warehouse_id}
+                                                            warehouse_name={e?.warehouse_name}
+                                                        /> */}
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
+                                                            {formatNumber(e?.grand_total)}
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={1}
                                                             textAlign={"left"}
-                                                            className={"truncate"}
+                                                            className="truncate"
                                                         >
                                                             {e?.note}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className={"flex items-center gap-2"}>
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className="flex items-center gap-2 justify-start"
+                                                        >
                                                             <div className="relative">
                                                                 <ModalImage
-                                                                    small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
-                                                                    large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
+                                                                    small={
+                                                                        e?.staff_create?.profile_image
+                                                                            ? e?.staff_create?.profile_image
+                                                                            : "/user-placeholder.jpg"
+                                                                    }
+                                                                    large={
+                                                                        e?.staff_create?.profile_image
+                                                                            ? e?.staff_create?.profile_image
+                                                                            : "/user-placeholder.jpg"
+                                                                    }
                                                                     className="h-6 w-6 rounded-full object-cover "
                                                                 >
                                                                     <div className="">
@@ -608,18 +570,18 @@ const WarehouseTransfer = (props) => {
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className={"mx-auto"}>
-                                                            <TagBranch className="w-fit">{e?.branch_name_id}</TagBranch>
+                                                        <RowItemTable colSpan={1} className="mx-auto">
+                                                            <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex justify-center">
                                                             <BtnAction
                                                                 onRefresh={refetch.bind(this)}
-                                                                onRefreshGroup={refetchFilterBar.bind(this)}
+                                                                onRefreshGroup={refetchFilterbar.bind(this)}
                                                                 dataLang={dataLang}
                                                                 warehouseman_id={e?.warehouseman_id}
                                                                 status_pay={e?.status_pay}
                                                                 id={e?.id}
-                                                                type="warehouseTransfer"
+                                                                type="production_warehouse"
                                                                 className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                             />
                                                         </RowItemTable>
@@ -634,15 +596,15 @@ const WarehouseTransfer = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <ContainerTotal className="!grid-cols-11">
-                        <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
+                    <ContainerTotal className="!grid-cols-9">
+                        <ColumnTable colSpan={3} textAlign={"center"} className="p-2">
                             {dataLang?.import_total || "import_total"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={"right"} className={"text-right"}>
-                            {formatMoney(data?.rTotal?.amount)}
+                        <ColumnTable colSpan={1} textAlign="right" className={"p-2 mr-1"}>
+                            {formatNumber(data?.rTotal?.grand_total)}
                         </ColumnTable>
                     </ContainerTotal>
-                    {data?.rResult.length != 0 && (
+                    {data?.rResult?.length != 0 && (
                         <ContainerPagination>
                             <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
@@ -658,7 +620,7 @@ const WarehouseTransfer = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"warehouseTransfer"}
+                nameModel={"production_warehouse"}
                 title={TITLE_STATUS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
@@ -669,4 +631,4 @@ const WarehouseTransfer = (props) => {
     );
 };
 
-export default WarehouseTransfer;
+export default ProductionWarehouse;
