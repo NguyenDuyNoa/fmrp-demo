@@ -1,4 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
 import apiProductsWarehouse from "@/Api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
@@ -25,6 +24,8 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useWarehouseComboboxByManufacture } from "@/hooks/common/useWarehouses";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
@@ -47,18 +48,14 @@ import { useSelector } from "react-redux";
 import LinkWarehouse from "../components/linkWarehouse";
 import PopupStatus from "../components/popupStatus";
 import PopupDetail from "./components/pupup";
+import { useProductsWarehouseCombobox } from "./hooks/useProductsWarehouseCombobox";
 import { useProductsWarehouseFillterbar } from "./hooks/useProductsWarehouseFillterbar";
 import { useProductsWarehouseList } from "./hooks/useProductsWarehouseList";
 
 const initalState = {
     keySearch: "",
-    onFetching: false,
+    keySearchCode: "",
     onSending: false,
-    onFetching_filter: false,
-    onFetchingGroup: false,
-    listBr: [],
-    listCode: [],
-    dataWarehouse: [],
     idImportWarehouse: null,
     idCode: null,
     idSupplier: null,
@@ -107,7 +104,13 @@ const ProductsWarehouse = (props) => {
         "filter[warehouse_id]": isState.idImportWarehouse != null ? isState.idImportWarehouse?.value : null,
     }
 
+    const { data: listBranch = [] } = useBranchList()
+
     const { data, isFetching, refetch } = useProductsWarehouseList(params);
+
+    const { data: listWarehouse = [] } = useWarehouseComboboxByManufacture()
+
+    const { data: listCode = [] } = useProductsWarehouseCombobox(isState.keySearchCode);
 
     const { data: dataFillterbar, refetch: refetchFillterbar } = useProductsWarehouseFillterbar({ ...params, limit: 0, "filter[status_bar]": undefined })
 
@@ -115,28 +118,9 @@ const ProductsWarehouse = (props) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-
-    const _ServerFetching_filter = async () => {
-        const { result: listBr } = await apiComons.apiBranchCombobox();
-        const { result: listCode } = await apiProductsWarehouse.apiComboboxProductWarehouse();
-        const data = await apiProductsWarehouse.apiComboboxWarehouse();
-
-        queryState({
-            listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
-            listCode: listCode?.map((e) => ({ label: e.code, value: e.id })) || [],
-            dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || [],
-            onFetching_filter: false,
-        });
-    };
-
     const _HandleSeachApi = debounce(async (inputValue) => {
-        const { result } = await apiProductsWarehouse.apiAjaxComboboxProductWarehouse({ data: { term: inputValue } });
-        queryState({ listCode: result?.map((e) => ({ label: e.code, value: e.id })) || [] });
+        queryState({ keySearchCode: inputValue });
     }, 500);
-
-    useEffect(() => {
-        isState.onFetching_filter && _ServerFetching_filter();
-    }, [isState.onFetching_filter]);
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -171,11 +155,8 @@ const ProductsWarehouse = (props) => {
     };
     const _ServerSending = async () => {
         let data = new FormData();
-
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
-
         data.append("id", checkedWare?.id);
-
         try {
             const { isSuccess, message, dataExport } = await apiProductsWarehouse.apiHandingStatusWarehouse(data);
 
@@ -194,9 +175,8 @@ const ProductsWarehouse = (props) => {
             if (dataExport?.length > 0) {
                 queryState({ dataExport: dataExport });
             }
-
         } catch (error) {
-
+            throw error
         }
     };
 
@@ -391,7 +371,7 @@ const ProductsWarehouse = (props) => {
                                                         label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
-                                                    ...isState.listBr,
+                                                    ...listBranch,
                                                 ]}
                                                 onChange={(e) => queryState({ idBranch: e })}
                                                 value={isState.idBranch}
@@ -409,7 +389,7 @@ const ProductsWarehouse = (props) => {
                                                         label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
                                                         isDisabled: true,
                                                     },
-                                                    ...isState.listCode,
+                                                    ...listCode,
                                                 ]}
                                                 onChange={(e) => queryState({ idCode: e })}
                                                 value={isState.idCode}
@@ -424,7 +404,7 @@ const ProductsWarehouse = (props) => {
                                                         label: dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport",
                                                         isDisabled: true,
                                                     },
-                                                    ...isState.dataWarehouse,
+                                                    ...listWarehouse,
                                                 ]}
                                                 onChange={(e) => queryState({ idImportWarehouse: e })}
                                                 value={isState.idImportWarehouse}

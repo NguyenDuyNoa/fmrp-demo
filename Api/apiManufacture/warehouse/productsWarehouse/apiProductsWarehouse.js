@@ -10,18 +10,12 @@ const apiProductsWarehouse = {
         const response = await axiosCustom('GET', `/api_web/Api_product_receipt/filterBar/?csrf_protection=true`, param);
         return response.data
     },
-    async apiComboboxProductWarehouse() {
-        const response = await axiosCustom('GET', `/api_web/Api_product_receipt/productReceiptCombobox/?csrf_protection=true`);
+    async apiComboboxProductWarehouse(method, data) {
+        const response = await axiosCustom(method, `/api_web/Api_product_receipt/productReceiptCombobox/?csrf_protection=true`, data);
         return response.data
     },
-    async apiAjaxComboboxProductWarehouse(data) {
-        const response = await axiosCustom('POST', `/api_web/Api_product_receipt/productReceiptCombobox/?csrf_protection=true`, data);
-        return response.data
-    },
-    async apiComboboxWarehouse() {
-        const response = await axiosCustom('GET', `/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true`);
-        return response.data
-    },
+
+
     async apiHandingStatusWarehouse(data) {
         const response = await axiosCustom('POST', `/api_web/Api_product_receipt/ConfirmWarehous?csrf_protection=true`, data);
         return response.data
@@ -35,14 +29,11 @@ const apiProductsWarehouse = {
         const response = await axiosCustom('GET', `/api_web/Api_product_receipt/getProductReceiptDetail/${id}?csrf_protection=true`,);
         return response.data
     },
-    async apiItemPoductWarehouse(param) {
-        const response = await axiosCustom('GET', `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`, param);
+    async apiItemPoductWarehouse(method, data) {
+        const response = await axiosCustom(method, `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`, data);
         return response.data
     },
-    async apiAjaxItemPoductWarehouse(data) {
-        const response = await axiosCustom('POST', `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`, data);
-        return response.data
-    },
+
     async apiWarehouseCombobox(param) {
         const response = await axiosCustom('GET', `/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true`, param);
         return response.data

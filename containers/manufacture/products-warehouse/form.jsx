@@ -1,4 +1,3 @@
-import apiComons from "@/Api/apiComon/apiComon";
 import apiProductsWarehouse from "@/Api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
@@ -7,8 +6,11 @@ import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useLocationByWarehouseTo, useWarehouseComboboxByManufactureByBranch } from "@/hooks/common/useWarehouses";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
@@ -19,6 +21,7 @@ import { isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import { debounce } from "lodash";
 import moment from "moment/moment";
@@ -29,6 +32,7 @@ import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
+import { useProductsWarehouseItems } from "./hooks/useProductsWarehouseItems";
 
 const ProductsWarehouseForm = (props) => {
     const router = useRouter();
@@ -43,23 +47,13 @@ const ProductsWarehouseForm = (props) => {
 
     const dataLang = props?.dataLang;
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-
-    const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
-
-    const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] = useState(false);
-
-    const [onFetchingLocation, sOnFetchingLocation] = useState(false);
-
-    const [onLoading, sOnLoading] = useState(false);
-
     const [onLoadingChild, sOnLoadingChild] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
     const [code, sCode] = useState("");
+
+    const [searchItems, setSearchItems] = useState("");
 
     const [startDate, sStartDate] = useState(new Date());
 
@@ -69,20 +63,11 @@ const ProductsWarehouseForm = (props) => {
 
     const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
 
-    const [dataBranch, sDataBranch] = useState([]);
-
-    const [dataItems, sDataItems] = useState([]);
-
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
+    const { dataProductExpiry, dataProductSerial } = useFeature();
     //new
-
     const statusExprired = useStatusExprired();
 
     const [listData, sListData] = useState([]);
-
-    const [dataWarehouse, sDataWarehouse] = useState([]);
-
-    const [dataLocation, sDataLocation] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
 
@@ -104,6 +89,14 @@ const ProductsWarehouseForm = (props) => {
 
     const [errSerial, sErrSerial] = useState(false);
 
+    const { data: dataBranch = [] } = useBranchList();
+
+    const { data: dataLocation = [] } = useLocationByWarehouseTo(idImportWarehouse, idBranch)
+
+    const { data: dataWarehouse } = useWarehouseComboboxByManufactureByBranch(idBranch, idImportWarehouse)
+
+    const { data: dataItems } = useProductsWarehouseItems(searchItems, idBranch)
+
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrBranch(false);
@@ -111,48 +104,25 @@ const ProductsWarehouseForm = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetching = async () => {
-        sOnLoading(true);
-        const { result } = await apiComons.apiBranchCombobox();
-        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-        sOnLoading(false);
-        sOnFetching(false);
-    };
 
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    const options = dataItems?.map((e) => ({
-        label: `${e.name}
-                <span style={{display: none}}>${e.code}</span>
-                <span style={{display: none}}>${e.product_variation} </span>
-                <span style={{display: none}}>${e.serial} </span>
-                <span style={{display: none}}>${e.lot} </span>
-                <span style={{display: none}}>${e.expiration_date} </span>
-                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-        value: e.id,
-        e,
-    }));
-
-    const _ServerFetchingDetailPage = async () => {
-        const rResult = await apiProductsWarehouse.apiDetailPagePoductWarehouse(id);
-        sIdBranch({
-            label: rResult?.branch_name,
-            value: rResult?.branch_id,
-        });
-        sIdImportWarehouse({
-            label: rResult?.warehouse_name,
-            value: rResult?.warehouse_id,
-        });
-        sListData(
-            rResult?.items.map((e) => ({
+    const { isFetching } = useQuery({
+        queryKey: ['api_products_warehouse_detail', id],
+        queryFn: async () => {
+            const rResult = await apiProductsWarehouse.apiDetailPagePoductWarehouse(id);
+            sIdBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
+            sIdImportWarehouse({
+                label: rResult?.warehouse_name,
+                value: rResult?.warehouse_id,
+            });
+            sListData(rResult?.items.map((e) => ({
                 id: e?.item?.id,
                 idParenBackend: e?.item?.id,
-                matHang: {
+                item: {
                     e: e?.item,
-                    label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
+                    label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
                     value: e.item?.id,
                 },
                 child: e?.child.map((ce) => ({
@@ -181,97 +151,27 @@ const ProductsWarehouseForm = (props) => {
                     note: ce?.note,
                 })),
             }))
-        );
-        sCode(rResult?.code);
-        sStartDate(moment(rResult?.date).toDate());
-        sNote(rResult?.note);
-        sOnFetchingDetail(false);
-    };
+            );
+            sCode(rResult?.code);
+            sStartDate(moment(rResult?.date).toDate());
+            sNote(rResult?.note);
+        },
+        enabled: !!id,
+        ...optionsQuery
+    })
 
-    useEffect(() => {
-        //new
-        onFetchingDetail && _ServerFetchingDetailPage();
-    }, [onFetchingDetail]);
-
-    useEffect(() => {
-        id &&
-            JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}" &&
-            sOnFetchingDetail(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) !== "{}" &&
-        JSON.stringify(dataProductExpiry) !== "{}" &&
-        JSON.stringify(dataProductSerial) !== "{}",
-    ]);
-
-    const _ServerFetching_ItemsAll = async () => {
-        const { data } = await apiProductsWarehouse.apiItemPoductWarehouse({
-            params: {
-                "filter[branch_id]": idBranch ? idBranch?.value : null,
-            },
-        });
-        sDataItems(data?.result);
-        sOnFetchingItemsAll(false);
-    };
-    const _ServerFetching_ExportWarehouse = async () => {
-        const data = await apiProductsWarehouse.apiWarehouseCombobox({
-            params: {
-                "filter[branch_id]": idBranch ? idBranch?.value : null,
-                "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : null,
-            },
-        });
-        sDataWarehouse(
-            data?.map((e) => ({
-                label: e?.warehouse_name,
-                value: e?.id,
-            }))
-        );
-        sOnFetchingExportWarehouse(false);
-    };
-    const _ServerFetching_Location = async () => {
-        const data = await apiProductsWarehouse.apiWarehouseLocationCombobox({
-            params: {
-                "filter[branch_id]": idBranch ? idBranch?.value : null,
-                "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : null,
-            },
-        });
-        sDataLocation(
-            data?.map((e) => ({
-                label: e?.location_name,
-                value: e?.id,
-            }))
-        );
-        sOnFetchingLocation(false);
-    };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        if (idBranch == null || idImportWarehouse == null || inputValue == "") {
-            return;
-        } else {
-            const { data } = await apiProductsWarehouse.apiAjaxItemPoductWarehouse({
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                },
-
-                data: {
-                    term: inputValue,
-                },
-            });
-            sDataItems(data?.result);
-        }
+        setSearchItems(inputValue);
     }, 500);
 
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
-            sDataItems([]);
             sListData([]);
             sIdImportWarehouse(null);
             sIdBranch(isKeyState?.value);
-            sDataWarehouse([]);
         }
         if (isKeyState?.type == "idImportWarehouse") {
-            sDataItems([]);
             sListData([]);
             sIdImportWarehouse(isKeyState?.value);
         }
@@ -319,35 +219,21 @@ const ProductsWarehouseForm = (props) => {
         const hasNullOrCondition = (data, conditionFn) =>
             data.some((item) => item.child?.some((childItem) => conditionFn(item, childItem)));
 
-        const hasNullKho = hasNullOrCondition(listData, (item, childItem) => childItem.location === null);
+        const hasNullWarehouse = hasNullOrCondition(listData, (item, childItem) => childItem.location === null);
 
-        const hasNullSerial = hasNullOrCondition(
-            listData,
-            (item, childItem) =>
-                item?.matHang.e?.text_type === "products" && (childItem.serial === "" || childItem.serial == null)
-        );
+        const hasNullSerial = hasNullOrCondition(listData, (item, childItem) => item?.item.e?.text_type === "products" && (childItem.serial === "" || childItem.serial == null));
 
-        const hasNullLot = hasNullOrCondition(
-            listData,
-            (item, childItem) => !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null)
-        );
+        const hasNullLot = hasNullOrCondition(listData, (item, childItem) => !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null));
 
-        const hasNullDate = hasNullOrCondition(
-            listData,
-            (item, childItem) => !childItem.disabledDate && childItem.date === null
-        );
+        const hasNullDate = hasNullOrCondition(listData, (item, childItem) => !childItem.disabledDate && childItem.date === null);
 
-        const hasNullQty = hasNullOrCondition(
-            listData,
-            (item, childItem) =>
-                childItem.importQuantity === null || childItem.importQuantity === "" || childItem.importQuantity == 0
-        );
+        const hasNullQty = hasNullOrCondition(listData, (item, childItem) => childItem.importQuantity === null || childItem.importQuantity === "" || childItem.importQuantity == 0);
 
         const isEmpty = listData?.length === 0;
 
         if (
             idBranch == null ||
-            hasNullKho ||
+            hasNullWarehouse ||
             hasNullQty ||
             isEmpty ||
             idImportWarehouse == null ||
@@ -357,10 +243,9 @@ const ProductsWarehouseForm = (props) => {
         ) {
             idBranch == null && sErrBranch(true);
             idImportWarehouse == null && sErrExportWarehouse(true);
-            hasNullKho && sErrWarehouse(true);
-
+            hasNullWarehouse && sErrWarehouse(true);
             hasNullQty && sErrQty(true);
-            hasNullKho && sErrWarehouse(true);
+            hasNullWarehouse && sErrWarehouse(true);
             hasNullLot && sErrLot(true);
             hasNullSerial && sErrSerial(true);
             hasNullDate && sErrDateList(true);
@@ -386,35 +271,24 @@ const ProductsWarehouseForm = (props) => {
     useEffect(() => {
         sErrBranch(false);
     }, [idBranch != null]);
+
     useEffect(() => {
         sErrExportWarehouse(false);
     }, [idImportWarehouse != null]);
 
     useEffect(() => {
-        router.query && sOnFetching(true);
-    }, [router.query]);
-
-    useEffect(() => {
-        onFetchingExportWarehouse && _ServerFetching_ExportWarehouse();
-        onFetchingItemsAll && _ServerFetching_ItemsAll();
-        onFetchingLocation && _ServerFetching_Location();
-    }, [onFetchingItemsAll, onFetchingExportWarehouse, onFetchingLocation]);
-
-    useEffect(() => {
-        idBranch != null && sOnFetchingExportWarehouse(true);
         idBranch == null && sIdImportWarehouse(null);
-        idBranch == null && sDataWarehouse([]);
     }, [idBranch]);
-
-    useEffect(() => {
-        idImportWarehouse != null && sOnFetchingItemsAll(true);
-        idImportWarehouse != null && sOnFetchingLocation(true);
-        idImportWarehouse == null && sDataItems([]);
-    }, [idImportWarehouse]);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
+
+    const haningProductionsWarehouse = useMutation({
+        mutationFn: ({ id, formData }) => {
+            return apiProductsWarehouse.apiHandingProdcutsWarehouse(id, formData)
+        }
+    })
 
     const _ServerSending = async () => {
         let formData = new FormData();
@@ -431,50 +305,40 @@ const ProductsWarehouseForm = (props) => {
 
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
-            formData.append(`items[${index}][item]`, item?.matHang?.value);
+            formData.append(`items[${index}][item]`, item?.item?.value);
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
-                formData.append(
-                    `items[${index}][child][${childIndex}][serial]`,
-                    childItem?.serial === null ? "" : childItem?.serial
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][lot]`,
-                    childItem?.lot === null ? "" : childItem?.lot
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][expiration_date]`,
-                    childItem?.date === null ? "" : formatMoment(childItem?.date, FORMAT_MOMENT.DATE_TIME_LONG)
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.location?.value || 0
-                );
+                formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
+                formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
+                formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : formatMoment(childItem?.date, FORMAT_MOMENT.DATE_TIME_LONG));
+                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.importQuantity);
             });
         });
-        const { isSuccess, message } = await apiProductsWarehouse.apiHandingProdcutsWarehouse(
-            id ? id : undefined,
-            formData
-        );
-        if (isSuccess) {
-            isShow("success", `${dataLang[message]}` || message);
-            sCode("");
-            sStartDate(new Date());
-            sIdBranch(null);
-            sIdImportWarehouse(null);
-            sNote("");
-            sErrBranch(false);
-            sErrDate(false);
-            sErrExportWarehouse(false);
-            //new
-            sListData([]);
-            router.push(routerProductsWarehouse.home);
-        } else {
-            handleCheckError(dataLang[message] || message);
-        }
-        sOnSending(false);
+        haningProductionsWarehouse.mutate({ id, formData }, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", `${dataLang[message]}` || message);
+                    sCode("");
+                    sStartDate(new Date());
+                    sIdBranch(null);
+                    sIdImportWarehouse(null);
+                    sNote("");
+                    sErrBranch(false);
+                    sErrDate(false);
+                    sErrExportWarehouse(false);
+                    sListData([]);
+                    router.push(routerProductsWarehouse.home);
+                    sOnSending(false);
+                } else {
+                    handleCheckError(dataLang[message] || message);
+                }
+            },
+            onError: (error) => {
+                throw error
+            }
+        })
     };
 
     useEffect(() => {
@@ -515,12 +379,12 @@ const ProductsWarehouseForm = (props) => {
 
     const _HandleAddParent = (value) => {
         sOnLoadingChild(true);
-        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
+        const checkData = listData?.some((e) => e?.item?.value === value?.value);
         if (!checkData) {
             const newData = {
                 id: Date.now(),
                 idParenBackend: null,
-                matHang: value,
+                item: value,
                 child: [
                     {
                         idChildBackEnd: null,
@@ -587,9 +451,7 @@ const ProductsWarehouseForm = (props) => {
                     const newQtyImport = Number(value?.value);
                     updatedChild.importQuantity = newQtyImport;
                 } else if (type === "location") {
-                    const checkKho = newData[parentIndex].child
-                        .map((house) => house)
-                        .some((i) => i?.location?.value === value?.value);
+                    const checkKho = newData[parentIndex].child.map((house) => house).some((i) => i?.location?.value === value?.value);
                     if (checkKho) {
                         handleCheckError("Vị trí nhập đã được chọn");
                     } else {
@@ -599,9 +461,7 @@ const ProductsWarehouseForm = (props) => {
                     const newTypeValue = value?.target.value;
                     // Kiểm tra xem giá trị mới đã tồn tại trong cả phần tử cha và các phần tử con
                     const existsInParent = newData[parentIndex].child.some((ce) => ce[type] === newTypeValue);
-                    const existsInOtherParents = newData.some(
-                        (e) => e.id !== parentId && e.child.some((ce) => ce[type] === newTypeValue)
-                    );
+                    const existsInOtherParents = newData.some((e) => e.id !== parentId && e.child.some((ce) => ce[type] === newTypeValue));
                     if (existsInParent || existsInOtherParents) {
                         handleQuantityError(`Giá trị ${type} đã tồn tại`);
                         return; // Dừng việc cập nhật nếu có lỗi
@@ -635,24 +495,20 @@ const ProductsWarehouseForm = (props) => {
 
     const _HandleChangeValue = (parentId, value) => {
         sOnLoadingChild(true);
-        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
+        const checkData = listData?.some((e) => e?.item?.value === value?.value);
         if (!checkData) {
             const newData = listData?.map((e) => {
                 if (e?.id === parentId) {
                     return {
                         ...e,
-                        matHang: value,
+                        item: value,
                         child: [
                             {
                                 idChildBackEnd: null,
                                 id: uuidv4(),
                                 disabledDate:
-                                    (value?.e?.text_type === "products" &&
-                                        dataProductExpiry?.is_enable === "1" &&
-                                        false) ||
-                                    (value?.e?.text_type === "products" &&
-                                        dataProductExpiry?.is_enable === "0" &&
-                                        true),
+                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
+                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
                                 unit: value?.e?.unit_name,
                                 importQuantity: null,
                                 numberOfConversions: null,
@@ -679,9 +535,7 @@ const ProductsWarehouseForm = (props) => {
         <React.Fragment>
             <Head>
                 <title>
-                    {id
-                        ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
-                        : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
+                    {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit" : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
                 </title>
             </Head>
             <Container className={"!h-auto"}>
@@ -694,19 +548,14 @@ const ProductsWarehouseForm = (props) => {
                         </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>
-                            {" "}
-                            {id
-                                ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
-                                : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
+                            {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit" : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
                         </h6>
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex justify-between items-center">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                            {id
-                                ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
-                                : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
+                            {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit" : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
                             <ButtonBack onClick={() => router.push(routerProductsWarehouse.home)} dataLang={dataLang} />
@@ -716,8 +565,7 @@ const ProductsWarehouseForm = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione ||
-                                    "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
@@ -729,9 +577,7 @@ const ProductsWarehouseForm = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
-                                        placeholder={
-                                            dataLang?.purchase_order_system_default || "purchase_order_system_default"
-                                        }
+                                        placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
@@ -750,11 +596,8 @@ const ProductsWarehouseForm = (props) => {
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
-                                            placeholder={
-                                                dataLang?.price_quote_system_default || "price_quote_system_default"
-                                            }
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -776,14 +619,12 @@ const ProductsWarehouseForm = (props) => {
                                         options={dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
-                                        isLoading={idBranch != null ? false : onLoading}
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -826,25 +667,19 @@ const ProductsWarehouseForm = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.productsWarehouse_warehouseImport ||
-                                            "productsWarehouse_warehouseImport"}{" "}
+                                        {dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <SelectCore
                                         options={dataWarehouse}
                                         onChange={_HandleChangeInput.bind(this, "idImportWarehouse")}
-                                        isLoading={idBranch != null ? false : onLoading}
                                         value={idImportWarehouse}
                                         isClearable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.productsWarehouse_warehouseImport ||
-                                            "productsWarehouse_warehouseImport"
-                                        }
-                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        placeholder={dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}
+                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -890,7 +725,6 @@ const ProductsWarehouseForm = (props) => {
                                     <SelectCore
                                         options={[]}
                                         onChange={_HandleChangeInput.bind(this, "")}
-                                        isLoading={idBranch != null ? false : onLoading}
                                         value={""}
                                         isClearable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
@@ -947,22 +781,6 @@ const ProductsWarehouseForm = (props) => {
                             {dataLang?.import_from_items || "import_from_items"}
                         </h4>
                         <div className="col-span-10">
-                            {/* ${
-                                    dataProductSerial.is_enable == "1"
-                                        ? dataMaterialExpiry.is_enable !=
-                                          dataProductExpiry.is_enable
-                                            ? "grid-cols-8"
-                                            : dataMaterialExpiry.is_enable ==
-                                              "1"
-                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                            : "grid-cols-6"
-                                        : dataMaterialExpiry.is_enable !=
-                                          dataProductExpiry.is_enable
-                                        ? "grid-cols-5"
-                                        : dataMaterialExpiry.is_enable == "1"
-                                        ? "grid-cols-5"
-                                        : "grid-cols-9"
-                                } */}
                             <div
                                 className={`${dataProductSerial?.is_enable == "1"
                                     ? "grid-cols-6"
@@ -972,8 +790,7 @@ const ProductsWarehouseForm = (props) => {
                                     } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
-                                    {dataLang?.productsWarehouse_warehouseLocaImport ||
-                                        "productsWarehouse_warehouseLocaImport"}
+                                    {dataLang?.productsWarehouse_warehouseLocaImport || "productsWarehouse_warehouseLocaImport"}
                                 </h4>
                                 {dataProductSerial?.is_enable === "1" && (
                                     <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
@@ -1013,7 +830,7 @@ const ProductsWarehouseForm = (props) => {
                     <div className="grid grid-cols-13 items-center gap-1 py-2">
                         <div className="col-span-3">
                             <SelectCore
-                                options={options}
+                                options={dataItems}
                                 value={null}
                                 onInputChange={(event) => {
                                     _HandleSeachApi(event);
@@ -1113,10 +930,7 @@ const ProductsWarehouseForm = (props) => {
                                     {" "}
                                     <SelectCore
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={
-                                            dataLang?.productsWarehouse_warehouseLocaImport ||
-                                            "productsWarehouse_warehouseLocaImport"
-                                        }
+                                        placeholder={dataLang?.productsWarehouse_warehouseLocaImport || "productsWarehouse_warehouseLocaImport"}
                                         className="3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
@@ -1201,7 +1015,7 @@ const ProductsWarehouseForm = (props) => {
                     </div>
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
-                            {onFetchingDetail ? (
+                            {isFetching ? (
                                 <Loading className="h-10 w-full" color="#0f4f9e" />
                             ) : (
                                 <>
@@ -1216,8 +1030,8 @@ const ProductsWarehouseForm = (props) => {
                                                         onInputChange={(event) => {
                                                             _HandleSeachApi(event);
                                                         }}
-                                                        options={options}
-                                                        value={e?.matHang}
+                                                        options={dataItems}
+                                                        value={e?.item}
                                                         className=""
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}
@@ -1296,7 +1110,7 @@ const ProductsWarehouseForm = (props) => {
                                                         }}
                                                     />
                                                     <button
-                                                        onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
+                                                        onClick={_HandleAddChild.bind(this, e?.id, e?.item)}
                                                         className="w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-2 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
                                                     >
                                                         <Add />
@@ -1306,7 +1120,7 @@ const ProductsWarehouseForm = (props) => {
                                                             onClick={_HandleDeleteAllChild.bind(
                                                                 this,
                                                                 e?.id,
-                                                                e?.matHang
+                                                                e?.item
                                                             )}
                                                             className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
                                                         >
@@ -1348,42 +1162,14 @@ const ProductsWarehouseForm = (props) => {
                                                                         ? "border-red-500 border"
                                                                         : ""
                                                                         }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                    placeholder={
-                                                                        onLoadingChild
-                                                                            ? ""
-                                                                            : dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                                            "productsWarehouse_warehouseLocaImport"
-                                                                    }
-                                                                    noOptionsMessage={() =>
-                                                                        dataLang?.returns_nodata || "returns_nodata"
-                                                                    }
+                                                                    placeholder={onLoadingChild ? "" : dataLang?.productsWarehouse_warehouseLocaImport || "productsWarehouse_warehouseLocaImport"}
+                                                                    noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                                                     menuPortalTarget={document.body}
                                                                     formatOptionLabel={(option) => (
-                                                                        <div className="">
-                                                                            {/* <div className="flex gap-1">
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                    {dataLang?.productsWarehouse_warehouseImport ||
-                                                                                        "productsWarehouse_warehouseImport"}
-
-                                                                                    :
-                                                                                </h2>
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                    {
-                                                                                        option?.warehouse_name
-                                                                                    }
-                                                                                </h2>
-                                                                            </div> */}
-                                                                            <div className="flex gap-1">
-                                                                                {/* <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                    {dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                                                        "productsWarehouse_warehouseLocaImport"}
-
-                                                                                    :
-                                                                                </h2> */}
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                    {option?.label}
-                                                                                </h2>
-                                                                            </div>
+                                                                        <div className="flex gap-1">
+                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                                {option?.label}
+                                                                            </h2>
                                                                         </div>
                                                                     )}
                                                                     style={{
@@ -1415,13 +1201,11 @@ const ProductsWarehouseForm = (props) => {
                                                                         <input
                                                                             value={ce?.serial}
                                                                             disabled={
-                                                                                e?.matHang?.e?.text_type != "products"
+                                                                                e?.item?.e?.text_type != "products"
                                                                             }
-                                                                            className={`border ${e?.matHang?.e?.text_type != "products"
+                                                                            className={`border ${e?.item?.e?.text_type != "products"
                                                                                 ? "bg-gray-50"
-                                                                                : errSerial &&
-                                                                                    (ce?.serial == "" ||
-                                                                                        ce?.serial == null)
+                                                                                : errSerial && (ce?.serial == "" || ce?.serial == null)
                                                                                     ? "border-red-500"
                                                                                     : "focus:border-[#92BFF7] border-[#d0d5dd] "
                                                                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
@@ -1449,9 +1233,7 @@ const ProductsWarehouseForm = (props) => {
                                                                                     disabled={ce?.disabledDate}
                                                                                     className={`border ${ce?.disabledDate
                                                                                         ? "bg-gray-50"
-                                                                                        : errLot &&
-                                                                                            (ce?.lot == "" ||
-                                                                                                ce?.lot == null)
+                                                                                        : errLot && (ce?.lot == "" || ce?.lot == null)
                                                                                             ? "border-red-500"
                                                                                             : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                                                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
@@ -1483,10 +1265,7 @@ const ProductsWarehouseForm = (props) => {
                                                                                                     date
                                                                                                 )
                                                                                             }
-                                                                                            placeholder={
-                                                                                                dataLang?.price_quote_system_default ||
-                                                                                                "price_quote_system_default"
-                                                                                            }
+                                                                                            placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
                                                                                             className={`border ${ce?.disabledDate
                                                                                                 ? "bg-gray-50"
                                                                                                 : errDateList &&

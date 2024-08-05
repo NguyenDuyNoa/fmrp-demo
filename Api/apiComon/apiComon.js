@@ -80,5 +80,11 @@ const apiComons = {
         return response.data
     },
 
+    // kho nhập
+    async apiComboboxWarehouseManufacture(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true`, params);
+        return response.data
+    },
+
 }
 export default apiComons

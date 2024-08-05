@@ -1,13 +1,3 @@
-import LinkWarehouse from "@/containers/manufacture/components/linkWarehouse";
-import { useEffect, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
-
-import useFeature from "@/hooks/useConfigFeature";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-
-import apiProductsWarehouse from "@/Api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -18,40 +8,30 @@ import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import LinkWarehouse from "@/containers/manufacture/components/linkWarehouse";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import { useProductsWarehouseDetail } from "../hooks/useProductsWarehouseDetail";
 
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const [data, sData] = useState();
-
     const dataSeting = useSetingServer();
-
-    const [onFetching, sOnFetching] = useState(false);
 
     const { dataProductExpiry, dataProductSerial } = useFeature();
 
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
+    const { data, isFetching } = useProductsWarehouseDetail(open, props?.id);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
-
-    const _ServerFetching_detailOrder = async () => {
-        const data = await apiProductsWarehouse.apiDetailPoductWarehouse(props?.id);
-        sData(data);
-        sOnFetching(false);
-    };
-
-    useEffect(() => {
-        setTimeout(() => {
-            onFetching && _ServerFetching_detailOrder();
-        }, 400);
-    }, [open]);
 
     return (
         <>
@@ -91,8 +71,7 @@ const PopupDetail = (props) => {
                                     <div className="col-span-3">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang?.production_warehouse_LSX ||
-                                                    "production_warehouse_LSX"}
+                                                {props?.dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -105,8 +84,7 @@ const PopupDetail = (props) => {
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang?.productsWarehouse_warehouseImport ||
-                                                    "productsWarehouse_warehouseImport"}
+                                                {props?.dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 <LinkWarehouse
@@ -120,8 +98,7 @@ const PopupDetail = (props) => {
                                     <div className="col-span-3 ">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang?.production_warehouse_Total_value ||
-                                                    "production_warehouse_Total_value"}
+                                                {props?.dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {formatNumber(data?.grand_total)}
@@ -129,8 +106,7 @@ const PopupDetail = (props) => {
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
                                                 <div className="relative">
@@ -166,19 +142,17 @@ const PopupDetail = (props) => {
                                             {props.dataLang?.import_detail_items || "import_detail_items"}
                                         </ColumnTablePopup>
                                         <ColumnTablePopup colSpan={2}>
-                                            {props.dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                "productsWarehouse_warehouseLocaImport"}
+                                            {props.dataLang?.productsWarehouse_warehouseLocaImport || "productsWarehouse_warehouseLocaImport"}
                                         </ColumnTablePopup>
                                         <ColumnTablePopup colSpan={1}>{"ĐVT"}</ColumnTablePopup>
                                         <ColumnTablePopup colSpan={2}>
-                                            {props.dataLang?.productsWarehouse_QtyImport ||
-                                                "productsWarehouse_QtyImport"}
+                                            {props.dataLang?.productsWarehouse_QtyImport || "productsWarehouse_QtyImport"}
                                         </ColumnTablePopup>
                                         <ColumnTablePopup colSpan={3}>
                                             {props.dataLang?.import_from_note || "import_from_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <>
@@ -258,11 +232,6 @@ const PopupDetail = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
-                                                                {/* <h6 className="font-medium">
-                                                                    {
-                                                                        e?.warehouse_name
-                                                                    }
-                                                                </h6> */}
                                                                 <h6 className="font-medium">{e?.location_name}</h6>
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
@@ -305,8 +274,7 @@ const PopupDetail = (props) => {
                                     <div className="col-span-2 space-y-1 text-right">
                                         <div className="font-medium text-left text-[13px]">
                                             <h3>
-                                                {props?.dataLang?.production_warehouse_totalItem ||
-                                                    "production_warehouse_totalItem"}
+                                                {props?.dataLang?.production_warehouse_totalItem || "production_warehouse_totalItem"}
                                             </h3>
                                         </div>
                                         <div className="font-medium text-left text-[13px]">
@@ -321,12 +289,7 @@ const PopupDetail = (props) => {
                                         </div>
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(
-                                                    data?.items?.reduce(
-                                                        (total, item) => total + Number(item.quantity),
-                                                        0
-                                                    )
-                                                )}
+                                                {formatNumber(data?.items?.reduce((total, item) => total + Number(item.quantity), 0))}
                                             </h3>
                                         </div>
                                     </div>

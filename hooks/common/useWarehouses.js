@@ -16,6 +16,37 @@ export const useWarehouseTranfer = () => {
     })
 }
 
+///combobox kho nhập ở model kho & sản xuất
+export const useWarehouseComboboxByManufacture = () => {
+    return useQuery({
+        queryKey: ['api_warehouse_combobox_manufacturer'],
+        queryFn: async () => {
+            const data = await apiComons.apiComboboxWarehouseManufacture({})
+
+            return data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || []
+        },
+        ...optionsQuery
+    })
+}
+
+///combobox nhập kho tp kho
+export const useWarehouseComboboxByManufactureByBranch = (idBranch, idImportWarehouse) => {
+    const params = {
+        "filter[branch_id]": idBranch ? idBranch?.value : null,
+        "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : null
+    }
+    return useQuery({
+        queryKey: ['api_warehouse_combobox_manufacturer_branch', { ...params }],
+        queryFn: async () => {
+            const data = await apiComons.apiComboboxWarehouseManufacture({ params: params })
+
+            return data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || []
+        },
+        enabled: !!idBranch,
+        ...optionsQuery
+    })
+}
+
 
 export const useWarehouseByBranch = () => {
     return useQuery({
@@ -46,9 +77,10 @@ export const useWarehouseComboboxlocation = (params) => {
 }
 
 
-export const useLocationByWarehouseTo = (id) => {
+export const useLocationByWarehouseTo = (idWarehouse, idBranch = undefined) => {
     const params = {
-        "filter[warehouse_id]": id ? id?.value : null,
+        "filter[warehouse_id]": idWarehouse ? idWarehouse?.value : null,
+        "filter[branch_id]": idBranch ? idBranch?.value : null
     };
     return useQuery({
         queryKey: ["api_location_combobox", { ...params }],
@@ -61,6 +93,6 @@ export const useLocationByWarehouseTo = (id) => {
                 value: e?.id,
             }))
         },
-        enabled: !!id
+        enabled: (!!idWarehouse || !!idBranch)
     })
 }
