@@ -81,7 +81,6 @@ const General = (props) => {
 
     const _ServerSending = async () => {
         let formData = new FormData();
-
         data.forEach((item, index) => {
             formData.append(`feature[${index}][code]`, item.code);
             formData.append(`feature[${index}][is_enable]`, item.is_enable);
@@ -89,13 +88,13 @@ const General = (props) => {
         try {
             const { isSuccess, message } = await apiGeneral.apiHanding(formData);
             if (isSuccess) {
-                isShow("success", props.dataLang[message]);
+                isShow("success", props.dataLang[message] || message);
                 sOnSending(false);
             } else {
-                isShow("error", props.dataLang[message]);
+                isShow("error", props.dataLang[message] || message);
             }
         } catch (error) {
-
+            throw error
         }
     };
 

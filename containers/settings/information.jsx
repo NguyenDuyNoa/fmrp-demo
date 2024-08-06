@@ -53,7 +53,7 @@ const Information = (props) => {
     }, []);
 
     const _HandleImg = ({ target: { files } }) => {
-        var [file] = files;
+        let [file] = files;
         if (file) {
             sData({
                 ...data,
@@ -107,10 +107,10 @@ const Information = (props) => {
                 isShow("error", "Cập nhật dữ liệu thất bại");
             }
             await _ServerFetching();
+            sOnSending(false);
         } catch (error) {
-
+            throw error
         }
-        sOnSending(false);
     };
 
     useEffect(() => {
