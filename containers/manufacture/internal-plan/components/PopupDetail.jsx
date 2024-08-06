@@ -1,4 +1,3 @@
-import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorRed } from "@/components/UI/common/Tag/TagStatus";
@@ -12,12 +11,12 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
+import { useInternalPlanDetail } from "../hooks/useInternalPlanDetail";
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const PopupDetail = (props) => {
-    const [data, sData] = useState();
 
     const [open, sOpen] = useState(false);
 
@@ -25,27 +24,11 @@ const PopupDetail = (props) => {
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-    const _ServerFetching_detailOrder = async () => {
-        try {
-            const { data } = await apiInternalPlan.apiDetailInternalPlan(props?.id);
-            sData(data);
-            sOnFetching(false);
-        } catch (error) { }
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching_detailOrder();
-    }, [open]);
+    const { data, isFetching } = useInternalPlanDetail(open, props?.id);
 
     return (
         <>
@@ -149,7 +132,7 @@ const PopupDetail = (props) => {
                                             {props.dataLang?.import_from_note || "import_from_note"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.internalPlansItems?.length > 0 ? (
                                         <>
