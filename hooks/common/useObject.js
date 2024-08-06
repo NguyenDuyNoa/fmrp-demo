@@ -2,6 +2,7 @@ import apiComons from "@/Api/apiComon/apiComon";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
+// đối tượng
 export const useObject = (dataLang) => {
     return useQuery({
         queryKey: ['api_object'],
@@ -12,20 +13,20 @@ export const useObject = (dataLang) => {
         ...optionsQuery
     })
 }
-
-export const useObjectList = (dataLang, idBranch, object) => {
+// danh sách đối tượng
+export const useObjectList = (dataLang, idBranch, idObject) => {
     return useQuery({
-        queryKey: ['api_object_list', idBranch, object],
+        queryKey: ['api_object_list', idBranch, idObject],
         queryFn: async () => {
             const { rResult } = await apiComons.apiObjectList({
                 params: {
-                    type: object?.value,
+                    type: idObject?.value,
                     "filter[branch_id]": idBranch?.value,
                 }
             });
-            return rResult?.map((e) => ({ label: dataLang[e?.name] || e?.name, value: e?.staffid })) || []
+            return rResult?.map((e) => ({ label: dataLang[e?.name] || e?.name, value: e?.staffid || e?.id })) || []
         },
-        enabled: !!object,
+        enabled: !!idObject,
         ...optionsQuery
     })
 }
