@@ -6,7 +6,7 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/U
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
-import Loading from '@/components/UI/loading';
+import Loading from '@/components/UI/loading/loading';
 import NoData from '@/components/UI/noData/nodata';
 import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';

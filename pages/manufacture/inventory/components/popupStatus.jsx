@@ -6,7 +6,7 @@ import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import { useEffect, useState } from "react";
 import PopupCustom from "/components/UI/popup";
 

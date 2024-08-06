@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useToggle } from "@/hooks/useToggle";
 
 import PopupCustom from "@/components/UI/popup";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 

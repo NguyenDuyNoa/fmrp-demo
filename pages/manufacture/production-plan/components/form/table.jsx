@@ -11,7 +11,7 @@ import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
 
 import useToast from "@/hooks/useToast";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import { TagColorRed } from "@/components/UI/common/Tag/TagStatus";

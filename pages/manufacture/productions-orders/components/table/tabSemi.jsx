@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";

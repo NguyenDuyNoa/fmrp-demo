@@ -6,7 +6,7 @@ import { Container } from "@/components/UI/common/layout";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { optionsQuery } from "@/configs/optionsQuery";

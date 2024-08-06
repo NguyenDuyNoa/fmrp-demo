@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Tooltip } from "react-tippy";
 import Popup from "reactjs-popup";
-import Loading from "./loading";
+import Loading from "./loading/loading";
 import Zoom from "./zoomElement/zoomElement";
 const deca = Lexend_Deca({
     subsets: ["latin"],

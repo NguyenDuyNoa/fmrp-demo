@@ -4,7 +4,7 @@ import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder"
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import Zoom from "@/components/UI/zoomElement/zoomElement";

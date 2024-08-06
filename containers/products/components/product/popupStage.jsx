@@ -1,6 +1,6 @@
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import PopupCustom from "@/components/UI/popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useDragAndDrop from "@/hooks/useDragAndDrop";

@@ -3,7 +3,7 @@ import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import PopupCustom from "@/components/UI/popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";

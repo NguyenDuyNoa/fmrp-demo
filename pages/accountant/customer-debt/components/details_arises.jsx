@@ -10,7 +10,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";

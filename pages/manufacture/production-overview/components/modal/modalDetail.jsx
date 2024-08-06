@@ -1,4 +1,4 @@
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import Zoom from "components/UI/zoomElement/zoomElement";
 import Image from "next/image";
 import History from "./history";

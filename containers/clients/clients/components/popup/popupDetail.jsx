@@ -3,7 +3,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import ImageErrors from "@/components/UI/imageErrors";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
 import { Tooltip } from "react-tippy";

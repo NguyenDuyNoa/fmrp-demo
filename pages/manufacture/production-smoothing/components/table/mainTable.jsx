@@ -3,7 +3,7 @@ import { Add, SearchNormal1 } from "iconsax-react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import PopupAdd from "../popup/popup";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 
 const MainTable = ({
     data,

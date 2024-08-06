@@ -8,7 +8,7 @@ import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import ExpandableContent from "components/UI/more";
 import { TickCircle } from "iconsax-react";
 import { useState } from "react";

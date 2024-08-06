@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import PopupCustom from "@/components/UI/popup";
 
 import { Add as IconAdd, Calendar as IconCalendar, Trash as IconDelete, Image as IconImage } from "iconsax-react";

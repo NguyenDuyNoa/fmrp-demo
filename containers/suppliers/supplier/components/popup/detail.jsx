@@ -4,7 +4,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import { useState } from "react";
 import { usseSupplierDetail } from "../../hooks/usseSupplierDetail";

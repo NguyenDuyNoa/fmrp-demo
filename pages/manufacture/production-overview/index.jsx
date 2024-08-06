@@ -6,7 +6,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Zoom from "components/UI/zoomElement/zoomElement";
 import { v4 as uuid } from "uuid";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import Step from "./components/modal/steps";
 import ModalDetail from "./components/modal/modalDetail";
 import { useMemo } from "react";

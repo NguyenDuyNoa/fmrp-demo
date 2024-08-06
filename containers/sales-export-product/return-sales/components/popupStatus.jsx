@@ -3,7 +3,7 @@ import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import vi from "date-fns/locale/vi";
 import { useEffect, useState } from "react";
 import { registerLocale } from "react-datepicker";

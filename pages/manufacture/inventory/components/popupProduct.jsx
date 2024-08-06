@@ -2,7 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import PopupCustom from "@/components/UI/popup";
 
 import useSetingServer from "@/hooks/useConfigNumber";

@@ -12,7 +12,7 @@ import * as XLSX from "xlsx";
 
 import { ArrowRight, Trash as IconDelete, Notification, RefreshCircle } from "iconsax-react";
 
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 
 import dynamic from "next/dynamic";
 

@@ -6,7 +6,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";

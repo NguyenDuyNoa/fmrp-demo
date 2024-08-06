@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import ModalImage from "react-modal-image";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 
 import useToast from "@/hooks/useToast";

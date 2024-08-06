@@ -12,7 +12,7 @@ import { Grid6, Trash as IconDelete } from "iconsax-react";
 import Popup_chitiet from "./components/popupDetail";
 import Popup_status from "./components/popupStatus";
 
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import useActionRole from "@/hooks/useRole";

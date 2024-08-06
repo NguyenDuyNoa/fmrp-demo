@@ -5,7 +5,7 @@ import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePag
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
-import Loading from '@/components/UI/loading';
+import Loading from '@/components/UI/loading/loading';
 import NoData from '@/components/UI/noData/nodata';
 import Pagination from "@/components/UI/pagination";
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate';

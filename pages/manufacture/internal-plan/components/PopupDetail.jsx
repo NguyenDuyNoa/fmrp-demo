@@ -3,7 +3,7 @@ import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/compon
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorRed } from "@/components/UI/common/Tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import ExpandableContent from "@/components/UI/more";
 import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

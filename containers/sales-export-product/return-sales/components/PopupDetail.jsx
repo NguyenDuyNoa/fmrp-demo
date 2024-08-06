@@ -8,7 +8,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ImageErrors from "components/UI/imageErrors";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import ExpandableContent from "components/UI/more";
 import vi from "date-fns/locale/vi";
 import { SearchNormal1 as IconSearch } from "iconsax-react";

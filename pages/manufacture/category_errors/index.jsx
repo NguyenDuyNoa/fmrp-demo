@@ -1,4 +1,4 @@
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";

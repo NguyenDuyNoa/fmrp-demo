@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";

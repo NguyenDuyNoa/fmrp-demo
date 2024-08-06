@@ -8,7 +8,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";

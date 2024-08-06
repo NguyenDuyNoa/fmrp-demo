@@ -7,7 +7,7 @@ import {
   SearchNormal1 as IconSearch,
   Add as IconAdd,
 } from "iconsax-react";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import DeleteButton from "./button/buttonDeleteSlect";
 import { motion } from "framer-motion";
 import AnimatedDiv from "../../../components/UI/motions";
@@ -33,9 +33,9 @@ const FormClient = ({
       ) : (
         <div
           className={`${onLoadingListData
-              ? "bg-white"
-              : (listDataContact?.length > 0 || listDataDelivery?.length > 0) &&
-              "bg-zinc-100 mt-2 "
+            ? "bg-white"
+            : (listDataContact?.length > 0 || listDataDelivery?.length > 0) &&
+            "bg-zinc-100 mt-2 "
             } grid grid-cols-8 items-start 3xl:gap-2 xxl:gap-2 2xl:gap-4 p-4 rounded-xl  transition-all ease-linear`}
         >
           <div className={`col-span-4   rounded-lg`}>

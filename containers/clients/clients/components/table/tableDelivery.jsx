@@ -1,5 +1,5 @@
 import React from "react";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import { Map, IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";

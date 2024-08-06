@@ -12,7 +12,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 
 import ImageErrors from "@/components/UI/imageErrors";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import ExpandableContent from "@/components/UI/more";
 import PopupCustom from "@/components/UI/popup";
 

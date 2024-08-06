@@ -7,7 +7,7 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import Loading from "@/components/UI/loading";
+import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import useSetingServer from "@/hooks/useConfigNumber";
