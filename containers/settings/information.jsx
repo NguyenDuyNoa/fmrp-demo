@@ -1,6 +1,7 @@
 import apiInformation from "@/Api/apiSettings/apiInformation";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
+import Loading from "@/components/UI/loading/loading";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { Camera as IconCamera } from "iconsax-react";
@@ -9,7 +10,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
-import LoadingItems from "/components/UI/loading";
 
 const Information = (props) => {
     const dataLang = props.dataLang;
@@ -250,7 +250,7 @@ const Information = (props) => {
                                 <img src="/icon/Verified.png" className="w-[25px] h-[25px]" />
                             </h1>
                             {onFetching ? (
-                                <LoadingItems className="h-60" color="#0f4f9e" />
+                                <Loading className="h-60" color="#0f4f9e" />
                             ) : (
                                 <div className="grid grid-cols-2 gap-7">
                                     <div className="space-y-3">
@@ -325,7 +325,7 @@ const Information = (props) => {
                                 Thông tin người đại diện pháp luật
                             </h1>
                             {onFetching ? (
-                                <LoadingItems className="h-60" color="#0f4f9e" />
+                                <Loading className="h-60" color="#0f4f9e" />
                             ) : (
                                 <div className="grid grid-cols-2 gap-7">
                                     <div className="space-y-3">
