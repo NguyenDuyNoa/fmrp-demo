@@ -4,13 +4,12 @@ import { useRouter } from "next/router";
 const useTab = (initialTab = "all") => {
     const router = useRouter();
 
-    const handleTab = useCallback(
-        (e) => {
-            router.push({
-                pathname: router.route,
-                query: { tab: e },
-            });
-        },
+    const handleTab = useCallback((e) => {
+        router.push({
+            pathname: router.route,
+            query: { tab: e },
+        });
+    },
         [router.query?.tab]
     );
 

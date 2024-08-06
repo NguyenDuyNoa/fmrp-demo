@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
-import Popup from "reactjs-popup";
-
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { _ServerInstance as Axios } from "@/services/axios";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { Verify } from "iconsax-react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { _ServerInstance as Axios } from "/services/axios";
+import Popup from "reactjs-popup";
 
 const PopupAppTrial = () => {
     const [isMounted, setIsMounted] = useState(false);

@@ -85,6 +85,15 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true`, params);
         return response.data
     },
-
+    // đối tượng
+    async apiListObject() {
+        const response = await axiosCustom('GET', `/api_web/Api_export_other/object/?csrf_protection=true`,);
+        return response.data
+    },
+    //ds đối tượng
+    async apiObjectList(param) {
+        const response = await axiosCustom('GET', `/api_web/Api_export_other/objectList/?csrf_protection=true`, param);
+        return response.data
+    },
 }
 export default apiComons

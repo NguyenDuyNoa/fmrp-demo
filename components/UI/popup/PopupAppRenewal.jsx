@@ -1,15 +1,14 @@
-import { PresentionChart, User } from "iconsax-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import Popup from "reactjs-popup";
-
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { PresentionChart, User } from "iconsax-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Select from "react-select";
-import { _ServerInstance as Axios } from "/services/axios";
+import Popup from "reactjs-popup";
+import { _ServerInstance as Axios } from "@/services/axios";
 
 const PopupAppRenewal = () => {
     const [openModal, setOpenModal] = useState(false);
@@ -67,11 +66,7 @@ const PopupAppRenewal = () => {
         }
     };
 
-    const hiddenOptions = [];
-    // const hiddenOptions = isState?.idBranch?.length > 3 ? isState?.idBranch?.slice(0, 3) : [];
-
     const options = [];
-    // const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
     if (!isMounted) {
         return null;
