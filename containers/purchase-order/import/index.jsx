@@ -68,7 +68,8 @@ const initalState = {
     valueCode: null,
     valueSupplier: null,
     valueDate: { startDate: null, endDate: null },
-    data_export: [],
+    dataExport: [],
+    refreshing: false,
 };
 const PurchaseImport = (props) => {
     const dataLang = props.dataLang;
@@ -318,15 +319,18 @@ const PurchaseImport = (props) => {
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
         data.append("id", checkedWare?.id);
         handingStatus.mutate(data, {
-            onSuccess: ({ isSuccess, message, data_export }) => {
+            onSuccess: async ({ isSuccess, message, data_export }) => {
                 if (isSuccess) {
                     isShow("success", `${dataLang[message] || message}`);
-                    refetch()
+                    queryState({ refreshing: true })
+                    await refetch()
+                    await refetchFilterBar()
+                    queryState({ refreshing: false })
                 } else {
                     isShow("error", `${dataLang[message] || message}`);
                 }
                 if (data_export?.length > 0) {
-                    queryState({ data_export: data_export });
+                    queryState({ dataExport: data_export });
                 }
             }
         })
@@ -351,8 +355,8 @@ const PurchaseImport = (props) => {
                 <title>{dataLang?.import_title || "import_title"} </title>
             </Head>
             <Container>
-                {isState.data_export.length > 0 && (
-                    <PopupStatus className="hidden" data_export={isState.data_export} dataLang={dataLang} />
+                {isState.dataExport?.length > 0 && (
+                    <PopupStatus className="hidden" dataExport={isState.dataExport} dataLang={dataLang} />
                 )}
                 {statusExprired ? (
                     <EmptyExprired />
@@ -538,7 +542,7 @@ const PurchaseImport = (props) => {
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isFetching ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>

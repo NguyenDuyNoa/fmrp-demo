@@ -36,10 +36,10 @@ const PopupStatus = (props) => {
         if (props?.data_export?.length > 0) {
             setTimeout(() => {
                 sOpen(true);
-                sData(props?.data_export);
+                sData(props?.dataExport);
             }, 1000);
         }
-    }, [props?.data_export]);
+    }, [props?.dataExport]);
 
     return (
         <PopupCustom

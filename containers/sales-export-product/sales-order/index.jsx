@@ -78,6 +78,8 @@ const SalesOrder = (props) => {
 
     const statusExprired = useStatusExprired();
 
+    const [refreshing, setRefreshing] = useState(false);
+
     const [keySearch, sKeySearch] = useState("");
 
     const [isExpanded, setIsExpanded] = useState(false);
@@ -301,12 +303,14 @@ const SalesOrder = (props) => {
         formData.append("status", newStatus);
 
         handingStatus.mutate({ data: formData, id: id, stt: newStatus }, {
-            onSuccess: ({ isSuccess, message }) => {
+            onSuccess: async ({ isSuccess, message }) => {
 
                 if (isSuccess) {
                     isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}` || message);
-                    refetch()
-                    refetchFilterBar()
+                    setRefreshing(true)
+                    await refetch()
+                    await refetchFilterBar()
+                    setRefreshing(false)
                 } else {
                     isShow("error", `${dataLang[message] || message}` || message);
                 }
@@ -357,21 +361,19 @@ const SalesOrder = (props) => {
                             {dataFilterBar &&
                                 dataFilterBar?.map((e) => {
                                     return (
-                                        <div key={e?.id}>
-                                            <TabFilter
-                                                style={{
-                                                    backgroundColor: "#e2f0fe",
-                                                }}
-                                                dataLang={dataLang}
-                                                key={e?.id}
-                                                onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                total={e?.count}
-                                                active={e?.id}
-                                                className={"text-[#0F4F9E]"}
-                                            >
-                                                {dataLang[e?.name]}
-                                            </TabFilter>
-                                        </div>
+                                        <TabFilter
+                                            style={{
+                                                backgroundColor: "#e2f0fe",
+                                            }}
+                                            dataLang={dataLang}
+                                            key={e?.id}
+                                            onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                            total={e?.count}
+                                            active={e?.id}
+                                            className={"text-[#0F4F9E]"}
+                                        >
+                                            {dataLang[e?.name]}
+                                        </TabFilter>
                                     );
                                 })}
                         </ContainerFilterTab>
@@ -520,7 +522,7 @@ const SalesOrder = (props) => {
                                         </ColumnTable>
                                     </HeaderTable>
                                     {/* {loading ? */}
-                                    {isFetching ? (
+                                    {(isFetching && !refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>

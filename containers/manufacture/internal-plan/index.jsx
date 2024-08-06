@@ -48,6 +48,7 @@ const initsId = {
     idBranch: null,
     valueDate: { startDate: null, endDate: null },
 };
+
 const InternalPlan = (props) => {
     const dataLang = props.dataLang;
 
@@ -61,7 +62,7 @@ const InternalPlan = (props) => {
 
     const [idFillter, sIdFillter] = useState(initsId);
 
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     const [keySearch, sKeySearch] = useState("");
 
@@ -92,9 +93,9 @@ const InternalPlan = (props) => {
             if (isSuccess == 1) {
                 isShow("success", `${dataLang[message] || message}`);
                 handleQueryId({ status: false });
-                setIsRefreshing(true);
+                setRefreshing(true);
                 await refetch();
-                setIsRefreshing(false);
+                setRefreshing(false);
                 return;
             }
             isShow("error", `${dataLang[message] || message}`);
@@ -329,7 +330,7 @@ const InternalPlan = (props) => {
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {(isFetching && !isRefreshing) ? (
+                                    {(isFetching && !refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>

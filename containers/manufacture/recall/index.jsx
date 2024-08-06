@@ -61,7 +61,7 @@ const initialState = {
     idBranch: null,
     valueDate: { startDate: null, endDate: null },
     dataExport: [],
-    onFetchingGroup: false,
+    refreshing: false,
 };
 
 const Recall = (props) => {
@@ -168,9 +168,10 @@ const Recall = (props) => {
             const { isSuccess, message, data_export } = await apiRecall.apiHandingStatusRecall(data);
             if (isSuccess) {
                 isShow("success", `${dataLang[message]}` || message);
+                queryState({ refreshing: true });
                 await refetch();
                 await refetchFilterbar();
-                queryState({ onSending: false });
+                queryState({ onSending: false, refreshing: false });
             } else {
                 isShow("error", `${dataLang[message]}` || message);
             }
@@ -337,20 +338,19 @@ const Recall = (props) => {
                             />
                         </div>
                         <ContainerFilterTab>
-                            {dataFilterbar &&
-                                dataFilterbar?.map((e) => {
-                                    return (
-                                        <TabFilter
-                                            dataLang={dataLang}
-                                            key={e.id}
-                                            onClick={_HandleSelectTab.bind(this, `${e.id}`)}
-                                            total={e.count}
-                                            active={e.id}
-                                        >
-                                            {dataLang[e?.name] || e?.name}
-                                        </TabFilter>
-                                    );
-                                })}
+                            {dataFilterbar && dataFilterbar?.map((e) => {
+                                return (
+                                    <TabFilter
+                                        dataLang={dataLang}
+                                        key={e.id}
+                                        onClick={_HandleSelectTab.bind(this, `${e.id}`)}
+                                        total={e.count}
+                                        active={e.id}
+                                    >
+                                        {dataLang[e?.name] || e?.name}
+                                    </TabFilter>
+                                );
+                            })}
                         </ContainerFilterTab>
                         <ContainerTable>
                             <div className="xl:space-y-3 space-y-2">
@@ -484,7 +484,7 @@ const Recall = (props) => {
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isFetching ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>

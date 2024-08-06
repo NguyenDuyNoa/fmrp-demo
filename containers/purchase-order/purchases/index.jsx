@@ -53,16 +53,13 @@ import { usePurchasesList, usePurchasesListCode } from "./hooks/usePurchasesList
 dayjs.locale("vi");
 
 const initialData = {
-    onFetchingBranch: false,
-    onFetchingCode: false,
-    onFetchingUser: false,
-    onFetchingGroup: false,
     onSending: false,
     keySearch: "",
     idBranch: null,
     idCode: null,
     idUser: null,
     active: null,
+    refreshing: false,
     valueDate: { startDate: null, endDate: null },
 };
 const Purchases = (props) => {
@@ -120,7 +117,6 @@ const Purchases = (props) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace({
@@ -148,17 +144,20 @@ const Purchases = (props) => {
 
     const _ServerSending = async (id, newStatus) => {
         handingStatus.mutate({ id, newStatus }, {
-            onSuccess: ({ isSuccess, message }) => {
+            onSuccess: async ({ isSuccess, message }) => {
                 if (isSuccess) {
-                    isShow("success", `${dataLang[message]}`);
-                    queryState({ onSending: false });
-                    refetch()
-                    refetchGroup()
+                    isShow("success", `${dataLang[message] || message}`);
+                    queryState({ refreshing: true });
+                    await refetch()
+                    await refetchGroup()
+                    queryState({ onSending: false, refreshing: false });
                 } else {
-                    isShow("error", `${dataLang[message]}`);
+                    isShow("error", `${dataLang[message] || message}`);
                 }
             },
-            onError: () => { }
+            onError: (err) => {
+                throw err
+            }
         })
     };
 
@@ -312,20 +311,19 @@ const Purchases = (props) => {
                             />
                         </div>
                         <ContainerFilterTab>
-                            {dataFilterbar &&
-                                dataFilterbar?.map((e) => {
-                                    return (
-                                        <TabFilter
-                                            key={e.id}
-                                            onClick={_HandleSelectTab.bind(this, `${e.id}`)}
-                                            total={e.count}
-                                            active={e.id}
-                                            className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "}`}
-                                        >
-                                            {dataLang[e?.name] || e?.name}
-                                        </TabFilter>
-                                    );
-                                })}
+                            {dataFilterbar && dataFilterbar?.map((e) => {
+                                return (
+                                    <TabFilter
+                                        key={e.id}
+                                        onClick={_HandleSelectTab.bind(this, `${e.id}`)}
+                                        total={e.count}
+                                        active={e.id}
+                                        className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "}`}
+                                    >
+                                        {dataLang[e?.name] || e?.name}
+                                    </TabFilter>
+                                );
+                            })}
                         </ContainerFilterTab>
                         <ContainerTable>
                             <div className="xl:space-y-3 space-y-2">
@@ -466,7 +464,7 @@ const Purchases = (props) => {
                                             {dataLang?.purchase_action || "purchase_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {(isLoading || isFetching) ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">

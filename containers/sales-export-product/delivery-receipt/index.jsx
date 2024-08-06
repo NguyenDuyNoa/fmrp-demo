@@ -58,6 +58,7 @@ const initialState = {
     idBranch: null,
     idDelivery: null,
     idCustomer: null,
+    refreshing: false,
     valueDate: { startDate: null, endDate: null },
 };
 const DeliveryReceipt = (props) => {
@@ -277,12 +278,17 @@ const DeliveryReceipt = (props) => {
 
             if (isSuccess) {
                 isShow(alert_type, dataLang[message] || message);
-                refetch();
+                queryState({ refreshing: true });
+                await refetch();
+                await refetchFilterBar();
+                queryState({ refreshing: false });
+
             } else {
                 isShow(alert_type, dataLang[message] || message);
             }
             queryState({ onSending: false });
         } catch (error) {
+            throw error
         }
     };
 
@@ -335,21 +341,19 @@ const DeliveryReceipt = (props) => {
                             />
                         </div>
                         <ContainerFilterTab>
-                            {dataFilterbar &&
-                                dataFilterbar?.map((e) => {
-                                    return (
-                                        <div key={e?.id}>
-                                            <TabFilter
-                                                dataLang={dataLang}
-                                                onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                total={e?.count}
-                                                active={e?.id}
-                                            >
-                                                {e?.name}
-                                            </TabFilter>
-                                        </div>
-                                    );
-                                })}
+                            {dataFilterbar && dataFilterbar?.map((e) => {
+                                return (
+                                    <TabFilter
+                                        key={e?.id}
+                                        dataLang={dataLang}
+                                        onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                        total={e?.count}
+                                        active={e?.id}
+                                    >
+                                        {e?.name}
+                                    </TabFilter>
+                                );
+                            })}
                         </ContainerFilterTab>
                         {/* table */}
                         <ContainerTable>
@@ -489,7 +493,7 @@ const DeliveryReceipt = (props) => {
                                             {dataLang?.price_quote_operations || "price_quote_operations"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isFetching ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>

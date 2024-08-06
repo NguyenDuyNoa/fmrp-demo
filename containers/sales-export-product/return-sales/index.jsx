@@ -61,6 +61,7 @@ const initsArr = {
     keySearchCode: "",
     keySearchClient: "",
     onSending: false,
+    refreshing: false,
 };
 const ReturnSales = (props) => {
     const dataLang = props.dataLang;
@@ -286,14 +287,16 @@ const ReturnSales = (props) => {
         data.append("id", checkedWare?.id);
 
         handingStatus.mutate(data, {
-            onSuccess: ({ isSuccess, message, alert_type, data_export }) => {
+            onSuccess: async ({ isSuccess, message, alert_type, data_export }) => {
                 if (isSuccess) {
                     isShow(alert_type, dataLang[message] || message);
                 } else {
                     isShow("error", dataLang[message] || message);
                 }
-                refetch()
-                refetchFilterBar()
+                queryState({ refreshing: true });
+                await refetch()
+                await refetchFilterBar()
+                queryState({ refreshing: false });
                 if (data_export?.length > 0) {
                     queryState({ dataExport: [...data_export] });
                 }
@@ -345,21 +348,19 @@ const ReturnSales = (props) => {
                                 />
                             </div>
                             <ContainerFilterTab>
-                                {dataFilterBar &&
-                                    dataFilterBar?.map((e) => {
-                                        return (
-                                            <div key={e?.id}>
-                                                <TabFilter
-                                                    dataLang={dataLang}
-                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                    total={e?.count}
-                                                    active={e?.id}
-                                                >
-                                                    {dataLang[e?.name] || e?.name}
-                                                </TabFilter>
-                                            </div>
-                                        );
-                                    })}
+                                {dataFilterBar && dataFilterBar?.map((e) => {
+                                    return (
+                                        <TabFilter
+                                            key={e?.id}
+                                            dataLang={dataLang}
+                                            onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                            total={e?.count}
+                                            active={e?.id}
+                                        >
+                                            {dataLang[e?.name] || e?.name}
+                                        </TabFilter>
+                                    );
+                                })}
                             </ContainerFilterTab>
                             {/* table */}
                             <ContainerTable>
@@ -507,7 +508,7 @@ const ReturnSales = (props) => {
                                                 {dataLang?.import_action || "import_action"}
                                             </ColumnTable>
                                         </HeaderTable>
-                                        {isFetching ? (
+                                        {(isFetching && !isState.refreshing) ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.rResult?.length > 0 ? (
                                             <>

@@ -56,12 +56,10 @@ const initData = {
     keySearch: "",
     keySearchCode: "",
     keySearchCient: "",
-    listBr: [],
-    listQuoteCode: [],
-    listCustomer: [],
     idBranch: null,
     idQuoteCode: null,
     idCustomer: null,
+    refreshing: false,
     valueDate: { startDate: null, endDate: null },
 };
 const PriceQuote = (props) => {
@@ -319,11 +317,13 @@ const PriceQuote = (props) => {
         formData.append("status", newStatus);
 
         handingStatus.mutate({ data: formData, id: id, stt: newStatus }, {
-            onSuccess: ({ isSuccess }) => {
+            onSuccess: async ({ isSuccess }) => {
                 if (isSuccess !== false) {
                     isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
-                    refetch();
-                    refetchFilter();
+                    queryState({ refreshing: true })
+                    await refetch();
+                    await refetchFilter();
+                    queryState({ refreshing: false })
                 }
             },
             onError: (err) => {
@@ -370,22 +370,19 @@ const PriceQuote = (props) => {
                         </div>
 
                         <ContainerFilterTab>
-                            {dataFilter &&
-                                dataFilter?.map((e) => {
-                                    return (
-                                        <div key={e?.id}>
-                                            <TabFilter
-                                                dataLang={dataLang}
-                                                key={e?.id}
-                                                onClick={() => handleTab(e?.id)}
-                                                total={e?.count}
-                                                active={e?.id}
-                                            >
-                                                {dataLang[e?.name]}
-                                            </TabFilter>
-                                        </div>
-                                    );
-                                })}
+                            {dataFilter && dataFilter?.map((e) => {
+                                return (
+                                    <TabFilter
+                                        dataLang={dataLang}
+                                        key={e?.id}
+                                        onClick={() => handleTab(e?.id)}
+                                        total={e?.count}
+                                        active={e?.id}
+                                    >
+                                        {dataLang[e?.name]}
+                                    </TabFilter>
+                                );
+                            })}
                         </ContainerFilterTab>
                         <ContainerTable>
                             <div className="xl:space-y-3 space-y-2">
@@ -530,7 +527,7 @@ const PriceQuote = (props) => {
                                             {dataLang?.price_quote_operations || "price_quote_operations"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {(isLoading || isFetching) ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : dataPriceQuote?.rResult?.length > 0 ? (
                                         <>

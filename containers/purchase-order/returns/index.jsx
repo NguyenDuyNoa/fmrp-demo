@@ -56,6 +56,7 @@ const initialState = {
     keySearch: "",
     keySearchCode: "",
     valueBr: null,
+    refreshing: false,
     valueCode: null,
     valueSupplier: null,
     valueDate: { startDate: null, endDate: null, }
@@ -286,16 +287,19 @@ const PurchaseReturns = (props) => {
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
         data.append("id", checkedWare?.id);
         handingStatus.mutate(data, {
-            onSuccess: ({ isSuccess, message }) => {
+            onSuccess: async ({ isSuccess, message }) => {
                 if (isSuccess) {
                     isShow("success", `${dataLang[message]}` || message);
-                    refetch()
-                    refetchFilter()
+                    queryState({ refreshing: true });
+                    await refetch()
+                    await refetchFilter()
+                    queryState({ refreshing: false });
                 } else {
                     isShow("error", `${dataLang[message]}` || message);
                 }
             },
             onError: (error) => {
+                throw error
             },
         })
         queryState({ onSending: false });
@@ -496,7 +500,7 @@ const PurchaseReturns = (props) => {
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {(isFetching) ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>

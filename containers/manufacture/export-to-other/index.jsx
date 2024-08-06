@@ -64,6 +64,7 @@ const initialState = {
     idObject: null,
     valueDate: { startDate: null, endDate: null },
     dataExport: [],
+    refreshing: false,
 };
 const ExportToOther = (props) => {
     const dataLang = props.dataLang;
@@ -173,8 +174,10 @@ const ExportToOther = (props) => {
             const { isSuccess, message, data_export } = await apiExportToOther.apiHandingStatus(data);
             if (isSuccess) {
                 isShow("success", dataLang[message] || message);
+                queryState({ refreshing: true });
                 await refetch()
                 await refetchFillterBar()
+                queryState({ refreshing: false });
             } else {
                 isShow("error", dataLang[message] || message);
             }
@@ -520,7 +523,7 @@ const ExportToOther = (props) => {
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {(isFetching) ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>

@@ -62,6 +62,7 @@ const initalState = {
     idBranch: null,
     valueDate: { startDate: null, endDate: null },
     dataExport: [],
+    refreshing: false,
 }
 const ProductsWarehouse = (props) => {
     const dataLang = props.dataLang;
@@ -162,12 +163,13 @@ const ProductsWarehouse = (props) => {
 
             if (isSuccess) {
                 isShow("success", `${dataLang[message] || message}`);
+                queryState({ refreshing: true });
 
                 await refetch();
 
                 await refetchFillterbar();
 
-                queryState({ onSending: false });
+                queryState({ onSending: false, refreshing: false });
             } else {
                 isShow("error", `${dataLang[message] || message}`);
             }
@@ -483,7 +485,7 @@ const ProductsWarehouse = (props) => {
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isFetching ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>

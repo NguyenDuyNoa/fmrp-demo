@@ -47,6 +47,7 @@ const initalState = {
     room: [],
     valueBr: [],
     keySearch: "",
+    refreshing: false
 };
 const PersonelStaff = (props) => {
     const dataLang = props.dataLang;
@@ -100,14 +101,17 @@ const PersonelStaff = (props) => {
 
     const handleDelete = async () => {
         sStatus(isKeyState);
-        const index = isState.data.findIndex((x) => x.id === isKeyState);
-        if (index !== -1 && isState.data[index].active === "0") {
-            sActive((isState.data[index].active = "1"));
-        } else if (index !== -1 && isState.data[index].active === "1") {
-            sActive((isState.data[index].active = "0"));
+        const index = data?.rResult.findIndex((x) => x.id === isKeyState);
+
+        if (index !== -1) {
+            if (data.rResult[index].active === "0") {
+                data.rResult[index].active = "1";
+                sActive("1");
+            } else if (data.rResult[index].active === "1") {
+                data.rResult[index].active = "0";
+                sActive("0");
+            }
         }
-        _ServerSending();
-        queryState({ data: [...isState.data] });
         handleQueryId({ status: false });
     };
 
@@ -128,13 +132,21 @@ const PersonelStaff = (props) => {
                     isShow("error", dataLang[message] || message);
                 }
             },
-            onError: (error) => { }
+            onError: (error) => {
+                throw error
+            }
         })
     };
 
     useEffect(() => {
         isState.onSending && _ServerSending();
     }, [isState.onSending]);
+
+    useEffect(() => {
+        if (active || status) {
+            queryState({ onSending: true });
+        }
+    }, [active, status]);
 
     const multiDataSet = [
         {

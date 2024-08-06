@@ -64,6 +64,7 @@ const initialState = {
     idBranch: null,
     valueDate: { startDate: null, endDate: null, },
     dataExport: [],
+    refreshing: false,
 };
 const WarehouseTransfer = (props) => {
     const dataLang = props.dataLang;
@@ -170,9 +171,10 @@ const WarehouseTransfer = (props) => {
 
             if (isSuccess) {
                 isShow(alert_type, dataLang[message] || message);
+                queryState({ refreshing: true });
                 await refetch()
                 await refetchFilterBar()
-                queryState({ onSending: false });
+                queryState({ onSending: false, refreshing: false });
             } else {
                 isShow("error", dataLang[message] || message);
             }
@@ -524,7 +526,7 @@ const WarehouseTransfer = (props) => {
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {isFetching ? (
+                                    {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult.length > 0 ? (
                                         <>
