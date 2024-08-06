@@ -3,6 +3,7 @@ import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSal
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
 
 export const useWarehouseTranfer = () => {
     return useQuery({
@@ -94,5 +95,37 @@ export const useLocationByWarehouseTo = (idWarehouse, idBranch = undefined) => {
             }))
         },
         enabled: (!!idWarehouse || !!idBranch)
+    })
+}
+
+/// kho kiểm kê
+export const useWarehouseInventory = (id) => {
+    return useQuery({
+        queryKey: ['api_warehouse_inventory', id],
+        queryFn: async () => {
+            const { rResult } = await apiComons.apiWarehouseInventory(id)
+            return rResult.map((e) => ({ label: e.name, value: e.id }))
+        },
+        enabled: !!id
+    })
+}
+/// vị trí kho kiểm kê
+
+export const useLocationByWarehouseInventory = (id) => {
+    const dispatch = useDispatch();
+    return useQuery({
+        queryKey: ['api_location_warehouse_inventory', id],
+        queryFn: async () => {
+            const data = await apiComons.apiLocationInWarehouseInventory(id);
+
+            const newData = data.map((e) => ({ label: e.name, value: e.id }))
+
+            dispatch({
+                type: "location_inventory/update",
+                payload: newData,
+            });
+            return newData
+        },
+        enabled: !!id
     })
 }

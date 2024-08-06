@@ -13,14 +13,8 @@ const apiInventory = {
         return response.data
     },
     // form
-    async apiWarehouseInventory(id) {
-        const response = await axiosCustom('GET', `api_web/api_warehouse/warehouse?csrf_protection=true&filter[is_system]=2&filter[branch_id]=${id}`);
-        return response.data
-    },
-    async apiLocationInWarehouseInventory(id) {
-        const response = await axiosCustom('GET', `/api_web/api_warehouse/LocationInWarehouse/${id}?csrf_protection=true`);
-        return response.data
-    },
+
+
     async apiHandingInventory(data) {
         const response = await axiosCustom('POST', `/api_web/api_inventory/addDetail?csrf_protection=true`, data);
         return response.data

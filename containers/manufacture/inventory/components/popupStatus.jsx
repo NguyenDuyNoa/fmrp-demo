@@ -1,14 +1,14 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
+import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import Loading from "@/components/UI/loading/loading";
 import { useEffect, useState } from "react";
-import PopupCustom from "/components/UI/popup";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
@@ -31,13 +31,13 @@ const Popup_status = (props) => {
     useEffect(() => {
         sData([]);
         sOpen(false);
-        if (props?.data_export?.length > 0) {
+        if (props?.dataExport?.length > 0) {
             setTimeout(() => {
                 sOpen(true);
-                sData(props?.data_export);
+                sData(props?.dataExport);
             }, 1000);
         }
-    }, [props?.data_export]);
+    }, [props?.dataExport]);
 
     return (
         <PopupCustom
@@ -52,16 +52,10 @@ const Popup_status = (props) => {
                         <HeaderTablePopup
                             gridCols={
                                 dataProductSerial.is_enable == "1"
-                                    ? dataMaterialExpiry.is_enable !=
-                                        dataProductExpiry.is_enable
-                                        ? 12
-                                        : dataMaterialExpiry.is_enable == "1"
-                                            ? 12 : 10
-                                    : dataMaterialExpiry.is_enable !=
-                                        dataProductExpiry.is_enable
-                                        ? 11
-                                        : dataMaterialExpiry.is_enable == "1"
-                                            ? 11 : 9
+                                    ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? 12
+                                        : dataMaterialExpiry.is_enable == "1" ? 12 : 10
+                                    : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? 11
+                                        : dataMaterialExpiry.is_enable == "1" ? 11 : 9
                             }
                         >
                             <ColumnTablePopup colSpan={2}>
@@ -78,8 +72,7 @@ const Popup_status = (props) => {
                                     {"Serial"}
                                 </ColumnTablePopup>
                             )}
-                            {dataMaterialExpiry.is_enable === "1" ||
-                                dataProductExpiry.is_enable === "1" ? (
+                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                 <>
                                     <ColumnTablePopup>
                                         {"Lot"}

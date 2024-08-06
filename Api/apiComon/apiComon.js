@@ -95,5 +95,15 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/Api_export_other/objectList/?csrf_protection=true`, param);
         return response.data
     },
+    // kho kiểm kê
+    async apiWarehouseInventory(id) {
+        const response = await axiosCustom('GET', `api_web/api_warehouse/warehouse?csrf_protection=true&filter[is_system]=2&filter[branch_id]=${id}`);
+        return response.data
+    },
+    /// vị tri kho kiểm kê
+    async apiLocationInWarehouseInventory(id) {
+        const response = await axiosCustom('GET', `/api_web/api_warehouse/LocationInWarehouse/${id}?csrf_protection=true`);
+        return response.data
+    },
 }
 export default apiComons

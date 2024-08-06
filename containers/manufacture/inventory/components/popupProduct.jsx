@@ -1,72 +1,58 @@
-import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-
-import Loading from "@/components/UI/loading/loading";
-import PopupCustom from "@/components/UI/popup";
-
-import useSetingServer from "@/hooks/useConfigNumber";
-import useToast from "@/hooks/useToast";
-import {
-    Add as IconAdd,
-    Calendar as IconCalendar,
-    Trash as IconDelete,
-    ArrowDown2 as IconDown,
-    Image as IconImage,
-} from "iconsax-react";
-import { debounce } from "lodash";
-import moment from "moment";
-import DatePicker from "react-datepicker";
-import Select from "react-select";
-
+import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
-
-import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
+import Loading from "@/components/UI/loading/loading";
+import PopupCustom from "@/components/UI/popup";
+import { optionsQuery } from "@/configs/optionsQuery";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useToast from "@/hooks/useToast";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 import { SelectCore } from "@/utils/lib/Select";
-const Popup_Product = React.memo((props) => {
-    const dataPstWH = useSelector((state) => state.location_inventory);
-
+import { useQuery } from "@tanstack/react-query";
+import { Add as IconAdd, Calendar as IconCalendar, Trash as IconDelete, ArrowDown2 as IconDown, Image as IconImage, } from "iconsax-react";
+import { debounce } from "lodash";
+import moment from "moment";
+import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+import DatePicker from "react-datepicker";
+import { useSelector } from "react-redux";
+import Select from "react-select";
+import { useInventoryItems } from "../hooks/useInventoryItems";
+const PopupProduct = React.memo((props) => {
+    const isShow = useToast();
     const scrollAreaRef = useRef(null);
+    const dataSeting = useSetingServer();
+    const [open, sOpen] = useState(false);
+    const [product, sProduct] = useState(null);
+    const [searchItems, setSearchItems] = useState("");
+    const [listAllProduct, sListAllProduct] = useState([]);
+    const dataPstWH = useSelector((state) => state.location_inventory);
+    const { data: dataProduct, isFetching } = useInventoryItems(searchItems);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
-    const isShow = useToast();
-
-    const dataSeting = useSetingServer();
-
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-    const [open, sOpen] = useState(false);
     const _TogglePopup = (e) => sOpen(e);
+
     const _CheckWareHouse = () => {
         if (props.warehouse !== null) {
             sOpen(true);
         } else {
             isShow("error", "Vui lý chọn kho hàng");
-
             props.sErrWareHouse(true);
         }
     };
 
-    const [onFetching, sOnFetching] = useState(false);
-    const [onSendingProduct, sOnSendingProduct] = useState(false);
-
-    const [dataProduct, sDataProduct] = useState([]);
-    const [product, sProduct] = useState(null);
-    const [listAllProduct, sListAllProduct] = useState([]);
-
     useEffect(() => {
-        open && sDataProduct([]);
         open && sListAllProduct([]);
         open && sProduct(null);
-        open && sOnFetching(true);
     }, [open]);
 
     const _HandleChangeValue = (value) => {
@@ -74,99 +60,51 @@ const Popup_Product = React.memo((props) => {
     };
     const _HandleInputChange = debounce(async (inputValue) => {
         try {
-            const { data } = await apiInventory.apiItemsNoneVariantInventory({
-                data: {
-                    term: inputValue,
-                },
-            });
-            sDataProduct(
-                data?.result?.map((e) => ({
-                    label: `${e.name + e.code + e.id}`,
-                    name: e.name,
-                    value: e.id,
-                    code: e.code,
-                    img: e.images,
-                    type: e.text_type,
-                }))
-            );
+            setSearchItems(inputValue);
         } catch (error) { }
     }, 500);
 
-    const _ServerFetching = async () => {
-        try {
-            const { data } = await apiInventory.apiItemsNoneVariantInventory({});
-            sDataProduct(
-                data?.result?.map((e) => ({
-                    label: `${e.name + e.code + e.id}`,
-                    name: e.name,
-                    value: e.id,
-                    code: e.code,
-                    img: e.images,
-                    type: e.text_type,
-                }))
-            );
-        } catch (error) { }
-        sOnFetching(false);
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    const _ServerSendingProduct = async () => {
-        try {
+    const { isFetching: isFetchingProduct } = useQuery({
+        queryKey: ["api_inventory_by_id", product?.value, props.warehouse?.value],
+        queryFn: async () => {
             const { isSuccess } = await apiInventory.apiGetVariantInventory({
                 data: {
                     id: product?.value,
                     warehouse_id: props.warehouse?.value,
                 },
             });
-            sListAllProduct(
-                isSuccess?.result
-                    ?.map((e) => ({
-                        id: e.id,
-                        code: e.code,
-                        name: e.name,
-                        img: e.images,
-                        variant: e.product_variation,
-                        type: e.text_type,
-                        checkExpiry: e.expiry,
-                        checkSerial: e.serial,
-                        show: false,
-                        dataLot: e.lot_array?.map((e) => ({
-                            label: e,
-                            value: e,
-                        })),
-                        dataSerial:
-                            e.serial_array?.length > 0
-                                ? e.serial_array?.map((e) => ({
-                                    label: e,
-                                    value: e,
-                                }))
-                                : [],
-                        child: [],
-                        checkChild: e.warehouse?.map((ce) => ({
-                            amount: null,
-                            quantity: Number(ce.quantity),
-                            serial: ce.serial,
-                            lot: ce.lot,
-                            date: moment(ce.expiration_date).format("DD/MM/yyyy"),
-                            locate: ce.location_id,
-                        })),
-                    }))
-                    .filter((e) => !props.dataChoose.some((ce) => e.id === ce.id))
-            );
-        } catch (error) { }
-        sOnSendingProduct(false);
-    };
-
-    useEffect(() => {
-        onSendingProduct && _ServerSendingProduct();
-    }, [onSendingProduct]);
-
-    useEffect(() => {
-        open && product !== null && sOnSendingProduct(true);
-    }, [product]);
+            sListAllProduct(isSuccess?.result?.map((e) => ({
+                id: e.id,
+                code: e.code,
+                name: e.name,
+                img: e.images,
+                variant: e.product_variation,
+                type: e.text_type,
+                checkExpiry: e.expiry,
+                checkSerial: e.serial,
+                show: false,
+                dataLot: e.lot_array?.map((e) => ({
+                    label: e,
+                    value: e,
+                })),
+                dataSerial: e.serial_array?.length > 0 ? e.serial_array?.map((e) => ({
+                    label: e,
+                    value: e,
+                })) : [],
+                child: [],
+                checkChild: e?.warehouse?.map((ce) => ({
+                    amount: null,
+                    quantity: Number(ce.quantity),
+                    serial: ce.serial,
+                    lot: ce.lot,
+                    date: moment(ce.expiration_date).format("DD/MM/yyyy"),
+                    locate: ce.location_id,
+                })) || [],
+            })).filter((e) => !props.dataChoose.some((ce) => e.id === ce.id)));
+        },
+        enabled: open && !!product,
+        ...optionsQuery
+    })
 
     const _HandleActionItem = (id, type) => {
         if (type === "add") {
@@ -271,32 +209,27 @@ const Popup_Product = React.memo((props) => {
         setTimeout(() => {
             const newData = listAllProduct.map((e) => {
                 if (e.id === parentId) {
-                    const checkData = e.child
-                        ?.filter((ce) => ce?.id !== id)
-                        ?.some(
-                            (item) =>
-                                item?.locate?.value === locate?.value &&
-                                item.lot?.value === lot?.value &&
-                                moment(item.date).format("DD/MM/yyyy") == moment(date).format("DD/MM/yyyy")
-                        );
-                    const newChild = e.child
-                        ?.map((ce) => {
-                            if (ce.id == id && checkData) {
-                                isShow("error", `Trùng mặt hàng`);
-                                return {
-                                    ...ce,
-                                    locate: null,
-                                    amount: null,
-                                    lot: null,
-                                    date: null,
-                                    serial: null,
-                                    quantity: null,
-                                    price: null,
-                                };
-                            }
-                            return ce;
-                        })
-                        .filter((item) => item.locate !== null);
+                    const checkData = e.child?.filter((ce) => ce?.id !== id)?.some((item) =>
+                        item?.locate?.value === locate?.value &&
+                        item.lot?.value === lot?.value &&
+                        moment(item.date).format("DD/MM/yyyy") == moment(date).format("DD/MM/yyyy")
+                    );
+                    const newChild = e.child?.map((ce) => {
+                        if (ce.id == id && checkData) {
+                            isShow("error", `Trùng mặt hàng`);
+                            return {
+                                ...ce,
+                                locate: null,
+                                amount: null,
+                                lot: null,
+                                date: null,
+                                serial: null,
+                                quantity: null,
+                                price: null,
+                            };
+                        }
+                        return ce;
+                    }).filter((item) => item.locate !== null);
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -305,11 +238,10 @@ const Popup_Product = React.memo((props) => {
             if (!parent) return null;
             const child = parent.child.find((e) => e.id === id) || null;
             // if(!child) return null;
-            const check = parent.checkChild.find(
-                (e) =>
-                    e.locate === child?.locate?.value &&
-                    e.lot === child.lot?.value &&
-                    e.date === moment(child.date).format("DD/MM/yyyy")
+            const check = parent.checkChild.find((e) =>
+                e.locate === child?.locate?.value &&
+                e.lot === child.lot?.value &&
+                e.date === moment(child.date).format("DD/MM/yyyy")
             );
             const newData1 = newData.map((e) => {
                 if (e.id === parentId) {
@@ -370,27 +302,23 @@ const Popup_Product = React.memo((props) => {
         setTimeout(() => {
             const newData = listAllProduct.map((e) => {
                 if (e.id === parentId) {
-                    const checkData = e.child
-                        ?.filter((ce) => ce?.id !== id)
-                        ?.some((item) => item?.locate?.value === locate?.value);
-                    const newChild = e.child
-                        ?.map((ce) => {
-                            if (ce.id == id && checkData) {
-                                isShow("error", `Trùng mặt hàng`);
-                                return {
-                                    ...ce,
-                                    locate: null,
-                                    amount: null,
-                                    lot: null,
-                                    date: null,
-                                    serial: null,
-                                    quantity: null,
-                                    price: null,
-                                };
-                            }
-                            return ce;
-                        })
-                        .filter((item) => item.locate !== null);
+                    const checkData = e.child?.filter((ce) => ce?.id !== id)?.some((item) => item?.locate?.value === locate?.value);
+                    const newChild = e.child?.map((ce) => {
+                        if (ce.id == id && checkData) {
+                            isShow("error", `Trùng mặt hàng`);
+                            return {
+                                ...ce,
+                                locate: null,
+                                amount: null,
+                                lot: null,
+                                date: null,
+                                serial: null,
+                                quantity: null,
+                                price: null,
+                            };
+                        }
+                        return ce;
+                    }).filter((item) => item.locate !== null);
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -436,7 +364,7 @@ const Popup_Product = React.memo((props) => {
             classNameBtn={props.className}
         >
             <div className="py-4 w-[1000px] 2xl:space-y-5 space-y-4">
-                {onFetching ? (
+                {isFetching ? (
                     <Loading className="h-60" color="#0f4f9e" />
                 ) : (
                     <div className="space-y-1">
@@ -503,7 +431,7 @@ const Popup_Product = React.memo((props) => {
                         />
                     </div>
                 )}
-                {onSendingProduct ? (
+                {isFetchingProduct ? (
                     <Loading className="h-60" color="#0f4f9e" />
                 ) : (
                     <>
@@ -831,4 +759,4 @@ const Popup_Product = React.memo((props) => {
         </PopupCustom>
     );
 });
-export default Popup_Product;
+export default PopupProduct;

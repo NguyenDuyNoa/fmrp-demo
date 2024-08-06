@@ -1,11 +1,3 @@
-import { PopupParent } from "@/utils/lib/Popup";
-import { useEffect, useState } from "react";
-import ModalImage from "react-modal-image";
-
-import useFeature from "@/hooks/useConfigFeature";
-import useSetingServer from "@/hooks/useConfigNumber";
-
-import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -14,36 +6,24 @@ import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-const Popup_chitiet = (props) => {
+import { PopupParent } from "@/utils/lib/Popup";
+import { useState } from "react";
+import ModalImage from "react-modal-image";
+import { useInventoryDetail } from "../hooks/useInventoryDetail";
+const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
-
-    const [data, sData] = useState();
-
-    const [onFetching, sOnFetching] = useState(false);
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
     const dataSeting = useSetingServer();
 
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-
-    const _ServerFetching_detailUser = async () => {
-        try {
-            const db = await apiInventory.apiDetailInventory(props?.id);
-            sData(db);
-            sOnFetching(false);
-        } catch (error) { }
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching_detailUser();
-    }, [open]);
+    const { data, isFetching } = useInventoryDetail(open, props?.id)
 
     //copy arr
     let listQty = data?.items || [];
@@ -194,7 +174,7 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.inventory_handle || "inventory_handle"}
                                         </ColumnTablePopup>
                                     </HeaderTablePopup>
-                                    {onFetching ? (
+                                    {isFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <>
@@ -330,20 +310,17 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3 space-y-1 text-right">
                                         <div className=" text-left text-[13px] font-medium">
                                             <h3>
-                                                {props.dataLang?.inventory_total_quantity_inventory ||
-                                                    "inventory_total_quantity_inventory"}
+                                                {props.dataLang?.inventory_total_quantity_inventory || "inventory_total_quantity_inventory"}
                                             </h3>
                                         </div>
                                         <div className=" text-left text-[13px] font-medium">
                                             <h3>
-                                                {props.dataLang?.inventory_actual_total_amount ||
-                                                    "inventory_actual_total_amount"}
+                                                {props.dataLang?.inventory_actual_total_amount || "inventory_actual_total_amount"}
                                             </h3>
                                         </div>
                                         <div className=" text-left text-[13px] font-medium">
                                             <h3>
-                                                {props.dataLang?.inventory_total_amount_difference ||
-                                                    "inventory_total_amount_difference"}
+                                                {props.dataLang?.inventory_total_amount_difference || "inventory_total_amount_difference"}
                                             </h3>
                                         </div>
                                         <div className=" text-left text-[13px] font-medium">
@@ -383,4 +360,4 @@ const Popup_chitiet = (props) => {
         </>
     );
 };
-export default Popup_chitiet;
+export default PopupDetail;
