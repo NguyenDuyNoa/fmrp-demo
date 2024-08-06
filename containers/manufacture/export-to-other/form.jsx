@@ -311,9 +311,7 @@ const ExportToOtherForm = (props) => {
                         idChildBackEnd: null,
                         id: uuidv4(),
                         disabledDate:
-                            (value?.e?.text_type === "material" &&
-                                dataMaterialExpiry?.is_enable === "1" &&
-                                false) ||
+                            (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
                             (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
                             (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
                             (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
@@ -420,12 +418,8 @@ const ExportToOtherForm = (props) => {
                                 id: uuidv4(),
                                 location: null,
                                 disabledDate:
-                                    (value?.e?.text_type === "material" &&
-                                        dataMaterialExpiry?.is_enable === "1" &&
-                                        false) ||
-                                    (value?.e?.text_type === "material" &&
-                                        dataMaterialExpiry?.is_enable === "0" &&
-                                        true),
+                                    (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
+                                    (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true),
                                 dataWarehouse: value?.e?.warehouseList.map((e) => ({
                                     label: e?.location_name,
                                     value: e?.id,
@@ -433,9 +427,7 @@ const ExportToOtherForm = (props) => {
                                     qty: e?.quantity,
                                 })),
                                 unit: value?.e?.unit_name,
-
                                 toOtherQuantity: null,
-
                                 note: "",
                             },
                         ],
@@ -519,29 +511,19 @@ const ExportToOtherForm = (props) => {
         } else {
             formData.append("object_id", listObject?.value);
         }
-
         formData.append("note", note);
-
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
-
             formData.append(`items[${index}][item]`, item?.item?.value);
-
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
-
                 formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
-
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
-
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.toOtherQuantity);
             });
         });
         try {
-            const { isSuccess, message } = await apiExportToOther.apiHandingExportToOther(
-                id ? id : undefined,
-                formData
-            );
+            const { isSuccess, message } = await apiExportToOther.apiHandingExportToOther(id ? id : undefined, formData);
             if (isSuccess) {
                 isShow("success", `${dataLang[message]}` || message);
                 sCode("");
@@ -1045,7 +1027,7 @@ const ExportToOtherForm = (props) => {
                                                         </h5>
                                                     </div>
                                                     <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                        {dataLang[option.e?.text_type]}
+                                                        {dataLang[option.e?.text_type] || option.e?.text_type}
                                                     </h5>
                                                     <div className="flex items-center gap-2 italic">
                                                         {dataProductSerial.is_enable === "1" && (
@@ -1303,9 +1285,7 @@ const ExportToOtherForm = (props) => {
                                                                 <SelectCore
                                                                     options={ce?.dataWarehouse}
                                                                     value={ce?.location}
-                                                                    isLoading={
-                                                                        ce?.location != null ? false : onLoadingChild
-                                                                    }
+                                                                    isLoading={ce?.location != null ? false : onLoadingChild}
                                                                     onChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -1380,9 +1360,7 @@ const ExportToOtherForm = (props) => {
                                                                 </button>
 
                                                                 <InPutNumericFormat
-                                                                    placeholder={
-                                                                        ce?.location == null && "Chọn vị trí trước"
-                                                                    }
+                                                                    placeholder={ce?.location == null && "Chọn vị trí trước"}
                                                                     disabled={ce?.location == null}
                                                                     className={`${errQty &&
                                                                         (ce?.toOtherQuantity == null ||
@@ -1443,9 +1421,7 @@ const ExportToOtherForm = (props) => {
                                                                         ce?.id,
                                                                         "note"
                                                                     )}
-                                                                    placeholder={
-                                                                        dataLang?.recall_noteChild || "recall_noteChild"
-                                                                    }
+                                                                    placeholder={dataLang?.recall_noteChild || "recall_noteChild"}
                                                                     type="text"
                                                                     className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none"
                                                                 />
@@ -1507,18 +1483,17 @@ const ExportToOtherForm = (props) => {
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
-                                    {formatNumber(
-                                        listData?.reduce((total, item) => {
-                                            item?.child?.forEach((childItem) => {
-                                                if (
-                                                    childItem.toOtherQuantity !== undefined &&
-                                                    childItem.toOtherQuantity !== null
-                                                ) {
-                                                    total += childItem.toOtherQuantity;
-                                                }
-                                            });
-                                            return total;
-                                        }, 0)
+                                    {formatNumber(listData?.reduce((total, item) => {
+                                        item?.child?.forEach((childItem) => {
+                                            if (
+                                                childItem.toOtherQuantity !== undefined &&
+                                                childItem.toOtherQuantity !== null
+                                            ) {
+                                                total += childItem.toOtherQuantity;
+                                            }
+                                        });
+                                        return total;
+                                    }, 0)
                                     )}
                                 </h3>
                             </div>
@@ -1529,7 +1504,7 @@ const ExportToOtherForm = (props) => {
                         </div>
                     </div>
                 </div>
-            </Container>{" "}
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
