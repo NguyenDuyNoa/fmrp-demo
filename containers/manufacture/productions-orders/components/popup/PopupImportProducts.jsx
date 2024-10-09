@@ -531,9 +531,9 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                                 <h1 className="2xl:text-sm text-xs font-medium w-1/4">Số lượng xuất kho</h1>
                                                                 <div className="bg-[#FFC8A6] rounded-xl flex justify-center items-center py-[1px] w-[73%]">
                                                                     <InPutNumericFormat
-                                                                        className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#FFC8A6] bg-white max-w-[80%] w-[80%]'}
                                                                         placeholder={'0'}
                                                                         value={e.quantity}
+                                                                        className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#FFC8A6] bg-white max-w-[80%] w-[80%]'}
                                                                     />
                                                                 </div>
                                                             </div>
@@ -575,8 +575,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                     />
                     <ButtonSubmit
                         loading={false}
-                        onClick={handleSubmit.bind(this)}
                         dataLang={dataLang}
+                        onClick={handleSubmit.bind(this)}
                     />
                 </div>
             </div>

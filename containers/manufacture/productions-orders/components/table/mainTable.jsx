@@ -186,7 +186,7 @@ const MainTable = ({ dataLang }) => {
             isState.valuePlan,
             isState.valueProducts],
         queryFn: () => fetchisState(),
-        enabled: isState.openModal == false,
+        // enabled: isState.openModal == false,
         ...optionsQuery
     })
 

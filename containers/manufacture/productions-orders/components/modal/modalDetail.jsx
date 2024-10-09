@@ -168,7 +168,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                 }
             });
         },
-        enabled: isState.openModal,
+        enabled: !!isState.openModal,
         placeholderData: keepPreviousData,
         ...optionsQuery,
     })
