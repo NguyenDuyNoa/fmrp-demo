@@ -33,7 +33,7 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { components } from "react-select";
-import PopupCustom from "/components/UI/popup";
+import PopupCustom from "@/components/UI/popup";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });

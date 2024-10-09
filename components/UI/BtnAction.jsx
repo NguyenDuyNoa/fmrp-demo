@@ -4,6 +4,9 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import Popup_Bom from "@/containers/products/components/product/popupBom";
 import Popup_Products from "@/containers/products/components/product/popupProducts";
 import Popup_Stage from "@/containers/products/components/product/popupStage";
+import Popup_TableValidateDelete from "@/containers/purchase-order/order/components/validateDelete";
+import Popup_TableValidateEdit from "@/containers/purchase-order/order/components/validateEdit";
+import Popup_servie from "@/containers/purchase-order/servicev-voucher/components/popup";
 import PopupDetailKeepStock from "@/containers/sales-export-product/sales-order/components/PopupDetailKeepStock";
 import PopupKeepStock from "@/containers/sales-export-product/sales-order/components/PopupKeepStock";
 import useFeature from "@/hooks/useConfigFeature";
@@ -12,11 +15,8 @@ import useActionRole from "@/hooks/useRole";
 import { useSetData } from "@/hooks/useSetData";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import Popup_dspc from "@/pages/accountant/payment/components/popup";
-import Popup_dspt from "@/pages/accountant/receipts/components/popup";
-import Popup_TableValidateDelete from "@/containers/purchase-order/order/components/validateDelete";
-import Popup_TableValidateEdit from "@/containers/purchase-order/order/components/validateEdit";
-import Popup_servie from "@/containers/purchase-order/servicev-voucher/components/popup";
+import Popup_dspc from "@/containers/accountant/payment/components/popup";
+import Popup_dspt from "@/containers/accountant/receipts/components/popup";
 import { routerImport, routerOrder, routerPurchases, routerReturns } from "@/routers/buyImportGoods";
 import { routerExportToOther, routerInternalPlan, routerProductionWarehouse, routerProductsWarehouse, routerRecall, routerWarehouseTransfer, } from "@/routers/manufacture";
 import { routerDeliveryReceipt, routerPriceQuote, routerReturnSales, routerSalesOrder } from "@/routers/sellingGoods";
@@ -223,10 +223,7 @@ export const BtnAction = React.memo((props) => {
             if (props?.status === "ordered") {
                 isShow("error", `${props?.dataLang?.po_imported_cant_edit || "po_imported_cant_edit"}`);
             } else if (props?.status === "confirmed") {
-                isShow(
-                    "error",
-                    `${props?.dataLang?.po_imported_cant_edit_with_confirm || "po_imported_cant_edit_with_confirm"}`
-                );
+                isShow("error", `${props?.dataLang?.po_imported_cant_edit_with_confirm || "po_imported_cant_edit_with_confirm"}`);
             } else {
                 handleQueryPage();
             }
@@ -252,11 +249,9 @@ export const BtnAction = React.memo((props) => {
         ///Đơn đặt hàng PO
         if (!!props?.id && props?.type === "order") {
             if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
-                isShow(
-                    "error",
-                    `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
-                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
-                    }`
+                isShow("error", `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
+                    ||
+                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")}`
                 );
             } else {
                 handleQueryPage();
@@ -265,11 +260,9 @@ export const BtnAction = React.memo((props) => {
         //Nhập hàng
         if (!!props?.id && props?.type === "import") {
             if (props?.warehouseman_id != "0" || props?.status_pay != "not_spent") {
-                isShow(
-                    "error",
-                    `${(props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit) ||
-                    (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
-                    }`
+                isShow("error", `${(props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit)
+                    ||
+                    (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))}`
                 );
             } else {
                 handleQueryPage();
@@ -300,7 +293,6 @@ export const BtnAction = React.memo((props) => {
             if (!!props?.type === "servicev_voucher" && !!props?.status_pay != "not_spent") {
                 isShow("error", `${"Phiếu dịch vụ đã chi. Không thể sửa"}`);
             }
-
             if (props?.warehouseman_id && props?.warehouseman_id != "0") {
                 isShow("error", `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`);
             } else {
@@ -310,10 +302,7 @@ export const BtnAction = React.memo((props) => {
     };
 
     const _ServerFetching_ValidatePayment = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_purchase_order/paymentStatus/${props?.id}?csrf_protection=true`,
-            {},
+        Axios("GET", `/api_web/Api_purchase_order/paymentStatus/${props?.id}?csrf_protection=true`, {},
             (err, response) => {
                 if (!err) {
                     let db = response.data;
@@ -366,8 +355,7 @@ export const BtnAction = React.memo((props) => {
             ) : (
                 <Popup
                     trigger={
-                        <button className={` flex space-x-1 items-center bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-sm xl:!text-xs text-[9px] ` + props.className}
-                        >
+                        <button className={` flex space-x-1 items-center bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-sm xl:!text-xs text-[9px] ` + props.className}>
                             <span>{props.dataLang?.btn_action || "btn_action"}</span>
                             <ArrowDown2 size={12} />
                         </button>
@@ -513,8 +501,7 @@ export const BtnAction = React.memo((props) => {
                                         <button
                                             onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                             type="button"
-                                            className={`${props.type == "sales_product" ? "" : "justify-center"
-                                                } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                            className={`${props.type == "sales_product" ? "" : "justify-center"} group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                         >
                                             <Box1
                                                 size={20}
@@ -534,8 +521,8 @@ export const BtnAction = React.memo((props) => {
                                         <PopupDetailKeepStock {...props} {...shareProps} />
                                     ) : (
                                         <button
-                                            onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                             type="button"
+                                            onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                             className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                                         >
                                             <BoxSearch
@@ -543,8 +530,7 @@ export const BtnAction = React.memo((props) => {
                                                 className="group-hover:text-amber-500 group-hover:scale-110 group-hover:shadow-md "
                                             />
                                             <p className="group-hover:text-amber-500 pr-2.5">
-                                                {props.dataLang?.salesOrder_see_stock_keeping ||
-                                                    "salesOrder_see_stock_keeping"}
+                                                {props.dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
                                             </p>
                                         </button>
                                     )}
@@ -571,11 +557,8 @@ export const BtnAction = React.memo((props) => {
                                                     isShow("warning", WARNING_STATUS_ROLE);
                                                 }
                                             }}
-                                            className={` group transition-all ease-in-out flex items-center 
-                                                ${(props.type == "products" && "justify-start") || props.type == "sales_product"
-                                                    ? ""
-                                                    : "justify-center"
-                                                }  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                            className={` group transition-all ease-in-out flex items-center   ${(props.type == "products" && "justify-start") || props.type == "sales_product" ? "" : "justify-center"} 
+                                            gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                         >
                                             <RiDeleteBin6Line
                                                 size={20}

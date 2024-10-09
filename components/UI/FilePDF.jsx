@@ -87,86 +87,87 @@ const FilePDF = ({
             receipts: `/api_web/Api_expense_payslips/expenseCoupon/${props?.id}?csrf_protection=true`,
             payment: `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
         };
-
-        await Axios("GET", initialApi[props.type], {}, (err, response) => {
-            if (response && response.data) {
-                let db = props.type == "internal_plan" ? response.data.data : response.data;
-
-                if (!db) return;
-                const {
-                    docDefinition,
-                    docDefinitionDeliveryFull,
-                    docDefinitionReturnSalesFull,
-                    docDefinitionInternalPlan,
-                    docDefinitionPurchases,
-                    docDefinitionOrder,
-                    docDefinitionServiceVoucher,
-                    docDefinitionImportFull,
-                    docDefinitionReturnFull,
-                    docDefinitionWarehouseTransfer,
-                    docDefinitionProduction_warehouse,
-                    docDefinitionProductionWarehouse,
-                    docDefinitionRecall,
-                    docDefinitionexportToOther,
-                    ///2liên
-                    docDefinitionReceiptsTwo,
-                    docDefinitionPaymentTwo,
-
-                    docDefinitionDeliveryNoPrice,
-                    docDefinitionReturnSalesNoPrice,
-                    docDefinitionImportNoPrice,
-                    docDefinitionReturnFullNoPrice,
-                    ///1 liên
-                    docDefinitionReceipts,
-                    docDefinitionPayment,
-                } = handleUpdateData(db);
-
-                const dataPDF = {
-                    fullTitle: {
-                        sales_product: docDefinition,
-                        price_quote: docDefinition,
-                        deliveryReceipt: docDefinitionDeliveryFull,
-                        returnSales: docDefinitionReturnSalesFull,
-                        internal_plan: docDefinitionInternalPlan,
-                        purchases: docDefinitionPurchases,
-                        order: docDefinitionOrder,
-                        servicev_voucher: docDefinitionServiceVoucher,
-                        import: docDefinitionImportFull,
-                        returns: docDefinitionReturnFull,
-                        warehouseTransfer: docDefinitionWarehouseTransfer,
-                        production_warehouse: docDefinitionProduction_warehouse,
-                        productsWarehouse: docDefinitionProductionWarehouse,
-                        recall: docDefinitionRecall,
-                        exportToOther: docDefinitionexportToOther,
+        try {
+            await Axios("GET", initialApi[props.type], {}, (err, response) => {
+                if (response && response.data) {
+                    let db = props.type == "internal_plan" ? response.data.data : response.data;
+                    if (!db) return;
+                    const {
+                        docDefinition,
+                        docDefinitionDeliveryFull,
+                        docDefinitionReturnSalesFull,
+                        docDefinitionInternalPlan,
+                        docDefinitionPurchases,
+                        docDefinitionOrder,
+                        docDefinitionServiceVoucher,
+                        docDefinitionImportFull,
+                        docDefinitionReturnFull,
+                        docDefinitionWarehouseTransfer,
+                        docDefinitionProduction_warehouse,
+                        docDefinitionProductionWarehouse,
+                        docDefinitionRecall,
+                        docDefinitionexportToOther,
                         ///2liên
-                        receipts: docDefinitionReceiptsTwo,
-                        payment: docDefinitionPaymentTwo,
-                    },
+                        docDefinitionReceiptsTwo,
+                        docDefinitionPaymentTwo,
 
-                    noprice: {
-                        deliveryReceipt: docDefinitionDeliveryNoPrice,
-                        returnSales: docDefinitionReturnSalesNoPrice,
-                        import: docDefinitionImportNoPrice,
-                        returns: docDefinitionReturnFullNoPrice,
+                        docDefinitionDeliveryNoPrice,
+                        docDefinitionReturnSalesNoPrice,
+                        docDefinitionImportNoPrice,
+                        docDefinitionReturnFullNoPrice,
                         ///1 liên
-                        receipts: docDefinitionReceipts,
-                        payment: docDefinitionPayment,
-                    },
-                };
+                        docDefinitionReceipts,
+                        docDefinitionPayment,
+                    } = handleUpdateData(db);
 
-                const dataKeys = Object.keys(dataPDF);
-                if (dataKeys.includes(type) && dataPDF[type][props?.type]) {
-                    // if (dataKeys.includes(type) && dataPDF !== undefined && dataCompany !== undefined) {
-                    const pdfGenerator = pdfMake.createPdf(dataPDF[type][props?.type]);
-                    pdfGenerator.open((blob) => {
-                        const url = URL.createObjectURL(blob);
-                        setUrl(url);
-                    });
+                    const dataPDF = {
+                        fullTitle: {
+                            sales_product: docDefinition,
+                            price_quote: docDefinition,
+                            deliveryReceipt: docDefinitionDeliveryFull,
+                            returnSales: docDefinitionReturnSalesFull,
+                            internal_plan: docDefinitionInternalPlan,
+                            purchases: docDefinitionPurchases,
+                            order: docDefinitionOrder,
+                            servicev_voucher: docDefinitionServiceVoucher,
+                            import: docDefinitionImportFull,
+                            returns: docDefinitionReturnFull,
+                            warehouseTransfer: docDefinitionWarehouseTransfer,
+                            production_warehouse: docDefinitionProduction_warehouse,
+                            productsWarehouse: docDefinitionProductionWarehouse,
+                            recall: docDefinitionRecall,
+                            exportToOther: docDefinitionexportToOther,
+                            ///2liên
+                            receipts: docDefinitionReceiptsTwo,
+                            payment: docDefinitionPaymentTwo,
+                        },
+
+                        noprice: {
+                            deliveryReceipt: docDefinitionDeliveryNoPrice,
+                            returnSales: docDefinitionReturnSalesNoPrice,
+                            import: docDefinitionImportNoPrice,
+                            returns: docDefinitionReturnFullNoPrice,
+                            ///1 liên
+                            receipts: docDefinitionReceipts,
+                            payment: docDefinitionPayment,
+                        },
+                    };
+                    const dataKeys = Object.keys(dataPDF);
+                    if (dataKeys.includes(type) && dataPDF[type][props?.type]) {
+                        // if (dataKeys.includes(type) && dataPDF !== undefined && dataCompany !== undefined) {
+                        const pdfGenerator = pdfMake.createPdf(dataPDF[type][props?.type]);
+                        pdfGenerator.open((blob) => {
+                            const url = URL.createObjectURL(blob);
+                            setUrl(url);
+                        });
+                    }
+                } else {
+                    console.log("err", err);
                 }
-            } else {
-                console.log("err", err);
-            }
-        });
+            });
+        } catch (error) {
+            throw new Error(error);
+        }
     };
 
     const marginContent = [0, 8, 0, 0];
@@ -223,9 +224,7 @@ const FilePDF = ({
                             style: "headerInfoText",
                         },
                         {
-                            text: dataCompany?.company_phone_number
-                                ? `Số điện thoại: ${dataCompany?.company_phone_number}`
-                                : "",
+                            text: dataCompany?.company_phone_number ? `Số điện thoại: ${dataCompany?.company_phone_number}` : "",
                             style: "headerInfoText",
                         },
                         {
@@ -580,8 +579,7 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                                }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"}`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -599,8 +597,7 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                                }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"}`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -625,9 +622,7 @@ const FilePDF = ({
                     text: [
                         { text: "Khách hàng: ", inline: true, fontSize: 10 },
                         {
-                            text:
-                                (props?.type == "deliveryReceipt" && `${data?.customer_name}`) ||
-                                `${data?.client_name}`,
+                            text: (props?.type == "deliveryReceipt" && `${data?.customer_name}`) || `${data?.client_name}`,
                             bold: true,
                             fontSize: 10,
                         },
@@ -650,7 +645,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -735,10 +730,7 @@ const FilePDF = ({
                                         stackBt.push(serialStack);
                                     }
 
-                                    if (
-                                        dataMaterialExpiry?.is_enable === "1" ||
-                                        dataProductExpiry?.is_enable === "1"
-                                    ) {
+                                    if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
                                         const subStack = [
                                             {
                                                 text: [
@@ -801,9 +793,7 @@ const FilePDF = ({
                                             margin: styleMarginChild,
                                         },
                                         {
-                                            text: item?.price_after_discount
-                                                ? formatMoney(item?.price_after_discount)
-                                                : "",
+                                            text: item?.price_after_discount ? formatMoney(item?.price_after_discount) : "",
                                             fontSize: 10,
                                             alignment: "center",
                                             margin: styleMarginChild,
@@ -831,8 +821,7 @@ const FilePDF = ({
                                 : ""),
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -856,9 +845,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
-                                        "purchase_order_detail_discounty"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}`,
                                     bold: true,
                                     colSpan: 2,
                                     margin: styleMarginChildTotal,
@@ -883,9 +870,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
-                                        "purchase_order_detail_money_after_discount"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -909,9 +894,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
-                                        "purchase_order_detail_tax_money"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -935,9 +918,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
-                                        "purchase_order_detail_into_money"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`,
                                     bold: true,
                                     margin: styleMarginChildTotal,
                                     colSpan: 2,
@@ -1090,7 +1071,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -1393,7 +1374,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -1478,10 +1459,7 @@ const FilePDF = ({
                                                         italics: true,
                                                     },
                                                     {
-                                                        text:
-                                                            item?.item?.serial == null || item?.item?.serial == ""
-                                                                ? "-"
-                                                                : item?.item?.serial,
+                                                        text: item?.item?.serial == null || item?.item?.serial == "" ? "-" : item?.item?.serial,
                                                         fontSize: 9,
                                                         italics: true,
                                                         margin: marginTextTotal,
@@ -1492,10 +1470,7 @@ const FilePDF = ({
                                         stackBt.push(serialStack);
                                     }
 
-                                    if (
-                                        dataMaterialExpiry?.is_enable === "1" ||
-                                        dataProductExpiry?.is_enable === "1"
-                                    ) {
+                                    if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
                                         const subStack = [
                                             {
                                                 text: [
@@ -1505,10 +1480,7 @@ const FilePDF = ({
                                                         italics: true,
                                                     },
                                                     {
-                                                        text:
-                                                            item?.item?.lot == null || item?.item?.lot == ""
-                                                                ? "-"
-                                                                : item?.item?.lot,
+                                                        text: item?.item?.lot == null || item?.item?.lot == "" ? "-" : item?.item?.lot,
                                                         fontSize: 9,
                                                         italics: true,
                                                         margin: marginTextTotal,
@@ -1563,9 +1535,7 @@ const FilePDF = ({
                                             margin: styleMarginChild,
                                         },
                                         {
-                                            text: item?.price_after_discount
-                                                ? formatMoney(item?.price_after_discount)
-                                                : "",
+                                            text: item?.price_after_discount ? formatMoney(item?.price_after_discount) : "",
                                             fontSize: 10,
                                             alignment: "center",
                                             margin: styleMarginChild,
@@ -1593,8 +1563,7 @@ const FilePDF = ({
                                 : ""),
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -1618,9 +1587,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
-                                        "purchase_order_detail_discounty"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}`,
                                     bold: true,
                                     colSpan: 2,
                                     margin: styleMarginChildTotal,
@@ -1645,9 +1612,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
-                                        "purchase_order_detail_money_after_discount"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -1671,9 +1636,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
-                                        "purchase_order_detail_tax_money"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -1697,9 +1660,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
-                                        "purchase_order_detail_into_money"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`,
                                     bold: true,
                                     margin: styleMarginChildTotal,
                                     colSpan: 2,
@@ -1786,8 +1747,7 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                                }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"}`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -1850,7 +1810,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -1914,10 +1874,7 @@ const FilePDF = ({
                                                         italics: true,
                                                     },
                                                     {
-                                                        text:
-                                                            item?.item?.serial == null || item?.item?.serial == ""
-                                                                ? "-"
-                                                                : item?.item?.serial,
+                                                        text: item?.item?.serial == null || item?.item?.serial == "" ? "-" : item?.item?.serial,
                                                         fontSize: 9,
                                                         italics: true,
                                                         margin: marginTextTotal,
@@ -1928,10 +1885,7 @@ const FilePDF = ({
                                         stackBt.push(serialStack);
                                     }
 
-                                    if (
-                                        dataMaterialExpiry?.is_enable === "1" ||
-                                        dataProductExpiry?.is_enable === "1"
-                                    ) {
+                                    if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
                                         const subStack = [
                                             {
                                                 text: [
@@ -1941,10 +1895,7 @@ const FilePDF = ({
                                                         italics: true,
                                                     },
                                                     {
-                                                        text:
-                                                            item?.item?.lot == null || item?.item?.lot == ""
-                                                                ? "-"
-                                                                : item?.item?.lot,
+                                                        text: item?.item?.lot == null || item?.item?.lot == "" ? "-" : item?.item?.lot,
                                                         fontSize: 9,
                                                         italics: true,
                                                         margin: marginTextTotal,
@@ -2380,18 +2331,12 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text:
-                                props?.type === "purchases"
-                                    ? `${props.dataLang?.purchase_planNumber + ": " || "purchase_planNumber"}`
-                                    : "",
+                            text: props?.type === "purchases" ? `${props.dataLang?.purchase_planNumber + ": " || "purchase_planNumber"}` : "",
                             inline: true,
                             fontSize: 10,
                         },
                         {
-                            text:
-                                props?.type === "purchases"
-                                    ? `${data?.reference_no != null ? data?.reference_no : ""}`
-                                    : "",
+                            text: props?.type === "purchases" ? `${data?.reference_no != null ? data?.reference_no : ""}` : "",
                             bold: true,
                             fontSize: 10,
                         },
@@ -2405,7 +2350,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -2682,7 +2627,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -2719,9 +2664,7 @@ const FilePDF = ({
                                             margin: styleMarginChild,
                                         },
                                         {
-                                            text: item?.item?.product_variation
-                                                ? ` ${item?.item?.product_variation}`
-                                                : "",
+                                            text: item?.item?.product_variation ? ` ${item?.item?.product_variation}` : "",
                                             fontSize: 9,
                                             italics: false,
                                             margin: styleMarginChild,
@@ -3033,7 +2976,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -3390,7 +3333,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -3474,10 +3417,7 @@ const FilePDF = ({
                                                         italics: true,
                                                     },
                                                     {
-                                                        text:
-                                                            item.serial == null || item.serial == ""
-                                                                ? "-"
-                                                                : item.serial,
+                                                        text: item.serial == null || item.serial == "" ? "-" : item.serial,
                                                         fontSize: 9,
                                                         italics: true,
                                                         margin: marginTextTotal,
@@ -3488,10 +3428,7 @@ const FilePDF = ({
                                         stackBt.push(serialStack);
                                     }
 
-                                    if (
-                                        dataMaterialExpiry?.is_enable === "1" ||
-                                        dataProductExpiry?.is_enable === "1"
-                                    ) {
+                                    if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
                                         const subStack = [
                                             {
                                                 text: [
@@ -3518,9 +3455,7 @@ const FilePDF = ({
                                                         italics: true,
                                                     },
                                                     {
-                                                        text: item.expiration_date
-                                                            ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
-                                                            : "-",
+                                                        text: item.expiration_date ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-",
                                                         fontSize: 8.5,
                                                         italics: true,
                                                         margin: marginTextTotal,
@@ -3585,8 +3520,7 @@ const FilePDF = ({
                                 : ""),
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3610,9 +3544,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
-                                        "purchase_order_detail_discounty"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}`,
                                     bold: true,
                                     colSpan: 2,
                                     margin: styleMarginChildTotal,
@@ -3637,9 +3569,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
-                                        "purchase_order_detail_money_after_discount"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -3663,9 +3593,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
-                                        "purchase_order_detail_tax_money"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -3689,9 +3617,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
-                                        "purchase_order_detail_into_money"
-                                        }`,
+                                    text: `${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`,
                                     bold: true,
                                     margin: styleMarginChildTotal,
                                     colSpan: 2,
@@ -3918,7 +3844,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -3982,10 +3908,7 @@ const FilePDF = ({
                                                         italics: true,
                                                     },
                                                     {
-                                                        text:
-                                                            item.serial == null || item.serial == ""
-                                                                ? "-"
-                                                                : item.serial,
+                                                        text: item.serial == null || item.serial == "" ? "-" : item.serial,
                                                         fontSize: 9,
                                                         italics: true,
                                                         margin: marginTextTotal,
@@ -3996,10 +3919,7 @@ const FilePDF = ({
                                         stackBt.push(serialStack);
                                     }
 
-                                    if (
-                                        dataMaterialExpiry?.is_enable === "1" ||
-                                        dataProductExpiry?.is_enable === "1"
-                                    ) {
+                                    if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
                                         const subStack = [
                                             {
                                                 text: [
@@ -4329,7 +4249,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -4865,7 +4785,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -5306,7 +5226,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -5606,10 +5526,7 @@ const FilePDF = ({
                 {
                     stack: [
                         {
-                            text: uppercaseText(
-                                `${props.dataLang?.production_warehouse || "production_warehouse"}`,
-                                "contentTitle"
-                            ),
+                            text: uppercaseText(`${props.dataLang?.production_warehouse || "production_warehouse"}`, "contentTitle"),
                         },
                     ],
                     margin: marginContent,
@@ -5626,10 +5543,7 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${props.dataLang?.purchase_order_table_code + ": " ||
-                                                "purchase_order_table_code"
-                                                }`,
-
+                                            text: `${props.dataLang?.purchase_order_table_code + ": " || "purchase_order_table_code"}`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -5647,9 +5561,7 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " ||
-                                                "purchase_order_table_dayvoucers"
-                                                }`,
+                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " || "purchase_order_table_dayvoucers"}`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -5710,7 +5622,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -5813,10 +5725,7 @@ const FilePDF = ({
                                         stackBt.push(serialStack);
                                     }
 
-                                    if (
-                                        dataMaterialExpiry?.is_enable === "1" ||
-                                        dataProductExpiry?.is_enable === "1"
-                                    ) {
+                                    if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
                                         const subStack = [
                                             {
                                                 text: [
@@ -5913,9 +5822,7 @@ const FilePDF = ({
                                 : ""),
                             [
                                 {
-                                    text: `${props?.dataLang?.production_warehouse_totalItem ||
-                                        "production_warehouse_totalItem"
-                                        }`,
+                                    text: `${props?.dataLang?.production_warehouse_totalItem || "production_warehouse_totalItem"}`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -5938,8 +5845,7 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${props?.dataLang?.production_warehouse_sales || "production_warehouse_sales"
-                                        }`,
+                                    text: `${props?.dataLang?.production_warehouse_sales || "production_warehouse_sales"}`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -6165,7 +6071,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -6211,10 +6117,7 @@ const FilePDF = ({
                                                     italics: true,
                                                 },
                                                 {
-                                                    text:
-                                                        item?.serial == null || item?.serial == ""
-                                                            ? "-"
-                                                            : item?.serial,
+                                                    text: item?.serial == null || item?.serial == "" ? "-" : item?.serial,
                                                     fontSize: 9,
                                                     italics: true,
                                                     margin: marginTextTotal,
@@ -6556,7 +6459,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },
@@ -6971,7 +6874,7 @@ const FilePDF = ({
                             inline: true,
                             fontSize: 10,
                         },
-                        { text: `${data?.note}`, bold: true, fontSize: 10 },
+                        { text: `${data?.note ?? ""}`, bold: true, fontSize: 10 },
                     ],
                     margin: marginFistChild,
                 },

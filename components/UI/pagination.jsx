@@ -15,20 +15,12 @@ const Index = React.memo(({ postsPerPage, paginate, totalPosts, currentPage }) =
 
     return (
         <ReactPaginate
-            nextLabel={
-                <>
-                    <ArrowRight size="18" color="blue" />
-                </>
-            }
+            nextLabel={<ArrowRight size="18" color="blue" />}
             onPageChange={handlePageClick}
             pageRangeDisplayed={3}
             marginPagesDisplayed={2}
             pageCount={pageCount}
-            previousLabel={
-                <>
-                    <ArrowLeft size="18" color="blue" />
-                </>
-            }
+            previousLabel={<ArrowLeft size="18" color="blue" />}
             pageClassName="page-item"
             pageLinkClassName="page-link"
             previousClassName="page-item"

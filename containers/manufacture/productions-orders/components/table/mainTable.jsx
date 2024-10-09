@@ -1,31 +1,59 @@
-import { SearchNormal1 } from "iconsax-react";
-import React, { useEffect, useState } from "react";
-import { v4 as uddid } from "uuid";
-
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-
-import FilterHeader from "../header/filterHeader";
-
-import TabItem from "./tabItem";
-
-import apiComons from "@/Api/apiComon/apiComon";
-import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRM_DELETION, TITLE_DELETE_PRODUCTIONS_ORDER } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useInternalPlansSearchCombobox } from "@/hooks/common/useInternalPlans";
+import { useItemsVariantSearchCombobox } from "@/hooks/common/useItems";
+import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
+import { SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
+import React, { useEffect, useState } from "react";
+import { v4 as uddid } from "uuid";
+import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
+import { useProductionOrdersComboboxDetail } from "../../hooks/useProductionOrdersComboboxDetail";
+import FilterHeader from "../header/filterHeader";
 import ModalDetail from "../modal/modalDetail";
+import TabItem from "./tabItem";
 import TabSemi from "./tabSemi";
+import Loading from "@/components/UI/loading/loading";
+
+const initialState = {
+    isTab: "products",
+    countAll: 0,
+    listDataLeft: [],
+    listDataRight: {
+        title: "",
+        dataPPItems: [],
+        dataSemiItems: [],
+    },
+    openModal: false,
+    next: null,
+    page: 1,
+    limit: 15,
+    search: "",
+    dataModal: {},
+    valueOrders: null,
+    valuePlan: null,
+    valueProductionOrdersDetail: null,
+    valueProductionOrders: null,
+    valueProducts: [],
+    valueBr: null,
+    searchProductionOrders: "",
+    searchOrders: "",
+    searchPlan: "",
+    searchItemsVariant: "",
+    date: { dateStart: null, dateEnd: null }
+};
 const MainTable = ({ dataLang }) => {
     const listTab = [
         {
@@ -42,39 +70,6 @@ const MainTable = ({ dataLang }) => {
 
     const isShow = useToast();
 
-    const initialState = {
-        isTab: "products",
-        countAll: 0,
-        listDataLeft: [],
-        listDataRight: {
-            title: "",
-            dataPPItems: [],
-            dataSemiItems: [],
-        },
-        openModal: false,
-        next: null,
-        page: 1,
-        limit: 15,
-        search: "",
-        dataModal: {},
-        listOrders: [],
-        listPlan: [],
-        valueOrders: null,
-        valuePlan: null,
-        comboboxProductionOrdersDetail: [],
-        valueProductionOrdersDetail: null,
-        valueProductionOrders: null,
-        comboboxProductionOrders: [],
-        listBr: [],
-        listProducts: [],
-        valueProducts: [],
-        valueBr: null,
-        date: {
-            dateStart: null,
-            dateEnd: null,
-        },
-    };
-
     const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
     const [isState, sIsState] = useState(initialState);
@@ -88,6 +83,19 @@ const MainTable = ({ dataLang }) => {
     const [isMouted, setIsMouted] = useState(false);
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
+    const { data: listBr = [] } = useBranchList()
+
+    const { data: listOrders = [] } = useOrdersSearchCombobox(isState.searchOrders);
+
+    const { data: listPlan = [] } = useInternalPlansSearchCombobox(isState.searchPlan);
+
+    const { data: comboboxProductionOrdersDetail = [] } = useProductionOrdersComboboxDetail()
+
+    const { data: listProducts = [] } = useItemsVariantSearchCombobox(isState.searchItemsVariant);
+
+    const { data: comboboxProductionOrders = [] } = useProductionOrdersCombobox(isState.searchProductionOrders)
+
 
     useEffect(() => {
         setIsMouted(true);
@@ -122,16 +130,15 @@ const MainTable = ({ dataLang }) => {
     };
 
     const params = {
-        date_start: isState.date.dateStart ? formatMoment(isState.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
-        date_end: isState.date.dateEnd ? formatMoment(isState.date.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
-        search: isState.search == "" ? "" : isState.search,
         branch_id: isState.valueBr?.value || "",
         _po_id: isState.valueProductionOrders?.value || "",
+        search: isState.search == "" ? "" : isState.search,
         _pod_id: isState.valueProductionOrdersDetail?.value || "",
         orders_id: [isState.valueOrders?.value]?.length > 0 ? [isState.valueOrders?.value].map((e) => e) : "",
+        date_end: isState.date.dateEnd ? formatMoment(isState.date.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
         internal_plans_id: [isState.valuePlan?.value]?.length > 0 ? [isState.valuePlan?.value].map((e) => e) : "",
-        item_variation_id:
-            isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
+        date_start: isState.date.dateStart ? formatMoment(isState.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        item_variation_id: isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
     };
 
     const fetchisState = async () => {
@@ -161,8 +168,11 @@ const MainTable = ({ dataLang }) => {
                     },
                 });
             }
-        } catch (error) { }
+        } catch (error) {
+            throw new Error(error);
+        }
     };
+
     const { data, isLoading } = useQuery({
         queryKey: ["apiProductionOrders",
             isState.page,
@@ -179,8 +189,6 @@ const MainTable = ({ dataLang }) => {
         enabled: isState.openModal == false,
         ...optionsQuery
     })
-
-
 
     const handleFilter = (type, value) => queryState({ [type]: value, page: 1 });
 
@@ -298,89 +306,35 @@ const MainTable = ({ dataLang }) => {
         } catch (error) { }
     };
 
+
     const fetchComboboxProductionOrders = debounce(async (value) => {
         try {
-            const { data } = await apiProductionsOrders.apiComboboxProductionOrders({ params: { search: value } });
-            queryState({
-                comboboxProductionOrders: data?.po?.map((e) => {
-                    return { value: e?.id, label: e?.reference_no };
-                }),
-            });
-        } catch (error) { }
-    }, 500);
-
-    const fetchComboboxProductionOrdersDetail = debounce(async (value) => {
-        try {
-            const { data } = await apiProductionsOrders.apiComboboxProductionOrdersDetail();
-            queryState({
-                comboboxProductionOrdersDetail: data?.pod?.map((e) => {
-                    return { value: e?.id, label: e?.reference_no_detail };
-                }),
-            });
-        } catch (error) { }
-    }, 500);
-
-    const fetchDataBranch = debounce(async (value) => {
-        try {
-            const { result } = await apiComons.apiBranchCombobox();
-            queryState({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
+            queryState({ searchProductionOrders: value });
         } catch (error) { }
     }, 500);
 
     const fetchDataItems = debounce(async (value) => {
         try {
-            const { data } = await apiComons.apiListItemsVariant({ data: { term: value } });
-            const newData = data?.result.map((e) => ({
-                label: `${e.name}
-                    <span style={{display: none}}>${e.code}</span>
-                    <span style={{display: none}}>${e.text_type} ${e.unit_name} ${e.product_variation} </span>`,
-                value: e.id,
-                e,
-            }));
-            queryState({ listProducts: newData });
+            queryState({ searchItemsVariant: value });
         } catch (error) { }
     }, 500);
 
     const fetDataOrder = debounce(async (value) => {
         try {
-            const { data } = await apiMaterialsPlanning.apiSearchOrders({ params: { search: value } });
-            if (data?.items) {
-                queryState({
-                    listOrders: data?.items?.map((e) => {
-                        return {
-                            value: e?.id,
-                            label: e?.reference_no,
-                        };
-                    }),
-                });
-            }
+            queryState({ searchOrders: value });
         } catch (error) { }
     }, 500);
 
+
     const fetchDataPlan = debounce(async (value) => {
         try {
-            const { data } = await apiMaterialsPlanning.apiSearchInternalPlans({ params: { search: value } });
-            if (data?.items) {
-                queryState({
-                    listPlan: data?.items?.map((e) => {
-                        return {
-                            value: e?.id,
-                            label: e?.reference_no,
-                        };
-                    }),
-                });
-            }
+            queryState({ searchPlan: value });
         } catch (error) { }
     }, 500);
 
     useEffect(() => {
         if (isMouted) {
-            fetchComboboxProductionOrders();
-            fetchComboboxProductionOrdersDetail();
-            fetchDataBranch();
             fetchDataItems();
-            fetDataOrder();
-            fetchDataPlan();
         }
     }, [isMouted]);
 
@@ -413,22 +367,6 @@ const MainTable = ({ dataLang }) => {
     };
 
     const handleConfim = async () => {
-        // await Axios(
-        //     "DELETE",
-        //     `/api_web/api_manufactures/deleteProductionPlans/${isId}?csrf_protection=true`,
-        //     {},
-        //     (err, response) => {
-        //         if (!err) {
-        //             const { isSuccess, message } = response?.data;
-        //             if (isSuccess == 1) {
-        //                 fetchisState();
-        //                 isShow("success", `${dataLang[message] || message}`);
-        //                 return;
-        //             }
-        //             isShow("error", `${dataLang[message] || message}`);
-        //         }
-        //     }
-        // );
         handleQueryId({ status: false });
     };
 
@@ -496,6 +434,12 @@ const MainTable = ({ dataLang }) => {
         fetDataOrder,
         fetchDataPlan,
         fetchDataItems,
+        listBr,
+        listOrders,
+        listPlan,
+        listProducts,
+        comboboxProductionOrders,
+        comboboxProductionOrdersDetail
     };
 
     if (!isMouted) {
@@ -526,55 +470,54 @@ const MainTable = ({ dataLang }) => {
                             </form>
                         </div>
                         <Customscrollbar className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
-                            {isState.listDataLeft.map((e, eIndex) => (
-                                <div
-                                    key={e.id}
-                                    onClick={() => handleShow(e.id)}
-                                    className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"
-                                        } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"
-                                        } `}
-                                >
-                                    <div className="flex justify-between">
-                                        <div className="flex flex-col gap-1">
-                                            <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
-                                                {e.title}
-                                            </h1>
-                                            <h3 className="text-[#667085] font-normal text-[11px]">
-                                                {dataLang?.materials_planning_create_on ||
-                                                    "materials_planning_create_on"}{" "}
-                                                <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
-                                                    {e.time}
-                                                </span>
-                                            </h3>
-                                        </div>
-                                        <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
-                                    </div>
-                                    {e.showParent && (
-                                        <div className="flex flex-col gap-2 mt-1 w-full">
-                                            <div className="flex items-center gap-1">
-                                                <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
-                                                    {dataLang?.materials_planning_foloww_up ||
-                                                        "materials_planning_foloww_up"}
-                                                    :
+                            {isLoading
+                                ?
+                                <Loading />
+                                :
+                                isState.listDataLeft.map((e, eIndex) => (
+                                    <div
+                                        key={e.id}
+                                        onClick={() => handleShow(e.id)}
+                                        className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                    >
+                                        <div className="flex justify-between">
+                                            <div className="flex flex-col gap-1">
+                                                <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
+                                                    {e.title}
+                                                </h1>
+                                                <h3 className="text-[#667085] font-normal text-[11px]">
+                                                    {dataLang?.materials_planning_create_on ||
+                                                        "materials_planning_create_on"}{" "}
+                                                    <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
+                                                        {e.time}
+                                                    </span>
                                                 </h3>
-                                                <div className="flex items-center gap-1">
-                                                    {e.followUp.map((i, index) => (
-                                                        <div key={index}>
-                                                            <h2 className="text-[#191D23] font-medium 3xl:text-sm text-xs">
-                                                                {i.nameFollow}
-                                                            </h2>
-                                                        </div>
-                                                    ))}
-                                                </div>
                                             </div>
-                                            {isState.listDataRight?.title && (
-                                                <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded font-medium w-fit">
-                                                    <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
-                                                    {dataLang?.productions_orders_produced ||
-                                                        "productions_orders_produced"}
-                                                </span>
-                                            )}
-                                            {/* <div className="w-full flex items-center">
+                                            <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
+                                        </div>
+                                        {e.showParent && (
+                                            <div className="flex flex-col gap-2 mt-1 w-full">
+                                                <div className="flex items-center gap-1">
+                                                    <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
+                                                        {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
+                                                    </h3>
+                                                    <div className="flex items-center gap-1">
+                                                        {e.followUp.map((i, index) => (
+                                                            <div key={index}>
+                                                                <h2 className="text-[#191D23] font-medium 3xl:text-sm text-xs">
+                                                                    {i.nameFollow}
+                                                                </h2>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                {isState.listDataRight?.title && (
+                                                    <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded font-medium w-fit">
+                                                        <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
+                                                        {dataLang?.productions_orders_produced || "productions_orders_produced"}
+                                                    </span>
+                                                )}
+                                                {/* <div className="w-full flex items-center">
                                                 {e.processBar.map((j, JIndex) => {
                                                     return (
                                                         <div key={j.id} className="flex flex-col w-full items-start">
@@ -605,10 +548,10 @@ const MainTable = ({ dataLang }) => {
                                                     )
                                                 })}
                                             </div> */}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             {isState.next && (
                                 <button
                                     type="button"
@@ -621,19 +564,23 @@ const MainTable = ({ dataLang }) => {
                         </Customscrollbar>
                     </div>
                     <div className="w-[75%] border border-[#d8dae5] ">
-                        <div className="flex items-center justify-between py-1 px-4 border-b">
-                            <div className="">
-                                <h1 className="text-[#52575E] font-normal text-xs uppercase">
-                                    {dataLang?.productions_orders || "productions_orders"}
-                                </h1>
-                                <div className="flex items-center gap-2">
-                                    <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                        {isState.listDataRight?.title ??
-                                            (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
-                                    </h1>
-                                </div>
-                            </div>
-                            {/* <button
+                        {isLoading
+                            ?
+                            <Loading />
+                            :
+                            <>
+                                <div className="flex items-center justify-between py-1 px-4 border-b">
+                                    <div className="">
+                                        <h1 className="text-[#52575E] font-normal text-xs uppercase">
+                                            {dataLang?.productions_orders || "productions_orders"}
+                                        </h1>
+                                        <div className="flex items-center gap-2">
+                                            <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
+                                                {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
+                                            </h1>
+                                        </div>
+                                    </div>
+                                    {/* <button
                                 className=" bg-red-100 rounded-lg  outline-none focus:outline-none"
                                 onClick={() => {
                                     if (+isState?.countAll == 0) {
@@ -660,32 +607,30 @@ const MainTable = ({ dataLang }) => {
                                     </h3>
                                 </div>
                             </button> */}
-                        </div>
-                        <div className="mx-4">
-                            <div className="border-b my-6 ">
-                                <div className="flex items-center gap-4 ">
-                                    {listTab.map((e) => (
-                                        <button
-                                            key={e.id}
-                                            onClick={() => handleActiveTab(e.type)}
-                                            className={`hover:bg-[#F7FBFF] ${isState.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
-                                                } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
-                                        >
-                                            <h3
-                                                className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"
-                                                    } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
-                                            >
-                                                {e.name}
-                                            </h3>
-                                        </button>
-                                    ))}
                                 </div>
-                            </div>
-                            <div>
-                                {isState.isTab == "products" && <TabItem {...shareProps} />}
-                                {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />}
-                            </div>
-                        </div>
+                                <div className="mx-4">
+                                    <div className="border-b my-6 ">
+                                        <div className="flex items-center gap-4 ">
+                                            {listTab.map((e) => (
+                                                <button
+                                                    key={e.id}
+                                                    onClick={() => handleActiveTab(e.type)}
+                                                    className={`hover:bg-[#F7FBFF] ${isState.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
+                                                >
+                                                    <h3 className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
+                                                        {e.name}
+                                                    </h3>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {isState.isTab == "products" && <TabItem {...shareProps} />}
+                                        {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />}
+                                    </div>
+                                </div>
+                            </>
+                        }
                     </div>
                 </div>
                 <ModalDetail {...shareProps} />

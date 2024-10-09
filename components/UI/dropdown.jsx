@@ -39,11 +39,8 @@ export const Dropdown = (props) => {
                     <div className="bg-white 2xl:py-2 lg:py-0.5 px-0.5 rounded-lg justify-between flex divide-x divide-[#DDDDE2]">
                         {props.data?.map((e, i) => (
                             <div
-                                className={`${e.title
-                                    ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5"
-                                    : "px-1"
-                                    } 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
                                 key={i}
+                                className={`${e.title ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5" : "px-1"} 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
                             >
                                 {e.title && (
                                     <h3 className="3xl:text-[22px] 2xl:text-[20px] xl:text-[18px] lg:text-[18px] font-medium px-3">
@@ -208,10 +205,10 @@ export const Dropdown = (props) => {
                                                         </Link>
                                                     ) : (
                                                         <button
+                                                            type="button"
                                                             onClick={() =>
                                                                 showToat("warning", "Bạn không có quyền truy cập")
                                                             }
-                                                            type="button"
                                                             className="outline-none cursor-not-allowed text-left text-gray-100 w-full opacity-60"
                                                         >
                                                             <Zoom>
@@ -263,10 +260,7 @@ export const DropdownThongBao = (props) => {
         <div className="">
             <Popup
                 trigger={
-                    <button
-                        className={`flex items-center justify-center text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] 
-              `}
-                    >
+                    <button className={`flex items-center justify-center text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] `} >
                         {props.children}
                     </button>
                 }
@@ -277,9 +271,7 @@ export const DropdownThongBao = (props) => {
                 position={props.position}
                 className={`popover-edit -translate-y-10 ${props.className}`}
             >
-                <div
-                    className={`w-auto ${deca.className} bg-white mb-1  overflow-auto scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 3xl:max-h-[700px] xxl:max-h-[500px] 2xl:max-h-[500px] xl:max-h-[400px] lg:max-h-[370px] max-h-[500px]  px-0.5 rounded-lg justify-between  `}
-                >
+                <div className={`w-auto ${deca.className} bg-white mb-1  overflow-auto scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 3xl:max-h-[700px] xxl:max-h-[500px] 2xl:max-h-[500px] xl:max-h-[400px] lg:max-h-[370px] max-h-[500px]  px-0.5 rounded-lg justify-between  `}>
                     <div className="flex items-center sticky top-0  bg-white  rounded z-[999]  p-0 pt-2">
                         {props?.data?.tab &&
                             props?.data?.tab.map((e, index, array) => {
@@ -302,9 +294,7 @@ export const DropdownThongBao = (props) => {
                             })}
                     </div>
                     <div className="">
-                        <div
-                            className={`3xl:px-2 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
-                        >
+                        <div className={`3xl:px-2 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}>
                             <div className="space-y-0.5">
                                 {onFetching ? (
                                     <Loading />
@@ -314,7 +304,6 @@ export const DropdownThongBao = (props) => {
                                             subItems={props.data?.tab.find((e) => e.id === tab)?.sub || []}
                                             checkStt={checkStt}
                                         />
-
                                         {props.data?.tab.find((e) => e.id === tab)?.sub?.length > 0 && (
                                             <Link href={`${props.data?.tab[tab]?.link}`}>
                                                 <Zoom className="text-center    items-center ">
@@ -345,7 +334,7 @@ const TabContent = ({ subItems, checkStt }) => {
     };
     return (
         <div className="tab-content">
-            {subItems.length === 0 ? (
+            {subItems?.length === 0 ? (
                 <div className=" max-w-[352px] mt-14 mx-auto">
                     <div className="text-center">
                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
@@ -356,10 +345,8 @@ const TabContent = ({ subItems, checkStt }) => {
                     </div>
                 </div>
             ) : (
-                <div
-                    className={`3xl:px-2 3xl:py-1 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
-                >
-                    {subItems.map((ce, index) => (
+                <div className={`3xl:px-2 3xl:py-1 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}>
+                    {subItems?.map((ce, index) => (
                         <div key={index}>
                             <Link title={ce.title} href={`${ce?.link}`}>
                                 <div className="border-b  w-full items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
@@ -416,13 +403,13 @@ const TabContent = ({ subItems, checkStt }) => {
         </div>
     );
 };
+
 const TabFilters = React.memo((props) => {
     return (
         <button
             style={props.style}
             onClick={props.onClick}
-            className={`${props.tab == props.active && "bg-blue-400 text-white"} ${props.className
-                } justify-center 3xl:text-[12px] xxl:text-[11px]  2xl:text-[8.5px] xl:text-[8px] lg:text-[7.5px] text-[9px] flex  items-center rounded-md px-2 py-1 outline-none relative`}
+            className={`${props.tab == props.active && "bg-blue-400 text-white"} ${props.className} justify-center 3xl:text-[12px] xxl:text-[11px]  2xl:text-[8.5px] xl:text-[8px] lg:text-[7.5px] text-[9px] flex  items-center rounded-md px-2 py-1 outline-none relative`}
         >
             {props.children}
             {!props.checkStt && (

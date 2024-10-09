@@ -1,5 +1,6 @@
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
+import { _ServerInstance as Axios } from "@/services/axios";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { PresentionChart, User } from "iconsax-react";
@@ -8,18 +9,20 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Select from "react-select";
 import Popup from "reactjs-popup";
-import { _ServerInstance as Axios } from "@/services/axios";
+
+const initialState = {
+    listPackageDeadline: [],
+    listPackageName: [],
+};
 
 const PopupAppRenewal = () => {
-    const [openModal, setOpenModal] = useState(false);
-    const [isMounted, setIsMounted] = useState(false);
     const dataSeting = useSetingServer()
-    const dataAuthentication = useSelector((state) => state.auth);
 
-    const initialState = {
-        listPackageDeadline: [],
-        listPackageName: [],
-    };
+    const [openModal, setOpenModal] = useState(false);
+
+    const [isMounted, setIsMounted] = useState(false);
+
+    const dataAuthentication = useSelector((state) => state.auth);
 
     const [isState, setIsState] = useState(initialState);
 
@@ -42,22 +45,16 @@ const PopupAppRenewal = () => {
     }, [dataAuthentication.status_active_package.status]);
 
     const fetchListPackage = () => {
-        Axios(
-            "GET",
-            `api_web/api_login/get_list_data_pack?csrf_protection=true`,
-            {},
-
-            (err, res) => {
-                if (!err && res.data) {
-                    queryKeyIsState({
-                        listPackageDeadline: res.data.monthly_rental.map((e) => ({ label: e.title, value: e.id })),
-                        listPackageName: res.data.package_service.map((e) => ({ label: e.title, value: e.id })),
-                    });
-                } else {
-                    console.log("bug");
-                }
+        Axios("GET", `api_web/api_login/get_list_data_pack?csrf_protection=true`, {}, (err, res) => {
+            if (!err && res.data) {
+                queryKeyIsState({
+                    listPackageDeadline: res.data.monthly_rental.map((e) => ({ label: e.title, value: e.id })),
+                    listPackageName: res.data.package_service.map((e) => ({ label: e.title, value: e.id })),
+                });
+            } else {
+                console.log("bug");
             }
-        );
+        });
     };
 
     const handleOpenSelect = () => {

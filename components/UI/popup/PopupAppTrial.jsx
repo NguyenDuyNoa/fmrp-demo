@@ -8,7 +8,9 @@ import Popup from "reactjs-popup";
 
 const PopupAppTrial = () => {
     const [isMounted, setIsMounted] = useState(false);
+
     const [openModal, setOpenModal] = useState(false);
+
     const dataAuthentication = useSelector((state) => state.auth);
 
     useEffect(() => {

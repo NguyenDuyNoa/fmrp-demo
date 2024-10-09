@@ -14,6 +14,12 @@ const FilterHeader = memo(
         fetDataOrder,
         fetchDataPlan,
         fetchDataItems,
+        listBr,
+        listOrders,
+        listPlan,
+        listProducts,
+        comboboxProductionOrders,
+        comboboxProductionOrdersDetail
     }) => {
         return (
             <>
@@ -27,7 +33,7 @@ const FilterHeader = memo(
                                 fetchComboboxProductionOrders(e);
                             }}
                             onChange={(e) => handleFilter("valueProductionOrders", e)}
-                            options={isState.comboboxProductionOrders}
+                            options={comboboxProductionOrders}
                             classNamePrefix={"productionSmoothing"}
                             placeholder={dataLang?.productions_orders_details_number || 'productions_orders_details_number'}
                         />
@@ -38,7 +44,7 @@ const FilterHeader = memo(
                             isClearable={true}
                             value={isState.valueBr}
                             onChange={(e) => handleFilter("valueBr", e)}
-                            options={isState.listBr}
+                            options={listBr}
                             classNamePrefix={"productionSmoothing"}
                             placeholder={dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}
                         />
@@ -49,7 +55,7 @@ const FilterHeader = memo(
                             isClearable={true}
                             value={isState.valueProductionOrdersDetail}
                             onChange={(e) => handleFilter("valueProductionOrdersDetail", e)}
-                            options={isState.comboboxProductionOrdersDetail}
+                            options={comboboxProductionOrdersDetail}
                             classNamePrefix={"productionSmoothing"}
                             placeholder={dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}
                         />
@@ -59,7 +65,7 @@ const FilterHeader = memo(
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueProducts}
-                            options={[{ label: "Mặt hàng", value: "", isDisabled: true }, ...isState.listProducts]}
+                            options={[{ label: "Mặt hàng", value: "", isDisabled: true }, ...listProducts]}
                             onChange={(e) => handleFilter("valueProducts", e)}
                             classNamePrefix={"productionSmoothing"}
                             placeholder={dataLang?.productions_orders_item || 'productions_orders_item'}
@@ -140,7 +146,7 @@ const FilterHeader = memo(
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueOrders}
-                            options={isState.listOrders}
+                            options={listOrders}
                             onInputChange={(e) => {
                                 fetDataOrder(e);
                             }}
@@ -154,7 +160,7 @@ const FilterHeader = memo(
                         <SelectComponent
                             isClearable={true}
                             value={isState.valuePlan}
-                            options={isState.listPlan}
+                            options={listPlan}
                             onInputChange={(e) => {
                                 fetchDataPlan(e);
                             }}

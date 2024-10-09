@@ -1,8 +1,10 @@
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { ContainerFilterTab } from "@/components/UI/common/layout";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { optionsQuery } from "@/configs/optionsQuery";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { memo, useEffect, useState } from "react";
@@ -15,10 +17,54 @@ import TabInFormation from "./tabInFormation";
 import TabProcessingCost from "./tabProcessingCost";
 import TabRecallMaterials from "./tabRecallMaterials";
 import TabWarehouseHistory from "./tabWarehouseHistory";
-import { useQuery } from "@tanstack/react-query";
 
+const listTab = [
+    {
+        id: 1,
+        name: "Thông tin",
+        count: 0,
+    },
+    {
+        id: 2,
+        name: "Tình hình xuất NVL",
+        count: 0,
+    },
+    {
+        id: 3,
+        name: "Lịch sử xuất NVL/BTP",
+        count: 1,
+    },
+    {
+        id: 4,
+        name: "Lịch sử nhập kho TP",
+        count: 1,
+    },
+    {
+        id: 5,
+        name: "Thu hồi NVL",
+        count: 2,
+    },
+    // {
+    //     id: 6,
+    //     name: 'Phiếu công việc',
+    //     count: 3
+    // },
+    {
+        id: 6,
+        name: "Chi phí NVL - Gia công",
+        count: 0,
+    },
+];
+
+const initialState = {
+    isTab: 1,
+    dataDetail: {},
+};
 
 const ModalDetail = memo(({ isState, queryState, dataLang }) => {
+    const minWidth = 900; // Đặt giá trị chiều rộng tối thiểu
+
+    const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
 
     const dataTotal = [
         {
@@ -40,46 +86,10 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
             bgSmall: "#EE1E1E",
         },
     ];
-    const listTab = [
-        {
-            id: 1,
-            name: "Thông tin",
-            count: 0,
-        },
-        {
-            id: 2,
-            name: "Tình hình xuất NVL",
-            count: 0,
-        },
-        {
-            id: 3,
-            name: "Lịch sử xuất NVL/BTP",
-            count: 1,
-        },
-        {
-            id: 4,
-            name: "Lịch sử nhập kho TP",
-            count: 1,
-        },
-        {
-            id: 5,
-            name: "Thu hồi NVL",
-            count: 2,
-        },
-        // {
-        //     id: 6,
-        //     name: 'Phiếu công việc',
-        //     count: 3
-        // },
-        {
-            id: 6,
-            name: "Chi phí NVL - Gia công",
-            count: 0,
-        },
-    ];
-
 
     const router = useRouter();
+
+    const dataSeting = useSetingServer();
 
     const [width, setWidth] = useState(900);
 
@@ -89,22 +99,11 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
 
     const [initialWidth, setInitialWidth] = useState(null);
 
-    const minWidth = 900; // Đặt giá trị chiều rộng tối thiểu
-
-    const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
-
-    const initialState = {
-        isTab: 1,
-        dataDetail: {},
-    };
-
     const [isMounted, setIsMounted] = useState(false);
 
     const [isStateModal, setIsStateModal] = useState(initialState);
 
     const queryStateModal = (key) => setIsStateModal((x) => ({ ...x, ...key }));
-
-    const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
@@ -120,17 +119,14 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                 setWidth(Math.min(Math.max(newWidth, minWidth), maxWidth));
             }
         };
-
         const stopResize = () => {
             setIsResizing(false);
             document.body.classList.remove("no-select");
         };
-
         if (isResizing) {
             document.addEventListener("mousemove", handleResize);
             document.addEventListener("mouseup", stopResize);
         }
-
         return () => {
             document.removeEventListener("mousemove", handleResize);
             document.removeEventListener("mouseup", stopResize);
@@ -151,9 +147,8 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         });
         queryStateModal({ isTab: e });
     };
-    console.log("isState?.dataModal", isState?.dataModal?.id);
     const { data, isLoading } = useQuery({
-        queryKey: ["apiItemOrdersDetail", isState.openModal],
+        queryKey: ["api_item_orders_detail", isState.openModal],
         queryFn: async () => {
             const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
             queryStateModal({
@@ -173,10 +168,12 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                 }
             });
         },
-        enabled: !!isState.openModal
+        enabled: isState.openModal,
+        placeholderData: keepPreviousData,
+        ...optionsQuery,
     })
 
-    const shareProps = { queryStateModal, isState, dataLang, isStateModal, width, listTab };
+    const shareProps = { queryStateModal, isState, isLoading, dataLang, isStateModal, width, listTab };
 
     const components = {
         1: <TabInFormation {...shareProps} />,
@@ -296,12 +293,9 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                             <button
                                 key={e.id}
                                 onClick={() => handleActiveTab(e.id)}
-                                className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
-                                    } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
+                                className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
                             >
-                                <h3
-                                    className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} ${width > 1100 ? "text-base" : "text-sm"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
-                                >
+                                <h3 className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} ${width > 1100 ? "text-base" : "text-sm"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
                                     {e.name}
                                     <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-[13px] xl:text-sm lg:text-sm  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
                                         {e?.count > 0 && e?.count}

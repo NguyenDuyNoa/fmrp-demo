@@ -237,7 +237,7 @@ const ProductionWarehouseForm = (props) => {
         formData.append("code", code);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch?.value);
-        formData.append("note", note);
+        formData.append("note", note ?? "");
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
             formData.append(`items[${index}][item]`, item?.item?.value);

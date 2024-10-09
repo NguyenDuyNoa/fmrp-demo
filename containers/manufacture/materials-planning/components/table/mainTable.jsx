@@ -19,14 +19,14 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { CONFIRM_DELETION, TITLE_DELETE_COMMAND } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranch";
+import { useInternalPlansSearchCombobox } from "@/hooks/common/useInternalPlans";
+import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { debounce } from "lodash";
 import { MdAdd } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { useMaterialsPlanningSearchInternalPlans } from "../../hooks/useMaterialsPlanningSearchInternalPlans";
 import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
-import { useMaterialsPlanningSearchOrders } from "../../hooks/useMaterialsPlanningSearchOrders";
 
 const initialState = {
     isTab: "item",
@@ -117,9 +117,9 @@ const MainTable = ({ dataLang }) => {
 
     const { data: listBranch = [] } = useBranchList()
 
-    const { data: listOrder = [] } = useMaterialsPlanningSearchOrders(isValue.searchOrder)
+    const { data: listOrder = [] } = useOrdersSearchCombobox(isValue.searchOrder)
 
-    const { data: listPlan = [] } = useMaterialsPlanningSearchInternalPlans(isValue.searchPlan)
+    const { data: listPlan = [] } = useInternalPlansSearchCombobox(isValue.searchPlan)
 
     useEffect(() => {
         sIsMounted(true);

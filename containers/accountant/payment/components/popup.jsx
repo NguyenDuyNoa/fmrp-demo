@@ -1,45 +1,30 @@
-import React, { useState, useRef, useEffect } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
-import ReactExport from "react-data-export";
-
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import PopupCustom from "@/components/UI/popup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
+import useToast from "@/hooks/useToast";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumber from "@/utils/helpers/formatnumber";
+import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
+import { SelectCore } from "@/utils/lib/Select";
+import { Add, Trash as IconDelete } from "iconsax-react";
+import { debounce } from "lodash";
+import moment from "moment/moment";
+import { useEffect, useRef, useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { BiEdit } from "react-icons/bi";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import { useSelector } from "react-redux";
+import { components } from "react-select";
 import Swal from "sweetalert2";
 import { v4 as uuidv4 } from "uuid";
-
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
-import "react-datepicker/dist/react-datepicker.css";
-import DatePicker, { registerLocale } from "react-datepicker";
-
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Add,
-} from "iconsax-react";
-
-import { BiEdit } from "react-icons/bi";
-
-import PopupCustom from "/components/UI/popup";
-import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import { components } from "react-select";
-import { useSelector } from "react-redux";
-import formatNumber from "@/utils/helpers/formatnumber";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
-import { debounce } from "lodash";
-import useActionRole from "@/hooks/useRole";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import useToast from "@/hooks/useToast";
-import { SelectCore } from "@/utils/lib/Select";
-import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import { formatMoment } from "@/utils/helpers/formatMoment";
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { _ServerInstance as Axios } from "@/services/axios";
 
 const Toast = Swal.mixin({
     toast: true,

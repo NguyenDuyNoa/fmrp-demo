@@ -2,7 +2,7 @@ import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlan
 import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
-export const useMaterialsPlanningSearchInternalPlans = (value) => {
+export const useInternalPlansSearchCombobox = (value) => {
     return useQuery({
         queryKey: ["api_search_internal_plans", value],
         queryFn: async () => {

@@ -17,7 +17,8 @@ import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-const Popup_chitietPhatsinh = (props) => {
+// Popup_chitietPhatsinh
+const PopupDetailArises = (props) => {
     const dataLang = props?.dataLang;
     const initialState = {
         open: false,
@@ -252,4 +253,4 @@ const Popup_chitietPhatsinh = (props) => {
         </>
     );
 };
-export default Popup_chitietPhatsinh;
+export default PopupDetailArises;

@@ -3,12 +3,7 @@ import Zoom from "../zoomElement/zoomElement";
 const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
     return (
         <Zoom>
-            <div
-                className={`${
-                    // warehouseman_id == "0" ? "bg-blue-700/90" : " bg-green-700/90"
-                    warehouseman_id == "0" ? "bg-blue-200" : " bg-green-200"
-                    } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center gap-1`}
-            >
+            <div className={`${warehouseman_id == "0" ? "bg-blue-200" : " bg-green-200"} rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center gap-1`} >
                 <label
                     className="relative flex cursor-pointer items-center rounded-full px-1 py-2"
                     htmlFor={id}
@@ -17,7 +12,6 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                     <input
                         type="checkbox"
                         className={`
-                      
                          ${warehouseman_id == "0"
                                 ? "checked:border-blue-700 checked:bg-blue-700/90 checked:before:bg-blue-700/90"
                                 : "checked:border-green-700 checked:bg-green-700/90 border-green-700 checked:before:bg-limborder-green-700/90"
@@ -47,8 +41,7 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                 </label>
                 <label
                     htmlFor={id}
-                    className={`${warehouseman_id == "0" ? "text-blue-700" : "text-green-700"
-                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] lg:text-[8px] text-[8px] font-medium cursor-pointer`}
+                    className={`${warehouseman_id == "0" ? "text-blue-700" : "text-green-700"}  3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] lg:text-[8px] text-[8px] font-medium cursor-pointer`}
                 >
                     {warehouseman_id == "0" ? "Chưa duyệt" : "Đã duyệt"}
                     {/* {warehouseman_id == "0" ? "Chưa duyệt kho" : "Đã duyệt kho"} */}

@@ -14,7 +14,6 @@ const apiComons = {
     async apiListItemsVariant(params) {
         const response = await axiosCustom('POST', `/api_web/api_product/searchProductsVariant`, params);
         return response.data
-
     },
     // thành phố
     async apiListProvince() {

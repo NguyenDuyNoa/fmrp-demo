@@ -1,9 +1,4 @@
-import React, { useEffect, useState } from "react";
-
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import { getdataDetail } from "../../../../Api/apiReceipts/api";
-
+import { getdataDetail } from "@/Api/apiReceipts/api";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -13,7 +8,10 @@ import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import React, { useEffect, useState } from "react";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);

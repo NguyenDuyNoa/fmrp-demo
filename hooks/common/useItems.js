@@ -25,7 +25,8 @@ export const useUnitList = () => {
                 payload: unit
             });
             return unit
-        }
+        },
+        ...optionsQuery
     })
 }
 
@@ -49,7 +50,25 @@ export const useVariantList = (params = undefined) => {
                 payload: variation
             });
             return variation
-        }
+        },
+        ...optionsQuery
+    })
+}
+
+/// lệnh sản xuất
+export const useItemsVariantSearchCombobox = (value) => {
+    return useQuery({
+        queryKey: ['api_items_variation_search_combobox', value],
+        queryFn: async () => {
+            const { data } = await apiComons.apiListItemsVariant({ data: { term: value } });
+            const newData = data?.result.map((e) => ({
+                label: `${e.name} <span style={{display: none}}>${e.code}</span> <span style={{display: none}}>${e.text_type} ${e.unit_name} ${e.product_variation} </span>`,
+                value: e.id,
+                e,
+            })) || []
+            return newData
+        },
+        ...optionsQuery
     })
 }
 

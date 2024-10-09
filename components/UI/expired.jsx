@@ -42,7 +42,7 @@ const Expirred = () => {
     }, [checkDate]);
     return (
         <React.Fragment>
-            {checkDate ? (
+            {checkDate && (
                 <div className="rounded relative">
                     <div className="flex justify-between items-center bg-gray-100 p-1">
                         <div className="flex items-center gap-1">
@@ -72,8 +72,8 @@ const Expirred = () => {
                         </div>
                         <div>
                             <button
-                                onClick={_HandleExtend.bind(this)}
                                 type="button"
+                                onClick={_HandleExtend.bind(this)}
                                 className="relative inline-flex items-center justify-start px-3.5 py-1 overflow-hidden font-medium transition-all bg-red-500 rounded group"
                             >
                                 <span className="absolute top-0 right-0 inline-block w-4 h-4 transition-all duration-500 ease-in-out bg-red-700 rounded group-hover:-mr-4 group-hover:-mt-4">
@@ -92,7 +92,7 @@ const Expirred = () => {
                         </span>
                     </span>
                 </div>
-            ) : null}
+            )}
         </React.Fragment>
     );
 };

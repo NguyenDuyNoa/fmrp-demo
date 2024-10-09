@@ -16,14 +16,14 @@ const DropdowLimit = ({ sLimit, limit, dataLang }) => {
         <>
             <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">{dataLang?.display}</div>
             <select
-                className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                onChange={(e) => sLimit(e.target.value)}
                 value={limit}
+                onChange={(e) => sLimit(e.target.value)}
+                className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
             >
                 <option className="text-[10px] xl:text-xs 2xl:text-sm hidden" disabled>
                     {limit == -1 ? "Tất cả" : limit}
                 </option>
-                {data.map((e) => (
+                {data?.map((e) => (
                     <option className="text-[10px] xl:text-xs 2xl:text-sm" value={e}>
                         {e}
                     </option>

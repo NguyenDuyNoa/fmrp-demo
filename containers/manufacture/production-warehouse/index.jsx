@@ -512,16 +512,8 @@ const ProductionWarehouse = (props) => {
                                                         >
                                                             <div className="relative">
                                                                 <ModalImage
-                                                                    small={
-                                                                        e?.staff_create?.profile_image
-                                                                            ? e?.staff_create?.profile_image
-                                                                            : "/user-placeholder.jpg"
-                                                                    }
-                                                                    large={
-                                                                        e?.staff_create?.profile_image
-                                                                            ? e?.staff_create?.profile_image
-                                                                            : "/user-placeholder.jpg"
-                                                                    }
+                                                                    small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
+                                                                    large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
                                                                     className="h-6 w-6 rounded-full object-cover "
                                                                 >
                                                                     <div className="">

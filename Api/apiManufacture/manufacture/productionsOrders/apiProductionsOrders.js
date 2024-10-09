@@ -35,8 +35,13 @@ const apiProductionsOrders = {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/agreeProcess`, data);
         return response.data
     },
-    // Lấy dữ liệu trước khi nhập sản xuất
 
+    async apiHandingProducts(data) {
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/handlingProducts`, data);
+        return response.data
+    },
+
+    // Lấy dữ liệu trước khi nhập sản xuất
     async apiDataProducts(data) {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/getDataProducts`, data);
         return response.data

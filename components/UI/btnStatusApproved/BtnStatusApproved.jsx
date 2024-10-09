@@ -13,7 +13,8 @@ const BtnStatusApproved = ({ onClick, title, type, className }) => {
         ${type == "3" && " border-orange-400 text-white bg-orange-500 hover:bg-orange-600 !h-10"}
         transition-all duration-300 ease-in-out  hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1`}
         onClick={onClick}
-    >   {
+    >
+        {
             title ? title : type == "1" ? STATUS_APPROVED : STATUS_UNAPPROVED
         }
         <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />

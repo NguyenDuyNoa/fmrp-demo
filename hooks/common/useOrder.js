@@ -2,7 +2,8 @@ import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlan
 import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 
-export const useMaterialsPlanningSearchOrders = (value) => {
+// đơn hàng bán 
+export const useOrdersSearchCombobox = (value) => {
     return useQuery({
         queryKey: ["api_search_orders", value],
         queryFn: async () => {
