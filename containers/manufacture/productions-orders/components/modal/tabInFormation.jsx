@@ -180,7 +180,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     return (
-        <div key={id ?? ""} className={`max-w-sm`}>
+        <div key={id ?? ""} className={`max-w-lg w-full`}>
             <div className={`bg-white sticky top-0 z-[1] `}>
                 <div className={`flex items-start py-2 px-4 h-[90px]  gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-full`}>
                     <div className="min-h-[32px] h-8 w-8 min-w-[32px]">
@@ -290,7 +290,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                     </span>
                                                     -
                                                     <span className="text-[#9295A4] text-[10px]">
-                                                        SL:{formatNumber(e?.quantity)}
+                                                        SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
                                                     </span>
                                                 </div>
                                             )
