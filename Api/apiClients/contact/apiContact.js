@@ -5,10 +5,6 @@ const apiContact = {
         return response.data
 
     },
-    async apiClientContact(params) {
-        const response = await axiosCustom('GET', `/api_web/api_client/client_option/?csrf_protection=true`, params);
-        return response.data
-    },
 
 }
 export default apiContact

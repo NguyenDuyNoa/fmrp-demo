@@ -19,6 +19,17 @@ export const useClientCombobox = (search) => {
         }
     })
 }
+/// danh sách khách hàng đổ hết nhưng không có ajax
+
+export const useClientComboboxNoSearchToParams = (params) => {
+    return useQuery({
+        queryKey: ["api_client_combobox_no_search_to_params", { ...params }],
+        queryFn: async () => {
+            const data = await apiComons.apiClientContact(params)
+            return data?.rResult?.map(({ name, id }) => ({ label: name, value: id })) || []
+        }
+    })
+}
 
 // danh sách khách hàng đổ hết nhưng có chi nhánh mới hiện sử dụng trong form đơn hàng bán
 export const useClientComboboxByBranch = (params) => {
@@ -54,7 +65,7 @@ export const useClientByBranch = (value) => {
         queryKey: ["api_client_by_branch", value],
         queryFn: async () => {
 
-            const { rResult } = await apiContact.apiClientContact({ params: { "filter[branch_id]": value != null ? value?.value : null } });
+            const { rResult } = await apiComons.apiClientContact({ params: { "filter[branch_id]": value != null ? value?.value : null } });
 
             return rResult?.map((e) => ({ label: e?.name, value: e?.id })) || [];
         },

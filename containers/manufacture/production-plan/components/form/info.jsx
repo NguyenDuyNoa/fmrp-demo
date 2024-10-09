@@ -9,7 +9,7 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import useToast from "@/hooks/useToast";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
-const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
+const InFo = ({ data, listBranch, handleRemoveBtn, isValue, onChangeValue, tab }) => {
     const showToat = useToast();
 
     const isBreakpoint = {
@@ -162,9 +162,8 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                             isClearable={true}
                             value={isValue.idBrach}
                             onChange={onChangeValue("idBrach")}
-                            options={data.dataBrand}
-                            className={`${isValue.idBrach == null && "border-red-500 border rounded-md"
-                                } w-full z-[999] cursor-pointer`}
+                            options={listBranch}
+                            className={`${isValue.idBrach == null && "border-red-500 border rounded-md"} w-full z-[999] cursor-pointer`}
                             styles={isBreakpoint}
                         />
                     </div>

@@ -3,13 +3,9 @@ import Image from "next/image";
 import ModalImage from "react-modal-image";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-
 import { TickCircle as IconTick } from "iconsax-react";
 import formatNumber from "@/utils/helpers/formatnumber";
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
-
-
 import useToast from "@/hooks/useToast";
 import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";

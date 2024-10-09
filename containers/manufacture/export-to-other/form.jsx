@@ -492,9 +492,6 @@ const ExportToOtherForm = (props) => {
     useClearErrorEffect(sErrListObject, listObject != null);
     useClearErrorEffect(sErrExportWarehouse, idExportWarehouse != null);
 
-    console.log("listObject", listObject);
-    console.log("object?.value", object?.value);
-
     const _ServerSending = async () => {
         let formData = new FormData();
 

@@ -1,24 +1,23 @@
-import { Add } from "iconsax-react";
-import PopupCustom from "/components/UI/popup";
-import { useState } from "react";
-import Image from "next/image";
-import DatePicker from "react-datepicker";
-import { v4 as uuid } from "uuid";
-import vi from "date-fns/locale/vi";
-import { components } from "react-select";
 import SelectComponent from "components/UI/filterComponents/selectComponent";
 import Zoom from "components/UI/zoomElement/zoomElement";
+import Image from "next/image";
+import { useState } from "react";
+import DatePicker from "react-datepicker";
+import { components } from "react-select";
+import PopupCustom from "/components/UI/popup";
+
+const initialValue = {
+    startDate: null,
+    endDate: null,
+    stages: [],
+    satff: [],
+};
+
 const PopupAdd = ({ data, listStaff }) => {
+    const dataFake = { ...data };
     const [isOpenPopup, sIsOpenPopup] = useState(false);
-    const initialValue = {
-        startDate: null,
-        endDate: null,
-        stages: [],
-        satff: [],
-    };
     const [valueChange, sValueChange] = useState(initialValue);
     const handleOpenPopup = (e) => sIsOpenPopup(e);
-    const dataFake = { ...data };
     const [checkboxes, setCheckboxes] = useState(dataFake.data.map((i) => ({ ...i, checked: false })));
 
     const handleCheckboxChange = (id) => {
@@ -173,9 +172,7 @@ const PopupAdd = ({ data, listStaff }) => {
                         type="button"
                         className="text-[#3276FA] 3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px] font-normal transition-all duration-200 ease-linear hover:text-blue-700"
                     >
-                        {checkboxes.filter((e) => e.checked).length > 0
-                            ? `Bỏ chọn tất cả (${checkboxes.filter((e) => e.checked).length})`
-                            : `Chọn tất cả (${checkboxes.length})`}
+                        {checkboxes.filter((e) => e.checked).length > 0 ? `Bỏ chọn tất cả (${checkboxes.filter((e) => e.checked).length})` : `Chọn tất cả (${checkboxes.length})`}
                     </button>
                 </div>
                 <div
@@ -183,8 +180,13 @@ const PopupAdd = ({ data, listStaff }) => {
                    scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 `}
                 >
                     {checkboxes.map((checkbox) => (
-                        <Zoom className="w-fit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 1.02 }}>
-                            <div key={checkbox.id} className="border border-[#D0D5DD] my-3 mx-1 rounded-lg ">
+                        <Zoom
+                            key={checkbox.id}
+                            className="w-fit"
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 1.02 }}
+                        >
+                            <div className="border border-[#D0D5DD] my-3 mx-1 rounded-lg ">
                                 <label htmlFor={checkbox.id} className="flex items-center  p-2 gap-2 cursor-pointer">
                                     <label
                                         className="relative flex items-center  cursor-pointer rounded-[4px] p-0.5"

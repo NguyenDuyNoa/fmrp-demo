@@ -20,6 +20,31 @@ import { MdClear } from "react-icons/md";
 import ModalImage from "react-modal-image";
 import { v4 as uuidv4 } from "uuid";
 
+const initialState = {
+    onFetching: false,
+    type: [
+        {
+            id: uuidv4(),
+            label: "materials_planning_semi",
+            value: "product",
+        },
+        {
+            id: uuidv4(),
+            label: "materials_planning_materials",
+            value: "material",
+        },
+    ],
+    arrayItem: [],
+};
+
+const initForm = {
+    date: new Date(),
+    note: "",
+    type: "material",
+    purchaseName: "Yêu cầu mua hàng (PR)",
+    arrayItem: [],
+}
+
 const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue, fetchDataTable, ...rest }) => {
     const [open, sOpen] = useState(false);
 
@@ -29,36 +54,11 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
 
     const dataSeting = useSetingServer();
 
-    const initialState = {
-        onFetching: false,
-        type: [
-            {
-                id: uuidv4(),
-                label: "materials_planning_semi",
-                value: "product",
-            },
-            {
-                id: uuidv4(),
-                label: "materials_planning_materials",
-                value: "material",
-            },
-        ],
-        arrayItem: [],
-    };
-
     const [isState, sIsState] = useState(initialState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
-    const form = useForm({
-        defaultValues: {
-            date: new Date(),
-            note: "",
-            type: "material",
-            purchaseName: "Yêu cầu mua hàng (PR)",
-            arrayItem: [],
-        },
-    });
+    const form = useForm({ defaultValues: { ...initForm } });
 
     /// lắng nghe thay đổi
     const findValue = form.watch();
@@ -73,43 +73,44 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
     };
 
     const fetchListItem = async () => {
-        queryState({ onFetching: true });
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        let formData = new FormData();
-        // type: 1 nvl, 2 BTP
-        // type_object: 2 YCMH
-        formData.append("type", findValue.type == "material" ? 1 : 2);
-        formData.append("type_object", 2);
-        formData.append("pPlan_id", dataTable.listDataRight.idCommand);
-        const { isSuccess, message, data } = await apiMaterialsPlanning.apiKeepItemsWarehouses(formData);
-        const newData = data?.items?.map((e) => {
-            return {
-                id: uuidv4(),
-                idParent: e?.id,
-                item: {
-                    item_id: e?.item_id,
-                    item_code: e?.item_code,
-                    name: e?.item_name,
-                    type: e?.type_item,
-                    image: e?.images,
-                    variation: e?.item_variation,
-                },
-                unit: e?.unit_name_parent,
-                // sl giữ
-                quantityKeepp: formatNumber(e?.quantity_keep),
-                // sl còn lại
-                quantityRest: formatNumber(e?.quantity_rest),
-                // sl đã mua
-                quantityPurchased: e?.quantity_purchase,
-                quantity:
-                    formatNumber(e?.quantity_rest - e?.quantity_purchase) > 0
-                        ? formatNumber(e?.quantity_rest - e?.quantity_purchase)
-                        : null,
-                itemVariationOptionValueId: e?.item_variation_option_value_id,
-            };
-        });
-        form.setValue("arrayItem", newData);
-        queryState({ onFetching: false });
+        try {
+            queryState({ onFetching: true });
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            let formData = new FormData();
+            // type: 1 nvl, 2 BTP
+            // type_object: 2 YCMH
+            formData.append("type_object", 2);
+            formData.append("type", findValue.type == "material" ? 1 : 2);
+            formData.append("pPlan_id", dataTable.listDataRight.idCommand);
+            const { isSuccess, message, data } = await apiMaterialsPlanning.apiKeepItemsWarehouses(formData);
+            const newData = data?.items?.map((e) => {
+                return {
+                    id: uuidv4(),
+                    idParent: e?.id,
+                    item: {
+                        item_id: e?.item_id,
+                        item_code: e?.item_code,
+                        name: e?.item_name,
+                        type: e?.type_item,
+                        image: e?.images,
+                        variation: e?.item_variation,
+                    },
+                    unit: e?.unit_name_parent,
+                    // sl giữ
+                    quantityKeepp: formatNumber(e?.quantity_keep),
+                    // sl còn lại
+                    quantityRest: formatNumber(e?.quantity_rest),
+                    // sl đã mua
+                    quantityPurchased: e?.quantity_purchase,
+                    quantity: formatNumber(e?.quantity_rest - e?.quantity_purchase) > 0 ? formatNumber(e?.quantity_rest - e?.quantity_purchase) : null,
+                    itemVariationOptionValueId: e?.item_variation_option_value_id,
+                };
+            });
+            form.setValue("arrayItem", newData);
+            queryState({ onFetching: false });
+        } catch (error) {
+            throw error
+        }
     };
 
     useEffect(() => {
@@ -121,11 +122,9 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
 
     const onSubmit = async (value) => {
         if (value.arrayItem.length == 0) {
-            return shhowToat(
-                "error",
-                dataLang?.materials_planning_no_items_purchase || "materials_planning_no_items_purchase"
-            );
+            return shhowToat("error", dataLang?.materials_planning_no_items_purchase || "materials_planning_no_items_purchase");
         }
+
         let formData = new FormData();
         formData.append("note", value.note);
         formData.append("name", value.purchaseName);
@@ -138,6 +137,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
             formData.append(`items[${index}][item_id]`, e?.item?.item_id);
             formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
         });
+
         const data = await apiMaterialsPlanning.apiHandlingPurchaseProductionPlan(formData);
         if (data?.isSuccess) {
             isShow("success", data?.message);
@@ -145,9 +145,9 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
             fetchDataTable(1);
             _ToggleModal(false);
             form.reset();
-        } else {
-            isShow("error", data?.message);
+            return
         }
+        isShow("error", data?.message);
     };
     return (
         <>
@@ -158,16 +158,12 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                         className=" bg-blue-100 rounded-lg  outline-none focus:outline-none"
                         onClick={() => {
                             if (+dataTable?.countAll == 0) {
-                                return isShow(
-                                    "error",
-                                    dataLang?.materials_planning_please_add || "materials_planning_please_add"
-                                );
+                                return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
                             }
                             _ToggleModal(true);
                         }}
                     >
                         <div className="flex items-center gap-2 py-2 px-3 ">
-                            {/* <Image height={16} width={16} src={icon} className="object-cover" /> */}
                             {icon}
                             <h3 className="text-blue-600 font-medium 3xl:text-base text-xs">{title}</h3>
                         </div>
@@ -191,9 +187,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                 rules={{
                                     required: {
                                         value: true,
-                                        message:
-                                            dataLang?.materials_planning_pease_select_purchase ||
-                                            "materials_planning_pease_select_purchase",
+                                        message: dataLang?.materials_planning_pease_select_purchase || "materials_planning_pease_select_purchase",
                                     },
                                 }}
                                 render={({ field, fieldState }) => {
@@ -276,9 +270,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                 rules={{
                                     required: {
                                         value: true,
-                                        message:
-                                            dataLang?.materials_planning_enter_ticket ||
-                                            "materials_planning_enter_ticket",
+                                        message: dataLang?.materials_planning_enter_ticket || "materials_planning_enter_ticket",
                                     },
                                 }}
                                 control={form.control}
@@ -356,8 +348,8 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                         {findValue.arrayItem?.map((e, index) => (
                                             <div
-                                                className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
                                                 key={e?.id?.toString()}
+                                                className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
                                             >
                                                 <h6 className="text-[13px] flex items-center font-medium py-1 col-span-4 text-left">
                                                     <div className={`flex items-center gap-2`}>
@@ -408,23 +400,17 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                         rules={{
                                                             required: {
                                                                 value: true,
-                                                                message:
-                                                                    dataLang?.materials_planning_enter_quantity ||
-                                                                    "materials_planning_enter_quantity",
+                                                                message: dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity",
                                                             },
                                                             validate: {
                                                                 fn: (value) => {
                                                                     try {
                                                                         let mss = "";
                                                                         if (value == null) {
-                                                                            mss =
-                                                                                dataLang?.materials_planning_enter_quantity ||
-                                                                                "materials_planning_enter_quantity";
+                                                                            mss = dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity";
                                                                         }
                                                                         if (value == 0) {
-                                                                            mss =
-                                                                                dataLang?.materials_planning_must_be_greater ||
-                                                                                "materials_planning_must_be_greater";
+                                                                            mss = dataLang?.materials_planning_must_be_greater || "materials_planning_must_be_greater";
                                                                         }
                                                                         return mss || true;
                                                                     } catch (error) {
@@ -441,11 +427,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                                             } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                                         {...field}
                                                                         onChange={(event) =>
-                                                                            field.onChange(
-                                                                                event.target.value == ""
-                                                                                    ? null
-                                                                                    : +event.target.value
-                                                                            )
+                                                                            field.onChange(event.target.value == "" ? null : +event.target.value)
                                                                         }
                                                                         isAllowed={(values) => {
                                                                             // const { floatValue, value } = values;

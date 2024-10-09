@@ -2,6 +2,7 @@ import apiComons from "@/Api/apiComon/apiComon";
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import apiVariant from "@/Api/apiSettings/apiVariant";
+import { optionsQuery } from "@/configs/optionsQuery";
 
 // ds đơn vị tính
 export const useUnitList = () => {
@@ -51,3 +52,4 @@ export const useVariantList = (params = undefined) => {
         }
     })
 }
+

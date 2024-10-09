@@ -3,12 +3,9 @@ import Popup from "reactjs-popup";
 import React, { useRef, useState, useEffect } from "react";
 import ModalImage from "react-modal-image";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
-
 import Loading from "@/components/UI/loading/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
-
 import useToast from "@/hooks/useToast";
-import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 const BodyGantt = ({
@@ -28,19 +25,17 @@ const BodyGantt = ({
     handleChekedAll,
 }) => {
     const showToast = useToast();
-
     const container1Ref = useRef();
     const container2Ref = useRef();
     const container3Ref = useRef();
-
+    const divRefs = useRef([]);
     const dataSeting = useSetingServer()
-
+    const [heights, setHeights] = useState([]);
+    const [checkCkecked, sCheckCkecked] = useState(false);
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
-
     const handleScroll = (e) => {
         const container1Element = container1Ref.current;
         const container2Element = container2Ref.current;
-
         container2Element.scrollLeft = container1Element.scrollLeft;
         container1Ref.current.scrollTop = e.target.scrollTop;
         container3Ref.current.scrollTop = e.target.scrollTop;
@@ -50,13 +45,6 @@ const BodyGantt = ({
         container1Ref.current.scrollTop = e.target.scrollTop;
         container3Ref.current.scrollTop = e.target.scrollTop;
     };
-
-    const [checkCkecked, sCheckCkecked] = useState(false);
-
-
-    const divRefs = useRef([]);
-
-    const [heights, setHeights] = useState([]);
 
     useEffect(() => {
         const newHeights = divRefs.current.map(ref => ref?.offsetHeight);

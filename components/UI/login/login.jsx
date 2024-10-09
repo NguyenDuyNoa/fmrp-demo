@@ -304,6 +304,7 @@ const LoginPage = React.memo((props) => {
                                             </div>
                                         </div>
                                         <button
+                                            type="submit"
                                             onClick={handleSubmit((data) => onSubmit(data, "login"))}
                                             className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0375f3] via-[#0375f3] via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105"
                                         >

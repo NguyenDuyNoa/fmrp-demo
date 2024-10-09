@@ -1,6 +1,3 @@
-import dynamic from "next/dynamic";
-import Image from "next/image";
-
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
@@ -40,22 +37,6 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                         </h4>
                         <h4 className="col-span-2  text-center flex items-center justify-center gap-2 text-[#344054] font-normal text-xs capitalize">
                             {dataLang?.materials_planning_lack || "materials_planning_lack"}
-                            {/* <div className="flex-col flex gap-1 cursor-pointer">
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedrop.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedow.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                            </div> */}
                         </h4>
                     </div>
                     {isFetching ? (
@@ -65,9 +46,7 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                             {dataBom?.productsBom.map((e, index) => (
                                 <div
                                     key={e.id}
-                                    className={`grid grid-cols-12 items-center py-2 ${dataBom?.productsBom?.length - 1 == index ? "" : "border-b"
-                                        }
-                                           `}
+                                    className={`grid grid-cols-12 items-center py-2 ${dataBom?.productsBom?.length - 1 == index ? "" : "border-b"}`}
                                 >
                                     <h4 className="col-span-5 px-4 text-[#141522] flex items-center gap-2 font-medium text-sm">
                                         <ModalImage

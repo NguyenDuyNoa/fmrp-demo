@@ -1,12 +1,12 @@
-import React from "react";
-import dynamic from "next/dynamic";
-import DatePicker from "react-datepicker";
 import { ArrowDown2 } from "iconsax-react";
+import dynamic from "next/dynamic";
+import React from "react";
+import DatePicker from "react-datepicker";
 import { components } from "react-select";
-
 const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), { ssr: false });
 
 const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options, dataLang }) => {
+
     return (
         <>
             <div className="grid grid-cols-14 items-center gap-2 ">

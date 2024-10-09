@@ -2,11 +2,7 @@ import DatePicker from "react-datepicker";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { ArrowDown2 } from "iconsax-react";
 
-const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPlan }) => {
-    const renderMonthContent = (month, shortMonth, longMonth) => {
-        const tooltipText = `Tooltip for month: ${longMonth}`;
-        return <span title={tooltipText}>{shortMonth}</span>;
-    };
+const FilterHeader = ({ dataLang, listBranch, listOrder, listPlan, isValue, queryValue, fetchDataOrder, fetchDataPlan }) => {
     return (
         <>
             <div className="grid grid-cols-10 items-center gap-10 ">
@@ -18,10 +14,10 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                         isClearable={true}
                         value={isValue.valueOrder}
                         onInputChange={(e) => {
-                            fetDataOrder(e);
+                            fetchDataOrder(e)
                         }}
                         onChange={(e) => queryValue({ valueOrder: e, page: 1 })}
-                        options={isValue.listOrders}
+                        options={listOrder}
                         classNamePrefix={"productionSmoothing"}
                         placeholder={dataLang?.materials_planning_order_number || "materials_planning_order_number"}
                     />
@@ -34,10 +30,10 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                         isClearable={true}
                         value={isValue.valuePlan}
                         onInputChange={(e) => {
-                            fetchDataPlan(e);
+                            fetchDataPlan(e)
                         }}
                         onChange={(e) => queryValue({ valuePlan: e, page: 1 })}
-                        options={isValue.listPlan}
+                        options={listPlan}
                         classNamePrefix={"productionSmoothing"}
                         placeholder={dataLang?.internal_plan || "internal_plan"}
                     />
@@ -50,7 +46,7 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                         isClearable={true}
                         value={isValue.valueBr}
                         onChange={(e) => queryValue({ valueBr: e, page: 1 })}
-                        options={isValue.listBr}
+                        options={listBranch}
                         classNamePrefix={"productionSmoothing"}
                         placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                     />

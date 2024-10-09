@@ -1,9 +1,7 @@
-import Zoom from "components/UI/zoomElement/zoomElement";
-import { Add, SearchNormal1 } from "iconsax-react";
-import Image from "next/image";
-import { useEffect, useRef } from "react";
-import PopupAdd from "../popup/popup";
 import Loading from "@/components/UI/loading/loading";
+import { SearchNormal1 } from "iconsax-react";
+import Image from "next/image";
+import React, { useRef } from "react";
 
 const MainTable = ({
     data,
@@ -23,7 +21,6 @@ const MainTable = ({
     const handleScroll = (e) => {
         const container1Element = container1Ref.current;
         const container2Element = container2Ref.current;
-
         container2Element.scrollLeft = container1Element.scrollLeft;
     };
     return (
@@ -66,23 +63,21 @@ const MainTable = ({
                 </div>
             </div>
             <div className="flex border border-t-0 !mt-0">
-                <div
-                    className="overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 
+                <div className="overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 
                 3xl:h-[67.7vh] border-r xxl:h-[54.5vh] 2xl:h-[60.4vh]  xl:h-[55.7vh] lg:h-[57.2vh] h-[60vh] !m-0  overflow-y-auto min-w-[300px] "
                 >
                     {data.data.map((e, index) => (
-                        <div className={`border-[#E7EAEE] bg-white ${index == 0 ? "" : ""} border-b`}>
+                        <div key={index} className={`border-[#E7EAEE] bg-white ${index == 0 ? "" : ""} border-b`}>
                             <div
                                 onClick={() => handleShowProgress(e.id)}
-                                className={` ${isOpen && e.id == idParent ? "bg-[#EBF5FF]/100" : ""
-                                    }  cursor-pointer hover:bg-[#EBF5FF]  transition-all    duration-200 ease-linear flex   items-center`}
+                                className={` ${isOpen && e.id == idParent ? "bg-[#EBF5FF]/100" : ""}  cursor-pointer hover:bg-[#EBF5FF]  transition-all    duration-200 ease-linear flex   items-center`}
                             >
                                 <div className="p-5">
                                     <div className="grid grid-cols-13 items-center gap-1 justify-center">
                                         <div className="col-span-3 w-[44px] h-[44px]">
                                             <Image
                                                 src={e.image}
-                                                alt=""
+                                                alt="@demo"
                                                 className="object-cover  w-full h-full"
                                                 width={150}
                                                 height={150}
@@ -98,28 +93,11 @@ const MainTable = ({
                                             <div className="my-5">
                                                 <div className="flex items-center">
                                                     {e.process.map((i, index) => (
-                                                        <>
-                                                            <div
-                                                                className={`${i.active
-                                                                    ? `h-2 w-2 rounded-full bg-green-500`
-                                                                    : `h-2 w-2 rounded-full bg-[#CCCCCC]`
-                                                                    } `}
-                                                            />
-                                                            <div
-                                                                className={`${i.active
-                                                                    ? `w-[13%] bg-green-500 h-0.5 `
-                                                                    : `w-[13%] bg-[#CCCCCC] h-0.5 `
-                                                                    }`}
-                                                            />
-                                                            {index === e.process.length - 1 && (
-                                                                <div
-                                                                    className={`${i.active
-                                                                        ? `h-2 w-2 rounded-full bg-green-500`
-                                                                        : `h-2 w-2 rounded-full bg-[#CCCCCC]`
-                                                                        } `}
-                                                                />
-                                                            )}
-                                                        </>
+                                                        <React.Fragment key={index}>
+                                                            <div className={`${i.active ? `h-2 w-2 rounded-full bg-green-500` : `h-2 w-2 rounded-full bg-[#CCCCCC]`} `} />
+                                                            <div className={`${i.active ? `w-[13%] bg-green-500 h-0.5 ` : `w-[13%] bg-[#CCCCCC] h-0.5 `}`} />
+                                                            {index === e.process.length - 1 && (<div className={`${i.active ? `h-2 w-2 rounded-full bg-green-500` : `h-2 w-2 rounded-full bg-[#CCCCCC]`} `} />)}
+                                                        </React.Fragment>
                                                     ))}
                                                 </div>
                                             </div>
@@ -148,56 +126,51 @@ const MainTable = ({
                         ref={container1Ref}
                         onScroll={handleScroll}
                         className="flex flex-col   overflow-x-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 
-                    3xl:h-[67.7vh] xxl:h-[54.5vh] 2xl:h-[60.4vh] xl:h-[55.7vh] lg:h-[57.2vh] h-[52vh] !m-0  overflow-y-auto"
+                        3xl:h-[67.7vh] xxl:h-[54.5vh] 2xl:h-[60.4vh] xl:h-[55.7vh] lg:h-[57.2vh] h-[52vh] !m-0  overflow-y-auto"
                     >
-                        {isOpen &&
-                            dataFind?.child.map((ce, ceIndex) => {
-                                return (
-                                    <div className={`flex `}>
-                                        <div className="min-w-[100px] bg-white z-[999] border-r border-b py-2 px-1 flex items-center justify-center sticky top-0 left-0">
-                                            <div className="flex flex-col justify-center items-center">
-                                                <h3 className="text-[#595C68] text-xs font-light">{ce.date.month}</h3>
-                                                <div className="flex gap-2">
-                                                    <h2 className="text-[#667085] font-light text-base">
-                                                        {ce.date.rank}
-                                                    </h2>
-                                                    <h2 className="text-[#202236] font-semibold text-base">
-                                                        {ce.date.days}
-                                                    </h2>
-                                                </div>
+                        {isOpen && dataFind?.child.map((ce, ceIndex) => {
+                            return (
+                                <div key={ceIndex} className={`flex `}>
+                                    <div className="min-w-[100px] bg-white z-[999] border-r border-b py-2 px-1 flex items-center justify-center sticky top-0 left-0">
+                                        <div className="flex flex-col justify-center items-center">
+                                            <h3 className="text-[#595C68] text-xs font-light">{ce.date.month}</h3>
+                                            <div className="flex gap-2">
+                                                <h2 className="text-[#667085] font-light text-base">
+                                                    {ce.date.rank}
+                                                </h2>
+                                                <h2 className="text-[#202236] font-semibold text-base">
+                                                    {ce.date.days}
+                                                </h2>
                                             </div>
                                         </div>
-                                        <div className={`flex border-b`}>
-                                            {ce.dataChild.map((e, eIndex) => {
-                                                return (
-                                                    <div
-                                                        className={`flex flex-col  min-w-[200px]  border-t-0 border-r`}
-                                                    >
-                                                        {e.db?.map((i) => (
-                                                            <div className="m-auto">
-                                                                <div className="w-fit">
-                                                                    <div className="text-[#0F4F9E] w-full flex items-center  gap-1 font-medium text-sm py-1 px-2 bg-[#EBF5FF] rounded-2xl my-1">
-                                                                        <div
-                                                                            style={{
-                                                                                backgroundImage: `linear-gradient(to left, ${i.bland}, ${i.drak})`,
-                                                                            }}
-                                                                            className=" text-sm  rounded-full h-[24px]  w-[24px] text-[#FFFFFF] flex items-center justify-center"
-                                                                        >
-                                                                            {/* className="bg-gradient-to-l from-blue-400/80 to-[#1556D9] text-sm  rounded-full h-[24px]  w-[24px] text-[#FFFFFF] flex items-center justify-center"> */}
-                                                                            {i.name[0]}
-                                                                        </div>
-                                                                        <h1>{i.name}</h1>
+                                    </div>
+                                    <div className={`flex border-b`}>
+                                        {ce.dataChild.map((e, eIndex) => {
+                                            return (
+                                                <div key={eIndex} className={`flex flex-col  min-w-[200px]  border-t-0 border-r`} >
+                                                    {e.db?.map((i, iIndex) => (
+                                                        <div key={iIndex} className="m-auto">
+                                                            <div className="w-fit">
+                                                                <div className="text-[#0F4F9E] w-full flex items-center  gap-1 font-medium text-sm py-1 px-2 bg-[#EBF5FF] rounded-2xl my-1">
+                                                                    <div
+                                                                        style={{ backgroundImage: `linear-gradient(to left, ${i.bland}, ${i.drak})` }}
+                                                                        className=" text-sm  rounded-full h-[24px]  w-[24px] text-[#FFFFFF] flex items-center justify-center"
+                                                                    >
+                                                                        {/* className="bg-gradient-to-l from-blue-400/80 to-[#1556D9] text-sm  rounded-full h-[24px]  w-[24px] text-[#FFFFFF] flex items-center justify-center"> */}
+                                                                        {i.name[0]}
                                                                     </div>
+                                                                    <h1>{i.name}</h1>
                                                                 </div>
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                );
-                            })}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

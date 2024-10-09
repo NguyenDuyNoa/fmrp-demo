@@ -36,11 +36,18 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/Api_unit/unit/?csrf_protection=true`, params);
         return response.data
     },
+
+    // khách hàng
     async apiSearchClient(params) {
         const response = await axiosCustom('GET', `/api_web/api_client/searchClients?csrf_protection=true`, params);
         return response.data
     },
     async apiSearcClientFilterByBranch(params) {
+        const response = await axiosCustom('GET', `/api_web/api_client/client_option/?csrf_protection=true`, params);
+        return response.data
+    },
+
+    async apiClientContact(params) {
         const response = await axiosCustom('GET', `/api_web/api_client/client_option/?csrf_protection=true`, params);
         return response.data
     },

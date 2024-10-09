@@ -1,12 +1,10 @@
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading/loading";
+import PopupCustom from "@/components/UI/popup";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
+import { useToggle } from "@/hooks/useToggle";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
-import { useToggle } from "@/hooks/useToggle";
-
-import PopupCustom from "@/components/UI/popup";
-import Loading from "@/components/UI/loading/loading";
-import Zoom from "@/components/UI/zoomElement/zoomElement";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
 const PopupEditer = ({ }) => {
     const { isOpen, handleOpen } = useToggle(false);

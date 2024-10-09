@@ -71,10 +71,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                     onClick={() => handShowItem(e.id, isTab)}
                                                     className={`cursor-pointer text-[#3276FA] font-normal xl:text-sm text-xs border-b border-[#3276FA] w-fit`}
                                                 >
-                                                    {e.showChild
-                                                        ? dataLang?.materials_planning_hide || "materials_planning_hide"
-                                                        : dataLang?.materials_planning_show_more ||
-                                                        "materials_planning_show_more"}
+                                                    {e.showChild ? dataLang?.materials_planning_hide || "materials_planning_hide" : dataLang?.materials_planning_show_more || "materials_planning_show_more"}
                                                 </h3>
                                             </Zoom>
                                             <Zoom
@@ -127,17 +124,13 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                         <div className="flex items-center gap-5 my-2">
                                             <h5 className="text-[#3A3E4C] font-normal xl:text-sm text-xs">
                                                 <span className="pr-2 text-[#9295A4] font-normal xl:text-sm text-xs">
-                                                    {dataLang?.warehouseTransfer_transferWarehouse ||
-                                                        "warehouseTransfer_transferWarehouse"}
-                                                    :
+                                                    {dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"} :
                                                 </span>
                                                 {e.warehouseFrom}
                                             </h5>
                                             <h5 className="text-[#3A3E4C] font-normal xl:text-sm text-xs">
                                                 <span className="pr-2 text-[#9295A4] font-normal xl:text-sm text-xs">
-                                                    {dataLang?.warehouseTransfer_receivingWarehouse ||
-                                                        "warehouseTransfer_receivingWarehouse"}
-                                                    :
+                                                    {dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"} :
                                                 </span>
                                                 {e.warehouseTo}
                                             </h5>
@@ -154,30 +147,16 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                 {dataLang?.purchase_unit || "purchase_unit"}
                                             </h4>
                                             <h4 className="col-span-2 flex items-center gap-2 justify-center text-[#344054] font-normal text-xs ">
-                                                {isTab === "dataKeepStock" &&
-                                                    (dataLang?.materials_planning_quantity_kept ||
-                                                        "materials_planning_quantity_kept")}
-                                                {isTab === "dataPurchases" &&
-                                                    (dataLang?.price_quote_quantity || "price_quote_quantity")}
+                                                {isTab === "dataKeepStock" && (dataLang?.materials_planning_quantity_kept || "materials_planning_quantity_kept")}
+                                                {isTab === "dataPurchases" && (dataLang?.price_quote_quantity || "price_quote_quantity")}
                                             </h4>
-                                            <h4
-                                                className={`${isTab === "dataKeepStock"
-                                                    ? "col-span-2 text-center px-4"
-                                                    : "col-span-4 text-left px-0"
-                                                    }   text-[#344054] font-normal text-xs`}
-                                            >
-                                                {isTab === "dataKeepStock" &&
-                                                    (dataLang?.warehouseTransfer_rransferPosition ||
-                                                        "warehouseTransfer_rransferPosition")}
-                                                {isTab === "dataPurchases" &&
-                                                    (dataLang?.purchase_status || "purchase_status")}
+                                            <h4 className={`${isTab === "dataKeepStock" ? "col-span-2 text-center px-4" : "col-span-4 text-left px-0"}   text-[#344054] font-normal text-xs`}>
+                                                {isTab === "dataKeepStock" && (dataLang?.warehouseTransfer_rransferPosition || "warehouseTransfer_rransferPosition")}
+                                                {isTab === "dataPurchases" && (dataLang?.purchase_status || "purchase_status")}
                                             </h4>
                                             {isTab === "dataKeepStock" && (
-                                                <h4
-                                                    className={`col-span-2 px-4 text-center text-[#344054] font-normal text-xs`}
-                                                >
-                                                    {dataLang?.warehouseTransfer_receivingLocation ||
-                                                        "warehouseTransfer_receivingLocation"}
+                                                <h4 className={`col-span-2 px-4 text-center text-[#344054] font-normal text-xs`} >
+                                                    {dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"}
                                                 </h4>
                                             )}
                                         </div>
@@ -185,8 +164,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                             {e.arrListData.map((i, index) => (
                                                 <div
                                                     key={i.id}
-                                                    className={`grid grid-cols-12 items-center ${e.arrListData?.length - 1 == index ? "" : "border-b"
-                                                        } `}
+                                                    className={`grid grid-cols-12 items-center ${e.arrListData?.length - 1 == index ? "" : "border-b"} `}
                                                 >
                                                     <h4 className="col-span-4 flex items-center py-2 px-4 gap-2">
                                                         <ModalImage
@@ -260,48 +238,19 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                     >
                                                                         <div className="flex items-center w-full">
                                                                             {index === 0 && (
-                                                                                <div
-                                                                                    className={`${j.active
-                                                                                        ? "bg-[#00C170]"
-                                                                                        : "bg-gray-500"
-                                                                                        } min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`}
-                                                                                />
+                                                                                <div className={`${j.active ? "bg-[#00C170]" : "bg-gray-500"} min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`} />
                                                                             )}
-                                                                            <div
-                                                                                className={`${j.active
-                                                                                    ? "bg-[#00C170]"
-                                                                                    : "bg-gray-500"
-                                                                                    }  h-[2px] w-full`}
-                                                                            />
+                                                                            <div className={`${j.active ? "bg-[#00C170]" : "bg-gray-500"}  h-[2px] w-full`} />
                                                                             {index === i.processBar.length - 1 && (
-                                                                                <div
-                                                                                    className={`${j.active
-                                                                                        ? "bg-[#00C170]"
-                                                                                        : "bg-gray-500"
-                                                                                        } min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`}
-                                                                                />
+                                                                                <div className={`${j.active ? "bg-[#00C170]" : "bg-gray-500"} min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`} />
                                                                             )}
                                                                         </div>
                                                                     </motion.div>
-                                                                    <div
-                                                                        className={`mt-1 ${index === i.processBar.length - 1 &&
-                                                                            "relative -right-[94%]"
-                                                                            }`}
-                                                                    >
-                                                                        <p
-                                                                            className={`${j.active
-                                                                                ? "text-[#0BAA2E]"
-                                                                                : "text-gray-500"
-                                                                                } font-normal text-[10px] uppercase`}
-                                                                        >
+                                                                    <div className={`mt-1 ${index === i.processBar.length - 1 && "relative -right-[94%]"}`}>
+                                                                        <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal text-[10px] uppercase`} >
                                                                             {j.title}
                                                                         </p>
-                                                                        <p
-                                                                            className={` ${j.quantity > 0
-                                                                                ? "opacity-100"
-                                                                                : "opacity-0"
-                                                                                } text-[#0BAA2E] font-normal text-[10px]`}
-                                                                        >
+                                                                        <p className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"} text-[#0BAA2E] font-normal text-[10px]`} >
                                                                             SL:
                                                                             <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
                                                                                 {j.quantity > 0
