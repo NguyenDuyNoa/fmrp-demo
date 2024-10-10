@@ -94,7 +94,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                 });
             });
             const { data } = await apiMaterialsPlanning.apiHandlingKeepProductionsPlan(formData);
-            if (data?.isSuccess) {
+            if (data?.isSuccess == 1) {
                 isShow("success", data?.message);
                 queryValue({ page: 1 });
                 fetchDataTable(1);
@@ -247,7 +247,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             title={dataLang?.materials_planning_raw_materials || "materials_planning_raw_materials"}
             button={
                 <button
-                    className=" bg-blue-100 rounded-lg  outline-none focus:outline-none"
+                    className="bg-blue-100 rounded-lg outline-none  focus:outline-none"
                     onClick={() => {
                         if (+dataTable?.countAll == 0) {
                             return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
@@ -255,9 +255,9 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                         _ToggleModal(true);
                     }}
                 >
-                    <div className="flex items-center gap-2 py-2 px-3 ">
+                    <div className="flex items-center gap-2 px-3 py-2 ">
                         {icon}
-                        <h3 className="text-blue-600 font-medium 3xl:text-base text-xs">{title}</h3>
+                        <h3 className="text-xs font-medium text-blue-600 3xl:text-base">{title}</h3>
                     </div>
                 </button>
             }
@@ -268,10 +268,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             <div className="mt-4">
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
                 <div className="grid grid-cols-10 gap-4">
-                    <div className="col-span-4 flex flex-col">
+                    <div className="flex flex-col col-span-4">
                         <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
                             {dataLang?.materials_planning_storage_date || "materials_planning_storage_date"}{" "}
-                            <span className=" text-red-500">*</span>
+                            <span className="text-red-500 ">*</span>
                         </div>
                         <Controller
                             name="date"
@@ -285,7 +285,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                             render={({ field, fieldState }) => {
                                 return (
                                     <>
-                                        <div className="custom-date-picker flex flex-row  relative">
+                                        <div className="relative flex flex-row custom-date-picker">
                                             <DatePicker
                                                 {...field}
                                                 ref={(ref) => {
@@ -327,7 +327,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                             control={form.control}
                             render={({ field }) => {
                                 return (
-                                    <div className="mt-6 flex items-centerem gap-8">
+                                    <div className="flex gap-8 mt-6 items-centerem">
                                         {isState.type.map((e) => {
                                             return (
                                                 <div className="flex items-center cursor-pointer">
@@ -337,7 +337,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                         {...field}
                                                         checked={field.value === e.value}
                                                         onChange={() => field.onChange(e.value)}
-                                                        className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
+                                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 focus:ring-2"
                                                     />
                                                     <label
                                                         htmlFor={e.value}
@@ -438,7 +438,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                 <ModalImage
                                                                     small="/no_img.png"
                                                                     large="/no_img.png"
-                                                                    className="w-full h-full rounded object-contain p-1"
+                                                                    className="object-contain w-full h-full p-1 rounded"
                                                                 ></ModalImage>
                                                             </div>
                                                         )}
@@ -582,17 +582,17 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                                     size={15}
                                                                                                 />
                                                                                             ) : (
-                                                                                                <div className="h-4 w-4 rounded-full bg-transparent border border-gray-300" />
+                                                                                                <div className="w-4 h-4 bg-transparent border border-gray-300 rounded-full" />
                                                                                             )}
                                                                                         </div>
                                                                                         <div className="flex flex-col items-start jus">
                                                                                             <h3>
                                                                                                 {x.label} -
-                                                                                                <span className="text-blue-500 pl-1">
+                                                                                                <span className="pl-1 text-blue-500">
                                                                                                     {x.value}
                                                                                                 </span>
                                                                                             </h3>
-                                                                                            <div className="flex items-center font-oblique flex-wrap">
+                                                                                            <div className="flex flex-wrap items-center font-oblique">
                                                                                                 {dataProductSerial.is_enable === "1" && (
                                                                                                     <div className="flex gap-0.5">
                                                                                                         <h6 className="text-[8px]">
@@ -674,7 +674,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                     }}
                                                 />
                                             </h6>
-                                            <div className="col-span-1 flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1">
                                                 <button
                                                     onClick={(event) => removeItem(e.id)}
                                                     type="button"
@@ -692,7 +692,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                     ) : (
                         <NoData />
                     )}
-                    <div className="text-right mt-5 space-x-2">
+                    <div className="mt-5 space-x-2 text-right">
                         <button
                             type="button"
                             onClick={_ToggleModal.bind(this, false)}

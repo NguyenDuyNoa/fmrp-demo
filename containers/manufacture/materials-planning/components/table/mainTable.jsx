@@ -156,7 +156,7 @@ const MainTable = ({ dataLang }) => {
         branch_id: isValue.valueBr?.value || "",
     };
 
-    const fetchDataTable = async (page) => {
+    const fetchDataTable = async (page = 1) => {
         try {
             const { data } = await apiMaterialsPlanning.apiProductionPlans(page, isValue.limit, { params: params });
             const arrayItem = convertArrData(data?.productionPlans);
@@ -397,18 +397,14 @@ const MainTable = ({ dataLang }) => {
     };
 
     const handleConfim = async () => {
-        try {
-            const { isSuccess, message } = await apiMaterialsPlanning.apiDeleteProductionPlans(isId);
-            if (isSuccess == 1) {
-                fetchDataTable();
-                isShow("success", `${dataLang[message] || message}`);
-            } else {
-                isShow("error", `${dataLang[message] || message}`);
-            }
-            handleQueryId({ status: false });
-        } catch (error) {
-            throw new Error(error);
+        const { isSuccess, message } = await apiMaterialsPlanning.apiDeleteProductionPlans(isId);
+        if (isSuccess == 1) {
+            fetchDataTable(1);
+            isShow("success", `${dataLang[message] || message}`);
+        } else {
+            isShow("error", `${dataLang[message] || message}`);
         }
+        handleQueryId({ status: false });
     };
 
     const handShowItem = (id, type) => {
@@ -438,23 +434,20 @@ const MainTable = ({ dataLang }) => {
     };
 
     const handleConfimDeleteItem = async () => {
-        try {
-            const type = {
-                dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
-                dataPurchases: `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`,
-            };
-            const { isSuccess, message } = await apiMaterialsPlanning.apiDeletePurchasesTransfer(type[isIdChild]);
-            if (isSuccess) {
-                fetchDataTable(1);
-                queryValue({ page: 1 });
-                isShow("success", dataLang[message] || message);
-            } else {
-                isShow("error", dataLang[message] || message);
-            }
-            handleQueryId({ status: false });
-        } catch (error) {
-            throw new Error(error);
+        const type = {
+            dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
+            dataPurchases: `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`,
+        };
+        const { isSuccess, message } = await apiMaterialsPlanning.apiDeletePurchasesTransfer(type[isIdChild]);
+        if (isSuccess) {
+            fetchDataTable(1);
+            queryValue({ page: 1 });
+            isShow("success", dataLang[message] || message);
+        } else {
+            isShow("error", dataLang[message] || message);
         }
+        handleQueryId({ status: false });
+
     };
 
     const fetchDataPlan = debounce(async (e) => {
@@ -495,7 +488,7 @@ const MainTable = ({ dataLang }) => {
                 <div className="flex ">
                     <div className="w-[20%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
-                            <form className="flex items-center relative  w-full">
+                            <form className="relative flex items-center w-full">
                                 <SearchNormal1
                                     size={20}
                                     className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
@@ -553,7 +546,7 @@ const MainTable = ({ dataLang }) => {
                                 <button
                                     type="button"
                                     onClick={() => queryValue({ page: isValue.page + 1 })}
-                                    className="mx-auto text-sm block py-1 bg-blue-50 w-full hover:bg-blue-200 mt-1 transition-all duration-200 ease-linear"
+                                    className="block w-full py-1 mx-auto mt-1 text-sm transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200"
                                 >
                                     {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
                                 </button>
@@ -561,7 +554,7 @@ const MainTable = ({ dataLang }) => {
                         </Customscrollbar>
                     </div>
                     <div className="w-[80%] border border-[#d8dae5] ">
-                        <div className="flex items-center justify-between py-1 px-4 border-b">
+                        <div className="flex items-center justify-between px-4 py-1 border-b">
                             <div>
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">
                                     {dataLang?.materials_planning_nvl || "materials_planning_nvl"}
@@ -580,7 +573,7 @@ const MainTable = ({ dataLang }) => {
                                     >
                                         {(e.id == 3 && (
                                             <button
-                                                className=" bg-red-100 rounded-lg  outline-none focus:outline-none"
+                                                className="bg-red-100 rounded-lg outline-none focus:outline-none"
                                                 onClick={() => {
                                                     if (+dataTable?.countAll == 0) {
                                                         return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
@@ -591,9 +584,9 @@ const MainTable = ({ dataLang }) => {
                                                     }
                                                 }}
                                             >
-                                                <div className="flex items-center gap-2 py-2 px-3 ">
+                                                <div className="flex items-center gap-2 px-3 py-2 ">
                                                     {e.icon}
-                                                    <h3 className="text-red-600 font-medium 3xl:text-base text-xs">
+                                                    <h3 className="text-xs font-medium text-red-600 3xl:text-base">
                                                         {e.name}
                                                     </h3>
                                                 </div>
@@ -626,7 +619,7 @@ const MainTable = ({ dataLang }) => {
                             </div>
                         </div>
                         <div className="mx-4">
-                            <div className="border-b my-6 ">
+                            <div className="my-6 border-b ">
                                 <div className="flex items-center gap-4 ">
                                     {listTab.map((e) => (
                                         <button
