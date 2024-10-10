@@ -93,7 +93,7 @@ const Products = (props) => {
 
     const { data: dataVariant } = useVariantList()
 
-    const { data: dataProductType } = useProductTypeProducts()
+    const { data: dataProductType } = useProductTypeProducts(dataLang)
 
     const { data: dataCategory = [] } = useCategoryOptions({});
 
