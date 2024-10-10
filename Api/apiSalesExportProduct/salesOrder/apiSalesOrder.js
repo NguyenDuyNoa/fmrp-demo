@@ -67,7 +67,7 @@ const apiSalesOrder = {
         return response.data
     },
     async apiHandingSalesOrder(id, data) {
-        const response = await axiosCustom('POST', IDBObjectStore ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true` : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true", data);
+        const response = await axiosCustom('POST', id ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true` : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true", data);
         return response.data
     },
 
