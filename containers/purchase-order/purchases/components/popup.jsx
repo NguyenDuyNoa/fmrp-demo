@@ -22,7 +22,7 @@ const PopupDetail = (props) => {
 
     const dataSeting = useSetingServer()
 
-    const { data, isFetching } = usePurChasesDetail(open, props?.data?.id);
+    const { data, isFetching } = usePurChasesDetail(open, props?.id);
 
     let listQty = data?.items;
 
@@ -54,7 +54,7 @@ const PopupDetail = (props) => {
                                 <GeneralInformation  {...props} />
                                 <div className="grid grid-cols-8  min-h-[140px] p-2">
                                     <div className="col-span-3">
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className="col-span-1 text-[13px]">
                                                 {props.dataLang?.purchase_day || "purchase_day"}
                                             </h3>
@@ -62,7 +62,7 @@ const PopupDetail = (props) => {
                                                 {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className="col-span-1 text-[13px]">
                                                 {props.dataLang?.purchase_code || "purchase_code"}
                                             </h3>
@@ -70,7 +70,7 @@ const PopupDetail = (props) => {
                                                 {data?.code}
                                             </h3>
                                         </div>
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className="col-span-1 text-[13px]">
                                                 {props.dataLang?.purchase_planNumber || "purchase_planNumber"}
                                             </h3>
@@ -84,7 +84,7 @@ const PopupDetail = (props) => {
                                         <div className="my-4 font-semibold text-[13px]">
                                             {props.dataLang?.purchase_orderStatus || "purchase_orderStatus"}
                                         </div>
-                                        <div className="flex flex-wrap  gap-2 items-center justify-start">
+                                        <div className="flex flex-wrap items-center justify-start gap-2">
                                             {(data?.order_status?.status ===
                                                 "purchase_ordered" && (
                                                     <TagColorSky className={'!py-1'} name={props.dataLang[data?.order_status?.status]} />
@@ -101,7 +101,7 @@ const PopupDetail = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className="col-span-1 text-[13px]">
                                                 {props.dataLang?.purchase_status || "purchase_status"}
                                             </h3>
@@ -114,7 +114,7 @@ const PopupDetail = (props) => {
                                                     data?.status != 0 &&
                                                     <div className={`font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 w-fit  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center`}>
                                                         <TickCircle
-                                                            className="bg-lime-500 rounded-full animate-pulse "
+                                                            className="rounded-full bg-lime-500 animate-pulse "
                                                             color="white"
                                                             size={15}
                                                         />
@@ -125,8 +125,8 @@ const PopupDetail = (props) => {
                                                 }
                                             </h3>
                                         </div>
-                                        {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        {/* <div className='grid grid-cols-2 my-4 font-medium'>Tổng số lượng</div> */}
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className="col-span-1 text-[13px]">
                                                 {props.dataLang?.purchase_propnent || "purchase_propnent"}
                                             </h3>
@@ -137,7 +137,7 @@ const PopupDetail = (props) => {
                                                 <CustomAvatar profileImage={data?.profile_image} fullName={data?.user_create_name} />
                                             </div>
                                         </div>
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className="col-span-1 text-[13px]">
                                                 {props.dataLang?.purchase_branch || "purchase_branch"}
                                             </h3>
@@ -202,7 +202,7 @@ const PopupDetail = (props) => {
                                                                         <ModalImage
                                                                             small="/no_img.png"
                                                                             large="/no_img.png"
-                                                                            className="w-full h-full rounded object-contain p-1"
+                                                                            className="object-contain w-full h-full p-1 rounded"
                                                                         >
                                                                             {" "}
                                                                         </ModalImage>
@@ -247,7 +247,7 @@ const PopupDetail = (props) => {
                                 <h2 className="font-medium p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5] text-[13px]">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
-                                <div className=" mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">
+                                <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-5 ">
                                     <div className="col-span-9">
                                         <h3 className="text-[13px] p-1 font-medium">
                                             {props.dataLang?.purchase_note || "import_from_note"}
