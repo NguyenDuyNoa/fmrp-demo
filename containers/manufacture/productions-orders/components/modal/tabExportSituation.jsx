@@ -23,21 +23,21 @@ import { v4 as uddid } from 'uuid';
 import * as XLSX from 'xlsx';
 const Column = dynamic(() => import("@ant-design/plots").then(({ Column }) => Column), { ssr: false });
 
+const initialState = {
+    onFetching: false,
+    dataChart: [],
+    dataTable: [],
+    dataDefault: [],
+}
+
 const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => {
+    const router = useRouter()
+
+    const dataSeting = useSetingServer();
+
     const [isTab, setIsTab] = useState('chart')
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
-    const initialState = {
-        onFetching: false,
-        dataChart: [],
-        dataTable: [],
-        dataDefault: [],
-    }
-
     const [isMounted, setIsMounted] = useState(false)
-
-    const router = useRouter()
 
     const [isExportSituation, setIsExportSituation] = useState(initialState)
 
@@ -45,9 +45,8 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
     // const { checkAdd, checkExport } = useActionRole(auth, "")
-
-    const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
@@ -56,42 +55,46 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
     })
 
     const fetchData = async () => {
-        const { data } = await apiProductionsOrders.apiExportSituation(isStateModal.dataDetail?.poi?.poi_id)
-        const newData = data?.boms?.map(e => {
-            return {
-                id: uddid(),
-                image: '/no_img.png',
-                name: e?.item_name,
-                itemVariation: e?.product_variation,
-                code: e?.item_code,
-                unit: e?.unit_name,
-                type: e?.type_products,
-                quantityPlan: e?.quantity_total_quota,
-                quantityExport: e?.quantity_exported,
-                quantityImport: e?.quantity_recovery,
-                quantityRemaining: e?.quantity_rest
-            }
-        })
-        const chart = data?.boms?.flatMap(e => {
-            const nameMap = {
-                'quantity_total_quota': 'Kế hoạch',
-                'quantity_exported': 'Đã xuất',
-                'quantity_recovery': 'Thu hồi',
-                'quantity_rest': 'Còn lại'
-            };
-            const columnName = e.item_code;
-            return Object.entries(e).map(([key, value]) => {
-                if (key in nameMap) {
-                    return {
-                        name: nameMap[key],
-                        column: columnName,
-                        value: Number(value),
-                    };
+        try {
+            const { data } = await apiProductionsOrders.apiExportSituation(isStateModal.dataDetail?.poi?.poi_id)
+            const newData = data?.boms?.map(e => {
+                return {
+                    id: uddid(),
+                    image: '/no_img.png',
+                    name: e?.item_name,
+                    itemVariation: e?.product_variation,
+                    code: e?.item_code,
+                    unit: e?.unit_name,
+                    type: e?.type_products,
+                    quantityPlan: e?.quantity_total_quota,
+                    quantityExport: e?.quantity_exported,
+                    quantityImport: e?.quantity_recovery,
+                    quantityRemaining: e?.quantity_rest
                 }
-                return undefined;
-            }).filter(item => item !== undefined);
-        });
-        queryStatesetExportSituation({ dataTable: newData, dataDefault: newData, dataChart: chart, })
+            })
+            const chart = data?.boms?.flatMap(e => {
+                const nameMap = {
+                    'quantity_total_quota': 'Kế hoạch',
+                    'quantity_exported': 'Đã xuất',
+                    'quantity_recovery': 'Thu hồi',
+                    'quantity_rest': 'Còn lại'
+                };
+                const columnName = e.item_code;
+                return Object.entries(e).map(([key, value]) => {
+                    if (key in nameMap) {
+                        return {
+                            name: nameMap[key],
+                            column: columnName,
+                            value: Number(value),
+                        };
+                    }
+                    return undefined;
+                }).filter(item => item !== undefined);
+            });
+            queryStatesetExportSituation({ dataTable: newData, dataDefault: newData, dataChart: chart, })
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 
     const { isLoading, refetch } = useQuery({
@@ -235,9 +238,15 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                 {
                     isTab == 'table' &&
                     <div className="flex justify-end items-center gap-1">
-                        <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={handleSearch} classInput={'border'} />
+                        <SearchComponent
+                            colSpan={1}
+                            dataLang={dataLang}
+                            placeholder={dataLang?.branch_search}
+                            onChange={handleSearch}
+                            classInput={'border'}
+                        />
                         <OnResetData onClick={() => refetch()} sOnFetching={() => { }} />
-                        <div className={``}>
+                        <div>
                             {isExportSituation.dataDefault?.length > 0 && (
                                 <ExcelFileComponent
                                     dataLang={dataLang}
@@ -288,61 +297,59 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                         {isLoading ? (
                             <Loading className="h-80" color="#0f4f9e" />
                         ) : isExportSituation.dataTable?.length > 0 ? (
-                            <>
-                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                    {isExportSituation.dataTable?.map((e, index) => (
-                                        <RowTable gridCols={11} key={e.id.toString()} >
-                                            <RowItemTable colSpan={1} textAlign={'center'}>
-                                                {index + 1}
-                                            </RowItemTable>
-                                            <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'}>
-                                                <ModalImage
-                                                    small={e.image}
-                                                    large={e.image}
-                                                    width={36}
-                                                    height={36}
-                                                    alt={e.name}
-                                                    className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
-                                                />
-                                                <div className='flex flex-col'>
-                                                    <span>{e.name}</span>
-                                                    <div className='flex items-center gap-1 text-gray-500'>
-                                                        <span>{e.code}</span>-<span>{e.itemVariation}</span>
-                                                    </div>
+                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                {isExportSituation.dataTable?.map((e, index) => (
+                                    <RowTable gridCols={11} key={e.id.toString()} >
+                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                            {index + 1}
+                                        </RowItemTable>
+                                        <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'}>
+                                            <ModalImage
+                                                small={e.image}
+                                                large={e.image}
+                                                width={36}
+                                                height={36}
+                                                alt={e.name}
+                                                className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                            />
+                                            <div className='flex flex-col'>
+                                                <span>{e.name}</span>
+                                                <div className='flex items-center gap-1 text-gray-500'>
+                                                    <span>{e.code}</span>-<span>{e.itemVariation}</span>
                                                 </div>
-                                            </RowItemTable>
-                                            <RowItemTable colSpan={2} textAlign={'center'}>
-                                                <span
-                                                    className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
+                                            </div>
+                                        </RowItemTable>
+                                        <RowItemTable colSpan={2} textAlign={'center'}>
+                                            <span
+                                                className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
                                                                      ${(e?.type === "products" && "text-lime-500 border-lime-500") ||
-                                                        (e?.type == "semi_products" && "text-orange-500 border-orange-500") ||
-                                                        (e?.type == "out_side" && "text-sky-500 border-sky-500") ||
-                                                        (e?.type == "materials" && "text-purple-500 border-purple-500") ||
-                                                        (e?.type == "semi_products_outside" && "text-green-500 border-green-500")
-                                                        }`}
-                                                >
-                                                    {dataLang[e?.type] || e?.type}
-                                                </span>
-                                            </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={'center'}>
-                                                {e.unit}
-                                            </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={e?.quantityPlan > 0 ? "right" : 'center'}>
-                                                {e.quantityPlan > 0 ? formatNumber(e.quantityPlan) : '-'}
-                                            </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={e?.quantityExport > 0 ? "right" : 'center'}>
-                                                {e.quantityExport > 0 ? formatNumber(e.quantityExport) : '-'}
-                                            </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={e?.quantityRemaining > 0 ? "right" : 'center'}>
-                                                {e.quantityRemaining > 0 ? formatNumber(e.quantityRemaining) : '-'}
-                                            </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={e?.quantityImport > 0 ? "right" : 'center'}>
-                                                {e.quantityImport > 0 ? formatNumber(e.quantityImport) : '-'}
-                                            </RowItemTable>
-                                        </RowTable>
-                                    ))}
-                                </div>
-                            </>
+                                                    (e?.type == "semi_products" && "text-orange-500 border-orange-500") ||
+                                                    (e?.type == "out_side" && "text-sky-500 border-sky-500") ||
+                                                    (e?.type == "materials" && "text-purple-500 border-purple-500") ||
+                                                    (e?.type == "semi_products_outside" && "text-green-500 border-green-500")
+                                                    }`}
+                                            >
+                                                {dataLang[e?.type] || e?.type}
+                                            </span>
+                                        </RowItemTable>
+                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                            {e.unit}
+                                        </RowItemTable>
+                                        <RowItemTable colSpan={1} textAlign={e?.quantityPlan > 0 ? "right" : 'center'}>
+                                            {e.quantityPlan > 0 ? formatNumber(e.quantityPlan) : '-'}
+                                        </RowItemTable>
+                                        <RowItemTable colSpan={1} textAlign={e?.quantityExport > 0 ? "right" : 'center'}>
+                                            {e.quantityExport > 0 ? formatNumber(e.quantityExport) : '-'}
+                                        </RowItemTable>
+                                        <RowItemTable colSpan={1} textAlign={e?.quantityRemaining > 0 ? "right" : 'center'}>
+                                            {e.quantityRemaining > 0 ? formatNumber(e.quantityRemaining) : '-'}
+                                        </RowItemTable>
+                                        <RowItemTable colSpan={1} textAlign={e?.quantityImport > 0 ? "right" : 'center'}>
+                                            {e.quantityImport > 0 ? formatNumber(e.quantityImport) : '-'}
+                                        </RowItemTable>
+                                    </RowTable>
+                                ))}
+                            </div>
                         ) : <NoData />}
 
                     </div>

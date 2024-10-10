@@ -111,5 +111,16 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/api_warehouse/LocationInWarehouse/${id}?csrf_protection=true`);
         return response.data
     },
+    // phương thức tt
+    async apiPaymentList() {
+        const response = await axiosCustom('GET', `/api_web/Api_payment_method/payment_method/?csrf_protection=true`);
+        return response.data
+    },
+    // danh sách đối tượng
+    // async apiPaymentList() {
+    //     const response = await axiosCustom('GET', `/api_web/Api_payment_method/payment_method/?csrf_protection=true`);
+    //     return response.data
+    // },
+    // /api_web/Api_expense_voucher/object/?csrf_protection=true
 }
 export default apiComons

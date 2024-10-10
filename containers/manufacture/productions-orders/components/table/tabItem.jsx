@@ -1,15 +1,12 @@
-import Image from "next/image";
-
-import Loading from "@/components/UI/loading/loading";
-
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import moment from "moment";
-import ModalImage from "react-modal-image";
+import Image from "next/image";
 import { memo } from "react";
 import { FiCornerDownRight } from "react-icons/fi";
+import ModalImage from "react-modal-image";
 
 const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowModel }) => {
     const dataSeting = useSetingServer();
@@ -48,8 +45,7 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                         width={14}
                                         height={17}
                                         alt="dow.png"
-                                        className={`object-cover ${e.showChild ? "" : "-rotate-90"
-                                            } transition-all duration-150 ease-linear`}
+                                        className={`object-cover ${e.showChild ? "" : "-rotate-90"} transition-all duration-150 ease-linear`}
                                     />
                                     <h1 className="text-[#52575E] font-semibold 3xl:text-sm text-xs py-2">{e.title}</h1>
                                 </div>
@@ -58,9 +54,8 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                         <div
                                             key={i.id}
                                             onClick={() => handleShowModel(i)}
-                                            className={`grid grid-cols-12 ${isState.dataModal.id == i.id ? "bg-gray-100" : ""
-                                                } items-center col-span-12 group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out
-                                                 ${e.arrListData?.length - 1 == index ? "" : "border-b"}`}
+                                            className={`grid grid-cols-12 ${isState.dataModal.id == i.id ? "bg-gray-100" : ""} ${e.arrListData?.length - 1 == index ? "" : "border-b"}   
+                                            items-center col-span-12 group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out`}
                                         >
                                             <h4 className="col-span-4 text-[#344054] font-normal text-xs flex items-start py-2 px-4 gap-2">
                                                 <ModalImage
@@ -72,12 +67,7 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                                     className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                 />
                                                 <div className="flex flex-col gap-0.5">
-                                                    <h1
-                                                        className={`${isState.dataModal.id == i.id
-                                                            ? "text-[#0F4F9E]"
-                                                            : "text-[#000000]"
-                                                            } group-hover:text-[#0F4F9E] font-semibold xl:text-sm text-xs`}
-                                                    >
+                                                    <h1 className={`${isState.dataModal.id == i.id ? "text-[#0F4F9E]" : "text-[#000000]"} group-hover:text-[#0F4F9E] font-semibold xl:text-sm text-xs`}     >
                                                         {i.name}
                                                     </h1>
                                                     <h1 className="text-[#9295A4] font-normal text-[11px]">
@@ -139,37 +129,28 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                                             <li
                                                                 className={`${JIndex == i.processBar.length - 1
                                                                     ? "list-none flex w-full relative text-gray-900 "
-                                                                    : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active
-                                                                        ? "after:bg-[#00C170]"
-                                                                        : "after:bg-gray-500"
-                                                                    }   after:inline-block after:absolute after:top-1 after:left-[15px]`
+                                                                    : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 
+                                                                    ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} after:inline-block after:absolute after:top-1 after:left-[15px]`
                                                                     }`}
                                                             >
                                                                 <div className="block whitespace-nowrap z-10 ">
-                                                                    <span
-                                                                        className={`w-[10px] h-[10px]  border-2  ${j.active
-                                                                            ? "bg-[#00C170] border-[#00C170]"
-                                                                            : "bg-gray-500 border-gray-500"
-                                                                            } rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}
+                                                                    <span className={`w-[10px] h-[10px]  border-2  ${j.active
+                                                                        ? "bg-[#00C170] border-[#00C170]"
+                                                                        : "bg-gray-500 border-gray-500"
+                                                                        } rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}
                                                                     ></span>
-                                                                    <p
-                                                                        className={`${j.active
-                                                                            ? "text-[#0BAA2E]"
-                                                                            : "text-gray-500"
-                                                                            } font-normal absolute  3xl:text-[11px] text-[10px]`}
+                                                                    <p className={`${j.active
+                                                                        ? "text-[#0BAA2E]"
+                                                                        : "text-gray-500"
+                                                                        } font-normal absolute  3xl:text-[11px] text-[10px]`}
                                                                     >
                                                                         {j.title}
                                                                     </p>
 
-                                                                    <p
-                                                                        className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"
-                                                                            } text-[#0BAA2E] font-normal text-[10px]`}
-                                                                    >
+                                                                    <p className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"} text-[#0BAA2E] font-normal text-[10px]`} >
                                                                         SL:
                                                                         <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
-                                                                            {j.quantity > 0
-                                                                                ? formatNumber(j.quantity)
-                                                                                : "-"}
+                                                                            {j.quantity > 0 ? formatNumber(j.quantity) : "-"}
                                                                         </span>
                                                                     </p>
                                                                 </div>

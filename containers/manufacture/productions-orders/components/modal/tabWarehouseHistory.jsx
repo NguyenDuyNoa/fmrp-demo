@@ -18,103 +18,101 @@ import { useRouter } from 'next/router';
 import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { v4 as uddid } from 'uuid';
+
+const initialState = {
+    onFetching: false,
+    dataTable: [
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+        {
+            id: uddid(),
+            warehouse: 'Kho bán thành phẩm',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            date: new Date(),
+            codeResent: 'PR-00000'
+        },
+    ]
+}
 const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
-    const initialState = {
-        onFetching: false,
-        dataTable: [
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                warehouse: 'Kho bán thành phẩm',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-        ]
-    }
-
     const router = useRouter()
 
     const [isExportHistory, setIsExportHistory] = useState(initialState)
@@ -123,6 +121,7 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
     // const { checkAdd, checkExport } = useActionRole(auth, "")
 
     const dataSeting = useSetingServer();

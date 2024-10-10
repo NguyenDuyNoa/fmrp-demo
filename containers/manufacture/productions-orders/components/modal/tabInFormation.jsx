@@ -1,16 +1,15 @@
+import Loading from "@/components/UI/loading/loading";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import Image from "next/image";
 import { memo, useEffect, useState } from "react";
 import { AiOutlineFileText } from "react-icons/ai";
 import { FaArrowAltCircleRight, FaCheck, FaCheckCircle } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa6";
+import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
 import PopupImportProducts from "../popup/PopupImportProducts";
-import Loading from "@/components/UI/loading/loading";
-import { FiCornerDownRight } from "react-icons/fi";
 
 
 const initialState = {

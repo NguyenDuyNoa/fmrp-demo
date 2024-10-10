@@ -1,6 +1,8 @@
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import Loading from "@/components/UI/loading/loading";
+import NoData from "@/components/UI/noData/nodata";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { CONFIRM_DELETION, TITLE_DELETE_PRODUCTIONS_ORDER } from "@/constants/delete/deleteTable";
@@ -10,7 +12,6 @@ import { useInternalPlansSearchCombobox } from "@/hooks/common/useInternalPlans"
 import { useItemsVariantSearchCombobox } from "@/hooks/common/useItems";
 import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
-import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -25,7 +26,6 @@ import FilterHeader from "../header/filterHeader";
 import ModalDetail from "../modal/modalDetail";
 import TabItem from "./tabItem";
 import TabSemi from "./tabSemi";
-import Loading from "@/components/UI/loading/loading";
 
 const initialState = {
     isTab: "products",
@@ -68,8 +68,6 @@ const MainTable = ({ dataLang }) => {
         },
     ];
 
-    const isShow = useToast();
-
     const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
     const [isState, sIsState] = useState(initialState);
@@ -95,7 +93,6 @@ const MainTable = ({ dataLang }) => {
     const { data: listProducts = [] } = useItemsVariantSearchCombobox(isState.searchItemsVariant);
 
     const { data: comboboxProductionOrders = [] } = useProductionOrdersCombobox(isState.searchProductionOrders)
-
 
     useEffect(() => {
         setIsMouted(true);
@@ -222,7 +219,9 @@ const MainTable = ({ dataLang }) => {
                     },
                 });
             }
-        } catch (error) { }
+        } catch (error) {
+            throw new Error(error);
+        }
     };
 
     useEffect(() => {
@@ -303,14 +302,18 @@ const MainTable = ({ dataLang }) => {
                     }),
                 },
             });
-        } catch (error) { }
+        } catch (error) {
+            throw new Error(error);
+        }
     };
 
 
     const fetchComboboxProductionOrders = debounce(async (value) => {
         try {
             queryState({ searchProductionOrders: value });
-        } catch (error) { }
+        } catch (error) {
+
+        }
     }, 500);
 
     const fetchDataItems = debounce(async (value) => {
@@ -474,50 +477,51 @@ const MainTable = ({ dataLang }) => {
                                 ?
                                 <Loading />
                                 :
-                                isState.listDataLeft.map((e, eIndex) => (
-                                    <div
-                                        key={e.id}
-                                        onClick={() => handleShow(e.id)}
-                                        className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
-                                    >
-                                        <div className="flex justify-between">
-                                            <div className="flex flex-col gap-1">
-                                                <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
-                                                    {e.title}
-                                                </h1>
-                                                <h3 className="text-[#667085] font-normal text-[11px]">
-                                                    {dataLang?.materials_planning_create_on ||
-                                                        "materials_planning_create_on"}{" "}
-                                                    <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
-                                                        {e.time}
-                                                    </span>
-                                                </h3>
-                                            </div>
-                                            <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
-                                        </div>
-                                        {e.showParent && (
-                                            <div className="flex flex-col gap-2 mt-1 w-full">
-                                                <div className="flex items-center gap-1">
-                                                    <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
-                                                        {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
+                                isState.listDataLeft?.length > 0 ?
+                                    isState.listDataLeft.map((e, eIndex) => (
+                                        <div
+                                            key={e.id}
+                                            onClick={() => handleShow(e.id)}
+                                            className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                        >
+                                            <div className="flex justify-between">
+                                                <div className="flex flex-col gap-1">
+                                                    <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
+                                                        {e.title}
+                                                    </h1>
+                                                    <h3 className="text-[#667085] font-normal text-[11px]">
+                                                        {dataLang?.materials_planning_create_on ||
+                                                            "materials_planning_create_on"}{" "}
+                                                        <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
+                                                            {e.time}
+                                                        </span>
                                                     </h3>
-                                                    <div className="flex items-center gap-1">
-                                                        {e.followUp.map((i, index) => (
-                                                            <div key={index}>
-                                                                <h2 className="text-[#191D23] font-medium 3xl:text-sm text-xs">
-                                                                    {i.nameFollow}
-                                                                </h2>
-                                                            </div>
-                                                        ))}
-                                                    </div>
                                                 </div>
-                                                {isState.listDataRight?.title && (
-                                                    <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded font-medium w-fit">
-                                                        <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
-                                                        {dataLang?.productions_orders_produced || "productions_orders_produced"}
-                                                    </span>
-                                                )}
-                                                {/* <div className="w-full flex items-center">
+                                                <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
+                                            </div>
+                                            {e.showParent && (
+                                                <div className="flex flex-col gap-2 mt-1 w-full">
+                                                    <div className="flex items-center gap-1">
+                                                        <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
+                                                            {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
+                                                        </h3>
+                                                        <div className="flex items-center gap-1">
+                                                            {e.followUp.map((i, index) => (
+                                                                <div key={index}>
+                                                                    <h2 className="text-[#191D23] font-medium 3xl:text-sm text-xs">
+                                                                        {i.nameFollow}
+                                                                    </h2>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    {isState.listDataRight?.title && (
+                                                        <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded font-medium w-fit">
+                                                            <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
+                                                            {dataLang?.productions_orders_produced || "productions_orders_produced"}
+                                                        </span>
+                                                    )}
+                                                    {/* <div className="w-full flex items-center">
                                                 {e.processBar.map((j, JIndex) => {
                                                     return (
                                                         <div key={j.id} className="flex flex-col w-full items-start">
@@ -548,10 +552,13 @@ const MainTable = ({ dataLang }) => {
                                                     )
                                                 })}
                                             </div> */}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                    : <NoData />
+                            }
+
                             {isState.next && (
                                 <button
                                     type="button"
@@ -568,19 +575,21 @@ const MainTable = ({ dataLang }) => {
                             ?
                             <Loading />
                             :
-                            <>
-                                <div className="flex items-center justify-between py-1 px-4 border-b">
-                                    <div className="">
-                                        <h1 className="text-[#52575E] font-normal text-xs uppercase">
-                                            {dataLang?.productions_orders || "productions_orders"}
-                                        </h1>
-                                        <div className="flex items-center gap-2">
-                                            <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                                {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
+                            (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0)
+                                ?
+                                <>
+                                    <div className="flex items-center justify-between py-1 px-4 border-b">
+                                        <div className="">
+                                            <h1 className="text-[#52575E] font-normal text-xs uppercase">
+                                                {dataLang?.productions_orders || "productions_orders"}
                                             </h1>
+                                            <div className="flex items-center gap-2">
+                                                <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
+                                                    {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
+                                                </h1>
+                                            </div>
                                         </div>
-                                    </div>
-                                    {/* <button
+                                        {/* <button
                                 className=" bg-red-100 rounded-lg  outline-none focus:outline-none"
                                 onClick={() => {
                                     if (+isState?.countAll == 0) {
@@ -607,29 +616,31 @@ const MainTable = ({ dataLang }) => {
                                     </h3>
                                 </div>
                             </button> */}
-                                </div>
-                                <div className="mx-4">
-                                    <div className="border-b my-6 ">
-                                        <div className="flex items-center gap-4 ">
-                                            {listTab.map((e) => (
-                                                <button
-                                                    key={e.id}
-                                                    onClick={() => handleActiveTab(e.type)}
-                                                    className={`hover:bg-[#F7FBFF] ${isState.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
-                                                >
-                                                    <h3 className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
-                                                        {e.name}
-                                                    </h3>
-                                                </button>
-                                            ))}
+                                    </div>
+                                    <div className="mx-4">
+                                        <div className="border-b my-6 ">
+                                            <div className="flex items-center gap-4 ">
+                                                {listTab.map((e) => (
+                                                    <button
+                                                        key={e.id}
+                                                        onClick={() => handleActiveTab(e.type)}
+                                                        className={`hover:bg-[#F7FBFF] ${isState.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
+                                                    >
+                                                        <h3 className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
+                                                            {e.name}
+                                                        </h3>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {isState.isTab == "products" && <TabItem {...shareProps} />}
+                                            {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />}
                                         </div>
                                     </div>
-                                    <div>
-                                        {isState.isTab == "products" && <TabItem {...shareProps} />}
-                                        {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />}
-                                    </div>
-                                </div>
-                            </>
+                                </>
+                                :
+                                <NoData />
                         }
                     </div>
                 </div>

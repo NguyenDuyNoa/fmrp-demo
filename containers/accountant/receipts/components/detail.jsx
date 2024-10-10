@@ -12,7 +12,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import React, { useEffect, useState } from "react";
-const Popup_chitiet = (props) => {
+const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
@@ -233,4 +233,4 @@ const Popup_chitiet = (props) => {
     );
 };
 
-export default Popup_chitiet;
+export default PopupDetail;

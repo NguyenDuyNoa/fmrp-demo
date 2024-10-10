@@ -18,36 +18,38 @@ import { memo, useEffect, useState } from 'react';
 import ModalImage from 'react-modal-image';
 import { useSelector } from 'react-redux';
 import { v4 as uddid } from 'uuid';
+
+
+const initialState = {
+    onFetching: false,
+    dataTable: [
+        {
+            id: uddid(),
+            image: '/no_img.png',
+            name: 'ÁO SƠ MI - S - TRẮNG',
+            itemVariation: 'Biến thể 1',
+            code: 'SMM',
+            unit: 'Cái',
+            type: 'materials',
+            quantityExport: 500,
+            quantityRecall: 500,
+            exportCosts: 1000000,
+            recoveryCosts: 1000000,
+            moneyTone: 2000000,
+            //sl gia công
+            machiningQuantity: 1000,
+            // chi phí gia công
+            processingCost: 10000
+        },
+    ]
+}
+
 const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
-    const [isTab, setIsTab] = useState(1)
-
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
-    const initialState = {
-        onFetching: false,
-        dataTable: [
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityExport: 500,
-                quantityRecall: 500,
-                exportCosts: 1000000,
-                recoveryCosts: 1000000,
-                moneyTone: 2000000,
-                //sl gia công
-                machiningQuantity: 1000,
-                // chi phí gia công
-                processingCost: 10000
-            },
-        ]
-    }
-
     const router = useRouter()
+
+    const dataSeting = useSetingServer();
+
+    const [isTab, setIsTab] = useState(1)
 
     const [isExportSituation, setIsExportSituation] = useState(initialState)
 
@@ -55,9 +57,8 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
     // const { checkAdd, checkExport } = useActionRole(auth, "")
-
-    const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 

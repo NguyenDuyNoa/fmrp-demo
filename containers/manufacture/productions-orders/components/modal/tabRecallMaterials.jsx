@@ -19,33 +19,34 @@ import { useRouter } from 'next/router';
 import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { v4 as uddid } from 'uuid';
-const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => {
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
-    const initialState = {
-        onFetching: false,
-        dataTable: [
-            {
-                id: uddid(),
-                date: new Date(),
-                codeReceipts: 'NKNB-090524687',
-                codeImport: 'NK-080502',
-                warehouse: 'Kho bán thành phẩm',
-                code: 'NVL-ABC',
-                name: 'Xeo Gk Khánh Việt ĐL100',
-                unit: 'Cuộn',
-                locationWarehouse: 'LSXCT-12122306',
-                quantity: 1000,
-                user: {
-                    name: 'Nguyễn Văn Tôn',
-                    image: '/user-placeholder.jpg'
-                },
-                note: 'Note',
+const initialState = {
+    onFetching: false,
+    dataTable: [
+        {
+            id: uddid(),
+            date: new Date(),
+            codeReceipts: 'NKNB-090524687',
+            codeImport: 'NK-080502',
+            warehouse: 'Kho bán thành phẩm',
+            code: 'NVL-ABC',
+            name: 'Xeo Gk Khánh Việt ĐL100',
+            unit: 'Cuộn',
+            locationWarehouse: 'LSXCT-12122306',
+            quantity: 1000,
+            user: {
+                name: 'Nguyễn Văn Tôn',
+                image: '/user-placeholder.jpg'
             },
-        ]
-    }
+            note: 'Note',
+        },
+    ]
+}
 
+const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => {
     const router = useRouter()
+
+    const dataSeting = useSetingServer();
 
     const [isExportHistory, setIsExportHistory] = useState(initialState)
 
@@ -55,7 +56,7 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
 
     // const { checkAdd, checkExport } = useActionRole(auth, "")
 
-    const dataSeting = useSetingServer();
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
@@ -134,53 +135,51 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                     {isExportHistory.onFetching ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : isExportHistory.dataTable?.length > 0 ? (
-                        <>
-                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                {isExportHistory.dataTable?.map((e, index) => (
-                                    <RowTable gridCols={12} key={e.id.toString()} >
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                            {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                            {e.codeReceipts}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                            {e.codeImport}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={2}>
-                                            <div className='flex flex-col'>
-                                                <span>{e.name}</span>
-                                                <div className='flex items-center gap-1 text-gray-500 text-xs'>
-                                                    Mã: <span>{e.code}</span>
-                                                </div>
+                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                            {isExportHistory.dataTable?.map((e, index) => (
+                                <RowTable gridCols={12} key={e.id.toString()} >
+                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                        {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                        {e.codeReceipts}
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                        {e.codeImport}
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={2}>
+                                        <div className='flex flex-col'>
+                                            <span>{e.name}</span>
+                                            <div className='flex items-center gap-1 text-gray-500 text-xs'>
+                                                Mã: <span>{e.code}</span>
                                             </div>
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                            {e.unit}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'right'}>
-                                            {e.quantity > 0 ? formatNumber(e.quantity) : '-'}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={2} textAlign={'center'}>
-                                            {e.warehouse}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                            {e.locationWarehouse}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                            <CustomAvatar
-                                                data={e}
-                                                profileImage={e?.user?.image}
-                                                fullName={e?.user?.name}
-                                            />
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                            {e.note}
-                                        </RowItemTable>
-                                    </RowTable>
-                                ))}
-                            </div>
-                        </>
+                                        </div>
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                        {e.unit}
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                        {e.quantity > 0 ? formatNumber(e.quantity) : '-'}
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={2} textAlign={'center'}>
+                                        {e.warehouse}
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                        {e.locationWarehouse}
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                        <CustomAvatar
+                                            data={e}
+                                            profileImage={e?.user?.image}
+                                            fullName={e?.user?.name}
+                                        />
+                                    </RowItemTable>
+                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                        {e.note}
+                                    </RowItemTable>
+                                </RowTable>
+                            ))}
+                        </div>
                     ) : <NoData />}
 
                 </div>
