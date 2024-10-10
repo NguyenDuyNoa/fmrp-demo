@@ -18,7 +18,7 @@ const apiMaterialsPlanning = {
         return response.data
     },
     async apiDeleteProductionPlans(id) {
-        const response = await axiosCustom('DELETE', `/api_web/api_manufactures/deleteProductionPlans/${id}?csrf_protection=true`, param);
+        const response = await axiosCustom('DELETE', `/api_web/api_manufactures/deleteProductionPlans/${id}?csrf_protection=true`);
         return response.data
 
     },

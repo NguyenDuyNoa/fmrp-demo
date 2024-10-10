@@ -4,13 +4,16 @@ import { optionsQuery } from "@/configs/optionsQuery";
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 // danh sách thành phẩm type thành phẩm
-export const useProductTypeProducts = () => {
+export const useProductTypeProducts = (dataLang) => {
     const dispatch = useDispatch();
     return useQuery({
         queryKey: ["api_products_type_products"],
         queryFn: async () => {
 
             const data = await apiProducts.apiProductTypeProducts();
+
+            console.log("datadatadatadata", data);
+
 
             dispatch({
                 type: "type_finishedProduct/update",
