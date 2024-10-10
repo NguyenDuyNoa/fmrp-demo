@@ -139,6 +139,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
         });
 
         const data = await apiMaterialsPlanning.apiHandlingPurchaseProductionPlan(formData);
+
         if (data?.isSuccess) {
             isShow("success", data?.message);
             queryValue({ page: 1 });
@@ -155,7 +156,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                 title={dataLang?.materials_planning_add_purchase || "materials_planning_add_purchase"}
                 button={
                     <button
-                        className=" bg-blue-100 rounded-lg  outline-none focus:outline-none"
+                        className="bg-blue-100 rounded-lg outline-none focus:outline-none"
                         onClick={() => {
                             if (+dataTable?.countAll == 0) {
                                 return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
@@ -163,9 +164,9 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                             _ToggleModal(true);
                         }}
                     >
-                        <div className="flex items-center gap-2 py-2 px-3 ">
+                        <div className="flex items-center gap-2 px-3 py-2 ">
                             {icon}
-                            <h3 className="text-blue-600 font-medium 3xl:text-base text-xs">{title}</h3>
+                            <h3 className="text-xs font-medium text-blue-600 3xl:text-base">{title}</h3>
                         </div>
                     </button>
                 }
@@ -176,10 +177,10 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                 <div className="mt-4">
                     <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
                     <div className="grid grid-cols-12 gap-4">
-                        <div className="col-span-4 flex flex-col">
+                        <div className="flex flex-col col-span-4">
                             <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
                                 {dataLang?.materials_planning_date_purchase || "materials_planning_date_purchase"}{" "}
-                                <span className=" text-red-500">*</span>
+                                <span className="text-red-500 ">*</span>
                             </div>
                             <Controller
                                 name="date"
@@ -193,7 +194,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                 render={({ field, fieldState }) => {
                                     return (
                                         <>
-                                            <div className="custom-date-picker flex flex-row  relative">
+                                            <div className="relative flex flex-row custom-date-picker">
                                                 <DatePicker
                                                     {...field}
                                                     ref={(ref) => {
@@ -235,7 +236,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                 control={form.control}
                                 render={({ field }) => {
                                     return (
-                                        <div className="mt-6 flex items-centerem gap-8">
+                                        <div className="flex gap-8 mt-6 items-centerem">
                                             {isState.type.map((e) => {
                                                 return (
                                                     <div className="flex items-center cursor-pointer">
@@ -245,7 +246,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                             {...field}
                                                             checked={field.value === e.value}
                                                             onChange={() => field.onChange(e.value)}
-                                                            className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
+                                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 focus:ring-2"
                                                         />
                                                         <label
                                                             htmlFor={e.value}
@@ -263,7 +264,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                         </div>
                         <div className="col-span-4">
                             <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
-                                {dataLang?.purchase_name || "purchase_name"} <span className=" text-red-500">*</span>
+                                {dataLang?.purchase_name || "purchase_name"} <span className="text-red-500 ">*</span>
                             </div>
                             <Controller
                                 name="purchaseName"
@@ -366,7 +367,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                                     <ModalImage
                                                                         small="/no_img.png"
                                                                         large="/no_img.png"
-                                                                        className="w-full h-full rounded object-contain p-1"
+                                                                        className="object-contain w-full h-full p-1 rounded"
                                                                     ></ModalImage>
                                                                 </div>
                                                             )}
@@ -421,7 +422,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                         }}
                                                         render={({ field, fieldState }) => {
                                                             return (
-                                                                <duv className="flex flex-col justify-center items-center">
+                                                                <duv className="flex flex-col items-center justify-center">
                                                                     <InPutNumericFormat
                                                                         className={`${fieldState.error && "border-red-500"
                                                                             } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
@@ -455,7 +456,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                         }}
                                                     />
                                                 </h6>
-                                                <div className="col-span-1 flex items-center justify-center">
+                                                <div className="flex items-center justify-center col-span-1">
                                                     <button
                                                         onClick={(event) => removeItem(e.id)}
                                                         type="button"
@@ -473,7 +474,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                         ) : (
                             <NoData />
                         )}
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={_ToggleModal.bind(this, false)}

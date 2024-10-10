@@ -93,9 +93,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                     formData.append(`items[${index}][location][${locaitonIndex}][location_serial]`, i?.serial);
                 });
             });
-            const { data } = await apiMaterialsPlanning.apiHandlingKeepProductionsPlan(formData);
-            console.log("data", data);
-
+            const data = await apiMaterialsPlanning.apiHandlingKeepProductionsPlan(formData);
             if (data?.isSuccess == 1) {
                 isShow("success", data?.message);
                 queryValue({ page: 1 });
