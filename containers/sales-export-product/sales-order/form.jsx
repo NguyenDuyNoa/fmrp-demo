@@ -1114,7 +1114,7 @@ const SalesOrderForm = (props) => {
         return (
             <components.MenuList {...props}>
                 {allItems?.length > 0 && (
-                    <div className="grid grid-cols-2 items-center  cursor-pointer">
+                    <div className="grid items-center grid-cols-2 cursor-pointer">
                         <div
                             className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] "
                             onClick={_HandleSelectAll.bind(this)}
@@ -1161,13 +1161,13 @@ const SalesOrderForm = (props) => {
                             {option.e?.name}
                         </h3>
 
-                        <div className="flex 3xl:gap-2 2xl:gap-1 xl:gap-1 gap-1">
+                        <div className="flex gap-1 3xl:gap-2 2xl:gap-1 xl:gap-1">
                             <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
                                 {option.e?.product_variation}
                             </h5>
                         </div>
 
-                        <div className="flex 3xl:gap-4 2xl:gap-3 xl:gap-3 gap-1">
+                        <div className="flex gap-1 3xl:gap-4 2xl:gap-3 xl:gap-3">
                             <h5 className="text-gray-400 3xl:min-w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
                                 {dataLang[option.e?.text_type]}
                             </h5>
@@ -1191,7 +1191,7 @@ const SalesOrderForm = (props) => {
     // render option formatGroupLabel tax
     const taxRateLabel = (option) => {
         return (
-            <div className="flex justify-start items-center">
+            <div className="flex items-center justify-start">
                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">{option?.label}</h2>
                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">{`(${option?.tax_rate})`}</h2>
             </div>
@@ -1221,23 +1221,23 @@ const SalesOrderForm = (props) => {
                     </div>
                 )}
                 <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
-                    <div className="flex justify-between items-center ">
+                    <div className="flex items-center justify-between ">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {" "}
                             {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
                         </h2>
-                        <div className="flex justify-end items-center mr-2">
+                        <div className="flex items-center justify-end mr-2">
                             <ButtonBack onClick={() => router.push(routerSalesOrder.home)} dataLang={dataLang} />
                         </div>
                     </div>
 
                     {/* Thông tin chung */}
-                    <div className=" w-full rounded">
+                    <div className="w-full rounded ">
                         <div>
                             <h2 className="3xl:text-[17px] 2xl:text-[16px] xl:text-[15px] text-[14px] font-normal bg-[#ECF0F4] p-1">
                                 {dataLang?.detail_general_information || "detail_general_information"}
                             </h2>
-                            <div className="grid grid-cols-12 gap-1 items-center">
+                            <div className="grid items-center grid-cols-12 gap-1">
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px]">
                                         {dataLang?.sales_product_code || "sales_product_code"}
@@ -1365,7 +1365,7 @@ const SalesOrderForm = (props) => {
                                         {dataLang?.sales_product_date || "sales_product_date"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="custom-date-picker flex flex-row">
+                                    <div className="flex flex-row custom-date-picker">
                                         <DatePicker
                                             blur
                                             fixedHeight
@@ -1449,7 +1449,7 @@ const SalesOrderForm = (props) => {
                                                 value="0"
                                                 checked={typeOrder === "0" ? true : false}
                                                 name="default-radio"
-                                                className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                             />
                                             <label
                                                 for="default-radio-1"
@@ -1541,12 +1541,13 @@ const SalesOrderForm = (props) => {
                                 onChange={(value) => handleOnChangeInput("itemAll", value)}
                                 value={itemsAll?.value ? itemsAll?.value : option?.map((e) => e?.item)}
                                 isMulti
+                                maxShowMuti={0}
                                 components={{ MenuList, MultiValue }}
                                 formatOptionLabel={(option) => {
                                     if (option.value === "0") {
-                                        return <div className="text-gray-400 font-medium">{option.label}</div>;
+                                        return <div className="font-medium text-gray-400">{option.label}</div>;
                                     } else if (option.value === null) {
-                                        return <div className="text-gray-400 font-medium">{option.label}</div>;
+                                        return <div className="font-medium text-gray-400">{option.label}</div>;
                                     } else {
                                         return (
                                             <>
@@ -1599,11 +1600,11 @@ const SalesOrderForm = (props) => {
                                                             <div className="text-right opacity-0">{"0"}</div>
                                                             <div className="flex gap-2">
                                                                 <div className="flex items-center gap-2">
-                                                                    <h5 className="text-gray-400 font-normal">
+                                                                    <h5 className="font-normal text-gray-400">
                                                                         {dataLang?.purchase_survive || "purchase_survive"}
                                                                         :
                                                                     </h5>
-                                                                    <h5 className=" font-medium">
+                                                                    <h5 className="font-medium ">
                                                                         {formatNumber(option.e?.qty_warehouse || 0)}
                                                                     </h5>
                                                                 </div>
@@ -1722,18 +1723,18 @@ const SalesOrderForm = (props) => {
                                         />
                                     </div>
 
-                                    <div className="grid col-span-10 grid-cols-10 gap-1  items-center mb-1">
-                                        <div className="col-span-1 text-center flex items-center justify-center">
+                                    <div className="grid items-center grid-cols-10 col-span-10 gap-1 mb-1">
+                                        <div className="flex items-center justify-center col-span-1 text-center">
                                             <h3
                                                 className={`cursor-default 3xl:text-[16px] 2xl:text-[14px] xl:text-[13px] text-[12px]`}
                                             />
                                         </div>
-                                        <div className="col-span-1 flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1">
                                             <button
                                                 disabled={true}
                                                 className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                             >
-                                                <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75 " />
+                                                <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90 " />
                                             </button>
                                             <InPutNumericFormat
                                                 className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
@@ -1745,10 +1746,10 @@ const SalesOrderForm = (props) => {
                                                 disabled={true}
                                                 className=" 2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                             >
-                                                <Add size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
+                                                <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
                                             </button>
                                         </div>
-                                        <div className="col-span-1 text-center flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1 text-center">
                                             <InPutNumericFormat
                                                 value={1}
                                                 allowNegative={false}
@@ -1759,7 +1760,7 @@ const SalesOrderForm = (props) => {
                                                 thousandSeparator=","
                                             />
                                         </div>
-                                        <div className="col-span-1 text-center flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1 text-center">
                                             <InPutNumericFormat
                                                 value={0}
                                                 className={`cursor-default appearance-none text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
@@ -1769,14 +1770,14 @@ const SalesOrderForm = (props) => {
                                                 isNumericString={true}
                                             />
                                         </div>
-                                        <div className="col-span-1 text-right flex items-center justify-end">
+                                        <div className="flex items-center justify-end col-span-1 text-right">
                                             <h3
                                                 className={`cursor-default px-2 py-2.5 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
                                             >
                                                 1
                                             </h3>
                                         </div>
-                                        <div className="col-span-1 flex justify-center items-center">
+                                        <div className="flex items-center justify-center col-span-1">
                                             <SelectComponent
                                                 options={taxOptions}
                                                 value={null}
@@ -1806,7 +1807,7 @@ const SalesOrderForm = (props) => {
                                                 }}
                                             />
                                         </div>
-                                        <div className="col-span-1 text-right flex items-center justify-end">
+                                        <div className="flex items-center justify-end col-span-1 text-right">
                                             <h3
                                                 className={`cursor-default px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
                                             >
@@ -1814,7 +1815,7 @@ const SalesOrderForm = (props) => {
                                             </h3>
                                         </div>
                                         <div className="col-span-1 ">
-                                            <div className="custom-date-picker flex flex-row relative">
+                                            <div className="relative flex flex-row custom-date-picker">
                                                 <DatePicker
                                                     selected={null}
                                                     blur
@@ -1826,7 +1827,7 @@ const SalesOrderForm = (props) => {
                                                 <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%]  text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-default" />
                                             </div>
                                         </div>
-                                        <div className="col-span-1 flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1">
                                             <input
                                                 value={null}
                                                 name="optionEmail"
@@ -1836,7 +1837,7 @@ const SalesOrderForm = (props) => {
                                                 className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
                                             />
                                         </div>
-                                        <div className="col-span-1 flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1">
                                             <button
                                                 onClick={() => _HandleDelete("default", "default")}
                                                 type="button"
@@ -1851,7 +1852,7 @@ const SalesOrderForm = (props) => {
 
                                 {/* phân chia  */}
                                 {sortedArr.map((e, index) => (
-                                    <div className="grid grid-cols-12 gap-1 py-1 items-center" key={e?.id}>
+                                    <div className="grid items-center grid-cols-12 gap-1 py-1" key={e?.id}>
                                         <div className="col-span-2 ">
                                             <SelectComponent
                                                 onInputChange={(event) => {
@@ -1893,20 +1894,20 @@ const SalesOrderForm = (props) => {
                                             />
                                         </div>
 
-                                        <div className="col-span-1 text-center flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1 text-center">
                                             <h3
                                                 className={`'cursor-text 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
                                             >
                                                 {e?.unit}
                                             </h3>
                                         </div>
-                                        <div className="col-span-1 flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1">
                                             <div className="flex items-center justify-center">
                                                 <button
                                                     onClick={() => handleDecrease(e?.id)}
                                                     className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                                 >
-                                                    <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
+                                                    <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
                                                 </button>
                                                 <InPutNumericFormat
                                                     value={e?.quantity}
@@ -1928,11 +1929,11 @@ const SalesOrderForm = (props) => {
                                                     onClick={() => handleIncrease(e.id)}
                                                     className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                                 >
-                                                    <Add size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
+                                                    <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="col-span-1 text-center flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1 text-center">
                                             <InPutMoneyFormat
                                                 value={e?.price}
                                                 onValueChange={(value) =>
@@ -1944,7 +1945,7 @@ const SalesOrderForm = (props) => {
                                                     } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
                                         </div>
-                                        <div className="col-span-1 text-center flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1 text-center">
                                             <InPutNumericFormat
                                                 value={e?.discount}
                                                 onValueChange={(value) =>
@@ -1955,14 +1956,14 @@ const SalesOrderForm = (props) => {
                                                 isNumericString={true}
                                             />
                                         </div>
-                                        <div className="col-span-1 text-right flex items-center justify-end">
+                                        <div className="flex items-center justify-end col-span-1 text-right">
                                             <h3
                                                 className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
                                             >
                                                 {formatNumber(e?.price_after_discount)}
                                             </h3>
                                         </div>
-                                        <div className="col-span-1 flex justify-center items-center p-0">
+                                        <div className="flex items-center justify-center col-span-1 p-0">
                                             <SelectComponent
                                                 options={taxOptions}
                                                 onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
@@ -2003,7 +2004,7 @@ const SalesOrderForm = (props) => {
                                                 }}
                                             />
                                         </div>
-                                        <div className="col-span-1 text-right flex items-center justify-end">
+                                        <div className="flex items-center justify-end col-span-1 text-right">
                                             <h3
                                                 className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                             >
@@ -2011,7 +2012,7 @@ const SalesOrderForm = (props) => {
                                             </h3>
                                         </div>
                                         <div className="col-span-1 ">
-                                            <div className="custom-date-picker flex flex-row relative">
+                                            <div className="relative flex flex-row custom-date-picker">
                                                 <DatePicker
                                                     selected={e?.delivery_date ? e?.delivery_date : null}
                                                     blur
@@ -2046,7 +2047,7 @@ const SalesOrderForm = (props) => {
                                                 </label>
                                             )}
                                         </div>
-                                        <div className="col-span-1 flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1">
                                             <input
                                                 value={e?.note}
                                                 onChange={(value) => handleOnChangeInputOption(e?.id, "note", value)}
@@ -2056,7 +2057,7 @@ const SalesOrderForm = (props) => {
                                                 className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
                                             />
                                         </div>
-                                        <div className="col-span-1 flex items-center justify-center">
+                                        <div className="flex items-center justify-center col-span-1">
                                             <button
                                                 onClick={_HandleDelete.bind(this, e?.id)}
                                                 type="button"
@@ -2073,11 +2074,11 @@ const SalesOrderForm = (props) => {
                     </div>
 
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
-                        <div className="col-span-3  flex items-center gap-2">
+                        <div className="flex items-center col-span-3 gap-2">
                             <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]">
                                 {dataLang?.sales_product_discount || "sales_product_discount"}
                             </h2>
-                            <div className="col-span-1 text-center flex items-center justify-center">
+                            <div className="flex items-center justify-center col-span-1 text-center">
                                 <InPutNumericFormat
                                     value={totalDiscount}
                                     onValueChange={handleOnChangeInput.bind(this, "totaldiscount")}
@@ -2086,7 +2087,7 @@ const SalesOrderForm = (props) => {
                                 />
                             </div>
                         </div>
-                        <div className="col-span-3 flex items-center gap-2">
+                        <div className="flex items-center col-span-3 gap-2">
                             <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]">
                                 {dataLang?.sales_product_tax || "sales_product_tax"}
                             </h2>
@@ -2096,7 +2097,7 @@ const SalesOrderForm = (props) => {
                                 onChange={(value) => handleOnChangeInput("total_tax", value)}
                                 value={totalTax ? "" : ""}
                                 formatOptionLabel={(option) => (
-                                    <div className="flex justify-start items-center gap-1 ">
+                                    <div className="flex items-center justify-start gap-1 ">
                                         <h2>{option?.label}</h2>
                                         <h2>{`(${option?.tax_rate})`}</h2>
                                     </div>
@@ -2131,11 +2132,11 @@ const SalesOrderForm = (props) => {
                                 }}
                             />
                         </div>
-                        <div className="col-span-3 flex items-center gap-1">
+                        <div className="flex items-center col-span-3 gap-1">
                             <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] whitespace-nowrap">
                                 {dataLang?.sales_product_item_date || "sales_product_item_date"}
                             </h2>
-                            <div className="custom-date-picker flex flex-row relative">
+                            <div className="relative flex flex-row custom-date-picker">
                                 <DatePicker
                                     selected={null}
                                     onChange={(date) => handleOnChangeInput("total_delivery_date", date)}

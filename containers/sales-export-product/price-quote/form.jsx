@@ -118,7 +118,7 @@ const PriceQuoteForm = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     }
 
-    const { data: dataTasxes } = useTaxList();
+    const { data: dataTasxes = [] } = useTaxList();
 
     const { data: dataBranch = [] } = useBranchList({});
 
@@ -687,11 +687,11 @@ const PriceQuoteForm = (props) => {
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {id ? dataLang?.price_quote_edit_order || "price_quote_edit_order" : dataLang?.price_quote_add_order || "price_quote_add_order"}
                         </h2>
-                        <div className="flex justify-end items-center mr-2">
+                        <div className="flex items-center justify-end mr-2">
                             <ButtonBack
                                 onClick={() => router.push(routerPriceQuote.home)}
                                 dataLang={dataLang}
@@ -699,12 +699,12 @@ const PriceQuoteForm = (props) => {
                         </div>
                     </div>
 
-                    <div className=" w-full rounded">
+                    <div className="w-full rounded ">
                         <div>
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
                                 {dataLang?.detail_general_information || "detail_general_information"}
                             </h2>
-                            <div className="grid grid-cols-12 gap-3 items-center mt-2">
+                            <div className="grid items-center grid-cols-12 gap-3 mt-2">
                                 <div className="col-span-4">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.price_quote_code || "price_quote_code"}
@@ -835,12 +835,12 @@ const PriceQuoteForm = (props) => {
                                     />
                                 </div>
 
-                                <div className="col-span-4 relative">
+                                <div className="relative col-span-4">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.price_quote_date || "price_quote_date"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="custom-date-picker flex flex-row">
+                                    <div className="flex flex-row custom-date-picker">
                                         <DatePicker
                                             blur
                                             fixedHeight
@@ -870,12 +870,12 @@ const PriceQuoteForm = (props) => {
                                     )}
                                 </div>
 
-                                <div className="col-span-4 relative">
+                                <div className="relative col-span-4">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.price_quote_effective_date || "price_quote_effective_date"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="custom-date-picker flex flex-row">
+                                    <div className="flex flex-row custom-date-picker">
                                         <DatePicker
                                             selected={effectiveDate}
                                             blur
@@ -950,7 +950,7 @@ const PriceQuoteForm = (props) => {
                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                     {sortedArr.map((e, index) => (
                                         <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
-                                            <div className="col-span-3 z-10 my-auto ">
+                                            <div className="z-10 col-span-3 my-auto ">
                                                 <SelectComponent
                                                     onInputChange={(event) => { _HandleSeachApi(event) }}
                                                     dangerouslySetInnerHTML={{ __html: option.label }}
@@ -987,12 +987,12 @@ const PriceQuoteForm = (props) => {
                                                                         {option.e?.name}
                                                                     </h3>
 
-                                                                    <div className="flex 3xl:gap-2 2xl:gap-1 xl:gap-1 gap-1">
+                                                                    <div className="flex gap-1 3xl:gap-2 2xl:gap-1 xl:gap-1">
                                                                         <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
                                                                             {option.e?.product_variation}
                                                                         </h5>
                                                                     </div>
-                                                                    <div className="flex text-gray-400 items-center gap-2">
+                                                                    <div className="flex items-center gap-2 text-gray-400">
                                                                         <h5 className="text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                             {dataLang[option.e?.text_type]}
                                                                         </h5>
@@ -1034,7 +1034,7 @@ const PriceQuoteForm = (props) => {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="col-span-1 text-center flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1 text-center">
                                                 <h3
                                                     className={`${index === 0 ? "cursor-default" : "cursor-text"
                                                         } 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
@@ -1042,7 +1042,7 @@ const PriceQuoteForm = (props) => {
                                                     {e?.unit}
                                                 </h3>
                                             </div>
-                                            <div className="col-span-1 flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1">
                                                 <div className="flex items-center justify-center">
                                                     <button
                                                         disabled={index === 0}
@@ -1073,7 +1073,7 @@ const PriceQuoteForm = (props) => {
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="col-span-1 text-center flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1 text-center">
                                                 <InPutMoneyFormat
                                                     value={index === 0 ? 1 : e?.price}
                                                     onValueChange={_HandleChangeInputOption.bind(
@@ -1089,7 +1089,7 @@ const PriceQuoteForm = (props) => {
                                                     appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                             </div>
-                                            <div className="col-span-1 text-center flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1 text-center">
                                                 <InPutNumericFormat
                                                     value={index === 0 ? 0 : e?.discount}
                                                     onValueChange={_HandleChangeInputOption.bind(
@@ -1104,14 +1104,14 @@ const PriceQuoteForm = (props) => {
                                                 />
                                             </div>
 
-                                            <div className="col-span-1 text-right flex items-center justify-end">
+                                            <div className="flex items-center justify-end col-span-1 text-right">
                                                 <h3
                                                     className={`${index === 0 ? "cursor-default" : "cursor-text"} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
                                                 >
                                                     {formatMoney(e?.priceAffter)}
                                                 </h3>
                                             </div>
-                                            <div className="col-span-1 flex justify-center items-center">
+                                            <div className="flex items-center justify-center col-span-1">
                                                 <SelectComponent
                                                     options={taxOptions}
                                                     onChange={_HandleChangeInputOption.bind(this, e?.id, "taxStages", index)}
@@ -1130,7 +1130,7 @@ const PriceQuoteForm = (props) => {
                                                     isDisabled={index === 0 ? true : false}
                                                     hideSelectedOptions={false}
                                                     formatOptionLabel={(option) => (
-                                                        <div className="flex justify-start items-center gap-1 ">
+                                                        <div className="flex items-center justify-start gap-1 ">
                                                             <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                 {option?.label}
                                                             </h2>
@@ -1162,14 +1162,14 @@ const PriceQuoteForm = (props) => {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="col-span-1 text-right flex items-center justify-end">
+                                            <div className="flex items-center justify-end col-span-1 text-right">
                                                 <h3
                                                     className={`${index === 0 ? "cursor-default" : "cursor-text"} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
                                                 >
                                                     {formatMoney(e?.totalPrice)}
                                                 </h3>
                                             </div>
-                                            <div className="col-span-1 flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1">
                                                 <input
                                                     value={e?.note}
                                                     onChange={_HandleChangeInputOption.bind(this, e?.id, "note", index)}
@@ -1180,7 +1180,7 @@ const PriceQuoteForm = (props) => {
                                                     className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                                                 />
                                             </div>
-                                            <div className="col-span-1 flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1">
                                                 <button
                                                     onClick={_HandleDelete.bind(this, e?.id)}
                                                     type="button"
@@ -1198,18 +1198,18 @@ const PriceQuoteForm = (props) => {
                     </div>
 
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
-                        <div className="col-span-2  flex items-center gap-2">
+                        <div className="flex items-center col-span-2 gap-2">
                             <h2>{dataLang?.price_quote_total_discount || "price_quote_total_discount"}</h2>
-                            <div className="col-span-1 text-center flex items-center justify-center">
+                            <div className="flex items-center justify-center col-span-1 text-center">
                                 <NumericFormat
                                     value={discounttong}
                                     onValueChange={_HandleChangeInput.bind(this, "discounttong")}
-                                    className=" text-center py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
+                                    className="w-20 px-2 py-1 font-normal text-center bg-transparent border-b-2 border-gray-300 focus:outline-none"
                                     isAllowed={isAllowedDiscount}
                                 />
                             </div>
                         </div>
-                        <div className="col-span-5 flex items-center gap-2">
+                        <div className="flex items-center col-span-5 gap-2">
                             <h2 className="">{dataLang?.price_quote_tax || "price_quote_tax"}</h2>
                             <div className="w-[50%]">
                                 <SelectComponent
@@ -1218,7 +1218,7 @@ const PriceQuoteForm = (props) => {
                                     onChange={_HandleChangeInput.bind(this, "taxTotal")}
                                     value={taxTotal}
                                     formatOptionLabel={(option) => (
-                                        <div className="flex justify-start items-center gap-1 ">
+                                        <div className="flex items-center justify-start gap-1 ">
                                             <h2>{option?.label}</h2>
                                             <h2>{`(${option?.tax_rate})`}</h2>
                                         </div>
@@ -1274,7 +1274,7 @@ const PriceQuoteForm = (props) => {
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                         />
                     </div>
-                    <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
+                    <div className="flex-col justify-between col-span-3 mt-5 space-y-4 text-right ">
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal">

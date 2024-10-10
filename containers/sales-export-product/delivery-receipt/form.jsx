@@ -708,7 +708,7 @@ const DeliveryReceiptForm = (props) => {
         return (
             <components.MenuList {...props}>
                 {dataItems?.length > 0 && (
-                    <div className="grid grid-cols-2 items-center  cursor-pointer">
+                    <div className="grid items-center grid-cols-2 cursor-pointer">
                         <div
                             className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] "
                             onClick={() => handleSelectAll("addAll")}
@@ -756,7 +756,7 @@ const DeliveryReceiptForm = (props) => {
                             {option.e?.name}
                         </h3>
 
-                        <div className="flex 3xl:gap-2 2xl:gap-1 xl:gap-1 gap-1">
+                        <div className="flex gap-1 3xl:gap-2 2xl:gap-1 xl:gap-1">
                             <h5 className="text-gray-400  3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
                                 {option.e?.code} :
                             </h5>
@@ -764,7 +764,7 @@ const DeliveryReceiptForm = (props) => {
                                 {option.e?.product_variation}
                             </h5>
                         </div>
-                        <div className="flex 3xl:gap-3 2xl:gap-3 xl:gap-3 gap-1">
+                        <div className="flex gap-1 3xl:gap-3 2xl:gap-3 xl:gap-3">
                             <div className="flex items-center gap-1">
                                 <h5 className="min-w-1/3 text-gray-400 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
                                     {dataLang[option.e?.text_type]}
@@ -928,11 +928,11 @@ const DeliveryReceiptForm = (props) => {
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex justify-between items-center ">
+                    <div className="flex items-center justify-between ">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                         </h2>
-                        <div className="flex justify-end items-center mr-2">
+                        <div className="flex items-center justify-end mr-2">
                             <ButtonBack
                                 onClick={() => router.push(routerDeliveryReceipt.home)}
                                 dataLang={dataLang}
@@ -940,12 +940,12 @@ const DeliveryReceiptForm = (props) => {
                         </div>
                     </div>
 
-                    <div className=" w-full rounded">
+                    <div className="w-full rounded ">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
                                 {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-12  gap-3 items-center mt-2">
+                            <div className="grid items-center grid-cols-12 gap-3 mt-2">
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
@@ -959,11 +959,11 @@ const DeliveryReceiptForm = (props) => {
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
-                                <div className="col-span-3 relative">
+                                <div className="relative col-span-3">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </label>
-                                    <div className="custom-date-picker flex flex-row">
+                                    <div className="flex flex-row custom-date-picker">
                                         <DatePicker
                                             blur
                                             fixedHeight
@@ -1327,7 +1327,7 @@ const DeliveryReceiptForm = (props) => {
                         </div>
                     </div>
                     <div className=" bg-[#ECF0F4] p-2 grid  grid-cols-12">
-                        <div className="font-normal col-span-12">
+                        <div className="col-span-12 font-normal">
                             {dataLang?.import_item_information || "import_item_information"}
                         </div>
                     </div>
@@ -1342,6 +1342,7 @@ const DeliveryReceiptForm = (props) => {
                                 onChange={_HandleChangeInput.bind(this, "itemAll")}
                                 value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.matHang)}
                                 isMulti
+                                maxShowMuti={0}
                                 components={{ MenuList, MultiValue }}
                                 formatOptionLabel={(option) => selectItemsLabel(option)}
                                 placeholder={"Chọn nhanh mặt hàng"}
@@ -1421,7 +1422,7 @@ const DeliveryReceiptForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-12 items-center gap-1 py-2">
+                    <div className="grid items-center grid-cols-12 gap-1 py-2">
                         <div className="col-span-2">
                             <Select
                                 options={options}
@@ -1470,7 +1471,7 @@ const DeliveryReceiptForm = (props) => {
                             />
                         </div>
                         <div className="col-span-10">
-                            <div className="grid grid-cols-11  divide-x border-t border-b border-r border-l">
+                            <div className="grid grid-cols-11 border-t border-b border-l border-r divide-x">
                                 <div className="col-span-2">
                                     {" "}
                                     <Select
@@ -1481,23 +1482,23 @@ const DeliveryReceiptForm = (props) => {
                                     />
                                 </div>
                                 <div className="col-span-1"></div>
-                                <div className="col-span-1 flex  justify-center items-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                        <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                     </button>
                                     <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                        <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                     </button>
                                 </div>
-                                <div className="col-span-1 justify-center flex items-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <div className=" 3xl:text-[12px] w-full 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50 text-black">
                                         1
                                     </div>
                                 </div>
-                                <div className="col-span-1 justify-center flex items-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <div className=" w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50">
                                         0
                                     </div>
@@ -1505,7 +1506,7 @@ const DeliveryReceiptForm = (props) => {
                                 <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-end">
                                     0
                                 </div>
-                                <div className="col-span-1 flex items-center w-full">
+                                <div className="flex items-center w-full col-span-1">
                                     <Select
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={dataLang?.returns_tax || "returns_tax"}
@@ -1534,15 +1535,15 @@ const DeliveryReceiptForm = (props) => {
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
                             {isFetching ? (
-                                <Loading className="h-10 w-full" color="#0f4f9e" />
+                                <Loading className="w-full h-10" color="#0f4f9e" />
                             ) : (
                                 <>
                                     {listData?.map((e) => (
                                         <div
                                             key={e?.id?.toString()}
-                                            className="grid grid-cols-12 gap-2 my-1 items-start"
+                                            className="grid items-start grid-cols-12 gap-2 my-1"
                                         >
-                                            <div className="col-span-2 border border-r p-2 pb-1 h-full">
+                                            <div className="h-full col-span-2 p-2 pb-1 border border-r">
                                                 <div className="relative mt-5">
                                                     <Select
                                                         options={options}
@@ -1590,7 +1591,7 @@ const DeliveryReceiptForm = (props) => {
                                                     />
                                                     <button
                                                         onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
-                                                        className="w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
+                                                        className="absolute flex flex-col items-center justify-center w-8 h-8 transition ease-in-out rounded bg-slate-100 -top-4 right-5 hover:rotate-45 hover:bg-slate-200 hover:scale-105 hover:text-red-500"
                                                     >
                                                         <Add className="" />
                                                     </button>
@@ -1608,14 +1609,14 @@ const DeliveryReceiptForm = (props) => {
                                                     </button>
                                                 )}
                                             </div>
-                                            <div className="col-span-10  items-center">
+                                            <div className="items-center col-span-10">
                                                 <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                                                     {load ? (
                                                         <Loading className="h-2 col-span-11" color="#0f4f9e" />
                                                     ) : (
                                                         e?.child?.map((ce) => (
                                                             <React.Fragment key={ce?.id?.toString()}>
-                                                                <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
+                                                                <div className="flex flex-col justify-center h-full col-span-2 p-1 border-t border-l">
                                                                     <Select
                                                                         options={ce?.dataWarehouse}
                                                                         value={ce?.warehouse}
@@ -1723,7 +1724,7 @@ const DeliveryReceiptForm = (props) => {
                                                                             )}
                                                                         >
                                                                             <Minus
-                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                                className="scale-50 2xl:scale-100 xl:scale-100"
                                                                                 size="16"
                                                                             />
                                                                         </button>
@@ -1768,7 +1769,7 @@ const DeliveryReceiptForm = (props) => {
                                                                             )}
                                                                         >
                                                                             <Add
-                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                                className="scale-50 2xl:scale-100 xl:scale-100"
                                                                                 size="16"
                                                                             />
                                                                         </button>
@@ -1784,8 +1785,8 @@ const DeliveryReceiptForm = (props) => {
                                                                                         className="font-medium"
                                                                                     />
                                                                                     <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
-                                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-indigo-500">
-                                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75 absolute"></span>
+                                                                                        <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
+                                                                                            <span className="absolute inline-flex w-full h-full bg-indigo-400 rounded-full opacity-75 animate-ping"></span>
                                                                                         </span>
                                                                                     </span>
                                                                                 </div>
@@ -1794,16 +1795,16 @@ const DeliveryReceiptForm = (props) => {
                                                                             on={["hover", "focus"]}
                                                                         >
                                                                             <div className="flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm">
-                                                                                <span className="font-medium text-xs">
+                                                                                <span className="text-xs font-medium">
                                                                                     Sl tồn:{" "}
                                                                                     {ce?.warehouse == null ? 0 : formatNumber(+ce?.warehouse?.qty)}
                                                                                 </span>
 
-                                                                                <span className="font-medium text-xs">
+                                                                                <span className="text-xs font-medium">
                                                                                     Sl đã giao:{" "}
                                                                                     {formatNumber(ce?.quantityDelive)}
                                                                                 </span>
-                                                                                <span className="font-medium text-xs">
+                                                                                <span className="text-xs font-medium">
                                                                                     Sl chưa giao:{" "}
                                                                                     {formatNumber(ce?.quantityStock - ce?.quantityDelive)}
                                                                                 </span>
@@ -1856,7 +1857,7 @@ const DeliveryReceiptForm = (props) => {
                                                                         {formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}
                                                                     </h3>
                                                                 </div>
-                                                                <div className=" flex flex-col items-center p-1 h-full justify-center">
+                                                                <div className="flex flex-col items-center justify-center h-full p-1 ">
                                                                     <Select
                                                                         options={taxOptions}
                                                                         value={ce?.tax}
@@ -1875,7 +1876,7 @@ const DeliveryReceiptForm = (props) => {
                                                                             outline: "none",
                                                                         }}
                                                                         formatOptionLabel={(option) => (
-                                                                            <div className="flex justify-start items-center gap-1 ">
+                                                                            <div className="flex items-center justify-start gap-1 ">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                                     {option?.label}
                                                                                 </h2>
@@ -1924,7 +1925,7 @@ const DeliveryReceiptForm = (props) => {
                                                                             e?.id,
                                                                             ce?.id
                                                                         )}
-                                                                        className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
+                                                                        className="flex flex-col items-center justify-center p-2 text-red-500 transition-all ease-linear rounded-md  hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
                                                                     >
                                                                         <IconDelete />
                                                                     </button>
@@ -1941,25 +1942,25 @@ const DeliveryReceiptForm = (props) => {
                         </div>
                     </div>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
-                        <div className="col-span-2  flex items-center gap-2">
+                        <div className="flex items-center col-span-2 gap-2">
                             <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
-                            <div className="col-span-1 text-center flex items-center justify-center">
+                            <div className="flex items-center justify-center col-span-1 text-center">
                                 <InPutNumericFormat
                                     value={generalDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "generalDiscount")}
-                                    className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
+                                    className="w-20 px-2 py-1 font-medium text-center bg-transparent border-b-2 border-gray-300  focus:outline-none"
                                     isAllowed={isAllowedDiscount}
                                 />
                             </div>
                         </div>
-                        <div className="col-span-2 flex items-center gap-2 ">
+                        <div className="flex items-center col-span-2 gap-2 ">
                             <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
                             <Select
                                 options={taxOptions}
                                 onChange={_HandleChangeInput.bind(this, "generalTax")}
                                 value={generalTax}
                                 formatOptionLabel={(option) => (
-                                    <div className="flex justify-start items-center gap-1 ">
+                                    <div className="flex items-center justify-start gap-1 ">
                                         <h2>{option?.label}</h2>
                                         <h2>{`(${option?.tax_rate})`}</h2>
                                     </div>
@@ -2025,7 +2026,7 @@ const DeliveryReceiptForm = (props) => {
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                         />
                     </div>
-                    <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
+                    <div className="flex-col justify-between col-span-3 mt-5 space-y-4 text-right ">
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal ">
