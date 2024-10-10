@@ -68,7 +68,7 @@ const ProductsCategory = (props) => {
 
     const { data, isFetching, refetch } = useProductCategory(params)
 
-    const { data: dataCategoryOption, refetch: refetchSup } = useItemCategoryCombobox()
+    const { data: dataCategoryOption = [], refetch: refetchSup } = useItemCategoryCombobox()
 
     const _HandleFilterOpt = (type, value) => {
         if (type == "category") {
@@ -165,11 +165,11 @@ const ProductsCategory = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.catagory_finishedProduct_group_title || "catagory_finishedProduct_group_title"}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ? (
                                     <Popup_Products
                                         onRefresh={refetch.bind(this)}
@@ -192,7 +192,7 @@ const ProductsCategory = (props) => {
                             </div>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -239,7 +239,7 @@ const ProductsCategory = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -257,7 +257,7 @@ const ProductsCategory = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -311,7 +311,7 @@ const ProductsCategory = (props) => {
                         </ContainerTable>
                     </div>
                     {data?.rResult?.length != 0 && (
-                        <ContainerPagination className="flex space-x-5 my-2 items-center">
+                        <ContainerPagination className="flex items-center my-2 space-x-5">
                             <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
@@ -366,13 +366,13 @@ const Item = React.memo((props) => {
                     {props.data?.note}
                 </RowItemTable>
                 <RowItemTable colSpan={2}>
-                    <span className="flex gap-2 flex-wrap justify-start ">
+                    <span className="flex flex-wrap justify-start gap-2 ">
                         {props.data?.branch?.map((e) => (
                             <TagBranch key={e?.id}>{e.name}</TagBranch>
                         ))}
                     </span>
                 </RowItemTable>
-                <RowItemTable colSpan={1} className="flex justify-center space-x-2 px-2">
+                <RowItemTable colSpan={1} className="flex justify-center px-2 space-x-2">
                     {role == true || checkEdit ? (
                         <Popup_Products
                             onRefresh={props.onRefresh}
@@ -440,19 +440,19 @@ const ItemsChild = React.memo((props) => {
         <React.Fragment key={props.data?.id}>
             <RowTable gridCols={11}>
                 {props.data?.level == "3" && (
-                    <RowItemTable colSpan={1} className="h-full flex justify-center items-center pl-24">
+                    <RowItemTable colSpan={1} className="flex items-center justify-center h-full pl-24">
                         <IconDown className="rotate-45" />
                     </RowItemTable>
                 )}
                 {props.data?.level == "2" && (
-                    <RowItemTable colSpan={1} className="h-full flex justify-center items-center pl-12">
+                    <RowItemTable colSpan={1} className="flex items-center justify-center h-full pl-12">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
                     </RowItemTable>
                 )}
                 {props.data?.level == "1" && (
-                    <RowItemTable colSpan={1} className="h-full flex justify-center items-center ">
+                    <RowItemTable colSpan={1} className="flex items-center justify-center h-full ">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
@@ -469,7 +469,7 @@ const ItemsChild = React.memo((props) => {
                 <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.note}
                 </RowItemTable>
-                <RowItemTable colSpan={2} className="gap-2 flex flex-wrap px-2">
+                <RowItemTable colSpan={2} className="flex flex-wrap gap-2 px-2">
                     {props.data?.branch.map((e) => (
                         <TagBranch key={e?.id}>{e.name}</TagBranch>
                     ))}
