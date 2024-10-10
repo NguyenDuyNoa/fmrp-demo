@@ -94,6 +94,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                 });
             });
             const { data } = await apiMaterialsPlanning.apiHandlingKeepProductionsPlan(formData);
+            console.log("data", data);
+
             if (data?.isSuccess == 1) {
                 isShow("success", data?.message);
                 queryValue({ page: 1 });
@@ -247,7 +249,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             title={dataLang?.materials_planning_raw_materials || "materials_planning_raw_materials"}
             button={
                 <button
-                    className="bg-blue-100 rounded-lg outline-none  focus:outline-none"
+                    className="bg-blue-100 rounded-lg outline-none focus:outline-none"
                     onClick={() => {
                         if (+dataTable?.countAll == 0) {
                             return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
