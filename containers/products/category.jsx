@@ -32,6 +32,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Popup_Products from "./components/category/popup";
 import { useProductCategory } from "./hooks/category/useProductCategory";
+import { useCategoryOptions } from "./hooks/product/useCategoryOptions";
 
 const ProductsCategory = (props) => {
     const dataLang = props.dataLang;
@@ -68,7 +69,8 @@ const ProductsCategory = (props) => {
 
     const { data, isFetching, refetch } = useProductCategory(params)
 
-    const { data: dataCategoryOption = [], refetch: refetchSup } = useItemCategoryCombobox()
+    const { data: dataCategoryOption = [], refetch: refetchSup } = useCategoryOptions()
+    // const { data: dataCategoryOption = [], refetch: refetchSup } = useItemCategoryCombobox()
 
     const _HandleFilterOpt = (type, value) => {
         if (type == "category") {
