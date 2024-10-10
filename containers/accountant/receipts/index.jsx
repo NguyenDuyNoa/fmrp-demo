@@ -19,12 +19,14 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useObjectCombobox } from "@/hooks/common/useObject";
+import { usePayment } from "@/hooks/common/usePayment";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
-import { useSetData } from "@/hooks/useSetData";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
@@ -33,15 +35,12 @@ import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import PopupDetailThere from "../components/detailThere";
 import PopupDetail from "./components/detail";
 import Popup_dspt from "./components/popup";
-import { _ServerInstance as Axios } from "@/services/axios";
 import { useReceiptsList } from "./hooks/useReceiptsList";
-import { useBranchList } from "@/hooks/common/useBranch";
-import { usePayment } from "@/hooks/common/usePayment";
 
 
 const inistialValue = {
@@ -52,9 +51,6 @@ const inistialValue = {
 };
 
 
-const inistialFetch = { onFetching_filter: false };
-
-const initstialData = { dataObject: [] };
 const Receipts = (props) => {
     const dataLang = props.dataLang;
 
@@ -70,9 +66,7 @@ const Receipts = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [fetching, sFetching] = useState(inistialFetch);
-
-    const { isData: dataTable, updateData } = useSetData(initstialData);
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const { isValue: value, onChangeValue } = useChangeValue(inistialValue);
 
@@ -82,42 +76,27 @@ const Receipts = (props) => {
     // other_payslips_coupon
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "receipts");
 
-    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
-
-    const updateFetch = (e) => sFetching((i) => ({ ...i, ...e }));
-
     const parameters = {
         limit: limit,
         page: router.query?.page || 1,
-        "filter[branch_id]": value.idBranch != null ? value.idBranch.value : null,
-        "filter[start_date]": value.valueDate?.startDate != null ? value.valueDate?.startDate : null,
-        "filter[end_date]": value.valueDate?.endDate != null ? value.valueDate?.endDate : null,
-        "filter[payment_mode]": value.idMethod != null ? value.idMethod.value : null,
-        "filter[objects]": value.idObject != null ? value.idObject.value : null,
         "filter[search]": keySearch,
+        "filter[objects]": value.idObject != null ? value.idObject.value : null,
+        "filter[branch_id]": value.idBranch != null ? value.idBranch.value : null,
+        "filter[payment_mode]": value.idMethod != null ? value.idMethod.value : null,
+        "filter[end_date]": value.valueDate?.endDate != null ? value.valueDate?.endDate : null,
+        "filter[start_date]": value.valueDate?.startDate != null ? value.valueDate?.startDate : null,
     };
 
     const { data: listBr = [] } = useBranchList()
 
     const { data: listPayment = [] } = usePayment()
 
+    const { data: dataObject = [] } = useObjectCombobox(dataLang)
+
     const { data, refetch, isLoading, isFetching } = useReceiptsList(parameters);
-
-    const _ServerFetching_filter = () => {
-
-        Axios("GET", "/api_web/Api_expense_voucher/object/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                // updateData({ dataObject: data?.map(({ name, id }) => ({ label: dataLang[name] ? dataLang[name] : name, value: id })) });
-            }
-        });
-
-        updateFetch({ onFetching_filter: false });
-    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
-
         router.replace({
             pathname: router.route,
             query: {
@@ -125,16 +104,6 @@ const Receipts = (props) => {
             },
         });
     }, 500);
-
-    useEffect(() => {
-        fetching.onFetching_filter && _ServerFetching_filter();
-    }, [fetching.onFetching_filter]);
-
-
-    useEffect(() => {
-        updateFetch({ onFetching_filter: true })
-    }, []);
-
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
@@ -281,13 +250,14 @@ const Receipts = (props) => {
                                 {dataLang?.receipts_title}
                             </h2>
                             <div className="flex items-center justify-end gap-2">
-                                {role == true || checkAdd ? (
+                                {(role == true || checkAdd)
+                                    ?
                                     <Popup_dspt
                                         onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
-                                ) : (
+                                    :
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -297,7 +267,7 @@ const Receipts = (props) => {
                                     >
                                         {dataLang?.branch_popup_create_new}
                                     </button>
-                                )}
+                                }
                             </div>
                         </div>
                         <ContainerTable>
@@ -347,7 +317,7 @@ const Receipts = (props) => {
                                                         label: dataLang?.payment_ob || "payment_ob",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataTable.dataObject,
+                                                    ...dataObject,
                                                 ]}
                                                 isClearable={true}
                                                 onChange={onChangeValue("idObject")}
@@ -365,7 +335,8 @@ const Receipts = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex items-center justify-end gap-2">
                                             <OnResetData onClick={() => refetch()} sOnFetching={() => { }} />
-                                            {role == true || checkExport ? (
+                                            {(role == true || checkExport)
+                                                ?
                                                 <div className={``}>
                                                     {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
@@ -376,7 +347,7 @@ const Receipts = (props) => {
                                                         />
                                                     )}
                                                 </div>
-                                            ) : (
+                                                :
                                                 <button
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
@@ -384,7 +355,7 @@ const Receipts = (props) => {
                                                     <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            )}
+                                            }
                                             <div className="">
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -435,118 +406,116 @@ const Receipts = (props) => {
                                     {(isLoading || isFetching) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                {data?.rResult?.map((e) => (
-                                                    <RowTable gridCols={12} key={e.id.toString()}>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <PopupDetail
+                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                            {data?.rResult?.map((e) => (
+                                                <RowTable gridCols={12} key={e.id.toString()}>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        <PopupDetail
+                                                            dataLang={dataLang}
+                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]"
+                                                            name={e?.code}
+                                                            id={e?.id}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        textAlign={"center"}
+                                                        className={"flex items-center justify-center"}
+                                                    >
+                                                        {
+                                                            (e?.objects === "client" && <TagColorSky name={dataLang[e?.objects] || e?.objects} />)
+                                                            ||
+                                                            (e?.objects === "supplier" && <TagColorOrange name={dataLang[e?.objects] || e?.objects} />)
+                                                            ||
+                                                            (e?.objects === "other" && <TagColorRed name={dataLang[e?.objects] || e?.objects} />)
+                                                        }
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                        {e?.object_text}
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        className={"flex items-center justify-center"}
+                                                    >
+                                                        {
+                                                            (e?.type_vouchers === "import" && (
+                                                                <TagColorMore
+                                                                    color={"#a855f7"}
+                                                                    backgroundColor={"#e9d5ff"}
+                                                                    name={dataLang[e?.type_vouchers] || e?.type_vouchers}
+                                                                />
+                                                            ))
+                                                            ||
+                                                            (e?.type_vouchers === "deposit" && (
+                                                                <TagColorMore
+                                                                    color={"#06b6d4"}
+                                                                    backgroundColor={"#a5f3fc"}
+                                                                    name={dataLang[e?.type_vouchers] || e?.type_vouchers}
+                                                                />
+                                                            ))
+                                                            ||
+                                                            (e?.type_vouchers === "service" && <TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />)
+                                                            ||
+                                                            (e?.type_vouchers === "order" && (
+                                                                <TagColorMore
+                                                                    color={"#22c55e"}
+                                                                    backgroundColor={"#bbf7d0"}
+                                                                    name={dataLang[e?.type_vouchers] || e?.type_vouchers}
+                                                                />
+                                                            ))
+                                                        }
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="" textAlign={"left"}>
+                                                        {e?.voucher?.map((code, index) => (
+                                                            <PopupDetailThere
+                                                                key={code?.id}
                                                                 dataLang={dataLang}
-                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]"
-                                                                name={e?.code}
-                                                                id={e?.id}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            textAlign={"center"}
-                                                            className={"flex items-center justify-center"}
-                                                        >
-                                                            {
-                                                                (e?.objects === "client" && <TagColorSky name={dataLang[e?.objects] || e?.objects} />)
-                                                                ||
-                                                                (e?.objects === "supplier" && <TagColorOrange name={dataLang[e?.objects] || e?.objects} />)
-                                                                ||
-                                                                (e?.objects === "other" && <TagColorRed name={dataLang[e?.objects] || e?.objects} />)
-                                                            }
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"left"}>
-                                                            {e?.object_text}
-                                                        </RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            className={"flex items-center justify-center"}
-                                                        >
-                                                            {
-                                                                (e?.type_vouchers === "import" && (
-                                                                    <TagColorMore
-                                                                        color={"#a855f7"}
-                                                                        backgroundColor={"#e9d5ff"}
-                                                                        name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                                    />
-                                                                ))
-                                                                ||
-                                                                (e?.type_vouchers === "deposit" && (
-                                                                    <TagColorMore
-                                                                        color={"#06b6d4"}
-                                                                        backgroundColor={"#a5f3fc"}
-                                                                        name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                                    />
-                                                                ))
-                                                                ||
-                                                                (e?.type_vouchers === "service" && <TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />)
-                                                                ||
-                                                                (e?.type_vouchers === "order" && (
-                                                                    <TagColorMore
-                                                                        color={"#22c55e"}
-                                                                        backgroundColor={"#bbf7d0"}
-                                                                        name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                                    />
-                                                                ))
-                                                            }
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="" textAlign={"left"}>
-                                                            {e?.voucher?.map((code, index) => (
-                                                                <PopupDetailThere
-                                                                    key={code?.id}
-                                                                    dataLang={dataLang}
-                                                                    className=" hover:text-blue-600 transition-all ease-in-out 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 py-1  rounded-md text-center text-[#0F4F9E]"
-                                                                    type={code.voucher_type}
-                                                                    id={code.id}
-                                                                    name={code?.code}
-                                                                >
-                                                                    {code?.code}
-                                                                </PopupDetailThere>
-                                                            ))}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.payment_mode_name}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"right"}>
-                                                            {formatMoney(e?.total)}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className={""}>
-                                                            <CustomAvatar
-                                                                fullName={e?.staff_name}
-                                                                profileImage={e?.profile_image}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="col-span-1 mx-auto">
-                                                            <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
-                                                        </RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            textAlign={"left"}
-                                                            className={"truncate"}
-                                                        >
-                                                            {e?.note}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex justify-center">
-                                                            <BtnAction
-                                                                onRefresh={refetch.bind(this)}
-                                                                dataLang={dataLang}
-                                                                id={e?.id}
-                                                                type="receipts"
-                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                            />
-                                                        </RowItemTable>
-                                                    </RowTable>
-                                                ))}
-                                            </div>
-                                        </>
+                                                                className=" hover:text-blue-600 transition-all ease-in-out 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 py-1  rounded-md text-center text-[#0F4F9E]"
+                                                                type={code.voucher_type}
+                                                                id={code.id}
+                                                                name={code?.code}
+                                                            >
+                                                                {code?.code}
+                                                            </PopupDetailThere>
+                                                        ))}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        {e?.payment_mode_name}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"right"}>
+                                                        {formatMoney(e?.total)}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className={""}>
+                                                        <CustomAvatar
+                                                            fullName={e?.staff_name}
+                                                            profileImage={e?.profile_image}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="col-span-1 mx-auto">
+                                                        <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        textAlign={"left"}
+                                                        className={"truncate"}
+                                                    >
+                                                        {e?.note}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="flex justify-center">
+                                                        <BtnAction
+                                                            onRefresh={refetch.bind(this)}
+                                                            dataLang={dataLang}
+                                                            id={e?.id}
+                                                            type="receipts"
+                                                            className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                        />
+                                                    </RowItemTable>
+                                                </RowTable>
+                                            ))}
+                                        </div>
                                     ) : (
                                         <NoData />
                                     )}

@@ -109,7 +109,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
             form.setValue("arrayItem", newData);
             queryState({ onFetching: false });
         } catch (error) {
-            throw error
+            throw new error
         }
     };
 

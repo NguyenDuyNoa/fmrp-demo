@@ -30,3 +30,15 @@ export const useObjectList = (dataLang, idBranch, idObject) => {
         ...optionsQuery
     })
 }
+
+///combobox đối tượng
+export const useObjectCombobox = (dataLang) => {
+    return useQuery({
+        queryKey: ['api_object_list_combobox'],
+        queryFn: async () => {
+            const data = await apiComons.apiObjectCombobox();
+            return data?.map(({ name, id }) => ({ label: dataLang[name], value: id }))
+        },
+        ...optionsQuery
+    })
+}
