@@ -1,14 +1,3 @@
-import { SearchNormal1 as IconSearch } from "iconsax-react";
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-
-import PopupDetailArises from "./components/details_arises";
-import PopupDetailFirst from "./components/details_first";
-import { _ServerInstance as Axios } from "/services/axios";
-
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -23,7 +12,6 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading/loading";
 import Pagination from "@/components/UI/pagination";
-
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
@@ -31,6 +19,15 @@ import usePagination from "@/hooks/usePagination";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import PopupDetailArises from "./components/details_arises";
+import PopupDetailFirst from "./components/details_first";
+import { _ServerInstance as Axios } from "/services/axios";
 
 const initialData = {
     data: [],
@@ -307,7 +304,7 @@ const CustomerDebt = (props) => {
                             </h2>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-4">
@@ -363,7 +360,7 @@ const CustomerDebt = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData sOnFetching={sOnFetching} />
                                             <div>
                                                 {dataTable.dataExcel?.length > 0 && (
@@ -391,7 +388,7 @@ const CustomerDebt = (props) => {
                                         <div className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] col-span-2 text-center text-gray-600 uppercase font-semibold">
                                             {dataLang?.customerDebt_suppliert || "customerDebt_suppliert"}
                                         </div>
-                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                                                 {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
                                             </h4>
@@ -402,7 +399,7 @@ const CustomerDebt = (props) => {
                                                 {dataLang?.customerDebt_collect || "customerDebt_collect"}
                                             </h4>
                                         </div>
-                                        <div className="col-span-3 grid grid-cols-4   items-center justify-center">
+                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                                                 {dataLang?.debt_suppliers_Arise || "debt_suppliers_Arise"}
                                             </h4>
@@ -413,7 +410,7 @@ const CustomerDebt = (props) => {
                                                 {dataLang?.customerDebt_collect || "customerDebt_collect"}
                                             </h4>
                                         </div>
-                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                                                 {dataLang?.debt_suppliers_Ending || "debt_suppliers_Ending"}
                                             </h4>
@@ -441,7 +438,7 @@ const CustomerDebt = (props) => {
                                                         <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
                                                             {e.name}
                                                         </h6>
-                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                                             <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
                                                                 {e.no_start == "0" ? (
                                                                     "-"
@@ -478,7 +475,7 @@ const CustomerDebt = (props) => {
                                                                 )}
                                                             </h4>
                                                         </div>
-                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                                             <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
                                                                 {e.no_debt == "0" ? (
                                                                     "-"
@@ -518,7 +515,7 @@ const CustomerDebt = (props) => {
                                                             </h4>
                                                         </div>
 
-                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                                             <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
                                                                 {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
                                                             </h4>
@@ -548,14 +545,14 @@ const CustomerDebt = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <div className="grid grid-cols-12 bg-slate-100 shadow items-center rounded-md">
+                    <div className="grid items-center grid-cols-12 rounded-md shadow bg-slate-100">
                         <div className="col-span-3 p-2 text-center">
                             <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
                                 {dataLang?.import_total || "import_total"}
                             </h3>
                         </div>
 
-                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
                                 {formatNumber(total?.no_start)}
                             </h3>
@@ -563,7 +560,7 @@ const CustomerDebt = (props) => {
                                 {formatNumber(total?.thu_start)}
                             </h3>
                         </div>
-                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
                                 {formatNumber(total?.no_debt)}
                             </h3>
@@ -571,7 +568,7 @@ const CustomerDebt = (props) => {
                                 {formatNumber(total?.thu_debt)}
                             </h3>
                         </div>
-                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
                                 {formatNumber(total?.no_end)}
                             </h3>

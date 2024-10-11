@@ -53,7 +53,7 @@ const PopupDetailFirst = (props) => {
                     page: isState.currentPage,
                     "filter[branch_id]": props?.idBranch != null ? props?.idBranch.value : null,
                     "filter[supplier_id]": props?.idSupplier ? props?.idSupplier.value : null,
-                    "filter[start_date]": props?.date?.startDate ? formatMoment(props?.date?.startDate, FORMAT_MOMENT.DATE_LONG).format("YYYY-MM-DD") : "",
+                    "filter[start_date]": props?.date?.startDate ? formatMoment(props?.date?.startDate, FORMAT_MOMENT.DATE_LONG) : "",
                     "filter[end_date]": props?.date?.endDate ? formatMoment(props?.date?.endDate, FORMAT_MOMENT.DATE_LONG) : "",
                 },
             },
@@ -126,7 +126,7 @@ const PopupDetailFirst = (props) => {
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
                 <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px] 3xl:h-auto  2xl:h-auto xl:h-auto lg:h-[400px] h-[500px] ">
                     <div>
-                        <div className="bg-blue-400 rounded flex justify-between">
+                        <div className="flex justify-between bg-blue-400 rounded">
                             <h2 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-semibold p-2 text-white">
                                 {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
                             </h2>
@@ -135,7 +135,7 @@ const PopupDetailFirst = (props) => {
                             </h2>
                         </div>
                         <div className="bg-slate-100">
-                            <div className=" flex gap-2 justify-between p-2">
+                            <div className="flex justify-between gap-2 p-2 ">
                                 <h2 className="flex gap-2 font-semibold 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                                     {dataLang?.customerDebt_suppliert || "customerDebt_suppliert"}:
                                     <h2 className="font-semibold capitalize text-blue-700 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
@@ -193,7 +193,7 @@ const PopupDetailFirst = (props) => {
                                                 <div className="divide-y divide-slate-100 min:h-[170px]  max:h-[170px]">
                                                     {updatedData?.map((e) => (
                                                         <div
-                                                            className="grid grid-cols-14 hover:bg-slate-50 items-center border-b"
+                                                            className="grid items-center border-b grid-cols-14 hover:bg-slate-50"
                                                             key={e.id?.toString()}
                                                         >
                                                             <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-center ">
@@ -224,7 +224,7 @@ const PopupDetailFirst = (props) => {
                                                             <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-left">
                                                                 <ExpandableContent content={e?.note} />
                                                             </h6>
-                                                            <h6 className="col-span-2 w-fit mx-auto">
+                                                            <h6 className="col-span-2 mx-auto w-fit">
                                                                 <TagBranch className="w-fit">
                                                                     {e?.branch_name}
                                                                 </TagBranch>
@@ -236,7 +236,7 @@ const PopupDetailFirst = (props) => {
                                         </>
                                     ) : <NoData />}
                                 </div>
-                                <div className="flex space-x-5 items-center justify-between">
+                                <div className="flex items-center justify-between space-x-5">
                                     {isState.data?.length > 0 ? (
                                         <Pagination
                                             postsPerPage={limit}
@@ -251,7 +251,7 @@ const PopupDetailFirst = (props) => {
                                         <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                     </div>
                                 </div>
-                                <div className="grid-cols-14 grid items-center  border-b-gray-200 border-b  border-t   border-t-gray-200  z-10 bg-slate-100  rounded">
+                                <div className="z-10 grid items-center border-t border-b rounded grid-cols-14 border-b-gray-200 border-t-gray-200 bg-slate-100">
                                     <h2 className="border-l font-semibold p-2 text-[13px] border-r border-b  col-span-6 text-center uppercase">
                                         {dataLang?.debt_suppliers_totalAmount || "debt_suppliers_totalAmount"}
                                     </h2>
