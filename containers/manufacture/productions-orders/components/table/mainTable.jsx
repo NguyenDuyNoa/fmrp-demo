@@ -11,10 +11,8 @@ import { useBranchList } from "@/hooks/common/useBranch";
 import { useInternalPlansSearchCombobox } from "@/hooks/common/useInternalPlans";
 import { useItemsVariantSearchCombobox } from "@/hooks/common/useItems";
 import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
-import useSetingServer from "@/hooks/useConfigNumber";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
 import { SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
@@ -68,19 +66,15 @@ const MainTable = ({ dataLang }) => {
         },
     ];
 
-    const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
-
-    const [isState, sIsState] = useState(initialState);
-
-    const queryState = (key) => sIsState((prve) => ({ ...prve, ...key }));
+    const [isMouted, setIsMouted] = useState(false);
 
     const [isFetching, sIsFetChing] = useState(false);
 
-    const dataSeting = useSetingServer();
+    const [isState, sIsState] = useState(initialState);
 
-    const [isMouted, setIsMouted] = useState(false);
+    const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
-    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+    const queryState = (key) => sIsState((prve) => ({ ...prve, ...key }));
 
     const { data: listBr = [] } = useBranchList()
 
@@ -93,6 +87,8 @@ const MainTable = ({ dataLang }) => {
     const { data: listProducts = [] } = useItemsVariantSearchCombobox(isState.searchItemsVariant);
 
     const { data: comboboxProductionOrders = [] } = useProductionOrdersCombobox(isState.searchProductionOrders)
+
+    const handleFilter = (type, value) => queryState({ [type]: value, page: 1 });
 
     useEffect(() => {
         setIsMouted(true);
@@ -170,8 +166,8 @@ const MainTable = ({ dataLang }) => {
         }
     };
 
-    const { data, isLoading } = useQuery({
-        queryKey: ["apiProductionOrders",
+    const { isLoading } = useQuery({
+        queryKey: ["api_production_orders",
             isState.page,
             isState.search,
             isState.date.dateStart,
@@ -187,7 +183,6 @@ const MainTable = ({ dataLang }) => {
         ...optionsQuery
     })
 
-    const handleFilter = (type, value) => queryState({ [type]: value, page: 1 });
 
     const fetchisStateSeeMore = async () => {
         try {
@@ -220,7 +215,7 @@ const MainTable = ({ dataLang }) => {
                 });
             }
         } catch (error) {
-            throw new Error(error);
+            throw error
         }
     };
 
@@ -459,7 +454,7 @@ const MainTable = ({ dataLang }) => {
                 <div className="flex ">
                     <div className="w-[25%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
-                            <form className="flex items-center relative  w-full">
+                            <form className="relative flex items-center w-full">
                                 <SearchNormal1
                                     size={20}
                                     className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
@@ -500,7 +495,7 @@ const MainTable = ({ dataLang }) => {
                                                 <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
                                             </div>
                                             {e.showParent && (
-                                                <div className="flex flex-col gap-2 mt-1 w-full">
+                                                <div className="flex flex-col w-full gap-2 mt-1">
                                                     <div className="flex items-center gap-1">
                                                         <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
                                                             {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
@@ -521,10 +516,10 @@ const MainTable = ({ dataLang }) => {
                                                             {dataLang?.productions_orders_produced || "productions_orders_produced"}
                                                         </span>
                                                     )}
-                                                    {/* <div className="w-full flex items-center">
+                                                    {/* <div className="flex items-center w-full">
                                                 {e.processBar.map((j, JIndex) => {
                                                     return (
-                                                        <div key={j.id} className="flex flex-col w-full items-start">
+                                                        <div key={j.id} className="flex flex-col items-start w-full">
                                                             <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
                                                                 <span>{j.status}</span>
                                                                 <span>({moment(j.date).format('DD/MM/YYYY')})</span>
@@ -534,7 +529,7 @@ const MainTable = ({ dataLang }) => {
                                                                 :
                                                                 `flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active ? 'after:bg-[#00C170]' : 'after:bg-gray-500'}   after:inline-block after:absolute after:top-1 after:left-[25px]`}`}
                                                             >
-                                                                <div className="block whitespace-nowrap z-10">
+                                                                <div className="z-10 block whitespace-nowrap">
                                                                     <span className={`w-[10px] h-[10px]  border-2  ${j.active ? 'bg-[#00C170] border-[#00C170]' : 'bg-gray-500 border-gray-500'} rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}></span>
                                                                     <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[11px] text-[10px]`}>
                                                                         {j.title}
@@ -563,7 +558,7 @@ const MainTable = ({ dataLang }) => {
                                 <button
                                     type="button"
                                     onClick={() => queryState({ page: isState.page + 1 })}
-                                    className="mx-auto text-sm block py-1 bg-blue-50 w-full hover:bg-blue-200 mt-1 transition-all duration-200 ease-linear"
+                                    className="block w-full py-1 mx-auto mt-1 text-sm transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200"
                                 >
                                     {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
                                 </button>
@@ -578,7 +573,7 @@ const MainTable = ({ dataLang }) => {
                             (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0)
                                 ?
                                 <>
-                                    <div className="flex items-center justify-between py-1 px-4 border-b">
+                                    <div className="flex items-center justify-between px-4 py-1 border-b">
                                         <div className="">
                                             <h1 className="text-[#52575E] font-normal text-xs uppercase">
                                                 {dataLang?.productions_orders || "productions_orders"}
@@ -590,7 +585,7 @@ const MainTable = ({ dataLang }) => {
                                             </div>
                                         </div>
                                         {/* <button
-                                className=" bg-red-100 rounded-lg  outline-none focus:outline-none"
+                                className="bg-red-100 rounded-lg outline-none focus:outline-none"
                                 onClick={() => {
                                     if (+isState?.countAll == 0) {
                                         return isShow(
@@ -609,16 +604,16 @@ const MainTable = ({ dataLang }) => {
                                     handleQueryId({ status: true, id: isState.listDataRight?.idCommand });
                                 }}
                             >
-                                <div className="flex items-center gap-2 py-2 px-3 ">
+                                <div className="flex items-center gap-2 px-3 py-2 ">
                                     <RiDeleteBin5Line className="text-base text-red-600" />
-                                    <h3 className="text-red-600 font-medium 3xl:text-base text-xs">
+                                    <h3 className="text-xs font-medium text-red-600 3xl:text-base">
                                         {dataLang?.materials_planning_delete || "materials_planning_delete"}
                                     </h3>
                                 </div>
                             </button> */}
                                     </div>
                                     <div className="mx-4">
-                                        <div className="border-b my-6 ">
+                                        <div className="my-6 border-b ">
                                             <div className="flex items-center gap-4 ">
                                                 {listTab.map((e) => (
                                                     <button

@@ -35,7 +35,7 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                 <Customscrollbar className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[36vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto">
                     {isState?.listDataRight?.dataPPItems?.length > 0 ? (
                         isState?.listDataRight?.dataPPItems?.map((e) => (
-                            <div key={e.id} className="grid grid-cols-12 items-center ">
+                            <div key={e.id} className="grid items-center grid-cols-12 ">
                                 <div
                                     onClick={() => handShowItem(e.id, "dataPPItems")}
                                     className="col-span-12 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded cursor-pointer"
@@ -78,7 +78,7 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                                             return (
                                                                 <div className="flex items-center gap-1">
                                                                     <FiCornerDownRight size={15} />
-                                                                    <div className="border border-gray-400 px-2 py-1 rounded-xl flex items-center gap-1">
+                                                                    <div className="flex items-center gap-1 px-2 py-1 border border-gray-400 rounded-xl">
                                                                         <ModalImage
                                                                             small={e.image}
                                                                             large={e.image}
@@ -108,10 +108,10 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                             <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
                                                 {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
                                             </h4>
-                                            <h4 className="col-span-5 flex items-center">
+                                            <h4 className="flex items-center col-span-5">
                                                 {i.processBar.map((j, JIndex) => {
                                                     return (
-                                                        <div key={j.id} className="flex flex-col w-full items-start">
+                                                        <div key={j.id} className="flex flex-col items-start w-full">
                                                             {/* <div className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
                                                                 {moment(j.date).format('DD/MM/YYYY, HH:mm:ss')}
                                                                 <span>{j.status}</span>
@@ -133,7 +133,7 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                                                     ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} after:inline-block after:absolute after:top-1 after:left-[15px]`
                                                                     }`}
                                                             >
-                                                                <div className="block whitespace-nowrap z-10 ">
+                                                                <div className="z-10 block whitespace-nowrap ">
                                                                     <span className={`w-[10px] h-[10px]  border-2  ${j.active
                                                                         ? "bg-[#00C170] border-[#00C170]"
                                                                         : "bg-gray-500 border-gray-500"
@@ -178,7 +178,7 @@ const RenderHtml = ({ item }) => {
     return (
         <div className="flex items-center gap-1">
             <FiCornerDownRight size={15} />
-            <div className="border border-gray-400 px-2 py-1 rounded-xl flex items-center gap-1">
+            <div className="flex items-center gap-1 px-2 py-1 border border-gray-400 rounded-xl">
                 <ModalImage
                     small={item.image ?? "/no_img.png"}
                     large={item.image ?? "/no_img.png"}
@@ -199,15 +199,13 @@ const ChildProduct = ({ product }) => {
     return (
         <div className="flex flex-col gap-2">
             <RenderHtml item={product} />
-            {product?.sub &&
-                product?.sub?.length > 0 &&
-                product?.sub.map((child) => {
-                    return (
-                        <div className="ml-4">
-                            <ChildProduct key={child?.id} product={child} />
-                        </div>
-                    );
-                })}
+            {product?.sub && product?.sub?.length > 0 && product?.sub.map((child) => {
+                return (
+                    <div ey={child?.id} className="ml-4">
+                        <ChildProduct k product={child} />
+                    </div>
+                );
+            })}
         </div>
     );
 };
@@ -219,8 +217,8 @@ const ProductItem = ({ item }) => {
             <RenderHtml item={item} />
             {item.sub.map((product) => {
                 return (
-                    <div className="ml-4">
-                        <ChildProduct key={product?.id} product={product} />
+                    <div key={product?.id} className="ml-4">
+                        <ChildProduct product={product} />
                     </div>
                 );
             })}

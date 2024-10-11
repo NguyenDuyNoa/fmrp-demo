@@ -121,5 +121,28 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/Api_expense_voucher/object/?csrf_protection=true`);
         return response.data
     },
+    //  đối tượng combobox trong phiếu thu
+    async apiObjectPaySlipCombobox() {
+        const response = await axiosCustom('GET', `/api_web/Api_expense_payslips/object?csrf_protection=true`);
+        return response.data
+    },
+    // ds đối tượng
+    async apiObjectListPaySlipCombobox(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_expense_payslips/objectList?csrf_protection=true`, params);
+        return response.data
+    },
+
+    // ds loại chứng từ trong phiếu thu
+    async apiVoucherTypePaySlipCombobox(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_expense_payslips/voucher_type?csrf_protection=true`, params);
+        return response.data
+    },
+
+    // danh sách chứng từ trong phiếu thu
+    async apiVoucherListPaySlipCombobox(params, search) {
+        const response = await axiosCustom(search ? 'POST' : 'GET', `/api_web/Api_expense_payslips/voucher_list?csrf_protection=true`, params);
+        return response.data
+    },
+
 }
 export default apiComons

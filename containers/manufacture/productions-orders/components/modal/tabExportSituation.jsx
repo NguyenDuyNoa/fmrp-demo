@@ -212,15 +212,14 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
     if (!isMounted) return null
     return (
         <div className='h-full'>
-            <div className='flex justify-between items-center'>
+            <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-1'>
-                    <h1 className="3xl:text-basse text-sm my-1 w-1/3">{listTab[isStateModal.isTab - 1]?.name}</h1>
-                    <div className="flex justify-start items-center gap-4">
+                    <h1 className="w-1/3 my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1>
+                    <div className="flex items-center justify-start gap-4">
                         <button
                             type="button"
                             onClick={() => {
                                 setIsTab('chart')
-
                             }}
                             className={`${isTab === 'chart' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
                             {dataLang?.productions_orders_details_table_export_chart || 'productions_orders_details_table_export_chart'}
@@ -237,7 +236,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                 </div>
                 {
                     isTab == 'table' &&
-                    <div className="flex justify-end items-center gap-1">
+                    <div className="flex items-center justify-end gap-1">
                         <SearchComponent
                             colSpan={1}
                             dataLang={dataLang}
@@ -262,8 +261,10 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                     </div>
                 }
             </div>
-            <div className={`${isTab === 'chart' && (width > 1100 ? "h-[calc(100vh_-_343px)]" : 'h-[calc(100vh_-_473px)]') ||
-                isTab === 'table' && (width > 1100 ? "3xl:h-[calc(100vh_-_405px)] xxl:h-[calc(100vh_-_380px)] 2xl:h-[calc(100vh_-_380px)] xl:h-[calc(100vh_-_380px)] lg:h-[calc(100vh_-_426px)] h-[calc(100vh_-_426px)]" :
+            <div className={`${isTab === 'chart' && (width > 1100 ? "h-[calc(100vh_-_343px)]" : 'h-[calc(100vh_-_473px)]')
+                ||
+                isTab === 'table' && (width > 1100 ? "3xl:h-[calc(100vh_-_405px)] xxl:h-[calc(100vh_-_380px)] 2xl:h-[calc(100vh_-_380px)] xl:h-[calc(100vh_-_380px)] lg:h-[calc(100vh_-_426px)] h-[calc(100vh_-_426px)]"
+                    :
                     '3xl:h-[calc(100vh_-_510px)] 2xl:h-[calc(100vh_-_480px)] xl:h-[calc(100vh_-_480px)] lg:h-[calc(100vh_-_470px)] h-[calc(100vh_-_470px)]')
                 }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
                 {isTab === 'table' &&
@@ -368,16 +369,16 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                     <ColumnTable colSpan={7} textAlign={'center'} className="p-2">
                         {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
                     </ColumnTable>
-                    <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
+                    <ColumnTable colSpan={1} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
                         {formatNumber(totals.quantityPlan)}
                     </ColumnTable>
-                    <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
+                    <ColumnTable colSpan={1} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
                         {formatNumber(totals.quantityExport)}
                     </ColumnTable>
-                    <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
+                    <ColumnTable colSpan={1} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
                         {formatNumber(totals.quantityRemaining)}
                     </ColumnTable>
-                    <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
+                    <ColumnTable colSpan={1} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
                         {formatNumber(totals.quantityImport)}
                     </ColumnTable>
                 </ContainerTotal>

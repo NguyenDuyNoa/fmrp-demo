@@ -42,3 +42,27 @@ export const useObjectCombobox = (dataLang) => {
         ...optionsQuery
     })
 }
+///combobox đối tượng trong phiếu thu
+export const useObjectPaySlipCombobox = (dataLang) => {
+    return useQuery({
+        queryKey: ['api_object_combobox_payslip'],
+        queryFn: async () => {
+            const data = await apiComons.apiObjectPaySlipCombobox();
+            return data?.map(({ name, id }) => ({ label: dataLang[name], value: id }))
+        },
+        ...optionsQuery
+    })
+}
+
+///combobox ds đối tượng trong phiếu thu
+export const useObjectListPaySlipCombobox = (params, dataLang) => {
+    return useQuery({
+        queryKey: ['api_object_list_combobox_payslip', { ...params }],
+        queryFn: async () => {
+            const { rResult } = await apiComons.apiObjectListPaySlipCombobox({ params });
+
+            return rResult?.map(({ name, id }) => ({ label: name, value: id }))
+        },
+        ...optionsQuery
+    })
+}

@@ -12,6 +12,7 @@ import Pagination from "@/components/UI/pagination";
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate';
 import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
+import usePagination from '@/hooks/usePagination';
 import { formatMoment } from '@/utils/helpers/formatMoment';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Grid6 } from 'iconsax-react';
@@ -46,6 +47,8 @@ const initialState = {
 const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => {
     const router = useRouter()
 
+    const { paginate } = usePagination()
+
     const dataSeting = useSetingServer();
 
     const [isExportHistory, setIsExportHistory] = useState(initialState)
@@ -55,21 +58,9 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     // const { checkAdd, checkExport } = useActionRole(auth, "")
-
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
-
 
     useEffect(() => {
         sTotalItems(10)
@@ -81,15 +72,15 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
 
     return (
         <div className='h-full'>
-            <div className='flex justify-between items-center'>
+            <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-1'>
-                    <h1 className="3xl:text-basse text-sm my-1">{listTab[isStateModal.isTab - 1]?.name}</h1>
+                    <h1 className="my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1>
                 </div>
-                <div className="flex justify-end items-center gap-1">
+                <div className="flex items-center justify-end gap-1">
                     <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={() => { }} classInput={'border'} />
                     <OnResetData sOnFetching={(e) => queryStateExportHistory({ onFetching: e })} />
                     <button onClick={() => { }} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                        <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                         <span>{dataLang?.client_list_exportexcel}</span>
                     </button>
                     <div>
@@ -150,7 +141,7 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                                     <RowItemTable colSpan={2}>
                                         <div className='flex flex-col'>
                                             <span>{e.name}</span>
-                                            <div className='flex items-center gap-1 text-gray-500 text-xs'>
+                                            <div className='flex items-center gap-1 text-xs text-gray-500'>
                                                 Mã: <span>{e.code}</span>
                                             </div>
                                         </div>

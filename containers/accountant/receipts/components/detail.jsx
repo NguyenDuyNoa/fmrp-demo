@@ -151,9 +151,7 @@ const PopupDetail = (props) => {
                                     {isFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.voucher?.length > 0 ? (
-                                        <Customscrollbar
-                                            className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]"
-                                        >
+                                        <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]">
                                             <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                 {data?.voucher?.map((e, index) => (
                                                     <div
