@@ -176,7 +176,7 @@ const ProductionPlan = (props) => {
         }
     };
 
-    const { isLoading } = useQuery({
+    const { isLoading, isFetching } = useQuery({
         queryKey: ['api_production_internal_plan', { ...params }, router.query.tab],
         queryFn: _ServerFetching,
         placeholderData: keepPreviousData,
@@ -331,7 +331,7 @@ const ProductionPlan = (props) => {
         },
         data,
         isValue,
-        isFetching: isLoading,
+        isFetching: isLoading || isFetching,
         options: listProduct,
         _HandleSeachApi,
         handleQueryId,
@@ -361,7 +361,7 @@ const ProductionPlan = (props) => {
                 />
 
                 {data?.length > 0 && (
-                    <ContainerPagination className="flex space-x-5 items-center">
+                    <ContainerPagination className="flex items-center space-x-5">
                         <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                         <Pagination
                             postsPerPage={limit}
