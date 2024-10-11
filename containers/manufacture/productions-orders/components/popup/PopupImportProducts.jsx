@@ -177,7 +177,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("product[item][quantity]", isState?.item?.quantity)
                 formData.append("product[item][item_image]", isState?.item?.item_image)
                 formData.append("product[item][product_variation]", isState?.item?.product_variation)
-                formData.append("product[item][quantity_enter]", isState?.item?.quantityEnter)
+                formData.append("product[item][quantity_enter]", isState?.item?.quantity || isState?.item?.quantityEnter)
 
                 isState.item?.bom?.forEach((e, index) => {
                     formData.append(`product[item][bom][${index}][type_products]`, e?.type_products)
@@ -271,7 +271,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 {
                     type == 'end_production' &&
                     <>
-                        <div className="w-full flex flex-col gap-2">
+                        <div className="flex flex-col w-full gap-2">
                             <div className="flex items-center gap-2 bg-[#EEF1FC] p-3 rounded-lg">
                                 <RiBox3Fill className="text-[#5770F7]" size={20} />
                                 <h2 className="font-medium  uppercase text-[#5770F7] 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
@@ -286,7 +286,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                             width={1280}
                                             height={1024}
                                             alt="@image tp"
-                                            className="object-cover  rounded-md h-full w-full"
+                                            className="object-cover w-full h-full rounded-md"
                                         />
                                     </div>
                                     <div className="">
@@ -294,15 +294,15 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                             {isState.item.item_name}
                                         </h1>
                                         <div className="flex items-center gap-2">
-                                            <h1 className="2xl:text-sm text-xs font-medium text-black/60">
-                                                {isState.item.item_code} - Cần SX: <span className="text-black font-medium">{formanumber(isState.item.quantityDefault)}</span>
+                                            <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
+                                                {isState.item.item_code} - Cần SX: <span className="font-medium text-black">{formanumber(isState.item.quantityDefault)}</span>
                                             </h1>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="w-[55%] 2xl:w-[55%] lg:w-[60%] flex items-center gap-2">
-                                    <div className="flex items-center justify-center gap-2 w-1/2">
-                                        <h1 className="2xl:text-sm text-xs font-medium">Số lượng hoàn thành</h1>
+                                    <div className="flex items-center justify-center w-1/2 gap-2">
+                                        <h1 className="text-xs font-medium 2xl:text-sm">Số lượng hoàn thành</h1>
                                         <div className="bg-[#BAD1FE] rounded-xl flex justify-center items-center py-[1px]">
                                             <InPutNumericFormat
                                                 className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#BAD1FE] bg-white w-[70%]'}
@@ -386,7 +386,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 <div className="">
                                     <label className="text-[#344054] font-normal 2xl:text-sm text-xs mb-1 ">
                                         Chọn kho xuất
-                                        <span className="text-red-500 pl-1">*</span>
+                                        <span className="pl-1 text-red-500">*</span>
                                     </label>
                                     <SelectCore
                                         options={isState.warehouseExport}
@@ -442,7 +442,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 <div className="">
                                     <label className="text-[#344054] font-normal 2xl:text-sm text-xs mb-1 ">
                                         Thêm NVL/BTP xuất kho
-                                        <span className="text-red-500 pl-1">*</span>
+                                        <span className="pl-1 text-red-500">*</span>
                                     </label>
                                     <SelectCore
                                         options={[]}
@@ -499,7 +499,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 ?
                                 <Loading />
                                 :
-                                <div className="h-full grid grid-cols-2 gap-2">
+                                <div className="grid h-full grid-cols-2 gap-2">
                                     {isState.item?.bom?.length > 0 ? isState.item?.bom?.map((e, index) => {
                                         return (
                                             <div key={e?.item_id} className="bg-[#FCFAF8] min-h-[140px] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
@@ -507,28 +507,28 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                     #{index + 1}
                                                 </div>
                                                 <div className="flex flex-col w-full">
-                                                    <div className="flex items-start gap-3 w-full">
+                                                    <div className="flex items-start w-full gap-3">
                                                         <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
                                                             <Image
                                                                 src={e.image}
                                                                 width={1280}
                                                                 height={1024}
                                                                 alt="@image nvl"
-                                                                className="object-cover rounded-md h-full w-full"
+                                                                className="object-cover w-full h-full rounded-md"
                                                             />
                                                         </div>
-                                                        <div className="w-full flex flex-col gap-1">
+                                                        <div className="flex flex-col w-full gap-1">
                                                             <h1 className="text-base font-medium">
                                                                 {e.item_name}
                                                             </h1>
-                                                            <h1 className="2xl:text-sm text-xs font-medium text-black/60">
-                                                                {e.item_code} - Tồn kho: <span className="text-black font-medium">{formanumber(e?.quantity_warehouse)}</span>
+                                                            <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
+                                                                {e.item_code} - Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span>
                                                             </h1>
-                                                            <h1 className="2xl:text-sm text-xs font-medium text-black/60">
-                                                                Đã giữ kho: <span className="text-black font-medium">{formanumber(0)}</span> Kg
+                                                            <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
+                                                                Đã giữ kho: <span className="font-medium text-black">{formanumber(0)}</span> Kg
                                                             </h1>
                                                             <div className="flex items-center justify-between gap-2">
-                                                                <h1 className="2xl:text-sm text-xs font-medium w-1/4">Số lượng xuất kho</h1>
+                                                                <h1 className="w-1/4 text-xs font-medium 2xl:text-sm">Số lượng xuất kho</h1>
                                                                 <div className="bg-[#FFC8A6] rounded-xl flex justify-center items-center py-[1px] w-[73%]">
                                                                     <InPutNumericFormat
                                                                         placeholder={'0'}
@@ -543,7 +543,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                         size={18}
                                                         cursor={"pointer"}
                                                         onClick={() => handleDeleteItem(e.item_id)}
-                                                        className="absolute top-2 hover:scale-105 transition-all duration-150 ease-linear right-2 text-red-500"
+                                                        className="absolute text-red-500 transition-all duration-150 ease-linear top-2 hover:scale-105 right-2"
                                                     />
                                                 </div>
                                             </div>
@@ -559,7 +559,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                         </Customscrollbar>
                     </>
                 }
-                <div className="flex justify-end items-center gap-2 mt-2">
+                <div className="flex items-center justify-end gap-2 mt-2">
                     <ButtonCancel
                         loading={false}
                         onClick={() => {
