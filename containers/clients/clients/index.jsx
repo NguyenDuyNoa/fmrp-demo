@@ -55,11 +55,11 @@ const Client = (props) => {
 
     const { handleTab: _HandleSelectTab } = useTab("0");
 
+    const [isState, setIsState] = useState(initalState);
+
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "client_customers");
-
-    const [isState, setIsState] = useState(initalState);
 
     const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
@@ -73,7 +73,7 @@ const Client = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
-    const { data: listBr } = useBranchList({});
+    const { data: listBr = [] } = useBranchList({});
 
     const { data: listSelectCt } = useProvinceList({});
 
@@ -285,7 +285,7 @@ const Client = (props) => {
                                                         label: dataLang?.price_quote_branch || "price_quote_branch",
                                                         isDisabled: true,
                                                     },
-                                                    ...listBr || [],
+                                                    ...listBr,
                                                 ]}
                                                 onChange={(e) => queryState({ idBranch: e })}
                                                 value={isState.idBranch}
