@@ -184,7 +184,6 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 isState.idWarehouseExport.forEach((e, index) => {
                     formData.append(`warehouse_export_id[]`, e?.value)
                 })
-
                 formData.append("product[item][poi_id]", isState?.item?.poi_id)
                 formData.append("product[item][product_id]", isState?.item?.product_id)
                 formData.append("product[item][item_code]", isState?.item?.item_code)
@@ -195,10 +194,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("product[item][item_image]", isState?.item?.item_image)
                 formData.append("product[item][product_variation]", isState?.item?.product_variation)
                 formData.append("product[item][quantity_enter]", isState?.item?.quantity || isState?.item?.quantityEnter)
-                console.log(isState.item?.bom);
 
                 isState.item?.bom?.forEach((e, index) => {
-
                     formData.append(`product[item][bom][${index}][type_products]`, e?.type_products)
                     formData.append(`product[item][bom][${index}][type_item]`, e?.type_item)
                     formData.append(`product[item][bom][${index}][item_id]`, e?.item_id)
@@ -519,73 +516,74 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 <Loading />
                                 :
                                 <div className="grid h-full grid-cols-2 gap-2">
-                                    {isState.item?.bom?.length > 0 ? isState.item?.bom?.map((e, index) => {
-                                        return (
-                                            <div key={e?.item_id} className="bg-[#FCFAF8] min-h-[140px] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
-                                                <div className="text-[#667085] font-normal text-[10px]">
-                                                    #{index + 1}
-                                                </div>
-                                                <div className="flex flex-col w-full">
-                                                    <div className="flex items-start w-full gap-3">
-                                                        <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
-                                                            <Image
-                                                                src={e.image}
-                                                                width={1280}
-                                                                height={1024}
-                                                                alt="@image nvl"
-                                                                className="object-cover w-full h-full rounded-md"
-                                                            />
-                                                        </div>
-                                                        <div className="flex flex-col w-full gap-1">
-                                                            <h1 className="text-base font-medium">
-                                                                {e.item_name}
-                                                            </h1>
-                                                            <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
-                                                                {e.item_code} - Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span>
-                                                            </h1>
-                                                            <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
-                                                                Đã giữ kho: <span className="font-medium text-black">{formanumber(0)}</span> Kg
-                                                            </h1>
-                                                            <div className="flex items-center justify-between gap-2">
-                                                                <h1 className="w-1/4 text-xs font-medium 2xl:text-sm">Số lượng xuất kho</h1>
-                                                                <div className="bg-[#FFC8A6] rounded-xl flex justify-center items-center py-[1px] w-[73%]">
-                                                                    <InPutNumericFormat
-                                                                        placeholder={'0'}
-                                                                        value={e.quantity}
-                                                                        isAllowed={(values) => {
-                                                                            const { floatValue, value } = values;
-                                                                            if (floatValue == 0) {
-                                                                                return true;
-                                                                            }
-                                                                            if (floatValue < 0) {
-                                                                                isShow('warning', 'Vui lòng nhập lớn hơn 0');
-                                                                                return false
-                                                                            }
-                                                                            return true
-                                                                        }}
-                                                                        onValueChange={(value) => {
-                                                                            handChangeQuantity(value, e.item_id)
-                                                                        }}
-                                                                        className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#FFC8A6] bg-white max-w-[80%] w-[80%]'}
-                                                                    />
+                                    {
+                                        isState.item?.bom?.length > 0 ? isState.item?.bom?.map((e, index) => {
+                                            return (
+                                                <div key={e?.item_id} className="bg-[#FCFAF8] min-h-[140px] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
+                                                    <div className="text-[#667085] font-normal text-[10px]">
+                                                        #{index + 1}
+                                                    </div>
+                                                    <div className="flex flex-col w-full">
+                                                        <div className="flex items-start w-full gap-3">
+                                                            <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
+                                                                <Image
+                                                                    src={e.image}
+                                                                    width={1280}
+                                                                    height={1024}
+                                                                    alt="@image nvl"
+                                                                    className="object-cover w-full h-full rounded-md"
+                                                                />
+                                                            </div>
+                                                            <div className="flex flex-col w-full gap-1">
+                                                                <h1 className="text-base font-medium">
+                                                                    {e.item_name}
+                                                                </h1>
+                                                                <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
+                                                                    {e.item_code} - Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span>
+                                                                </h1>
+                                                                <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
+                                                                    Đã giữ kho: <span className="font-medium text-black">{formanumber(0)}</span> Kg
+                                                                </h1>
+                                                                <div className="flex items-center justify-between gap-2">
+                                                                    <h1 className="w-1/4 text-xs font-medium 2xl:text-sm">Số lượng xuất kho</h1>
+                                                                    <div className="bg-[#FFC8A6] rounded-xl flex justify-center items-center py-[1px] w-[73%]">
+                                                                        <InPutNumericFormat
+                                                                            placeholder={'0'}
+                                                                            value={e.quantity}
+                                                                            isAllowed={(values) => {
+                                                                                const { floatValue, value } = values;
+                                                                                if (floatValue == 0) {
+                                                                                    return true;
+                                                                                }
+                                                                                if (floatValue < 0) {
+                                                                                    isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                                    return false
+                                                                                }
+                                                                                return true
+                                                                            }}
+                                                                            onValueChange={(value) => {
+                                                                                handChangeQuantity(value, e.item_id)
+                                                                            }}
+                                                                            className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#FFC8A6] bg-white max-w-[80%] w-[80%]'}
+                                                                        />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <IconDelete
+                                                            size={18}
+                                                            cursor={"pointer"}
+                                                            onClick={() => handleDeleteItem(e.item_id)}
+                                                            className="absolute text-red-500 transition-all duration-150 ease-linear top-2 hover:scale-105 right-2"
+                                                        />
                                                     </div>
-                                                    <IconDelete
-                                                        size={18}
-                                                        cursor={"pointer"}
-                                                        onClick={() => handleDeleteItem(e.item_id)}
-                                                        className="absolute text-red-500 transition-all duration-150 ease-linear top-2 hover:scale-105 right-2"
-                                                    />
                                                 </div>
+                                            )
+                                        })
+                                            :
+                                            <div className="col-span-2">
+                                                <NoData />
                                             </div>
-                                        )
-                                    })
-                                        :
-                                        <div className="col-span-2">
-                                            <NoData />
-                                        </div>
                                     }
                                 </div>
                             }

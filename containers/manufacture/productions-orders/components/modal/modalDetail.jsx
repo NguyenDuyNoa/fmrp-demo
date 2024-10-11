@@ -2,8 +2,6 @@ import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOr
 import { ContainerFilterTab } from "@/components/UI/common/layout";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { optionsQuery } from "@/configs/optionsQuery";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -44,11 +42,6 @@ const listTab = [
         name: "Thu hồi NVL",
         count: 2,
     },
-    // {
-    //     id: 6,
-    //     name: 'Phiếu công việc',
-    //     count: 3
-    // },
     {
         id: 6,
         name: "Chi phí NVL - Gia công",
@@ -89,8 +82,6 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
 
     const router = useRouter();
 
-    const dataSeting = useSetingServer();
-
     const [width, setWidth] = useState(900);
 
     const [isResizing, setIsResizing] = useState(false);
@@ -104,8 +95,6 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
     const [isStateModal, setIsStateModal] = useState(initialState);
 
     const queryStateModal = (key) => setIsStateModal((x) => ({ ...x, ...key }));
-
-    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     useEffect(() => {
         setIsMounted(true);
@@ -161,7 +150,6 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                                 ...e,
                                 active: false,
                                 quantity: 100,
-                                arraySemi: []
                             }
                         })
                     }
@@ -195,11 +183,11 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
             }}
             className={`bg-[#FFFFFF] absolute top-[9.2%] right-0 shadow-md z-[999] transition-all duration-150 ease-linear`}
         >
-            <div className="pr-4 pl-3">
-                <div className="border-b border-gray-300 flex justify-between py-4">
+            <div className="pl-3 pr-4">
+                <div className="flex justify-between py-4 border-b border-gray-300">
                     <div className="flex items-center gap-2">
                         <FaAngleDoubleRight
-                            className="text-gray-600 text-sm cursor-pointer"
+                            className="text-sm text-gray-600 cursor-pointer"
                             onClick={() => {
                                 if (width == 900) {
                                     queryState({ openModal: !isState.openModal, dataModal: {} });
@@ -209,7 +197,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                             }}
                         />
                         <FaUpRightAndDownLeftFromCenter
-                            className="text-gray-600 text-sm cursor-pointer rotate-90"
+                            className="text-sm text-gray-600 rotate-90 cursor-pointer"
                             onClick={() => setWidth(window.innerWidth)}
                         />
                         <h1 className="text-[#0F4F9E] font-medium">
@@ -229,36 +217,36 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                             src={"/manufacture/x.png"}
                             width={20}
                             height={20}
-                            className="w-full h-full object-cover"
+                            className="object-cover w-full h-full"
                         />
                     </button>
                 </div>
                 <div className={`grid grid-cols-12 w-auto items-center flex-wrap gap-4`}>
                     <div className={`grid grid-cols-2 ${width >= 1100 ? "col-span-5" : "col-span-12"} `}>
                         <div className="flex flex-col">
-                            <div className="my-2 flex items-center gap-1">
+                            <div className="flex items-center gap-1 my-2">
                                 <h3 className="text-[13px]">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}:</h3>
                                 <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_po ?? ""}</h3>
                             </div>
-                            <div className="my-2  col-span-3 flex items-center gap-1">
+                            <div className="flex items-center col-span-3 gap-1 my-2">
                                 <h3 className="text-[13px] ">{dataLang?.productions_orders_details_plan || 'productions_orders_details_plan'}:</h3>
                                 <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_pp ?? ""}</h3>
                             </div>
-                            <div className="my-2 flex items-center gap-1">
+                            <div className="flex items-center gap-1 my-2">
                                 <h3 className="text-[13px]">{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}:</h3>
                                 <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_detail ?? ""}</h3>
                             </div>
                         </div>
                         <div className="flex flex-col">
-                            <div className="my-2 col-span-3 flex items-center gap-1">
+                            <div className="flex items-center col-span-3 gap-1 my-2">
                                 <h3 className="text-[13px]">{dataLang?.productions_orders_details_orders || 'productions_orders_details_orders'}:</h3>
                                 <h3 className="text-[13px] font-medium">{isStateModal.dataDetail?.poi?.object?.reference_no}</h3>
                             </div>
-                            <div className="my-2 col-span-3 flex items-center gap-1">
+                            <div className="flex items-center col-span-3 gap-1 my-2">
                                 <h3 className="text-[13px]">{dataLang?.productions_orders_details_client || 'productions_orders_details_client'}:</h3>
                                 <h3 className="text-[13px] font-medium">{isStateModal.dataDetail?.poi?.object?.company ?? ""}</h3>
                             </div>
-                            <div className="my-2 flex items-center gap-1">
+                            <div className="flex items-center gap-1 my-2">
                                 <h3 className=" text-[13px]">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}:</h3>
                                 <TagBranch className="w-fit">{isStateModal.dataDetail?.poi?.branch_name}</TagBranch>
                             </div>
@@ -268,16 +256,16 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                         {dataTotal.map((e, i) => (
                             <div
                                 key={i}
-                                className={`w-full p-4 rounded-md space-y-1.5`}
                                 style={{ backgroundColor: `${e.bgColor}` }}
+                                className={`w-full p-4 rounded-md space-y-1.5`}
                             >
                                 <h4 className={`text-[#3A3E4C] font-normal ${width >= 1100 ? "text-base" : "text-xs"}`}>
                                     {e.title}
                                 </h4>
-                                <div className="flex justify-between items-end">
+                                <div className="flex items-end justify-between">
                                     <h6
-                                        className={`text-base font-medium text-white px-3 py-1 flex flex-col justify-center items-center rounded-md`}
                                         style={{ backgroundColor: `${e.bgSmall}` }}
+                                        className={`text-base font-medium text-white px-3 py-1 flex flex-col justify-center items-center rounded-md`}
                                     >
                                         {e.number}
                                     </h6>
@@ -287,7 +275,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                     </div>
                 </div>
 
-                <div className="border-b mt-4">
+                <div className="mt-4 border-b">
                     <ContainerFilterTab>
                         {listTab.map((e) => (
                             <button
@@ -305,13 +293,13 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                         ))}
                     </ContainerFilterTab>
                 </div>
-                <div className="my-2 w-full">{components[isStateModal.isTab]}</div>
+                <div className="w-full my-2">{components[isStateModal.isTab]}</div>
             </div>
             <div
-                className="absolute bg-transparent top-0 left-0 -translate-x-1/4  h-full cursor-col-resize"
                 onMouseDown={startResize}
+                className="absolute top-0 left-0 h-full bg-transparent -translate-x-1/4 cursor-col-resize"
             >
-                <RxDragHandleDots1 size={21} className="my-auto h-full" />
+                <RxDragHandleDots1 size={21} className="h-full my-auto" />
             </div>
         </div>
     );

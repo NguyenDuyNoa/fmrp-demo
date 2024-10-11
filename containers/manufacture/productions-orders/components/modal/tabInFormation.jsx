@@ -5,7 +5,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { memo, useEffect, useState } from "react";
 import { AiOutlineFileText } from "react-icons/ai";
-import { FaArrowAltCircleRight, FaCheck, FaCheckCircle } from "react-icons/fa";
+import { FaCheck, FaCheckCircle } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa6";
 import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
@@ -53,15 +53,6 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
                                 ...i,
                                 active: false,
                                 quantity: 100,
-                                arraySemi: [
-                                    // {
-                                    //     id: uddid(),
-                                    //     image: "/no_img.png",
-                                    //     name: "ÁO SƠ MI - S - TRẮNG",
-                                    //     itemVariation: "Biến thể 1",
-                                    //     quantity: 1000,
-                                    // },
-                                ],
                             }
                         })
                     }
@@ -72,15 +63,13 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
 
     return (
         <div>
-            <h1 className="3xl:text-xl text-base my-1">{listTab[isStateModal.isTab - 1]?.name}</h1>
+            <h1 className="my-1 text-base 3xl:text-xl">{listTab[isStateModal.isTab - 1]?.name}</h1>
             {isLoading
                 ?
                 <Loading />
                 :
-                <div className="flex gap-2 w-full overflow-auto ">
-                    <div
-                        className={`${width > 900 ? "3xl:w-[15%] 2xl:w-[23%] xl:w-[25%] lg:w-[25%]" : "3xl:w-[30%] 2xl:w-[30%] xl:w-[35%] lg:w-[30%]"}  flex items-start py-2 px-4 gap-2 bg-gray-50 border rounded-md`}
-                    >
+                <div className="flex w-full gap-2 overflow-auto ">
+                    <div className={`${width > 900 ? "3xl:w-[15%] 2xl:w-[23%] xl:w-[25%] lg:w-[25%]" : "3xl:w-[30%] 2xl:w-[30%] xl:w-[35%] lg:w-[30%]"}  flex items-start py-2 px-4 gap-2 bg-gray-50 border rounded-md`}>
                         <ModalImage
                             small={isInfomation.dataInformation?.image}
                             large={isInfomation.dataInformation?.image}
@@ -99,9 +88,12 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
                             <h1 className={`text-[#9295A4] font-normal text-sm`}>
                                 Loại:{" "}
                                 <span className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
-                                 ${(isInfomation.dataInformation?.type === "products" && "text-lime-500 border-lime-500") ||
-                                    (isInfomation.dataInformation?.type === 1 && "text-orange-500 border-orange-500") ||
-                                    (isInfomation.dataInformation?.type === 2 && "text-sky-500 border-sky-500")}`}
+                                 ${(isInfomation.dataInformation?.type === "products" && "text-lime-500 border-lime-500")
+                                    ||
+                                    (isInfomation.dataInformation?.type === 1 && "text-orange-500 border-orange-500")
+                                    ||
+                                    (isInfomation.dataInformation?.type === 2 && "text-sky-500 border-sky-500")
+                                    }`}
                                 >
                                     {isInfomation.dataInformation?.type === "products" && "Thành phẩm"}
                                 </span>
@@ -136,33 +128,34 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
                             const shownElements = isInfomation.dataInformation?.arrayProducts?.filter((e) => e?.show);
                             return (
                                 <RenderItem
+                                    type='semi'
+                                    id={e?.id}
+                                    key={e?.id}
                                     name={e.name}
                                     code={e.code}
-                                    checkBorder={shownElements}
-                                    id={e?.id}
                                     image={e?.image}
-                                    itemVariation={e?.itemVariation}
+                                    dataLang={dataLang}
                                     quantity={e?.quantity}
                                     processBar={e?.processBar}
-                                    type='semi'
+                                    checkBorder={shownElements}
+                                    itemVariation={e?.itemVariation}
                                     dataDetail={isStateModal.dataDetail}
-                                    dataLang={dataLang}
                                 />
                             );
                         })}
                         <div className="">
                             <RenderItem
+                                id={undefined}
+                                type='products'
+                                checkBorder={''}
+                                dataLang={dataLang}
+                                image={"/no_img.png"}
+                                dataDetail={isStateModal.dataDetail}
                                 name={isStateModal.dataDetail?.poi?.item_name}
                                 code={isStateModal.dataDetail?.poi?.item_code}
-                                checkBorder={''}
-                                id={undefined}
-                                dataDetail={isStateModal.dataDetail}
-                                image={"/no_img.png"}
-                                type='products'
-                                itemVariation={isStateModal.dataDetail?.poi?.product_variation}
                                 quantity={isStateModal.dataDetail?.poi?.quantity}
                                 processBar={isStateModal.dataDetail?.poi?.stages}
-                                dataLang={dataLang}
+                                itemVariation={isStateModal.dataDetail?.poi?.product_variation}
                             />
                         </div>
                     </div>
@@ -189,7 +182,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                             width={18}
                             height={18}
                             alt={name}
-                            className="object-cover  rounded-md w-full h-full"
+                            className="object-cover w-full h-full rounded-md"
                         />
                     </div>
                     <div className="flex flex-col gap-0.5">
@@ -224,12 +217,14 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                     <div className="">
                                         <div className={`flex h-5 w-5 ${j?.active ? "border-[#14b8a6] bg-[#14b8a6]" : j?.begin_production == 1 ? 'border-orange-600' : "border-gray-400"}  items-center justify-center rounded-full border `}>
                                             {
-                                                processBar?.length - 1 != jIndex ?
+                                                processBar?.length - 1 != jIndex
+                                                    ?
                                                     <>
                                                         {jIndex % 2 == 0 && <FaArrowDown size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
                                                         {jIndex % 2 != 0 && <AiOutlineFileText size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
                                                     </>
-                                                    : <FaCheck size={8} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />
+                                                    :
+                                                    <FaCheck size={8} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />
                                             }
                                         </div>
                                     </div>
@@ -239,7 +234,16 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                 <div className="mt-0.5">
                                     <div className="flex items-center gap-2">
                                         <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>{j.stage_name}</p>
-                                        {(+j?.type == 2 || +j?.type == 3)
+                                        <PopupImportProducts
+                                            dataStage={j}
+                                            dataLang={dataLang}
+                                            dataDetail={dataDetail}
+                                            type={(+j?.type == 3) ? 'begin_production' : (+j?.type == 2 && 'end_production')}
+                                        >
+                                            <FaCheckCircle className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
+                                        </PopupImportProducts>
+
+                                        {/* {(+j?.type == 2 || +j?.type == 3)
                                             ?
                                             <div className="flex items-center gap-1">
                                                 <PopupImportProducts
@@ -269,31 +273,33 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                             >
                                                 <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
                                             </PopupImportProducts>
-                                        }
+                                        } */}
                                     </div>
                                     <div className="flex items-center gap-1 pt-2">
                                         {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
-                                        {j?.purchase_items?.map(e => {
-                                            return (
-                                                <div key={e?.id} className="border border-gray-400 px-2 py-px rounded-xl flex items-center gap-1">
-                                                    <ModalImage
-                                                        small={e?.image ?? "/no_img.png"}
-                                                        large={e?.image ?? "/no_img.png"}
-                                                        width={18}
-                                                        height={18}
-                                                        alt={e?.item_name}
-                                                        className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
-                                                    />
-                                                    <span className="text-[#9295A4] text-[10px]">
-                                                        {e?.reference_no}
-                                                    </span>
-                                                    -
-                                                    <span className="text-[#9295A4] text-[10px]">
-                                                        SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
-                                                    </span>
-                                                </div>
-                                            )
-                                        })}
+                                        {
+                                            j?.purchase_items?.map(e => {
+                                                return (
+                                                    <div key={e?.id} className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
+                                                        <ModalImage
+                                                            small={e?.image ?? "/no_img.png"}
+                                                            large={e?.image ?? "/no_img.png"}
+                                                            width={18}
+                                                            height={18}
+                                                            alt={e?.item_name}
+                                                            className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
+                                                        />
+                                                        <span className="text-[#9295A4] text-[10px]">
+                                                            {e?.reference_no}
+                                                        </span>
+                                                        -
+                                                        <span className="text-[#9295A4] text-[10px]">
+                                                            SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
+                                                        </span>
+                                                    </div>
+                                                )
+                                            })
+                                        }
                                     </div>
                                 </div>
                             </div>
