@@ -177,7 +177,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("product[item][quantity]", isState?.item?.quantity)
                 formData.append("product[item][item_image]", isState?.item?.item_image)
                 formData.append("product[item][product_variation]", isState?.item?.product_variation)
-                formData.append("product[item][quantity_enter]", isState?.item?.quantity || isState?.item?.quantityEnter)
+                formData.append("product[item][quantity_enter]", isState?.item?.quantityEnter || isState?.item?.quantity)
 
                 isState.item?.bom?.forEach((e, index) => {
                     formData.append(`product[item][bom][${index}][type_products]`, e?.type_products)
