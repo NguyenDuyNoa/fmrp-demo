@@ -116,6 +116,23 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
         })
     }
 
+    const handChangeQuantity = (value, id) => {
+        queryState({
+            item: {
+                ...isState.item,
+                bom: isState.item?.bom?.map(e => {
+                    if (e?.item_id == id) {
+                        return {
+                            ...e,
+                            quantity: formanumber(+value?.value),
+                        }
+                    }
+                    return e
+                })
+            }
+        })
+    };
+
     const handleDeleteItem = (id) => {
         queryState({
             item: {
@@ -178,8 +195,10 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("product[item][item_image]", isState?.item?.item_image)
                 formData.append("product[item][product_variation]", isState?.item?.product_variation)
                 formData.append("product[item][quantity_enter]", isState?.item?.quantity || isState?.item?.quantityEnter)
+                console.log(isState.item?.bom);
 
                 isState.item?.bom?.forEach((e, index) => {
+
                     formData.append(`product[item][bom][${index}][type_products]`, e?.type_products)
                     formData.append(`product[item][bom][${index}][type_item]`, e?.type_item)
                     formData.append(`product[item][bom][${index}][item_id]`, e?.item_id)
@@ -214,29 +233,29 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("dtPoi[reference_no_detail]", isState?.dtPoi?.reference_no_detail)
                 formData.append("dtPoi[pp_id]", isState?.dtPoi?.pp_id)
 
-                handingPopup.mutate(formData, {
-                    onSuccess: (data) => {
-                        if (data?.isSuccess) {
-                            isShow('success', data?.message)
-                            queryClient.invalidateQueries(["api_item_orders_detail", true])
-                            queryState({
-                                open: false,
-                                idWarehouseExport: [],
-                                idWarehouseImport: null,
-                                errorWarehouseImport: false,
-                                errorWarehouseExport: false
-                            })
-                            return
-                        }
-                        isShow('error', data?.message)
-                    },
-                    onError: (error) => {
-                        throw new Error(error);
-                    },
-                })
+                // handingPopup.mutate(formData, {
+                //     onSuccess: (data) => {
+                //         if (data?.isSuccess) {
+                //             isShow('success', data?.message)
+                //             queryClient.invalidateQueries(["api_item_orders_detail", true])
+                //             queryState({
+                //                 open: false,
+                //                 idWarehouseExport: [],
+                //                 idWarehouseImport: null,
+                //                 errorWarehouseImport: false,
+                //                 errorWarehouseExport: false
+                //             })
+                //             return
+                //         }
+                //         isShow('error', data?.message)
+                //     },
+                //     onError: (error) => {
+                //         throw new Error(error);
+                //     },
+                // })
             }
         } catch (error) {
-            throw new Error(error);
+            throw error
         }
     }
 
@@ -533,6 +552,20 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                                     <InPutNumericFormat
                                                                         placeholder={'0'}
                                                                         value={e.quantity}
+                                                                        isAllowed={(values) => {
+                                                                            const { floatValue, value } = values;
+                                                                            if (floatValue == 0) {
+                                                                                return true;
+                                                                            }
+                                                                            if (floatValue < 0) {
+                                                                                isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                                return false
+                                                                            }
+                                                                            return true
+                                                                        }}
+                                                                        onValueChange={(value) => {
+                                                                            handChangeQuantity(value, e.item_id)
+                                                                        }}
                                                                         className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#FFC8A6] bg-white max-w-[80%] w-[80%]'}
                                                                     />
                                                                 </div>
