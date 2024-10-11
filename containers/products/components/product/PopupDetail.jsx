@@ -18,6 +18,7 @@ import { useProductDetail } from "../../hooks/product/useProductDetail";
 import { useProductDetailStage } from "../../hooks/product/useProductDetailStage";
 import Popup_Bom from "./popupBom";
 import Popup_GiaiDoan from "./popupStage";
+import { is } from "date-fns/locale";
 const Popup_Detail = React.memo((props) => {
     const dataSeting = useSetingServer()
 
@@ -45,11 +46,11 @@ const Popup_Detail = React.memo((props) => {
 
     const [selectedListBom, sSelectedListBom] = useState([]);
 
-    const { data: list, isFetching } = useProductDetail(open, props.id)
+    const { data: list, isFetching, isLoading } = useProductDetail(open, props.id)
 
-    const { data: dataStage, isFetching: isFetchingStage } = useProductDetailStage(open, props.id)
+    const { data: dataStage, isFetching: isFetchingStage, isLoading: isLoadingStage, refetch: refetchStage } = useProductDetailStage(open, props.id)
 
-    const { isFetching: isFetchingBom, refetch: refetchBom } = useQuery({
+    const { isFetching: isFetchingBom, isLoading: isLoadingBom, refetch: refetchBom } = useQuery({
         queryKey: ["detail_bom_product"],
         queryFn: async () => {
             const params = {
@@ -115,14 +116,14 @@ const Popup_Detail = React.memo((props) => {
                     ))}
 
                 </div>
-                {isFetching ? (
+                {(isFetching || isLoading) ? (
                     <Loading className="h-96" color="#0f4f9e" />
                 ) : (
                     <React.Fragment>
                         {tab === 0 && (
                             <div className="grid grid-cols-2 gap-5">
                                 <div className="space-y-5">
-                                    <div className="space-y-3 bg-slate-100/40 p-2 rounded-md">
+                                    <div className="p-2 space-y-3 rounded-md bg-slate-100/40">
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">
                                                 {props.dataLang?.client_list_brand || "client_list_brand"}:
@@ -193,7 +194,7 @@ const Popup_Detail = React.memo((props) => {
                                             <h6 className="w-[55%] text-right">{list?.note}</h6>
                                         </div>
                                     </div>
-                                    <div className="space-y-3 bg-slate-100/40 p-2 rounded-md">
+                                    <div className="p-2 space-y-3 rounded-md bg-slate-100/40">
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">Giá bán:</h5>
                                             <h6 className="w-[55%] text-right">
@@ -210,15 +211,15 @@ const Popup_Detail = React.memo((props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="space-y-3 flex flex-col justify-between">
-                                    <div className="flex bg-slate-100/40 p-2 rounded-md">
+                                <div className="flex flex-col justify-between space-y-3">
+                                    <div className="flex p-2 rounded-md bg-slate-100/40">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
                                             {props.dataLang?.avatar || "avatar"}:
                                         </h5>
                                         {list?.images == null ? (
                                             <img
                                                 src="/no_image.png"
-                                                className="w-48 h-48 rounded object-contain select-none pointer-events-none"
+                                                className="object-contain w-48 h-48 rounded pointer-events-none select-none"
                                             />
                                         ) : (
                                             <Image
@@ -227,7 +228,7 @@ const Popup_Detail = React.memo((props) => {
                                                 quality={100}
                                                 src={list?.images}
                                                 alt="thumb type"
-                                                className="w-48 h-48 rounded object-contain select-none pointer-events-none"
+                                                className="object-contain w-48 h-48 rounded pointer-events-none select-none"
                                                 loading="lazy"
                                                 crossOrigin="anonymous"
                                                 placeholder="blur"
@@ -235,7 +236,7 @@ const Popup_Detail = React.memo((props) => {
                                             />
                                         )}
                                     </div>
-                                    <div className="bg-slate-100/40 p-2 rounded-md space-y-3">
+                                    <div className="p-2 space-y-3 rounded-md bg-slate-100/40">
                                         <h4 className="flex space-x-2">
                                             <IconUserEdit size={20} />
                                             <span className="text-[15px] font-medium">Người lập phiếu</span>
@@ -284,11 +285,11 @@ const Popup_Detail = React.memo((props) => {
                                                             : "grid-cols-4"
                                                             } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
                                                     >
-                                                        <div className="flex justify-center items-center self-center">
+                                                        <div className="flex items-center self-center justify-center">
                                                             {e?.image == null ? (
                                                                 <img
                                                                     src="/no_image.png"
-                                                                    className="w-auto h-20 rounded object-contain select-none pointer-events-none"
+                                                                    className="object-contain w-auto h-20 rounded pointer-events-none select-none"
                                                                 />
                                                             ) : (
                                                                 <Image
@@ -297,31 +298,31 @@ const Popup_Detail = React.memo((props) => {
                                                                     quality={100}
                                                                     src={e?.image}
                                                                     alt="thumb type"
-                                                                    className="w-auto h-20 rounded object-contain select-none pointer-events-none"
+                                                                    className="object-contain w-auto h-20 rounded pointer-events-none select-none"
                                                                     loading="lazy"
                                                                     crossOrigin="anonymous"
                                                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                                                 />
                                                             )}
                                                         </div>
-                                                        <h6 className="px-2 xl:text-base text-xs self-center text-center">
+                                                        <h6 className="self-center px-2 text-xs text-center xl:text-base">
                                                             {e?.name}
                                                         </h6>
                                                         {e?.variation_option_2?.length > 0 ? (
                                                             <div className="self-center space-y-0.5 col-span-2 grid grid-cols-2">
                                                                 {e?.variation_option_2?.map((ce) => (
                                                                     <React.Fragment key={ce.id ? ce.id?.toString() : ""}>
-                                                                        <h6 className="px-2 xl:text-base text-xs text-center">
+                                                                        <h6 className="px-2 text-xs text-center xl:text-base">
                                                                             {ce.name}
                                                                         </h6>
-                                                                        <h6 className="px-2 xl:text-base text-xs text-right">
+                                                                        <h6 className="px-2 text-xs text-right xl:text-base">
                                                                             {formatMoney(ce.price)}
                                                                         </h6>
                                                                     </React.Fragment>
                                                                 ))}
                                                             </div>
                                                         ) : (
-                                                            <h6 className="px-2 xl:text-base text-xs self-center text-right">
+                                                            <h6 className="self-center px-2 text-xs text-right xl:text-base">
                                                                 {formatMoney(e?.price)}
                                                             </h6>
                                                         )}
@@ -330,27 +331,18 @@ const Popup_Detail = React.memo((props) => {
                                             </div>
                                         </Customscrollbar>
                                     </div>
-                                ) : (
-                                    <div className="w-full h-96 flex flex-col justify-center items-center">
-                                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                            <IconSearch />
-                                        </div>
-                                        <h1 className="text-[#141522] text-base opacity-90 font-medium">
-                                            {props.dataLang?.no_data_found}
-                                        </h1>
-                                    </div>
-                                )}
+                                ) : <NoData />}
                             </React.Fragment>
                         )}
                         {tab === 2 && (
                             <>
-                                {isFetchingBom ? (
+                                {(isFetchingBom || isLoadingBom) ? (
                                     <Loading className="h-96" color="#0f4f9e" />
                                 ) : (
                                     <>
                                         {dataBom?.length > 0 ? (
                                             <div className="space-y-0.5 min-h-[384px]">
-                                                <div className="pb-3 flex space-x-3 items-center justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                                <div className="flex items-center justify-start pb-3 space-x-3 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                                     {dataBom?.map((e) => (
                                                         <button
                                                             key={e.product_variation_option_value_id.toString()}
@@ -385,8 +377,7 @@ const Popup_Detail = React.memo((props) => {
                                                         {props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}
                                                     </ColumnTablePopup>
                                                     <ColumnTablePopup colSpan={2}>
-                                                        %
-                                                        {props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}
+                                                        % {props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}
                                                     </ColumnTablePopup>
                                                     <ColumnTablePopup colSpan={2}>
                                                         {props.dataLang?.stage_usage_finishedProduct}
@@ -403,7 +394,7 @@ const Popup_Detail = React.memo((props) => {
                                                                 {/* <h6 className="px-2 xl:text-[15px] text-xs col-span-2">
                                                                     {e?.str_type_item}
                                                                 </h6> */}
-                                                                <h6 className="flex gap-1 items-center col-span-3">
+                                                                <h6 className="flex items-center col-span-3 gap-1">
                                                                     <span
                                                                         className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
                                                                      ${(e?.item_type_current === "products" && "text-lime-500 border-lime-500") ||
@@ -416,7 +407,7 @@ const Popup_Detail = React.memo((props) => {
                                                                         {e?.str_type_item ?? ""}
                                                                     </span>
                                                                 </h6>
-                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs col-span-2">
+                                                                <h6 className="col-span-2 px-2 text-xs 2xl:text-base xl:text-sm">
                                                                     <div className="grid grid-cols-1">
                                                                         <h5>{e?.item_name}</h5>
                                                                         <h5 className="text-xs italic">
@@ -424,23 +415,23 @@ const Popup_Detail = React.memo((props) => {
                                                                         </h5>
                                                                     </div>
                                                                 </h6>
-                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs col-span-2 text-center">
+                                                                <h6 className="col-span-2 px-2 text-xs text-center 2xl:text-base xl:text-sm">
                                                                     {e?.unit_name}
                                                                 </h6>
-                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs  col-span-2 text-center">
+                                                                <h6 className="col-span-2 px-2 text-xs text-center 2xl:text-base xl:text-sm">
                                                                     {formatNumber(e?.quota)}
                                                                 </h6>
-                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs  col-span-2 text-center">
+                                                                <h6 className="col-span-2 px-2 text-xs text-center 2xl:text-base xl:text-sm">
                                                                     {formatNumber(e?.loss)}%
                                                                 </h6>
-                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs col-span-2 text-center">
+                                                                <h6 className="col-span-2 px-2 text-xs text-center 2xl:text-base xl:text-sm">
                                                                     {e?.stage_name}
                                                                 </h6>
                                                             </div>
                                                         ))}
                                                     </div>
                                                 </Customscrollbar>
-                                                <div className="flex items-center space-x-3 justify-end">
+                                                <div className="flex items-center justify-end space-x-3">
                                                     <Popup_Bom
                                                         dataLang={props.dataLang}
                                                         id={props.id}
@@ -452,23 +443,16 @@ const Popup_Detail = React.memo((props) => {
                                                     />
                                                 </div>
                                             </div>
-                                        ) : (
-                                            <div className="w-full h-96 flex flex-col justify-center items-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="text-[#141522] text-base opacity-90 font-medium">
-                                                    {props.dataLang?.no_data_found}
-                                                </h1>
-                                            </div>
-                                        )}
+                                        ) :
+                                            <NoData />
+                                        }
                                     </>
                                 )}
                             </>
                         )}
                         {tab === 3 && (
                             <>
-                                {isFetchingStage ? (
+                                {(isFetchingStage || isLoadingStage) ? (
                                     <Loading className="h-96" color="#0f4f9e" />
                                 ) : (
                                     <React.Fragment>
@@ -495,30 +479,31 @@ const Popup_Detail = React.memo((props) => {
                                                                 key={e?.id ? e?.id.toString() : ""}
                                                                 className={`grid-cols-8 grid gap-2 px-2 py-2.5 hover:bg-slate-50 items-center`}
                                                             >
-                                                                <h6 className="text-center px-2 xl:text-base text-xs">
+                                                                <h6 className="px-2 text-xs text-center xl:text-base">
                                                                     {index + 1}
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs col-span-2">
+                                                                <h6 className="col-span-2 px-2 text-xs xl:text-base">
                                                                     {e?.stage_name}
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs col-span-3 flex justify-center text-green-600">
+                                                                <h6 className="flex justify-center col-span-3 px-2 text-xs text-green-600 xl:text-base">
                                                                     {e?.type == "2" && <IconTick />}
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs col-span-2 flex justify-center text-green-600">
+                                                                <h6 className="flex justify-center col-span-2 px-2 text-xs text-green-600 xl:text-base">
                                                                     {e?.final_stage == "1" && <IconTick />}
                                                                 </h6>
                                                             </div>
                                                         ))}
                                                     </div>
                                                 </Customscrollbar>
-                                                <div className="flex items-center space-x-3 justify-end">
+                                                <div className="flex items-center justify-end space-x-3">
                                                     <Popup_GiaiDoan
                                                         dataLang={props.dataLang}
                                                         id={props.id}
                                                         name={list?.name}
+                                                        onRefresh={refetchStage.bind(this)}
                                                         code={list?.code}
                                                         typeOpen="edit"
-                                                        className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
+                                                        className="px-4 py-2 text-base transition rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105"
                                                     />
                                                 </div>
                                             </div>

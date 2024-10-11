@@ -37,8 +37,8 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
-import Popup_dsnd from "./components/staff/popup";
-import Popup_chitiet from "./components/staff/popupDetail";
+import PopupStaff from "./components/staff/popup";
+import PopupDetail from "./components/staff/popupDetail";
 import { useStaffList } from "./hooks/staff/useStaffList";
 
 const initalState = {
@@ -274,14 +274,16 @@ const PersonelStaff = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.personnels_staff_title}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role ? (
-                                    <Popup_dsnd
+                                    <PopupStaff
                                         isState={isState}
+                                        listBranch={listBranch}
+                                        listPosition={listPosition}
                                         onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -301,7 +303,7 @@ const PersonelStaff = (props) => {
                         </div>
 
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -348,7 +350,7 @@ const PersonelStaff = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role ? (
                                                 <div className={``}>
@@ -366,7 +368,7 @@ const PersonelStaff = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -424,7 +426,7 @@ const PersonelStaff = (props) => {
                                                                     <ModalImage
                                                                         small="/no_image.png"
                                                                         large="/no_image.png"
-                                                                        className="w-full h-full rounded object-contain"
+                                                                        className="object-contain w-full h-full rounded"
                                                                     />
                                                                     :
                                                                     <ModalImage
@@ -436,7 +438,7 @@ const PersonelStaff = (props) => {
                                                             </div>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>
-                                                            <Popup_chitiet
+                                                            <PopupDetail
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:textx-blue-600 transition-all ease-linear px-2 text-left"
                                                                 name={e.full_name}
@@ -491,7 +493,7 @@ const PersonelStaff = (props) => {
                                                                 <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                                             </label>
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex  gap-1 flex-wrap">
+                                                        <RowItemTable colSpan={1} className="flex flex-wrap gap-1">
                                                             {e.branch?.map((i, indexB) => (
                                                                 <TagBranch key={indexB}>{i.name}</TagBranch>
                                                             ))}
@@ -499,17 +501,19 @@ const PersonelStaff = (props) => {
 
                                                         <RowItemTable
                                                             colSpan={1}
-                                                            className="space-x-2 text-center flex items-center justify-center"
+                                                            className="flex items-center justify-center space-x-2 text-center"
                                                         >
-                                                            <Popup_dsnd
+                                                            <PopupStaff
                                                                 onRefresh={refetch.bind(this)}
-                                                                className="xl:text-base text-xs "
+                                                                className="text-xs xl:text-base "
                                                                 dataLang={dataLang}
                                                                 name={e.name}
                                                                 code={e.code}
                                                                 phone_number={e.phone_number}
                                                                 email={e.email}
                                                                 id={e?.id}
+                                                                listBranch={listBranch}
+                                                                listPosition={listPosition}
                                                                 department={e.department}
                                                                 position_name={e.position_name}
                                                                 last_login={e.last_login}

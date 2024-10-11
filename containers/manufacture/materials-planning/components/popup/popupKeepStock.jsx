@@ -104,7 +104,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             }
             isShow("error", data?.message);
         } catch (error) {
-            throw new Error(error);
+            throw error
         }
     };
 
@@ -170,7 +170,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             form.setValue("arrayItem", newData);
             queryState({ onFetching: false });
         } catch (error) {
-            throw new Error(error);
+            throw error
         }
     };
     const fetchListLocationWarehouse = async (item, idWarehouse) => {

@@ -37,6 +37,45 @@ import PopupCustom from "@/components/UI/popup";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
+
+const inistialFetch = {
+    onSending: false,
+    onFetching: false,
+    onFetchingLisObject: false,
+    onFetchingTypeOfDocument: false,
+    onFetchingListTypeOfDocument: false,
+    onFetchingDetail: false,
+};
+const inistialArrr = {
+    dataBranch: [],
+    dataObject: [],
+    dataListObject: [],
+    dataMethod: [],
+    dataTypeofDoc: [],
+    dataListTypeofDoc: [],
+    dataTable: [],
+};
+const inistialError = {
+    errBranch: false,
+    errObject: false,
+    errListObject: false,
+    errPrice: false,
+    errMethod: false,
+    errListTypeDoc: false,
+    errSotien: false,
+};
+const inistialValue = {
+    date: new Date(),
+    code: null,
+    branch: null,
+    object: null,
+    listObject: null,
+    typeOfDocument: null,
+    listTypeOfDocument: [],
+    price: null,
+    method: null,
+    note: null,
+};
 const Popup_dspt = (props) => {
     let id = props?.id;
     const dataLang = props.dataLang;
@@ -52,44 +91,6 @@ const Popup_dspt = (props) => {
 
     const isShow = useToast();
 
-    const inistialFetch = {
-        onSending: false,
-        onFetching: false,
-        onFetchingLisObject: false,
-        onFetchingTypeOfDocument: false,
-        onFetchingListTypeOfDocument: false,
-        onFetchingDetail: false,
-    };
-    const inistialArrr = {
-        dataBranch: [],
-        dataObject: [],
-        dataListObject: [],
-        dataMethod: [],
-        dataTypeofDoc: [],
-        dataListTypeofDoc: [],
-        dataTable: [],
-    };
-    const inistialError = {
-        errBranch: false,
-        errObject: false,
-        errListObject: false,
-        errPrice: false,
-        errMethod: false,
-        errListTypeDoc: false,
-        errSotien: false,
-    };
-    const inistialValue = {
-        date: new Date(),
-        code: null,
-        branch: null,
-        object: null,
-        listObject: null,
-        typeOfDocument: null,
-        listTypeOfDocument: [],
-        price: null,
-        method: null,
-        note: null,
-    };
 
     const dataSeting = useSetingServer();
 
@@ -129,20 +130,15 @@ const Popup_dspt = (props) => {
                 code: result?.code,
                 branch: { label: result?.branch_name, value: result?.branch_id },
                 object: { label: dataLang[result?.objects] || result?.objects, value: result?.objects },
-                listObject:
-                    result?.objects === "other"
-                        ? { label: result?.object_text, value: result?.object_text }
-                        : { label: dataLang[result?.object_text] || result?.object_text, value: result?.objects_id },
-                typeOfDocument: result?.type_vouchers
-                    ? { label: dataLang[result?.type_vouchers] || result?.type_vouchers, value: result?.type_vouchers }
-                    : null,
-                listTypeOfDocument: result?.type_vouchers
-                    ? result?.voucher?.map(({ code, id, money }) => ({
-                        label: code,
-                        value: id,
-                        money: money,
-                    }))
-                    : [],
+                listObject: result?.objects === "other"
+                    ? { label: result?.object_text, value: result?.object_text }
+                    : { label: dataLang[result?.object_text] || result?.object_text, value: result?.objects_id },
+                typeOfDocument: result?.type_vouchers ? { label: dataLang[result?.type_vouchers] || result?.type_vouchers, value: result?.type_vouchers } : null,
+                listTypeOfDocument: result?.type_vouchers ? result?.voucher?.map(({ code, id, money }) => ({
+                    label: code,
+                    value: id,
+                    money: money,
+                })) : [],
                 price: +result?.total,
                 method: { label: result?.payment_mode_name, value: result?.payment_mode_id },
                 note: result?.note,
@@ -445,15 +441,15 @@ const Popup_dspt = (props) => {
         return (
             <components.MenuList {...props}>
                 {data.dataListTypeofDoc?.length > 0 && (
-                    <div className="grid grid-cols-2 items-center  cursor-pointer">
+                    <div className="grid items-center grid-cols-2 cursor-pointer">
                         <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center text-xs "
+                            className="col-span-1 p-2 text-xs text-center hover:bg-slate-200 "
                             onClick={handleSelectAll}
                         >
                             {dataLang?.payment_selectAll || "payment_selectAll"}
                         </div>
                         <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center text-xs "
+                            className="col-span-1 p-2 text-xs text-center hover:bg-slate-200 "
                             onClick={handleDeselectAll}
                         >
                             {dataLang?.payment_DeselectAll || "payment_DeselectAll"}
@@ -505,11 +501,7 @@ const Popup_dspt = (props) => {
     return (
         <>
             <PopupCustom
-                title={
-                    props.id
-                        ? `${props.dataLang?.receipts_edit || "receipts_edit"}`
-                        : `${props.dataLang?.receipts_add || "receipts_add"}`
-                }
+                title={props.id ? `${props.dataLang?.receipts_edit || "receipts_edit"}` : `${props.dataLang?.receipts_add || "receipts_add"}`}
                 button={
                     props?.id ? (
                         <div
@@ -520,9 +512,7 @@ const Popup_dspt = (props) => {
                                     isShow("warning", WARNING_STATUS_ROLE);
                                 }
                             }}
-                            className={
-                                "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"
-                            }
+                            className={"group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}
                         >
                             <BiEdit
                                 size={20}
@@ -532,19 +522,17 @@ const Popup_dspt = (props) => {
                                 {props.dataLang?.payment_editVotes || "payment_editVotes"}
                             </p>
                         </div>
-                    ) : (
-                        <div
-                            onClick={() => {
-                                if (role || checkAdd) {
-                                    sOpen(true);
-                                } else {
-                                    isShow("warning", WARNING_STATUS_ROLE);
-                                }
-                            }}
+                    ) :
+                        <div onClick={() => {
+                            if (role || checkAdd) {
+                                sOpen(true);
+                            } else {
+                                isShow("warning", WARNING_STATUS_ROLE);
+                            }
+                        }}
                         >
                             {props.dataLang?.branch_popup_create_new || "branch_popup_create_new"}
                         </div>
-                    )
                 }
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
@@ -557,13 +545,13 @@ const Popup_dspt = (props) => {
                 <div className="w-[40vw]">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         <div className="">
-                            <div className="grid grid-cols-12 gap-1 items-center ">
+                            <div className="grid items-center grid-cols-12 gap-1 ">
                                 <div className="col-span-12 grid grid-cols-12 items-center gap-1 overflow-auto 3xl:max-h-[400px] xxl:max-h-[300px] 2xl:max-h-[350px] xl:max-h-[300px] lg:max-h-[280px] max-h-[300px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="col-span-6 relative">
+                                    <div className="relative col-span-6">
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
                                             {dataLang?.serviceVoucher_day_vouchers}{" "}
                                         </label>
-                                        <div className="custom-date-picker flex flex-row ">
+                                        <div className="flex flex-row custom-date-picker ">
                                             <DatePicker
                                                 blur
                                                 fixedHeight
@@ -580,12 +568,10 @@ const Popup_dspt = (props) => {
                                                 className={`border  focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                             />
                                             {listValue.date && (
-                                                <>
-                                                    <MdClear
-                                                        className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                        onClick={() => _HandleChangeInput("clear")}
-                                                    />
-                                                </>
+                                                <MdClear
+                                                    className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                    onClick={() => _HandleChangeInput("clear")}
+                                                />
                                             )}
                                             <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
                                         </div>
@@ -659,8 +645,7 @@ const Popup_dspt = (props) => {
                                             menuPortalTarget={document.body}
                                             onMenuOpen={handleMenuOpen}
                                             closeMenuOnSelect={true}
-                                            className={`${error.errObject ? "border-red-500" : "border-transparent"
-                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                            className={`${error.errObject ? "border-red-500" : "border-transparent"} 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errObject && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -681,8 +666,7 @@ const Popup_dspt = (props) => {
                                                 isClearable={true}
                                                 value={listValue.listObject}
                                                 classNamePrefix="Select"
-                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
-                                                    } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"} Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                 isSearchable={true}
                                                 noOptionsMessage={() => `Chưa có gợi ý`}
                                                 formatCreateLabel={(value) => `Tạo "${value}"`}
@@ -735,8 +719,7 @@ const Popup_dspt = (props) => {
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 closeMenuOnSelect={true}
-                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             />
                                         )}
                                         {error.errListObject && (
@@ -750,9 +733,7 @@ const Popup_dspt = (props) => {
                                             {props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                         </label>
                                         <SelectCore
-                                            placeholder={
-                                                props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"
-                                            }
+                                            placeholder={props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                             options={data.dataTypeofDoc}
                                             onChange={_HandleChangeInput.bind(this, "typeOfDocument")}
                                             value={listValue.typeOfDocument}
@@ -808,30 +789,23 @@ const Popup_dspt = (props) => {
                                             onChange={_HandleChangeInput.bind(this, "price")}
                                             allowNegative={false}
                                             placeholder={
-                                                ((listValue.object == null || listValue.listObject == null) &&
-                                                    (props.dataLang?.payment_errObList || "payment_errObList")) ||
-                                                (listValue.object != null && props.dataLang?.payment_amountOfMoney) ||
+                                                ((listValue.object == null || listValue.listObject == null) && (props.dataLang?.payment_errObList || "payment_errObList"))
+                                                ||
+                                                (listValue.object != null && props.dataLang?.payment_amountOfMoney)
+                                                ||
                                                 "payment_amountOfMoney"
                                             }
                                             isAllowed={(values) => {
                                                 if (!values.value) return true;
                                                 const { floatValue } = values;
-                                                if (
-                                                    listValue.object?.value &&
-                                                    listValue.listTypeOfDocument?.length > 0
-                                                ) {
+                                                if (listValue.object?.value && listValue.listTypeOfDocument?.length > 0) {
                                                     if (listValue.object?.value != "other") {
                                                         let totalMoney = listValue.listTypeOfDocument.reduce(
                                                             (total, item) => total + parseFloat(item.money),
                                                             0
                                                         );
                                                         if (floatValue > totalMoney) {
-                                                            ToatstNotifi(
-                                                                "error",
-                                                                `${props.dataLang?.payment_errPlease ||
-                                                                "payment_errPlease"
-                                                                } ${formatNumber(totalMoney)}`
-                                                            );
+                                                            ToatstNotifi("error", `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${formatNumber(totalMoney)}`);
                                                         }
                                                         return false;
                                                         // return floatValue <= totalMoney;
@@ -869,7 +843,7 @@ const Popup_dspt = (props) => {
                                 <h2 className="font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5">
                                     {props.dataLang?.receipts_info || "receipts_info"}
                                 </h2>
-                                <div className="col-span-12 grid grid-cols-12 items-center divide-x border border-l-0 border-t-0 border-r-0">
+                                <div className="grid items-center grid-cols-12 col-span-12 border border-t-0 border-l-0 border-r-0 divide-x">
                                     <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold col-span-2">
                                         {"#"}
                                     </h1>
@@ -881,30 +855,25 @@ const Popup_dspt = (props) => {
                                     </h1>
                                 </div>
                                 {listValue.listTypeOfDocument.length > 0 && (
-                                    <div className="col-span-12 border border-b-0 rounded transition-all duration-200 ease-linear">
-                                        <div
-                                            className={`${listValue.listTypeOfDocument.length > 5
-                                                ? " h-[170px] overflow-auto"
-                                                : ""
-                                                } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
-                                        >
+                                    <div className="col-span-12 transition-all duration-200 ease-linear border border-b-0 rounded">
+                                        <div className={`${listValue.listTypeOfDocument.length > 5 ? " h-[170px] overflow-auto" : ""} scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}  >
                                             {listValue.listTypeOfDocument.map((e, index) => {
                                                 return (
                                                     <div
                                                         key={e.value}
-                                                        className="col-span-12 grid grid-cols-12 items-center divide-x border-b"
+                                                        className="grid items-center grid-cols-12 col-span-12 border-b divide-x"
                                                     >
-                                                        <h1 className="text-center text-xs p-2 col-span-2">
-                                                            <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl animate-pulse">
+                                                        <h1 className="col-span-2 p-2 text-xs text-center">
+                                                            <span className="px-2 py-1 text-purple-500 bg-purple-200 rounded-xl animate-pulse">
                                                                 {index + 1}
                                                             </span>
                                                         </h1>
-                                                        <h1 className="text-center text-xs p-2 col-span-5 ">
-                                                            <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl">
+                                                        <h1 className="col-span-5 p-2 text-xs text-center ">
+                                                            <span className="px-2 py-1 text-purple-500 bg-purple-200 rounded-xl">
                                                                 {e.label}
                                                             </span>
                                                         </h1>
-                                                        <h1 className="text-right text-xs p-2 col-span-5">
+                                                        <h1 className="col-span-5 p-2 text-xs text-right">
                                                             {formatNumber(e.money)}
                                                         </h1>
                                                     </div>
@@ -915,7 +884,7 @@ const Popup_dspt = (props) => {
                                 )}
                             </div>
                         </div>
-                        <div className="text-right mt-1 space-x-2">
+                        <div className="mt-1 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={_ToggleModal.bind(this, false)}

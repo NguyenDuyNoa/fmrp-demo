@@ -128,7 +128,9 @@ const SalesOrderForm = (props) => {
 
     const { data: dataStaffs = [] } = useStaffComboboxByBranch({ branch_id: branch != null ? [+branch?.value]?.map((e) => e) : null });
 
-    const { data: dataCustomer = [] } = useClientComboboxByBranch({ search: "", branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null, });
+    const { data: dataCustomer = [] } = useClientComboboxByBranch({ search: "", branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null });
+
+    // const { data: dataCustomer = [] } = useClientComboboxByBranch({ search: "", branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null, });
 
     useEffect(() => {
         router.query && setErrDate(false);

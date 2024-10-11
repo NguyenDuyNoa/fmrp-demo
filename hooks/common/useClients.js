@@ -37,7 +37,7 @@ export const useClientComboboxByBranch = (params) => {
         queryKey: ["api_search_clients_by_branch", { ...params }],
         queryFn: async () => {
 
-            const { data } = await apiComons.apiSearchClient({ ...params });
+            const { data } = await apiComons.apiSearchClient({ params });
 
             if (!params?.branch_id) return []
 

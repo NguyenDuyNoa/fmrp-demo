@@ -25,6 +25,20 @@ export async function middleware(request, event) {
     //         }
     //     })
     // )
+    // const session = request.cookies.get('session');
+
+    // if (!session) {
+    //     const newSession = 'your-session-id'; // Tạo ID phiên làm việc
+    //     const response = NextResponse.next();
+    //     response.cookies.set('session', newSession, {
+    //         path: '/',
+    //         sameSite: 'None', // Cho phép cookie từ miền khác
+    //         secure: true, // Chỉ sử dụng cookie qua HTTPS
+    //     });
+
+    //     return response;
+    // }
+    // console.log("response", session);
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api_web/Api_Authentication/authentication?csrf_protection=true`, {
             method: "GET",

@@ -38,12 +38,10 @@ const initialData = {
     admin: "0",
     valueBr: [],
     dataDepar: [],
-    brandpOpt: [],
     room: [],
     tab: 0,
     thumb: null,
     isDeleteThumb: false,
-    dataOption: [],
     typePassword: false,
     thumbFile: null,
     idPos: null,
@@ -87,7 +85,7 @@ const Popup_dsnd = (props) => {
 
 
     useQuery({
-        queryKey: ["api_permissionsStaff"],
+        queryKey: ["api_permissions_staff"],
         queryFn: async () => {
             const params = {
                 position_id: isState?.positionId != isState?.idPos?.value ? isState?.idPos?.value : 0,
@@ -147,15 +145,6 @@ const Popup_dsnd = (props) => {
         },
         enabled: !!isState.open && !!props?.id
     })
-
-    useEffect(() => {
-        if (isState.open) {
-            queryState({
-                brandpOpt: props?.isState?.dataBranch || [],
-                dataOption: props?.isState?.dataOption || [],
-            });
-        }
-    }, [isState.open]);
 
     const handleChange = (parent, child = null, permissions = null) => {
         const newData = isState.room?.map((e) => {
@@ -439,7 +428,7 @@ const Popup_dsnd = (props) => {
                                                     classParent="m-0"
                                                     closeMenuOnSelect={false}
                                                     placeholder={props.dataLang?.client_list_brand}
-                                                    options={isState.brandpOpt}
+                                                    options={props?.listBranch}
                                                     isSearchable={true}
                                                     onChange={(e) => queryState({ valueBr: e })}
                                                     LoadingIndicator
@@ -611,11 +600,11 @@ const Popup_dsnd = (props) => {
                                                             />
                                                         )}
                                                         {!isState.thumb && (
-                                                            <div className="h-full w-full flex flex-col justify-center items-center">
+                                                            <div className="flex flex-col items-center justify-center w-full h-full">
                                                                 <IconImage />
                                                             </div>
                                                         )}
-                                                        <div className="absolute bottom-0 -right-12 flex flex-col space-y-2">
+                                                        <div className="absolute bottom-0 flex flex-col space-y-2 -right-12">
                                                             <input
                                                                 onChange={_HandleChangeFileThumb.bind(this)}
                                                                 type="file"
@@ -626,7 +615,7 @@ const Popup_dsnd = (props) => {
                                                             <label
                                                                 htmlFor={`upload`}
                                                                 title="Sửa hình"
-                                                                className="cursor-pointer w-8 h-8 rounded-full bg-slate-100 flex flex-col justify-center items-center"
+                                                                className="flex flex-col items-center justify-center w-8 h-8 rounded-full cursor-pointer bg-slate-100"
                                                             >
                                                                 <IconEditImg size="17" />
                                                             </label>
@@ -634,7 +623,7 @@ const Popup_dsnd = (props) => {
                                                                 disabled={!isState.thumb ? true : false}
                                                                 onClick={_DeleteThumb.bind(this)}
                                                                 title="Xóa hình"
-                                                                className="w-8 h-8 rounded-full bg-red-500 disabled:opacity-30 flex flex-col justify-center items-center text-white"
+                                                                className="flex flex-col items-center justify-center w-8 h-8 text-white bg-red-500 rounded-full disabled:opacity-30"
                                                             >
                                                                 <IconDelete size="17" />
                                                             </button>
@@ -648,7 +637,7 @@ const Popup_dsnd = (props) => {
                             </Customscrollbar>
                         )}
                         {isState.tab == 1 && (
-                            <div className="flex  items-center justify-between gap-2  flex-wrap ">
+                            <div className="flex flex-wrap items-center justify-between gap-2 ">
                                 <div className="flex items-center w-full gap-5">
                                     <div className="w-1/2">
                                         <div className="">
@@ -656,7 +645,7 @@ const Popup_dsnd = (props) => {
                                                 {props.dataLang?.personnels_staff_position}
                                             </label>
                                             <SelectComponent
-                                                options={isState.dataOption}
+                                                options={props?.listPosition}
                                                 formatOptionLabel={SelectOptionLever}
                                                 value={isState.idPos}
                                                 maxMenuHeight="200px"
@@ -772,10 +761,10 @@ const Popup_dsnd = (props) => {
                                             {isState.room?.map((e) => {
                                                 return (
                                                     <div className={e?.hidden ? "hidden" : ""} key={e?.key}>
-                                                        <div className="flex w-max items-center">
+                                                        <div className="flex items-center w-max">
                                                             <div className="inline-flex items-center">
                                                                 <label
-                                                                    className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                    className="relative flex items-center p-3 rounded-full cursor-pointer"
                                                                     htmlFor={e?.key}
                                                                     data-ripple-dark="true"
                                                                 >
@@ -787,7 +776,7 @@ const Popup_dsnd = (props) => {
                                                                         checked={e?.is_check == 1 ? true : false}
                                                                         onChange={(value) => handleChange(e)}
                                                                     />
-                                                                    <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                    <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                                         <svg
                                                                             xmlns="http://www.w3.org/2000/svg"
                                                                             className="h-3.5 w-3.5"
@@ -822,7 +811,7 @@ const Popup_dsnd = (props) => {
                                                                                 "border-b"
                                                                                 } ml-10 border-t border-x`}
                                                                         >
-                                                                            <div className="border-b p-2 text-sm">
+                                                                            <div className="p-2 text-sm border-b">
                                                                                 {i?.name}
                                                                             </div>
                                                                             <div className="grid grid-cols-3 gap-1 ">
@@ -830,11 +819,11 @@ const Popup_dsnd = (props) => {
                                                                                     return (
                                                                                         <div
                                                                                             key={s?.key}
-                                                                                            className="flex w-full items-center"
+                                                                                            className="flex items-center w-full"
                                                                                         >
                                                                                             <div className="inline-flex items-center">
                                                                                                 <label
-                                                                                                    className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                                                    className="relative flex items-center p-3 rounded-full cursor-pointer"
                                                                                                     htmlFor={
                                                                                                         s?.key +
                                                                                                         "" +
@@ -867,7 +856,7 @@ const Popup_dsnd = (props) => {
                                                                                                             );
                                                                                                         }}
                                                                                                     />
-                                                                                                    <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                                                    <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                                                                         <svg
                                                                                                             xmlns="http://www.w3.org/2000/svg"
                                                                                                             className="h-3.5 w-3.5"
@@ -910,7 +899,7 @@ const Popup_dsnd = (props) => {
                                 </div>
                             </div>
                         )}
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={() => queryState({ open: false })}
