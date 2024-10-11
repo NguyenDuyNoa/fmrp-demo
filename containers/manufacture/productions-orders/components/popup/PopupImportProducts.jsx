@@ -233,26 +233,26 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("dtPoi[reference_no_detail]", isState?.dtPoi?.reference_no_detail)
                 formData.append("dtPoi[pp_id]", isState?.dtPoi?.pp_id)
 
-                // handingPopup.mutate(formData, {
-                //     onSuccess: (data) => {
-                //         if (data?.isSuccess) {
-                //             isShow('success', data?.message)
-                //             queryClient.invalidateQueries(["api_item_orders_detail", true])
-                //             queryState({
-                //                 open: false,
-                //                 idWarehouseExport: [],
-                //                 idWarehouseImport: null,
-                //                 errorWarehouseImport: false,
-                //                 errorWarehouseExport: false
-                //             })
-                //             return
-                //         }
-                //         isShow('error', data?.message)
-                //     },
-                //     onError: (error) => {
-                //         throw new Error(error);
-                //     },
-                // })
+                handingPopup.mutate(formData, {
+                    onSuccess: (data) => {
+                        if (data?.isSuccess) {
+                            isShow('success', data?.message)
+                            queryClient.invalidateQueries(["api_item_orders_detail", true])
+                            queryState({
+                                open: false,
+                                idWarehouseExport: [],
+                                idWarehouseImport: null,
+                                errorWarehouseImport: false,
+                                errorWarehouseExport: false
+                            })
+                            return
+                        }
+                        isShow('error', data?.message)
+                    },
+                    onError: (error) => {
+                        throw new Error(error);
+                    },
+                })
             }
         } catch (error) {
             throw error
