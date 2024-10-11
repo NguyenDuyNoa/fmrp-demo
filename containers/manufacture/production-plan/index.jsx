@@ -331,7 +331,7 @@ const ProductionPlan = (props) => {
         },
         data,
         isValue,
-        isFetching: isLoading || isFetching,
+        isFetching: isLoading,
         options: listProduct,
         _HandleSeachApi,
         handleQueryId,

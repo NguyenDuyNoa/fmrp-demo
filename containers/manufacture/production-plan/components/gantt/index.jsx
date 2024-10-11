@@ -59,7 +59,7 @@ const BodyGantt = ({
         <React.Fragment>
             {data?.length > 0 ? (
                 <div className="flex flex-col ">
-                    <div className="flex items-end  border-t overflow-hidden border-b">
+                    <div className="flex items-end overflow-hidden border-t border-b">
                         <div className={`min-w-[35%]  w-[35%]`}>
                             <div className="flex items-center gap-2 pb-1 pl-2">
                                 {[
@@ -83,8 +83,8 @@ const BodyGantt = ({
                                     </Zoom>
                                 ))}
                             </div>
-                            <div className="grid grid-cols-12  gap-2">
-                                <div className="col-span-1 flex items-center gap-1">
+                            <div className="grid grid-cols-12 gap-2">
+                                <div className="flex items-center col-span-1 gap-1">
                                     <div className="mr-1">
                                         {/* <button
                                             type="button"
@@ -109,10 +109,10 @@ const BodyGantt = ({
                                                     sCheckCkecked(!checkCkecked);
                                                 }}
                                             />
-                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                            <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-3 w-3"
+                                                    className="w-3 h-3"
                                                     viewBox="0 0 20 20"
                                                     fill="currentColor"
                                                     stroke="currentColor"
@@ -127,7 +127,7 @@ const BodyGantt = ({
                                             </div>
                                         </label>
                                     </div>
-                                    <div onClick={() => handleSort()} className="flex-col flex gap-1 cursor-pointer ">
+                                    <div onClick={() => handleSort()} className="flex flex-col gap-1 cursor-pointer ">
                                         <Image
                                             alt={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"
                                             }
@@ -151,7 +151,7 @@ const BodyGantt = ({
                                         />
                                     </div>
                                 </div>
-                                <div className="col-span-11 grid grid-cols-11 w-full">
+                                <div className="grid w-full grid-cols-11 col-span-11">
                                     <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
                                         Đơn hàng
                                     </div>
@@ -204,14 +204,14 @@ const BodyGantt = ({
                         </div>
                     </div>
                     {isFetching ? (
-                        <Loading />
+                        <Loading className="3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]" />
                     ) : (
                         <div className="flex divide-x">
                             <div
                                 ref={container3Ref}
                                 onScroll={handleScrollContainer2}
                                 className="flex-col min-w-[35%] w-[35%]  overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
-                            3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                                3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                             >
                                 {data?.map((e, eIndex) => {
                                     const outDate = ["outDate"].includes(e.status);
@@ -235,7 +235,7 @@ const BodyGantt = ({
                                                                 src={"/productionPlan/Shapedow.png"}
                                                                 className={`${e.show ? "rotate-0 t" : "-rotate-90 "} object-cover duration-500 col-span-1 mx-auto  transition-all ease-in-out`}
                                                             />
-                                                            <div className="grid grid-cols-11 col-span-11 w-full items-center gap-2">
+                                                            <div className="grid items-center w-full grid-cols-11 col-span-11 gap-2">
                                                                 <h2
                                                                     className={`text-[#52575E] ${(outDate && "group-hover:text-[#EE1E1E]") ||
                                                                         (processing && "group-hover:text-[#3276FA]") ||
@@ -245,7 +245,7 @@ const BodyGantt = ({
                                                                 >
                                                                     {e.nameOrder}
                                                                 </h2>
-                                                                <div className="flex items-center gap-1 col-span-2">
+                                                                <div className="flex items-center col-span-2 gap-1">
                                                                     <h2
                                                                         className={`${(outDate && "text-[#EE1E1E]") ||
                                                                             (processing && "text-[#3276FA]") ||
@@ -295,7 +295,7 @@ const BodyGantt = ({
                                                                             }`}
                                                                     ></button>
                                                                 </div>
-                                                                <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
+                                                                <div className="flex items-center col-span-3 gap-1 3xl:gap-2">
                                                                     {i.images != null ? (
                                                                         <ModalImage
                                                                             small={i.images}
@@ -363,7 +363,7 @@ const BodyGantt = ({
                                             {/* <div
                                                 className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[41px]`}
                                             >
-                                                <div className="flex gap-1 items-center ">
+                                                <div className="flex items-center gap-1 ">
                                                     <p className="text-[#11315B]  3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal">
                                                         {e.nameOrder}
                                                     </p>
@@ -441,7 +441,7 @@ const BodyGantt = ({
                                                     <div
                                                         className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[37px]`}
                                                     >
-                                                        {/* <div className="flex gap-1 items-center ">
+                                                        {/* <div className="flex items-center gap-1 ">
                                                             <p className="text-[#11315B]  3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal">
                                                                 {e.nameOrder}
                                                             </p>
@@ -563,7 +563,7 @@ const BodyGantt = ({
                             </div>
                         </div>
                     )}
-                    {/* <div className="w-full border-b flex flex-col">
+                    {/* <div className="flex flex-col w-full border-b">
                         <div className="border-b">
                             <button type="button" onClick={handleToggle} className="flex items-center gap-2 my-2">
                                 <Image
@@ -590,8 +590,9 @@ const BodyGantt = ({
                         <div className="flex items-center justify-around mt-6 "></div>
                     </div>
                 </div>
-            )}
-        </React.Fragment>
+            )
+            }
+        </React.Fragment >
     );
 };
 
