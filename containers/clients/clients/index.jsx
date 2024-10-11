@@ -222,11 +222,11 @@ const Client = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.client_list_title}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ? (
                                     <Popup_dskh
                                         listBr={listBr || []}
@@ -269,7 +269,7 @@ const Client = (props) => {
                                 })}
                         </ContainerFilterTab>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -298,7 +298,7 @@ const Client = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData onClick={() => refetch()} sOnFetching={() => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -316,7 +316,7 @@ const Client = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -386,34 +386,32 @@ const Client = (props) => {
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={2}
-                                                        className="flex object-cover  justify-start items-center flex-wrap gap-2"
+                                                        className="flex flex-wrap items-center justify-start object-cover gap-2"
                                                     >
-                                                        {e?.staff_charge
-                                                            ? e.staff_charge?.map((d) => {
-                                                                return (
-                                                                    <>
-                                                                        <Tooltip
-                                                                            title={d.full_name}
-                                                                            arrow
-                                                                            theme="dark"
-                                                                        >
-                                                                            <ImageErrors
-                                                                                src={d.profile_image}
-                                                                                width={40}
-                                                                                height={40}
-                                                                                defaultSrc="/user-placeholder.jpg"
-                                                                                alt="Image"
-                                                                                className="min-w-[40px] min-h-[40px] object-cover rounded-[100%] text-left cursor-pointer"
-                                                                            />
-                                                                        </Tooltip>
-                                                                    </>
-                                                                );
-                                                            })
+                                                        {e?.staff_charge ? e.staff_charge?.map((d) => {
+                                                            return (
+                                                                <Tooltip
+                                                                    title={d.full_name}
+                                                                    arrow
+                                                                    key={d?.id}
+                                                                    theme="dark"
+                                                                >
+                                                                    <ImageErrors
+                                                                        src={d.profile_image}
+                                                                        width={40}
+                                                                        height={40}
+                                                                        defaultSrc="/user-placeholder.jpg"
+                                                                        alt="Image"
+                                                                        className="min-w-[40px] min-h-[40px] object-cover rounded-[100%] text-left cursor-pointer"
+                                                                    />
+                                                                </Tooltip>
+                                                            );
+                                                        })
                                                             : ""}
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={2}
-                                                        className="flex justify-start flex-wrap items-center"
+                                                        className="flex flex-wrap items-center justify-start"
                                                     >
                                                         {e.client_group?.map((h) => {
                                                             return (
@@ -438,7 +436,7 @@ const Client = (props) => {
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
-                                                        className="flex items-center gap-1 flex-wrap"
+                                                        className="flex flex-wrap items-center gap-1"
                                                     >
                                                         {e.branch?.map((i, index) => (
                                                             <TagBranch key={index}>{i.name}</TagBranch>
@@ -446,14 +444,14 @@ const Client = (props) => {
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
-                                                        className="space-x-2 text-center flex items-center justify-center"
+                                                        className="flex items-center justify-center space-x-2 text-center"
                                                     >
                                                         {role == true || checkEdit ? (
                                                             <Popup_dskh
                                                                 listBr={listBr || []}
                                                                 listSelectCt={listSelectCt}
                                                                 onRefresh={refetch.bind(this)}
-                                                                className="xl:text-base text-xs "
+                                                                className="text-xs xl:text-base "
                                                                 listDs={listGroup}
                                                                 dataLang={dataLang}
                                                                 name={e.name}

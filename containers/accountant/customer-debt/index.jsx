@@ -11,15 +11,17 @@ import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecompon
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading/loading";
+import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useClientComboboxNoSearchToParams } from "@/hooks/common/useClients";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import { SearchNormal1 as IconSearch } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -27,14 +29,8 @@ import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import PopupDetailArises from "./components/details_arises";
 import PopupDetailFirst from "./components/details_first";
-import { _ServerInstance as Axios } from "/services/axios";
+import { useCustomerDebtList } from "./hooks/useCustomerDebtList";
 
-const initialData = {
-    data: [],
-    dataExcel: [],
-    listBr: [],
-    listClients: [],
-};
 const initialValue = {
     idClient: null,
     idBranch: null,
@@ -44,24 +40,16 @@ const initialValue = {
     },
 };
 const CustomerDebt = (props) => {
-    const { paginate } = usePagination();
     const router = useRouter();
     const dataLang = props.dataLang;
     const dataSeting = useSetingServer();
-    const [total, sTotal] = useState({});
+    const { paginate } = usePagination();
     const [keySearch, sKeySearch] = useState("");
     const statusExprired = useStatusExprired();
-    const [onFetching, sOnFetching] = useState(false);
-    const [dataTable, sDataTable] = useState(initialData);
     const [valueChange, sValueChange] = useState(initialValue);
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     useEffect(() => {
-        router.push({
-            pathname: router.route,
-            query: { tab: router.query?.tab ? router.query?.tab : "all" },
-        });
         const pastDays = 30;
         const today = new Date();
         const pastDate = new Date(today);
@@ -69,103 +57,21 @@ const CustomerDebt = (props) => {
         sValueChange((e) => ({ ...e, valueDate: { startDate: pastDate, endDate: today } }));
     }, []);
 
-    const _ServerFetching = async () => {
-        await Axios("GET", `/api_web/Api_debt_client/debtClient?csrf_protection=true`, {
-            params: {
-                search: keySearch,
-                limit: limit,
-                page: router.query?.page || 1,
-                "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
-                "filter[client_id]": valueChange.idClient ? valueChange.idClient.value : null,
-                "filter[start_date]": valueChange.valueDate?.startDate != null ? formatMoment(valueChange.valueDate?.startDate, FORMAT_MOMENT.DATE_LONG) : null,
-                "filter[end_date]": valueChange.valueDate?.endDate != null ? formatMoment(valueChange.valueDate?.endDate, FORMAT_MOMENT.DATE_LONG) : null,
-            },
-        },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data;
-                    sDataTable((e) => ({ ...e, data: rResult, dataExcel: rResult }));
-                    sTotalItems(output);
-                    sTotal(rTotal);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
+    const params = {
+        search: keySearch,
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
+        "filter[client_id]": valueChange.idClient ? valueChange.idClient.value : null,
+        "filter[start_date]": valueChange.valueDate?.startDate != null ? formatMoment(valueChange.valueDate?.startDate, FORMAT_MOMENT.DATE_LONG) : null,
+        "filter[end_date]": valueChange.valueDate?.endDate != null ? formatMoment(valueChange.valueDate?.endDate, FORMAT_MOMENT.DATE_LONG) : null,
+    }
 
-    const _ServerFetching_filter = async () => {
-        await Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                sDataTable((e) => ({ ...e, listBr: result?.map((e) => ({ label: e.name, value: e.id })) }));
-            }
-        });
-        await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sDataTable((e) => ({
-                    ...e,
-                    listClients: rResult?.map(({ name, id }) => ({ label: name, value: id })),
-                }));
-            }
-        });
-        sOnFetching_filter(false);
-    };
+    const { data: listBranch = [] } = useBranchList()
 
-    let searchTimeout;
+    const { data: listClients = [] } = useClientComboboxNoSearchToParams({})
 
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") {
-            return;
-        } else {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/api_client/client_option/?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let { rResult } = response.data;
-                            sDataTable((e) => ({
-                                ...e,
-                                listClients: rResult?.map(({ name, id }) => ({ label: name, value: id })),
-                            }));
-                        }
-                    }
-                );
-            }, 500);
-        }
-    };
-
-    useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    useEffect(() => {
-        (router.query.tab && sOnFetching(true)) ||
-            (keySearch && sOnFetching(true)) ||
-            (router.query?.tab && sOnFetching_filter(true)) ||
-            (valueChange.idBranch != null && sOnFetching(true)) ||
-            (valueChange.valueDate.startDate != null && valueChange.valueDate.endDate != null && sOnFetching(true)) ||
-            (valueChange.idClient != null && sOnFetching(true));
-    }, [
-        limit,
-        router.query?.page,
-        router.query?.tab,
-        valueChange.idBranch,
-        valueChange.valueDate.endDate,
-        valueChange.valueDate.startDate,
-        valueChange.idClient,
-    ]);
+    const { data, refetch, isFetching, isLoading } = useCustomerDebtList(params)
 
     const formatNumber = (number) => {
         return formatMoneyConfig(+number, dataSeting);
@@ -179,7 +85,6 @@ const CustomerDebt = (props) => {
                 tab: router.query?.tab,
             },
         });
-        sOnFetching(true);
     }, 500);
 
     const onchangFilter = (type) => (value) => sValueChange((e) => ({ ...e, [type]: value }));
@@ -260,7 +165,7 @@ const CustomerDebt = (props) => {
                     },
                 },
             ],
-            data: dataTable.dataExcel?.map((e) => [
+            data: data?.rResult?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.name ? e?.name : ""}` },
@@ -317,40 +222,31 @@ const CustomerDebt = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_table_branch ||
-                                                            "purchase_order_table_branch",
+                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataTable.listBr,
+                                                    ...listBranch,
                                                 ]}
                                                 isClearable={true}
                                                 value={valueChange.idBranch}
                                                 onChange={onchangFilter("idBranch")}
-                                                placeholder={
-                                                    dataLang?.purchase_order_table_branch ||
-                                                    "purchase_order_table_branch"
-                                                }
+                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                                 colSpan={1}
                                             />
                                             <SelectComponent
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.customerDebt_suppliert ||
-                                                            "customerDebt_suppliert",
+                                                        label: dataLang?.customerDebt_suppliert || "customerDebt_suppliert",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataTable.listClients,
+                                                    ...listClients,
                                                 ]}
                                                 colSpan={1}
                                                 isClearable={true}
                                                 onChange={onchangFilter("idClient")}
                                                 value={valueChange.idClient}
-                                                placeholder={
-                                                    dataLang?.customerDebt_suppliert || "customerDebt_suppliert"
-                                                }
+                                                placeholder={dataLang?.customerDebt_suppliert || "customerDebt_suppliert"}
                                             />
                                             <DateToDateComponent
                                                 colSpan={1}
@@ -361,9 +257,9 @@ const CustomerDebt = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex items-center justify-end gap-2">
-                                            <OnResetData sOnFetching={sOnFetching} />
+                                            <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                             <div>
-                                                {dataTable.dataExcel?.length > 0 && (
+                                                {data?.rResult?.length > 0 && (
                                                     <ExcelFileComponent
                                                         multiDataSet={multiDataSet}
                                                         filename={dataLang?.customerDebt_lits || "customerDebt_lits"}
@@ -422,125 +318,96 @@ const CustomerDebt = (props) => {
                                             </h4>
                                         </div>
                                     </HeaderTable>
-                                    {onFetching ? (
+                                    {(isLoading || isFetching) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
-                                    ) : dataTable.data?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                {dataTable.data?.map((e) => (
-                                                    <div
-                                                        className="relative  grid grid-cols-12 items-center py-1.5  hover:bg-slate-100/40 group"
-                                                        key={e.id.toString()}
-                                                    >
-                                                        <h6 className="text-center 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 capitalize">
-                                                            {e.code}
-                                                        </h6>
-                                                        <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                            {e.name}
-                                                        </h6>
-                                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                {e.no_start == "0" ? (
-                                                                    "-"
-                                                                ) : (
-                                                                    <PopupDetailFirst
-                                                                        name={
-                                                                            e.no_start == "0"
-                                                                                ? "-"
-                                                                                : formatNumber(e.no_start)
-                                                                        }
-                                                                        id={e?.id}
-                                                                        type={"no_start"}
-                                                                        className="text-left"
-                                                                        supplier_name={e.name}
-                                                                        {...propsPopup}
-                                                                    />
-                                                                )}
-                                                            </h4>
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                {e.thu_start == "0" ? (
-                                                                    "-"
-                                                                ) : (
-                                                                    <PopupDetailFirst
-                                                                        name={
-                                                                            e.thu_start == "0"
-                                                                                ? "-"
-                                                                                : formatNumber(e.thu_start)
-                                                                        }
-                                                                        id={e?.id}
-                                                                        className="text-left"
-                                                                        supplier_name={e.name}
-                                                                        {...propsPopup}
-                                                                    />
-                                                                )}
-                                                            </h4>
-                                                        </div>
-                                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                {e.no_debt == "0" ? (
-                                                                    "-"
-                                                                ) : (
-                                                                    <PopupDetailArises
-                                                                        name={
-                                                                            e.no_debt == "0"
-                                                                                ? "-"
-                                                                                : formatNumber(e.no_debt)
-                                                                        }
-                                                                        className="text-left uppercase"
-                                                                        id={e?.id}
-                                                                        type={"no_debt"}
-                                                                        supplier_name={e.name}
-                                                                        {...propsPopup}
-                                                                    />
-                                                                )}
-                                                            </h4>
-
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                {e.thu_debt == "0" ? (
-                                                                    "-"
-                                                                ) : (
-                                                                    <PopupDetailArises
-                                                                        className="text-left uppercase"
-                                                                        name={
-                                                                            e.thu_debt == "0"
-                                                                                ? "-"
-                                                                                : formatNumber(e.thu_debt)
-                                                                        }
-                                                                        id={e?.id}
-                                                                        type={"thu_debt"}
-                                                                        supplier_name={e.name}
-                                                                        {...propsPopup}
-                                                                    />
-                                                                )}
-                                                            </h4>
-                                                        </div>
-
-                                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
-                                                            </h4>
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                {e.thu_end == "0" ? "-" : formatNumber(e.thu_end)}
-                                                            </h4>
-                                                        </div>
+                                    ) : data?.rResult?.length > 0 ? (
+                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                            {data?.rResult?.map((e) => (
+                                                <div
+                                                    className="relative  grid grid-cols-12 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                    key={e.id.toString()}
+                                                >
+                                                    <h6 className="text-center 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 capitalize">
+                                                        {e.code}
+                                                    </h6>
+                                                    <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                        {e.name}
+                                                    </h6>
+                                                    <div className="grid items-center justify-center grid-cols-4 col-span-3">
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                            {e.no_start == "0" ? (
+                                                                "-"
+                                                            ) : (
+                                                                <PopupDetailFirst
+                                                                    name={e.no_start == "0" ? "-" : formatNumber(e.no_start)}
+                                                                    id={e?.id}
+                                                                    type={"no_start"}
+                                                                    className="text-left"
+                                                                    supplier_name={e.name}
+                                                                    {...propsPopup}
+                                                                />
+                                                            )}
+                                                        </h4>
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                            {e.thu_start == "0" ? (
+                                                                "-"
+                                                            ) : (
+                                                                <PopupDetailFirst
+                                                                    name={e.thu_start == "0" ? "-" : formatNumber(e.thu_start)}
+                                                                    id={e?.id}
+                                                                    className="text-left"
+                                                                    supplier_name={e.name}
+                                                                    {...propsPopup}
+                                                                />
+                                                            )}
+                                                        </h4>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
+                                                    <div className="grid items-center justify-center grid-cols-4 col-span-3">
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                            {e.no_debt == "0" ? (
+                                                                "-"
+                                                            ) : (
+                                                                <PopupDetailArises
+                                                                    name={e.no_debt == "0" ? "-" : formatNumber(e.no_debt)}
+                                                                    className="text-left uppercase"
+                                                                    id={e?.id}
+                                                                    type={"no_debt"}
+                                                                    supplier_name={e.name}
+                                                                    {...propsPopup}
+                                                                />
+                                                            )}
+                                                        </h4>
+
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                            {e.thu_debt == "0" ? (
+                                                                "-"
+                                                            ) : (
+                                                                <PopupDetailArises
+                                                                    className="text-left uppercase"
+                                                                    name={e.thu_debt == "0" ? "-" : formatNumber(e.thu_debt)}
+                                                                    id={e?.id}
+                                                                    type={"thu_debt"}
+                                                                    supplier_name={e.name}
+                                                                    {...propsPopup}
+                                                                />
+                                                            )}
+                                                        </h4>
+                                                    </div>
+
+                                                    <div className="grid items-center justify-center grid-cols-4 col-span-3">
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                            {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
+                                                        </h4>
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                            {e.thu_end == "0" ? "-" : formatNumber(e.thu_end)}
+                                                        </h4>
+                                                    </div>
                                                 </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {dataLang?.purchase_order_table_item_not_found ||
-                                                        "purchase_order_table_item_not_found"}
-                                                </h1>
-                                                <div className="flex items-center justify-around mt-6 "></div>
-                                            </div>
+                                            ))}
                                         </div>
-                                    )}
+                                    ) :
+                                        <NoData />
+                                    }
                                 </div>
                             </Customscrollbar>
                         </ContainerTable>
@@ -551,38 +418,37 @@ const CustomerDebt = (props) => {
                                 {dataLang?.import_total || "import_total"}
                             </h3>
                         </div>
-
                         <div className="grid items-center justify-center grid-cols-4 col-span-3">
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.no_start)}
+                                {formatNumber(data?.rTotal?.no_start)}
                             </h3>
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.thu_start)}
+                                {formatNumber(data?.rTotal?.thu_start)}
                             </h3>
                         </div>
                         <div className="grid items-center justify-center grid-cols-4 col-span-3">
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.no_debt)}
+                                {formatNumber(data?.rTotal?.no_debt)}
                             </h3>
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.thu_debt)}
+                                {formatNumber(data?.rTotal?.thu_debt)}
                             </h3>
                         </div>
                         <div className="grid items-center justify-center grid-cols-4 col-span-3">
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.no_end)}
+                                {formatNumber(data?.rTotal?.no_end)}
                             </h3>
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right ">
-                                {formatNumber(total?.thu_end)}
+                                {formatNumber(data?.rTotal?.thu_end)}
                             </h3>
                         </div>
                     </div>
-                    {dataTable.data?.length != 0 && (
+                    {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
