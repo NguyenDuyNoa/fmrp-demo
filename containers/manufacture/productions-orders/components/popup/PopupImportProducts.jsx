@@ -316,7 +316,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <h1 className="text-xs italic font-medium 2xl:text-sm text-black/60">
-                                                Cần SX: <span className="font-medium text-black">{formanumber(isState.item.quantityDefault)}</span>
+                                                Cần SX: <span className="font-medium text-black">{formanumber(isState.item.quantityDefault)}</span> <span className="lowercase">{isState?.item?.unit_name}</span>
                                             </h1>
                                         </div>
                                     </div>
@@ -547,10 +547,10 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                                     <h1 className="text-xs italic font-normal">{e?.item_code} - {e?.product_variation}</h1>
                                                                     <div className="flex items-center justify-between divide-x">
                                                                         <h1 className="w-1/2 text-xs font-medium 2xl:text-sm text-black/60">
-                                                                            Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span> <span>{e?.unit_name_primary}</span>
+                                                                            Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span> <span className="lowercase">{e?.unit_name_primary}</span>
                                                                         </h1>
                                                                         <h1 className="w-1/2 text-xs font-medium text-center 2xl:text-sm text-black/60">
-                                                                            Đã giữ kho: <span className="font-medium text-black">{formanumber(e?.quantity_keep)}</span> <span>{e?.unit_name_primary}</span>
+                                                                            Đã giữ kho: <span className="font-medium text-black">{formanumber(e?.quantity_keep)}</span> <span className="lowercase">{e?.unit_name_primary}</span>
                                                                         </h1>
                                                                     </div>
                                                                     <div className="flex items-center justify-between gap-2">

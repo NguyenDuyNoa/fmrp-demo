@@ -124,25 +124,27 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
                             ? "3xl:h-[calc(100vh_-_343px)] 2xl:h-[calc(100vh_-_343px)] xxl:h-[calc(100vh_-_345px)] 3xl:w-[85%] 2xl:w-[77%] xl:w-[75%] lg:w-[75%]"
                             : "3xl:h-[calc(100vh_-_500px)] h-[calc(100vh_-_460px)] 3xl:w-[70%] 2xl:w-[70%] xl:w-[65%] lg:w-[70%]"}  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 overflow-x-auto pr-2`}
                     >
-                        {isInfomation.dataInformation?.arrayProducts?.map((e) => {
-                            const shownElements = isInfomation.dataInformation?.arrayProducts?.filter((e) => e?.show);
-                            return (
-                                <RenderItem
-                                    type='semi'
-                                    id={e?.id}
-                                    key={e?.id}
-                                    name={e.name}
-                                    code={e.code}
-                                    image={e?.image}
-                                    dataLang={dataLang}
-                                    quantity={e?.quantity}
-                                    processBar={e?.processBar}
-                                    checkBorder={shownElements}
-                                    itemVariation={e?.itemVariation}
-                                    dataDetail={isStateModal.dataDetail}
-                                />
-                            );
-                        })}
+                        {
+                            isInfomation.dataInformation?.arrayProducts?.map((e) => {
+                                const shownElements = isInfomation.dataInformation?.arrayProducts?.filter((e) => e?.show);
+                                return (
+                                    <RenderItem
+                                        type='semi'
+                                        id={e?.id}
+                                        key={e?.id}
+                                        name={e.name}
+                                        code={e.code}
+                                        image={e?.image}
+                                        dataLang={dataLang}
+                                        quantity={e?.quantity}
+                                        processBar={e?.processBar}
+                                        checkBorder={shownElements}
+                                        itemVariation={e?.itemVariation}
+                                        dataDetail={isStateModal.dataDetail}
+                                    />
+                                );
+                            })
+                        }
                         <div className="">
                             <RenderItem
                                 id={undefined}
@@ -172,7 +174,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     return (
-        <div key={id ?? ""} className={`max-w-lg w-full`}>
+        <div key={id ?? ""} className={`max-w-lg min-w-[250px] w-[250px]`}>
             <div className={`bg-white sticky top-0 z-[1] `}>
                 <div className={`flex items-start py-2 px-4 h-[90px]  gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-full`}>
                     <div className="min-h-[32px] h-8 w-8 min-w-[32px]">
@@ -187,10 +189,10 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                     </div>
                     <div className="flex flex-col gap-0.5">
                         <div className={`text-xs ${type === "semi" ? "font-medium" : "text-[#5599EC] font-semibold"}`}>
-                            {name} - {code}
+                            {name}
                         </div>
                         <div className={`text-[10px] italic text-gray-500 w-fit`}>
-                            {itemVariation}
+                            {code} - {itemVariation}
                         </div>
                         <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
                             Số lượng: {quantity > 0 ? formatNumber(quantity) : "-"}
@@ -198,52 +200,53 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                     </div>
                 </div>
             </div>
-            {processBar?.map((j, jIndex) => {
-                const checkLast = processBar?.length - 1 != jIndex
-                const checkDate = processBar?.filter((e) => e?.date_production)?.length > 0
-                return (
-                    <div key={jIndex} className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
-                        <div className="flex min-h-[70px] gap-3">
-                            <div className={`${checkDate ? "" : 'hidden'} text-[10px] ${j?.active ? 'text-black' : "text-black/70"} font-normal text-right`}>
-                                <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
-                                    {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
-                                </div>
-                                <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
-                                    {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.TIME_SHORT)}
-                                </div>
-                            </div>
-                            <div className="flex">
-                                <div className={`mr-3 flex flex-col items-center`}>
-                                    <div className="">
-                                        <div className={`flex h-5 w-5 ${j?.active ? "border-[#14b8a6] bg-[#14b8a6]" : j?.begin_production == 1 ? 'border-orange-600' : "border-gray-400"}  items-center justify-center rounded-full border `}>
-                                            {
-                                                processBar?.length - 1 != jIndex
-                                                    ?
-                                                    <>
-                                                        {jIndex % 2 == 0 && <FaArrowDown size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
-                                                        {jIndex % 2 != 0 && <AiOutlineFileText size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
-                                                    </>
-                                                    :
-                                                    <FaCheck size={8} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />
-                                            }
-                                        </div>
+            {
+                processBar?.map((j, jIndex) => {
+                    const checkLast = processBar?.length - 1 != jIndex
+                    const checkDate = processBar?.filter((e) => e?.date_production)?.length > 0
+                    return (
+                        <div key={jIndex} className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
+                            <div className="flex min-h-[70px] gap-3">
+                                <div className={`${checkDate ? "" : 'hidden'} text-[10px] ${j?.active ? 'text-black' : "text-black/70"} font-normal text-right`}>
+                                    <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
+                                        {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
                                     </div>
-                                    {checkLast && <div className={`h-full w-px ${j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`}>
-                                    </div>}
+                                    <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
+                                        {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.TIME_SHORT)}
+                                    </div>
                                 </div>
-                                <div className="mt-0.5">
-                                    <div className="flex items-center gap-2">
-                                        <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>{j.stage_name}</p>
-                                        <PopupImportProducts
-                                            dataStage={j}
-                                            dataLang={dataLang}
-                                            dataDetail={dataDetail}
-                                            type={(+j?.type == 3) ? 'begin_production' : (+j?.type == 2 && 'end_production')}
-                                        >
-                                            <FaCheckCircle className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
-                                        </PopupImportProducts>
+                                <div className="flex">
+                                    <div className={`mr-3 flex flex-col items-center`}>
+                                        <div className="">
+                                            <div className={`flex h-5 w-5 ${j?.active ? "border-[#14b8a6] bg-[#14b8a6]" : j?.begin_production == 1 ? 'border-orange-600' : "border-gray-400"}  items-center justify-center rounded-full border `}>
+                                                {
+                                                    processBar?.length - 1 != jIndex
+                                                        ?
+                                                        <>
+                                                            {jIndex % 2 == 0 && <FaArrowDown size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
+                                                            {jIndex % 2 != 0 && <AiOutlineFileText size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
+                                                        </>
+                                                        :
+                                                        <FaCheck size={8} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />
+                                                }
+                                            </div>
+                                        </div>
+                                        {checkLast && <div className={`h-full w-px ${j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`}>
+                                        </div>}
+                                    </div>
+                                    <div className="mt-0.5">
+                                        <div className="flex items-center gap-2">
+                                            <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>{j.stage_name}</p>
+                                            <PopupImportProducts
+                                                dataStage={j}
+                                                dataLang={dataLang}
+                                                dataDetail={dataDetail}
+                                                type={(+j?.type == 3) ? 'begin_production' : (+j?.type == 2 && 'end_production')}
+                                            >
+                                                <FaCheckCircle className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
+                                            </PopupImportProducts>
 
-                                        {/* {(+j?.type == 2 || +j?.type == 3)
+                                            {/* {(+j?.type == 2 || +j?.type == 3)
                                             ?
                                             <div className="flex items-center gap-1">
                                                 <PopupImportProducts
@@ -274,39 +277,40 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                 <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
                                             </PopupImportProducts>
                                         } */}
-                                    </div>
-                                    <div className="flex items-center gap-1 pt-2">
-                                        {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
-                                        {
-                                            j?.purchase_items?.map(e => {
-                                                return (
-                                                    <div key={e?.id} className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
-                                                        <ModalImage
-                                                            small={e?.image ?? "/no_img.png"}
-                                                            large={e?.image ?? "/no_img.png"}
-                                                            width={18}
-                                                            height={18}
-                                                            alt={e?.item_name}
-                                                            className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
-                                                        />
-                                                        <span className="text-[#9295A4] text-[10px]">
-                                                            {e?.reference_no}
-                                                        </span>
-                                                        -
-                                                        <span className="text-[#9295A4] text-[10px]">
-                                                            SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
-                                                        </span>
-                                                    </div>
-                                                )
-                                            })
-                                        }
+                                        </div>
+                                        <div className="flex items-center gap-1 pt-2">
+                                            {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
+                                            {
+                                                j?.purchase_items?.map(e => {
+                                                    return (
+                                                        <div key={e?.id} className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
+                                                            <ModalImage
+                                                                small={e?.image ?? "/no_img.png"}
+                                                                large={e?.image ?? "/no_img.png"}
+                                                                width={18}
+                                                                height={18}
+                                                                alt={e?.item_name}
+                                                                className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
+                                                            />
+                                                            <span className="text-[#9295A4] text-[10px]">
+                                                                {e?.reference_no}
+                                                            </span>
+                                                            -
+                                                            <span className="text-[#9295A4] text-[10px]">
+                                                                SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )
-            })}
+                    )
+                })
+            }
         </div>
     )
 }

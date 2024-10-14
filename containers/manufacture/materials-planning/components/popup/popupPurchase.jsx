@@ -19,6 +19,9 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import ModalImage from "react-modal-image";
 import { v4 as uuidv4 } from "uuid";
+import { useMutation } from "@tanstack/react-query";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import ButtonCancel from "@/components/UI/button/buttonCancel";
 
 const initialState = {
     onFetching: false,
@@ -102,7 +105,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                     quantityRest: formatNumber(e?.quantity_rest),
                     // sl đã mua
                     quantityPurchased: e?.quantity_purchase,
-                    quantity: formatNumber(e?.quantity_rest - e?.quantity_purchase) > 0 ? formatNumber(e?.quantity_rest - e?.quantity_purchase) : null,
+                    quantity: formatNumber(e?.quantity_rest - e?.quantity_purchase) > 0 ? formatNumber(e?.quantity_rest - e?.quantity_purchase) : e?.quantity_rest,
                     itemVariationOptionValueId: e?.item_variation_option_value_id,
                 };
             });
@@ -120,6 +123,12 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
         }
     }, [findValue.type, open]);
 
+    const hangdingMutation = useMutation({
+        mutationFn: async (data) => {
+            return await apiMaterialsPlanning.apiHandlingPurchaseProductionPlan(data);
+        }
+    })
+
     const onSubmit = async (value) => {
         if (value.arrayItem.length == 0) {
             return shhowToat("error", dataLang?.materials_planning_no_items_purchase || "materials_planning_no_items_purchase");
@@ -133,22 +142,25 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
         formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG));
         value.arrayItem.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
-            formData.append(`items[${index}][quantity]`, e?.quantity);
+            formData.append(`items[${index}][quantity]`, parseFloat(e?.quantity));
             formData.append(`items[${index}][item_id]`, e?.item?.item_id);
             formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
         });
 
-        const data = await apiMaterialsPlanning.apiHandlingPurchaseProductionPlan(formData);
+        hangdingMutation.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow("success", message);
+                    queryValue({ page: 1 });
+                    fetchDataTable(1);
+                    _ToggleModal(false);
+                    form.reset();
+                    return
+                }
+                isShow("error", message);
+            }
+        });
 
-        if (data?.isSuccess) {
-            isShow("success", data?.message);
-            queryValue({ page: 1 });
-            fetchDataTable(1);
-            _ToggleModal(false);
-            form.reset();
-            return
-        }
-        isShow("error", data?.message);
     };
     return (
         <>
@@ -237,9 +249,9 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                 render={({ field }) => {
                                     return (
                                         <div className="flex gap-8 mt-6 items-centerem">
-                                            {isState.type.map((e) => {
+                                            {isState.type.map((e, index) => {
                                                 return (
-                                                    <div className="flex items-center cursor-pointer">
+                                                    <div key={index} className="flex items-center cursor-pointer">
                                                         <input
                                                             id={e.value}
                                                             type="radio"
@@ -424,11 +436,10 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                             return (
                                                                 <duv className="flex flex-col items-center justify-center">
                                                                     <InPutNumericFormat
-                                                                        className={`${fieldState.error && "border-red-500"
-                                                                            } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                                        className={`${fieldState.error && "border-red-500"} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                                         {...field}
-                                                                        onChange={(event) =>
-                                                                            field.onChange(event.target.value == "" ? null : +event.target.value)
+                                                                        onValueChange={(event) =>
+                                                                            field.onChange(event.value == "" ? null : +event.value)
                                                                         }
                                                                         isAllowed={(values) => {
                                                                             // const { floatValue, value } = values;
@@ -475,20 +486,16 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                             <NoData />
                         )}
                         <div className="mt-5 space-x-2 text-right">
-                            <button
-                                type="button"
-                                onClick={_ToggleModal.bind(this, false)}
-                                className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                            >
-                                {dataLang?.branch_popup_exit}
-                            </button>
-                            <button
-                                type="button"
+                            <ButtonCancel
+                                loading={false}
+                                onClick={() => _ToggleModal(false)}
+                                dataLang={dataLang}
+                            />
+                            <ButtonSubmit
+                                loading={hangdingMutation.isPending}
+                                dataLang={dataLang}
                                 onClick={() => form.handleSubmit((data) => onSubmit(data))()}
-                                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                            >
-                                {dataLang?.branch_popup_save}
-                            </button>
+                            />
                         </div>
                     </div>
                 </div>

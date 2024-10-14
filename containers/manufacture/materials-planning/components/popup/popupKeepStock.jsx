@@ -1,4 +1,6 @@
 import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
+import ButtonCancel from "@/components/UI/button/buttonCancel";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
@@ -13,6 +15,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useMutation } from "@tanstack/react-query";
 import { Add, Trash as IconDelete, ArrowDown2 as IconDown, TickCircle } from "iconsax-react";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
@@ -66,46 +69,55 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
     /// lắng nghe thay đổi
     const findValue = form.watch();
 
-    const onSubmit = async (value) => {
-        try {
-            if (value.arrayItem.length == 0) {
-                return isShow("error", dataLang?.materials_planning_no_items || "materials_planning_no_items");
-            }
-
-            let formData = new FormData();
-            formData.append("note", value.note);
-            formData.append("type", value.type == "material" ? 1 : 2);
-            formData.append("plan_id", dataTable?.listDataRight?.idCommand);
-            formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_SLASH_LONG));
-            value.arrayItem.forEach((e, index) => {
-                formData.append(`items[${index}][id]`, e?.idParent);
-                formData.append(`items[${index}][item_id]`, e?.item?.item_id);
-                formData.append(`items[${index}][item_code]`, e?.item?.item_code);
-                formData.append(`items[${index}][item_name]`, e?.item?.name);
-                formData.append(`items[${index}][item_variation]`, e?.item?.variation);
-                formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
-                formData.append(`items[${index}][warehouse_id]`, e?.valueWarehouse?.id);
-                e?.valueLocation?.forEach((i, locaitonIndex) => {
-                    formData.append(`items[${index}][location][${locaitonIndex}][location_id]`, i?.location_id);
-                    formData.append(`items[${index}][location][${locaitonIndex}][location_value]`, i?.newValue);
-                    formData.append(`items[${index}][location][${locaitonIndex}][location_lot]`, i?.lot);
-                    formData.append(`items[${index}][location][${locaitonIndex}][location_expiration_date]`, i?.expiration_date);
-                    formData.append(`items[${index}][location][${locaitonIndex}][location_serial]`, i?.serial);
-                });
-            });
-            const data = await apiMaterialsPlanning.apiHandlingKeepProductionsPlan(formData);
-            if (data?.isSuccess == 1) {
-                isShow("success", data?.message);
-                queryValue({ page: 1 });
-                fetchDataTable(1);
-                _ToggleModal(false);
-                form.reset();
-                return
-            }
-            isShow("error", data?.message);
-        } catch (error) {
-            throw error
+    const hangdingMutation = useMutation({
+        mutationFn: async (data) => {
+            return await apiMaterialsPlanning.apiHandlingKeepProductionsPlan(formData);
         }
+    })
+
+    const onSubmit = async (value) => {
+        if (value.arrayItem.length == 0) {
+            return isShow("error", dataLang?.materials_planning_no_items || "materials_planning_no_items");
+        }
+
+        let formData = new FormData();
+        formData.append("note", value.note);
+        formData.append("type", value.type == "material" ? 1 : 2);
+        formData.append("plan_id", dataTable?.listDataRight?.idCommand);
+        formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_SLASH_LONG));
+
+        value.arrayItem.forEach((e, index) => {
+            formData.append(`items[${index}][id]`, e?.idParent);
+            formData.append(`items[${index}][item_id]`, e?.item?.item_id);
+            formData.append(`items[${index}][item_code]`, e?.item?.item_code);
+            formData.append(`items[${index}][item_name]`, e?.item?.name);
+            formData.append(`items[${index}][item_variation]`, e?.item?.variation);
+            formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
+            formData.append(`items[${index}][warehouse_id]`, e?.valueWarehouse?.id);
+
+            e?.valueLocation?.forEach((i, locaitonIndex) => {
+                formData.append(`items[${index}][location][${locaitonIndex}][location_id]`, i?.location_id);
+                formData.append(`items[${index}][location][${locaitonIndex}][location_value]`, parseFloat(i?.newValue));
+                formData.append(`items[${index}][location][${locaitonIndex}][location_lot]`, i?.lot);
+                formData.append(`items[${index}][location][${locaitonIndex}][location_expiration_date]`, i?.expiration_date);
+                formData.append(`items[${index}][location][${locaitonIndex}][location_serial]`, i?.serial);
+            });
+        });
+
+        hangdingMutation.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess == 1) {
+                    isShow("success", message);
+                    queryValue({ page: 1 });
+                    fetchDataTable(1);
+                    _ToggleModal(false);
+                    form.reset();
+                    return
+                }
+                isShow("error", message);
+            },
+        })
+
     };
 
     useEffect(() => {
@@ -166,7 +178,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                     valueLocation: [],
                     itemVariationOptionValueId: e?.item_variation_option_value_id,
                 };
-            });
+            })
             form.setValue("arrayItem", newData);
             queryState({ onFetching: false });
         } catch (error) {
@@ -193,6 +205,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                     label: i?.name_location,
                                     value: formatNumber(i?.quantity_warehouse),
                                     qty: formatNumber(i?.quantity_warehouse),
+                                    newValue: "1000",
                                     show: true,
                                 };
                             }),
@@ -200,6 +213,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                     }
                     return e;
                 });
+                console.log("newData", newData);
                 form.setValue("arrayItem", newData);
             }
         } catch (error) {
@@ -559,6 +573,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                         },
                                                                     }}
                                                                     render={({ field, fieldState }) => {
+
                                                                         return (
                                                                             <div
                                                                                 key={x.idFe}
@@ -624,6 +639,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                         </div>
                                                                                     </div>
                                                                                 </Zoom>
+                                                                                {/* {console.log(e)
+                                                                                } */}
                                                                                 {x.show && (
                                                                                     <InPutNumericFormat
                                                                                         className={`py-1 px-2 my-1 ${fieldState.error
@@ -631,15 +648,14 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                             : "border-gray-400"
                                                                                             }  border outline-none rounded-3xl w-full`}
                                                                                         {...field}
-                                                                                        onChange={(event) =>
+                                                                                        onValueChange={(event) =>
                                                                                             field.onChange({
-                                                                                                newValue: event.target.value == "" ? null : event.target.value,
+                                                                                                newValue: event.value == "" ? null : event.value,
                                                                                                 ...x,
                                                                                             })
                                                                                         }
-                                                                                        value={
-                                                                                            field.value?.newValue
-                                                                                        }
+                                                                                        value={x?.newValue}
+                                                                                        // value={field.value?.newValue}
                                                                                         isAllowed={(values) => {
                                                                                             const { floatValue, value, } = values;
                                                                                             if (floatValue == 0) {
@@ -690,20 +706,17 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                         <NoData />
                     )}
                     <div className="mt-5 space-x-2 text-right">
-                        <button
-                            type="button"
-                            onClick={_ToggleModal.bind(this, false)}
-                            className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                        >
-                            {dataLang?.branch_popup_exit}
-                        </button>
-                        <button
-                            type="button"
+                        <ButtonCancel
+                            loading={false}
+                            onClick={() => _ToggleModal(false)}
+                            dataLang={dataLang}
+                        />
+                        <ButtonSubmit
+                            loading={hangdingMutation.isPending}
+                            dataLang={dataLang}
                             onClick={() => form.handleSubmit((data) => onSubmit(data))()}
-                            className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                        >
-                            {dataLang?.branch_popup_save}
-                        </button>
+                        />
+
                     </div>
                 </div>
             </div>
