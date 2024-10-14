@@ -188,6 +188,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                             warehouseLocation: data?.locationsWarehouse?.map((i) => {
                                 return {
                                     ...i,
+                                    idFe: uuidv4(),
                                     id: i?.location_id,
                                     label: i?.name_location,
                                     value: formatNumber(i?.quantity_warehouse),
@@ -212,7 +213,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                 return {
                     ...e,
                     warehouseLocation: e.warehouseLocation?.map((i) => {
-                        if (i.id == idChild) {
+                        if (i.idFe == idChild) {
                             return {
                                 ...i,
                                 show: !i.show,
@@ -476,9 +477,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                         },
                                                     }}
                                                     render={({ field, fieldState }) => {
-                                                        const arrWareHouse = findValue.arrayItem.find(
-                                                            (x) => x?.id == e?.id
-                                                        )?.warehouse;
+                                                        const arrWareHouse = findValue.arrayItem.find((x) => x?.id == e?.id)?.warehouse;
                                                         return (
                                                             <>
                                                                 <SelectComponent
@@ -531,9 +530,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                     name={`arrayItem.${index}.valueLocation`}
                                                     control={form.control}
                                                     render={({ field, fieldState }) => {
-                                                        const arrWareHouse = findValue.arrayItem.find(
-                                                            (x) => x?.id == e?.id
-                                                        )?.warehouseLocation;
+                                                        const arrWareHouse = findValue.arrayItem.find((x) => x?.id == e?.id)?.warehouseLocation;
                                                         return arrWareHouse?.map((x, Iindex) => {
                                                             return (
                                                                 <Controller
@@ -564,13 +561,13 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                     render={({ field, fieldState }) => {
                                                                         return (
                                                                             <div
-                                                                                key={x.id}
+                                                                                key={x.idFe}
                                                                                 className="w-full  z-[99]"
                                                                             >
                                                                                 <Zoom>
                                                                                     <div
                                                                                         onClick={() =>
-                                                                                            handleShow(e.id, x.id)
+                                                                                            handleShow(e.id, x.idFe)
                                                                                         }
                                                                                         className={`border-gray-400  w-full text-[10px] font-medium bg-white hover:bg-gray-100 transition-all ease-in-out  border rounded-2xl py-1 px-2 flex items-center gap-1`}
                                                                                     >

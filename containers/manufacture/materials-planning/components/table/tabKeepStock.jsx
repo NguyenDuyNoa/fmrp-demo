@@ -20,11 +20,11 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
     const [isTab, setIsTab] = useState("dataKeepStock");
     return (
         <>
-            <div className="flex justify-start items-center gap-8">
+            <div className="flex items-center justify-start gap-8">
                 <h1 className=" text-[#11315B] font-normal 3xl:text-lg text-base">
                     {dataLang?.materials_planning_plan_status || "materials_planning_plan_status"}
                 </h1>
-                <div className="flex  items-center gap-4">
+                <div className="flex items-center gap-4">
                     <button
                         type="button"
                         onClick={() => setIsTab("dataKeepStock")}
@@ -54,10 +54,10 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
             ) : dataTable?.listDataRight?.[isTab]?.length > 0 ? (
                 <Customscrollbar className="3xl:h-[52.5vh] xxl:h-[34.5vh] 2xl:h-[40vh] xl:h-[36vh] lg:h-[37.5vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
                     {dataTable?.listDataRight?.[isTab]?.map((e) => (
-                        <div key={e.id} className="border my-3 rounded ">
+                        <div key={e.id} className="my-3 border rounded ">
                             <div className="px-2">
                                 <div onClick={() => handShowItem(e.id, isTab)} className="cursor-pointer">
-                                    <div className="my-2 flex justify-between items-center">
+                                    <div className="flex items-center justify-between my-2">
                                         <h3 className="text-[#191D23] font-semibold 3xl:text-base  text-sm">
                                             {e.title}
                                         </h3>
@@ -96,7 +96,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                             </span>
                                             <span className="capitalize">{e.user}</span>
                                         </h5>
-                                        {isTab === "dataKeepStock" && <TagWarehouse data={e?.warehousemanId} />}
+                                        {isTab === "dataKeepStock" && <TagWarehouse data={{ warehouseman_id: e?.warehousemanId }} />}
                                         {isTab === "dataPurchases" &&
                                             ((e?.status == 0 && (
                                                 <div
@@ -110,7 +110,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                         className={`font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 w-fit  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center`}
                                                     >
                                                         <TickCircle
-                                                            className="bg-lime-500 rounded-full animate-pulse "
+                                                            className="rounded-full bg-lime-500 animate-pulse "
                                                             color="white"
                                                             size={15}
                                                         />
@@ -166,7 +166,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                     key={i.id}
                                                     className={`grid grid-cols-12 items-center ${e.arrListData?.length - 1 == index ? "" : "border-b"} `}
                                                 >
-                                                    <h4 className="col-span-4 flex items-center py-2 px-4 gap-2">
+                                                    <h4 className="flex items-center col-span-4 gap-2 px-4 py-2">
                                                         <ModalImage
                                                             small={i.image}
                                                             large={i.image}
@@ -182,7 +182,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                             <h1 className="text-[#9295A4] font-normal text-[11px]">
                                                                 {i.code} - {i.itemVariation}
                                                             </h1>
-                                                            <div className="flex items-center font-oblique flex-wrap">
+                                                            <div className="flex flex-wrap items-center font-oblique">
                                                                 {dataProductSerial.is_enable === "1" && (
                                                                     <div className="flex gap-0.5">
                                                                         <h6 className="text-[12px]">Serial:</h6>
@@ -229,7 +229,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                     {isTab === "dataPurchases" && (
                                                         <div className="col-span-4 flex items-center w-[70%]">
                                                             {i.processBar.map((j, index) => (
-                                                                <div className="flex flex-col my-2 w-full" key={j.id}>
+                                                                <div className="flex flex-col w-full my-2" key={j.id}>
                                                                     <motion.div
                                                                         initial={{ opacity: 0, scale: 0.5 }}
                                                                         animate={{ opacity: 1, scale: 1 }}

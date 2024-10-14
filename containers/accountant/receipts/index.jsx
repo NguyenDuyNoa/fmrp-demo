@@ -97,12 +97,6 @@ const Receipts = (props) => {
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
-        router.replace({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-            },
-        });
     }, 500);
 
     const formatMoney = (number) => {

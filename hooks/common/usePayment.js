@@ -4,7 +4,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const usePayment = () => {
     return useQuery({
-        queryKey: ["api_payment_list"],
+        queryKey: ["api_payment_list_combobox"],
         queryFn: async () => {
 
             const { rResult } = await apiComons.apiPaymentList()

@@ -79,12 +79,6 @@ const CustomerDebt = (props) => {
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
-        router.replace({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-            },
-        });
     }, 500);
 
     const onchangFilter = (type) => (value) => sValueChange((e) => ({ ...e, [type]: value }));

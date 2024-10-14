@@ -321,7 +321,7 @@ const ProductsWarehouse = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.productsWarehouse_title || "productsWarehouse_title"}
                             </h2>
@@ -356,7 +356,7 @@ const ProductsWarehouse = (props) => {
                             })}
                         </ContainerFilterTab>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
@@ -422,7 +422,7 @@ const ProductsWarehouse = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -440,7 +440,7 @@ const ProductsWarehouse = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -503,14 +503,17 @@ const ProductsWarehouse = (props) => {
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"right"}></RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
+                                                            {e?.reference_no_detail}
+                                                        </RowItemTable>
                                                         <LinkWarehouse
                                                             colSpan={1}
                                                             warehouse_id={e?.warehouse_id}
                                                             warehouse_name={e?.warehouse_name}
                                                         />
                                                         <RowItemTable colSpan={1} textAlign={"right"}>
-                                                            {formatNumber(e?.count_item)}
+                                                            {formatNumber(e?.total_quantity)}
+                                                            {/* {formatNumber(e?.count_item)} */}
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={1}
@@ -527,7 +530,7 @@ const ProductsWarehouse = (props) => {
                                                                 <ModalImage
                                                                     small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
                                                                     large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
-                                                                    className="h-6 w-6 rounded-full object-cover "
+                                                                    className="object-cover w-6 h-6 rounded-full "
                                                                 >
                                                                     <div className="">
                                                                         <ImageErrors
@@ -541,8 +544,8 @@ const ProductsWarehouse = (props) => {
                                                                     </div>
                                                                 </ModalImage>
                                                                 <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                    <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                        <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                    <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                                        <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -588,7 +591,7 @@ const ProductsWarehouse = (props) => {
                         <ColumnTable
                             colSpan={1}
                             textAlign={"right"}
-                            className="justify-end p-2 flex gap-2 flex-wrap  mr-1"
+                            className="flex flex-wrap justify-end gap-2 p-2 mr-1"
                         >
                             {formatNumber(data?.rTotal?.total_count_item)}
                         </ColumnTable>

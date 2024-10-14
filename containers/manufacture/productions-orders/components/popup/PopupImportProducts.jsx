@@ -294,8 +294,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                     Thành phẩm
                                 </h2>
                             </div>
-                            <div className="flex bg-[#F8FAFC] p-3 rounded-sm">
-                                <div className="w-[45%] 2xl:w-[45%] lg:w-[40%] flex items-center gap-3">
+                            <div className="flex items-start bg-[#F8FAFC] p-3 rounded-sm">
+                                <div className="w-[45%] 2xl:w-[45%] lg:w-[40%] flex items-start gap-3">
                                     <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
                                         <Image
                                             src={isState.item.image}
@@ -310,8 +310,13 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                             {isState.item.item_name}
                                         </h1>
                                         <div className="flex items-center gap-2">
-                                            <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
-                                                {isState.item.item_code} - Cần SX: <span className="font-medium text-black">{formanumber(isState.item.quantityDefault)}</span>
+                                            <h1 className="text-xs italic font-medium 2xl:text-sm text-black/60">
+                                                {isState.item.item_code} - {isState.item.product_variation}
+                                            </h1>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <h1 className="text-xs italic font-medium 2xl:text-sm text-black/60">
+                                                Cần SX: <span className="font-medium text-black">{formanumber(isState.item.quantityDefault)}</span>
                                             </h1>
                                         </div>
                                     </div>
@@ -511,81 +516,85 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                             </div>
                         </div>
                         <Customscrollbar className="3xl:h-[250px] xxl:h-[260px] 2xl:h-[250px] xl:h-[260px] h-[250 px] overflow-hidden mt-2">
-                            {isLoading
-                                ?
-                                <Loading />
-                                :
-                                <div className="grid h-full grid-cols-2 gap-2">
-                                    {
-                                        isState.item?.bom?.length > 0 ? isState.item?.bom?.map((e, index) => {
-                                            return (
-                                                <div key={e?.item_id} className="bg-[#FCFAF8] min-h-[140px] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
-                                                    <div className="text-[#667085] font-normal text-[10px]">
-                                                        #{index + 1}
-                                                    </div>
-                                                    <div className="flex flex-col w-full">
-                                                        <div className="flex items-start w-full gap-3">
-                                                            <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
-                                                                <Image
-                                                                    src={e.image}
-                                                                    width={1280}
-                                                                    height={1024}
-                                                                    alt="@image nvl"
-                                                                    className="object-cover w-full h-full rounded-md"
-                                                                />
-                                                            </div>
-                                                            <div className="flex flex-col w-full gap-1">
-                                                                <h1 className="text-base font-medium">
-                                                                    {e.item_name}
-                                                                </h1>
-                                                                <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
-                                                                    {e.item_code} - Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span>
-                                                                </h1>
-                                                                <h1 className="text-xs font-medium 2xl:text-sm text-black/60">
-                                                                    Đã giữ kho: <span className="font-medium text-black">{formanumber(0)}</span> Kg
-                                                                </h1>
-                                                                <div className="flex items-center justify-between gap-2">
-                                                                    <h1 className="w-1/4 text-xs font-medium 2xl:text-sm">Số lượng xuất kho</h1>
-                                                                    <div className="bg-[#FFC8A6] rounded-xl flex justify-center items-center py-[1px] w-[73%]">
-                                                                        <InPutNumericFormat
-                                                                            placeholder={'0'}
-                                                                            value={e.quantity}
-                                                                            isAllowed={(values) => {
-                                                                                const { floatValue, value } = values;
-                                                                                if (floatValue == 0) {
-                                                                                    return true;
-                                                                                }
-                                                                                if (floatValue < 0) {
-                                                                                    isShow('warning', 'Vui lòng nhập lớn hơn 0');
-                                                                                    return false
-                                                                                }
-                                                                                return true
-                                                                            }}
-                                                                            onValueChange={(value) => {
-                                                                                handChangeQuantity(value, e.item_id)
-                                                                            }}
-                                                                            className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#FFC8A6] bg-white max-w-[80%] w-[80%]'}
-                                                                        />
+                            {
+                                isLoading
+                                    ?
+                                    <Loading />
+                                    :
+                                    <div className="grid h-full grid-cols-2 gap-2">
+                                        {
+                                            isState.item?.bom?.length > 0 ? isState.item?.bom?.map((e, index) => {
+                                                return (
+                                                    <div key={e?.item_id} className="bg-[#FCFAF8] min-h-[140px] h-fit p-3 flex items-start  gap-2 rounded-lg relative">
+                                                        <div className="text-[#667085] font-normal text-[10px]">
+                                                            #{index + 1}
+                                                        </div>
+                                                        <div className="flex flex-col w-full">
+                                                            <div className="flex items-start w-full gap-3">
+                                                                <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
+                                                                    <Image
+                                                                        src={e?.image}
+                                                                        width={1280}
+                                                                        height={1024}
+                                                                        alt="@image nvl"
+                                                                        className="object-cover w-full h-full rounded-md"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex flex-col w-full gap-1">
+                                                                    <h1 className="text-base font-medium">
+                                                                        {e?.item_name}
+                                                                    </h1>
+                                                                    <h1 className="text-xs italic font-normal">{e?.item_code} - {e?.product_variation}</h1>
+                                                                    <div className="flex items-center justify-between divide-x">
+                                                                        <h1 className="w-1/2 text-xs font-medium 2xl:text-sm text-black/60">
+                                                                            Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span> <span>{e?.unit_name_primary}</span>
+                                                                        </h1>
+                                                                        <h1 className="w-1/2 text-xs font-medium text-center 2xl:text-sm text-black/60">
+                                                                            Đã giữ kho: <span className="font-medium text-black">{formanumber(e?.quantity_keep)}</span> <span>{e?.unit_name_primary}</span>
+                                                                        </h1>
+                                                                    </div>
+                                                                    <div className="flex items-center justify-between gap-2">
+                                                                        <h1 className="w-1/4 text-xs font-medium 2xl:text-sm">Số lượng xuất kho</h1>
+                                                                        <div className="bg-[#FFC8A6] rounded-xl flex justify-center items-center py-[1px] w-[73%]">
+                                                                            <InPutNumericFormat
+                                                                                placeholder={'0'}
+                                                                                value={e?.quantity}
+                                                                                isAllowed={(values) => {
+                                                                                    const { floatValue, value } = values;
+                                                                                    if (floatValue == 0) {
+                                                                                        return true;
+                                                                                    }
+                                                                                    if (floatValue < 0) {
+                                                                                        isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                                        return false
+                                                                                    }
+                                                                                    return true
+                                                                                }}
+                                                                                onValueChange={(value) => {
+                                                                                    handChangeQuantity(value, e.item_id)
+                                                                                }}
+                                                                                className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#FFC8A6] bg-white max-w-[80%] w-[80%]'}
+                                                                            />
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <IconDelete
+                                                                size={18}
+                                                                cursor={"pointer"}
+                                                                onClick={() => handleDeleteItem(e?.item_id)}
+                                                                className="absolute text-red-500 transition-all duration-150 ease-linear top-2 hover:scale-105 right-2"
+                                                            />
                                                         </div>
-                                                        <IconDelete
-                                                            size={18}
-                                                            cursor={"pointer"}
-                                                            onClick={() => handleDeleteItem(e.item_id)}
-                                                            className="absolute text-red-500 transition-all duration-150 ease-linear top-2 hover:scale-105 right-2"
-                                                        />
                                                     </div>
+                                                )
+                                            })
+                                                :
+                                                <div className="col-span-2">
+                                                    <NoData />
                                                 </div>
-                                            )
-                                        })
-                                            :
-                                            <div className="col-span-2">
-                                                <NoData />
-                                            </div>
-                                    }
-                                </div>
+                                        }
+                                    </div>
                             }
                         </Customscrollbar>
                     </>

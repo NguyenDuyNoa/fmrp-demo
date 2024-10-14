@@ -304,7 +304,7 @@ const ProductionWarehouse = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.production_warehouse || "production_warehouse"}
                             </h2>
@@ -339,7 +339,7 @@ const ProductionWarehouse = (props) => {
                             })}
                         </ContainerFilterTab>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
@@ -407,7 +407,7 @@ const ProductionWarehouse = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -425,7 +425,7 @@ const ProductionWarehouse = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -473,94 +473,93 @@ const ProductionWarehouse = (props) => {
                                     {(isFetching && !isState.refreshing) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                {data?.rResult?.map((e) => (
-                                                    <RowTable gridCols={9} key={e.id.toString()}>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <PopupDetail
-                                                                dataLang={dataLang}
-                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
-                                                                name={e?.code}
-                                                                id={e?.id}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {/* {formatNumber(e.total_price)} */}
-                                                        </RowItemTable>
-                                                        {/* <LinkWarehouse
+                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                            {data?.rResult?.map((e) => (
+                                                <RowTable gridCols={9} key={e.id.toString()}>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        <PopupDetail
+                                                            dataLang={dataLang}
+                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                            name={e?.code}
+                                                            id={e?.id}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        {/* {formatNumber(e.total_price)} */}
+                                                        {e?.reference_no_detail}
+                                                    </RowItemTable>
+                                                    {/* <LinkWarehouse
                                                             colSpan={1}
                                                             warehouse_id={e?.warehouse_id}
                                                             warehouse_name={e?.warehouse_name}
                                                         /> */}
-                                                        <RowItemTable colSpan={1} textAlign={"right"}>
-                                                            {formatNumber(e?.grand_total)}
-                                                        </RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            textAlign={"left"}
-                                                            className="truncate"
-                                                        >
-                                                            {e?.note}
-                                                        </RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            className="flex items-center gap-2 justify-start"
-                                                        >
-                                                            <div className="relative">
-                                                                <ModalImage
-                                                                    small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
-                                                                    large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
-                                                                    className="h-6 w-6 rounded-full object-cover "
-                                                                >
-                                                                    <div className="">
-                                                                        <ImageErrors
-                                                                            src={e?.staff_create?.profile_image}
-                                                                            width={25}
-                                                                            height={25}
-                                                                            defaultSrc="/user-placeholder.jpg"
-                                                                            alt="Image"
-                                                                            className="object-cover  rounded-[100%] text-left cursor-pointer"
-                                                                        />
-                                                                    </div>
-                                                                </ModalImage>
-                                                                <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                    <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                        <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                                    </span>
+                                                    <RowItemTable colSpan={1} textAlign={"right"}>
+                                                        {formatNumber(e?.grand_total)}
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        textAlign={"left"}
+                                                        className="truncate"
+                                                    >
+                                                        {e?.note}
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        className="flex items-center justify-start gap-2"
+                                                    >
+                                                        <div className="relative">
+                                                            <ModalImage
+                                                                small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
+                                                                large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
+                                                                className="object-cover w-6 h-6 rounded-full "
+                                                            >
+                                                                <div className="">
+                                                                    <ImageErrors
+                                                                        src={e?.staff_create?.profile_image}
+                                                                        width={25}
+                                                                        height={25}
+                                                                        defaultSrc="/user-placeholder.jpg"
+                                                                        alt="Image"
+                                                                        className="object-cover  rounded-[100%] text-left cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                            </ModalImage>
+                                                            <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                                    <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                                 </span>
-                                                            </div>
-                                                            <h6 className="capitalize">{e?.staff_create?.full_name}</h6>
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1}>
-                                                            <ButtonWarehouse
-                                                                warehouseman_id={e?.warehouseman_id}
-                                                                _HandleChangeInput={_HandleChangeInput}
-                                                                id={e?.id}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="mx-auto">
-                                                            <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex justify-center">
-                                                            <BtnAction
-                                                                onRefresh={refetch.bind(this)}
-                                                                onRefreshGroup={refetchFilterbar.bind(this)}
-                                                                dataLang={dataLang}
-                                                                warehouseman_id={e?.warehouseman_id}
-                                                                status_pay={e?.status_pay}
-                                                                id={e?.id}
-                                                                type="production_warehouse"
-                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                            />
-                                                        </RowItemTable>
-                                                    </RowTable>
-                                                ))}
-                                            </div>
-                                        </>
+                                                            </span>
+                                                        </div>
+                                                        <h6 className="capitalize">{e?.staff_create?.full_name}</h6>
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1}>
+                                                        <ButtonWarehouse
+                                                            warehouseman_id={e?.warehouseman_id}
+                                                            _HandleChangeInput={_HandleChangeInput}
+                                                            id={e?.id}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="mx-auto">
+                                                        <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="flex justify-center">
+                                                        <BtnAction
+                                                            onRefresh={refetch.bind(this)}
+                                                            onRefreshGroup={refetchFilterbar.bind(this)}
+                                                            dataLang={dataLang}
+                                                            warehouseman_id={e?.warehouseman_id}
+                                                            status_pay={e?.status_pay}
+                                                            id={e?.id}
+                                                            type="production_warehouse"
+                                                            className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                        />
+                                                    </RowItemTable>
+                                                </RowTable>
+                                            ))}
+                                        </div>
                                     ) : (
                                         <NoData />
                                     )}

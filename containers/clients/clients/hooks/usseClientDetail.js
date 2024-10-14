@@ -1,7 +1,7 @@
 import apiClient from "@/Api/apiClients/client/apiClient";
 import { useQuery } from "@tanstack/react-query";
 
-export const usseClientDetail = (open, id) => {
+export const useClientDetail = (open, id) => {
     return useQuery({
         queryKey: ["api_detail_user", id],
         enabled: open,

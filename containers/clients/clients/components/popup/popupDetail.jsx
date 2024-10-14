@@ -7,7 +7,7 @@ import Loading from "@/components/UI/loading/loading";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
 import { Tooltip } from "react-tippy";
-import { usseClientDetail } from "../../hooks/usseClientDetail";
+import { useClientDetail } from "../../hooks/useClientDetail";
 import TableContact from "../table/tableContact";
 import TableDelivery from "../table/tableDelivery";
 import PopupCustom from "@/components/UI/popup";
@@ -27,7 +27,7 @@ const Popup_chitiet = (props) => {
 
     const _HandleSelectTab = (index) => sTab(index);
 
-    const { data, isLoading } = usseClientDetail(open, props?.id);
+    const { data, isLoading } = useClientDetail(open, props?.id);
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -102,7 +102,7 @@ const Popup_chitiet = (props) => {
                                                     {data?.code}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between flex-wrap p-2">
+                                            <div className="flex flex-wrap justify-between p-2 mb-4">
                                                 <span className="text-slate-400 text-sm      w-[25%]">
                                                     {
                                                         props.dataLang
@@ -114,7 +114,7 @@ const Popup_chitiet = (props) => {
                                                     {data?.name}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
+                                            <div className="flex items-center justify-between p-2 mb-4">
                                                 <span className="text-slate-400 text-sm   w-[25%]">
                                                     {
                                                         props.dataLang
@@ -126,7 +126,7 @@ const Popup_chitiet = (props) => {
                                                     {data?.representative}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between  items-center p-2">
+                                            <div className="flex items-center justify-between p-2 mb-4">
                                                 <span className="text-slate-400 text-sm  w-[25%]">
                                                     {
                                                         props.dataLang
@@ -138,7 +138,7 @@ const Popup_chitiet = (props) => {
                                                     {data?.email}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
+                                            <div className="flex items-center justify-between p-2 mb-4">
                                                 <span className="text-slate-400 text-sm   w-[25%]">
                                                     {
                                                         props.dataLang
@@ -150,7 +150,7 @@ const Popup_chitiet = (props) => {
                                                     {data?.phone_number}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
+                                            <div className="flex items-center justify-between p-2 mb-4">
                                                 <span className="text-slate-400 text-sm   w-[25%]">
                                                     {
                                                         props.dataLang
@@ -162,7 +162,7 @@ const Popup_chitiet = (props) => {
                                                     {data?.tax_code}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
+                                            <div className="flex items-center justify-between p-2 mb-4">
                                                 <span className="text-slate-400 text-sm   w-[25%]">
                                                     {
                                                         props.dataLang
@@ -174,7 +174,7 @@ const Popup_chitiet = (props) => {
                                                     {data?.address}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
+                                            <div className="flex items-center justify-between p-2 mb-4">
                                                 <span className="text-slate-400 text-sm   w-[25%]">
                                                     {
                                                         props.dataLang
@@ -189,7 +189,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="w-[50%] bg-slate-100/40">
                                             <div className="mb-4 min-h-[50px] max-h-[auto] flex  p-2 justify-between  items-center flex-wrap">
-                                                <span className="text-slate-400 text-sm">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang
                                                             ?.client_popup_char
@@ -201,7 +201,7 @@ const Popup_chitiet = (props) => {
                                                         ? data?.staff_charge?.map(
                                                             (e) => {
                                                                 return (
-                                                                    <span className="font-normal capitalize   ml-1">
+                                                                    <span className="ml-1 font-normal capitalize">
                                                                         <Tooltip
                                                                             title={
                                                                                 e.full_name
@@ -225,8 +225,8 @@ const Popup_chitiet = (props) => {
                                                         : ""}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between  p-2 items-center flex-wrap">
-                                                <span className="text-slate-400 text-sm">
+                                            <div className="flex flex-wrap items-center justify-between p-2 mb-4">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang?.client_list_brand
                                                     }
@@ -242,8 +242,8 @@ const Popup_chitiet = (props) => {
                                                     })}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 justify-between  items-center p-2 flex space-x-2">
-                                                <span className="text-slate-400 text-sm">
+                                            <div className="flex items-center justify-between p-2 mb-4 space-x-2">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang
                                                             ?.client_list_group
@@ -278,8 +278,8 @@ const Popup_chitiet = (props) => {
                                                     )}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
-                                                <span className="text-slate-400 text-sm">
+                                            <div className="flex items-center justify-between p-2 mb-4">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang
                                                             ?.client_popup_limit
@@ -292,8 +292,8 @@ const Popup_chitiet = (props) => {
                                                     )}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
-                                                <span className="text-slate-400 text-sm">
+                                            <div className="flex items-center justify-between p-2 mb-4">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang
                                                             ?.client_popup_days
@@ -306,8 +306,8 @@ const Popup_chitiet = (props) => {
                                                     )}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
-                                                <span className="text-slate-400 text-sm">
+                                            <div className="flex items-center justify-between p-2 mb-4">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang
                                                             ?.client_popup_date
@@ -318,8 +318,8 @@ const Popup_chitiet = (props) => {
                                                     {data?.date_incorporation != null && data?.date_incorporation != "0000-00-00" ? formatMoment(data?.date_incorporation, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between items-center p-2">
-                                                <span className="text-slate-400 text-sm">
+                                            <div className="flex items-center justify-between p-2 mb-4">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang
                                                             ?.client_popup_city
@@ -334,8 +334,8 @@ const Popup_chitiet = (props) => {
                                                         : ""}
                                                 </span>
                                             </div>
-                                            <div className="mb-4 flex justify-between p-2 items-center">
-                                                <span className="text-slate-400 text-sm">
+                                            <div className="flex items-center justify-between p-2 mb-4">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang
                                                             ?.client_popup_district
@@ -350,7 +350,7 @@ const Popup_chitiet = (props) => {
                                                         : ""}
                                                 </span>
                                                 ,
-                                                <span className="text-slate-400 text-sm">
+                                                <span className="text-sm text-slate-400">
                                                     {
                                                         props.dataLang
                                                             ?.client_popup_wards

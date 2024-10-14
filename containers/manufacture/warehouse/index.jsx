@@ -300,11 +300,11 @@ const Warehouse = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.Warehouse_title || "Warehouse_title"}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ? (
                                     <PopupWarehouse
                                         W onRefresh={refetch.bind(this)}
@@ -325,7 +325,7 @@ const Warehouse = (props) => {
                                 )}
                             </div>
                         </div>
-                        <div className="3xl:space-y-3 space-y-2">
+                        <div className="space-y-2 3xl:space-y-3">
                             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                 <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                     <div className="grid grid-cols-5 gap-2">
@@ -368,7 +368,7 @@ const Warehouse = (props) => {
                                             hideSelectedOptions={false}
                                             isClearable={true}
                                             placeholder={dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare"}
-                                            className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                            className="z-20 text-xs bg-white rounded-md 3xl:text-base xxl:text-sm"
                                             isSearchable={true}
                                             colSpan={1}
                                         />
@@ -386,7 +386,7 @@ const Warehouse = (props) => {
                                             hideSelectedOptions={false}
                                             isClearable={true}
                                             placeholder={dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain"}
-                                            className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                            className="z-20 text-xs bg-white rounded-md 3xl:text-base xxl:text-sm"
                                             isSearchable={true}
                                             colSpan={1}
                                             components={{ MultiValue }}
@@ -405,7 +405,7 @@ const Warehouse = (props) => {
                                             hideSelectedOptions={false}
                                             isClearable={true}
                                             placeholder={dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub"}
-                                            className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                            className="z-20 text-xs bg-white rounded-md 3xl:text-base xxl:text-sm"
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             components={{ MultiValue }}
@@ -414,7 +414,7 @@ const Warehouse = (props) => {
                                     </div>
                                 </div>
                                 <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                    <div className="flex justify-end gap-2 space-x-2 items-center">
+                                    <div className="flex items-center justify-end gap-2 space-x-2">
                                         <OnResetData
                                             sOnFetching={() => { }}
                                             onClick={() => {
@@ -438,7 +438,7 @@ const Warehouse = (props) => {
                                                 onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                 className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                             >
-                                                <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                 <span>{dataLang?.client_list_exportexcel}</span>
                                             </button>
                                         )}
@@ -451,81 +451,80 @@ const Warehouse = (props) => {
                         </div>
                         <div className="grid grid-cols-10">
                             <ul className="col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {dataWarehouse?.rResult &&
-                                    dataWarehouse?.rResult?.map((item, index) => (
-                                        <PopupParent
-                                            trigger={
-                                                <div key={item.id} className="grid grid-cols-12 relative">
-                                                    <li
-                                                        className={`group col-span-12 ${isState.idWarehouse === item.id
-                                                            ? "bg-[#3276FA] text-white"
-                                                            : ""
-                                                            } font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
-                                                        onClick={() => handleClickChooseWarehouse(item)}
-                                                    >
-                                                        <div className="flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2">
-                                                            <div className="w-[6px] h-[6px] rounded-full bg-[#6C9AC4]" />
-                                                            <div className="flex flex-col items-start w-full">
-                                                                <div className="w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs ">
-                                                                    {item.name}
-                                                                    {/* {item.is_system == 1 && <span className={`${isState.idWarehouse === item.id ? "text-white" : "text-[#6C9AC4] group-hover:text-white"} lowercase`}>(Kho hệ thống)</span>} */}
-                                                                </div>
-                                                                {item.is_system == 1 && (
-                                                                    <div className="items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#F9ECC9]/35  bg-orange-100 text-[#FF9900] 3xl:text-sm text-xs font-medium cursor-default">
-                                                                        Kho hệ thống
-                                                                    </div>
-                                                                )}
+                                {dataWarehouse?.rResult && dataWarehouse?.rResult?.map((item, index) => (
+                                    <PopupParent
+                                        trigger={
+                                            <div key={item.id} className="relative grid grid-cols-12">
+                                                <li
+                                                    className={`group col-span-12 ${isState.idWarehouse === item.id
+                                                        ? "bg-[#3276FA] text-white"
+                                                        : ""
+                                                        } font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
+                                                    onClick={() => handleClickChooseWarehouse(item)}
+                                                >
+                                                    <div className="flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2">
+                                                        <div className="w-[6px] h-[6px] rounded-full bg-[#6C9AC4]" />
+                                                        <div className="flex flex-col items-start w-full">
+                                                            <div className="w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs ">
+                                                                {item.name}
+                                                                {/* {item.is_system == 1 && <span className={`${isState.idWarehouse === item.id ? "text-white" : "text-[#6C9AC4] group-hover:text-white"} lowercase`}>(Kho hệ thống)</span>} */}
                                                             </div>
+                                                            {item.is_system == 1 && (
+                                                                <div className="items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#F9ECC9]/35  bg-orange-100 text-[#FF9900] 3xl:text-sm text-xs font-medium cursor-default">
+                                                                    Kho hệ thống
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                        <div className="xl:w-[10%] xl:max-w-[10%] w-[15%] max-w-[15%] bg-[#E1ECFC]/80 p-1 3xl:text-base xl:text-xs text-xs text-center rounded-md text-black">
-                                                            {item.totalItems}
-                                                        </div>
-                                                    </li>
-                                                    {isState.idWarehouse === item.id && item.is_system == 0 && (
-                                                        <div className="absolute right-0 -top-1">
-                                                            <span className="relative flex h-3 w-3">
-                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            }
-                                            closeOnDocumentClick={false}
-                                            position="right top"
-                                            on={["hover"]}
-                                            arrow={false}
-                                        >
-                                            {isState.idWarehouse === item.id && item.is_system == 0 && (
-                                                <div className="ml-2 flex items-center gap-2  rounded-md bg-gray-200 3xl:py-3 py-2 px-4">
-                                                    {role == true || checkEdit ? (
-                                                        <PopupWarehouse
-                                                            W dataLang={dataLang}
-                                                            id={item?.id}
-                                                            name={item?.name}
-                                                            code={item?.code}
-                                                            address={item?.address}
-                                                            note={item?.note}
-                                                            branch={item?.branch}
-                                                            onRefresh={refetch.bind(this)}
-                                                        />
-                                                    ) : (
-                                                        <IconEdit
-                                                            className="cursor-pointer"
-                                                            onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
-                                                        />
-                                                    )}
-                                                    <BtnAction
-                                                        onRefresh={refetch.bind(this)}
-                                                        onRefreshGroup={refetchWarehouseDetail.bind(this)}
-                                                        dataLang={dataLang}
+                                                    </div>
+                                                    <div className="xl:w-[10%] xl:max-w-[10%] w-[15%] max-w-[15%] bg-[#E1ECFC]/80 p-1 3xl:text-base xl:text-xs text-xs text-center rounded-md text-black">
+                                                        {item.totalItems}
+                                                    </div>
+                                                </li>
+                                                {isState.idWarehouse === item.id && item.is_system == 0 && (
+                                                    <div className="absolute right-0 -top-1">
+                                                        <span className="relative flex w-3 h-3">
+                                                            <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-sky-400"></span>
+                                                            <span className="relative inline-flex w-3 h-3 rounded-full bg-sky-500"></span>
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        }
+                                        closeOnDocumentClick={false}
+                                        position="right top"
+                                        on={["hover"]}
+                                        arrow={false}
+                                    >
+                                        {isState.idWarehouse === item.id && item.is_system == 0 && (
+                                            <div className="flex items-center gap-2 px-4 py-2 ml-2 bg-gray-200 rounded-md 3xl:py-3">
+                                                {role == true || checkEdit ? (
+                                                    <PopupWarehouse
+                                                        W dataLang={dataLang}
                                                         id={item?.id}
-                                                        type="warehouse"
+                                                        name={item?.name}
+                                                        code={item?.code}
+                                                        address={item?.address}
+                                                        note={item?.note}
+                                                        branch={item?.branch}
+                                                        onRefresh={refetch.bind(this)}
                                                     />
-                                                </div>
-                                            )}
-                                        </PopupParent>
-                                    ))}
+                                                ) : (
+                                                    <IconEdit
+                                                        className="cursor-pointer"
+                                                        onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    />
+                                                )}
+                                                <BtnAction
+                                                    onRefresh={refetch.bind(this)}
+                                                    onRefreshGroup={refetchWarehouseDetail.bind(this)}
+                                                    dataLang={dataLang}
+                                                    id={item?.id}
+                                                    type="warehouse"
+                                                />
+                                            </div>
+                                        )}
+                                    </PopupParent>
+                                ))}
                             </ul>
                             <div className="col-span-8 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <div className={`2xl:w-[100%] pr-2`}>
@@ -593,9 +592,9 @@ const Warehouse = (props) => {
                                                             colSpan={2}
                                                             className={`flex justify-center items-center border-b py-2`}
                                                         >
-                                                            <h6 className="xl:text-base text-xs w-full  ">
+                                                            <h6 className="w-full text-xs xl:text-base ">
                                                                 {e?.image == null ? (
-                                                                    <div className="flex 3xl:gap-3 gap-2 px-2 w-full">
+                                                                    <div className="flex w-full gap-2 px-2 3xl:gap-3">
                                                                         <div className="3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center">
                                                                             <ModalImage
                                                                                 small="/no_image.png"
@@ -604,19 +603,19 @@ const Warehouse = (props) => {
                                                                             />
                                                                         </div>
                                                                         <div className="3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1">
-                                                                            <h6 className="3xl:text-base xl:text-sm lg:text-xs text-xs font-semibold text-zinc-600 w-full text-left">
+                                                                            <h6 className="w-full text-xs font-semibold text-left 3xl:text-base xl:text-sm lg:text-xs text-zinc-600">
                                                                                 {e.item_name == null
                                                                                     ? "-"
                                                                                     : e.item_name}
                                                                             </h6>
 
-                                                                            <h6 className="3xl:text-sm xl:text-xs lg:text-xs text-xs font-medium text-zinc-500 w-full text-left">
+                                                                            <h6 className="w-full text-xs font-medium text-left 3xl:text-sm xl:text-xs lg:text-xs text-zinc-500">
                                                                                 {e.item_code == null
                                                                                     ? "-"
                                                                                     : e.item_code}
                                                                             </h6>
 
-                                                                            <h6 className="w-fit text-left ">
+                                                                            <h6 className="text-left w-fit ">
                                                                                 <span
                                                                                     className={`${e.item_type == "product"
                                                                                         ? "text-lime-500  border-lime-500 "
@@ -631,7 +630,7 @@ const Warehouse = (props) => {
                                                                         </div>
                                                                     </div>
                                                                 ) : (
-                                                                    <div className="flex 3xl:gap-3 gap-2 px-2 w-full">
+                                                                    <div className="flex w-full gap-2 px-2 3xl:gap-3">
                                                                         <div className="3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center">
                                                                             <ModalImage
                                                                                 small={e?.image}
@@ -640,19 +639,19 @@ const Warehouse = (props) => {
                                                                             />
                                                                         </div>
                                                                         <div className="3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1">
-                                                                            <h6 className="3xl:text-base xl:text-sm lg:text-xs text-xs font-semibold text-zinc-600 w-full text-left ">
+                                                                            <h6 className="w-full text-xs font-semibold text-left 3xl:text-base xl:text-sm lg:text-xs text-zinc-600 ">
                                                                                 {e.item_name == null
                                                                                     ? "-"
                                                                                     : e.item_name}
                                                                             </h6>
 
-                                                                            <h6 className="3xl:text-sm xl:text-xs lg:text-xs text-xs font-medium text-zinc-500 w-full text-left">
+                                                                            <h6 className="w-full text-xs font-medium text-left 3xl:text-sm xl:text-xs lg:text-xs text-zinc-500">
                                                                                 {e.item_code == null
                                                                                     ? "-"
                                                                                     : e.item_code}
                                                                             </h6>
 
-                                                                            <h6 className="w-fit text-left ">
+                                                                            <h6 className="text-left w-fit ">
                                                                                 <span
                                                                                     className={`${e.item_type == "product"
                                                                                         ? "text-lime-500  border-lime-500"
@@ -705,14 +704,14 @@ const Warehouse = (props) => {
                                                                                 : " grid-cols-5"
                                                                         }`}
                                                                 >
-                                                                    <RowItemTable colSpan={1} className="border-b py-3">
+                                                                    <RowItemTable colSpan={1} className="py-3 border-b">
                                                                         {item.location_name == null
                                                                             ? "-"
                                                                             : item.location_name}
                                                                     </RowItemTable>
                                                                     <RowItemTable
                                                                         colSpan={1}
-                                                                        className="border-b py-3"
+                                                                        className="py-3 border-b"
                                                                         textAlign={"center"}
                                                                     >
                                                                         {item.option_name_1 == null
@@ -721,7 +720,7 @@ const Warehouse = (props) => {
                                                                     </RowItemTable>
                                                                     <RowItemTable
                                                                         colSpan={1}
-                                                                        className="border-b py-3"
+                                                                        className="py-3 border-b"
                                                                         textAlign={"center"}
                                                                     >
                                                                         {item.option_name_2 == null
@@ -731,7 +730,7 @@ const Warehouse = (props) => {
                                                                     {dataProductSerial?.is_enable === "1" ? (
                                                                         <RowItemTable
                                                                             colSpan={1}
-                                                                            className="border-b py-3"
+                                                                            className="py-3 border-b"
                                                                             textAlign={"center"}
                                                                         >
                                                                             {item.serial == null || item.serial == ""
@@ -746,7 +745,7 @@ const Warehouse = (props) => {
                                                                         <>
                                                                             <RowItemTable
                                                                                 colSpan={1}
-                                                                                className="border-b py-3"
+                                                                                className="py-3 border-b"
                                                                                 textAlign={"center"}
                                                                             >
                                                                                 {item.lot == null || item.lot == ""
@@ -755,7 +754,7 @@ const Warehouse = (props) => {
                                                                             </RowItemTable>
                                                                             <RowItemTable
                                                                                 colSpan={1}
-                                                                                className="border-b py-3"
+                                                                                className="py-3 border-b"
                                                                                 textAlign={"center"}
                                                                             >
                                                                                 {item.expiration_date
@@ -769,7 +768,7 @@ const Warehouse = (props) => {
                                                                     <RowItemTable
                                                                         textAlign={"right"}
                                                                         colSpan={1}
-                                                                        className="border-b py-3 "
+                                                                        className="py-3 border-b "
                                                                     >
                                                                         {item.quantity
                                                                             ? formatNumber(+item?.quantity)
@@ -778,7 +777,7 @@ const Warehouse = (props) => {
                                                                     <RowItemTable
                                                                         textAlign={"right"}
                                                                         colSpan={1}
-                                                                        className="border-b py-3"
+                                                                        className="py-3 border-b"
                                                                     >
                                                                         {item.amount
                                                                             ? formatNumber(+item?.amount)
@@ -808,7 +807,7 @@ const Warehouse = (props) => {
                                 totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
-                                className="3xl:text-base text-sm"
+                                className="text-sm 3xl:text-base"
                             />
                         </ContainerPagination>
                     )}

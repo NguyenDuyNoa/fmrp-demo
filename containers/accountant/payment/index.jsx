@@ -19,192 +19,81 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranch";
+import { useObjectCombobox } from "@/hooks/common/useObject";
+import { usePayment } from "@/hooks/common/usePayment";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
-import { useSetData } from "@/hooks/useSetData";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import { _ServerInstance as Axios } from "@/services/axios";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import PopupDetailThere from "../components/detailThere";
 import PopupDetail from "./components/detail";
 import Popup_dspc from "./components/popup";
+import { usePaymentList } from "./hooks/usePaymentList";
 
+const initialValue = {
+    idBranch: null,
+    idObject: null,
+    idMethod: null,
+    valueDate: { startDate: null, endDate: null },
+};
 const Payment = (props) => {
     const dataLang = props.dataLang;
-
-    const initialValue = {
-        idBranch: null,
-        idObject: null,
-        idMethod: null,
-        valueDate: { startDate: null, endDate: null },
-    };
-
-    const dataSeting = useSetingServer()
-
-    const initialData = { data: [], data_ex: [], dataMethod: [], dataObject: [], listBr: [] };
 
     const router = useRouter();
 
     const isShow = useToast()
 
+    const dataSeting = useSetingServer()
+
     const { paginate } = usePagination();
-
-    const [total, sTotal] = useState({});
-
-    const [keySearch, sKeySearch] = useState("");
 
     const statusExprired = useStatusExprired();
 
-    const [onFetching, sOnFetching] = useState(false);
+    const [keySearch, sKeySearch] = useState("");
 
-    const { isData, updateData } = useSetData(initialData);
+    const { limit, updateLimit } = useLimitAndTotalItems();
 
     const { isValue, onChangeValue } = useChangeValue(initialValue);
-
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
-
-    const { data, data_ex, dataMethod, dataObject, listBr } = isData;
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'payment');
 
-    const { limit, totalItems: totalItem, updateLimit, updateTotalItems } = useLimitAndTotalItems(15, {});
+    const params = {
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[branch_id]": isValue?.idBranch != null ? isValue?.idBranch.value : null,
+        "filter[start_date]": isValue?.valueDate?.startDate != null ? isValue?.valueDate?.startDate : null,
+        "filter[end_date]": isValue?.valueDate?.endDate != null ? isValue?.valueDate?.endDate : null,
+        "filter[payment_mode]": isValue?.idMethod != null ? isValue?.idMethod.value : null,
+        "filter[objects]": isValue?.idObject != null ? isValue?.idObject.value : null,
+        "filter[search]": keySearch,
+    }
 
-    useEffect(() => {
-        router.push({
-            pathname: router.route,
-            query: { tab: router.query?.tab ? router.query?.tab : 0 },
-        });
-    }, []);
+    const { data: listPayment = [] } = usePayment()
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true`,
-            {
-                params: {
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": isValue?.idBranch != null ? isValue?.idBranch.value : null,
-                    "filter[start_date]": isValue?.valueDate?.startDate != null ? isValue?.valueDate?.startDate : null,
-                    "filter[end_date]": isValue?.valueDate?.endDate != null ? isValue?.valueDate?.endDate : null,
-                    "filter[payment_mode]": isValue?.idMethod != null ? isValue?.idMethod.value : null,
-                    "filter[objects]": isValue?.idObject != null ? isValue?.idObject.value : null,
-                    "filter[search]": keySearch,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data;
+    const { data: listBranch = [] } = useBranchList()
 
-                    updateData({ data: rResult, data_ex: rResult });
+    const { data: listObject = [] } = useObjectCombobox(dataLang)
 
-                    updateTotalItems(output);
-
-                    sTotal(rTotal);
-                }
-
-                sOnFetching(false);
-            }
-        );
-    };
-
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-
-                updateData({ listBr: result?.map(({ name, id }) => ({ label: name, value: id })) });
-            }
-        });
-
-        Axios("GET", "/api_web/Api_payment_method/payment_method/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-
-                updateData({ dataMethod: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
-            }
-        });
-
-        Axios("GET", "/api_web/Api_expense_voucher/object/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-
-                updateData({ dataObject: data?.map(({ name, id }) => ({ label: dataLang[name] || name, value: id })) });
-            }
-        });
-
-        sOnFetching_filter(false);
-    };
-
-    useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
+    const { data, refetch, isLoading, isFetching } = usePaymentList(params)
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
-
-        router.replace({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-            },
-        });
-        sOnFetching(true);
     }, 500)
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    useEffect(() => {
-        (router.query.tab && sOnFetching(true)) ||
-            (keySearch && sOnFetching(true)) ||
-            (router.query?.tab && sOnFetching_filter(true));
-    }, [limit, router.query?.page, router.query?.tab]);
-
-    useEffect(() => {
-        if (
-            isValue?.idBranch != null ||
-            (isValue?.valueDate.startDate != null && isValue?.valueDate.endDate != null) ||
-            isValue?.idMethod != null ||
-            isValue?.idObject != null
-        ) {
-            router.push({
-                pathname: router.route,
-                query: {
-                    tab: router.query?.tab,
-                },
-            });
-            setTimeout(() => {
-                (isValue?.idBranch != null && sOnFetching(true)) ||
-                    (isValue?.valueDate.startDate != null && isValue?.valueDate.endDate != null && sOnFetching(true)) ||
-                    (isValue?.idMethod != null && sOnFetching(true)) ||
-                    (isValue?.idObject != null && sOnFetching(true));
-            }, 300);
-        } else {
-            sOnFetching(true);
-        }
-    }, [
-        isValue?.idBranch,
-        isValue?.valueDate.endDate,
-        isValue?.valueDate.startDate,
-        isValue?.idMethod,
-        isValue?.idObject,
-    ]);
 
     const formatNumber = (number) => {
         return formatMoneyConfig(+number, dataSeting)
@@ -319,28 +208,15 @@ const Payment = (props) => {
                 },
             ],
 
-            data: data_ex?.map((e) => [
+            data: data?.rResult?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
-                {
-                    value: `${e?.objects ? (dataLang[e.objects] !== undefined ? dataLang[e.objects] : "") : ""}`,
-                },
+                { value: `${e?.objects ? (dataLang[e.objects] !== undefined ? dataLang[e.objects] : "") : ""}`, },
                 { value: `${e?.object_text ? e?.object_text : ""}` },
-                {
-                    value: `${e?.type_vouchers
-                        ? dataLang[e?.type_vouchers] != undefined
-                            ? dataLang[e?.type_vouchers]
-                            : ""
-                        : ""
-                        }`,
-                },
-                {
-                    value: `${e?.voucher_code ? e?.voucher_code.join(", ") : ""}`,
-                },
-                {
-                    value: `${e?.payment_mode_name ? e?.payment_mode_name : ""}`,
-                },
+                { value: `${e?.type_vouchers ? dataLang[e?.type_vouchers] != undefined ? dataLang[e?.type_vouchers] : "" : ""}`, },
+                { value: `${e?.voucher_code ? e?.voucher_code.join(", ") : ""}`, },
+                { value: `${e?.payment_mode_name ? e?.payment_mode_name : ""}`, },
                 { value: `${e?.cost_name ? e?.cost_name?.join(", ") : ""}` },
                 { value: `${e?.total ? formatNumber(e?.total) : ""}` },
                 { value: `${e?.staff_name ? e?.staff_name : ""}` },
@@ -369,14 +245,14 @@ const Payment = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.payment_title || 'payment_title'}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ?
                                     <Popup_dspc
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
                                     <button
@@ -391,7 +267,7 @@ const Payment = (props) => {
                             </div>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-9 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-7">
                                         <div className="grid grid-cols-10 gap-2">
@@ -407,7 +283,7 @@ const Payment = (props) => {
                                                         label: dataLang?.price_quote_branch || "price_quote_branch",
                                                         isDisabled: true,
                                                     },
-                                                    ...listBr,
+                                                    ...listBranch,
                                                 ]}
                                                 isClearable={true}
                                                 onChange={onChangeValue("idBranch")}
@@ -422,7 +298,7 @@ const Payment = (props) => {
                                                         label: dataLang?.payment_TT_method || "payment_TT_method",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataMethod,
+                                                    ...listPayment,
                                                 ]}
                                                 isClearable={true}
                                                 onChange={onChangeValue("idMethod")}
@@ -437,7 +313,7 @@ const Payment = (props) => {
                                                         label: dataLang?.payment_ob || "payment_ob",
                                                         isDisabled: true,
                                                     },
-                                                    ...dataObject,
+                                                    ...listObject,
                                                 ]}
                                                 isClearable={true}
                                                 onChange={onChangeValue("idObject")}
@@ -453,11 +329,12 @@ const Payment = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={sOnFetching} />
-                                            {(role == true || checkExport) ?
+                                        <div className="flex items-center justify-end gap-2">
+                                            <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
+                                            {(role == true || checkExport)
+                                                ?
                                                 <div className={``}>
-                                                    {data_ex?.length > 0 && (
+                                                    {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
                                                             filename="Danh phiếu chi"
@@ -467,7 +344,7 @@ const Payment = (props) => {
                                                 </div>
                                                 :
                                                 <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             }
@@ -480,7 +357,7 @@ const Payment = (props) => {
                             </div>
                             <Customscrollbar className="min:h-[200px] h-[88%] max:h-[500px]">
                                 <div className="w-full">
-                                    <HeaderTable gridCols={13} className="grid grid-cols-13 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                    <HeaderTable gridCols={13} className="sticky top-0 z-10 grid items-center p-2 bg-white divide-x shadow-sm grid-cols-13 rounded-xl">
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.payment_date || "payment_date"}
                                         </ColumnTable>
@@ -521,109 +398,100 @@ const Payment = (props) => {
                                             {dataLang?.payment_action || "payment_action"}
                                         </ColumnTable>
                                     </HeaderTable>
-                                    {onFetching ? (
+                                    {(isLoading || isFetching) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
-                                    ) : data?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                {data?.map((e) => (
-                                                    <RowTable gridCols={13} key={e.id.toString()}
-                                                    >
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                                            <PopupDetail
-                                                                dataLang={dataLang}
-                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]" name={e?.code}
-                                                                id={e?.id}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex items-center w-fit mx-auto">
-                                                            {(e?.objects === "client" && (
-                                                                <TagColorSky name={dataLang[e?.objects] || e?.objects} />
-                                                            )) ||
-                                                                (e?.objects === "supplier" && (
-                                                                    <TagColorOrange name={dataLang[e?.objects] || e?.objects} />
-                                                                )) ||
-                                                                (e?.objects === "other" && (
-                                                                    <TagColorRed name={dataLang[e?.objects] || e?.objects} />
-                                                                ))}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'}>
-                                                            {e?.object_text}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex items-center w-fit mx-auto">
-
-                                                            {(e?.type_vouchers === "import" && (
-                                                                <TagColorMore color={'#a855f7'} backgroundColor={"#e9d5ff"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
-                                                            )) ||
-                                                                (e?.type_vouchers === "deposit" && (
-                                                                    <TagColorMore color={'#06b6d4'} backgroundColor={"#a5f3fc"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
-                                                                )) ||
-                                                                (e?.type_vouchers === "service" && (
-                                                                    <TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
-                                                                )) ||
-                                                                (e?.type_vouchers === "order" && (
-                                                                    <TagColorMore color={'#22c55e'} backgroundColor={'#bbf7d0'} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
-
-                                                                ))}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="mx-auto">
-                                                            {e?.voucher?.map((code) => (
-                                                                <React.Fragment key={code.id}>
-                                                                    <PopupDetailThere
-                                                                        key={code?.id}
-                                                                        dataLang={dataLang}
-                                                                        className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]   transition-all ease-in-out px-2 py-0.5  rounded-md text-center text-[#0F4F9E] hover:text-blue-600"
-                                                                        type={code.voucher_type}
-                                                                        id={code.id}
-                                                                        name={code?.code}
-                                                                    >
-                                                                        {code?.code}
-                                                                    </PopupDetailThere>
-                                                                </React.Fragment>
-                                                            ))}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                                            {e?.payment_mode_name}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'}>
-                                                            {e?.cost_name?.map((code, index) => (
-                                                                <React.Fragment key={code}>
-                                                                    {code}
-                                                                    {index !== e.cost_name.length - 1 && ", "}
-                                                                </React.Fragment>
-                                                            ))}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'right'}>
-                                                            {formatNumber(e?.total)}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1}>
-                                                            <CustomAvatar fullName={e?.staff_name} profileImage={e?.profile_image} />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="mx-auto">
-                                                            <TagBranch className="w-fit">
-                                                                {e?.branch_name}
-                                                            </TagBranch>
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'} className="truncate">
-                                                            {e?.note}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex justify-center">
-                                                            <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
-                                                                dataLang={dataLang}
-                                                                id={e?.id}
-                                                                type="payment"
-                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                            />
-                                                        </RowItemTable>
-                                                    </RowTable>
-                                                ))}
-                                            </div>
-                                        </>
-                                    ) : <NoData />}
+                                    ) : data?.rResult?.length > 0 ? (
+                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                            {data?.rResult?.map((e) => (
+                                                <RowTable gridCols={13} key={e.id.toString()}>
+                                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        <PopupDetail
+                                                            id={e?.id}
+                                                            dataLang={dataLang}
+                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]" name={e?.code}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="flex items-center mx-auto w-fit">
+                                                        {
+                                                            (e?.objects === "client" && (<TagColorSky name={dataLang[e?.objects] || e?.objects} />))
+                                                            ||
+                                                            (e?.objects === "supplier" && (<TagColorOrange name={dataLang[e?.objects] || e?.objects} />))
+                                                            ||
+                                                            (e?.objects === "other" && (<TagColorRed name={dataLang[e?.objects] || e?.objects} />))
+                                                        }
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'left'}>
+                                                        {e?.object_text}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="flex items-center mx-auto w-fit">
+                                                        {
+                                                            (e?.type_vouchers === "import" && (<TagColorMore color={'#a855f7'} backgroundColor={"#e9d5ff"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
+                                                            ||
+                                                            (e?.type_vouchers === "deposit" && (<TagColorMore color={'#06b6d4'} backgroundColor={"#a5f3fc"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
+                                                            ||
+                                                            (e?.type_vouchers === "service" && (<TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
+                                                            ||
+                                                            (e?.type_vouchers === "order" && (<TagColorMore color={'#22c55e'} backgroundColor={'#bbf7d0'} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
+                                                        }
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="mx-auto">
+                                                        {e?.voucher?.map((code) => (
+                                                            <React.Fragment key={code.id}>
+                                                                <PopupDetailThere
+                                                                    dataLang={dataLang}
+                                                                    className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]   transition-all ease-in-out px-2 py-0.5  rounded-md text-center text-[#0F4F9E] hover:text-blue-600"
+                                                                    type={code.voucher_type}
+                                                                    id={code.id}
+                                                                    name={code?.code}
+                                                                >
+                                                                    {code?.code}
+                                                                </PopupDetailThere>
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        {e?.payment_mode_name}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'left'}>
+                                                        {e?.cost_name?.map((code, index) => (
+                                                            <React.Fragment key={index}>
+                                                                {code}
+                                                                {index !== e.cost_name.length - 1 && ", "}
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        {formatNumber(e?.total)}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1}>
+                                                        <CustomAvatar fullName={e?.staff_name} profileImage={e?.profile_image} />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="mx-auto">
+                                                        <TagBranch className="w-fit">
+                                                            {e?.branch_name}
+                                                        </TagBranch>
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'left'} className="truncate">
+                                                        {e?.note}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="flex justify-center">
+                                                        <BtnAction
+                                                            id={e?.id}
+                                                            onRefresh={refetch.bind(this)}
+                                                            dataLang={dataLang}
+                                                            type="payment"
+                                                            className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                        />
+                                                    </RowItemTable>
+                                                </RowTable>
+                                            ))}
+                                        </div>
+                                    ) :
+                                        <NoData />
+                                    }
                                 </div>
                             </Customscrollbar>
                         </ContainerTable>
@@ -633,18 +501,18 @@ const Payment = (props) => {
                             {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
                         </ColumnTable>
                         <ColumnTable colSpan={1} textAlign={'right'} className={'p-2'}>
-                            {formatNumber(total?.sum_total)}
+                            {formatNumber(data?.rTotal?.sum_total)}
                         </ColumnTable>
                     </ContainerTotal>
-                    {data?.length != 0 && (
+                    {data?.rResult?.length != 0 && (
                         <ContainerPagination>
                             <TitlePagination
                                 dataLang={dataLang}
-                                totalItems={totalItem?.iTotalDisplayRecords}
+                                totalItems={data?.output?.iTotalDisplayRecords}
                             />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

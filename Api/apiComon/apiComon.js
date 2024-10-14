@@ -137,10 +137,26 @@ const apiComons = {
         const response = await axiosCustom('GET', `/api_web/Api_expense_payslips/voucher_type?csrf_protection=true`, params);
         return response.data
     },
+    // ds loại chứng từ trong phiếu chi
+    async apiVoucherTypeVoucherCombobox(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_expense_voucher/voucher_type/?csrf_protection=true`, params);
+        return response.data
+    },
 
     // danh sách chứng từ trong phiếu thu
     async apiVoucherListPaySlipCombobox(params, search) {
         const response = await axiosCustom(search ? 'POST' : 'GET', `/api_web/Api_expense_payslips/voucher_list?csrf_protection=true`, params);
+        return response.data
+    },
+    // danh sách chứng từ trong phiếu chi
+    async apiVoucherListVoucherCombobox(params, search) {
+        const response = await axiosCustom(search ? 'POST' : 'GET', `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`, params);
+        return response.data
+    },
+
+    /// loại chi phí trong phiếu chi
+    async apiCostComboboxByBranch(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_cost/costCombobox/?csrf_protection=true`, params);
         return response.data
     },
 

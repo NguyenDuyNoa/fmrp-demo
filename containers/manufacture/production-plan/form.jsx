@@ -21,6 +21,8 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranch";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useMutation } from "@tanstack/react-query";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 
 const InFo = dynamic(() => import("./components/form/info"), { ssr: false });
 const Table = dynamic(() => import("./components/form/table"), { ssr: false });
@@ -183,6 +185,14 @@ const ProductionPlanForm = (props) => {
         queryData({ dataProduction: newData });
     }, [isValue.dateRange]);
 
+    const mutatePlan = useMutation({
+        mutationFn: (data) => {
+            return apiProductionPlan.apiHandlingProductionPlans(data);
+        },
+        retry: 5,
+        gcTimeout: 5000,
+    })
+
     const handSavePlan = async () => {
         const { hasMissingBom, hasMissingStage, hasMissingQuantityDate } = data.dataProduction.reduce(
             (acc, item) => {
@@ -219,6 +229,7 @@ const ProductionPlanForm = (props) => {
         formData.append("branch_id", isValue.idBrach?.value ? isValue.idBrach?.value : "");
         formData.append("date", isValue.date ? formatMoment(isValue.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "");
         formData.append("timeline", `${formatMoment(isValue?.dateRange?.startDate, FORMAT_MOMENT.DATE_SLASH_LONG)}-${formatMoment(isValue?.dateRange?.endDate, FORMAT_MOMENT.DATE_SLASH_LONG)}`);
+
         data.dataProduction.forEach((e, index) => {
             formData.append(`items[${index}][quantity]`, e?.quantityRemaining ? e?.quantityRemaining : "");
             formData.append(`items[${index}][timeline]`, e?.date ? `${formatMoment(e?.date.startDate, FORMAT_MOMENT.DATE_SLASH_LONG)}-${formatMoment(e?.date.endDate, FORMAT_MOMENT.DATE_SLASH_LONG)}` : "");
@@ -229,17 +240,20 @@ const ProductionPlanForm = (props) => {
             formData.append(`items[${index}][object_id]`, e?.objec_id ? e?.objec_id : "");
             formData.append(`items[${index}][object_item_id]`, e?.object_item_id ? e?.object_item_id : "");
         });
-        try {
-            const { isSuccess, message } = await apiProductionPlan.apiHandlingProductionPlans(formData);
-            if (isSuccess == 1) {
-                showToat("success", message);
-                router.push(routerPproductionPlan.home);
-                return
-            }
-            showToat("error", message);
-        } catch (error) {
-            throw new Error(error);
-        }
+
+        mutatePlan.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess == 1) {
+                    showToat("success", message);
+                    router.push(routerPproductionPlan.home);
+                    return
+                }
+                showToat("error", message);
+            },
+            onError: (error) => {
+                throw new Error(error);
+            },
+        })
     };
 
     const shareProps = {
@@ -270,7 +284,7 @@ const ProductionPlanForm = (props) => {
                     </div>
                 )}
                 <ContainerBody>
-                    <div className="flex justify-between items-center mr-2 mt-1">
+                    <div className="flex items-center justify-between mt-1 mr-2">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             Thêm kế hoạch nguyên vật liệu
                         </h2>
@@ -281,12 +295,11 @@ const ProductionPlanForm = (props) => {
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
                             </button>
-                            <button
-                                onClick={() => handSavePlan()}
-                                className="bg-[#0F4F9E] text-white  rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 "
-                            >
-                                Lưu lại
-                            </button>
+                            <ButtonSubmit
+                                loading={mutatePlan.isPending}
+                                onClick={(e) => handSavePlan()}
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
                     <InFo {...shareProps} />
