@@ -1,15 +1,3 @@
-import { debounce } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-
-import { _ServerInstance as Axios } from "/services/axios";
-
-
-import PopupArises from "./components/details_arises";
-import PopupDetailFirst from "./components/details_first";
-
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -25,8 +13,9 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useSupplierList } from "@/containers/suppliers/supplier/hooks/useSupplierList";
+import { useBranchList } from "@/hooks/common/useBranch";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
@@ -34,6 +23,14 @@ import usePagination from "@/hooks/usePagination";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import PopupArises from "./components/details_arises";
+import PopupDetailFirst from "./components/details_first";
+import { useSupplierDebtList } from "./hooks/useSupplierDebtList";
+
 const DebtSuppliers = (props) => {
     const dataLang = props.dataLang;
 
@@ -43,25 +40,11 @@ const DebtSuppliers = (props) => {
 
     const dataSeting = useSetingServer();
 
-    const [data, sData] = useState([]);
-
     const statusExprired = useStatusExprired();
-
-    const [dataExcel, sDataExcel] = useState([]);
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
 
     const [keySearch, sKeySearch] = useState("");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
-
-    const [total, sTotal] = useState({});
-
-    const [listBr, sListBr] = useState([]);
-
-    const [listSupplier, sListSupplier] = useState([]);
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const pastDays = 30;
 
@@ -80,85 +63,23 @@ const DebtSuppliers = (props) => {
 
     const { isValue, onChangeValue } = useChangeValue(inistialValue);
 
-    useEffect(() => {
-        router.push({
-            pathname: router.route,
-            query: { tab: router.query?.tab ? router.query?.tab : "all" },
-        });
-        sOnFetching_filter(true);
-    }, []);
+    const params = {
+        search: keySearch,
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[branch_id]": isValue?.idBranch != null ? isValue?.idBranch.value : null,
+        "filter[supplier_id]": isValue?.idSupplier ? isValue?.idSupplier.value : null,
+        "filter[start_date]": isValue?.valueDate?.startDate != null ? formatMoment(isValue?.valueDate?.startDate, FORMAT_MOMENT.DATE_LONG) : null,
+        "filter[end_date]": isValue?.valueDate?.endDate != null ? formatMoment(isValue?.valueDate?.endDate, FORMAT_MOMENT.DATE_LONG) : null,
+    }
 
-    const _ServerFetching = async () => {
-        await Axios(
-            "GET",
-            `/api_web/Api_debt_supplier/GetDebtSuppliers?csrf_protection=true&cong=true`,
-            {
-                params: {
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": isValue?.idBranch != null ? isValue?.idBranch.value : null,
-                    "filter[supplier_id]": isValue?.idSupplier ? isValue?.idSupplier.value : null,
-                    "filter[start_date]":
-                        isValue?.valueDate?.startDate != null
-                            ? formatMoment(isValue?.valueDate?.startDate, FORMAT_MOMENT.DATE_LONG)
-                            : null,
-                    "filter[end_date]":
-                        isValue?.valueDate?.endDate != null
-                            ? formatMoment(isValue?.valueDate?.endDate, FORMAT_MOMENT.DATE_LONG)
-                            : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
-                    sDataExcel(rResult);
-                    sTotal(rTotal);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
+    const { data: listBranch = [] } = useBranchList()
 
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { result } = response?.data;
-                sListBr(result);
-            }
-        });
-        Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let db = response.data.rResult;
-                sListSupplier(db?.map((e) => ({ label: e.name, value: e.id })));
-            }
-        });
+    const { data: dataSupplier } = useSupplierList({})
 
-        sOnFetching_filter(false);
-    };
+    const { data, refetch, isFetching, isLoading } = useSupplierDebtList(params)
 
-    useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    useEffect(() => {
-        sOnFetching(true);
-    }, [
-        limit,
-        router.query?.page,
-        router.query?.tab,
-        isValue?.idBranch,
-        isValue?.valueDate.endDate,
-        isValue?.valueDate.startDate,
-        isValue?.idSupplier,
-        isValue?.idCode,
-    ]);
+    const listSupplier = dataSupplier?.rResult?.map((e) => ({ label: e.name, value: e.id })) || [];
 
     const formatNumber = (number) => {
         return formatMoneyConfig(+number, dataSeting);
@@ -166,16 +87,7 @@ const DebtSuppliers = (props) => {
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
-        router.replace({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-            },
-        });
-        sOnFetching(true);
     }, 500);
-
-    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
 
     const multiDataSet = [
         {
@@ -253,7 +165,7 @@ const DebtSuppliers = (props) => {
                     },
                 },
             ],
-            data: dataExcel?.map((e) => [
+            data: data?.rResult?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.name ? e?.name : ""}` },
@@ -284,14 +196,14 @@ const DebtSuppliers = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.debt_suppliers || "debt_suppliers"}
                             </h2>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
-                                <div className="bg-slate-100 w-full rounded-lg grid grid-cols-6 justify-between xl:p-3 p-2">
+                            <div className="space-y-2 xl:space-y-3">
+                                <div className="grid justify-between w-full grid-cols-6 p-2 rounded-lg bg-slate-100 xl:p-3">
                                     <div className="col-span-5">
                                         <div className="grid grid-cols-5">
                                             <SearchComponent
@@ -303,29 +215,22 @@ const DebtSuppliers = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_table_branch ||
-                                                            "purchase_order_table_branch",
+                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
-                                                    ...listBr_filter,
+                                                    ...listBranch,
                                                 ]}
                                                 colSpan={1}
                                                 isClearable={true}
                                                 value={isValue.idBranch}
                                                 onChange={onChangeValue("idBranch")}
-                                                placeholder={
-                                                    dataLang?.purchase_order_table_branch ||
-                                                    "purchase_order_table_branch"
-                                                }
+                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                             />
                                             <SelectComponent
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_table_supplier ||
-                                                            "purchase_order_table_supplier",
+                                                        label: dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier",
                                                         isDisabled: true,
                                                     },
                                                     ...listSupplier,
@@ -334,10 +239,7 @@ const DebtSuppliers = (props) => {
                                                 isClearable={true}
                                                 value={isValue?.idSupplier}
                                                 onChange={onChangeValue("idSupplier")}
-                                                placeholder={
-                                                    dataLang?.purchase_order_table_supplier ||
-                                                    "purchase_order_table_supplier"
-                                                }
+                                                placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                             />
                                             <DateToDateComponent
                                                 value={isValue?.valueDate}
@@ -346,10 +248,10 @@ const DebtSuppliers = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1">
-                                        <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={sOnFetching} />
+                                        <div className="flex items-center justify-end gap-2">
+                                            <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
                                             <div>
-                                                {dataExcel?.length > 0 && (
+                                                {data?.rResult?.length > 0 && (
                                                     <ExcelFileComponent
                                                         multiDataSet={multiDataSet}
                                                         filename={"Danh sách công nợ nhà cung cấp"}
@@ -368,17 +270,17 @@ const DebtSuppliers = (props) => {
                             <Customscrollbar className="min:h-[200px] 3xl:h-[92%] 2xl:h-[92%] xl:h-[82%] lg:h-[82%] max:h-[400px]">
                                 <div className="w-full">
                                     <HeaderTable gridCols={12}>
-                                        <div className="col-span-1 grid items-center">
+                                        <div className="grid items-center col-span-1">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
                                                 {dataLang?.debt_suppliers_code || "debt_suppliers_code"}
                                             </h4>
                                         </div>
-                                        <div className="col-span-2 grid items-center">
+                                        <div className="grid items-center col-span-2">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
                                                 {dataLang?.debt_suppliers_name || "debt_suppliers_name"}
                                             </h4>
                                         </div>
-                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                                                 {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
                                             </h4>
@@ -389,7 +291,7 @@ const DebtSuppliers = (props) => {
                                                 {dataLang?.debt_suppliers_Spend || "debt_suppliers_Spend"}
                                             </h4>
                                         </div>
-                                        <div className="col-span-3 grid grid-cols-4   items-center justify-center">
+                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                                                 {dataLang?.debt_suppliers_Arise || "debt_suppliers_Arise"}
                                             </h4>
@@ -400,7 +302,7 @@ const DebtSuppliers = (props) => {
                                                 {dataLang?.debt_suppliers_Spend || "debt_suppliers_Spend"}
                                             </h4>
                                         </div>
-                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                                                 {dataLang?.debt_suppliers_Ending || "debt_suppliers_Ending"}
                                             </h4>
@@ -412,124 +314,98 @@ const DebtSuppliers = (props) => {
                                             </h4>
                                         </div>
                                     </HeaderTable>
-                                    {onFetching ? (
+                                    {(isFetching || isLoading) ? (
                                         <Loading className="h-80" color="#0f4f9e" />
-                                    ) : data?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                {data?.map((e) => (
-                                                    <div
-                                                        className="relative  grid grid-cols-12 items-center py-1.5  hover:bg-slate-100/40 group"
-                                                        key={e.id.toString()}
-                                                    >
-                                                        <h6 className="text-center 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 capitalize">
-                                                            {e.code}
-                                                        </h6>
-                                                        <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                            {e.name}
-                                                        </h6>
-                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                {e.no_start == "0" ? (
-                                                                    "-"
-                                                                ) : (
-                                                                    <PopupDetailFirst
-                                                                        dataLang={dataLang}
-                                                                        className="text-left"
-                                                                        name={
-                                                                            e.no_start == "0"
-                                                                                ? "-"
-                                                                                : formatNumber(e.no_start)
-                                                                        }
-                                                                        id={e?.id}
-                                                                        type={"no_start"}
-                                                                        date={isValue.valueDate}
-                                                                        supplier_name={e.name}
-                                                                        idBranch={isValue?.idBranch}
-                                                                        idSupplier={isValue?.idSupplier}
-                                                                    />
-                                                                )}
-                                                            </h4>
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                {e.chi_start == "0" ? (
-                                                                    "-"
-                                                                ) : (
-                                                                    <PopupDetailFirst
-                                                                        dataLang={dataLang}
-                                                                        className="text-left"
-                                                                        name={
-                                                                            e.chi_start == "0"
-                                                                                ? "-"
-                                                                                : formatNumber(e.chi_start)
-                                                                        }
-                                                                        date={isValue.valueDate}
-                                                                        supplier_name={e.name}
-                                                                        id={e?.id}
-                                                                        type={"chi_start"}
-                                                                        idBranch={isValue?.idBranch}
-                                                                        idSupplier={isValue?.idSupplier}
-                                                                    />
-                                                                )}
-                                                            </h4>
-                                                        </div>
-                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                {e.no_debt == "0" ? (
-                                                                    "-"
-                                                                ) : (
-                                                                    <PopupArises
-                                                                        dataLang={dataLang}
-                                                                        className="text-left uppercase"
-                                                                        supplier_name={e.name}
-                                                                        name={
-                                                                            e.no_debt == "0"
-                                                                                ? "-"
-                                                                                : formatNumber(e.no_debt)
-                                                                        }
-                                                                        id={e?.id}
-                                                                        date={isValue.valueDate}
-                                                                        type={"no_debt"}
-                                                                        idBranch={isValue?.idBranch}
-                                                                        idSupplier={isValue?.idSupplier}
-                                                                    />
-                                                                )}
-                                                            </h4>
-
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                {e.chi_debt == "0" ? (
-                                                                    "-"
-                                                                ) : (
-                                                                    <PopupArises
-                                                                        dataLang={dataLang}
-                                                                        className="text-left uppercase"
-                                                                        supplier_name={e.name}
-                                                                        name={
-                                                                            e.chi_debt == "0"
-                                                                                ? "-"
-                                                                                : formatNumber(e.chi_debt)
-                                                                        }
-                                                                        id={e?.id}
-                                                                        date={isValue.valueDate}
-                                                                        type={"chi_debt"}
-                                                                        idBranch={isValue?.idBranch}
-                                                                        idSupplier={isValue?.idSupplier}
-                                                                    />
-                                                                )}
-                                                            </h4>
-                                                        </div>
-
-                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
-                                                            </h4>
-                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                {e.chi_end == "0" ? "-" : formatNumber(e.chi_end)}
-                                                            </h4>
-                                                        </div>
+                                    ) : data?.rResult?.length > 0 ? (
+                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                            {data?.rResult?.map((e) => (
+                                                <div
+                                                    key={e.id.toString()}
+                                                    className="relative  grid grid-cols-12 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                >
+                                                    <h6 className="text-center 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 capitalize">
+                                                        {e.code}
+                                                    </h6>
+                                                    <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                        {e.name}
+                                                    </h6>
+                                                    <div className="grid items-center justify-center grid-cols-4 col-span-3">
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                            {e.no_start == "0" ? ("-") : (
+                                                                <PopupDetailFirst
+                                                                    dataLang={dataLang}
+                                                                    className="text-left"
+                                                                    name={e.no_start == "0" ? "-" : formatNumber(e.no_start)}
+                                                                    id={e?.id}
+                                                                    type={"no_start"}
+                                                                    date={isValue.valueDate}
+                                                                    supplier_name={e.name}
+                                                                    idBranch={isValue?.idBranch}
+                                                                    idSupplier={isValue?.idSupplier}
+                                                                />
+                                                            )}
+                                                        </h4>
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                            {e.chi_start == "0" ? ("-") : (
+                                                                <PopupDetailFirst
+                                                                    dataLang={dataLang}
+                                                                    className="text-left"
+                                                                    name={e.chi_start == "0" ? "-" : formatNumber(e.chi_start)}
+                                                                    date={isValue.valueDate}
+                                                                    supplier_name={e.name}
+                                                                    id={e?.id}
+                                                                    type={"chi_start"}
+                                                                    idBranch={isValue?.idBranch}
+                                                                    idSupplier={isValue?.idSupplier}
+                                                                />
+                                                            )}
+                                                        </h4>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </>
+                                                    <div className="grid items-center justify-center grid-cols-4 col-span-3">
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                            {e.no_debt == "0" ? ("-") : (
+                                                                <PopupArises
+                                                                    dataLang={dataLang}
+                                                                    className="text-left uppercase"
+                                                                    supplier_name={e.name}
+                                                                    name={e.no_debt == "0" ? "-" : formatNumber(e.no_debt)}
+                                                                    id={e?.id}
+                                                                    date={isValue.valueDate}
+                                                                    type={"no_debt"}
+                                                                    idBranch={isValue?.idBranch}
+                                                                    idSupplier={isValue?.idSupplier}
+                                                                />
+                                                            )}
+                                                        </h4>
+
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                            {e.chi_debt == "0" ? ("-") : (
+                                                                <PopupArises
+                                                                    dataLang={dataLang}
+                                                                    className="text-left uppercase"
+                                                                    supplier_name={e.name}
+                                                                    name={e.chi_debt == "0" ? "-" : formatNumber(e.chi_debt)}
+                                                                    id={e?.id}
+                                                                    date={isValue.valueDate}
+                                                                    type={"chi_debt"}
+                                                                    idBranch={isValue?.idBranch}
+                                                                    idSupplier={isValue?.idSupplier}
+                                                                />
+                                                            )}
+                                                        </h4>
+                                                    </div>
+
+                                                    <div className="grid items-center justify-center grid-cols-4 col-span-3">
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                            {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
+                                                        </h4>
+                                                        <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                            {e.chi_end == "0" ? "-" : formatNumber(e.chi_end)}
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     ) : (
                                         <NoData />
                                     )}
@@ -537,44 +413,44 @@ const DebtSuppliers = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <div className="grid grid-cols-12 bg-slate-100 shadow items-center rounded-md">
+                    <div className="grid items-center grid-cols-12 rounded-md shadow bg-slate-100">
                         <div className="col-span-3 p-2 text-center">
                             <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
                                 {dataLang?.import_total || "import_total"}
                             </h3>
                         </div>
 
-                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.no_start)}
+                                {formatNumber(data?.rTotal?.no_start)}
                             </h3>
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.chi_start)}
-                            </h3>
-                        </div>
-                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.no_debt)}
-                            </h3>
-                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.chi_debt)}
+                                {formatNumber(data?.rTotal?.chi_start)}
                             </h3>
                         </div>
-                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                {formatNumber(total?.no_end)}
+                                {formatNumber(data?.rTotal?.no_debt)}
+                            </h3>
+                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                                {formatNumber(data?.rTotal?.chi_debt)}
+                            </h3>
+                        </div>
+                        <div className="grid items-center justify-center grid-cols-4 col-span-3">
+                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                                {formatNumber(data?.rTotal?.no_end)}
                             </h3>
                             <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right ">
-                                {formatNumber(total?.chi_end)}
+                                {formatNumber(data?.rTotal?.chi_end)}
                             </h3>
                         </div>
                     </div>
-                    {data?.length != 0 && (
+                    {data?.rResult?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
+                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
-                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />

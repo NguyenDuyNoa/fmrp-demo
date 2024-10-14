@@ -32,7 +32,7 @@ axios.interceptors.request.use(
 );
 
 
-const _ServerInstance = (method, url, dataObject = {}, callback) => {
+const _ServerInstance = async (method, url, dataObject = {}, callback) => {
     const showToat = useToast()
 
     let token = null;
