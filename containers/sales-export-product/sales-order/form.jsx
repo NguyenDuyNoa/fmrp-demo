@@ -1180,7 +1180,7 @@ const SalesOrderForm = (props) => {
                                 </h5>
 
                                 <h5 className=" font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                    {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : "0"}
                                 </h5>
                             </div>
                         </div>

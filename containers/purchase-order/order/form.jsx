@@ -1354,7 +1354,7 @@ const OrderForm = (props) => {
                                                                                 Số lượng:
                                                                             </h5>
                                                                             <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {option.e?.quantity_left}
+                                                                                {formatNumber(option.e?.quantity_left)}
                                                                             </h5>
                                                                             {"-"}
                                                                             <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
@@ -1362,7 +1362,7 @@ const OrderForm = (props) => {
                                                                                 :
                                                                             </h5>
                                                                             <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                                                                {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : "0"}
                                                                             </h5>
                                                                         </div>
                                                                     )}

@@ -13,6 +13,7 @@ import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranch";
 import { useClientByBranch } from "@/hooks/common/useClients";
+import { useTaxList } from "@/hooks/common/useTaxs";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
@@ -21,6 +22,7 @@ import { routerPriceQuote } from "@/routers/sellingGoods";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import { debounce } from "lodash";
@@ -33,7 +35,6 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
 import { usePriceQuoteContactByClient } from "./hooks/usePriceQuoteContactByClient";
-import { useTaxList } from "@/hooks/common/useTaxs";
 
 const PriceQuoteForm = (props) => {
     const router = useRouter();
@@ -135,6 +136,11 @@ const PriceQuoteForm = (props) => {
         router.query && sEffectiveDate(null);
         router.query && sNote("");
     }, [id, router.query]);
+
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    };
 
     // Fetch edit
     useQuery({
@@ -1002,7 +1008,7 @@ const PriceQuoteForm = (props) => {
                                                                             :
                                                                         </h5>
                                                                         <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                                                            {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : "0"}
                                                                         </h5>
                                                                     </div>
                                                                 </div>
