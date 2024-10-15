@@ -9,13 +9,14 @@ import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+import { optionsQuery } from "@/configs/optionsQuery";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Add, Trash as IconDelete, ArrowDown2 as IconDown, TickCircle } from "iconsax-react";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
@@ -26,7 +27,6 @@ import ModalImage from "react-modal-image";
 import { v4 as uuidv4 } from "uuid";
 
 const initialState = {
-    onFetching: false,
     type: [
         {
             id: uuidv4(),
@@ -39,7 +39,6 @@ const initialState = {
             value: "material",
         },
     ],
-    arrayItem: [],
 };
 
 const initForm = {
@@ -60,23 +59,21 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
 
     const [isState, sIsState] = useState(initialState);
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
-
-    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
-
     const form = useForm({ defaultValues: { ...initForm } });
+
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
     /// lắng nghe thay đổi
     const findValue = form.watch();
 
     const hangdingMutation = useMutation({
-        mutationFn: async (data) => {
+        mutationFn: async (formData) => {
             return await apiMaterialsPlanning.apiHandlingKeepProductionsPlan(formData);
         }
     })
 
     const onSubmit = async (value) => {
-        if (value.arrayItem.length == 0) {
+        if (value.arrayItem?.length == 0) {
             return isShow("error", dataLang?.materials_planning_no_items || "materials_planning_no_items");
         }
 
@@ -86,7 +83,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
         formData.append("plan_id", dataTable?.listDataRight?.idCommand);
         formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_SLASH_LONG));
 
-        value.arrayItem.forEach((e, index) => {
+        value.arrayItem?.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
             formData.append(`items[${index}][item_id]`, e?.item?.item_id);
             formData.append(`items[${index}][item_code]`, e?.item?.item_code);
@@ -95,13 +92,14 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
             formData.append(`items[${index}][warehouse_id]`, e?.valueWarehouse?.id);
 
-            e?.valueLocation?.forEach((i, locaitonIndex) => {
+            e?.valueLocation?.filter(x => x.show).forEach((i, locaitonIndex) => {
                 formData.append(`items[${index}][location][${locaitonIndex}][location_id]`, i?.location_id);
                 formData.append(`items[${index}][location][${locaitonIndex}][location_value]`, parseFloat(i?.newValue));
                 formData.append(`items[${index}][location][${locaitonIndex}][location_lot]`, i?.lot);
                 formData.append(`items[${index}][location][${locaitonIndex}][location_expiration_date]`, i?.expiration_date);
                 formData.append(`items[${index}][location][${locaitonIndex}][location_serial]`, i?.serial);
             });
+
         });
 
         hangdingMutation.mutate(formData, {
@@ -123,7 +121,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
     useEffect(() => {
         if (open) {
             form.setValue("arrayItem", []);
-            fetchListItem();
+            form.clearErrors()
         }
     }, [findValue.type, open]);
 
@@ -138,12 +136,12 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
 
     const fetchListItem = async () => {
         try {
-            queryState({ onFetching: true });
             await new Promise((resolve) => setTimeout(resolve, 500));
             let formData = new FormData();
             // type: 1 nvl, 2 BTP
             formData.append("type", findValue.type == "material" ? 1 : 2);
             formData.append("pPlan_id", dataTable.listDataRight.idCommand);
+
             const { isSuccess, message, data } = await apiMaterialsPlanning.apiKeepItemsWarehouses(formData);
             const newData = data?.items?.map((e) => {
                 return {
@@ -180,11 +178,18 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                 };
             })
             form.setValue("arrayItem", newData);
-            queryState({ onFetching: false });
         } catch (error) {
             throw error
         }
     };
+
+    const { isLoading, isFetching } = useQuery({
+        queryKey: ['api_keep_item_warrehouse', findValue.type, open],
+        queryFn: fetchListItem,
+        enabled: open,
+        ...optionsQuery
+    })
+
     const fetchListLocationWarehouse = async (item, idWarehouse) => {
         try {
             let formData = new FormData();
@@ -193,48 +198,72 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             formData.append("item_variation_option_value_id", item.itemVariationOptionValueId);
             const { isSuccess, message, data } = await apiMaterialsPlanning.apiLocationItemsWarehouse(formData);
             if (data?.locationsWarehouse) {
+                const quantityNeed = parseFloat(findValue.arrayItem.find(e => e.id === item.id)?.quantityNeed.replace(/,/g, '') || 0); // Chuyển đổi quantityNeed thành số
+                let remainingQuantity = quantityNeed; // Khởi tạo số lượng còn lại
                 const newData = findValue.arrayItem.map((e) => {
-                    if (e.id == item.id) {
+                    if (e.id === item.id) {
+                        const location = data?.locationsWarehouse?.map((i) => {
+                            const quantityWarehouse = parseFloat(i?.quantity_warehouse); // Đảm bảo là số
+                            let newValue = 0; // Khởi tạo newValue
+
+                            // Tính toán newValue dựa trên remainingQuantity và quantityWarehouse
+                            if (remainingQuantity > 0) {
+                                if (remainingQuantity > quantityWarehouse) {
+                                    newValue = quantityWarehouse; // Lấy quantityWarehouse
+                                    remainingQuantity -= quantityWarehouse; // Cập nhật remainingQuantity
+                                } else {
+                                    newValue = remainingQuantity; // Nếu remainingQuantity <= quantityWarehouse
+                                    remainingQuantity = 0; // Đặt remainingQuantity về 0
+                                }
+                            }
+                            // Xác định xem có nên hiển thị vị trí hay không
+                            const show = remainingQuantity > 0 || newValue > 0; // Đặt show thành true nếu remainingQuantity > 0 hoặc newValue > 0
+
+                            return {
+                                ...i,
+                                idFe: uuidv4(),
+                                id: i?.location_id,
+                                label: i?.name_location,
+                                value: formatNumber(i?.quantity_warehouse),
+                                qty: formatNumber(i?.quantity_warehouse),
+                                newValue: newValue > 0 ? newValue : "", // Đặt newValue
+                                show: show, // Đặt show dựa trên remainingQuantity
+                            };
+                        })
                         return {
                             ...e,
-                            warehouseLocation: data?.locationsWarehouse?.map((i) => {
-                                return {
-                                    ...i,
-                                    idFe: uuidv4(),
-                                    id: i?.location_id,
-                                    label: i?.name_location,
-                                    value: formatNumber(i?.quantity_warehouse),
-                                    qty: formatNumber(i?.quantity_warehouse),
-                                    newValue: "1000",
-                                    show: true,
-                                };
-                            }),
+                            valueLocation: location || [],
+                            warehouseLocation: location || [],
                         };
                     }
                     return e;
                 });
-                console.log("newData", newData);
                 form.setValue("arrayItem", newData);
+                form.clearErrors()
             }
         } catch (error) {
-            throw new Error(error);
+            throw error
         }
     };
 
     const handleShow = (idParent, idChild) => {
         const newData = findValue.arrayItem?.map((e) => {
+
+            const location = e.warehouseLocation?.map((i) => {
+                if (i.idFe == idChild) {
+                    return {
+                        ...i,
+                        show: !i.show,
+                    };
+                }
+                return i;
+            })
+
             if (e?.id == idParent) {
                 return {
                     ...e,
-                    warehouseLocation: e.warehouseLocation?.map((i) => {
-                        if (i.idFe == idChild) {
-                            return {
-                                ...i,
-                                show: !i.show,
-                            };
-                        }
-                        return i;
-                    }),
+                    valueLocation: location,
+                    warehouseLocation: location,
                 };
             }
             return e;
@@ -271,8 +300,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                     }}
                 >
                     <div className="flex items-center gap-2 px-3 py-2 ">
-                        {icon}
-                        <h3 className="text-xs font-medium text-blue-600 3xl:text-base">{title}</h3>
+                        {icon} <h3 className="text-xs font-medium text-blue-600 3xl:text-base">{title}</h3>
                     </div>
                 </button>
             }
@@ -317,8 +345,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                 placeholderText="DD/MM/YYYY"
                                                 dateFormat="dd/MM/yyyy"
                                                 // timeInputLabel={"Time: "}
-                                                className={`border ${fieldState.error ? "border-red-500" : "border-[#d0d5dd]"
-                                                    } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                                className={`border ${fieldState.error ? "border-red-500" : "border-[#d0d5dd]"} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                             />
                                             {field.value && (
                                                 <MdClear
@@ -343,26 +370,28 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                             render={({ field }) => {
                                 return (
                                     <div className="flex gap-8 mt-6 items-centerem">
-                                        {isState.type.map((e) => {
-                                            return (
-                                                <div className="flex items-center cursor-pointer">
-                                                    <input
-                                                        id={e.value}
-                                                        type="radio"
-                                                        {...field}
-                                                        checked={field.value === e.value}
-                                                        onChange={() => field.onChange(e.value)}
-                                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 focus:ring-2"
-                                                    />
-                                                    <label
-                                                        htmlFor={e.value}
-                                                        className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
-                                                    >
-                                                        {dataLang[e.label] || e.label}
-                                                    </label>
-                                                </div>
-                                            );
-                                        })}
+                                        {
+                                            isState.type.map((e, index) => {
+                                                return (
+                                                    <div key={index} className="flex items-center cursor-pointer">
+                                                        <input
+                                                            id={e.value}
+                                                            type="radio"
+                                                            {...field}
+                                                            checked={field.value === e.value}
+                                                            onChange={() => field.onChange(e.value)}
+                                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 focus:ring-2"
+                                                        />
+                                                        <label
+                                                            htmlFor={e.value}
+                                                            className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
+                                                        >
+                                                            {dataLang[e.label] || e.label}
+                                                        </label>
+                                                    </div>
+                                                );
+                                            })
+                                        }
                                     </div>
                                 );
                             }}
@@ -416,295 +445,287 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                             {dataLang?.inventory_operatione || "inventory_operatione"}
                         </ColumnTablePopup>
                     </HeaderTablePopup>
-                    {isState.onFetching ? (
+                    {(isLoading || isFetching)
+                        ?
                         <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
-                    ) : findValue.arrayItem && findValue.arrayItem?.length > 0 ? (
-                        <>
+                        :
+                        findValue.arrayItem && findValue.arrayItem?.length > 0
+                            ?
                             <Customscrollbar className="min-h-[300px] max-h-[300px] overflow-hidden">
                                 <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
-                                    {findValue.arrayItem?.map((e, index) => (
-                                        <div
-                                            className="grid items-center grid-cols-13 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
-                                            key={e?.id?.toString()}
-                                        >
-                                            <h6 className="text-[13px] flex items-center font-medium py-1 col-span-3 text-left">
-                                                {!e?.child && (
-                                                    <button
-                                                        className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                        onClick={() => {
-                                                            handleIncrease(e);
+                                    {
+                                        findValue.arrayItem?.map((e, index) => (
+                                            <div
+                                                key={e?.id?.toString()}
+                                                className="grid items-center grid-cols-13 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
+                                            >
+                                                <h6 className="text-[13px] flex items-center gap-1 font-medium py-1 col-span-3 text-left">
+                                                    {
+                                                        !e?.child &&
+                                                        <button
+                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                                                            onClick={() => {
+                                                                handleIncrease(e);
+                                                            }}
+                                                        >
+                                                            <Add size="20" />
+                                                        </button>
+                                                    }
+                                                    {e?.child && <IconDown className="rotate-45" />}
+                                                    <div className={`flex items-center gap-2`}>
+                                                        <div>
+                                                            {
+                                                                e?.item?.image != null
+                                                                    ?
+                                                                    <ModalImage
+                                                                        small={e?.item?.image}
+                                                                        large={e?.item?.image}
+                                                                        alt="Product Image"
+                                                                        className="custom-modal-image object-cover rounded w-[50px] h-[50px] mx-auto"
+                                                                    />
+                                                                    :
+                                                                    <div className="w-[50px] h-[50px] object-cover  mx-auto">
+                                                                        <ModalImage
+                                                                            small="/no_img.png"
+                                                                            large="/no_img.png"
+                                                                            className="object-contain w-full h-full p-1 rounded"
+                                                                        ></ModalImage>
+                                                                    </div>
+                                                            }
+                                                        </div>
+                                                        <div>
+                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                {e?.item?.name}
+                                                            </h6>
+                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                {e?.item?.variation}
+                                                            </h6>
+                                                        </div>
+                                                    </div>
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] px-2 py-0.5 col-span-1 rounded-md text-center break-words">
+                                                    {e?.unit}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] px-2 py-0.5 col-span-1 rounded-md text-center break-words">
+                                                    {e?.quantityNeed == 0 ? "-" : e?.quantityNeed}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] px-2 py-0.5 col-span-1 rounded-md text-center break-words">
+                                                    {e?.quantityKeepp == 0 ? "-" : e?.quantityKeepp}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] px-2 py-0.5 col-span-1 rounded-md text-center break-words">
+                                                    {e?.quantityInventory == 0 ? "-" : e?.quantityInventory}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] px-2 py-0.5 col-span-2 rounded-md text-center break-words">
+                                                    <Controller
+                                                        name={`arrayItem.${index}.valueWarehouse`}
+                                                        control={form.control}
+                                                        rules={{
+                                                            required: {
+                                                                value: findValue.arrayItem.find((x) => x?.id == e?.id)?.valueWarehouse ? false : true,
+                                                                message: dataLang?.materials_planning_pease_select_warehouse || "materials_planning_pease_select_warehouse",
+                                                            },
                                                         }}
-                                                    >
-                                                        <Add size="20" />
-                                                    </button>
-                                                )}
-                                                {e?.child && <IconDown className="rotate-45" />}
-                                                <div className={`flex items-center gap-2`}>
-                                                    <div>
-                                                        {e?.item?.image != null ? (
-                                                            <ModalImage
-                                                                small={e?.item?.image}
-                                                                large={e?.item?.image}
-                                                                alt="Product Image"
-                                                                className="custom-modal-image object-cover rounded w-[50px] h-[50px] mx-auto"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-[50px] h-[50px] object-cover  mx-auto">
-                                                                <ModalImage
-                                                                    small="/no_img.png"
-                                                                    large="/no_img.png"
-                                                                    className="object-contain w-full h-full p-1 rounded"
-                                                                ></ModalImage>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <h6 className="text-[13px] text-left font-medium capitalize">
-                                                            {e?.item?.name}
-                                                        </h6>
-                                                        <h6 className="text-[13px] text-left font-medium capitalize">
-                                                            {e?.item?.variation}
-                                                        </h6>
-                                                    </div>
-                                                </div>
-                                            </h6>
-                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                {e?.unit}
-                                            </h6>
-                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                {e?.quantityNeed == 0 ? "-" : e?.quantityNeed}
-                                            </h6>
-                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                {e?.quantityKeepp == 0 ? "-" : e?.quantityKeepp}
-                                            </h6>
-                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                {e?.quantityInventory == 0 ? "-" : e?.quantityInventory}
-                                            </h6>
-                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
-                                                <Controller
-                                                    name={`arrayItem.${index}.valueWarehouse`}
-                                                    control={form.control}
-                                                    rules={{
-                                                        required: {
-                                                            value: findValue.arrayItem.find((x) => x?.id == e?.id)?.valueWarehouse ? false : true,
-                                                            message: dataLang?.materials_planning_pease_select_warehouse || "materials_planning_pease_select_warehouse",
-                                                        },
-                                                    }}
-                                                    render={({ field, fieldState }) => {
-                                                        const arrWareHouse = findValue.arrayItem.find((x) => x?.id == e?.id)?.warehouse;
-                                                        return (
-                                                            <>
-                                                                <SelectComponent
-                                                                    className={`${fieldState.error ? "border-red-500" : "border-gray-400"} border  rounded`}
-                                                                    isClearable={true}
-                                                                    placeholder={dataLang?.salesOrder_select_warehouse || "salesOrder_select_warehouse"}
-                                                                    options={arrWareHouse}
-                                                                    formatOptionLabel={(option) => (
-                                                                        <div className="flex justify-start items-center gap-1 z-[99]">
-                                                                            <h2>{option?.label}</h2>
-                                                                            <h2>{`(${dataLang?.materials_planning_exist || "materials_planning_exist"}: ${option?.value})`}</h2>
-                                                                        </div>
-                                                                    )}
-                                                                    {...field}
-                                                                    onChange={(event) => {
-                                                                        const check = findValue.arrayItem.some((x) => x?.valueWarehouse?.id == event?.id);
-                                                                        if (check) {
-                                                                            return isShow("error", dataLang?.materials_planning_warehouse_has_been_selected || "materials_planning_warehouse_has_been_selected");
-                                                                        }
-
-                                                                        fetchListLocationWarehouse(e, event?.id);
-                                                                        field.onChange(event);
-                                                                    }}
-                                                                    styles={{
-                                                                        menu: (provided, state) => ({
-                                                                            ...provided,
-                                                                            width: "150%",
-                                                                            zIndex: 999,
-                                                                        }),
-                                                                    }}
-                                                                    value={
-                                                                        findValue.arrayItem.find(
-                                                                            (x) => x?.id == e?.id
-                                                                        )?.valueWarehouse
-                                                                    }
-                                                                    maxMenuHeight={150}
-                                                                />
-                                                                {fieldState.error && (
-                                                                    <span className="text-[12px]  text-red-500">
-                                                                        {fieldState.error.message}{" "}
-                                                                    </span>
-                                                                )}
-                                                            </>
-                                                        );
-                                                    }}
-                                                />
-                                            </h6>
-                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-3 grid grid-cols-1 gap-2  rounded-md text-center break-words">
-                                                <Controller
-                                                    name={`arrayItem.${index}.valueLocation`}
-                                                    control={form.control}
-                                                    render={({ field, fieldState }) => {
-                                                        const arrWareHouse = findValue.arrayItem.find((x) => x?.id == e?.id)?.warehouseLocation;
-                                                        return arrWareHouse?.map((x, Iindex) => {
+                                                        render={({ field, fieldState }) => {
+                                                            const arrWareHouse = findValue.arrayItem.find((x) => x?.id == e?.id)?.warehouse;
                                                             return (
-                                                                <Controller
-                                                                    name={`arrayItem.${index}.valueLocation.${Iindex}`}
-                                                                    control={form.control}
-                                                                    rules={{
-                                                                        required: {
-                                                                            value: x.show,
-                                                                            message: dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity",
-                                                                        },
-                                                                        validate: {
-                                                                            fn: (value) => {
-                                                                                try {
-                                                                                    let mss = "";
-                                                                                    if (x.show && value.newValue == null) {
-                                                                                        mss = dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity";
-                                                                                    }
-                                                                                    if (x.show && value.newValue == 0) {
-                                                                                        mss = dataLang?.materials_planning_must_be_greater || "materials_planning_must_be_greater";
-                                                                                    }
-                                                                                    return mss || true;
-                                                                                } catch (error) {
-                                                                                    throw error;
-                                                                                }
+                                                                <>
+                                                                    <SelectComponent
+                                                                        className={`${fieldState.error ? "border-red-500" : "border-gray-400"} border  rounded`}
+                                                                        isClearable={true}
+                                                                        placeholder={dataLang?.salesOrder_select_warehouse || "salesOrder_select_warehouse"}
+                                                                        options={arrWareHouse}
+                                                                        formatOptionLabel={(option) => (
+                                                                            <div className="flex justify-start items-center gap-1 z-[99]">
+                                                                                <h2>{option?.label}</h2>
+                                                                                <h2>{`(${dataLang?.materials_planning_exist || "materials_planning_exist"}: ${option?.value})`}</h2>
+                                                                            </div>
+                                                                        )}
+                                                                        {...field}
+                                                                        onChange={(event) => {
+                                                                            const check = findValue.arrayItem.some((x) => x?.valueWarehouse?.id == event?.id);
+                                                                            if (check) {
+                                                                                return isShow("error", dataLang?.materials_planning_warehouse_has_been_selected || "materials_planning_warehouse_has_been_selected");
+                                                                            }
+                                                                            fetchListLocationWarehouse(e, event?.id);
+                                                                            field.onChange(event);
+                                                                        }}
+                                                                        styles={{
+                                                                            menu: (provided, state) => ({
+                                                                                ...provided,
+                                                                                width: "150%",
+                                                                                zIndex: 999,
+                                                                            }),
+                                                                        }}
+                                                                        value={findValue.arrayItem.find((x) => x?.id == e?.id)?.valueWarehouse}
+                                                                        maxMenuHeight={150}
+                                                                    />
+                                                                    {fieldState.error && (
+                                                                        <span className="text-[12px]  text-red-500">
+                                                                            {fieldState.error.message}{" "}
+                                                                        </span>
+                                                                    )}
+                                                                </>
+                                                            );
+                                                        }}
+                                                    />
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-3 grid grid-cols-1 gap-2  rounded-md text-center break-words">
+                                                    <Controller
+                                                        name={`arrayItem.${index}.valueLocation`}
+                                                        control={form.control}
+                                                        render={({ field, fieldState }) => {
+                                                            const arrWareHouse = findValue.arrayItem.find((x) => x?.id == e?.id);
+                                                            return arrWareHouse?.warehouseLocation?.map((x, Iindex) => {
+                                                                return (
+                                                                    <Controller
+                                                                        name={`arrayItem.${index}.valueLocation.${Iindex}.newValue`}
+                                                                        control={form.control}
+                                                                        rules={{
+                                                                            required: {
+                                                                                value: x.show,
+                                                                                message: dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity",
                                                                             },
-                                                                        },
-                                                                    }}
-                                                                    render={({ field, fieldState }) => {
-
-                                                                        return (
-                                                                            <div
-                                                                                key={x.idFe}
-                                                                                className="w-full  z-[99]"
-                                                                            >
-                                                                                <Zoom>
-                                                                                    <div
-                                                                                        onClick={() =>
-                                                                                            handleShow(e.id, x.idFe)
+                                                                            validate: {
+                                                                                fn: (value) => {
+                                                                                    try {
+                                                                                        let mss = "";
+                                                                                        if (x.show && x.newValue == null && value.newValue == null) {
+                                                                                            mss = dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity";
                                                                                         }
-                                                                                        className={`border-gray-400  w-full text-[10px] font-medium bg-white hover:bg-gray-100 transition-all ease-in-out  border rounded-2xl py-1 px-2 flex items-center gap-1`}
-                                                                                    >
-                                                                                        <div>
-                                                                                            {x.show ? (
-                                                                                                <TickCircle
-                                                                                                    className="bg-blue-600 rounded-full "
-                                                                                                    color="white"
-                                                                                                    size={15}
-                                                                                                />
-                                                                                            ) : (
-                                                                                                <div className="w-4 h-4 bg-transparent border border-gray-300 rounded-full" />
-                                                                                            )}
-                                                                                        </div>
-                                                                                        <div className="flex flex-col items-start jus">
-                                                                                            <h3>
-                                                                                                {x.label} -
-                                                                                                <span className="pl-1 text-blue-500">
-                                                                                                    {x.value}
-                                                                                                </span>
-                                                                                            </h3>
-                                                                                            <div className="flex flex-wrap items-center font-oblique">
-                                                                                                {dataProductSerial.is_enable === "1" && (
-                                                                                                    <div className="flex gap-0.5">
-                                                                                                        <h6 className="text-[8px]">
-                                                                                                            Serial:
-                                                                                                        </h6>
-                                                                                                        <h6 className="text-[9px] px-1  w-[full] text-left ">
-                                                                                                            {x.serial == null || x.serial == "" ? "-" : x?.serial}
-                                                                                                        </h6>
-                                                                                                    </div>
-                                                                                                )}
-                                                                                                {(dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1") && (
-                                                                                                    <>
-                                                                                                        <div className="flex gap-0.5">
-                                                                                                            <h6 className="text-[8px]">
-                                                                                                                Lot:
-                                                                                                            </h6>{" "}
-                                                                                                            <h6 className="text-[9px] px-1  w-[full] text-left ">
-                                                                                                                {x.lot == null || x.lot == "" ? "-" : x?.lot}
-                                                                                                            </h6>
-                                                                                                        </div>
-                                                                                                        <div className="flex gap-0.5">
-                                                                                                            <h6 className="text-[8px]">
-                                                                                                                Date:
-                                                                                                            </h6>{" "}
-                                                                                                            <h6 className="text-[9px] px-1  w-[full] text-center ">
-                                                                                                                {x?.expiration_date ? formatMoment(x?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
-                                                                                                            </h6>
-                                                                                                        </div>
-                                                                                                    </>
-                                                                                                )}
+                                                                                        if (x.show && x.newValue == 0 && value.newValue == 0) {
+                                                                                            mss = dataLang?.materials_planning_must_be_greater || "materials_planning_must_be_greater";
+                                                                                        }
+                                                                                        return mss || true;
+                                                                                    } catch (error) {
+                                                                                        throw error;
+                                                                                    }
+                                                                                },
+                                                                            },
+                                                                        }}
+                                                                        render={({ field, fieldState }) => {
+                                                                            return (
+                                                                                <div key={x.idFe} className="w-full z-[99]" >
+                                                                                    <Zoom>
+                                                                                        <div
+                                                                                            onClick={() => handleShow(e.id, x.idFe)}
+                                                                                            className={`border-gray-400  w-full text-[10px] font-medium bg-white hover:bg-gray-100 transition-all ease-in-out  border rounded-2xl py-1 px-2 flex items-center gap-1`}
+                                                                                        >
+                                                                                            <div>
+                                                                                                {
+                                                                                                    x.show
+                                                                                                        ?
+                                                                                                        <TickCircle
+                                                                                                            className="bg-blue-600 rounded-full "
+                                                                                                            color="white"
+                                                                                                            size={15}
+                                                                                                        />
+                                                                                                        :
+                                                                                                        <div className="w-4 h-4 bg-transparent border border-gray-300 rounded-full" />
+                                                                                                }
+                                                                                            </div>
+                                                                                            <div className="flex flex-col items-start jus">
+                                                                                                <h3 className="">
+                                                                                                    {x.label} - <span className="pl-1 text-blue-500"> {x.value} </span>
+                                                                                                </h3>
+                                                                                                <div className="flex flex-wrap items-center font-oblique">
+                                                                                                    {
+                                                                                                        dataProductSerial.is_enable === "1" && (
+                                                                                                            <div className="flex gap-0.5">
+                                                                                                                <h6 className="text-[8px]">
+                                                                                                                    Serial:
+                                                                                                                </h6>
+                                                                                                                <h6 className="text-[9px] px-1  w-[full] text-left ">
+                                                                                                                    {x.serial == null || x.serial == "" ? "-" : x?.serial}
+                                                                                                                </h6>
+                                                                                                            </div>
+                                                                                                        )
+                                                                                                    }
+                                                                                                    {
+                                                                                                        (dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1") && (
+                                                                                                            <>
+                                                                                                                <div className="flex gap-0.5">
+                                                                                                                    <h6 className="text-[8px]">
+                                                                                                                        Lot:
+                                                                                                                    </h6>{" "}
+                                                                                                                    <h6 className="text-[9px] px-1  w-[full] text-left ">
+                                                                                                                        {x.lot == null || x.lot == "" ? "-" : x?.lot}
+                                                                                                                    </h6>
+                                                                                                                </div>
+                                                                                                                <div className="flex gap-0.5">
+                                                                                                                    <h6 className="text-[8px]">
+                                                                                                                        Date:
+                                                                                                                    </h6>{" "}
+                                                                                                                    <h6 className="text-[9px] px-1  w-[full] text-center ">
+                                                                                                                        {x?.expiration_date ? formatMoment(x?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                                                                    </h6>
+                                                                                                                </div>
+                                                                                                            </>
+                                                                                                        )
+                                                                                                    }
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                </Zoom>
-                                                                                {/* {console.log(e)
-                                                                                } */}
-                                                                                {x.show && (
-                                                                                    <InPutNumericFormat
-                                                                                        className={`py-1 px-2 my-1 ${fieldState.error
-                                                                                            ? "border-red-500"
-                                                                                            : "border-gray-400"
-                                                                                            }  border outline-none rounded-3xl w-full`}
-                                                                                        {...field}
-                                                                                        onValueChange={(event) =>
-                                                                                            field.onChange({
-                                                                                                newValue: event.value == "" ? null : event.value,
-                                                                                                ...x,
-                                                                                            })
-                                                                                        }
-                                                                                        value={x?.newValue}
-                                                                                        // value={field.value?.newValue}
-                                                                                        isAllowed={(values) => {
-                                                                                            const { floatValue, value, } = values;
-                                                                                            if (floatValue == 0) {
+                                                                                    </Zoom>
+                                                                                    {x.show &&
+                                                                                        <InPutNumericFormat
+                                                                                            className={`py-1 px-2 my-1 ${fieldState.error ? "border-red-500" : "border-gray-400"}  border outline-none rounded-3xl w-full`}
+                                                                                            {...field}
+                                                                                            onValueChange={(event) => {
+                                                                                                field.onChange({
+                                                                                                    ...x,
+                                                                                                    newValue: event.value == "" ? null : event.value,
+                                                                                                })
+                                                                                            }}
+                                                                                            value={field.value?.newValue || x?.newValue}
+                                                                                            isAllowed={(values) => {
+                                                                                                const { floatValue } = values;
+                                                                                                if (floatValue == 0) {
+                                                                                                    return true;
+                                                                                                }
+                                                                                                if (floatValue > parseFloat(x.value.replace(/,/g, ''))) {
+                                                                                                    isShow("warning", `${dataLang?.materials_planning_llease_enter || "materials_planning_llease_enter"} ${formatNumber(parseFloat(x.value.replace(/,/g, '')))}`);
+                                                                                                    return false;
+                                                                                                }
+                                                                                                if (floatValue < 0) {
+                                                                                                    isShow("warning", dataLang?.materials_planning_please_enter_greater || "materials_planning_please_enter_greater");
+                                                                                                    return false;
+                                                                                                }
                                                                                                 return true;
-                                                                                            }
-                                                                                            if (floatValue > x.value) {
-                                                                                                isShow("warning", `${dataLang?.materials_planning_llease_enter || "materials_planning_llease_enter"} ${formatNumber(x.value)}`);
-                                                                                                return false;
-                                                                                            }
-                                                                                            if (floatValue < 0) {
-                                                                                                isShow("warning", dataLang?.materials_planning_please_enter_greater || "materials_planning_please_enter_greater");
-                                                                                                return false;
-                                                                                            }
-                                                                                            return true;
-                                                                                        }}
-                                                                                    />
-                                                                                )}
-                                                                                {x.show && fieldState.error && (
-                                                                                    <span className="text-[12px]  text-red-500">
-                                                                                        {fieldState.error.message}{" "}
-                                                                                    </span>
-                                                                                )}
-                                                                            </div>
-                                                                        );
-                                                                    }}
-                                                                />
-                                                            );
-                                                        });
-                                                    }}
-                                                />
-                                            </h6>
-                                            <div className="flex items-center justify-center col-span-1">
-                                                <button
-                                                    onClick={(event) => removeItem(e.id)}
-                                                    type="button"
-                                                    title="Xóa"
-                                                    className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                                                >
-                                                    <IconDelete />
-                                                </button>
+                                                                                            }}
+                                                                                        />
+                                                                                    }
+                                                                                    {x.show && fieldState.error && (
+                                                                                        <span className="text-[12px]  text-red-500">
+                                                                                            {fieldState.error.message}
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                );
+                                                            });
+                                                        }}
+                                                    />
+                                                </h6>
+                                                <div className="flex items-center justify-center col-span-1">
+                                                    <button
+                                                        onClick={(event) => removeItem(e.id)}
+                                                        type="button"
+                                                        title="Xóa"
+                                                        className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
+                                                    >
+                                                        <IconDelete />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))
+                                    }
                                 </div>
                             </Customscrollbar>
-                        </>
-                    ) : (
-                        <NoData />
-                    )}
+                            :
+                            <NoData />
+                    }
                     <div className="mt-5 space-x-2 text-right">
                         <ButtonCancel
                             loading={false}
