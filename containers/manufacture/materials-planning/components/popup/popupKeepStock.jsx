@@ -94,7 +94,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
 
             e?.valueLocation?.filter(x => x.show).forEach((i, locaitonIndex) => {
                 formData.append(`items[${index}][location][${locaitonIndex}][location_id]`, i?.location_id);
-                formData.append(`items[${index}][location][${locaitonIndex}][location_value]`, parseFloat(i?.newValue));
+                formData.append(`items[${index}][location][${locaitonIndex}][location_value]`, parseFloat(i?.newValue.replace(/,/g, '')));
                 formData.append(`items[${index}][location][${locaitonIndex}][location_lot]`, i?.lot);
                 formData.append(`items[${index}][location][${locaitonIndex}][location_expiration_date]`, i?.expiration_date);
                 formData.append(`items[${index}][location][${locaitonIndex}][location_serial]`, i?.serial);
@@ -203,7 +203,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                 const newData = findValue.arrayItem.map((e) => {
                     if (e.id === item.id) {
                         const location = data?.locationsWarehouse?.map((i) => {
-                            const quantityWarehouse = parseFloat(i?.quantity_warehouse); // Đảm bảo là số
+                            const quantityWarehouse = parseFloat(i?.quantity_warehouse.replace(/,/g, '')); // Đảm bảo là số
                             let newValue = 0; // Khởi tạo newValue
 
                             // Tính toán newValue dựa trên remainingQuantity và quantityWarehouse
