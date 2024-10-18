@@ -185,13 +185,16 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             }
 
             if (type == "end_production") {
-                if (!isState.idWarehouseImport || isState.idWarehouseExport?.length == 0 || !isState.lot || !isState.date || !isState.serial) {
+                if (!isState.idWarehouseImport || isState.idWarehouseExport?.length == 0
+                    // ||    !isState.lot || !isState.date || !isState.serial
+
+                ) {
                     queryState({
                         errorWarehouseImport: !isState.idWarehouseImport,
                         errorWarehouseExport: isState.idWarehouseExport?.length == 0,
-                        errorSerial: !isState.serial,
-                        errorLot: !isState.lot,
-                        errorDate: !isState.date
+                        // errorSerial: !isState.serial,
+                        // errorLot: !isState.lot,
+                        // errorDate: !isState.date
                     })
                     isShow('error', 'Vui lòng kiểm tra dữ liệu!')
                     return
@@ -211,9 +214,9 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("product[item][item_image]", isState?.item?.item_image)
                 formData.append("product[item][product_variation]", isState?.item?.product_variation)
                 formData.append("product[item][quantity_enter]", isState?.item?.quantityEnter)
-                formData.append("product[item][lot]", isState?.lot ?? "")
-                formData.append("product[item][date_expiration]", isState?.date ?? "")
-                formData.append("product[item][serial]", isState?.serial ?? "")
+                // formData.append("product[item][lot]", isState?.lot ?? "")
+                // formData.append("product[item][date_expiration]", isState?.date ?? "")
+                // formData.append("product[item][serial]", isState?.serial ?? "")
 
                 isState.item?.bom?.forEach((e, index) => {
                     formData.append(`product[item][bom][${index}][type_products]`, e?.type_products)
