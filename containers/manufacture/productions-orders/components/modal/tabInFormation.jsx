@@ -5,7 +5,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { memo, useEffect, useState } from "react";
 import { AiOutlineFileText } from "react-icons/ai";
-import { FaCheck, FaCheckCircle } from "react-icons/fa";
+import { FaArrowAltCircleRight, FaCheck, FaCheckCircle } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa6";
 import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
@@ -51,8 +51,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
                         processBar: e?.stages?.map(i => {
                             return {
                                 ...i,
-                                active: false,
-                                quantity: 100,
+                                active: i?.active == "1",
                             }
                         })
                     }
@@ -174,7 +173,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     return (
-        <div key={id ?? ""} className={`max-w-lg min-w-[250px] w-[250px]`}>
+        <div key={id ?? ""} className={`min-w-[250px]`}>
             <div className={`bg-white sticky top-0 z-[1] `}>
                 <div className={`flex items-start py-2 px-4 h-[90px]  gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-full`}>
                     <div className="min-h-[32px] h-8 w-8 min-w-[32px]">
@@ -188,7 +187,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                         />
                     </div>
                     <div className="flex flex-col gap-0.5">
-                        <div className={`text-xs ${type === "semi" ? "font-medium" : "text-[#5599EC] font-semibold"}`}>
+                        <div className={`text-xs ${type === "semi" ? "font-medium" : "text-[#5599EC] font-semibold"} max-w-[200px]`}>
                             {name}
                         </div>
                         <div className={`text-[10px] italic text-gray-500 w-fit`}>
@@ -207,12 +206,20 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                     return (
                         <div key={jIndex} className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
                             <div className="flex min-h-[70px] gap-3">
-                                <div className={`${checkDate ? "" : 'hidden'} text-[10px] ${j?.active ? 'text-black' : "text-black/70"} font-normal text-right`}>
-                                    <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
+                                <div className={`
+                                ${checkDate ? "" : 'hidden'} text-[10px] 
+                                ${j?.active ? ' text-[#14b8a6]' : j?.begin_production == 1 ? "text-orange-600 " : "text-black/70"} 
+                                font-normal text-right`
+                                }
+                                >
+                                    <div className={`${j?.date_production ? 'block' : 'hidden'}`}>
                                         {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
                                     </div>
-                                    <div className={`${j?.date_production ? 'opacity-100' : 'opacity-0'}`}>
+                                    <div className={`${j?.date_production ? 'block' : 'hidden'} `}>
                                         {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.TIME_SHORT)}
+                                    </div>
+                                    <div>
+                                        {j?.active ? 'Đã hoàn thành' : j?.begin_production == 1 ? 'Đang sản xuất' : 'Chưa sản xuất'}
                                     </div>
                                 </div>
                                 <div className="flex">
@@ -223,40 +230,96 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                     processBar?.length - 1 != jIndex
                                                         ?
                                                         <>
-                                                            {jIndex % 2 == 0 && <FaArrowDown size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
-                                                            {jIndex % 2 != 0 && <AiOutlineFileText size={9} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />}
+                                                            {
+                                                                jIndex % 2 == 0 && <FaArrowDown
+                                                                    size={9}
+                                                                    className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`}
+                                                                />
+                                                            }
+                                                            {
+                                                                jIndex % 2 != 0 && <AiOutlineFileText
+                                                                    size={9}
+                                                                    className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`}
+                                                                />
+                                                            }
                                                         </>
                                                         :
-                                                        <FaCheck size={8} className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`} />
+                                                        <FaCheck
+                                                            size={8}
+                                                            className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`}
+                                                        />
                                                 }
                                             </div>
                                         </div>
-                                        {checkLast && <div className={`h-full w-px ${j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`}>
-                                        </div>}
+                                        {checkLast && <div className={`h-full w-px ${j?.active ? 'bg-[#14b8a6]' : j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`} />}
                                     </div>
                                     <div className="mt-0.5">
                                         <div className="flex items-center gap-2">
-                                            <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>{j.stage_name}</p>
-                                            <PopupImportProducts
+                                            <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>
+                                                {j.stage_name}
+                                            </p>
+                                            {/* <PopupImportProducts
                                                 dataStage={j}
                                                 dataLang={dataLang}
                                                 dataDetail={dataDetail}
-                                                type={(+j?.type == 3) ? 'begin_production' : (+j?.type == 2 && 'end_production')}
+                                                // type={j?.active ? 'done_production' : (+j?.type == 3) ? 'begin_production' : (+j?.type == 2 && 'end_production')}
+                                                type={
+                                                    j?.active
+                                                        ?
+                                                        'done_production'
+                                                        :
+                                                        (+j?.type == 3) ? 'begin_production' : (+j?.type == 2 && 'end_production')
+                                                }
                                             >
-                                                <FaCheckCircle className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
-                                            </PopupImportProducts>
+                                                <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"}
+                                                 cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`}
+                                                />
+                                            </PopupImportProducts> */}
 
-                                            {/* {(+j?.type == 2 || +j?.type == 3)
-                                            ?
-                                            <div className="flex items-center gap-1">
+                                            {(+j?.type == 2 || +j?.type == 3)
+                                                ?
                                                 <PopupImportProducts
                                                     dataDetail={dataDetail}
-                                                    type='begin_production'
+                                                    type={j?.active ? 'done_production' : 'end_production'}
                                                     dataStage={j}
                                                     dataLang={dataLang}
                                                 >
-                                                    <FaArrowAltCircleRight className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#5599EC]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
+                                                    <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
                                                 </PopupImportProducts>
+                                                :
+                                                +j?.type == 0 &&
+                                                <PopupImportProducts
+                                                    dataDetail={dataDetail}
+                                                    type={j?.active ? 'done_production' : 'end_production'}
+                                                    dataStage={j}
+                                                    dataLang={dataLang}
+                                                >
+                                                    <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
+                                                </PopupImportProducts>
+                                            }
+
+                                            {/* {(+j?.type == 2 || +j?.type == 3)
+                                                ?
+                                                <div className="flex items-center gap-1">
+                                                    <PopupImportProducts
+                                                        dataDetail={dataDetail}
+                                                        type='begin_production'
+                                                        dataStage={j}
+                                                        dataLang={dataLang}
+                                                    >
+                                                        <FaArrowAltCircleRight className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#5599EC]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
+                                                    </PopupImportProducts>
+                                                    <PopupImportProducts
+                                                        dataDetail={dataDetail}
+                                                        type='end_production'
+                                                        dataStage={j}
+                                                        dataLang={dataLang}
+                                                    >
+                                                        <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
+                                                    </PopupImportProducts>
+                                                </div>
+                                                :
+                                                +j?.type == 0 &&
                                                 <PopupImportProducts
                                                     dataDetail={dataDetail}
                                                     type='end_production'
@@ -265,44 +328,37 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                 >
                                                     <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
                                                 </PopupImportProducts>
-                                            </div>
-                                            :
-                                            +j?.type == 0 &&
-                                            <PopupImportProducts
-                                                dataDetail={dataDetail}
-                                                type='end_production'
-                                                dataStage={j}
-                                                dataLang={dataLang}
-                                            >
-                                                <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
-                                            </PopupImportProducts>
-                                        } */}
+                                            } */}
                                         </div>
-                                        <div className="flex items-center gap-1 pt-2">
-                                            {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
-                                            {
-                                                j?.purchase_items?.map(e => {
-                                                    return (
-                                                        <div key={e?.id} className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
-                                                            <ModalImage
-                                                                small={e?.image ?? "/no_img.png"}
-                                                                large={e?.image ?? "/no_img.png"}
-                                                                width={18}
-                                                                height={18}
-                                                                alt={e?.item_name}
-                                                                className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
-                                                            />
-                                                            <span className="text-[#9295A4] text-[10px]">
-                                                                {e?.reference_no}
-                                                            </span>
-                                                            -
-                                                            <span className="text-[#9295A4] text-[10px]">
-                                                                SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
-                                                            </span>
-                                                        </div>
-                                                    )
-                                                })
-                                            }
+                                        <div className="flex items-start gap-1 py-2">
+                                            <div className="">
+                                                {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
+                                            </div>
+                                            <div className="flex flex-col items-center gap-2">
+                                                {
+                                                    j?.purchase_items?.map(e => {
+                                                        return (
+                                                            <div key={e?.id} className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
+                                                                <ModalImage
+                                                                    small={e?.image ?? "/no_img.png"}
+                                                                    large={e?.image ?? "/no_img.png"}
+                                                                    width={18}
+                                                                    height={18}
+                                                                    alt={e?.item_name}
+                                                                    className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
+                                                                />
+                                                                <span className="text-[#9295A4] text-[10px]">
+                                                                    {e?.reference_no}
+                                                                </span>
+                                                                -
+                                                                <span className="text-[#9295A4] text-[10px]">
+                                                                    SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
+                                                                </span>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -311,7 +367,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                     )
                 })
             }
-        </div>
+        </div >
     )
 }
 

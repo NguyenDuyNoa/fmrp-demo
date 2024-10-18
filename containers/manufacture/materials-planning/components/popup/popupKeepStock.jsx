@@ -91,10 +91,9 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             formData.append(`items[${index}][item_variation]`, e?.item?.variation);
             formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
             formData.append(`items[${index}][warehouse_id]`, e?.valueWarehouse?.id);
-
             e?.valueLocation?.filter(x => x.show).forEach((i, locaitonIndex) => {
                 formData.append(`items[${index}][location][${locaitonIndex}][location_id]`, i?.location_id);
-                formData.append(`items[${index}][location][${locaitonIndex}][location_value]`, parseFloat(i?.newValue.replace(/,/g, '')));
+                formData.append(`items[${index}][location][${locaitonIndex}][location_value]`, typeof i?.newValue == "number" ? i?.newValue : parseFloat(i?.newValue?.replace(/,/g, '')));
                 formData.append(`items[${index}][location][${locaitonIndex}][location_lot]`, i?.lot);
                 formData.append(`items[${index}][location][${locaitonIndex}][location_expiration_date]`, i?.expiration_date);
                 formData.append(`items[${index}][location][${locaitonIndex}][location_serial]`, i?.serial);

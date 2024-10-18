@@ -274,7 +274,7 @@ const Order = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.purchase_order || "purchase_order"}
                             </h2>
@@ -314,7 +314,7 @@ const Order = (props) => {
                                 })}
                         </ContainerFilterTab>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-6 gap-2">
@@ -398,7 +398,7 @@ const Order = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -416,7 +416,7 @@ const Order = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -527,13 +527,13 @@ const Order = (props) => {
                                                         className="flex items-center justify-center text-center "
                                                     >
                                                         {(e?.import_status === "not_stocked" && (
-                                                            <TagColorSky name={dataLang[e?.import_status]} />
+                                                            <TagColorSky name={dataLang[e?.import_status] || e?.import_status} />
                                                         )) ||
                                                             (e?.import_status === "stocked_part" && (
-                                                                <TagColorOrange name={dataLang[e?.import_status]} />
+                                                                <TagColorOrange name={dataLang[e?.import_status] || e?.import_status} />
                                                             )) ||
                                                             (e?.import_status === "stocked" && (
-                                                                <TagColorLime name={dataLang[e?.import_status]} />
+                                                                <TagColorLime name={dataLang[e?.import_status] || e?.import_status} />
                                                             ))}
                                                     </RowItemTable>
                                                     <RowItemTable
@@ -546,7 +546,7 @@ const Order = (props) => {
                                                     <RowItemTable colSpan={1} className="mx-auto">
                                                         <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className=" flex justify-center">
+                                                    <RowItemTable colSpan={1} className="flex justify-center ">
                                                         <BtnAction
                                                             onRefresh={refetch.bind(this)}
                                                             dataLang={dataLang}

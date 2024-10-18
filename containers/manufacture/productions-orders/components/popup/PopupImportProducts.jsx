@@ -7,6 +7,7 @@ import Loading from "@/components/UI/loading/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
+import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -15,8 +16,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash as IconDelete } from "iconsax-react";
 import Image from "next/image";
 import { memo, useEffect, useState } from "react";
+import { BsCalendarEvent } from "react-icons/bs";
 import { FaBox } from "react-icons/fa";
 import { RiBox3Fill } from "react-icons/ri";
+import DatePicker from "react-datepicker";
+import { MdClear } from "react-icons/md";
 
 const initilaState = {
     open: false,
@@ -28,7 +32,13 @@ const initilaState = {
     idWarehouseExport: [],
     idWarehouseImport: null,
     errorWarehouseImport: false,
-    errorWarehouseExport: false
+    errorWarehouseExport: false,
+    errorSerial: false,
+    errorLot: false,
+    errorDate: false,
+    lot: "",
+    date: null,
+    serial: ""
 };
 
 const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...props }) => {
@@ -42,7 +52,10 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+
     const formanumber = (num) => formatNumberConfig(+num, dataSeting)
+
 
     const handingPopup = useMutation({
         mutationFn: (data) => {
@@ -56,7 +69,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
     })
 
     const { isLoading } = useQuery({
-        queryKey: ["api_data_products"],
+        queryKey: ["api_data_products", isState.open],
         queryFn: async () => {
             let formData = new FormData();
             formData.append('poi_id', dataStage?.poi_id);
@@ -83,6 +96,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 item: {
                     ...data?.product?.item,
                     quantityDefault: data?.product?.item?.quantity,
+                    quantityEnter: data?.product?.item?.quantity,
                     image: data?.product?.item?.item_image ?? '/no_img.png',
                     bom: data?.product?.item?.bom?.map(e => {
                         return {
@@ -171,10 +185,13 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             }
 
             if (type == "end_production") {
-                if (!isState.idWarehouseImport || isState.idWarehouseExport?.length == 0) {
+                if (!isState.idWarehouseImport || isState.idWarehouseExport?.length == 0 || !isState.lot || !isState.date || !isState.serial) {
                     queryState({
                         errorWarehouseImport: !isState.idWarehouseImport,
-                        errorWarehouseExport: isState.idWarehouseExport?.length == 0
+                        errorWarehouseExport: isState.idWarehouseExport?.length == 0,
+                        errorSerial: !isState.serial,
+                        errorLot: !isState.lot,
+                        errorDate: !isState.date
                     })
                     isShow('error', 'Vui lòng kiểm tra dữ liệu!')
                     return
@@ -190,10 +207,10 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("product[item][item_name]", isState?.item?.item_name)
                 formData.append("product[item][item_variation_id]", isState?.item?.item_variation_id)
                 formData.append("product[item][type_products]", isState?.item?.type_products)
-                formData.append("product[item][quantity]", isState?.item?.quantity)
+                formData.append("product[item][quantity]", isState?.item?.quantityDefault)
                 formData.append("product[item][item_image]", isState?.item?.item_image)
                 formData.append("product[item][product_variation]", isState?.item?.product_variation)
-                formData.append("product[item][quantity_enter]", isState?.item?.quantity || isState?.item?.quantityEnter)
+                formData.append("product[item][quantity_enter]", isState?.item?.quantityEnter)
 
                 isState.item?.bom?.forEach((e, index) => {
                     formData.append(`product[item][bom][${index}][type_products]`, e?.type_products)
@@ -222,6 +239,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 formData.append("product[dtPois][number]", isState?.dtPois?.number)
                 formData.append("product[dtPois][final_stage]", isState?.dtPois?.final_stage)
                 formData.append("product[dtPois][bom_id]", isState?.dtPois?.bom_id)
+                formData.append("product[dtPois][type]", isState?.dtPois?.type)
                 formData.append("product[dtPois][name_stage]", isState?.dtPois?.name_stage)
 
                 formData.append("dtPoi[poi_id]", isState?.dtPoi?.poi_id)
@@ -240,7 +258,10 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 idWarehouseExport: [],
                                 idWarehouseImport: null,
                                 errorWarehouseImport: false,
-                                errorWarehouseExport: false
+                                errorWarehouseExport: false,
+                                errorSerial: false,
+                                errorLot: false,
+                                errorDate: false
                             })
                             return
                         }
@@ -261,12 +282,12 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             title={type === "begin_production" ? "Bạn có muốn bắt đầu sản xuất công đoạn này ?" : `Hoàn thành công đoạn ${dataStage?.stage_name?.toUpperCase()}`}
             button={props.children}
             onClickOpen={() => {
+                if (type == 'done_production') {
+                    return isShow("error", "Công đoạn đã hoàn thành")
+                }
                 if (type == 'begin_production' && dataStage?.begin_production == 1) {
                     return isShow("error", "Công đoạn đã bắt đầu sản xuất")
                 }
-                // if (type == 'end_production' && dataStage?.begin_production == 1) {
-                //     return isShow("error", "Công đoạn đã hoàn thành")
-                // }
                 queryState({ open: true })
             }}
             lockScroll={true}
@@ -283,7 +304,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             classNameBtn={`${props?.className}`}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
-            <div className={`${type === "begin_production" ? "w-[500px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto" : "3xl:w-[1100px] 2xl:w-[900px] xl:w-[800px] w-[700px] h-[575px]"} `}>
+            <div className={`${type === "begin_production" ? "w-[500px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto" : "3xl:w-[1100px] 2xl:w-[900px] xl:w-[800px] w-[700px] xl:h-[625px] h-[575px]"} `}>
                 {
                     type == 'end_production' &&
                     <>
@@ -322,78 +343,151 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                     </div>
                                 </div>
                                 <div className="w-[55%] 2xl:w-[55%] lg:w-[60%] flex items-center gap-2">
-                                    <div className="flex items-center justify-center w-1/2 gap-2">
-                                        <h1 className="text-xs font-medium 2xl:text-sm">Số lượng hoàn thành</h1>
-                                        <div className="bg-[#BAD1FE] rounded-xl flex justify-center items-center py-[1px]">
-                                            <InPutNumericFormat
-                                                className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#BAD1FE] bg-white w-[70%]'}
-                                                placeholder={'0'}
-                                                isAllowed={(values) => {
-                                                    const { floatValue, value } = values;
-                                                    if (floatValue == 0) {
-                                                        return true;
-                                                    }
-                                                    if (floatValue < 0) {
-                                                        isShow('warning', 'Vui lòng nhập lớn hơn 0');
-                                                        return false
-                                                    }
-                                                    return true
-                                                }}
-                                                onValueChange={(value) => {
-                                                    handChangeQuantityParent(value)
-                                                }}
-                                                value={isState.item.quantity}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="w-1/2">
-                                        <SelectCore
-                                            options={isState.warehouseImport}
-                                            onChange={(e) => {
-                                                queryState({ idWarehouseImport: e });
-                                            }}
-                                            value={isState.idWarehouseImport}
-                                            isClearable={true}
-                                            closeMenuOnSelect={true}
-                                            hideSelectedOptions={false}
-                                            placeholder={'Kho nhập'}
-                                            className={`${isState.errorWarehouseImport ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} placeholder:text-slate-300 w-full z-50 rounded-xl bg-[#ffffff] text-[#52575E] font-normal outline-none border `}
-                                            isSearchable={true}
-                                            style={{
-                                                border: "none",
-                                                boxShadow: "none",
-                                                outline: "none",
-                                            }}
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: "#EBF5FF",
-                                                    primary50: "#92BFF7",
-                                                    primary: "#0F4F9E",
-                                                },
-                                                borderRadius: "12px",
-                                            })}
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                    ...base,
-                                                    color: "#cbd5e1",
-                                                }),
-                                                menu: (provided) => ({
-                                                    ...provided,
-                                                    zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                                }),
-                                                control: (base, state) => ({
-                                                    ...base,
-                                                    boxShadow: "none",
-                                                    padding: "2.7px",
-                                                    ...(state.isFocused && {
-                                                        border: "0 0 0 1px #92BFF7",
+                                    <div className="flex flex-col w-full gap-1">
+                                        <div className="flex items-center justify-between w-full gap-2">
+                                            <div className="flex flex-col w-1/2 gap-2">
+                                                <h1 className="text-xs font-medium 2xl:text-sm">Số lượng hoàn thành</h1>
+                                                <div className="bg-[#BAD1FE] rounded-xl flex justify-center items-center py-[1px]">
+                                                    <InPutNumericFormat
+                                                        className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#BAD1FE] bg-white w-[70%]'}
+                                                        placeholder={'0'}
+                                                        isAllowed={(values) => {
+                                                            const { floatValue, value } = values;
+                                                            if (floatValue == 0) {
+                                                                return true;
+                                                            }
+                                                            if (floatValue < 0) {
+                                                                isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                return false
+                                                            }
+                                                            return true
+                                                        }}
+                                                        onValueChange={(value) => {
+                                                            handChangeQuantityParent(value)
+                                                        }}
+                                                        value={isState.item.quantity}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col w-1/2 gap-2">
+                                                <h1 className="text-xs font-medium 2xl:text-sm">Kho nhập</h1>
+                                                <SelectCore
+                                                    options={isState.warehouseImport}
+                                                    onChange={(e) => { queryState({ idWarehouseImport: e }); }}
+                                                    value={isState.idWarehouseImport}
+                                                    isClearable={true}
+                                                    closeMenuOnSelect={true}
+                                                    hideSelectedOptions={false}
+                                                    placeholder={'Kho nhập'}
+                                                    className={`${isState.errorWarehouseImport ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} placeholder:text-slate-300 w-full z-50 rounded-xl bg-[#ffffff] text-[#52575E] font-normal outline-none border`}
+                                                    isSearchable={true}
+                                                    style={{
+                                                        border: "none",
+                                                        boxShadow: "none",
+                                                        outline: "none",
+                                                    }}
+                                                    theme={(theme) => ({
+                                                        ...theme,
+                                                        colors: {
+                                                            ...theme.colors,
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
+                                                            primary: "#0F4F9E",
+                                                        },
                                                         borderRadius: "12px",
-                                                    }),
-                                                }),
-                                            }}
-                                        />
+                                                    })}
+                                                    styles={{
+                                                        placeholder: (base) => ({
+                                                            ...base,
+                                                            color: "#cbd5e1",
+                                                        }),
+                                                        menu: (provided) => ({
+                                                            ...provided,
+                                                            zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                                        }),
+                                                        control: (base, state) => ({
+                                                            ...base,
+                                                            boxShadow: "none",
+                                                            padding: "2.7px",
+                                                            ...(state.isFocused && {
+                                                                border: "0 0 0 1px #92BFF7",
+                                                                borderRadius: "12px",
+                                                            }),
+                                                        }),
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                        {isState?.dtPois?.final_stage == "1" &&
+                                            <div className="flex items-center justify-between gap-2">
+                                                {dataProductSerial?.is_enable === "1" && (
+                                                    <div className="w-1/2">
+                                                        <div className="flex flex-col items-center justify-center h-full p-1">
+                                                            <input
+                                                                placeholder="Serial"
+                                                                value={isState.serial}
+                                                                onChange={(e) => {
+                                                                    queryState({ serial: e.target.value })
+                                                                }}
+                                                                className={`border ${isState.errorSerial ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} focus:border-[#92BFF7]  placeholder:text-slate-400 w-full bg-[#ffffff]
+                                                                rounded-xl text-[#52575E] font-normal p-1 outline-none cursor-pointer`}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {
+                                                    // dataMaterialExpiry.is_enable ===
+                                                    //     "1" ||
+                                                    dataProductExpiry?.is_enable === "1" && (
+                                                        <>
+                                                            <div className="w-1/2">
+                                                                <div className="flex flex-col items-center justify-center h-full p-1">
+                                                                    <input
+                                                                        placeholder="Lot"
+                                                                        value={isState.lot}
+                                                                        onChange={(e) => {
+                                                                            queryState({ lot: e.target.value })
+                                                                        }}
+                                                                        disabled={
+                                                                            (isState.item?.type_products == "products" && dataProductExpiry?.is_enable == "1" && false)
+                                                                            ||
+                                                                            (isState.item?.type_products == "products" && dataProductExpiry?.is_enable == "0" && true)
+                                                                        }
+                                                                        className={`border focus:border-[#92BFF7] ${isState.errorLot ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} disabled:bg-gray-50  placeholder:text-slate-400 w-full bg-[#ffffff]
+                                                                        rounded-xl text-[#52575E] font-normal p-1 outline-none cursor-pointer`}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="w-1/2">
+                                                                <div className="relative flex flex-row custom-date-picker">
+                                                                    <DatePicker
+                                                                        selected={isState.date}
+                                                                        blur
+                                                                        disabled={
+                                                                            (isState.item?.type_products == "products" && dataProductExpiry?.is_enable == "1" && false)
+                                                                            ||
+                                                                            (isState.item?.type_products == "products" && dataProductExpiry?.is_enable == "0" && true)
+                                                                        }
+                                                                        placeholderText="Ngày hết hạn"
+                                                                        dateFormat="dd/MM/yyyy"
+                                                                        onSelect={(date) => queryState({ date: date })}
+                                                                        placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                                                        className={`border ${isState.errorDate ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} disabled:bg-gray-50 placeholder:text-slate-400 w-full bg-[#ffffff] 
+                                                                            rounded-xl text-[#52575E] font-normal p-1 outline-none cursor-pointer`}
+                                                                    />
+                                                                    {isState.date &&
+                                                                        <MdClear
+                                                                            className="absolute right-[15%] top-0 translate-y-[50%] text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                                            onClick={() => queryState({ date: null })}
+                                                                        />
+                                                                    }
+                                                                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] top-0 translate-y-[50%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -515,7 +609,14 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 </div>
                             </div>
                         </div>
-                        <Customscrollbar className="3xl:h-[250px] xxl:h-[260px] 2xl:h-[250px] xl:h-[260px] h-[250 px] overflow-hidden mt-2">
+                        <Customscrollbar
+                            className={`${isState.item?.final_stage == "1"
+                                ?
+                                "3xl:h-[230px] xxl:h-[250px] 2xl:h-[240px] xl:h-[250px] h-[210px]"
+                                :
+                                "3xl:h-[240px] xxl:h-[260px] 2xl:h-[250px] xl:h-[260px] h-[220px]"
+                                } overflow-hidden mt-2`}
+                        >
                             {
                                 isLoading
                                     ?
@@ -545,6 +646,12 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                                         {e?.item_name}
                                                                     </h1>
                                                                     <h1 className="text-xs italic font-normal">{e?.item_code} - {e?.product_variation}</h1>
+                                                                    {
+                                                                        e?.stage_name && <h3 className="text-xs font-normal">
+                                                                            <span className="pr-1">Công đoạn trước:</span>
+                                                                            <span className="border-orange-400 border text-orange-500 px-1 py-0.5 rounded text-[10px]">{e?.stage_name}</span>
+                                                                        </h3>
+                                                                    }
                                                                     <div className="flex items-center justify-between divide-x">
                                                                         <h1 className="w-1/2 text-xs font-medium 2xl:text-sm text-black/60">
                                                                             Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span> <span className="lowercase">{e?.unit_name_primary}</span>
@@ -608,7 +715,10 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 idWarehouseExport: [],
                                 idWarehouseImport: null,
                                 errorWarehouseImport: false,
-                                errorWarehouseExport: false
+                                errorWarehouseExport: false,
+                                errorSerial: false,
+                                errorLot: false,
+                                errorDate: false
                             })
                         }}
                         dataLang={dataLang}

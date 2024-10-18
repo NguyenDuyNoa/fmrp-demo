@@ -142,7 +142,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
         formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG));
         value.arrayItem.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
-            formData.append(`items[${index}][quantity]`, parseFloat(e?.quantity.replace(/,/g, '')));
+            formData.append(`items[${index}][quantity]`, typeof e?.quantity == 'number' ? e?.quantity : parseFloat(e?.quantity.replace(/,/g, '')));
             formData.append(`items[${index}][item_id]`, e?.item?.item_id);
             formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
         });
