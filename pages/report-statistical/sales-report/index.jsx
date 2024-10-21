@@ -1,13 +1,8 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import SalesReport from "@/containers/report-statistical/sales-report";
 
 const Index = (props) => {
-    const router = useRouter();
-    useEffect(() => {
-        router.replace('/report-statistical/sales-report/quote');
-    }, [])
 
-    return null
+    return <SalesReport {...props} />
 };
 
 export default Index;

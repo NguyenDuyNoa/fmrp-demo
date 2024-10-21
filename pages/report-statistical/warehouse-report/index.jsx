@@ -1,13 +1,8 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import WarehouseReport from "@/containers/report-statistical/warehouse-report";
 
 const Index = (props) => {
-    const router = useRouter();
-    useEffect(() => {
-        router.replace('/report-statistical/warehouse-report/card');
-    }, [])
 
-    return null
+    return <WarehouseReport {...props} />
 };
 
 export default Index;

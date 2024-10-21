@@ -1,13 +1,7 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import FundBalance from '@/containers/report-statistical/fund-balance'
 
-const Index = (props) => {
-    const router = useRouter();
-    useEffect(() => {
-        router.replace('/report-statistical/fund-balance/autumn-diary');
-    }, [])
+const index = (props) => {
+    return <FundBalance {...props} />
+}
 
-    return null
-};
-
-export default Index;
+export default index

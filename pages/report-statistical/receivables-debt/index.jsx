@@ -1,13 +1,8 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import ReceivablesDebt from "@/containers/report-statistical/receivables-debt";
 
-const Index = (props) => {
-    const router = useRouter();
-    useEffect(() => {
-        router.replace('/report-statistical/receivables-debt/aggregate-debt');
-    }, [])
+const Page = (props) => {
 
-    return null
+    return <ReceivablesDebt {...props} />;
 };
 
-export default Index;
+export default Page;

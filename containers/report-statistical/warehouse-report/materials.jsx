@@ -1,9 +1,10 @@
+// NVL theo kho
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import { Container, ContainerTotal } from "@/components/UI/common/layout";
+import { Container } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
@@ -14,16 +15,15 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { ArrowDown2, Grid6 } from "iconsax-react";
+import { Grid6 } from "iconsax-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import DatePicker from "react-datepicker";
-import { TbFileReport } from "react-icons/tb";
 import Navbar from "../components/navbar";
 import TitleHeader from "../components/titleHeader";
 import usePagination from "@/hooks/usePagination";
-const Index = (props) => {
+
+const Materials = (props) => {
     const dataLang = props.dataLang;
 
     const dataSeting = useSetingServer();
@@ -52,18 +52,18 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>Báo cáo hàng trả lại</title>
+                <title>Báo cáo nvl theo kho</title>
             </Head>
-            <Container>
+            <Container className={"!pb-0"}>
                 {statusExprired ? <EmptyExprired /> : null}
 
                 <div className="h-full">
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <TitleHeader title={"Báo cáo bán hàng"} />
+                        <TitleHeader title={"Tồn kho"} />
                         <div className="grid grid-cols-10">
                             <Navbar />
                             <div className="col-span-8">
-                                <div className="3xl:space-y-3 space-y-2 col-span-8">
+                                <div className="col-span-8 space-y-2 3xl:space-y-3">
                                     <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                         <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                             <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
@@ -78,84 +78,37 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: "Khách hàng",
+                                                                label: "Danh mục",
                                                                 isDisabled: true,
                                                             },
                                                         ]}
-                                                        placeholder={"Khách hàng"}
+                                                        placeholder={"Danh mục"}
                                                         isSearchable={true}
                                                         colSpan={1}
                                                     />
-                                                    {/* <div className="w-full relative">
-                                                        <DatePicker
-                                                            id="start"
-                                                            portalId="menu-time"
-                                                            calendarClassName="rasta-stripes"
-                                                            clearButtonClassName="text"
-                                                            // selected={startDate}
-                                                            // onChange={(date) => setStartDate(date)}
-                                                            isClearable
-                                                            placeholderText="Ngày bắt đầu"
-                                                            className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
-                                                        />
-                                                        <ArrowDown2
-                                                            size="11"
-                                                            color="#6b7280"
-                                                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                                                        />
-                                                    </div>
-                                                    <div className="w-full relative">
-                                                        <DatePicker
-                                                            id="start"
-                                                            portalId="menu-time"
-                                                            calendarClassName="rasta-stripes"
-                                                            clearButtonClassName="text"
-                                                            // selected={startDate}
-                                                            // onChange={(date) => setStartDate(date)}
-                                                            isClearable
-                                                            placeholderText="Ngày kết thúc"
-                                                            className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
-                                                        />
-                                                        <ArrowDown2
-                                                            size="11"
-                                                            color="#6b7280"
-                                                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                                                        />
-                                                    </div> */}
-                                                    <div className="w-full relative">
-                                                        <DatePicker
-                                                            id="start"
-                                                            portalId="menu-time"
-                                                            calendarClassName="rasta-stripes"
-                                                            clearButtonClassName="text"
-                                                            // selected={startDate}
-                                                            // selected={startDate}
-                                                            // onChange={onChange}
-                                                            // startDate={startDate}
-                                                            // endDate={endDate}
-                                                            selectsRange
-                                                            // onChange={(date) => setStartDate(date)}
-                                                            isClearable
-                                                            placeholderText="Từ ngày đến ngày"
-                                                            className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
-                                                        />
-                                                        <ArrowDown2
-                                                            size="11"
-                                                            color="#6b7280"
-                                                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                                                        />
-                                                    </div>
+                                                    <SelectComponent
+                                                        options={[
+                                                            {
+                                                                value: "",
+                                                                label: "Nguyên liệu",
+                                                                isDisabled: true,
+                                                            },
+                                                        ]}
+                                                        placeholder={"Nguyên liệu"}
+                                                        isSearchable={true}
+                                                        colSpan={1}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                            <div className="flex justify-end gap-2 space-x-2 items-center">
+                                            <div className="flex items-center justify-end gap-2 space-x-2">
                                                 <OnResetData sOnFetching={() => { }} />
                                                 <button
                                                     onClick={() => { }}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                                 <div>
@@ -170,28 +123,22 @@ const Index = (props) => {
                                         {/* header table */}
                                         <HeaderTable gridCols={12}>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
-                                                Khách hàng
+                                                Mã NVL
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
-                                                Phiếu hàng trả lại
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={"center"}>
-                                                Ngày
+                                                Kho giữ
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
-                                                Mã mặt hàng
+                                                Kho hoạch định sx
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
-                                                Tên mặt hàng
+                                                Đông phương 2
                                             </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={"center"}>
-                                                Số lượng
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                Đông phương 1
                                             </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={"center"}>
-                                                Giá
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={"center"}>
-                                                Thành tiền
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                Tổng tồn kho
                                             </ColumnTable>
                                         </HeaderTable>
                                         {/* data table */}
@@ -208,19 +155,14 @@ const Index = (props) => {
                                                             {/* {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""} */}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2} textAlign={"center"}></RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"right"}></RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={"right"}></RowItemTable>
                                                         <RowItemTable colSpan={2} textAlign={"right"}></RowItemTable>
                                                         <RowItemTable colSpan={2} textAlign={"right"}></RowItemTable>
                                                         <RowItemTable
-                                                            colSpan={1}
+                                                            colSpan={2}
                                                             textAlign={"left"}
                                                             className={"truncate"}
                                                         ></RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            className="flex items-center space-x-1"
-                                                        ></RowItemTable>
-                                                        <RowItemTable colSpan={1}></RowItemTable>
                                                     </RowTable>
                                                 ))}
                                             </div>
@@ -231,14 +173,22 @@ const Index = (props) => {
                                 </div>
                                 {isState?.data?.length != 0 && (
                                     <ContainerTotal className="!grid-cols-12">
-                                        <ColumnTable colSpan={9} textAlign={"center"} className="p-2">
+                                        <ColumnTable colSpan={2} textAlign={"center"} className="p-2">
                                             {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"right"} className="p-2 mr-1">
+                                        <ColumnTable colSpan={2} textAlign={"right"} className="p-2 mr-1">
                                             {formatNumber(isState.total?.total_quantity)}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"right"} className="p-2 mr-1" />
-                                        <ColumnTable colSpan={1} textAlign={"right"} className="p-2 mr-1">
+                                        <ColumnTable colSpan={2} textAlign={"right"} className="p-2 mr-1">
+                                            {formatNumber(isState.total?.total_quantity)}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={"right"} className="p-2 mr-1">
+                                            {formatNumber(isState.total?.total_quantity)}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={"right"} className="p-2 mr-1">
+                                            {formatNumber(isState.total?.total_quantity)}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={"right"} className="p-2 mr-1">
                                             {formatNumber(isState.total?.total_quantity)}
                                         </ColumnTable>
                                     </ContainerTotal>
@@ -254,7 +204,7 @@ const Index = (props) => {
                                 totalPosts={Number(isState?.total?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
-                                className="3xl:text-base text-sm"
+                                className="text-sm 3xl:text-base"
                             />
                         </ContainerPagination>
                     )}
@@ -264,4 +214,4 @@ const Index = (props) => {
     );
 };
 
-export default Index;
+export default Materials;
