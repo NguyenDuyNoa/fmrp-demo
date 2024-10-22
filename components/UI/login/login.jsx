@@ -229,9 +229,9 @@ const LoginPage = React.memo((props) => {
                     </Head>
                     <div className="bg-[#EEF1F8]">
                         <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center overflow-hidden">
-                            <div className="flex justify-center space-x-20 w-full z-10">
-                                <div className="3xl:space-y-8 xxl:space-y-2 2xl:space-y-3 xl:space-y-2 lg:space-y-1 space-y-1">
-                                    <div className="bg-white px-16 pt-20 pb-12 xxl:pb-10 xxl:pt-4 2xl:pb-15 2xl:pt-10 xl:pb-8 lg:pt-2 xl:pt-4 rounded-lg space-y-10 w-[600px]">
+                            <div className="z-10 flex justify-center w-full space-x-20">
+                                <div className="space-y-1 3xl:space-y-8 xxl:space-y-2 2xl:space-y-3 xl:space-y-2 lg:space-y-1">
+                                    <form onSubmit={handleSubmit((data) => onSubmit(data, "login"))} className="bg-white px-16 pt-20 pb-12 xxl:pb-10 xxl:pt-4 2xl:pb-15 2xl:pt-10 xl:pb-8 lg:pt-2 xl:pt-4 rounded-lg space-y-10 w-[600px]">
                                         <div className="space-y-3">
                                             <h1 className="text-[#11315B] font-medium text-3xl text-center">
                                                 {dataLang?.auth_login || "auth_login"}
@@ -280,12 +280,12 @@ const LoginPage = React.memo((props) => {
                                                 )}
                                                 <button
                                                     onClick={() => queryState({ typePassword: !isState.typePassword })}
-                                                    className="absolute right-3 top-0 translate-y-1/2"
+                                                    className="absolute top-0 translate-y-1/2 right-3"
                                                 >
                                                     {isState.typePassword ? <IconEyeSlash /> : <IconEye />}
                                                 </button>
                                             </div>
-                                            <div className="flex w-full justify-between">
+                                            <div className="flex justify-between w-full">
                                                 <div className="flex items-center space-x-1.5">
                                                     <input
                                                         type="checkbox"
@@ -322,8 +322,8 @@ const LoginPage = React.memo((props) => {
                                         <h4 className="text-center text-[#667085] text-sm font-light">
                                             FOSOSOFT © 2021
                                         </h4>
-                                    </div>
-                                    <div className="flex items-center space-x-6 justify-center">
+                                    </form>
+                                    <div className="flex items-center justify-center space-x-6">
                                         <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">
                                             Cổng dịch vụ khách hàng
                                         </a>
@@ -391,7 +391,7 @@ const LoginPage = React.memo((props) => {
                                     </div>
                                     <div className="space-y-6">
                                         <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
-                                        <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
+                                        <div className="space-y-1 3xl:space-y-1 xxl:space-y-1 2xl:space-y-0">
                                             <p className="text-[#667085] font-light text-[16px]">
                                                 Giải pháp phần mềm cho doanh nghiệp
                                             </p>
@@ -444,7 +444,7 @@ const LoginPage = React.memo((props) => {
                     <Head>
                         <title>Đăng ký</title>
                     </Head>
-                    <div className="grid grid-cols-5 h-screen w-screen overflow-hidden">
+                    <div className="grid w-screen h-screen grid-cols-5 overflow-hidden">
                         <div className="col-span-2 bg-[#11315B] h-screen relative">
                             <Image
                                 src="/register/img.png"
@@ -452,7 +452,7 @@ const LoginPage = React.memo((props) => {
                                 width={828}
                                 height={1261}
                                 quality={100}
-                                className="object-contain w-full h-auto select-none pointer-events-none"
+                                className="object-contain w-full h-auto pointer-events-none select-none"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 placeholder="blur"
@@ -472,10 +472,10 @@ const LoginPage = React.memo((props) => {
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
                                 <h2 className="text-white text-2xl font-[600] mt-8">Đăng ký tài khoản FMRP</h2>
-                                <h6 className="text-white mt-3">Hỗ trợ đăng ký: 01821 92 2312</h6>
+                                <h6 className="mt-3 text-white">Hỗ trợ đăng ký: 01821 92 2312</h6>
                             </div>
                         </div>
-                        <div className="col-span-3 bg-white h-full flex flex-col items-center xxl:mt-0 2xl:mt-1 mt-1 3xl:p-0 2xl:p-0 p-0">
+                        <div className="flex flex-col items-center h-full col-span-3 p-0 mt-1 bg-white xxl:mt-0 2xl:mt-1 3xl:p-0 2xl:p-0">
                             <h1 className="text-[#11315B] 3xl:text-4xl xxl:text-3xl 2xl:text-3xl text-2xl font-[500]">
                                 Đăng ký
                             </h1>
@@ -495,14 +495,14 @@ const LoginPage = React.memo((props) => {
                                     </div>
                                 </div>
                                 {isState.stepRegister == 0 ? (
-                                    <div className="grid grid-cols-3  2xl:gap-5 gap-3 3xl:mt-5 xxl:mt-1 mt-2">
+                                    <div className="grid grid-cols-3 gap-3 mt-2 2xl:gap-5 3xl:mt-5 xxl:mt-1">
                                         {isState.listMajor.map((e, index) => (
                                             <label
                                                 key={e?.id?.toString()}
                                                 htmlFor={`major ${e?.id}`}
                                                 className="w-full h-full cursor-pointer xl:aspect-w-1 lg:aspect-w-3 lg:aspect-h-4 aspect-w-[5] xl:aspect-h-1 aspect-h-[4] rounded-md border border-[#DDDDE2] relative"
                                             >
-                                                <div className="w-full h-full flex flex-col items-center justify-between 2xl:p-5 p-3 select-none">
+                                                <div className="flex flex-col items-center justify-between w-full h-full p-3 select-none 2xl:p-5">
                                                     <input
                                                         type="radio"
                                                         id={`major ${e?.id}`}
@@ -539,11 +539,11 @@ const LoginPage = React.memo((props) => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="3xl:space-y-5 xxl:space-y-1 2xl:space-y-3 space-y-2 2xl:mt-0 xl:mt-0 lg:mt-0 mt-3">
-                                        <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
-                                            <label className="2xl:text-base text-sm">
+                                    <div className="mt-3 space-y-2 3xl:space-y-5 xxl:space-y-1 2xl:space-y-3 2xl:mt-0 xl:mt-0 lg:mt-0">
+                                        <div className="space-y-1 3xl:space-y-1 xxl:space-y-1 2xl:space-y-0">
+                                            <label className="text-sm 2xl:text-base">
                                                 Họ và tên của bạn
-                                                <span className="text-red-500 p-1">*</span>
+                                                <span className="p-1 text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -563,10 +563,10 @@ const LoginPage = React.memo((props) => {
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
-                                            <label className="2xl:text-base text-sm">
+                                        <div className="space-y-1 3xl:space-y-1 xxl:space-y-1 2xl:space-y-0">
+                                            <label className="text-sm 2xl:text-base">
                                                 Tên công ty
-                                                <span className="text-red-500 p-1">*</span>
+                                                <span className="p-1 text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -587,10 +587,10 @@ const LoginPage = React.memo((props) => {
                                             )}
                                         </div>
                                         <div className="grid grid-cols-2 gap-5">
-                                            <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
-                                                <label className="2xl:text-base text-sm">
+                                            <div className="space-y-1 3xl:space-y-1 xxl:space-y-1 2xl:space-y-0">
+                                                <label className="text-sm 2xl:text-base">
                                                     Email của bạn
-                                                    <span className="text-red-500 p-1">*</span>
+                                                    <span className="p-1 text-red-500">*</span>
                                                 </label>
                                                 <input
                                                     type="email"
@@ -614,10 +614,10 @@ const LoginPage = React.memo((props) => {
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
-                                                <label className="2xl:text-base text-sm">
+                                            <div className="space-y-1 3xl:space-y-1 xxl:space-y-1 2xl:space-y-0">
+                                                <label className="text-sm 2xl:text-base">
                                                     Số điện thoại
-                                                    <span className="text-red-500 p-1">*</span>
+                                                    <span className="p-1 text-red-500">*</span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -663,8 +663,8 @@ const LoginPage = React.memo((props) => {
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
-                                                <label className="2xl:text-base text-sm">Tỉnh / Thành phố</label>
+                                            <div className="space-y-1 3xl:space-y-1 xxl:space-y-1 2xl:space-y-0">
+                                                <label className="text-sm 2xl:text-base">Tỉnh / Thành phố</label>
                                                 <input
                                                     type="text"
                                                     name="city"
@@ -673,10 +673,10 @@ const LoginPage = React.memo((props) => {
                                                     className="w-full border placeholder:text-[13px] border-[#D0D5DD] 3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none focus:border-[#3276FA] rounded"
                                                 />
                                             </div>
-                                            <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
+                                            <div className="space-y-1 3xl:space-y-1 xxl:space-y-1 2xl:space-y-0">
                                                 <label className="2xl:text-base text-sm placeholder:text-[13px]">
                                                     Mật khẩu
-                                                    <span className="text-red-500 p-1">*</span>
+                                                    <span className="p-1 text-red-500">*</span>
                                                 </label>
                                                 <input
                                                     type="password"
@@ -702,15 +702,15 @@ const LoginPage = React.memo((props) => {
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="2xl:text-base text-sm">
+                                            <label className="text-sm 2xl:text-base">
                                                 Vị trí công việc
-                                                <span className="text-red-500 p-1">*</span>
+                                                <span className="p-1 text-red-500">*</span>
                                             </label>
                                             <div className="flex flex-wrap">
                                                 {isState.listPosition.map((e) => (
                                                     <div
                                                         key={e?.id?.toString()}
-                                                        className="flex space-x-3 items-center mr-6 mb-1"
+                                                        className="flex items-center mb-1 mr-6 space-x-3"
                                                     >
                                                         <input
                                                             id={`posiiton ${e?.id}`}
@@ -777,7 +777,7 @@ const LoginPage = React.memo((props) => {
                                         >
                                             Tiếp theo
                                         </button>
-                                        <div className="flex justify-center space-x-2 3xl:mt-5 xxl:mt-1 mt-1 2xl:mt-5">
+                                        <div className="flex justify-center mt-1 space-x-2 3xl:mt-5 xxl:mt-1 2xl:mt-5">
                                             <span className="font-[300] ">Bạn đã có tài khoản?</span>
                                             <button
                                                 onClick={_HandleIsLogin.bind(this, true)}
@@ -790,7 +790,7 @@ const LoginPage = React.memo((props) => {
                                 ) : (
                                     <>
                                         {isState.checkOtp && isState.countOtp > 0 && (
-                                            <div className="text-gray-400  mt-2 text-sm">
+                                            <div className="mt-2 text-sm text-gray-400">
                                                 Gửi lại mã xác thực sau {isState.countOtp} giây
                                             </div>
                                         )}
