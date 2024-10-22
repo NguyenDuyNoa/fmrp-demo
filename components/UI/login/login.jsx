@@ -279,6 +279,7 @@ const LoginPage = React.memo((props) => {
                                                     </span>
                                                 )}
                                                 <button
+                                                    type="button"
                                                     onClick={() => queryState({ typePassword: !isState.typePassword })}
                                                     className="absolute top-0 translate-y-1/2 right-3"
                                                 >
