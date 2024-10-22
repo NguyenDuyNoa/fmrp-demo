@@ -282,7 +282,7 @@ const ProductsWarehouse = (props) => {
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
-                { value: `${"Số LSX chi tiết"}` },
+                { value: `${e?.reference_no_detail ? e?.reference_no_detail : ""}` },
                 { value: `${e?.warehouse_name ? e?.warehouse_name : ""}` },
                 { value: `${e?.count_item ? formatNumber(e?.count_item) : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },

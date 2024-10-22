@@ -8,7 +8,7 @@ import { memo } from "react";
 import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
 
-const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowModel }) => {
+const TabItem = memo(({ isState, handShowItem, isLoadingRight, dataLang, handleShowModel }) => {
     const dataSeting = useSetingServer();
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     return (
@@ -29,7 +29,7 @@ const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                     </h4>
                 </div>
             </div>
-            {isFetching ? (
+            {isLoadingRight ? (
                 <Loading className="h-80" color="#0f4f9e" />
             ) : (
                 <Customscrollbar className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[36vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto">

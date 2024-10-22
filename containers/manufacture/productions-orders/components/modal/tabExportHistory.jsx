@@ -1,4 +1,5 @@
 // lich su xuất NVL/btp
+import apiProductionsOrders from '@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders';
 import OnResetData from '@/components/UI/btnResetData/btnReset';
 import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination';
 import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination';
@@ -8,182 +9,50 @@ import SearchComponent from '@/components/UI/filterComponents/searchComponent';
 import Loading from '@/components/UI/loading/loading';
 import NoData from '@/components/UI/noData/nodata';
 import Pagination from "@/components/UI/pagination";
+import { optionsQuery } from '@/configs/optionsQuery';
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate';
 import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
 import usePagination from '@/hooks/usePagination';
 import { formatMoment } from '@/utils/helpers/formatMoment';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useQuery } from '@tanstack/react-query';
 import { Grid6 } from 'iconsax-react';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useState } from 'react';
-import ModalImage from 'react-modal-image';
+import { memo } from 'react';
 import { useSelector } from 'react-redux';
-import { v4 as uddid } from 'uuid';
 const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
-    const initialState = {
-        onFetching: false,
-        dataTable: [
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantity: 1000,
-                date: new Date(),
-                codeResent: 'PR-00000'
-            },
-        ]
-    }
 
     const router = useRouter()
 
+    const dataSeting = useSetingServer()
+
     const { paginate } = usePagination()
 
-    const [isExportHistory, setIsExportHistory] = useState(initialState)
+    const { limit, updateLimit: sLimit } = useLimitAndTotalItems()
 
-    const queryStateExportHistory = (key) => setIsExportHistory(x => ({ ...x, ...key }))
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     // const { checkAdd, checkExport } = useActionRole(auth, "")
 
-    const dataSeting = useSetingServer();
+    const { data, isLoading, isFetching, refetch } = useQuery({
+        queryKey: ['api_get_suggest_exporting'],
+        queryFn: async () => {
+            let formData = new FormData();
 
-    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+            formData.append("pod_id", isStateModal?.dataDetail?.poi?.poi_id);
 
-    useEffect(() => {
-        sTotalItems(10)
-        queryStateExportHistory({ onFetching: true })
-        setTimeout(() => {
-            queryStateExportHistory({ onFetching: false })
-        }, 2000)
-    }, [])
+            const res = await apiProductionsOrders.apiGetSuggestExporting(formData)
+
+            return res.data || {}
+        },
+        ...optionsQuery
+    })
+
+    console.log("data", data);
+
 
     return (
         <div className='h-full'>
@@ -192,8 +61,13 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                     <h1 className="my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1>
                 </div>
                 <div className="flex items-center justify-end gap-1">
-                    <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={() => { }} classInput={'border'} />
-                    <OnResetData sOnFetching={(e) => queryStateExportHistory({ onFetching: e })} />
+                    <SearchComponent
+                        colSpan={1} dataLang={dataLang}
+                        placeholder={dataLang?.branch_search}
+                        onChange={() => { }}
+                        classInput={'border'}
+                    />
+                    <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
                     <button onClick={() => { }} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
                         <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                         <span>{dataLang?.client_list_exportexcel}</span>
@@ -211,77 +85,79 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                             STT
                         </ColumnTable>
                         <ColumnTable colSpan={2} textAlign={'center'}>
-                            Ngày chứng từ
+                            {dataLang?.productions_orders_modal_exporting_materials_document_date || 'productions_orders_modal_exporting_materials_document_date'}
                         </ColumnTable>
                         <ColumnTable colSpan={2} textAlign={'center'}>
-                            Mã chứng từ
+                            {dataLang?.productions_orders_modal_exporting_materials_document_code || 'productions_orders_modal_exporting_materials_document_code'}
                         </ColumnTable>
                         <ColumnTable colSpan={3} textAlign={'center'}>
-                            Mặt hàng
+                            {dataLang?.productions_orders_modal_exporting_materials_item || 'productions_orders_modal_exporting_materials_item'}
                         </ColumnTable>
                         <ColumnTable colSpan={2} textAlign={'center'}>
-                            Đơn vị tính
+                            {dataLang?.productions_orders_modal_exporting_materials_unit || 'productions_orders_modal_exporting_materials_unit'}
                         </ColumnTable>
                         <ColumnTable colSpan={2} textAlign={'center'}>
-                            Số lượng
+                            {dataLang?.productions_orders_modal_exporting_materials_quantity || 'productions_orders_modal_exporting_materials_quantity'}
                         </ColumnTable>
                     </HeaderTable>
-                    {isExportHistory.onFetching ? (
-                        <Loading className="h-80" color="#0f4f9e" />
-                    ) : isExportHistory.dataTable?.length > 0 ? (
-                        <>
-                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                {isExportHistory.dataTable?.map((e, index) => (
-                                    <RowTable gridCols={12} key={e.id.toString()} >
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                            {index + 1}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={2} textAlign={'center'}>
-                                            {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={2} textAlign={'center'}>
-                                            {e.codeResent}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'}>
-                                            <ModalImage
-                                                small={e.image}
-                                                large={e.image}
-                                                width={36}
-                                                height={36}
-                                                alt={e.name}
-                                                className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
-                                            />
-                                            <div className='flex flex-col'>
-                                                <span>{e.name}</span>
-                                                <div className='flex items-center gap-1 text-gray-500'>
-                                                    <span>{e.code}</span>-<span>{e.itemVariation}</span>
-                                                </div>
-                                            </div>
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={2} textAlign={'center'}>
-                                            {e.unit}
-                                        </RowItemTable>
-                                        <RowItemTable colSpan={2} textAlign={'right'}>
-                                            {e.quantity > 0 ? formatNumber(e.quantity) : '-'}
-                                        </RowItemTable>
-                                    </RowTable>
-                                ))}
-                            </div>
-                        </>
-                    ) : <NoData />}
-
+                    {
+                        (isLoading || isFetching)
+                            ?
+                            <Loading className="h-80" color="#0f4f9e" />
+                            : data?.rResult?.length > 0
+                                ?
+                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                    {
+                                        data?.rResult?.map((e, index) => (
+                                            <RowTable gridCols={12} key={e.id.toString()} >
+                                                <RowItemTable colSpan={1} textAlign={'center'}>
+                                                    {index + 1}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={2} textAlign={'center'}>
+                                                    {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={2} textAlign={'center'}>
+                                                    {e.code}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'}>
+                                                    {/* <ModalImage
+                                                        small={e.image ?? '/no_img.png'}
+                                                        large={e.image ?? '/no_img.png'}
+                                                        width={36}
+                                                        height={36}
+                                                        alt={e.name}
+                                                        className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                                    />
+                                                    <div className='flex flex-col'>
+                                                        <span>{e.name}</span>
+                                                        <div className='flex items-center gap-1 text-gray-500'>
+                                                            <span>{e.code}</span>-<span>{e.itemVariation}</span>
+                                                        </div>
+                                                    </div> */}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={2} textAlign={'center'}>
+                                                    {e.unit}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={2} textAlign={'right'}>
+                                                    {e.quantity > 0 ? formatNumber(e.quantity) : '-'}
+                                                </RowItemTable>
+                                            </RowTable>
+                                        ))
+                                    }
+                                </div>
+                                :
+                                <NoData />
+                    }
                 </div>
             </div>
             <ContainerPagination>
                 <TitlePagination
                     dataLang={dataLang}
-                    totalItems={10}
-                // totalItems={totalItems?.iTotalDisplayRecords}
+                    totalItems={data?.output?.iTotalDisplayRecords}
                 />
                 <Pagination
                     postsPerPage={limit}
-                    totalPosts={100}
-                    // totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                    totalPosts={data?.output?.iTotalDisplayRecords}
                     paginate={paginate}
                     currentPage={router.query?.page || 1}
                 />

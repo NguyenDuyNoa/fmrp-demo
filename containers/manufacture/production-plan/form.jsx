@@ -266,27 +266,28 @@ const ProductionPlanForm = (props) => {
         onChangeValue,
         tab,
         handChangeTable,
+        dataLang
     };
 
     return (
         <>
             <Head>
-                <title>{"Thêm kế hoạch nguyên vật liệu"}</title>
+                <title>{dataLang?.production_plan_form_add || 'production_plan_form_add'}</title>
             </Head>
             <Container>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{"Kế hoạch nguyên vật liệu"}</h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.production_plan_form_materials_planning || 'production_plan_form_materials_planning'}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{"Thêm kế hoạch NVL"}</h6>
+                        <h6>{dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'}</h6>
                     </div>
                 )}
                 <ContainerBody>
                     <div className="flex items-center justify-between mt-1 mr-2">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                            Thêm kế hoạch nguyên vật liệu
+                            {dataLang?.production_plan_form_add || 'production_plan_form_add'}
                         </h2>
                         <div className="flex items-center gap-2">
                             <button

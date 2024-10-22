@@ -14,6 +14,7 @@ export const useAuththentication = (auth) => {
             } else {
                 dispatch({ type: "auth/update", payload: false });
             }
+            return info || false
         },
         placeholderData: keepPreviousData,
         enabled: auth == null,
@@ -47,6 +48,7 @@ export const useSetings = () => {
                 dataProductSerial: fature.find((x) => x.code == "product_serial"),
             };
             dispatch({ type: "setings/feature", payload: newData });
+            return newData
         },
         placeholderData: keepPreviousData,
         ...optionsQuery

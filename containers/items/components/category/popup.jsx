@@ -1,4 +1,6 @@
 import apiCategory from "@/Api/apiMaterial/category/apiCategory";
+import ButtonCancel from "@/components/UI/button/buttonCancel";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import PopupCustom from "@/components/UI/popup";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import useToast from "@/hooks/useToast";
@@ -11,23 +13,31 @@ import { useItemCategoryOptoptions } from "../../hooks/category/useItemCategoryO
 
 const Popup_NVL = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
+
     const isShow = useToast();
 
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
 
     const [onSending, sOnSending] = useState(false);
 
     const [branch, sBranch] = useState([]);
+
     const branch_id = branch?.map((e) => e.value);
 
     const [code, sCode] = useState("");
+
     const [name, sName] = useState("");
+
     const [editorValue, sEditorValue] = useState("");
 
     const [errBranch, sErrBranch] = useState(false);
+
     const [errCode, sErrCode] = useState(false);
+
     const [errName, sErrName] = useState(false);
+
     const [idCategory, sIdCategory] = useState(null);
 
     const { data: dataOption = [] } = useItemCategoryOptoptions(open, props.data?.id)
@@ -37,15 +47,7 @@ const Popup_NVL = React.memo((props) => {
         open && sName(props.data?.name ? props.data?.name : "");
         open && sEditorValue(props.data?.note ? props.data?.note : "");
         open && sIdCategory(props.data?.parent_id ? props.data?.parent_id : null);
-        open &&
-            sBranch(
-                props.data?.branch?.length > 0
-                    ? props.data?.branch?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    }))
-                    : []
-            );
+        open && sBranch(props.data?.branch?.length > 0 ? props.data?.branch?.map((e) => ({ label: e.name, value: e.id, })) : []);
         open && sErrCode(false);
         open && sErrName(false);
         open && sErrBranch(false);
@@ -63,13 +65,11 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
-
     const handingCategory = useMutation({
         mutationFn: async (data) => {
             return apiCategory.apiHandingCategory(data, props.data?.id)
         }
     })
-
 
     const _ServerSending = () => {
         let formData = new FormData();
@@ -78,12 +78,13 @@ const Popup_NVL = React.memo((props) => {
         formData.append("name", name);
         formData.append("note", editorValue);
         formData.append("parent_id", idCategory ? idCategory : null);
+
         branch_id.forEach((id) => formData.append("branch_id[]", id));
 
         handingCategory.mutate(formData, {
             onSuccess: ({ isSuccess, message }) => {
                 if (isSuccess) {
-                    isShow("success", props.dataLang[message]);
+                    isShow("success", props.dataLang[message] || message);
                     sName("");
                     sCode("");
                     sEditorValue("");
@@ -92,7 +93,7 @@ const Popup_NVL = React.memo((props) => {
                     props.onRefreshOpt && props.onRefreshOpt();
                     sOpen(false);
                 } else {
-                    isShow("error", props.dataLang[message]);
+                    isShow("error", props.dataLang[message] || message);
                 }
             },
             onError: (error) => {
@@ -155,7 +156,7 @@ const Popup_NVL = React.memo((props) => {
                         isClearable={true}
                         placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
                         isMulti
-                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                        noOptionsMessage={() => `${props.dataLang?.no_data_found || 'no_data_found'}`}
                         closeMenuOnSelect={false}
                         className={`${errBranch ? "border-red-500" : "border-transparent"
                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -183,43 +184,43 @@ const Popup_NVL = React.memo((props) => {
                 </div>
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_code} <span className="text-red-500">*</span>
+                        {props.dataLang?.category_material_group_code || 'category_material_group_code'} <span className="text-red-500">*</span>
                     </label>
                     <input
                         value={code}
                         onChange={_HandleChangeInput.bind(this, "code")}
                         type="text"
-                        placeholder={props.dataLang?.category_material_group_code}
+                        placeholder={props.dataLang?.category_material_group_code || 'category_material_group_code'}
                         className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                     />
                     {errCode && (
                         <label className="text-sm text-red-500">
-                            {props.dataLang?.category_material_group_err_code}
+                            {props.dataLang?.category_material_group_err_code || 'category_material_group_err_code'}
                         </label>
                     )}
                 </div>
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_name} <span className="text-red-500">*</span>
+                        {props.dataLang?.category_material_group_name || 'category_material_group_name'} <span className="text-red-500">*</span>
                     </label>
                     <input
                         value={name}
                         onChange={_HandleChangeInput.bind(this, "name")}
                         type="text"
-                        placeholder={props.dataLang?.category_material_group_name}
+                        placeholder={props.dataLang?.category_material_group_name || 'category_material_group_name'}
                         className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                     />
                     {errName && (
                         <label className="text-sm text-red-500">
-                            {props.dataLang?.category_material_group_err_name}
+                            {props.dataLang?.category_material_group_err_name || 'category_material_group_err_name'}
                         </label>
                     )}
                 </div>
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_level}
+                        {props.dataLang?.category_material_group_level || 'category_material_group_level'}
                     </label>
                     <Select
                         options={dataOption}
@@ -227,7 +228,7 @@ const Popup_NVL = React.memo((props) => {
                         defaultValue={
                             idCategory == "0" || !idCategory
                                 ? {
-                                    label: `${props.dataLang?.category_material_group_level}`,
+                                    label: `${props.dataLang?.category_material_group_level || 'category_material_group_level'}`,
                                 }
                                 : {
                                     label: dataOption.find((x) => x?.parent_id == idCategory)?.label,
@@ -246,7 +247,7 @@ const Popup_NVL = React.memo((props) => {
                         }
                         onChange={valueIdCategory.bind(this)}
                         isClearable={true}
-                        placeholder={props.dataLang?.category_material_group_level}
+                        placeholder={props.dataLang?.category_material_group_level || 'category_material_group_level'}
                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
                         isSearchable={true}
                         theme={(theme) => ({
@@ -261,10 +262,10 @@ const Popup_NVL = React.memo((props) => {
                     />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_popup_note}</label>
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_popup_note || 'client_popup_note'}</label>
                     <textarea
                         type="text"
-                        placeholder={props.dataLang?.client_popup_note}
+                        placeholder={props.dataLang?.client_popup_note || 'client_popup_note'}
                         rows={5}
                         value={editorValue}
                         onChange={_HandleChangeInput.bind(this, "editor")}
@@ -272,18 +273,17 @@ const Popup_NVL = React.memo((props) => {
                     />
                 </div>
                 <div className="flex justify-end space-x-2">
-                    <button
+                    <ButtonCancel
+                        dataLang={props.dataLang}
                         onClick={_ToggleModal.bind(this, false)}
-                        className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
-                    >
-                        {props.dataLang?.branch_popup_exit}
-                    </button>
-                    <button
+                        className="px-4 py-2 text-base transition rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105"
+                    />
+                    <ButtonSubmit
+                        dataLang={props.dataLang}
+                        loading={handingCategory.isPending}
                         onClick={_HandleSubmit.bind(this)}
                         className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#0F4F9E] hover:opacity-90 hover:scale-105 transition"
-                    >
-                        {props.dataLang?.branch_popup_save}
-                    </button>
+                    />
                 </div>
             </div>
         </PopupCustom>

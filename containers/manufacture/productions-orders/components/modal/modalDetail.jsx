@@ -142,7 +142,8 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         queryKey: ["api_item_orders_detail", isState.openModal],
         queryFn: async () => {
             const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
-            queryStateModal({
+
+            const newData = {
                 dataDetail: {
                     ...data,
                     poi: {
@@ -156,7 +157,10 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                         })
                     }
                 }
-            });
+            }
+            queryStateModal({ ...newData });
+            return newData
+
         },
         enabled: !!isState.openModal,
         placeholderData: keepPreviousData,
@@ -281,20 +285,23 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
 
                 <div className="mt-4 border-b">
                     <ContainerFilterTab>
-                        {listTab.map((e) => (
-                            <button
-                                key={e.id}
-                                onClick={() => handleActiveTab(e.id)}
-                                className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
-                            >
-                                <h3 className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} ${width > 1100 ? "text-base" : "text-sm"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
-                                    {e.name}
-                                    <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-[13px] xl:text-sm lg:text-sm  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
-                                        {e?.count > 0 && e?.count}
-                                    </span>
-                                </h3>
-                            </button>
-                        ))}
+                        {
+                            listTab.map((e) => (
+                                <button
+                                    key={e.id}
+                                    onClick={() => handleActiveTab(e.id)}
+                                    className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id ? "border-[#0F4F9E] border-b bg-[#F7FBFF]" : 'border-b border-transparent'}
+                                    hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
+                                >
+                                    <h3 className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} ${width > 1100 ? "text-base" : "text-sm"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
+                                        {e.name}
+                                        <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-[13px] xl:text-sm lg:text-sm  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
+                                            {e?.count > 0 && e?.count}
+                                        </span>
+                                    </h3>
+                                </button>
+                            ))
+                        }
                     </ContainerFilterTab>
                 </div>
                 <div className="w-full my-2">{components[isStateModal.isTab]}</div>

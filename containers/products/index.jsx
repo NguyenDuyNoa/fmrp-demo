@@ -236,7 +236,6 @@ const Products = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">
                             {dataLang?.header_category_material || "header_category_material"}
@@ -247,11 +246,11 @@ const Products = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.list_finishedProduct_title}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ?
                                     <Popup_Products
                                         onRefresh={refetch.bind(this)}
@@ -276,6 +275,7 @@ const Products = (props) => {
                             <button
                                 onClick={_HandleSelectTab.bind(this, "all")}
                                 className={`${router.query?.tab === "all" ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {props.dataLang?.all_group}
@@ -303,10 +303,10 @@ const Products = (props) => {
                             </button>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
-                                        <div className="grid grid-cols-12 items-center gap-2">
+                                        <div className="grid items-center grid-cols-12 gap-2">
                                             <SearchComponent
                                                 dataLang={dataLang}
                                                 onChange={_HandleOnChangeKeySearch.bind(this)}
@@ -365,7 +365,7 @@ const Products = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2 ">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                             {(role == true || checkExport) ?
                                                 <div className={``}>
@@ -379,7 +379,7 @@ const Products = (props) => {
                                                 </div>
                                                 :
                                                 <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             }
@@ -440,18 +440,18 @@ const Products = (props) => {
                                             <div className="divide-y divide-slate-200">
                                                 {data?.rResult?.map((e) => (
                                                     <RowTable key={e?.id.toString()} gridCols={13}>
-                                                        <RowItemTable colSpan={1} className="justify-center flex self-center">
+                                                        <RowItemTable colSpan={1} className="flex self-center justify-center">
                                                             {e?.images == null ? (
                                                                 <ModalImage
                                                                     small="/no_image.png"
                                                                     large="/no_image.png"
-                                                                    className="w-full h-12 rounded object-cover"
+                                                                    className="object-cover w-full h-12 rounded"
                                                                 />
                                                             ) : (
                                                                 <ModalImage
                                                                     small={e?.images}
                                                                     large={e?.images}
-                                                                    className="w-full h-12 rounded object-contain"
+                                                                    className="object-contain w-full h-12 rounded"
                                                                 />
                                                             )}
                                                         </RowItemTable>
@@ -479,7 +479,7 @@ const Products = (props) => {
                                                                     {e?.name}
                                                                 </button>
                                                             </Popup_Detail>
-                                                            <h6 className="flex gap-1 items-center">
+                                                            <h6 className="flex items-center gap-1">
                                                                 <span
                                                                     className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed 2xl:text-[10px] text-[9px]
                                                                      ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") ||
@@ -502,21 +502,15 @@ const Products = (props) => {
                                                         </RowItemTable> */}
                                                         <RowItemTable colSpan={1} className="flex items-center justify-center">
                                                             {
-                                                                Number(e?.variation_count) == 0 ?
-                                                                    (
-                                                                        Number(e?.ct_versions) != 0 && <IconTick className="text-green-500" />
-                                                                    )
+                                                                Number(e?.variation_count) == 0
+                                                                    ?
+                                                                    Number(e?.ct_versions) != 0 && <IconTick className="text-green-500" />
                                                                     :
-                                                                    (
-                                                                        Number(e?.variation_count) > Number(e?.ct_versions) ?
-                                                                            (
-                                                                                Number(e?.ct_versions) == 0 ? "" : formatNumber(e?.ct_versions)
-                                                                            )
-                                                                            :
-                                                                            (
-                                                                                <IconTick className="text-green-500" />
-                                                                            )
-                                                                    )
+                                                                    Number(e?.variation_count) > Number(e?.ct_versions)
+                                                                        ?
+                                                                        Number(e?.ct_versions) == 0 ? "" : formatNumber(e?.ct_versions)
+                                                                        :
+                                                                        <IconTick className="text-green-500" />
                                                             }
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex items-center justify-center">
@@ -529,7 +523,7 @@ const Products = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'left'}>
                                                             {e?.note}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className="flex items-center gap-1 flex-wrap">
+                                                        <RowItemTable colSpan={2} className="flex flex-wrap items-center gap-1">
                                                             {e?.branch.map((i) => (
                                                                 <TagBranch key={i}>
                                                                     {i.name}
@@ -545,22 +539,15 @@ const Products = (props) => {
                                                                 name={e.name}
                                                                 code={e.code}
                                                                 bom={
-                                                                    Number(e?.variation_count) == 0 ?
-                                                                        (
-                                                                            Number(e?.ct_versions) != 0 && true
-                                                                        )
+                                                                    Number(e?.variation_count) == 0
+                                                                        ?
+                                                                        Number(e?.ct_versions) != 0 && true
                                                                         :
-                                                                        (
-                                                                            Number(e?.variation_count) > Number(e?.ct_versions) ?
-                                                                                (
-                                                                                    Number(e?.ct_versions) == 0 ? false : true
-                                                                                )
-                                                                                :
-                                                                                (
-                                                                                    true
-                                                                                )
-                                                                        )
-
+                                                                        Number(e?.variation_count) > Number(e?.ct_versions)
+                                                                            ?
+                                                                            Number(e?.ct_versions) == 0 ? false : true
+                                                                            :
+                                                                            true
                                                                 }
                                                                 // bom={Number(e?.ct_versions)}
                                                                 stage={Number(e?.ct_versions_stage)}
@@ -578,20 +565,22 @@ const Products = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    {data?.rResult?.length != 0 && (
-                        <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={data?.output?.iTotalDisplayRecords}
-                            />
-                            <Pagination
-                                postsPerPage={limit}
-                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
-                                paginate={paginate}
-                                currentPage={router.query?.page || 1}
-                            />
-                        </ContainerPagination>
-                    )}
+                    {
+                        data?.rResult?.length != 0 && (
+                            <ContainerPagination>
+                                <TitlePagination
+                                    dataLang={dataLang}
+                                    totalItems={data?.output?.iTotalDisplayRecords}
+                                />
+                                <Pagination
+                                    postsPerPage={limit}
+                                    totalPosts={Number(data?.output?.iTotalDisplayRecords)}
+                                    paginate={paginate}
+                                    currentPage={router.query?.page || 1}
+                                />
+                            </ContainerPagination>
+                        )
+                    }
                 </ContainerBody>
             </Container>
         </React.Fragment>

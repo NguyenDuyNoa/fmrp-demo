@@ -12,10 +12,12 @@ import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import { TagColorRed } from "@/components/UI/common/Tag/TagStatus";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
+const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable }) => {
     const showToast = useToast();
     const { getItem } = FnlocalStorage();
     const getLocalStorageTab = getItem("tab");
+    console.log("dataLang", dataLang);
+
     return (
         <>
             <div className="grid grid-cols-13 items-center bg-[#F7F8F9] rounded sticky top-0 z-[200]">
@@ -28,31 +30,31 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                     </h3>
                 </h3>
                 <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    THÀNH PHẨM
+                    {dataLang?.production_plan_form_materials_finished_product || 'production_plan_form_materials_finished_product'}
                 </h3>
                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    ĐỊNH MỨC BOM
+                    {dataLang?.production_plan_form_materials_bom_rate || 'production_plan_form_materials_bom_rate'}
                 </h3>
                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    ĐƠN VỊ
+                    {dataLang?.production_plan_form_materials_unit || 'production_plan_form_materials_unit'}
                 </h3>
                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    CÔNG ĐOẠN
+                    {dataLang?.production_plan_form_materials_stage || 'production_plan_form_materials_stage'}
                 </h3>
                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    SL TRONG KHO
+                    {dataLang?.production_plan_form_materials_in_stock || 'production_plan_form_materials_in_stock'}
                 </h3>
                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    SL CẦN
+                    {dataLang?.production_plan_form_materials_need || 'production_plan_form_materials_need'}
                 </h3>
                 <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    Timeline sản xuất
+                    {dataLang?.production_plan_form_materials_timeline || 'production_plan_form_materials_timeline'}
                 </h3>
                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    DỰ KIẾN GIAO
+                    {dataLang?.production_plan_form_materials_expected || 'production_plan_form_materials_expected'}
                 </h3>
                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    TÁC VỤ
+                    {dataLang?.production_plan_form_materials_task || 'production_plan_form_materials_task'}
                 </h3>
             </div>
             <div className="3xl:h-[44vh] xxl:h-[22vh] 2xl:h-[30vh] xl:h-[24vh] lg:h-[24vh] h-[30vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
@@ -111,13 +113,13 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                             i.bom == null ? "border-red-500 " : "border-[#E1E1E1]"
                                         } border rounded-md`}
                                         formatOptionLabel={(options) => {
-                                            return <div className="3xl:text-sm text-xs">{options.label}</div>;
+                                            return <div className="text-xs 3xl:text-sm">{options.label}</div>;
                                         }}
                                         onChange={(e) => {
                                             handChangeTable(i.idParent, i.id, e, "bom");
                                         }}
                                         noOptionsMessage={() => {
-                                            return <div className="3xl:text-sm text-xs">Không có dữ liệu</div>;
+                                            return <div className="text-xs 3xl:text-sm">Không có dữ liệu</div>;
                                         }}
                                         styles={{
                                             placeholder: (base) => ({
@@ -169,13 +171,13 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                         options={[{ label: "test", value: 1 }]}
                                         menuPortalTarget={document.body}
                                         formatOptionLabel={(options) => {
-                                            return <div className="3xl:text-sm text-xs">{options.label}</div>;
+                                            return <div className="text-xs 3xl:text-sm">{options.label}</div>;
                                         }}
                                         onChange={(e) => {
                                             handChangeTable(i.idParent, i.id, e, "stage");
                                         }}
                                         noOptionsMessage={() => {
-                                            return <div className="3xl:text-sm text-xs">Không có dữ liệu</div>;
+                                            return <div className="text-xs 3xl:text-sm">Không có dữ liệu</div>;
                                         }}
                                         styles={{
                                             placeholder: (base) => ({
@@ -229,22 +231,15 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                         }}
                                         isAllowed={({ floatValue }) => {
                                             if (floatValue < 0) {
-                                                showToast("error", `Số lượng cần phải lớn hơn 0.`);
+                                                showToast("error", dataLang?.production_plan_form_materials_qty_needs_to_be_greater || 'production_plan_form_materials_qty_needs_to_be_greater');
                                                 return false;
                                             }
                                             return true;
                                         }}
-                                    // isAllowed={({ floatValue }) => {
-                                    //     if (floatValue == 0) {
-                                    //         showToast("error", `Số lượng cần phải lớn hơn 0.`);
-                                    //         return false;
-                                    //     }
-                                    //     return true;
-                                    // }}
                                     />
                                 </h3>
                                 <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
-                                    <div className="w-full relative">
+                                    <div className="relative w-full">
                                         <DatePicker
                                             selected={i.date.startDate}
                                             onChange={(dates) => {
@@ -265,12 +260,9 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                             portalId="menu-time"
                                             isClearable
                                             clearButtonClassName="mr-6 hover:scale-150 transition-all duration-150 ease-linear"
-                                            placeholderText="Ngày - Ngày"
+                                            placeholderText={dataLang?.production_plan_form_materials_date_to_date || 'production_plan_form_materials_date_to_date'}
                                             className={`py-[8px] px-4  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px]  text-[10px] placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
-                                            ${i.date.startDate == null && i.date.endDate == null
-                                                    ? "border-red-500"
-                                                    : "border-[#E1E1E1]"
-                                                }  focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] z-[999]`}
+                                            ${i.date.startDate == null ? "border-red-500" : "border-[#E1E1E1]"}  focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] z-[999]`}
                                         />
 
                                         <Image
@@ -278,7 +270,7 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                             src={"/productionPlan/Union.png"}
                                             width={12}
                                             height={12}
-                                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 opacity-60"
+                                            className="absolute right-0 -translate-x-1/2 -translate-y-1/2 top-1/2 opacity-60"
                                         />
                                     </div>
                                 </h3>
@@ -295,7 +287,7 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                         {i?.deliveryDate}
                                     </h2>
                                 </h3>
-                                <h3 className="py-2 flex items-center gap-6 justify-center">
+                                <h3 className="flex items-center justify-center gap-6 py-2">
                                     {/* <Image
                                             src={"/productionPlan/edit-3.png"}
                                             width={24}
@@ -304,14 +296,14 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                             className="object-cover rounded-md cursor-pointer"
                                         /> */}
                                     {/* <PopupEditer isLoading={isLoading} /> */}
-                                    <Zoom className="w-fit h-full">
+                                    <Zoom className="h-full w-fit">
                                         <Image
                                             onClick={() => handleRemoveItem(i.id)}
                                             src={"/productionPlan/trash-2.png"}
                                             width={24}
                                             height={24}
                                             alt=""
-                                            className="object-cover rounded-md  cursor-pointer"
+                                            className="object-cover rounded-md cursor-pointer"
                                         />
                                     </Zoom>
                                 </h3>

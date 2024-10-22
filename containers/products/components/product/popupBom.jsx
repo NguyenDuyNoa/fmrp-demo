@@ -76,9 +76,8 @@ const Popup_Bom = React.memo((props) => {
         return () => clearTimeout();
     };
 
-    const dataRestVariant = dataVariant?.filter(
-        (item1) => !dataSelectedVariant?.some((item2) => item1?.label === item2?.label && item1?.value === item2?.value)
-    );
+    const dataRestVariant = dataVariant?.filter((item1) => !dataSelectedVariant?.some((item2) => item1?.label === item2?.label && item1?.value === item2?.value));
+
     const [currentData, sCurrentData] = useState([]);
 
     const [errValue, sErrValue] = useState(false);
@@ -550,8 +549,7 @@ const Popup_Bom = React.memo((props) => {
 
     return (
         <PopupCustom
-            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${props.name
-                })`}
+            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${props.name})`}
             button={
                 <div
                     onClick={() => {
@@ -574,9 +572,7 @@ const Popup_Bom = React.memo((props) => {
                         <AttachCircle size={20} className="group-hover:text-green-500 group-hover:scale-110" />
                     )}
                     <button type="button" className="group-hover:text-green-500">
-                        {props.type == "add"
-                            ? `${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"}`
-                            : `${props.dataLang?.edit_bom || "edit_bom"}`}
+                        {props.type == "add" ? `${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"}` : `${props.dataLang?.edit_bom || "edit_bom"}`}
                     </button>
                 </div>
             }
@@ -586,7 +582,7 @@ const Popup_Bom = React.memo((props) => {
         >
             <div className="py-4 w-[1100px]    space-y-2">
                 <>
-                    <div className="flex justify-between items-end pb-2">
+                    <div className="flex items-end justify-between pb-2">
                         <div className="w-2/3">
                             <label className="text-[#344054] font-normal text-sm mb-1 ">
                                 {props.dataLang?.category_material_list_variant} <span className="text-red-500">*</span>
@@ -638,28 +634,30 @@ const Popup_Bom = React.memo((props) => {
                         </div>
                     </div>
                     {dataSelectedVariant?.length > 0 && (
-                        <div className="pb-2 flex space-x-3 items-center justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                            {dataSelectedVariant.map((e) => (
-                                <div className="flex">
-                                    <button
-                                        key={e?.value}
-                                        onClick={_HandleSelectTab.bind(this, e?.value)}
-                                        className={`${tab == e?.value
-                                            ? "text-[#0F4F9E] bg-[#0F4F9E10]"
-                                            : "hover:text-[#0F4F9E] bg-slate-50/50"
-                                            } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center whitespace-nowrap`}
-                                    >
-                                        <span>{e?.label?.includes("NONE") ? "Mặc định" : e?.label}</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={_HandleDeleteBOM.bind(this, e?.value)}
-                                        className="text-red-500"
-                                    >
-                                        <IconDelete />
-                                    </button>
-                                </div>
-                            ))}
+                        <div className="flex items-center justify-start pb-2 space-x-3 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            {
+                                dataSelectedVariant.map((e, index) => (
+                                    <div key={index} className="flex">
+                                        <button
+                                            key={e?.value}
+                                            onClick={_HandleSelectTab.bind(this, e?.value)}
+                                            className={`${tab == e?.value
+                                                ? "text-[#0F4F9E] bg-[#0F4F9E10]"
+                                                : "hover:text-[#0F4F9E] bg-slate-50/50"
+                                                } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center whitespace-nowrap`}
+                                        >
+                                            <span>{e?.label?.includes("NONE") ? "Mặc định" : e?.label}</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={_HandleDeleteBOM.bind(this, e?.value)}
+                                            className="text-red-500"
+                                        >
+                                            <IconDelete />
+                                        </button>
+                                    </div>
+                                ))
+                            }
                         </div>
                     )}
                     <div className="space-y-1 -pt-5">
@@ -688,7 +686,7 @@ const Popup_Bom = React.memo((props) => {
                                         {selectedList?.child?.map((e, index) => (
                                             <div
                                                 key={e.id}
-                                                className="py-1 px-2 grid grid-cols-14 w-full hover:bg-slate-100 items-center"
+                                                className="grid items-center w-full px-2 py-1 grid-cols-14 hover:bg-slate-100"
                                             >
                                                 <div className="col-span-3">
                                                     <Select
@@ -731,7 +729,7 @@ const Popup_Bom = React.memo((props) => {
                                                                 width: "150%",
                                                             }),
                                                         }}
-                                                    />{" "}
+                                                    />
                                                 </div>
                                                 <div className="col-span-2">
                                                     <Select
@@ -751,9 +749,7 @@ const Popup_Bom = React.memo((props) => {
                                                                 e.id,
                                                                 e.name
                                                             )
-                                                        }
-
-                                                        }
+                                                        }}
                                                         formatOptionLabel={(option) => (
                                                             <div className="">
                                                                 <div className="flex gap-1">
@@ -951,19 +947,21 @@ const Popup_Bom = React.memo((props) => {
                                 )}
                             </div>
                         </Customscrollbar>
-                        {dataSelectedVariant?.length > 0 && (
-                            <button
-                                onClick={_HandleAddNew.bind(this, selectedList?.value)}
-                                type="button"
-                                title="Thêm"
-                                className={`hover:text-[#0F4F9E] hover:bg-[#e2f0fe] transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
-                            >
-                                <IconAdd />
-                                {props.dataLang?.bom_design_add_finishedProduct || "bom_design_add_finishedProduct"}
-                            </button>
-                        )}
+                        {
+                            dataSelectedVariant?.length > 0 && (
+                                <button
+                                    onClick={_HandleAddNew.bind(this, selectedList?.value)}
+                                    type="button"
+                                    title="Thêm"
+                                    className={`hover:text-[#0F4F9E] hover:bg-[#e2f0fe] transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
+                                >
+                                    <IconAdd />
+                                    {props.dataLang?.bom_design_add_finishedProduct || "bom_design_add_finishedProduct"}
+                                </button>
+                            )
+                        }
                     </div>
-                    <div className="text-right mt-5 space-x-2">
+                    <div className="mt-5 space-x-2 text-right">
                         <button
                             type="button"
                             onClick={_ToggleModal.bind(this, false)}

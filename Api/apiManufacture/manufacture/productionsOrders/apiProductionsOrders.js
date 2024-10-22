@@ -30,6 +30,11 @@ const apiProductionsOrders = {
         const response = await axiosCustom('GET', `/api_web/api_manufactures/getListBomPOD/${id}`);
         return response.data
     },
+    // lịch sử xuất NVL/BTP
+    async apiGetSuggestExporting(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/getSuggestExporting`, data);
+        return response.data
+    },
     // api đổi trạng thái sản xuất
     async apiAgreeProcess(data) {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/agreeProcess`, data);

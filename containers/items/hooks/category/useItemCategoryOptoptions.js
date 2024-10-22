@@ -6,7 +6,7 @@ export const useItemCategoryOptoptions = (open, id) => {
         queryKey: ['api_detail_category_option'],
         queryFn: async () => {
             const { rResult } = await apiCategory.apiDetailCategoryOptionCategory(id);
-            return rResult.map((e) => ({
+            return rResult.map((x) => ({
                 label: `${x.name + " " + "(" + x.code + ")"}`,
                 value: x?.id,
                 level: x?.level,

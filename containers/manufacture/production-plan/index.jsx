@@ -344,7 +344,7 @@ const ProductionPlan = (props) => {
     return (
         <>
             <Head>
-                <title>{"Kế hoạch sản xuất"}</title>
+                <title>{dataLang?.production_plan_title || 'production_plan_title'}</title>
             </Head>
             <Container>
                 {statusExprired ? <EmptyExprired /> : <Header {...shareProps} />}

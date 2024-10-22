@@ -1,24 +1,25 @@
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { ArrowDown2 } from "iconsax-react";
 import dynamic from "next/dynamic";
 import React from "react";
 import DatePicker from "react-datepicker";
-import { components } from "react-select";
 const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), { ssr: false });
 
 const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options, dataLang }) => {
 
     return (
         <>
-            <div className="grid grid-cols-14 items-center gap-2 ">
+            <div className="grid items-center gap-2 grid-cols-14 ">
                 <div className="col-span-2">
-                    <h3 className="text-sm text-[#051B44] font-medium ml-1">Khách hàng</h3>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.production_plan_form_materials_client || 'production_plan_form_materials_client'}</h3>
                     <SelectComponent
                         isClearable={true}
                         value={isValue.idClient}
                         onChange={onChangeValue("idClient")}
-                        options={[{ label: "Khách hàng", value: "", isDisabled: true }, ...isData?.client]}
+                        options={[{ label: dataLang?.production_plan_form_materials_client || 'production_plan_form_materials_client', value: "", isDisabled: true }, ...isData?.client]}
                         classNamePrefix={"productionSmoothing"}
-                        placeholder={"Khách hàng"}
+                        placeholder={dataLang?.production_plan_form_materials_client || 'production_plan_form_materials_client'}
                     />
                 </div>
                 <div className="col-span-2">
@@ -35,29 +36,19 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                     />
                 </div>
                 <div className="col-span-2">
-                    <h3 className="text-sm text-[#051B44] font-medium ml-1">Nhóm thành phẩm</h3>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.production_plan_form_materials_finished_product_group || 'production_plan_form_materials_finished_product_group'}</h3>
                     <SelectComponent
                         value={isValue.idProductGroup}
                         isClearable={true}
-                        options={[{ label: "Nhóm thành phẩm", value: "", isDisabled: true }, ...isData?.productGroup]}
-                        formatOptionLabel={({ level, label }) => {
-                            return (
-                                <div className="flex gap-2 truncate">
-                                    {level == 1 && <span>--</span>}
-                                    {level == 2 && <span>----</span>}
-                                    {level == 3 && <span>------</span>}
-                                    {level == 4 && <span>--------</span>}
-                                    <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
-                                </div>
-                            );
-                        }}
+                        options={[{ label: dataLang?.production_plan_form_materials_finished_product_group || 'production_plan_form_materials_finished_product_group', value: "", isDisabled: true }, ...isData?.productGroup]}
+                        formatOptionLabel={SelectOptionLever}
                         onChange={onChangeValue("idProductGroup")}
                         classNamePrefix={"productionSmoothing"}
-                        placeholder={"Nhóm thành phẩm"}
+                        placeholder={dataLang?.production_plan_form_materials_finished_product_group || 'production_plan_form_materials_finished_product_group'}
                     />
                 </div>
                 <div className="col-span-2">
-                    <h3 className="text-sm text-[#051B44] font-medium ml-1">Thành phẩm</h3>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_popup_finished_product || 'productions_orders_popup_finished_product'}</h3>
                     <SelectComponent
                         isClearable={true}
                         value={isValue.idProduct}
@@ -65,16 +56,17 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         onInputChange={(event) => {
                             _HandleSeachApi(event);
                         }}
+                        maxShowMuti={1}
                         components={{ MultiValue }}
                         isMulti={true}
-                        options={[{ label: "Thành phẩm", value: "", isDisabled: true }, ...options]}
+                        options={[{ label: dataLang?.productions_orders_popup_finished_product || 'productions_orders_popup_finished_product', value: "", isDisabled: true }, ...options]}
                         closeMenuOnSelect={false}
                         formatOptionLabel={(option) => {
                             return (
                                 <div className="">
                                     {option?.isDisabled ? (
                                         <div className="custom-text">
-                                            <h3 className="font-medium text-base">{option.label}</h3>
+                                            <h3 className="text-base font-medium">{option.label}</h3>
                                         </div>
                                     ) : (
                                         <div className="flex items-center gap-2">
@@ -137,21 +129,21 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                     />
                 </div>
                 <div className="col-span-2">
-                    <h3 className="text-sm text-[#051B44] font-medium ml-1">Trạng thái kế hoạch</h3>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.production_plan_form_materials_status_plan || 'production_plan_form_materials_status_plan'}</h3>
                     <SelectComponent
                         isClearable={true}
                         value={isValue.planStatus}
                         onChange={onChangeValue("planStatus")}
-                        options={[{ label: "Trạng thái kế hoạch", value: "", isDisabled: true }, ...isData?.planStatus]}
+                        options={[{ label: dataLang?.production_plan_form_materials_status_plan || 'production_plan_form_materials_status_plan', value: "", isDisabled: true }, ...isData?.planStatus]}
                         classNamePrefix={"productionSmoothing"}
-                        placeholder={"Trạng thái kế hoạch"}
+                        placeholder={dataLang?.production_plan_form_materials_status_plan || 'production_plan_form_materials_status_plan'}
                     />
                 </div>
                 <div className="col-span-2">
                     <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                        Ngày bắt đầu
+                        {dataLang?.production_plan_form_materials_start_date || 'production_plan_form_materials_start_date'}
                     </label>
-                    <div className="w-full relative">
+                    <div className="relative w-full">
                         <DatePicker
                             id="start"
                             calendarClassName="rasta-stripes"
@@ -160,21 +152,21 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                             onChange={onChangeValue("startDate")}
                             dateFormat={"dd/MM/yyyy"}
                             isClearable
-                            placeholderText="Ngày bắt đầu"
+                            placeholderText={dataLang?.production_plan_form_materials_start_date || 'production_plan_form_materials_start_date'}
                             className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
                         />
                         <ArrowDown2
                             size="11"
                             color="#6b7280"
-                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                            className="absolute right-0 -translate-x-1/2 -translate-y-1/2 top-1/2"
                         />
                     </div>
                 </div>
                 <div className="col-span-2">
                     <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                        Ngày kết thúc
+                        {dataLang?.production_plan_form_materials_end_date || 'production_plan_form_materials_end_date'}
                     </label>
-                    <div className="w-full relative">
+                    <div className="relative w-full">
                         <DatePicker
                             id="start"
                             calendarClassName="rasta-stripes"
@@ -183,13 +175,13 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                             onChange={onChangeValue("endDate")}
                             isClearable
                             dateFormat={"dd/MM/yyyy"}
-                            placeholderText="Ngày kết thúc"
+                            placeholderText={dataLang?.production_plan_form_materials_end_date || 'production_plan_form_materials_end_date'}
                             className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
                         />
                         <ArrowDown2
                             size="11"
                             color="#6b7280"
-                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                            className="absolute right-0 -translate-x-1/2 -translate-y-1/2 top-1/2"
                         />
                     </div>
                 </div>
@@ -198,37 +190,5 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
     );
 };
 
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
 
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 2;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 export default React.memo(FilterHeader);

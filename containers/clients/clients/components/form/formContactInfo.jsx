@@ -7,9 +7,9 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                 <div className="w-full p-3 pt-0">
                     <div className="" key={option.idFe?.toString()}>
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {dataLang?.client_popup_fiandlass}
+                            {dataLang?.client_popup_fiandlass || 'client_popup_fiandlass'}
                         </label>
-                        <span className="text-red-500 px-1">*</span>
+                        <span className="px-1 text-red-500">*</span>
                         <input
                             // disabled={option?.idBe && !option?.disble}
                             value={option.full_name}
@@ -20,8 +20,8 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             className={`${option.full_name == '' ? "border-red-500" : ""} focus:border-[#92BFF7]  disabled:bg-gray-300 border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                         />
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {dataLang?.client_popup_phone}
-                        </label><span className="text-red-500 px-1">*</span>
+                            {dataLang?.client_popup_phone || 'client_popup_phone'}
+                        </label><span className="px-1 text-red-500">*</span>
                         <input
                             // disabled={option?.idBe && !option?.disble}
                             value={option.phone_number}
@@ -42,7 +42,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             className="focus:border-[#92BFF7]  disabled:bg-gray-100 placeholder:text-xs border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                         />
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {dataLang?.client_popup_position}
+                            {dataLang?.client_popup_position || 'client_popup_position'}
                         </label>
                         <input
                             // disabled={option?.idBe && !option?.disble}
@@ -54,7 +54,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             className="focus:border-[#92BFF7]  disabled:bg-gray-100 placeholder:text-xs border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                         />
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {dataLang?.client_popup_birthday}
+                            {dataLang?.client_popup_birthday || 'client_popup_birthday'}
                         </label>
                         <input
                             // disabled={option?.idBe && !option?.disble}
@@ -65,7 +65,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             className="focus:border-[#92BFF7]  disabled:bg-gray-100 border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                         />
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {dataLang?.client_popup_adress}
+                            {dataLang?.client_popup_adress || 'client_popup_adress'}
                         </label>
                         <textarea
                             // disabled={option?.idBe && !option?.disble}

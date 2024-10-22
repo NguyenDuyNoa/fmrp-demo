@@ -17,7 +17,7 @@ const FormContactDelivery = ({ optionDelivery, dataLang, onChangOptionsDelivery,
                     type="text"
                     className="focus:border-[#92BFF7] placeholder:text-xs border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                 />
-                <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.client_popup_phone}</label>
+                <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.client_popup_phone || 'client_popup_phone'}</label>
                 <input
                     value={optionDelivery.phoneDelivery}
                     onChange={(e) => onChangOptionsDelivery(optionDelivery.idFe, "phoneDelivery", e)}
@@ -27,7 +27,7 @@ const FormContactDelivery = ({ optionDelivery, dataLang, onChangOptionsDelivery,
                     className="focus:border-[#92BFF7] placeholder:text-xs border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                 />
 
-                <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.client_popup_adress}</label>
+                <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.client_popup_adress || 'client_popup_adress'}</label>
                 <textarea
                     value={optionDelivery.addressDelivery}
                     onChange={(e) => onChangOptionsDelivery(optionDelivery.idFe, "addressDelivery", e)}

@@ -8,6 +8,7 @@ import Zoom from "@/components/UI/zoomElement/zoomElement";
 import useToast from "@/hooks/useToast";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
+import NoData from "@/components/UI/noData/nodata";
 const BodyGantt = ({
     handleShowSub,
     handleCheked,
@@ -63,8 +64,8 @@ const BodyGantt = ({
                         <div className={`min-w-[35%]  w-[35%]`}>
                             <div className="flex items-center gap-2 pb-1 pl-2">
                                 {[
-                                    { name: " Đơn hàng bán", tab: "order" },
-                                    { name: "Kế hoạch nội bộ", tab: "plan" },
+                                    { name: dataLang?.production_plan_gantt_order || 'production_plan_gantt_order', tab: "order" },
+                                    { name: dataLang?.production_plan_gantt_internal || 'production_plan_gantt_internal', tab: "plan" },
                                 ].map((e) => (
                                     <Zoom className="w-fit">
                                         <button
@@ -153,19 +154,19 @@ const BodyGantt = ({
                                 </div>
                                 <div className="grid w-full grid-cols-11 col-span-11">
                                     <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
-                                        Đơn hàng
+                                        {dataLang?.production_plan_gantt_table_order || 'production_plan_gantt_table_order'}
                                     </div>
                                     <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                        Trạng thái
+                                        {dataLang?.production_plan_gantt_table_status || 'production_plan_gantt_table_status'}
                                     </div>
                                     <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                        SL
+                                        {dataLang?.production_plan_gantt_table_quantity || 'production_plan_gantt_table_quantity'}
                                     </div>
                                     <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                        SL đã lập KHSX
+                                        {dataLang?.production_plan_gantt_table_quantity_plan || 'production_plan_gantt_table_quantity_plan'}
                                     </div>
                                     <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                        SL còn lại
+                                        {dataLang?.production_plan_gantt_table_quantity_remaining || 'production_plan_gantt_table_quantity_remaining'}
                                     </div>
                                 </div>
                             </div>
@@ -330,9 +331,9 @@ const BodyGantt = ({
                                                                         (i.status == "unfulfilled" && "text-[#FF8F0D]")
                                                                         } font-medium col-span-2 3xl:text-[13px] whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px]`}
                                                                 >
-                                                                    {i.status == "outDate" && "Đã quá hạn"}
-                                                                    {i.status == "sussces" && "Hoàn thành"}
-                                                                    {i.status == "unfulfilled" && "Chưa thực hiện"}
+                                                                    {i.status == "outDate" && dataLang?.production_plan_gantt_table_status_over}
+                                                                    {i.status == "sussces" && dataLang?.production_plan_gantt_table_status_complete}
+                                                                    {i.status == "unfulfilled" && dataLang?.production_plan_gantt_table_status_not_done}
                                                                 </h3>
                                                                 <h3 className="text-[#52575E] pl-4 text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
                                                                     {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
@@ -578,19 +579,8 @@ const BodyGantt = ({
                         </div>
                     </div> */}
                 </div>
-            ) : (
-                <div className=" flex flex-col justify-center items-center h-[70%] mx-auto">
-                    <div className="text-center">
-                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                            <IconSearch />
-                        </div>
-                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                            {dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}
-                        </h1>
-                        <div className="flex items-center justify-around mt-6 "></div>
-                    </div>
-                </div>
-            )
+            ) :
+                <NoData />
             }
         </React.Fragment >
     );

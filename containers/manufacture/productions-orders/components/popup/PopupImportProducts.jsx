@@ -7,10 +7,12 @@ import Loading from "@/components/UI/loading/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import { isAllowedNumberThanWarning } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -257,7 +259,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 if (isState?.dtPois?.final_stage == "1") {
                     formData.append("product[item][lot]", isState?.lot ?? "")
                     formData.append("product[item][serial]", isState?.serial ?? "")
-                    formData.append("product[item][date_expiration]", isState?.date ?? "")
+                    formData.append("product[item][date_expiration]", formatMoment(isState?.date, FORMAT_MOMENT.DATE_SLASH_LONG) ?? "")
                 }
 
                 isState.item?.bom?.forEach((e, index) => {
@@ -356,7 +358,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 <div className="w-[45%] 2xl:w-[45%] lg:w-[40%] flex items-start gap-3">
                                     <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
                                         <Image
-                                            src={isState.item.image}
+                                            src={isState.item.image || '/no_img.png'}
                                             width={1280}
                                             height={1024}
                                             alt="@image tp"
@@ -729,7 +731,6 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 }
                 <div className="flex items-center justify-end gap-2 mt-2">
                     <ButtonCancel
-                        loading={false}
                         onClick={() => { queryState({ ...stateDefault }) }}
                         dataLang={dataLang}
                     />

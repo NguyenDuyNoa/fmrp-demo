@@ -1,5 +1,6 @@
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import useToast from "@/hooks/useToast";
+import { isAllowedNumberThanWarning } from "@/utils/helpers/common";
 import Select from "react-select";
 
 const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict, dataChar }) => {
@@ -9,7 +10,7 @@ const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict,
       <div className="flex flex-wrap justify-between ">
         <div className="w-[48%]">
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_list_namecode}{" "}
+            {dataLang?.client_list_namecode || 'client_list_namecode'}
           </label>
           <input
             value={isState.code}
@@ -38,16 +39,16 @@ const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict,
             />
             {isState?.errInputName && (
               <label className="mb-4  text-[14px] text-red-500">
-                {dataLang?.client_list_nameuser}
+                {dataLang?.client_list_nameuser || 'client_list_nameuser'}
               </label>
             )}
           </div>
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_list_repre}
+            {dataLang?.client_list_repre || 'client_list_repre'}
           </label>
           <input
             value={isState.representative}
-            placeholder={dataLang?.client_list_repre}
+            placeholder={dataLang?.client_list_repre || 'client_list_repre'}
             onChange={(e) => queryState({ representative: e.target.value })}
             name="fname"
             type="text"
@@ -59,35 +60,35 @@ const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict,
           <input
             value={isState.email}
             onChange={(e) => queryState({ email: e.target.value })}
-            placeholder={dataLang?.client_popup_mail}
+            placeholder={dataLang?.client_popup_mail || 'client_popup_mail'}
             name="fname"
             type="email"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
           />
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_list_phone}
+            {dataLang?.client_list_phone || 'client_list_phone'}
           </label>
           <input
             value={isState.phone_number}
             onChange={(e) => queryState({ phone_number: e.target.value })}
-            placeholder={dataLang?.client_list_phone}
+            placeholder={dataLang?.client_list_phone || 'client_list_phone'}
             name="fname"
             type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
           />
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_list_taxtcode}
+            {dataLang?.client_list_taxtcode || 'client_list_taxtcode'}
           </label>
           <input
             value={isState.tax_code}
             onChange={(e) => queryState({ tax_code: e.target.value })}
-            placeholder={dataLang?.client_list_taxtcode}
+            placeholder={dataLang?.client_list_taxtcode || 'client_list_taxtcode'}
             name="fname"
             type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
           />
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_popup_date}
+            {dataLang?.client_popup_date || 'client_popup_date'}
           </label>
           <input
             value={isState.date_incorporation}
@@ -98,12 +99,12 @@ const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict,
           />
 
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_popup_adress}
+            {dataLang?.client_popup_adress || 'client_popup_adress'}
           </label>
           <textarea
             value={isState.address}
             onChange={(e) => queryState({ address: e.target.value })}
-            placeholder={dataLang?.client_popup_adress}
+            placeholder={dataLang?.client_popup_adress || 'client_popup_adress'}
             name="fname"
             type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] h-[40px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
@@ -112,12 +113,12 @@ const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict,
         <div className="w-[48%]">
           <div>
             <label className="text-[#344054] font-normal text-sm mb-1 ">
-              {dataLang?.client_list_brand}{" "}
+              {dataLang?.client_list_brand || 'client_list_brand'}
               <span className="text-red-500">*</span>
             </label>
             <Select
               closeMenuOnSelect={false}
-              placeholder={dataLang?.client_list_brand}
+              placeholder={dataLang?.client_list_brand || 'client_list_brand'}
               options={isState.dataBr}
               isSearchable={true}
               onChange={(e) => queryState({ valueBr: e })}
@@ -151,16 +152,16 @@ const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict,
             />
             {isState.errInputBr && (
               <label className="mb-2  text-[14px] text-red-500">
-                {dataLang?.client_list_bran}
+                {dataLang?.client_list_bran || 'client_list_bran'}
               </label>
             )}
           </div>
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_popup_char}
+            {dataLang?.client_popup_char || 'client_popup_char'}
           </label>
           <Select
             closeMenuOnSelect={false}
-            placeholder={dataLang?.client_popup_char}
+            placeholder={dataLang?.client_popup_char || 'client_popup_char'}
             options={dataChar}
             isSearchable={true}
             onChange={(e) => queryState({ valueChar: e })}
@@ -193,10 +194,10 @@ const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict,
             className={` placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none mb-2 rounded-[5.5px] bg-white border-none xl:text-base text-[14.5px]`}
           />
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_list_group}
+            {dataLang?.client_list_group || 'client_popup_char'}
           </label>
           <Select
-            placeholder={dataLang?.client_list_group}
+            placeholder={dataLang?.client_list_group || 'client_popup_char'}
             noOptionsMessage={() => "Không có dữ liệu"}
             options={dataGroup}
             //hihi
@@ -230,53 +231,55 @@ const Form = ({ dataLang, dataWard, dataGroup, isState, queryState, dataDitrict,
             className="rounded-[5.5px] py-0.5 mb-2 bg-white border-none xl:text-base text-[14.5px] "
           />
           <label className="text-[#344054] font-normal text-sm mb-1 ">
-            {dataLang?.client_popup_limit}
+            {dataLang?.client_popup_limit || 'client_popup_limit'}
           </label>
           <InPutNumericFormat
             value={isState.debt_limit || 0}
             onValueChange={(e) => queryState({ debt_limit: e.floatValue })}
             isAllowed={(values) => {
-              const { floatValue } = values;
-              if (floatValue == 0) {
-                return true;
-              }
-              if (floatValue < 0) {
-                isShow('warning', 'Vui lòng nhập lớn hơn 0');
-                return false
-              }
-              return true
+              // const { floatValue } = values;
+              // if (floatValue == 0) {
+              //   return true;
+              // }
+              // if (floatValue < 0) {
+              //   isShow('warning', 'Vui lòng nhập lớn hơn 0');
+              //   return false
+              // }
+              // return true
+              isAllowedNumberThanWarning(values, dataLang);
             }}
-            placeholder={dataLang?.client_popup_limit}
+            placeholder={dataLang?.client_popup_limit || 'client_popup_limit'}
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
           />
           <div>
             <label className="text-[#344054] font-normal text-sm mb-1 ">
-              {dataLang?.client_popup_days}
+              {dataLang?.client_popup_days || 'client_popup_days'}
             </label>
             <InPutNumericFormat
               value={isState.debt_limit_day || 0}
               onValueChange={(e) => queryState({ debt_limit_day: e.floatValue })}
               isAllowed={(values) => {
-                const { floatValue } = values;
-                if (floatValue == 0) {
-                  return true;
-                }
-                if (floatValue < 0) {
-                  isShow('warning', 'Vui lòng nhập lớn hơn 0');
-                  return false
-                }
-                return true
+                isAllowedNumberThanWarning(values, dataLang);
+                // const { floatValue } = values;
+                // if (floatValue == 0) {
+                //   return true;
+                // }
+                // if (floatValue < 0) {
+                //   isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                //   return false
+                // }
+                // return true
               }}
-              placeholder={dataLang?.client_popup_days}
+              placeholder={dataLang?.client_popup_days || 'client_popup_days'}
               className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
             />
           </div>
           <div>
             <label className="text-[#344054] font-normal text-sm mb-1 ">
-              {dataLang?.client_popup_city}
+              {dataLang?.client_popup_city || 'client_popup_days'}
             </label>
             <Select
-              placeholder={dataLang?.client_popup_city}
+              placeholder={dataLang?.client_popup_city || 'client_popup_days'}
               options={isState.dataCity}
               value={isState.valueCt}
               onChange={(e) => queryState({ valueCt: e })}

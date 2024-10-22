@@ -19,6 +19,8 @@ import FormContactInfo from "../form/formContactInfo";
 import FormContactDelivery from "../form/formDelivery";
 import PopupCustom from "@/components/UI/popup";
 import { useWardList } from "@/hooks/common/useAddress";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import ButtonCancel from "@/components/UI/button/buttonCancel";
 
 const initalState = {
     open: false,
@@ -361,21 +363,21 @@ const Popup_dskh = (props) => {
                         className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                             }  px-4 py-2 outline-none font-semibold`}
                     >
-                        {props.dataLang?.client_popup_general}
+                        {props.dataLang?.client_popup_general || 'client_popup_general'}
                     </button>
                     <button
                         onClick={() => _HandleSelectTab(1)}
                         className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                             }  px-4 py-2 outline-none font-semibold`}
                     >
-                        {props.dataLang?.client_popup_contact}
+                        {props.dataLang?.client_popup_contact || 'client_popup_contact'}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 2)}
                         className={`${tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                             }  px-4 py-2 outline-none font-semibold`}
                     >
-                        {props.dataLang?.client_popup_devivelyInfo}
+                        {props.dataLang?.client_popup_devivelyInfo || 'client_popup_devivelyInfo'}
                     </button>
                 </div>
                 <div className="mt-4">
@@ -405,12 +407,12 @@ const Popup_dskh = (props) => {
                                                 onChangOptions={onChangOptions}
                                                 onDelete={handleQueryId}
                                             >
-                                                <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
+                                                <IconDelete className="transition duration-200 group-hover:text-white animate-bounce ease-linea" />
                                             </FormContactInfo>
                                         ))}
                                         <ButtoonAdd onClick={() => _HandleAddNew()}>
                                             <IconAdd className="animate-bounce" />
-                                            {props.dataLang?.client_popup_addcontact}
+                                            {props.dataLang?.client_popup_addcontact || 'client_popup_addcontact'}
                                         </ButtoonAdd>
                                     </div>
                                 </Customscrollbar>
@@ -428,31 +430,28 @@ const Popup_dskh = (props) => {
                                                 onChangOptionsDelivery={onChangOptionsDelivery}
                                                 onDelete={handleQueryId}
                                             >
-                                                <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
+                                                <IconDelete className="transition duration-200 group-hover:text-white animate-bounce ease-linea" />
                                             </FormContactDelivery>
                                         ))}
                                         <ButtoonAdd onClick={_HandleAddNewDelivery.bind(this)}>
                                             <IconAdd className="animate-bounce" />
-                                            {props.dataLang?.client_popup_devivelyAdd}
+                                            {props.dataLang?.client_popup_devivelyAdd || 'client_popup_devivelyAdd'}
                                         </ButtoonAdd>
                                     </div>
                                 </Customscrollbar>
                             </div>
                         )}
-                        <div className="text-right mt-5 space-x-2">
-                            <button
-                                type="button"
+                        <div className="mt-5 space-x-2 text-right">
+                            <ButtonCancel
+                                dataLang={props.dataLang}
                                 onClick={() => queryState({ open: false })}
                                 className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD] hover:scale-105 transition-all ease-linear"
-                            >
-                                {props.dataLang?.branch_popup_exit}
-                            </button>
-                            <button
-                                type="submit"
+                            />
+                            <ButtonSubmit
+                                dataLang={props.dataLang}
+                                onClick={() => { }}
                                 className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
-                            >
-                                {props.dataLang?.branch_popup_save}
-                            </button>
+                            />
                         </div>
                     </form>
                 </div>
