@@ -10,25 +10,21 @@ import PopupCustom from "@/components/UI/popup";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
+import { isAllowedNumberThanWarning } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash as IconDelete } from "iconsax-react";
 import Image from "next/image";
 import { memo, useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import { FaBox } from "react-icons/fa";
-import { RiBox3Fill } from "react-icons/ri";
-import DatePicker from "react-datepicker";
 import { MdClear } from "react-icons/md";
+import { RiBox3Fill } from "react-icons/ri";
 
-const initilaState = {
+const stateDefault = {
     open: false,
-    item: { bom: [] },
-    dtPoi: {},
-    dtPois: {},
-    warehouseImport: [],
-    warehouseExport: [],
     idWarehouseExport: [],
     idWarehouseImport: null,
     errorWarehouseImport: false,
@@ -37,8 +33,17 @@ const initilaState = {
     errorLot: false,
     errorDate: false,
     lot: "",
-    date: null,
-    serial: ""
+    serial: "",
+    date: null
+}
+
+const initilaState = {
+    item: { bom: [] },
+    dtPoi: {},
+    dtPois: {},
+    warehouseImport: [],
+    warehouseExport: [],
+    ...stateDefault
 };
 
 const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...props }) => {
@@ -50,12 +55,11 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
 
     const [isState, sIsState] = useState(initilaState);
 
+    const formanumber = (num) => formatNumberConfig(+num, dataSeting)
+
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
-
-    const formanumber = (num) => formatNumberConfig(+num, dataSeting)
-
 
     const handingPopup = useMutation({
         mutationFn: (data) => {
@@ -72,10 +76,12 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
         queryKey: ["api_data_products", isState.open],
         queryFn: async () => {
             let formData = new FormData();
+
             formData.append('poi_id', dataStage?.poi_id);
             formData.append('pois_id', dataStage?.id);
             formData.append('type', dataStage?.type);
             formData.append('bom_id', dataStage?.bom_id);
+
             const { data, ...res } = await apiProductionsOrders.apiDataProducts(formData);
 
             const newData = {
@@ -164,10 +170,23 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
         queryState({ errorWarehouseExport: false })
     }, [isState.idWarehouseExport])
 
+    useEffect(() => {
+        queryState({ errorLot: false })
+    }, [isState.lot])
+
+    useEffect(() => {
+        queryState({ errorDate: false })
+    }, [isState.date])
+
+    useEffect(() => {
+        queryState({ errorSerial: false })
+    }, [isState.errorSerial])
+
     const handleSubmit = (e) => {
         try {
             e.preventDefault();
             let formData = new FormData()
+            // Bắt đầu sản xuất công đoạn
             if (type == "begin_production") {
                 formData.append('pois_id', dataStage?.id)
                 formData.append('status', 1)
@@ -185,22 +204,42 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             }
 
             if (type == "end_production") {
-                if (!isState.idWarehouseImport || isState.idWarehouseExport?.length == 0 ||
-                    (isState?.dtPois?.final_stage == "1" && (!isState.lot || !isState.date || !isState.serial))
-                ) {
-                    queryState({
-                        errorWarehouseImport: !isState.idWarehouseImport,
-                        errorWarehouseExport: isState.idWarehouseExport?.length == 0,
-                        errorSerial: isState?.dtPois?.final_stage == "1" && !isState.serial,
-                        errorLot: isState?.dtPois?.final_stage == "1" && !isState.lot,
-                        errorDate: isState?.dtPois?.final_stage == "1" && !isState.date
-                    })
-                    isShow('error', 'Vui lòng kiểm tra dữ liệu!')
+                if (isState?.dtPois?.final_stage == "1" && ((dataProductSerial?.is_enable === "1" && !isState.serial) ||
+                    (dataProductExpiry?.is_enable === "1" && (!isState.lot || !isState.date)) ||
+                    !isState.idWarehouseImport ||
+                    isState.idWarehouseExport?.length == 0
+                )) {
+
+                    if (dataProductSerial?.is_enable === "1" && !isState.serial) {
+                        queryState({ errorSerial: !isState.serial })
+                    }
+
+                    if (dataProductExpiry?.is_enable === "1" && (!isState.lot || !isState.date)) {
+                        queryState({ errorLot: !isState.lot, errorDate: !isState.date })
+                    }
+
+                    if (!isState.idWarehouseImport || isState.idWarehouseExport?.length == 0) {
+                        queryState({
+                            errorWarehouseImport: !isState.idWarehouseImport,
+                            errorWarehouseExport: isState.idWarehouseExport?.length == 0
+                        })
+                    }
+                    isShow('error', dataLang.data_null || "data_null")
                     return
+                } else {
+                    if (!isState.idWarehouseImport || isState.idWarehouseExport?.length == 0) {
+                        queryState({
+                            errorWarehouseImport: !isState.idWarehouseImport,
+                            errorWarehouseExport: isState.idWarehouseExport?.length == 0,
+                        })
+                        isShow('error', dataLang.data_null || "data_null")
+                        return
+                    }
                 }
 
+
                 formData.append("warehouse_import_id", isState.idWarehouseImport?.value ?? "")
-                isState.idWarehouseExport.forEach((e, index) => {
+                isState.idWarehouseExport.forEach((e) => {
                     formData.append(`warehouse_export_id[]`, e?.value)
                 })
 
@@ -262,16 +301,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                         if (data?.isSuccess) {
                             isShow('success', data?.message)
                             queryClient.invalidateQueries(["api_item_orders_detail", true])
-                            queryState({
-                                open: false,
-                                idWarehouseExport: [],
-                                idWarehouseImport: null,
-                                errorWarehouseImport: false,
-                                errorWarehouseExport: false,
-                                errorSerial: false,
-                                errorLot: false,
-                                errorDate: false
-                            })
+                            queryState({ ...stateDefault })
                             return
                         }
                         isShow('error', data?.message)
@@ -288,27 +318,25 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
 
     return (
         <PopupCustom
-            title={type === "begin_production" ? "Bạn có muốn bắt đầu sản xuất công đoạn này ?" : `Hoàn thành công đoạn ${dataStage?.stage_name?.toUpperCase()}`}
+            title={type === "begin_production"
+                ?
+                dataLang?.productions_orders_popup_title_stage || 'productions_orders_popup_title_stage'
+                :
+                `${dataLang?.productions_orders_popup_complete_step || 'productions_orders_popup_complete_step'} ${dataStage?.stage_name?.toUpperCase()}`}
             button={props.children}
             onClickOpen={() => {
                 if (type == 'done_production') {
-                    return isShow("error", "Công đoạn đã hoàn thành")
+                    return isShow("error", dataLang?.productions_orders_popup_complete_has || 'productions_orders_popup_complete_has')
                 }
                 if (type == 'begin_production' && dataStage?.begin_production == 1) {
-                    return isShow("error", "Công đoạn đã bắt đầu sản xuất")
+                    return isShow("error", dataLang?.productions_orders_popup_complete_has_begun || 'productions_orders_popup_complete_has_begun')
                 }
                 queryState({ open: true })
             }}
             lockScroll={true}
             open={isState.open}
             onClose={() => {
-                queryState({
-                    open: false,
-                    idWarehouseExport: [],
-                    idWarehouseImport: null,
-                    errorWarehouseImport: false,
-                    errorWarehouseExport: false
-                })
+                queryState({ ...stateDefault })
             }}
             classNameBtn={`${props?.className}`}
         >
@@ -321,7 +349,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                             <div className="flex items-center gap-2 bg-[#EEF1FC] p-3 rounded-lg">
                                 <RiBox3Fill className="text-[#5770F7]" size={20} />
                                 <h2 className="font-medium  uppercase text-[#5770F7] 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
-                                    Thành phẩm
+                                    {dataLang?.productions_orders_popup_finished_product || 'productions_orders_popup_finished_product'}
                                 </h2>
                             </div>
                             <div className="flex items-start bg-[#F8FAFC] p-3 rounded-sm">
@@ -346,7 +374,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <h1 className="text-xs italic font-medium 2xl:text-sm text-black/60">
-                                                Cần SX: <span className="font-medium text-black">{formanumber(isState.item.quantityDefault)}</span> <span className="lowercase">{isState?.item?.unit_name}</span>
+                                                {dataLang?.productions_orders_popup_need_production || 'productions_orders_popup_need_production'}:
+                                                <span className="font-medium text-black pl-0.5">{formanumber(isState.item.quantityDefault)}</span> <span className="lowercase">{isState?.item?.unit_name}</span>
                                             </h1>
                                         </div>
                                     </div>
@@ -354,23 +383,13 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 <div className="w-[55%] 2xl:w-[55%] lg:w-[60%] flex items-center gap-2">
                                     <div className="flex flex-col w-full gap-1">
                                         <div className="flex items-center justify-between w-full gap-2">
-                                            <div className="flex flex-col w-1/2 gap-2">
-                                                <h1 className="text-xs font-medium 2xl:text-sm">Số lượng hoàn thành</h1>
+                                            <div className="flex flex-col w-1/2 gap-0.5">
+                                                <h1 className="text-xs font-medium 2xl:text-sm">{dataLang?.productions_orders_popup_quantity_completed || 'productions_orders_popup_quantity_completed'}</h1>
                                                 <div className="bg-[#BAD1FE] rounded-xl flex justify-center items-center py-[1px]">
                                                     <InPutNumericFormat
                                                         className={'border-2 text-right py-1.5 px-2 text-base focus:outline-none border-[#BAD1FE] bg-white w-[70%]'}
                                                         placeholder={'0'}
-                                                        isAllowed={(values) => {
-                                                            const { floatValue, value } = values;
-                                                            if (floatValue == 0) {
-                                                                return true;
-                                                            }
-                                                            if (floatValue < 0) {
-                                                                isShow('warning', 'Vui lòng nhập lớn hơn 0');
-                                                                return false
-                                                            }
-                                                            return true
-                                                        }}
+                                                        isAllowed={(e) => isAllowedNumberThanWarning(e, dataLang)}
                                                         onValueChange={(value) => {
                                                             handChangeQuantityParent(value)
                                                         }}
@@ -378,8 +397,8 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col w-1/2 gap-2">
-                                                <h1 className="text-xs font-medium 2xl:text-sm">Kho nhập</h1>
+                                            <div className="flex flex-col w-1/2 gap-0.5">
+                                                <h1 className="text-xs font-medium 2xl:text-sm">{dataLang?.productions_orders_popup_import_warehouse || 'productions_orders_popup_import_warehouse'}</h1>
                                                 <SelectCore
                                                     options={isState.warehouseImport}
                                                     onChange={(e) => { queryState({ idWarehouseImport: e }); }}
@@ -387,7 +406,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                     isClearable={true}
                                                     closeMenuOnSelect={true}
                                                     hideSelectedOptions={false}
-                                                    placeholder={'Kho nhập'}
+                                                    placeholder={dataLang?.productions_orders_popup_import_warehouse || 'productions_orders_popup_import_warehouse'}
                                                     className={`${isState.errorWarehouseImport ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} placeholder:text-slate-300 w-full z-50 rounded-xl bg-[#ffffff] text-[#52575E] font-normal outline-none border`}
                                                     isSearchable={true}
                                                     style={{
@@ -427,23 +446,26 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                 />
                                             </div>
                                         </div>
-                                        {isState?.dtPois?.final_stage == "1" &&
+                                        {
+                                            isState?.dtPois?.final_stage == "1" &&
                                             <div className="flex items-center justify-between gap-2">
-                                                {dataProductSerial?.is_enable === "1" && (
-                                                    <div className="w-1/2">
-                                                        <div className="flex flex-col items-center justify-center h-full p-1">
-                                                            <input
-                                                                placeholder="Serial"
-                                                                value={isState.serial}
-                                                                onChange={(e) => {
-                                                                    queryState({ serial: e.target.value })
-                                                                }}
-                                                                className={`border ${isState.errorSerial ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} focus:border-[#92BFF7]  placeholder:text-slate-400 w-full bg-[#ffffff]
+                                                {
+                                                    dataProductSerial?.is_enable === "1" && (
+                                                        <div className="w-1/2">
+                                                            <div className="flex flex-col items-center justify-center h-full p-1">
+                                                                <input
+                                                                    placeholder="Serial"
+                                                                    value={isState.serial}
+                                                                    onChange={(e) => {
+                                                                        queryState({ serial: e.target.value })
+                                                                    }}
+                                                                    className={`border ${isState.errorSerial ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} focus:border-[#92BFF7]  placeholder:text-slate-400 w-full bg-[#ffffff]
                                                                 rounded-xl text-[#52575E] font-normal p-1 outline-none cursor-pointer`}
-                                                            />
+                                                                />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                    )
+                                                }
                                                 {
                                                     // dataMaterialExpiry.is_enable ===
                                                     //     "1" ||
@@ -503,13 +525,13 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                             <div className="flex items-center gap-2 bg-[#FCF3EE] p-3 rounded-lg">
                                 <FaBox className="text-[#FF641C]" size={16} />
                                 <h2 className="font-medium  uppercase text-[#FF641C] 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
-                                    Nguyên vật liệu
+                                    {dataLang?.productions_orders_popup_raw_materials || 'productions_orders_popup_raw_materials'}
                                 </h2>
                             </div>
                             <div className="grid grid-cols-2 gap-5">
                                 <div className="">
                                     <label className="text-[#344054] font-normal 2xl:text-sm text-xs mb-1 ">
-                                        Chọn kho xuất
+                                        {dataLang?.productions_orders_popup_export_warehouse || 'productions_orders_popup_export_warehouse'}
                                         <span className="pl-1 text-red-500">*</span>
                                     </label>
                                     <SelectCore
@@ -524,7 +546,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={'Chọn kho xuất'}
+                                        placeholder={dataLang?.productions_orders_popup_export_warehouse || 'productions_orders_popup_export_warehouse'}
                                         className={`${isState.errorWarehouseExport ? 'border-[#FF0000]' : 'border-[#d0d5dd]'} placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded-xl text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -565,7 +587,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                 </div>
                                 <div className="">
                                     <label className="text-[#344054] font-normal 2xl:text-sm text-xs mb-1 ">
-                                        Thêm NVL/BTP xuất kho
+                                        {dataLang?.productions_orders_popup_add_raw_materials || 'productions_orders_popup_add_raw_materials'}
                                         <span className="pl-1 text-red-500">*</span>
                                     </label>
                                     <SelectCore
@@ -577,7 +599,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={'Chọn NVL/BTP'}
+                                        placeholder={dataLang?.productions_orders_popup_select_raw_materials || 'productions_orders_popup_select_raw_materials'}
                                         className={`placeholder:text-slate-300 rounded-xl w-full z-30 bg-[#ffffff] text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -657,35 +679,25 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                                                                     <h1 className="text-xs italic font-normal">{e?.item_code} - {e?.product_variation}</h1>
                                                                     {
                                                                         e?.stage_name && <h3 className="text-xs font-normal">
-                                                                            <span className="pr-1">Công đoạn trước:</span>
+                                                                            <span className="pr-1">{dataLang?.productions_orders_popup_previous_stage || 'productions_orders_popup_previous_stage'}:</span>
                                                                             <span className="border-orange-400 border text-orange-500 px-1 py-0.5 rounded text-[10px]">{e?.stage_name}</span>
                                                                         </h3>
                                                                     }
                                                                     <div className="flex items-center justify-between divide-x">
                                                                         <h1 className="w-1/2 text-xs font-medium 2xl:text-sm text-black/60">
-                                                                            Tồn kho: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span> <span className="lowercase">{e?.unit_name_primary}</span>
+                                                                            {dataLang?.productions_orders_popup_inventory || 'productions_orders_popup_inventory'}: <span className="font-medium text-black">{formanumber(e?.quantity_warehouse)}</span> <span className="lowercase">{e?.unit_name_primary}</span>
                                                                         </h1>
                                                                         <h1 className="w-1/2 text-xs font-medium text-center 2xl:text-sm text-black/60">
-                                                                            Đã giữ kho: <span className="font-medium text-black">{formanumber(e?.quantity_keep)}</span> <span className="lowercase">{e?.unit_name_primary}</span>
+                                                                            {dataLang?.productions_orders_popup_stored || 'productions_orders_popup_stored'}: <span className="font-medium text-black">{formanumber(e?.quantity_keep)}</span> <span className="lowercase">{e?.unit_name_primary}</span>
                                                                         </h1>
                                                                     </div>
                                                                     <div className="flex items-center justify-between gap-2">
-                                                                        <h1 className="w-1/4 text-xs font-medium 2xl:text-sm">Số lượng xuất kho</h1>
+                                                                        <h1 className="w-1/4 text-xs font-medium 2xl:text-sm">{dataLang?.productions_orders_popup_quantity_release || 'productions_orders_popup_quantity_release'}</h1>
                                                                         <div className="bg-[#FFC8A6] rounded-xl flex justify-center items-center py-[1px] w-[73%]">
                                                                             <InPutNumericFormat
                                                                                 placeholder={'0'}
                                                                                 value={e?.quantity}
-                                                                                isAllowed={(values) => {
-                                                                                    const { floatValue, value } = values;
-                                                                                    if (floatValue == 0) {
-                                                                                        return true;
-                                                                                    }
-                                                                                    if (floatValue < 0) {
-                                                                                        isShow('warning', 'Vui lòng nhập lớn hơn 0');
-                                                                                        return false
-                                                                                    }
-                                                                                    return true
-                                                                                }}
+                                                                                isAllowed={(e) => isAllowedNumberThanWarning(e, dataLang)}
                                                                                 onValueChange={(value) => {
                                                                                     handChangeQuantity(value, e.item_id)
                                                                                 }}
@@ -718,22 +730,11 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 <div className="flex items-center justify-end gap-2 mt-2">
                     <ButtonCancel
                         loading={false}
-                        onClick={() => {
-                            queryState({
-                                open: false,
-                                idWarehouseExport: [],
-                                idWarehouseImport: null,
-                                errorWarehouseImport: false,
-                                errorWarehouseExport: false,
-                                errorSerial: false,
-                                errorLot: false,
-                                errorDate: false
-                            })
-                        }}
+                        onClick={() => { queryState({ ...stateDefault }) }}
                         dataLang={dataLang}
                     />
                     <ButtonSubmit
-                        loading={false}
+                        loading={handingPopup.isPending}
                         dataLang={dataLang}
                         onClick={handleSubmit.bind(this)}
                     />

@@ -35,7 +35,7 @@ const TabSemi = memo(({ isState, handShowItem, isFetching, dataLang }) => {
                 <Customscrollbar className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[36vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto">
                     {isState?.listDataRight?.dataSemiItems?.length > 0 ? (
                         isState?.listDataRight?.dataSemiItems?.map((e) => (
-                            <div key={e.id} className="grid grid-cols-12 items-center ">
+                            <div key={e.id} className="grid items-center grid-cols-12 ">
                                 <div
                                     onClick={() => handShowItem(e.id, "dataSemiItems")}
                                     className="col-span-12 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded cursor-pointer"
@@ -49,63 +49,62 @@ const TabSemi = memo(({ isState, handShowItem, isFetching, dataLang }) => {
                                     />
                                     <h1 className="text-[#52575E] font-semibold 3xl:text-sm text-xs py-2">{e.title}</h1>
                                 </div>
-                                {e.showChild &&
-                                    e.arrListData.map((i, index) => (
-                                        <div
-                                            key={i.id}
-                                            className={`grid grid-cols-12 ${isState.dataModal.id == i.id ? "bg-gray-100" : ""} ${e.arrListData?.length - 1 == index ? "" : "border-b"} items-center col-span-12 group transition-all duration-150 ease-in-out`}
-                                        >
-                                            <h4 className="col-span-4 text-[#344054] font-normal text-xs flex flex-col py-2 px-4 gap-2">
-                                                <div className="border border-gray-400 w-fit px-2 py-1 rounded-xl flex items-center gap-1">
-                                                    <ModalImage
-                                                        small={i.childProducts?.image}
-                                                        large={i.childProducts?.image}
-                                                        width={18}
-                                                        height={18}
-                                                        alt={i.childProducts?.name}
-                                                        className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
-                                                    />
-                                                    <span className="text-[#9295A4] text-[11px]">
-                                                        {i.childProducts?.item_name} - SL:{" "}
-                                                        {i.childProducts?.quantity > 0 ? formatNumber(i.childProducts?.quantity) : "-"}{" "}
-                                                    </span>
+                                {e.showChild && e.arrListData.map((i, index) => (
+                                    <div
+                                        key={i.id}
+                                        className={`grid grid-cols-12 ${isState.dataModal.id == i.id ? "bg-gray-100" : ""} ${e.arrListData?.length - 1 == index ? "" : "border-b"} items-center col-span-12 group transition-all duration-150 ease-in-out`}
+                                    >
+                                        <h4 className="col-span-4 text-[#344054] font-normal text-xs flex flex-col py-2 px-4 gap-2">
+                                            <div className="flex items-center gap-1 px-2 py-1 border border-gray-400 w-fit rounded-xl">
+                                                <ModalImage
+                                                    small={i.childProducts?.image}
+                                                    large={i.childProducts?.image}
+                                                    width={18}
+                                                    height={18}
+                                                    alt={i.childProducts?.name}
+                                                    className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
+                                                />
+                                                <span className="text-[#9295A4] text-[11px]">
+                                                    {i.childProducts?.item_name} - SL:{" "}
+                                                    {i.childProducts?.quantity > 0 ? formatNumber(i.childProducts?.quantity) : "-"}{" "}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <FiCornerDownRight size={15} />
+                                                <ModalImage
+                                                    small={i.image}
+                                                    large={i.image}
+                                                    width={36}
+                                                    height={36}
+                                                    alt={i.name}
+                                                    className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                                />
+                                                <div className="flex flex-col gap-0.5">
+                                                    <h1 className={`${isState.dataModal.id == i.id ? "text-[#0F4F9E]" : "text-[#000000]"} group-hover:text-[#0F4F9E] font-semibold xl:text-sm text-xs`}  >
+                                                        {i.name}
+                                                    </h1>
+                                                    <h1 className="text-[#9295A4] font-normal text-[11px]">
+                                                        {i.code} - {i.itemVariation}
+                                                    </h1>
                                                 </div>
-                                                <div className="flex items-start gap-2">
-                                                    <FiCornerDownRight size={15} />
-                                                    <ModalImage
-                                                        small={i.image}
-                                                        large={i.image}
-                                                        width={36}
-                                                        height={36}
-                                                        alt={i.name}
-                                                        className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
-                                                    />
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <h1 className={`${isState.dataModal.id == i.id ? "text-[#0F4F9E]" : "text-[#000000]"} group-hover:text-[#0F4F9E] font-semibold xl:text-sm text-xs`}  >
-                                                            {i.name}
-                                                        </h1>
-                                                        <h1 className="text-[#9295A4] font-normal text-[11px]">
-                                                            {i.code} - {i.itemVariation}
-                                                        </h1>
-                                                    </div>
-                                                </div>
-                                            </h4>
-                                            <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
-                                                {i.unit}
-                                            </h4>
-                                            <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
-                                                {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
-                                            </h4>
-                                            <h4 className="col-span-5 flex items-center">
-                                                {i.processBar.map((j, JIndex) => {
-                                                    return (
-                                                        <div key={j.id} className="flex flex-col w-full items-start">
-                                                            {/* <div className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
+                                            </div>
+                                        </h4>
+                                        <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                            {i.unit}
+                                        </h4>
+                                        <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                            {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
+                                        </h4>
+                                        <h4 className="flex items-center col-span-5">
+                                            {i.processBar.map((j, JIndex) => {
+                                                return (
+                                                    <div key={j.id} className="flex flex-col items-start w-full">
+                                                        {/* <div className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
                                                                 {moment(j.date).format('DD/MM/YYYY, HH:mm:ss')}
                                                                 <span>{j.status}</span>
                                                                 <span>({moment(j.date).format('DD/MM/YYYY')})</span>
                                                             </div> */}
-                                                            {/* <p
+                                                        {/* <p
                                                                 className={`${
                                                                     j.active ? "text-[#0BAA2E]" : "text-gray-500"
                                                                 } font-normal 3xl:text-[10px] text-[9px] flex flex-col`}
@@ -114,7 +113,7 @@ const TabSemi = memo(({ isState, handShowItem, isFetching, dataLang }) => {
                                                                 <span>({moment(j.date).format("DD/MM/YYYY")})</span>
                                                             </p> */}
 
-                                                            {/* <li
+                                                        {/* <li
                                                                 className={`${
                                                                     JIndex == i.processBar.length - 1
                                                                         ? "flex w-full relative text-gray-900 "
@@ -125,7 +124,7 @@ const TabSemi = memo(({ isState, handShowItem, isFetching, dataLang }) => {
                                                                           }   after:inline-block after:absolute after:top-1 after:left-[25px]`
                                                                 }`}
                                                             >
-                                                                <div className="block whitespace-nowrap z-10">
+                                                                <div className="z-10 block whitespace-nowrap">
                                                                     <span
                                                                         className={`w-[10px] h-[10px]  border-2  ${
                                                                             j.active
@@ -157,29 +156,29 @@ const TabSemi = memo(({ isState, handShowItem, isFetching, dataLang }) => {
                                                                     </p>
                                                                 </div>
                                                             </li> */}
-                                                            <li className={`${JIndex == i.processBar.length - 1 ? "list-none flex w-full relative text-gray-900 "
-                                                                : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 
+                                                        <li className={`${JIndex == i.processBar.length - 1 ? "list-none flex w-full relative text-gray-900 "
+                                                            : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 
                                                                     ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} after:inline-block after:absolute after:top-1 after:left-[15px]`}`}
-                                                            >
-                                                                <div className="block whitespace-nowrap z-10 ">
-                                                                    <span className={`w-[10px] h-[10px]  border-2  ${j.active ? "bg-[#00C170] border-[#00C170]" : "bg-gray-500 border-gray-500"} rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}></span>
-                                                                    <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal absolute  3xl:text-[11px] text-[10px]`} >
-                                                                        {j.title}
-                                                                    </p>
-                                                                    <p className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"} text-[#0BAA2E] font-normal text-[10px]`}  >
-                                                                        SL:
-                                                                        <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
-                                                                            {j.quantity > 0 ? formatNumber(j.quantity) : "-"}
-                                                                        </span>
-                                                                    </p>
-                                                                </div>
-                                                            </li>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </h4>
-                                        </div>
-                                    ))}
+                                                        >
+                                                            <div className="z-10 block whitespace-nowrap ">
+                                                                <span className={`w-[10px] h-[10px]  border-2  ${j.active ? "bg-[#00C170] border-[#00C170]" : "bg-gray-500 border-gray-500"} rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}></span>
+                                                                <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal absolute  3xl:text-[11px] text-[10px]`} >
+                                                                    {j.title}
+                                                                </p>
+                                                                <p className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"} text-[#0BAA2E] font-normal text-[10px]`}  >
+                                                                    SL:
+                                                                    <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
+                                                                        {j.quantity > 0 ? formatNumber(j.quantity) : "-"}
+                                                                    </span>
+                                                                </p>
+                                                            </div>
+                                                        </li>
+                                                    </div>
+                                                );
+                                            })}
+                                        </h4>
+                                    </div>
+                                ))}
                             </div>
                         ))
                     ) : (

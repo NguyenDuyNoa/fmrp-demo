@@ -44,12 +44,24 @@ const isAllowedNumber = (values) => {
         return true;
     }
 }
+const isAllowedNumberThanWarning = (values, dataLang) => {
+    const { floatValue, value } = values;
+    if (floatValue == 0) {
+        return true;
+    }
+    if (floatValue < 0) {
+        isShow('warning', dataLang?.productions_orders_popup_please_enter_greater || 'productions_orders_popup_please_enter_greater');
+        return false
+    }
+    return true
+}
 
 
 
 export {
     isAllowedDiscount,
     isAllowedNumber,
+    isAllowedNumberThanWarning,
     convertArrayToObject,
     parseStringToArray,
     parseStringToObject,

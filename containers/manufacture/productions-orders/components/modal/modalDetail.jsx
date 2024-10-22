@@ -16,38 +16,7 @@ import TabProcessingCost from "./tabProcessingCost";
 import TabRecallMaterials from "./tabRecallMaterials";
 import TabWarehouseHistory from "./tabWarehouseHistory";
 
-const listTab = [
-    {
-        id: 1,
-        name: "Thông tin",
-        count: 0,
-    },
-    {
-        id: 2,
-        name: "Tình hình xuất NVL",
-        count: 0,
-    },
-    {
-        id: 3,
-        name: "Lịch sử xuất NVL/BTP",
-        count: 1,
-    },
-    {
-        id: 4,
-        name: "Lịch sử nhập kho TP",
-        count: 1,
-    },
-    {
-        id: 5,
-        name: "Thu hồi NVL",
-        count: 2,
-    },
-    {
-        id: 6,
-        name: "Chi phí NVL - Gia công",
-        count: 0,
-    },
-];
+
 
 const initialState = {
     isTab: 1,
@@ -77,6 +46,39 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
             number: 0,
             bgColor: "#FFEEF0",
             bgSmall: "#EE1E1E",
+        },
+    ];
+
+    const listTab = [
+        {
+            id: 1,
+            name: dataLang?.productions_orders_modal_information || 'productions_orders_modal_information',
+            count: 0,
+        },
+        {
+            id: 2,
+            name: dataLang?.productions_orders_modal_appeared || 'productions_orders_modal_appeared',
+            count: 0,
+        },
+        {
+            id: 3,
+            name: dataLang?.productions_orders_modal_history_exporting_materials || 'productions_orders_modal_history_exporting_materials',
+            count: 1,
+        },
+        {
+            id: 4,
+            name: dataLang?.productions_orders_modal_history_import_product || 'productions_orders_modal_history_import_product',
+            count: 1,
+        },
+        {
+            id: 5,
+            name: dataLang?.productions_orders_modal_recovery_materials || 'productions_orders_modal_recovery_materials',
+            count: 2,
+        },
+        {
+            id: 6,
+            name: dataLang?.productions_orders_modal_costs_processing || 'productions_orders_modal_costs_processing',
+            count: 0,
         },
     ];
 
@@ -253,25 +255,27 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                         </div>
                     </div>
                     <div className={`grid grid-cols-3 ${width >= 1100 ? "col-span-7" : "col-span-12"}  gap-5`}>
-                        {dataTotal.map((e, i) => (
-                            <div
-                                key={i}
-                                style={{ backgroundColor: `${e.bgColor}` }}
-                                className={`w-full p-4 rounded-md space-y-1.5`}
-                            >
-                                <h4 className={`text-[#3A3E4C] font-normal ${width >= 1100 ? "text-base" : "text-xs"}`}>
-                                    {e.title}
-                                </h4>
-                                <div className="flex items-end justify-between">
-                                    <h6
-                                        style={{ backgroundColor: `${e.bgSmall}` }}
-                                        className={`text-base font-medium text-white px-3 py-1 flex flex-col justify-center items-center rounded-md`}
-                                    >
-                                        {e.number}
-                                    </h6>
+                        {
+                            dataTotal.map((e, i) => (
+                                <div
+                                    key={i}
+                                    style={{ backgroundColor: `${e.bgColor}` }}
+                                    className={`w-full p-4 rounded-md space-y-1.5`}
+                                >
+                                    <h4 className={`text-[#3A3E4C] font-normal ${width >= 1100 ? "text-base" : "text-xs"}`}>
+                                        {e.title}
+                                    </h4>
+                                    <div className="flex items-end justify-between">
+                                        <h6
+                                            style={{ backgroundColor: `${e.bgSmall}` }}
+                                            className={`text-base font-medium text-white px-3 py-1 flex flex-col justify-center items-center rounded-md`}
+                                        >
+                                            {e.number}
+                                        </h6>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        }
                     </div>
                 </div>
 
