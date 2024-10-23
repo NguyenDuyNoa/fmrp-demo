@@ -1,16 +1,6 @@
-import React from "react";
-import Select, { components } from "react-select";
-import {
-  Edit as IconEdit,
-  Grid6 as IconExcel,
-  Trash as IconDelete,
-  SearchNormal1 as IconSearch,
-  Add as IconAdd,
-} from "iconsax-react";
 import Loading from "@/components/UI/loading/loading";
+import Select from "react-select";
 import DeleteButton from "./button/buttonDeleteSlect";
-import { motion } from "framer-motion";
-import AnimatedDiv from "../../../components/UI/motions";
 
 const FormClient = ({
   onLoadingListData,
