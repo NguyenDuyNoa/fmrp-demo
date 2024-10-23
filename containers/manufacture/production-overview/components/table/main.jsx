@@ -1,13 +1,11 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { PresentionChart } from "iconsax-react";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+
 const Main = ({ handleIsShowModel, sIsshow, data, updatedData }) => {
     return (
         <>
-            <div className="relative flex item-center gap-4  w-full overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+            <div className="relative flex w-full gap-4 overflow-x-auto overflow-y-hidden item-center scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 {updatedData.map((e, index) => (
                     <div key={index} className="">
                         <div className="flex w-[330px] justify-center items-center gap-2">
@@ -34,7 +32,7 @@ const Main = ({ handleIsShowModel, sIsshow, data, updatedData }) => {
                             style={{
                                 backgroundColor: e.color,
                             }}
-                            className="w-full h-2  rounded-2xl"
+                            className="w-full h-2 rounded-2xl"
                         ></div>
 
                         {/* <ScrollArea
@@ -86,7 +84,7 @@ const Main = ({ handleIsShowModel, sIsshow, data, updatedData }) => {
                                                     src={ce.image}
                                                     width={80}
                                                     height={84}
-                                                    className="w-full h-full object-cover rounded-xl "
+                                                    className="object-cover w-full h-full rounded-xl "
                                                 />
                                             </div>
                                             <div className="col-span-7">
@@ -99,7 +97,7 @@ const Main = ({ handleIsShowModel, sIsshow, data, updatedData }) => {
                                                 {ce.manufacture && (
                                                     <h1
                                                         style={{ backgroundColor: ce.colorNo }}
-                                                        className="p-1 rounded-lg text-white text-xs text-center"
+                                                        className="p-1 text-xs text-center text-white rounded-lg"
                                                     >
                                                         {ce.no}
                                                     </h1>
@@ -175,7 +173,7 @@ const Main = ({ handleIsShowModel, sIsshow, data, updatedData }) => {
                                                     src={ce.image}
                                                     width={80}
                                                     height={84}
-                                                    className="w-full h-full object-cover rounded-xl "
+                                                    className="object-cover w-full h-full rounded-xl "
                                                 />
                                             </div>
                                             <div className="col-span-7">
@@ -188,7 +186,7 @@ const Main = ({ handleIsShowModel, sIsshow, data, updatedData }) => {
                                                 {ce.manufacture && (
                                                     <h1
                                                         style={{ backgroundColor: ce.colorNo }}
-                                                        className="p-2 my-1 rounded-lg text-white text-xs text-center"
+                                                        className="p-2 my-1 text-xs text-center text-white rounded-lg"
                                                     >
                                                         {ce.no}
                                                     </h1>

@@ -6,12 +6,6 @@ import Select, { components } from 'react-select';
 import { v4 as uuidv4 } from 'uuid';
 import { _ServerInstance as Axios } from '/services/axios';
 
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-  ssr: false,
-});
-
-
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate';
 import { formatMoment } from '@/utils/helpers/formatMoment';
 import { Add, Add as IconAdd, Trash as IconDelete, Minus } from "iconsax-react";
@@ -851,9 +845,9 @@ const Index = (props) => {
     return (
       <components.MenuList {...props}>
         {allItems?.length > 0 &&
-          <div className='grid grid-cols-2 items-center  cursor-pointer'>
-            <div className='hover:bg-slate-200 p-2 col-span-1 text-center ' onClick={handleSelectAll}>Chọn tất cả</div>
-            <div className='hover:bg-slate-200 p-2 col-span-1 text-center' onClick={handleDeselectAll}>Bỏ chọn tất cả</div>
+          <div className='grid items-center grid-cols-2 cursor-pointer'>
+            <div className='col-span-1 p-2 text-center hover:bg-slate-200 ' onClick={handleSelectAll}>Chọn tất cả</div>
+            <div className='col-span-1 p-2 text-center hover:bg-slate-200' onClick={handleDeselectAll}>Bỏ chọn tất cả</div>
           </div>
         }
         {props.children}
@@ -1014,19 +1008,19 @@ const Index = (props) => {
             <span className='text-[#141522]/40'>/</span>
             <h6>{id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}</h6>
           </div>
-          <div className='flex justify-between items-center'>
-            <h2 className='xl:text-2xl text-xl '>{dataLang?.import_title || "import_title"}</h2>
-            <div className="flex justify-end items-center">
+          <div className='flex items-center justify-between'>
+            <h2 className='text-xl xl:text-2xl '>{dataLang?.import_title || "import_title"}</h2>
+            <div className="flex items-center justify-end">
               <button
                 onClick={() => router.back()}
                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105">{dataLang?.import_comeback || "import_comeback"}</button>
             </div>
           </div>
 
-          <div className=' w-full rounded'>
+          <div className='w-full rounded '>
             <div className=''>
               <h2 className='font-normal bg-[#ECF0F4] p-2'>{dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>
-              <div className="grid grid-cols-10  gap-3 items-center mt-2">
+              <div className="grid items-center grid-cols-10 gap-3 mt-2">
                 <div className='col-span-2'>
                   <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_code_vouchers || "import_code_vouchers"} </label>
                   <input
@@ -1184,9 +1178,9 @@ const Index = (props) => {
             </div>
           </div>
           <div className=' bg-[#ECF0F4] p-2 grid  grid-cols-12'>
-            <div className='font-normal col-span-12'>{dataLang?.import_item_information || "import_item_information"}</div>
+            <div className='col-span-12 font-normal'>{dataLang?.import_item_information || "import_item_information"}</div>
           </div>
-          <div className='grid grid-cols-10 items-end gap-3'>
+          <div className='grid items-end grid-cols-10 gap-3'>
             <div div className='col-span-2  z-[100] my-auto'>
               <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_click_items || "import_click_items"} </label>
               <Select
@@ -1200,12 +1194,12 @@ const Index = (props) => {
                 formatOptionLabel={(option) => {
                   if (option.value === "0") {
                     return (
-                      <div className='text-gray-400 font-medium'>{option.label}</div>
+                      <div className='font-medium text-gray-400'>{option.label}</div>
                     )
                   }
                   else if (option.value === null) {
                     return (
-                      <div className='text-gray-400 font-medium'>{option.label}</div>
+                      <div className='font-medium text-gray-400'>{option.label}</div>
                     )
                   }
                   else {
@@ -1234,7 +1228,7 @@ const Index = (props) => {
                           <div className='text-right opacity-0'>{"0"}</div>
                           <div className='flex gap-2'>
                             <div className='flex items-center gap-2'>
-                              <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5>
+                              <h5 className='font-normal text-gray-400'>{dataLang?.purchase_survive || "purchase_survive"}:</h5>
                               <h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
                             </div>
                           </div>
@@ -1287,7 +1281,7 @@ const Index = (props) => {
                 onChange={_HandleChangeInput.bind(this, "khotong")}
                 value={khotong}
                 formatOptionLabel={(option) => (
-                  <div className='flex justify-start items-center gap-1 '>
+                  <div className='flex items-center justify-start gap-1 '>
                     <h2>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
                     <h2>{dataLang?.import_Warehouse_location || "import_Warehouse_ocation"}</h2>
                     <h2>{option?.label}</h2>
@@ -1364,7 +1358,7 @@ const Index = (props) => {
                               onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang", index)}
                               value={e?.mathang}
                               formatOptionLabel={(option) => (
-                                <div className='flex items-center  justify-between py-2'>
+                                <div className='flex items-center justify-between py-2'>
                                   <div className='flex items-center gap-2'>
                                     <div className='w-[40px] h-h-[60px]'>
                                       {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" className='object-cover rounded' />) :
@@ -1434,7 +1428,7 @@ const Index = (props) => {
                             <div className='flex items-center space-x-5'>
                               {
                                 index > 0 &&
-                                <button onClick={_HandleActionItem.bind(this, e?.id, "add")} className='w-10 h-10 rounded bg-slate-50 hover:bg-slate-100 transition flex flex-col justify-center items-center '><IconAdd /></button>
+                                <button onClick={_HandleActionItem.bind(this, e?.id, "add")} className='flex flex-col items-center justify-center w-10 h-10 transition rounded bg-slate-50 hover:bg-slate-100 '><IconAdd /></button>
                               }
                             </div>
                           </div>
@@ -1444,7 +1438,7 @@ const Index = (props) => {
                         {e?.child?.map(ce =>
                           <React.Fragment key={ce?.id}>
                             <div className='grid grid-cols-10'>
-                              <div className='col-span-1  my-auto'>
+                              <div className='col-span-1 my-auto'>
                                 <Select
                                   onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "khohang")}
                                   value={ce?.khohang}
@@ -1480,10 +1474,10 @@ const Index = (props) => {
 
                                 />
                               </div>
-                              <div className='col-span-1 text-end flex items-center justify-end'>
+                              <div className='flex items-center justify-end col-span-1 text-end'>
                                 <h3 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] 2xl:pr-0 xl:pr-0 pr-1'>{ce?.donvitinh}</h3>
                               </div>
-                              <div className='col-span-1 flex items-center justify-center'>
+                              <div className='flex items-center justify-center col-span-1'>
                                 <div className="flex items-center justify-center">
                                   <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 p-  bg-slate-200 rounded-full"
                                     onClick={() => handleDecrease(ce?.id)} disabled={index === 0}
@@ -1508,7 +1502,7 @@ const Index = (props) => {
                                   </button>
                                 </div>
                               </div>
-                              <div className='col-span-1 text-center flex items-center justify-center'>
+                              <div className='flex items-center justify-center col-span-1 text-center'>
                                 <NumericFormat
                                   value={ce?.dongia}
                                   disabled={index === 0}
@@ -1522,7 +1516,7 @@ const Index = (props) => {
                                   thousandSeparator=","
                                 />
                               </div>
-                              <div className='col-span-1 text-center flex items-center justify-center'>
+                              <div className='flex items-center justify-center col-span-1 text-center'>
                                 <NumericFormat
                                   value={ce?.chietkhau}
                                   disabled={index === 0}
@@ -1536,10 +1530,10 @@ const Index = (props) => {
                                   isNumericString={true}
                                 />
                               </div>
-                              <div className='col-span-1 text-right flex items-center justify-end'>
+                              <div className='flex items-center justify-end col-span-1 text-right'>
                                 <h3 className='px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{formatNumber(ce?.dongiasauck)}</h3>
                               </div>
-                              <div className='col-span-1 flex justify-center items-center'>
+                              <div className='flex items-center justify-center col-span-1'>
                                 <Select
                                   options={index === 0 ? [] : taxOptions}
                                   // onChange={_HandleChangeInputOption.bind(this, e?.id, "thue", index)}
@@ -1561,7 +1555,7 @@ const Index = (props) => {
                                   placeholder={dataLang?.import_from_tax || "import_from_tax"}
                                   hideSelectedOptions={false}
                                   formatOptionLabel={(option) => (
-                                    <div className='flex justify-start items-center gap-1 '>
+                                    <div className='flex items-center justify-start gap-1 '>
                                       <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
                                       <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
                                     </div>
@@ -1602,11 +1596,11 @@ const Index = (props) => {
                                   }}
                                 />
                               </div>
-                              <div className='col-span-1 text-right flex items-center justify-end'>
+                              <div className='flex items-center justify-end col-span-1 text-right'>
                                 {/* <h3 className='px-2'>{formatNumber(e.thanhtien)}</h3> */}
                                 <h3 className='px-2 2xl:text-[13px] xl:text-[13px] text-[12.5px]'>{formatNumber(ce?.thanhtien)}</h3>
                               </div>
-                              <div className='col-span-1 flex items-center justify-center'>
+                              <div className='flex items-center justify-center col-span-1'>
                                 <input
                                   value={ce?.ghichu}
                                   disabled={index === 0}
@@ -1618,7 +1612,7 @@ const Index = (props) => {
                                   className="focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                                 />
                               </div>
-                              <div className='col-span-1 flex items-center justify-center'>
+                              <div className='flex items-center justify-center col-span-1'>
                                 <button onClick={_HandleDeleteChild.bind(this, e.id, ce.id)} title='Xóa' className='text-red-500 hover:text-red-600'><IconDelete /></button>
                               </div>
                             </div>
@@ -1633,13 +1627,13 @@ const Index = (props) => {
             </div>
           </div>
           <div className='grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
-            <div className='col-span-2  flex items-center gap-2'>
+            <div className='flex items-center col-span-2 gap-2'>
               <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
-              <div className='col-span-1 text-center flex items-center justify-center'>
+              <div className='flex items-center justify-center col-span-1 text-center'>
                 <NumericFormat
                   value={chietkhautong}
                   onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
-                  className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
+                  className="w-20 px-2 py-1 font-medium text-center bg-transparent border-b-2 border-gray-300  focus:outline-none"
                   thousandSeparator=","
                   allowNegative={false}
                   decimalScale={0}
@@ -1647,14 +1641,14 @@ const Index = (props) => {
                 />
               </div>
             </div>
-            <div className='col-span-2 flex items-center gap-2'>
+            <div className='flex items-center col-span-2 gap-2'>
               <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
               <Select
                 options={taxOptions}
                 onChange={_HandleChangeInput.bind(this, "thuetong")}
                 value={thuetong}
                 formatOptionLabel={(option) => (
-                  <div className='flex justify-start items-center gap-1 '>
+                  <div className='flex items-center justify-start gap-1 '>
                     <h2>{option?.label}</h2>
                     <h2>{`(${option?.tax_rate})`}</h2>
                   </div>
@@ -1714,7 +1708,7 @@ const Index = (props) => {
               className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
             />
           </div>
-          <div className="text-right mt-5 space-y-4 col-span-2 flex-col justify-between ">
+          <div className="flex-col justify-between col-span-2 mt-5 space-y-4 text-right ">
             <div className='flex justify-between '>
             </div>
             <div className='flex justify-between '>

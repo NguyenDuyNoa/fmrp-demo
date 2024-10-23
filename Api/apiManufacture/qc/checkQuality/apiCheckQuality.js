@@ -9,7 +9,5 @@ const apiCheckQuality = {
     //         throw error;
     //     }
     // },
-
-
 }
 export default apiCheckQuality

@@ -4,9 +4,6 @@ import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import Loading from "@/components/UI/loading/loading";
 import dynamic from "next/dynamic";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-  ssr: false,
-});
 const TableContact = (props) => {
   return (
     <div>
@@ -37,11 +34,7 @@ const TableContact = (props) => {
               <Loading className="h-80" color="#0f4f9e" />
             ) : props?.data?.contact?.length > 0 ? (
               <>
-                <ScrollArea
-                  className="min-h-[455px] max-h-[455px] overflow-hidden"
-                  speed={1}
-                  smoothScrolling={true}
-                >
+                <Customscrollbar className="min-h-[455px] max-h-[455px]">
                   <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
                     {props?.data?.contact?.map((e) => (
                       <div
@@ -69,7 +62,7 @@ const TableContact = (props) => {
                       </div>
                     ))}
                   </div>
-                </ScrollArea>
+                </Customscrollbar>
               </>
             ) : (
               <div className=" max-w-[352px] mt-24 mx-auto">

@@ -1,16 +1,15 @@
-import Image from "next/image";
-import dynamic from "next/dynamic";
-import { v4 as uddid } from "uuid";
 import { SearchNormal1 } from "iconsax-react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { v4 as uddid } from "uuid";
 
-import Zoom from "@/components/UI/zoomElement/zoomElement";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 
 const TabItem = dynamic(() => import("./tabItem"), { ssr: false });
 
@@ -18,6 +17,7 @@ const TabPlan = dynamic(() => import("./tabPlan"), { ssr: false });
 
 const TabKeepStock = dynamic(() => import("./tabKeepStock"), { ssr: false });
 
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const MainTable = ({ dataLang }) => {
@@ -1509,7 +1509,7 @@ const MainTable = ({ dataLang }) => {
                 <div className="flex ">
                     <div className="w-[25%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
-                            <form className="flex items-center relative  w-full">
+                            <form className="relative flex items-center w-full">
                                 <SearchNormal1
                                     size={20}
                                     className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
@@ -1521,11 +1521,7 @@ const MainTable = ({ dataLang }) => {
                                 />
                             </form>
                         </div>
-                        <ScrollArea
-                            className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
-                            speed={1}
-                            smoothScrolling={true}
-                        >
+                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh]">
                             {dataTable.map((e, eIndex) => (
                                 <div
                                     key={e.id}
@@ -1538,7 +1534,7 @@ const MainTable = ({ dataLang }) => {
                                         <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
                                             {e.title}
                                         </h1>
-                                        <div className="flex flex-col items-end 3xl:my-1 xxl:my-1 2xl:my-1 xl:my-0 my-0">
+                                        <div className="flex flex-col items-end my-0 3xl:my-1 xxl:my-1 2xl:my-1 xl:my-0">
                                             <h3 className="text-[#667085] font-normal 3xl:text-xs text-[11px]">
                                                 Tạo vào{" "}
                                                 <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
@@ -1601,10 +1597,10 @@ const MainTable = ({ dataLang }) => {
                                     )}
                                 </div>
                             ))}
-                        </ScrollArea>
+                        </Customscrollbar>
                     </div>
                     <div className="w-[75%] border border-[#d8dae5] ">
-                        <div className="flex items-center justify-between py-1 px-4 border-b">
+                        <div className="flex items-center justify-between px-4 py-1 border-b">
                             <div>
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">Kế hoạch NVL</h1>
                                 <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
@@ -1618,7 +1614,7 @@ const MainTable = ({ dataLang }) => {
                                             className=" bg-[#F3F4F6] rounded-lg  outline-none focus:outline-none"
                                             key={e.id}
                                         >
-                                            <div className="flex items-center gap-2 py-2 px-3 ">
+                                            <div className="flex items-center gap-2 px-3 py-2 ">
                                                 <Image height={16} width={16} src={e.icon} className="object-cover" />
                                                 <h3 className="text-[#141522] font-medium 3xl:text-base text-xs">
                                                     {e.name}
@@ -1630,7 +1626,7 @@ const MainTable = ({ dataLang }) => {
                             </div>
                         </div>
                         <div className="mx-4">
-                            <div className="border-b my-6 ">
+                            <div className="my-6 border-b ">
                                 <div className="flex items-center gap-4 ">
                                     {listTab.map((e) => (
                                         <button

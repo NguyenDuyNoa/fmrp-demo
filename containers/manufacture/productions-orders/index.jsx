@@ -4,6 +4,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import Head from "next/head";
 import Header from "./components/header/header";
 import MainTable from "./components/table/mainTable";
+import { ProductionsOrdersContext, ProductionsOrdersProvider } from "./context/productionsOrders";
+import { useContext } from "react";
 
 const ProductionsOrders = (props) => {
     const dataLang = props.dataLang;
@@ -11,7 +13,6 @@ const ProductionsOrders = (props) => {
     const propsDefault = { dataLang };
 
     const statusExprired = useStatusExprired();
-
     return (
         <>
             <Head>
@@ -19,7 +20,9 @@ const ProductionsOrders = (props) => {
             </Head>
             <Container className={'relative'}>
                 {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}
-                <MainTable {...propsDefault} />
+                <ProductionsOrdersProvider>
+                    <MainTable {...propsDefault} />
+                </ProductionsOrdersProvider>
             </Container>
         </>
     );

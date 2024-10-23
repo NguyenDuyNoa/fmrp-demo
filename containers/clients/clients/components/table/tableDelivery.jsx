@@ -1,12 +1,8 @@
-import React from "react";
-import Loading from "@/components/UI/loading/loading";
-import { Map, IconSearch } from "iconsax-react";
-import dynamic from "next/dynamic";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-  ssr: false,
-});
+import Loading from "@/components/UI/loading/loading";
+import { Map } from "iconsax-react";
+
 const TableDelivery = (props) => {
   return (
     <div>
@@ -34,11 +30,7 @@ const TableDelivery = (props) => {
               <Loading className="h-80" color="#0f4f9e" />
             ) : props?.data?.clients_address_delivery?.length > 0 ? (
               <>
-                <ScrollArea
-                  className="min-h-[455px] max-h-[455px] overflow-hidden"
-                  speed={1}
-                  smoothScrolling={true}
-                >
+                <Customscrollbar className="min-h-[455px] max-h-[455px]"  >
                   <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
                     {props?.data?.clients_address_delivery?.map((e, index) => (
                       <div
@@ -69,7 +61,7 @@ const TableDelivery = (props) => {
                       </div>
                     ))}
                   </div>
-                </ScrollArea>
+                </Customscrollbar>
               </>
             ) : (
               <div className=" max-w-[352px] mt-24 mx-auto">

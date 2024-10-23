@@ -454,7 +454,7 @@ const Header = () => {
                                     ? "1"
                                     : "0",
                             name: "Import dữ liệu",
-                            link: "/import",
+                            link: "/convenience/import",
                         },
                         {
                             viewOwn:
@@ -472,7 +472,7 @@ const Header = () => {
                                     ? "1"
                                     : "0",
                             name: "Export dữ liệu",
-                            link: "/export",
+                            link: "/convenience/export",
                         },
                     ],
                 },

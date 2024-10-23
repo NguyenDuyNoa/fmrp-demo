@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import ReactExport from "react-data-export";
 import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+
 
 import { NumericFormat } from "react-number-format";
 import Swal from "sweetalert2";
@@ -625,15 +623,15 @@ const Popup_dspt = (props) => {
         return (
             <components.MenuList {...props}>
                 {data.dataListTypeofDoc?.length > 0 && (
-                    <div className="grid grid-cols-2 items-center  cursor-pointer">
+                    <div className="grid items-center grid-cols-2 cursor-pointer">
                         <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center text-xs "
+                            className="col-span-1 p-2 text-xs text-center hover:bg-slate-200 "
                             onClick={handleSelectAll}
                         >
                             {dataLang?.payment_selectAll || "payment_selectAll"}
                         </div>
                         <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center text-xs "
+                            className="col-span-1 p-2 text-xs text-center hover:bg-slate-200 "
                             onClick={handleDeselectAll}
                         >
                             {dataLang?.payment_DeselectAll || "payment_DeselectAll"}
@@ -713,13 +711,13 @@ const Popup_dspt = (props) => {
                     {/* <form onSubmit={_HandleSubmit.bind(this)} className=""> */}
                     <form onSubmit={handleSubmit(onSubmit)} className="">
                         <div className="">
-                            <div className="grid grid-cols-12 gap-1 items-center ">
+                            <div className="grid items-center grid-cols-12 gap-1 ">
                                 <div className="col-span-12 grid grid-cols-12 items-center gap-1 overflow-auto 3xl:max-h-[400px] xxl:max-h-[300px] 2xl:max-h-[350px] xl:max-h-[300px] lg:max-h-[280px] max-h-[300px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="col-span-6 relative">
+                                    <div className="relative col-span-6">
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
                                             {dataLang?.serviceVoucher_day_vouchers}{" "}
                                         </label>
-                                        <div className="custom-date-picker flex flex-row ">
+                                        <div className="flex flex-row custom-date-picker ">
                                             <DatePicker
                                                 blur
                                                 fixedHeight
@@ -1049,7 +1047,7 @@ const Popup_dspt = (props) => {
                                             </label>
                                         )}
                                     </div>
-                                    <div className="col-span-6  ">
+                                    <div className="col-span-6 ">
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                             {props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                         </label>
@@ -1091,7 +1089,7 @@ const Popup_dspt = (props) => {
                                             className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                         />
                                     </div>
-                                    <div className="col-span-6  ">
+                                    <div className="col-span-6 ">
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                             {props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                         </label>
@@ -1220,35 +1218,35 @@ const Popup_dspt = (props) => {
                                 <h2 className="font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5">
                                     {props.dataLang?.payment_costInfo || "payment_costInfo"}
                                 </h2>
-                                <div className="col-span-12 grid grid-cols-4 items-center divide-x border border-l-0 border-t-0 border-r-0">
+                                <div className="grid items-center grid-cols-4 col-span-12 border border-t-0 border-l-0 border-r-0 divide-x">
                                     <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">{""}</h1>
                                     <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">{""}</h1>
                                     <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">{""}</h1>
                                     <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">{""}</h1>
                                 </div>
                                 {data.dataTable.length > 0 && (
-                                    <div className="col-span-12 border border-b-0 rounded m-1 transition-all duration-200 ease-linear">
+                                    <div className="col-span-12 m-1 transition-all duration-200 ease-linear border border-b-0 rounded">
                                         <div
                                             className={`${data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
                                                 } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
                                         >
                                             {data.dataTable.map((e) => {
                                                 return (
-                                                    <div className="col-span-12 grid grid-cols-4 items-center divide-x border-b">
-                                                        <h1 className="text-center text-xs p-2 ">
-                                                            <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl">
+                                                    <div className="grid items-center grid-cols-4 col-span-12 border-b divide-x">
+                                                        <h1 className="p-2 text-xs text-center ">
+                                                            <span className="px-2 py-1 text-purple-500 bg-purple-200 rounded-xl">
                                                                 {e.import_code}
                                                             </span>
                                                         </h1>
-                                                        <h1 className="text-center text-xs p-2">
-                                                            <span className="py-1 px-2 bg-orange-200 text-orange-500 rounded-xl">
+                                                        <h1 className="p-2 text-xs text-center">
+                                                            <span className="px-2 py-1 text-orange-500 bg-orange-200 rounded-xl">
                                                                 {e.payslip_code}
                                                             </span>
                                                         </h1>
-                                                        <h1 className="text-center text-xs p-2">
+                                                        <h1 className="p-2 text-xs text-center">
                                                             {formatNumber(e.deposit_amount)}
                                                         </h1>
-                                                        <h1 className="text-center text-xs p-2">
+                                                        <h1 className="p-2 text-xs text-center">
                                                             {formatNumber(e.amount_left)}
                                                         </h1>
                                                     </div>
@@ -1259,7 +1257,7 @@ const Popup_dspt = (props) => {
                                 )}
                             </div>
                         </div>
-                        <div className="text-right mt-1 space-x-2">
+                        <div className="mt-1 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={_ToggleModal.bind(this, false)}

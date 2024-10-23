@@ -5,7 +5,7 @@ import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { memo, useEffect, useState } from "react";
+import { memo, useContext, useEffect, useState } from "react";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { FaUpRightAndDownLeftFromCenter } from "react-icons/fa6";
 import { RxDragHandleDots1 } from "react-icons/rx";
@@ -15,6 +15,7 @@ import TabInFormation from "./tabInFormation";
 import TabProcessingCost from "./tabProcessingCost";
 import TabRecallMaterials from "./tabRecallMaterials";
 import TabWarehouseHistory from "./tabWarehouseHistory";
+import { ProductionsOrdersContext } from "../../context/productionsOrders";
 
 
 
@@ -23,7 +24,8 @@ const initialState = {
     dataDetail: {},
 };
 
-const ModalDetail = memo(({ isState, queryState, dataLang }) => {
+const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
+
     const minWidth = 900; // Đặt giá trị chiều rộng tối thiểu
 
     const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
@@ -98,6 +100,9 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
 
     const queryStateModal = (key) => setIsStateModal((x) => ({ ...x, ...key }));
 
+    const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
+
+
     useEffect(() => {
         setIsMounted(true);
     }, [])
@@ -167,7 +172,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         ...optionsQuery,
     })
 
-    const shareProps = { queryStateModal, isState, isLoading, dataLang, isStateModal, width, listTab };
+    const shareProps = { queryStateModal, isState, refetchProductionsOrders, isLoading, dataLang, isStateModal, width, listTab };
 
     const components = {
         1: <TabInFormation {...shareProps} />,

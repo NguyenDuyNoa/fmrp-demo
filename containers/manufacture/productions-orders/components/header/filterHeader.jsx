@@ -1,14 +1,13 @@
 import DatePicker from "react-datepicker";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { ArrowDown2 } from "iconsax-react";
-import { memo } from "react";
+import { memo, useContext } from "react";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
+import { ProductionsOrdersContext } from "../../context/productionsOrders";
 
 const FilterHeader = memo(
     ({
         dataLang,
-        isState,
-        queryState,
         handleFilter,
         fetchComboboxProductionOrders,
         fetDataOrder,
@@ -21,9 +20,11 @@ const FilterHeader = memo(
         comboboxProductionOrders,
         comboboxProductionOrdersDetail
     }) => {
+        const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
+
         return (
             <>
-                <div className="grid grid-cols-14 items-center gap-2">
+                <div className="grid items-center gap-2 grid-cols-14">
                     <div className="col-span-2">
                         <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}</h3>
                         <SelectComponent
@@ -80,7 +81,7 @@ const FilterHeader = memo(
                                     <div className="">
                                         {option?.isDisabled ? (
                                             <div className="custom-text">
-                                                <h3 className="font-medium text-base">{option.label}</h3>
+                                                <h3 className="text-base font-medium">{option.label}</h3>
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-2">
@@ -169,7 +170,7 @@ const FilterHeader = memo(
                             placeholder={dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
                         />
                     </div>
-                    <div className="w-full col-span-2 relative">
+                    <div className="relative w-full col-span-2">
                         <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_day_to_day || 'productions_orders_day_to_day'}</h3>
                         <DatePicker
                             id="start"
@@ -196,7 +197,7 @@ const FilterHeader = memo(
                         <ArrowDown2
                             size="11"
                             color="#6b7280"
-                            className="absolute top-1/2 right-0 -translate-x-1/2 translate-y-1/2"
+                            className="absolute right-0 -translate-x-1/2 translate-y-1/2 top-1/2"
                         />
                     </div>
                 </div>

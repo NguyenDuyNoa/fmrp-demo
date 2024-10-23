@@ -11,10 +11,8 @@ import { Tooltip } from "react-tippy";
 import TableContact from "../table/tableContact";
 import TableDelivery from "../table/tableDelivery";
 import { useClientDetail } from "../../hooks/usseClientDetail";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
 
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
@@ -78,12 +76,7 @@ const Popup_chitiet = (props) => {
                 </div>
                 <div className="mt-4 space-x-5 w-[930px] 3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px]">
                     {tab === 0 && (
-                        <ScrollArea
-                            ref={scrollAreaRef}
-                            className="w-[930px] 3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] overflow-hidden "
-                            speed={1}
-                            smoothScrolling={true}
-                        >
+                        <Customscrollbar className="w-[930px] 3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px]">
                             {isLoading ? (
                                 <Loading className="h-80" color="#0f4f9e" />
                             ) : (
@@ -369,7 +362,7 @@ const Popup_chitiet = (props) => {
                                     </div>
                                 )
                             )}
-                        </ScrollArea>
+                        </Customscrollbar>
                     )}
                     {tab === 1 && (
                         <TableContact

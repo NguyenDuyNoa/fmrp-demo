@@ -25,7 +25,7 @@ const PopupDetail = (props) => {
 
     const dataSeting = useSetingServer();
 
-    const { dataProductExpiry, dataProductSerial } = useFeature();
+    const { dataProductExpiry, dataProductSerial, dataMaterialExpiry } = useFeature();
 
     const { data, isFetching } = useProductsWarehouseDetail(open, props?.id);
 
@@ -208,28 +208,30 @@ const PopupDetail = (props) => {
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                            {dataProductExpiry.is_enable === "1" ? (
-                                                                                <>
-                                                                                    <div className="flex gap-0.5">
-                                                                                        <h6 className="text-[12px]">
-                                                                                            Lot:
-                                                                                        </h6>{" "}
-                                                                                        <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e?.lot == null || e?.lot == "" ? "-" : e?.lot}
-                                                                                        </h6>
-                                                                                    </div>
-                                                                                    <div className="flex gap-0.5">
-                                                                                        <h6 className="text-[12px]">
-                                                                                            Date:
-                                                                                        </h6>{" "}
-                                                                                        <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
-                                                                                        </h6>
-                                                                                    </div>
-                                                                                </>
-                                                                            ) : (
-                                                                                ""
-                                                                            )}
+                                                                            {
+                                                                                // dataMaterialExpiry.is_enable === "1" ||
+                                                                                dataProductExpiry?.is_enable === "1" ? (
+                                                                                    <>
+                                                                                        <div className="flex gap-0.5">
+                                                                                            <h6 className="text-[12px]">
+                                                                                                Lot:
+                                                                                            </h6>{" "}
+                                                                                            <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                                                {e?.lot == null || e?.lot == "" ? "-" : e?.lot}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                        <div className="flex gap-0.5">
+                                                                                            <h6 className="text-[12px]">
+                                                                                                Date:
+                                                                                            </h6>{" "}
+                                                                                            <h6 className="text-[12px]  px-2   w-[full] text-center ">
+                                                                                                {e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </>
+                                                                                ) : (
+                                                                                    ""
+                                                                                )}
                                                                         </div>
                                                                     </div>
                                                                 </div>

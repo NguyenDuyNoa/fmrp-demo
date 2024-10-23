@@ -18,12 +18,13 @@ import { SelectCore } from "@/utils/lib/Select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash as IconDelete } from "iconsax-react";
 import Image from "next/image";
-import { memo, useEffect, useState } from "react";
+import { memo, useContext, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import { FaBox } from "react-icons/fa";
 import { MdClear } from "react-icons/md";
 import { RiBox3Fill } from "react-icons/ri";
+import { ProductionsOrdersContext } from "../../context/productionsOrders";
 
 const stateDefault = {
     open: false,
@@ -48,7 +49,7 @@ const initilaState = {
     ...stateDefault
 };
 
-const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...props }) => {
+const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, refetchProductionsOrders, ...props }) => {
     const isShow = useToast();
 
     const queryClient = useQueryClient()
@@ -71,7 +72,10 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
             if (type == "end_production") {
                 return apiProductionsOrders.apiHandingProducts(data)
             }
-        }
+        },
+        retry: 5,
+        gcTime: 5000,
+        retryDelay: 5000,
     })
 
     const { isLoading } = useQuery({
@@ -197,7 +201,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                     onSuccess: ({ isSuccess, message }) => {
                         isShow("success", message)
                         queryState({ open: false })
-                        queryClient.invalidateQueries('api_item_orders_detail');
+                        queryClient.invalidateQueries(['api_item_orders_detail', true]);
                     },
                     onError: (error) => {
                         throw new Error(error);
@@ -263,7 +267,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, ...pr
                 }
 
                 isState.item?.bom?.forEach((e, index) => {
-                    formData.append(`product[item][bom][${index}][type_products]`, e?.type_products)
+                    formData.append(`product[item][bom][${index}][type_bom]`, e?.type_bom)
                     formData.append(`product[item][bom][${index}][type_item]`, e?.type_item)
                     formData.append(`product[item][bom][${index}][item_id]`, e?.item_id)
                     formData.append(`product[item][bom][${index}][item_variation_option_value_id]`, e?.item_variation_option_value_id)

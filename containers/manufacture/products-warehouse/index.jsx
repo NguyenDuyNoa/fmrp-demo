@@ -570,6 +570,7 @@ const ProductsWarehouse = (props) => {
                                                                 status_pay={e?.status_pay}
                                                                 id={e?.id}
                                                                 type="productsWarehouse"
+                                                                referenceNoDetail={e?.reference_no_detail}
                                                                 className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                             />
                                                         </RowItemTable>

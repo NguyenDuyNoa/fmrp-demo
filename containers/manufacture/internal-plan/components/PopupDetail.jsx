@@ -1,3 +1,4 @@
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorRed } from "@/components/UI/common/Tag/TagStatus";
@@ -10,12 +11,10 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
-import dynamic from "next/dynamic";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useInternalPlanDetail } from "../hooks/useInternalPlanDetail";
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const PopupDetail = (props) => {
 
     const [open, sOpen] = useState(false);
@@ -48,7 +47,7 @@ const PopupDetail = (props) => {
                                 <GeneralInformation {...props} />
                                 <div className="grid grid-cols-9  min-h-[70px] px-2  bg-zinc-50">
                                     <div className="col-span-3">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
@@ -56,11 +55,11 @@ const PopupDetail = (props) => {
                                                 {data?.internalPlans?.date != null ? formatMoment(data?.internalPlans?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
-                                        <div className="grid grid-cols-2 col-span-2 items-center">
+                                        <div className="grid items-center grid-cols-2 col-span-2">
                                             <h3 className=" text-[13px] font-medium">
                                                 {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
-                                            <div className="font-medium grid grid-cols-2">
+                                            <div className="grid grid-cols-2 font-medium">
                                                 <CustomAvatar
                                                     profileImage={data?.internalPlans?.created_by_profile_image}
                                                     fullName={data?.internalPlans?.created_by_full_name}
@@ -69,7 +68,7 @@ const PopupDetail = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h3>
@@ -77,7 +76,7 @@ const PopupDetail = (props) => {
                                                 {data?.internalPlans?.reference_no}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.internal_plan_name || "internal_plan_name"}
                                             </h3>
@@ -87,14 +86,14 @@ const PopupDetail = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.internal_plan_status || "internal_plan_status"}
                                             </h3>
                                             <h3 className=" w-fit">
                                                 {/* <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-0.5 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]">
                                                     <TickCircle
-                                                        className="bg-lime-500 rounded-full"
+                                                        className="rounded-full bg-lime-500"
                                                         color="white"
                                                         size={15}
                                                     />
@@ -108,7 +107,7 @@ const PopupDetail = (props) => {
                                                 )}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
@@ -136,11 +135,7 @@ const PopupDetail = (props) => {
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.internalPlansItems?.length > 0 ? (
                                         <>
-                                            <ScrollArea
-                                                className="min-h-[250px] max-h-[250px] 2xl:max-h-[250px] overflow-hidden"
-                                                speed={1}
-                                                smoothScrolling={true}
-                                            >
+                                            <Customscrollbar className="min-h-[250px] max-h-[250px] 2xl:max-h-[250px]">
                                                 <div className="divide-y divide-slate-200 min:h-[250px]  max:h-[250px]">
                                                     {data?.internalPlansItems?.map((e, index) => (
                                                         <div
@@ -162,7 +157,7 @@ const PopupDetail = (props) => {
                                                                                 <ModalImage
                                                                                     small="/no_img.png"
                                                                                     large="/no_img.png"
-                                                                                    className="w-full h-full rounded object-contain p-1"
+                                                                                    className="object-contain w-full h-full p-1 rounded"
                                                                                 >
                                                                                     {" "}
                                                                                 </ModalImage>
@@ -176,7 +171,7 @@ const PopupDetail = (props) => {
                                                                         <h6 className="text-[13px] text-left font-medium capitalize">
                                                                             {e?.product_variation}
                                                                         </h6>
-                                                                        {/* <div className="flex items-center font-oblique flex-wrap">
+                                                                        {/* <div className="flex flex-wrap items-center font-oblique">
                                                                             {dataProductSerial.is_enable === "1" ? (
                                                                                 <div className="flex gap-0.5">
                                                                                     <h6 className="text-[12px]">
@@ -247,7 +242,7 @@ const PopupDetail = (props) => {
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </ScrollArea>
+                                            </Customscrollbar>
                                         </>
                                     ) : (
                                         <div className=" max-w-[352px] mt-24 mx-auto">
@@ -269,7 +264,7 @@ const PopupDetail = (props) => {
                                 <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
-                                <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                     <div className="col-span-7">
                                         <h3 className="text-[13px] p-1">
                                             {props.dataLang?.returns_reason || "returns_reason"}

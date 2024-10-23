@@ -4,13 +4,16 @@ import NoData from "@/components/UI/noData/nodata";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Image from "next/image";
-import { memo } from "react";
+import { memo, useContext } from "react";
 import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
+import { ProductionsOrdersContext } from "../../context/productionsOrders";
 
-const TabItem = memo(({ isState, handShowItem, isLoadingRight, dataLang, handleShowModel }) => {
+const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel }) => {
     const dataSeting = useSetingServer();
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+    const { isStateProvider: isState } = useContext(ProductionsOrdersContext);
+
     return (
         <>
             <div className="my-4">

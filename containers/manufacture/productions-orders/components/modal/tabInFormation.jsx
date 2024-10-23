@@ -1,13 +1,20 @@
+import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import Loading from "@/components/UI/loading/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { memo, useEffect, useState } from "react";
 import { AiOutlineFileText } from "react-icons/ai";
-import { FaArrowAltCircleRight, FaCheck, FaCheckCircle } from "react-icons/fa";
+import { FaCheck, FaCheckCircle } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa6";
 import { FiCornerDownRight } from "react-icons/fi";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import ModalImage from "react-modal-image";
 import PopupImportProducts from "../popup/PopupImportProducts";
 
@@ -16,7 +23,7 @@ const initialState = {
     dataInformation: {},
 };
 
-const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang, listTab }) => {
+const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab, refetchProductionsOrders }) => {
     const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
@@ -140,6 +147,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
                                         checkBorder={shownElements}
                                         itemVariation={e?.itemVariation}
                                         dataDetail={isStateModal.dataDetail}
+                                        refetchProductionsOrders={refetchProductionsOrders}
                                     />
                                 );
                             })
@@ -157,6 +165,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
                                 quantity={isStateModal.dataDetail?.poi?.quantity}
                                 processBar={isStateModal.dataDetail?.poi?.stages}
                                 itemVariation={isStateModal.dataDetail?.poi?.product_variation}
+                                refetchProductionsOrders={refetchProductionsOrders}
                             />
                         </div>
                     </div>
@@ -166,11 +175,46 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, isState, dataLang
     );
 });
 
-const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, quantity, processBar, checkBorder, dataLang }) => {
+const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, quantity, processBar, checkBorder, dataLang, refetchProductionsOrders }) => {
+    const isShow = useToast()
+
+    const queryClient = useQueryClient()
 
     const dataSeting = useSetingServer()
 
+    const { isOpen, handleQueryId, isId } = useToggle();
+
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
+    const handinngDeleteItem = useMutation({
+        mutationFn: (data) => {
+            return apiProductionsOrders.apiRemovePurchaseProduct(data)
+        },
+        retry: 5,
+        gcTime: 5000,
+        retryDelay: 5000,
+    })
+
+    const handleConfimDeleteItem = () => {
+        let formData = new FormData();
+        formData.append("purchase_product_id", isId);
+        handinngDeleteItem.mutate(formData, {
+            onSuccess: ({ isSuccess, message }) => {
+                if (isSuccess) {
+                    isShow('success', message);
+
+                    queryClient.invalidateQueries(['api_item_orders_detail', true]);
+
+                    return
+                }
+                isShow('error', message);
+            },
+            onError: (err) => {
+
+            }
+        })
+        handleQueryId({ status: false })
+    }
 
     return (
         <div key={id ?? ""} className={`min-w-[250px]`}>
@@ -206,11 +250,9 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                     return (
                         <div key={jIndex} className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
                             <div className="flex min-h-[70px] gap-3">
-                                <div className={`
-                                ${checkDate ? "" : 'hidden'} text-[10px] 
-                                ${j?.active ? ' text-[#14b8a6]' : j?.begin_production == 1 ? "text-orange-600 " : "text-black/70"} 
-                                font-normal text-right`
-                                }
+                                <div className={` ${checkDate ? "" : 'hidden'} text-[10px] 
+                                ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-black/70"} 
+                                font-normal text-right` }
                                 >
                                     <div className={`${j?.date_production ? 'block' : 'hidden'}`}>
                                         {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
@@ -225,7 +267,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                 <div className="flex">
                                     <div className={`mr-3 flex flex-col items-center`}>
                                         <div className="">
-                                            <div className={`flex h-5 w-5 ${j?.active ? "border-[#14b8a6] bg-[#14b8a6]" : j?.begin_production == 1 ? 'border-orange-600' : "border-gray-400"}  items-center justify-center rounded-full border `}>
+                                            <div className={`flex h-5 w-5 ${j?.active ? "border-[#10b981] bg-[#10b981]" : j?.begin_production == 1 ? 'border-orange-600' : "border-gray-400"}  items-center justify-center rounded-full border `}>
                                                 {
                                                     processBar?.length - 1 != jIndex
                                                         ?
@@ -251,11 +293,11 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                 }
                                             </div>
                                         </div>
-                                        {checkLast && <div className={`h-full w-px ${j?.active ? 'bg-[#14b8a6]' : j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`} />}
+                                        {checkLast && <div className={`h-full w-px ${j?.active ? 'bg-[#10b981]' : j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`} />}
                                     </div>
                                     <div className="mt-0.5">
                                         <div className="flex items-center gap-2">
-                                            <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>
+                                            <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>
                                                 {j.stage_name}
                                             </p>
                                             {/* <PopupImportProducts
@@ -283,6 +325,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                     type={j?.active ? 'done_production' : 'end_production'}
                                                     dataStage={j}
                                                     dataLang={dataLang}
+                                                    refetchProductionsOrders={refetchProductionsOrders}
                                                 >
                                                     <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
                                                 </PopupImportProducts>
@@ -293,6 +336,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                     type={j?.active ? 'done_production' : 'end_production'}
                                                     dataStage={j}
                                                     dataLang={dataLang}
+                                                    refetchProductionsOrders={refetchProductionsOrders}
                                                 >
                                                     <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
                                                 </PopupImportProducts>
@@ -331,29 +375,38 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                             } */}
                                         </div>
                                         <div className="flex items-start gap-1 py-2">
-                                            <div className="">
-                                                {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
-                                            </div>
+                                            {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
                                             <div className="flex flex-col items-center gap-2">
                                                 {
                                                     j?.purchase_items?.map(e => {
                                                         return (
-                                                            <div key={e?.id} className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
-                                                                <ModalImage
-                                                                    small={e?.image ?? "/no_img.png"}
-                                                                    large={e?.image ?? "/no_img.png"}
-                                                                    width={18}
-                                                                    height={18}
-                                                                    alt={e?.item_name}
-                                                                    className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
-                                                                />
-                                                                <span className="text-[#9295A4] text-[10px]">
-                                                                    {e?.reference_no}
-                                                                </span>
-                                                                -
-                                                                <span className="text-[#9295A4] text-[10px]">
-                                                                    SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
-                                                                </span>
+                                                            <div key={e?.id} className="flex items-center gap-2">
+                                                                <div className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
+                                                                    <ModalImage
+                                                                        small={e?.image ?? "/no_img.png"}
+                                                                        large={e?.image ?? "/no_img.png"}
+                                                                        width={18}
+                                                                        height={18}
+                                                                        alt={e?.item_name}
+                                                                        className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
+                                                                    />
+                                                                    <span className="text-[#9295A4] text-[10px]">
+                                                                        {e?.reference_no}
+                                                                    </span>
+                                                                    -
+                                                                    <span className="text-[#9295A4] text-[10px]">
+                                                                        SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
+                                                                    </span>
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => { handleQueryId({ status: true, id: e?.pp_id }); }}
+                                                                    className={`group transition-all ease-in-out hover:bg-slate-50 text-left cursor-pointer w-full`}
+                                                                >
+                                                                    <RiDeleteBin6Line
+                                                                        size={14}
+                                                                        className="group-hover:text-[#f87171] group-hover:scale-110"
+                                                                    />
+                                                                </button>
                                                             </div>
                                                         )
                                                     })
@@ -367,7 +420,16 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                     )
                 })
             }
-        </div >
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={() => { handleConfimDeleteItem() }}
+                cancel={() => { handleQueryId({ status: false }) }}
+            />
+        </div>
     )
 }
 

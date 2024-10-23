@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import ReactExport from "react-data-export";
 import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+
 
 import { NumericFormat } from "react-number-format";
 import Swal from "sweetalert2";
@@ -26,6 +24,7 @@ import dynamic from "next/dynamic";
 import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import PopupCustom from "/components/UI/popup";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -808,15 +807,15 @@ const Popup_dspc = (props) => {
         return (
             <components.MenuList {...props}>
                 {dataListTypeofDoc?.length > 0 && (
-                    <div className="grid grid-cols-2 items-center  cursor-pointer">
+                    <div className="grid items-center grid-cols-2 cursor-pointer">
                         <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center text-xs "
+                            className="col-span-1 p-2 text-xs text-center hover:bg-slate-200 "
                             onClick={handleSelectAll}
                         >
                             {dataLang?.payment_selectAll || "payment_selectAll"}
                         </div>
                         <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center text-xs "
+                            className="col-span-1 p-2 text-xs text-center hover:bg-slate-200 "
                             onClick={handleDeselectAll}
                         >
                             {dataLang?.payment_DeselectAll ||
@@ -935,12 +934,12 @@ const Popup_dspc = (props) => {
                 <div className="w-[40vw]">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         <div className="">
-                            <div className="grid grid-cols-12 space-x-1 items-center">
-                                <div className="col-span-6 relative">
+                            <div className="grid items-center grid-cols-12 space-x-1">
+                                <div className="relative col-span-6">
                                     <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
                                         {dataLang?.serviceVoucher_day_vouchers}{" "}
                                     </label>
-                                    <div className="custom-date-picker flex flex-row ">
+                                    <div className="flex flex-row custom-date-picker ">
                                         <DatePicker
                                             blur
                                             fixedHeight
@@ -1303,7 +1302,7 @@ const Popup_dspc = (props) => {
                                         </label>
                                     )}
                                 </div>
-                                <div className="col-span-6  ">
+                                <div className="col-span-6 ">
                                     <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                         {props.dataLang
                                             ?.payment_typeOfDocument ||
@@ -1354,7 +1353,7 @@ const Popup_dspc = (props) => {
                                         className={`border-transparent 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                     />
                                 </div>
-                                <div className="col-span-6  ">
+                                <div className="col-span-6 ">
                                     <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                         {props.dataLang?.payment_listOfDoc ||
                                             "payment_listOfDoc"}
@@ -1539,7 +1538,7 @@ const Popup_dspc = (props) => {
                                                     this
                                                 )}
                                                 title="Thêm"
-                                                className="transition hover:bg-red-100 hover:animate-pulse	 rounded-full bg-slate-200 flex flex-col justify-center items-center"
+                                                className="flex flex-col items-center justify-center transition rounded-full hover:bg-red-100 hover:animate-pulse bg-slate-200"
                                             >
                                                 <Add
                                                     color="red"
@@ -1561,18 +1560,13 @@ const Popup_dspc = (props) => {
                                                 "payment_operation"}
                                         </h4>
                                     </div>
-                                    <ScrollArea
-                                        ref={scrollAreaRef}
-                                        className="min-h-[100px] max-h-[100px]  overflow-hidden"
-                                        speed={1}
-                                        smoothScrolling={true}
-                                    >
+                                    <Customscrollbar className="min-h-[100px] max-h-[100px]">
                                         {sortedArr.map((e, index) => (
                                             <div
-                                                className="grid grid-cols-12 items-center gap-1 py-1 "
+                                                className="grid items-center grid-cols-12 gap-1 py-1 "
                                                 key={e?.id}
                                             >
-                                                <div className="col-span-6  my-auto ">
+                                                <div className="col-span-6 my-auto ">
                                                     <Select
                                                         closeMenuOnSelect={true}
                                                         placeholder={
@@ -1639,7 +1633,7 @@ const Popup_dspc = (props) => {
                                                             } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                                     />
                                                 </div>
-                                                <div className="col-span-4 text-center flex items-center justify-center">
+                                                <div className="flex items-center justify-center col-span-4 text-center">
                                                     <NumericFormat
                                                         value={e?.sotien}
                                                         disabled={price == ""}
@@ -1700,7 +1694,7 @@ const Popup_dspc = (props) => {
                                                         thousandSeparator=","
                                                     />
                                                 </div>
-                                                <div className="col-span-2 flex items-center justify-center">
+                                                <div className="flex items-center justify-center col-span-2">
                                                     <button
                                                         onClick={_HandleDelete.bind(
                                                             this,
@@ -1715,11 +1709,11 @@ const Popup_dspc = (props) => {
                                                 </div>
                                             </div>
                                         ))}
-                                    </ScrollArea>
+                                    </Customscrollbar>
                                 </div>
                             </div>
                         </div>
-                        <div className="text-right mt-1 space-x-2">
+                        <div className="mt-1 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={_ToggleModal.bind(this, false)}

@@ -63,7 +63,7 @@ const ProductsWarehouseForm = (props) => {
 
     const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
 
-    const { dataProductExpiry, dataProductSerial } = useFeature();
+    const { dataProductExpiry, dataMaterialExpiry, dataProductSerial } = useFeature();
     //new
     const statusExprired = useStatusExprired();
 
@@ -950,8 +950,7 @@ const ProductsWarehouseForm = (props) => {
                                     ""
                                 )}
                                 {
-                                    // dataMaterialExpiry.is_enable === "1" ||
-                                    dataProductExpiry?.is_enable === "1" ? (
+                                    dataMaterialExpiry.is_enable === "1" || dataProductExpiry?.is_enable === "1" ? (
                                         <>
                                             <div className="flex items-center col-span-1 ">
                                                 <InPutNumericFormat

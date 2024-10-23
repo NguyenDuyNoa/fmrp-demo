@@ -16,8 +16,9 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useQuery } from "@tanstack/react-query";
 import { SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { v4 as uddid } from "uuid";
+import { ProductionsOrdersContext } from "../../context/productionsOrders";
 import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
 import { useProductionOrdersComboboxDetail } from "../../hooks/useProductionOrdersComboboxDetail";
 import FilterHeader from "../header/filterHeader";
@@ -25,34 +26,6 @@ import ModalDetail from "../modal/modalDetail";
 import TabItem from "./tabItem";
 import TabSemi from "./tabSemi";
 
-const initialState = {
-    isTab: "products",
-    countAll: 0,
-    listDataLeft: [],
-    listDataRight: {
-        title: "",
-        dataPPItems: [],
-        dataSemiItems: [],
-    },
-    openModal: false,
-    next: null,
-    page: 1,
-    limit: 15,
-    search: "",
-    dataModal: {},
-    valueOrders: null,
-    valuePlan: null,
-    valueProductionOrdersDetail: null,
-    valueProductionOrders: null,
-    valueProducts: [],
-    valueBr: null,
-    searchProductionOrders: "",
-    searchOrders: "",
-    searchPlan: "",
-    searchItemsVariant: "",
-    date: { dateStart: null, dateEnd: null },
-    idDetailProductionOrder: null,
-};
 const MainTable = ({ dataLang }) => {
     const listTab = [
         {
@@ -69,13 +42,11 @@ const MainTable = ({ dataLang }) => {
 
     const [isMouted, setIsMouted] = useState(false);
 
-    const [isState, sIsState] = useState(initialState);
-
-    const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
-
-    const queryState = (key) => sIsState((prve) => ({ ...prve, ...key }));
+    const { isOpen, handleQueryId, isIdChild } = useToggle();
 
     const { data: listBr = [] } = useBranchList()
+
+    const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
 
     const { data: listOrders = [] } = useOrdersSearchCombobox(isState.searchOrders);
 
@@ -133,7 +104,7 @@ const MainTable = ({ dataLang }) => {
         item_variation_id: isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
     };
 
-    const fetchisState = async () => {
+    const fetchState = async () => {
         try {
             const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, { params: params });
             const arrayItem = convertArrData(data?.productionOrders);
@@ -142,12 +113,21 @@ const MainTable = ({ dataLang }) => {
                 listDataLeft: arrayItem.map((e, index) => {
                     return {
                         ...e,
-                        showParent: index == 0,
+                        showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
                     };
                 }),
                 next: data?.next == 1,
             });
-            if (isState.search == "" && arrayItem[0]?.id) {
+            // if (isState.search == "" && arrayItem[0]?.id) {
+            //     queryState({ idDetailProductionOrder: arrayItem[0]?.id });
+            // }
+            if (isState.search == "") {
+                if (isState.idDetailProductionOrder) {
+                    queryState({ idDetailProductionOrder: isState.idDetailProductionOrder });
+                } else {
+                    queryState({ idDetailProductionOrder: arrayItem[0]?.id });
+                }
+            } else {
                 queryState({ idDetailProductionOrder: arrayItem[0]?.id });
             }
             if (data?.productionOrders?.length == 0) {
@@ -166,7 +146,7 @@ const MainTable = ({ dataLang }) => {
         }
     };
 
-    const { isLoading } = useQuery({
+    const { isLoading, refetch: refetchProductionsOrders } = useQuery({
         queryKey: ["api_production_orders",
             isState.page,
             isState.search,
@@ -178,13 +158,14 @@ const MainTable = ({ dataLang }) => {
             isState.valueOrders,
             isState.valuePlan,
             isState.valueProducts],
-        queryFn: () => fetchisState(),
+        queryFn: () => fetchState(),
         // enabled: isState.openModal == false,
         ...optionsQuery
     })
 
 
     const fetchisStateSeeMore = async () => {
+
         try {
             const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, { params: params });
             const item = convertArrData(data?.productionOrders);
@@ -194,12 +175,19 @@ const MainTable = ({ dataLang }) => {
                 listDataLeft: arrayItem.map((e, index) => {
                     return {
                         ...e,
-                        showParent: index == 0,
+                        showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
                     };
                 }),
                 next: data?.next == 1,
+
             });
-            if (isState.search == "" && arrayItem[0]?.id) {
+            if (isState.search == "") {
+                if (isState.idDetailProductionOrder) {
+                    queryState({ idDetailProductionOrder: isState.idDetailProductionOrder });
+                } else {
+                    queryState({ idDetailProductionOrder: arrayItem[0]?.id });
+                }
+            } else {
                 queryState({ idDetailProductionOrder: arrayItem[0]?.id });
             }
             if (data?.productionOrders?.length == 0) {
@@ -226,14 +214,14 @@ const MainTable = ({ dataLang }) => {
 
     const { isLoading: isLoadingRight } = useQuery({
         queryKey: ['api_detail_production_orders', isState.idDetailProductionOrder],
-        queryFn: () => fetchisStateRight(isState.idDetailProductionOrder),
+        queryFn: () => fetchisStateRight(),
         enabled: !!isState.idDetailProductionOrder,
         ...optionsQuery
     })
 
-    const fetchisStateRight = async (id) => {
+    const fetchisStateRight = async () => {
         try {
-            const { data, isSuccess } = await apiProductionsOrders.apiDetailProductionOrders(id);
+            const { data, isSuccess } = await apiProductionsOrders.apiDetailProductionOrders(isState.idDetailProductionOrder);
             if (!isSuccess == 1) return;
             queryState({
                 listDataRight: {
@@ -375,7 +363,7 @@ const MainTable = ({ dataLang }) => {
     };
 
     const onChangeSearch = debounce((e) => {
-        queryState({ search: e.target.value, page: 1 });
+        queryState({ search: e.target.value, page: 1, openModal: false });
     }, 500);
 
     const handDeleteItem = (id, type) => {
@@ -392,7 +380,7 @@ const MainTable = ({ dataLang }) => {
         //     if (!err) {
         //         let { isSuccess, message } = response.data;
         //         if (isSuccess) {
-        //             fetchisState(1);
+        //             fetchState(1);
         //             queryState({ page: 1 });
         //             isShow("success", dataLang[message] || message);
         //         } else {
@@ -407,13 +395,11 @@ const MainTable = ({ dataLang }) => {
         queryState({ openModal: true, dataModal: item });
     };
 
+
     const shareProps = {
-        isState,
         dataLang,
         handShowItem,
         handDeleteItem,
-        isState,
-        queryState,
         handleShowModel,
         handleFilter,
         fetchComboboxProductionOrders,
@@ -426,7 +412,8 @@ const MainTable = ({ dataLang }) => {
         listProducts,
         comboboxProductionOrders,
         comboboxProductionOrdersDetail,
-        isLoadingRight
+        isLoadingRight,
+        refetchProductionsOrders
     };
 
     if (!isMouted) {

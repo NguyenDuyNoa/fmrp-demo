@@ -21,8 +21,7 @@ import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLev
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranch";
-import { useUnitList } from "@/hooks/common/useItems";
-import { useVariantList } from "@/hooks/common/useItems";
+import { useUnitList, useVariantList } from "@/hooks/common/useItems";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
@@ -35,7 +34,6 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Grid6, Edit as IconEdit, UserEdit as IconUserEdit } from "iconsax-react";
 import { debounce } from "lodash";
-import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -46,7 +44,6 @@ import Popup_NVL from "./components/items/popupNvl";
 import { useItemCategoryOptions } from "./hooks/items/useItemCategoryOptions";
 import { useItemDetail } from "./hooks/items/useItemDetail";
 import { useItemList } from "./hooks/items/useItemList";
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false, });
 const Items = (props) => {
     const dataLang = props.dataLang;
 
@@ -239,11 +236,11 @@ const Items = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.category_material_list_title}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ?
                                     <Popup_NVL
                                         dataMaterialExpiry={dataMaterialExpiry}
@@ -262,7 +259,7 @@ const Items = (props) => {
                                 }
                             </div>
                         </div>
-                        <div className="xl:space-y-3 space-y-2">
+                        <div className="space-y-2 xl:space-y-3">
                             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                 <div className="col-span-4">
                                     <div className="grid grid-cols-9 gap-2">
@@ -309,7 +306,7 @@ const Items = (props) => {
                                 </div>
 
                                 <div className="col-span-2 ">
-                                    <div className="flex space-x-2 items-center justify-end">
+                                    <div className="flex items-center justify-end space-x-2">
                                         <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                         {(role == true || checkExport) ?
                                             <div className={``}>
@@ -324,7 +321,7 @@ const Items = (props) => {
                                             </div>
                                             :
                                             <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                                <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                 <span>{dataLang?.client_list_exportexcel}</span>
                                             </button>
                                         }
@@ -379,13 +376,13 @@ const Items = (props) => {
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                             {dataItems?.rResult?.map((e) => (
                                                 <RowTable gridCols={13} key={e?.id ? e?.id.toString() : ""}>
-                                                    <RowItemTable colSpan={1} className="select-none justify-center flex">
+                                                    <RowItemTable colSpan={1} className="flex justify-center select-none">
                                                         <div className="w-[48px] h-[48px] mx-auto">
                                                             {e?.images == null ? (
                                                                 <ModalImage
                                                                     small="/no_image.png"
                                                                     large="/no_image.png"
-                                                                    className="w-full h-full rounded object-contain"
+                                                                    className="object-contain w-full h-full rounded"
                                                                 />
                                                             ) : (
                                                                 <>
@@ -427,14 +424,14 @@ const Items = (props) => {
                                                     <RowItemTable colSpan={1} textAlign={"center"}>
                                                         {e?.variation_count ? e?.variation_count : "0"}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={2} className="flex  gap-1 flex-wrap">
+                                                    <RowItemTable colSpan={2} className="flex flex-wrap gap-1">
                                                         {e.branch?.map((i) => (
                                                             <TagBranch key={i}>
                                                                 {i.name}
                                                             </TagBranch>
                                                         ))}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="space-x-2 text-center flex items-center justify-center">
+                                                    <RowItemTable colSpan={1} className="flex items-center justify-center space-x-2 text-center">
                                                         {role == true || checkEdit ?
                                                             <Popup_NVL
                                                                 dataMaterialExpiry={dataMaterialExpiry}
@@ -537,7 +534,7 @@ const Popup_Detail = React.memo((props) => {
                     <React.Fragment>
                         {tab === 0 ? (
                             <div className="grid grid-cols-2 gap-5">
-                                <div className="space-y-3 bg-slate-100/40 p-2 rounded-md">
+                                <div className="p-2 space-y-3 rounded-md bg-slate-100/40">
                                     <div className="flex justify-between">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
                                             {props.dataLang?.client_list_brand || "client_list_brand"}:
@@ -628,15 +625,15 @@ const Popup_Detail = React.memo((props) => {
                                         </h6>
                                     </div>
                                 </div>
-                                <div className="space-y-3 flex flex-col justify-between">
-                                    <div className="flex bg-slate-100/40 p-2 rounded-md">
+                                <div className="flex flex-col justify-between space-y-3">
+                                    <div className="flex p-2 rounded-md bg-slate-100/40">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
                                             {props.dataLang?.avatar || "avatar"}:
                                         </h5>
                                         {list?.images == null ? (
                                             <img
                                                 src="/no_image.png"
-                                                className="w-48 h-48 rounded object-contain select-none pointer-events-none"
+                                                className="object-contain w-48 h-48 rounded pointer-events-none select-none"
                                             />
                                         ) : (
                                             <Image
@@ -645,14 +642,14 @@ const Popup_Detail = React.memo((props) => {
                                                 quality={100}
                                                 src={list?.images}
                                                 alt="thumb type"
-                                                className="w-48 h-48 rounded object-contain select-none pointer-events-none"
+                                                className="object-contain w-48 h-48 rounded pointer-events-none select-none"
                                                 loading="lazy"
                                                 crossOrigin="anonymous"
                                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                             />
                                         )}
                                     </div>
-                                    <div className="bg-slate-100/40 p-2 rounded-md space-y-3">
+                                    <div className="p-2 space-y-3 rounded-md bg-slate-100/40">
                                         <h4 className="flex space-x-2">
                                             <IconUserEdit size={20} />
                                             <span className="text-[15px] font-medium">Người lập phiếu</span>
@@ -693,10 +690,8 @@ const Popup_Detail = React.memo((props) => {
                                                 </ColumnTablePopup>
                                             )}
                                         </HeaderTablePopup>
-                                        <ScrollArea
+                                        <Customscrollbar
                                             className="min-h-[400px] max-h-[450px]"
-                                            speed={1}
-                                            smoothScrolling={true}
                                         >
                                             <div className="divide-y divide-slate-200">
                                                 {list?.variation_option_value?.map((e) => (
@@ -707,11 +702,11 @@ const Popup_Detail = React.memo((props) => {
                                                             : "grid-cols-2"
                                                             } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
                                                     >
-                                                        <div className="flex justify-center self-center">
+                                                        <div className="flex self-center justify-center">
                                                             {e?.image == null ? (
                                                                 <img
                                                                     src="/no_image.png"
-                                                                    className="w-auto h-20 rounded object-contain select-none pointer-events-none"
+                                                                    className="object-contain w-auto h-20 rounded pointer-events-none select-none"
                                                                 />
                                                             ) : (
                                                                 <Image
@@ -720,21 +715,21 @@ const Popup_Detail = React.memo((props) => {
                                                                     quality={100}
                                                                     src={e?.image}
                                                                     alt="thumb type"
-                                                                    className="w-auto h-20 rounded object-contain select-none pointer-events-none"
+                                                                    className="object-contain w-auto h-20 rounded pointer-events-none select-none"
                                                                     loading="lazy"
                                                                     crossOrigin="anonymous"
                                                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                                                 />
                                                             )}
                                                         </div>
-                                                        <h6 className="px-2 xl:text-base text-xs self-center text-center">
+                                                        <h6 className="self-center px-2 text-xs text-center xl:text-base">
                                                             {e?.name}
                                                         </h6>
                                                         {e?.variation_option_2?.length > 0 && (
                                                             <div className="self-center space-y-0.5">
                                                                 {e?.variation_option_2?.map((ce) => (
                                                                     <React.Fragment key={ce.id?.toString()}>
-                                                                        <h6 className="px-2 xl:text-base text-xs  text-center">
+                                                                        <h6 className="px-2 text-xs text-center xl:text-base">
                                                                             {ce.name}
                                                                         </h6>
                                                                     </React.Fragment>
@@ -744,7 +739,7 @@ const Popup_Detail = React.memo((props) => {
                                                     </div>
                                                 ))}
                                             </div>
-                                        </ScrollArea>
+                                        </Customscrollbar>
                                     </div>
                                 ) : (
                                     <NoData />

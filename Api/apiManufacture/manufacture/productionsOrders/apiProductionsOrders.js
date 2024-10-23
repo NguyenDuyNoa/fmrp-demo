@@ -35,6 +35,13 @@ const apiProductionsOrders = {
         const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/getSuggestExporting`, data);
         return response.data
     },
+
+    //  lịch sử nhập kho tp
+    async apiGetPurchaseProducts(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Purchase_Products/getPurchaseProducts`, data);
+        return response.data
+    },
+
     // api đổi trạng thái sản xuất
     async apiAgreeProcess(data) {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/agreeProcess`, data);
@@ -56,6 +63,13 @@ const apiProductionsOrders = {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/searchWarehousePOD`, data);
         return response.data
     },
+
+    // xóa thành phẩm trong công đoạn
+    async apiRemovePurchaseProduct(data) {
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/removePurchaseProduct`, data);
+        return response.data
+    },
+
 
 }
 export default apiProductionsOrders

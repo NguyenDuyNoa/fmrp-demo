@@ -553,6 +553,7 @@ const ProductionWarehouse = (props) => {
                                                             warehouseman_id={e?.warehouseman_id}
                                                             status_pay={e?.status_pay}
                                                             id={e?.id}
+                                                            referenceNoDetail={e?.reference_no_detail}
                                                             type="production_warehouse"
                                                             className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                         />

@@ -11,6 +11,7 @@ import NoData from '@/components/UI/noData/nodata';
 import Pagination from "@/components/UI/pagination";
 import { optionsQuery } from '@/configs/optionsQuery';
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate';
+import useFeature from '@/hooks/useConfigFeature';
 import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
 import usePagination from '@/hooks/usePagination';
@@ -18,8 +19,10 @@ import { formatMoment } from '@/utils/helpers/formatMoment';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from '@tanstack/react-query';
 import { Grid6 } from 'iconsax-react';
+import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
-import { memo } from 'react';
+import { memo, useState } from 'react';
+import ModalImage from 'react-modal-image';
 import { useSelector } from 'react-redux';
 const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
 
@@ -28,6 +31,8 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
     const dataSeting = useSetingServer()
 
     const { paginate } = usePagination()
+    //search mã ct
+    const [isSearch, setIsSearch] = useState("");
 
     const { limit, updateLimit: sLimit } = useLimitAndTotalItems()
 
@@ -37,21 +42,43 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
 
     // const { checkAdd, checkExport } = useActionRole(auth, "")
 
+    const onChangeSearch = debounce((e) => { setIsSearch(e.target.value) }, 500)
+
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+
     const { data, isLoading, isFetching, refetch } = useQuery({
-        queryKey: ['api_get_suggest_exporting'],
+        queryKey: ['api_get_suggest_exporting', isSearch],
         queryFn: async () => {
             let formData = new FormData();
+
+            formData.append("search", isSearch);
 
             formData.append("pod_id", isStateModal?.dataDetail?.poi?.poi_id);
 
             const res = await apiProductionsOrders.apiGetSuggestExporting(formData)
 
-            return res.data || {}
+            const flattenedItemsArray = res?.data?.rResult.flatMap(entry =>
+                entry.items.map(item => ({
+                    branch_name: entry.branch_name,
+                    code: entry.code,
+                    created_by: entry.created_by,
+                    date: entry.date,
+                    grand_total: entry.grand_total,
+                    id: entry.id,
+                    note: entry.note,
+                    poi_data: entry.poi_data,
+                    poi_id: entry.poi_id,
+                    staff_create: entry.staff_create,
+                    total_quantity: entry.total_quantity,
+                    item
+                }))
+            );
+            return { ...res.data, rResult: flattenedItemsArray } || {}
         },
         ...optionsQuery
     })
 
-    console.log("data", data);
+
 
 
     return (
@@ -64,7 +91,7 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                     <SearchComponent
                         colSpan={1} dataLang={dataLang}
                         placeholder={dataLang?.branch_search}
-                        onChange={() => { }}
+                        onChange={(e) => onChangeSearch(e)}
                         classInput={'border'}
                     />
                     <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
@@ -119,27 +146,67 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                 <RowItemTable colSpan={2} textAlign={'center'}>
                                                     {e.code}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'}>
-                                                    {/* <ModalImage
-                                                        small={e.image ?? '/no_img.png'}
-                                                        large={e.image ?? '/no_img.png'}
+                                                <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-1'}>
+                                                    <ModalImage
+                                                        small={e?.item?.images ?? '/no_img.png'}
+                                                        large={e?.item?.images ?? '/no_img.png'}
                                                         width={36}
                                                         height={36}
-                                                        alt={e.name}
+                                                        alt={e?.item?.name}
                                                         className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                     />
-                                                    <div className='flex flex-col'>
-                                                        <span>{e.name}</span>
-                                                        <div className='flex items-center gap-1 text-gray-500'>
-                                                            <span>{e.code}</span>-<span>{e.itemVariation}</span>
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className='flex flex-col'>
+                                                                <span>{e?.item?.item_name}</span>
+                                                                <div className='flex items-center gap-1 text-xs italic text-gray-500'>
+                                                                    <span>{e?.item?.item_code}</span>-<span>{e?.item?.product_variation}</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div> */}
+                                                        <div className="flex flex-wrap items-center font-oblique">
+                                                            {
+                                                                dataProductSerial.is_enable === "1" && (
+                                                                    <div className="flex gap-0.5">
+                                                                        <h6 className="text-[12px]">
+                                                                            Serial:
+                                                                        </h6>
+                                                                        <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                            {e?.item?.serial == null || e?.item?.serial == "" ? "-" : e?.item?.serial}
+                                                                        </h6>
+                                                                    </div>
+                                                                )
+                                                            }
+                                                            {
+                                                                dataProductExpiry.is_enable === "1" && (
+                                                                    <>
+                                                                        <div className="flex gap-0.5">
+                                                                            <h6 className="text-[12px]">
+                                                                                Lot:
+                                                                            </h6>{" "}
+                                                                            <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                                {e?.item?.lot == null || e?.item?.lot == "" ? "-" : e?.item?.lot}
+                                                                            </h6>
+                                                                        </div>
+                                                                        <div className="flex gap-0.5">
+                                                                            <h6 className="text-[12px]">
+                                                                                Date:
+                                                                            </h6>{" "}
+                                                                            <h6 className="text-[12px]  px-2   w-[full] text-center ">
+                                                                                {e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                            </h6>
+                                                                        </div>
+                                                                    </>
+                                                                )
+                                                            }
+                                                        </div>
+                                                    </div>
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={2} textAlign={'center'}>
-                                                    {e.unit}
+                                                    {e?.item?.unit_name}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={2} textAlign={'right'}>
-                                                    {e.quantity > 0 ? formatNumber(e.quantity) : '-'}
+                                                    {e?.item?.quantity_export > 0 ? formatNumber(e?.item?.quantity_export) : '-'}
                                                 </RowItemTable>
                                             </RowTable>
                                         ))

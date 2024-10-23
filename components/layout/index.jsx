@@ -1,7 +1,4 @@
-import {
-    QueryClient,
-    QueryClientProvider
-} from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
@@ -17,17 +14,15 @@ const queryClient = new QueryClient({
 
 const Index = ({ children }) => {
     return (
-        <>
-            <QueryClientProvider client={queryClient}>
-                <div>
-                    <Header />
-                    <div className="overflow-hidden">{children}</div>
-                </div>
-                <PopupAppTrial />
-                <PopupAppRenewal />
-                <ReactQueryDevtools initialIsOpen={true} />
-            </QueryClientProvider>
-        </>
+        <QueryClientProvider client={queryClient}>
+            <div>
+                <Header />
+                <div className="overflow-hidden">{children}</div>
+            </div>
+            <PopupAppTrial />
+            <PopupAppRenewal />
+            <ReactQueryDevtools initialIsOpen={true} />
+        </QueryClientProvider>
     );
 };
 

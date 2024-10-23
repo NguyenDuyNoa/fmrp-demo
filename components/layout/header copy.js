@@ -483,13 +483,13 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Import dữ liệu",
-                            link: "/import"
+                            link: "/convenience/import"
                         },
                         {
                             hidden: 0,
                             disble: 0,
                             name: "Export dữ liệu",
-                            link: "/export"
+                            link: "/convenience/export"
                         },
                     ],
                 },
@@ -1049,8 +1049,8 @@ const Header = () => {
             {/* <header className="z-40 w-full bg-[#0375f3] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             {/* <header className="z-40 w-full bg-[#0f4f9e] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             <div className="3xl:mx-10 2xl:mx-10 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">
-                <div className="flex justify-between items-center">
-                    <div className="flex 3xl:space-x-6 2xl:space-x-4 xl:space-x-4 space-x-2 items-center">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 3xl:space-x-6 2xl:space-x-4 xl:space-x-4">
                         <Link href="/">
                             <Image
                                 alt=""
@@ -1102,20 +1102,20 @@ const Header = () => {
                                     trigger="manual"
                                     html={
                                         <React.Fragment>
-                                            <div className="  rounded-lg  w-auto h-auto  ">
-                                                <div className="flex justify-center items-center  rounded-lg">
+                                            <div className="w-auto h-auto rounded-lg ">
+                                                <div className="flex items-center justify-center rounded-lg">
                                                     <ArrowUp
                                                         size="32"
                                                         color="green"
                                                         className="rotate-45 animate-pulse "
                                                     />
-                                                    <h2 className="text-black font-semibold text-justify  py-2 px-3 ">
+                                                    <h2 className="px-3 py-2 font-semibold text-justify text-black ">
                                                         {dropdown.text}
                                                     </h2>
                                                 </div>
                                             </div>
                                             {/* <div className=" mt-[20px]   bg-gray-100 shadow-2xl rounded-lg  w-auto h-auto min-h-[30px] ">
-                        <div className="flex justify-center items-center shadow-2xl rounded-lg">
+                        <div className="flex items-center justify-center rounded-lg shadow-2xl">
                           <ArrowUp
                             size="32"
                             color="green"
@@ -1189,7 +1189,7 @@ const Header = () => {
               Kho & Sản xuất
             </Dropdown> */}
                     </div>
-                    <div className="flex 3xl:space-x-5 2xl:space-x-4 xl:space-x-3 lg:space-x-2  items-center">
+                    <div className="flex items-center 3xl:space-x-5 2xl:space-x-4 xl:space-x-3 lg:space-x-2">
                         <a
                             href="#"
                             title="Thông báo"
@@ -1207,7 +1207,7 @@ const Header = () => {
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
                         </a>
-                        <form className="flex items-center relative">
+                        <form className="relative flex items-center">
                             <div className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] absolute left-3">
                                 <Image
                                     alt=""
@@ -1215,7 +1215,7 @@ const Header = () => {
                                     width={24}
                                     height={18}
                                     quality={100}
-                                    className="w-auto h-auto object-contain"
+                                    className="object-contain w-auto h-auto"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1230,7 +1230,7 @@ const Header = () => {
                         <Link
                             href="/settings"
                             title="Cài đặt"
-                            className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
+                            className="transition 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75"
                         >
                             <Image
                                 alt=""
@@ -1247,7 +1247,7 @@ const Header = () => {
                         {/* <a
               href="#"
               title="Thông báo"
-              className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
+              className="relative transition 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 "
             >
               <Image
                 alt=""
@@ -1267,7 +1267,7 @@ const Header = () => {
                         <a
                             href="#"
                             title="Thông báo"
-                            className="3xl:scale-100 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
+                            className="relative transition 3xl:scale-100 2xl:scale-95 xl:scale-90 lg:scale-75 "
                         >
                             <DropdownThongBao
                                 data={ListThongBao}
@@ -1280,7 +1280,7 @@ const Header = () => {
                                     width={18}
                                     height={18}
                                     quality={100}
-                                    className="object-contain 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
+                                    className="object-contain transition 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1297,7 +1297,7 @@ const Header = () => {
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
+                                className="object-contain transition 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1307,7 +1307,7 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div className="px-10 py-0  pt-1 overflow-x-auto">
+            <div className="px-10 py-0 pt-1 overflow-x-auto">
                 <Expirred />
                 {/* <PopupModelTime /> */}
             </div>
@@ -1410,7 +1410,7 @@ const DropdownAvatar = React.memo(() => {
                 className={`popover-edit `}
             >
                 <div className="w-[300px]">
-                    <div className="bg-white rounded justify-between">
+                    <div className="justify-between bg-white rounded">
                         <div className="flex space-x-3 px-3 py-3.5 border-b border-[#F2F4F7]">
                             <div className="h-fit min-w-[40px] relative">
                                 {auth?.user_avatar !== null ? (
