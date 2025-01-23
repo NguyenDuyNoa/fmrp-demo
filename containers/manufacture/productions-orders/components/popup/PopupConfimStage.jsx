@@ -442,7 +442,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                             <th className="border p-2 min-w-[120px]">SL xuất kho</th>
                                             <th className="border p-2 min-w-[120px]">Tồn kho</th>
                                             <th className="border p-2 min-w-[150px]">Kho hàng</th>
-                                            <th className="border p-2 min-w-[100px]">Actions</th>
+                                            <th className="border p-2 min-w-[100px]">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody className="h-[calc(80vh_/_2_-_155px)]">
