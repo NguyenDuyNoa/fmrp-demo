@@ -14,8 +14,22 @@ const nextConfig = {
                 source: '/',
                 destination: '/dashboard',
             },
+            // {
+            //     source: '/settings',
+            //     destination: '/settings/information',
+            // },
         ]
     },
-};
+    redirects: async () => {
+        return [
+            {
+                source: '/settings',
+                destination: '/settings/information',
+                permanent: true,
+            },
+        ]
+
+    }
+}
 
 module.exports = nextConfig;
