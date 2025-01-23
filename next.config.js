@@ -20,16 +20,16 @@ const nextConfig = {
             // },
         ]
     },
-    redirects: async () => {
-        return [
-            {
-                source: '/settings',
-                destination: '/settings/information',
-                permanent: true,
-            },
-        ]
+    // redirects: async () => {
+    //     return [
+    //         {
+    //             source: '/settings',
+    //             destination: '/settings/information',
+    //             permanent: true,
+    //         },
+    //     ]
 
-    }
+    // }
 }
 
 module.exports = nextConfig;
