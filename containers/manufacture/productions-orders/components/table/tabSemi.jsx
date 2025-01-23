@@ -11,7 +11,9 @@ import { ProductionsOrdersContext } from "../../context/productionsOrders";
 
 const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
     const dataSeting = useSetingServer();
+
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
     const { isStateProvider: isState } = useContext(ProductionsOrdersContext);
 
     return (

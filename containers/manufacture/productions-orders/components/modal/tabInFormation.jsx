@@ -320,26 +320,28 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
 
                                             {(+j?.type == 2 || +j?.type == 3)
                                                 ?
-                                                <PopupImportProducts
-                                                    dataDetail={dataDetail}
-                                                    type={j?.active ? 'done_production' : 'end_production'}
-                                                    dataStage={j}
-                                                    dataLang={dataLang}
-                                                    refetchProductionsOrders={refetchProductionsOrders}
-                                                >
-                                                    <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
-                                                </PopupImportProducts>
+                                                // <PopupImportProducts
+                                                //     dataDetail={dataDetail}
+                                                //     type={j?.active ? 'done_production' : 'end_production'}
+                                                //     dataStage={j}
+                                                //     dataLang={dataLang}
+                                                //     refetchProductionsOrders={refetchProductionsOrders}
+                                                // >
+                                                //     <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
+                                                // </PopupImportProducts>
+                                                <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-500"} cursor-default hover:scale-110 transition-all duration-150 ease-linear`} />
                                                 :
                                                 +j?.type == 0 &&
-                                                <PopupImportProducts
-                                                    dataDetail={dataDetail}
-                                                    type={j?.active ? 'done_production' : 'end_production'}
-                                                    dataStage={j}
-                                                    dataLang={dataLang}
-                                                    refetchProductionsOrders={refetchProductionsOrders}
-                                                >
-                                                    <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
-                                                </PopupImportProducts>
+                                                // <PopupImportProducts
+                                                //     dataDetail={dataDetail}
+                                                //     type={j?.active ? 'done_production' : 'end_production'}
+                                                //     dataStage={j}
+                                                //     dataLang={dataLang}
+                                                //     refetchProductionsOrders={refetchProductionsOrders}
+                                                // >
+                                                //     <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
+                                                // </PopupImportProducts>
+                                                <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-500"} cursor-default hover:scale-110 transition-all duration-150 ease-linear`} />
                                             }
 
                                             {/* {(+j?.type == 2 || +j?.type == 3)
@@ -398,7 +400,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                                         SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
                                                                     </span>
                                                                 </div>
-                                                                <button
+                                                                {/* <button
                                                                     onClick={() => { handleQueryId({ status: true, id: e?.pp_id }); }}
                                                                     className={`group transition-all ease-in-out hover:bg-slate-50 text-left cursor-pointer w-full`}
                                                                 >
@@ -406,7 +408,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                                         size={14}
                                                                         className="group-hover:text-[#f87171] group-hover:scale-110"
                                                                     />
-                                                                </button>
+                                                                </button> */}
                                                             </div>
                                                         )
                                                     })

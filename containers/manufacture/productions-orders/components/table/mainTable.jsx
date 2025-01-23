@@ -16,6 +16,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useQuery } from "@tanstack/react-query";
 import { SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
+import dynamic from "next/dynamic";
 import React, { useContext, useEffect, useState } from "react";
 import { v4 as uddid } from "uuid";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
@@ -25,6 +26,9 @@ import FilterHeader from "../header/filterHeader";
 import ModalDetail from "../modal/modalDetail";
 import TabItem from "./tabItem";
 import TabSemi from "./tabSemi";
+import PopupConfimStage from "../popup/PopupConfimStage";
+
+// const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 
 const MainTable = ({ dataLang }) => {
     const listTab = [
@@ -40,11 +44,11 @@ const MainTable = ({ dataLang }) => {
         },
     ];
 
+    const { data: listBr = [] } = useBranchList()
+
     const [isMouted, setIsMouted] = useState(false);
 
     const { isOpen, handleQueryId, isIdChild } = useToggle();
-
-    const { data: listBr = [] } = useBranchList()
 
     const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
 
@@ -560,6 +564,10 @@ const MainTable = ({ dataLang }) => {
                                                 </h1>
                                             </div>
                                         </div>
+                                        {/* <div className="text-base font-medium text-blue-500 cursor-pointer">
+                                            Hoàn thành công đoạn
+                                        </div> */}
+                                        <PopupConfimStage dataLang={dataLang} dataRight={isState} />
                                         {/* <button
                                 className="bg-red-100 rounded-lg outline-none focus:outline-none"
                                 onClick={() => {

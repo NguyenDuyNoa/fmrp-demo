@@ -1029,7 +1029,9 @@ const Header = () => {
 
         }
     }, [dataPstWH, isLastDropdown, dropdowns.length, currentDropdownIndex]);
+
     const currentDropdown = dropdowns[currentDropdownIndex];
+
     return (
         <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
             <div className="3xl:mx-6 2xl:mx-4 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">

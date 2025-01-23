@@ -11,7 +11,9 @@ import { ProductionsOrdersContext } from "../../context/productionsOrders";
 
 const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel }) => {
     const dataSeting = useSetingServer();
+
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
     const { isStateProvider: isState } = useContext(ProductionsOrdersContext);
 
     return (

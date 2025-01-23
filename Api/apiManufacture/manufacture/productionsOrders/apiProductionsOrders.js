@@ -70,6 +70,21 @@ const apiProductionsOrders = {
         return response.data
     },
 
+    // ds công đoạn tp, công đoạn btp
 
+    async apiFinishedStages(id) {
+        const response = await axiosCustom('GET', `/api_web/api_manufactures/finished_stages?po_id=${id}`);
+        return response.data
+    },
+    // lấy thông tin mặt hàng cần hoàn thành
+    async apiActiveStages(data) {
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/activeStages`, data);
+        return response.data
+    },
+    // API lấy thông tin BOM cần xuất
+    async apiLoadOutOfStock(data) {
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/loadOutOfStock`, data);
+        return response.data
+    },
 }
 export default apiProductionsOrders

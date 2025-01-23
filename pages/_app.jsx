@@ -6,7 +6,8 @@ import store from "@/services/redux";
 import { Lexend_Deca } from "@next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Head from "next/head";
-import React, { useEffect } from "react";
+import { useRouter } from "next/router";
+import React, { Suspense, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import "sweetalert2/src/sweetalert2.scss";
@@ -32,11 +33,13 @@ const Index = (props) => {
                 <Head>
                     <link rel="shortcut icon" href="/Favicon.png" />
                 </Head>
-                <Provider store={store}>
-                    <main className={deca.className}>
-                        <MainPage {...props} />
-                    </main>
-                </Provider>
+                <Suspense fallback={<LoadingPage />}>
+                    <Provider store={store}>
+                        <main className={deca.className}>
+                            <MainPage {...props} />
+                        </main>
+                    </Provider>
+                </Suspense>
             </QueryClientProvider>
         </React.Fragment>
     );
@@ -44,6 +47,9 @@ const Index = (props) => {
 
 function MainPage({ Component, pageProps }) {
     const { } = useSetings()
+
+    const router = useRouter();
+
 
     const dispatch = useDispatch();
 
