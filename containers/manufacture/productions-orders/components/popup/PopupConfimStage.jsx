@@ -161,7 +161,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
     return (
         <PopupCustom
             title={<p>Hoàn thành công đoạn <span className="text-blue-500">(Số lệnh sản xuất: {data?.po?.reference_no})</span></p>}
-            button={<button className="py-1.5 px-4 transition-all duration-150 ease-in-out border border-blue-500 rounded-lg text-blue-500 text-sm hover:bg-blue-500 hover:text-white">Hoàn thành công đoạn</button>}
+            button={<button className="py-1.5 px-4 transition-all duration-150 ease-in-out border border-blue-500 rounded-lg text-sm hover:bg-blue-500/70 hover:border-blue-500/70 bg-blue-500 text-white">Hoàn thành công đoạn</button>}
             onClickOpen={() => {
                 queryState({ open: true });
             }}
