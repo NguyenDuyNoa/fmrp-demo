@@ -51,7 +51,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
     const { data: dataLoadOutOfStock, isLoading: isLoadingLoadOutOfStock, onGetData: onGetDataLoadOutOfStock } = useLoadOutOfStock()
 
     const handleSelectStep = async (type, e) => {
-        if (e?.stage_id == activeStep?.item?.stage_id) return
+        if ((e?.stage_id == activeStep?.item?.stage_id && type == activeStep?.type)) return
 
         setActiveStep({ type, item: e });
 
