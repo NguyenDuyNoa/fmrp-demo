@@ -356,12 +356,12 @@ const Header = () => {
                     title: "Điều độ sản xuất",
                     link: "/manufacture/production-smoothing",
                 },
-                {
-                    viewOwn: -1,
-                    view: -1,
-                    title: "Tổng quan sản xuất",
-                    link: "/manufacture/production-overview",
-                },
+                // {
+                //     viewOwn: -1,
+                //     view: -1,
+                //     title: "Tổng quan sản xuất",
+                //     link: "/manufacture/production-overview",
+                // },
                 {
                     viewOwn: -1,
                     view: -1,
