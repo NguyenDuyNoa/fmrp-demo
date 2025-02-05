@@ -950,7 +950,8 @@ const ProductsWarehouseForm = (props) => {
                                     ""
                                 )}
                                 {
-                                    dataMaterialExpiry.is_enable === "1" || dataProductExpiry?.is_enable === "1" ? (
+                                    // dataMaterialExpiry.is_enable === "1" ||
+                                    dataProductExpiry?.is_enable === "1" ? (
                                         <>
                                             <div className="flex items-center col-span-1 ">
                                                 <InPutNumericFormat
