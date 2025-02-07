@@ -200,6 +200,8 @@ const ProductionPlan = (props) => {
         });
     };
 
+
+
     const updateListProducts = (order, timeLine) => {
         const newDb = order.listProducts.map((product) => {
             const newArrDays = sortArrayByDay(product.processArr, timeLine);
@@ -224,7 +226,6 @@ const ProductionPlan = (props) => {
             return listOrder?.map((order) => {
                 const updatedListProducts = updateListProducts(order, timeLine);
                 const processDefaultUpdate = updateProcessDefault(order, timeLine);
-
                 return {
                     ...order,
                     show: updatedListProducts?.length > 0,

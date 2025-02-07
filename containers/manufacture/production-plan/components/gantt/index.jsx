@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Popup from "reactjs-popup";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
 import ModalImage from "react-modal-image";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import Loading from "@/components/UI/loading/loading";
@@ -26,14 +26,27 @@ const BodyGantt = ({
     handleChekedAll,
 }) => {
     const showToast = useToast();
+
     const container1Ref = useRef();
+
     const container2Ref = useRef();
+
     const container3Ref = useRef();
+
+    const checkRankRef = useRef(null);
+
     const divRefs = useRef([]);
+
     const dataSeting = useSetingServer()
+
     const [heights, setHeights] = useState([]);
+
     const [checkCkecked, sCheckCkecked] = useState(false);
+
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
+    const [isLastActive, setIsLastActive] = useState()
+
     const handleScroll = (e) => {
         const container1Element = container1Ref.current;
         const container2Element = container2Ref.current;
@@ -55,6 +68,100 @@ const BodyGantt = ({
     useEffect(() => {
         sCheckCkecked(false);
     }, [router]);
+
+    // Hàm lấy phần tử có ngày lớn nhất với điều kiện active: true
+    const getLatestActiveProcess = (data) => {
+        let latestProcess = null;
+
+        for (let i = 0; i < data.length; i++) {
+            const item = data[i];
+            for (let j = 0; j < item.listProducts.length; j++) {
+                const product = item.listProducts[j];
+                for (let k = 0; k < product.processArr.length; k++) {
+                    const process = product.processArr[k];
+
+                    if (process.active) { // Chỉ xét phần tử có active = true
+                        const processDate = new Date(process.date.split('/').reverse().join('-')); // Chuyển "dd/MM/yyyy" thành "yyyy-MM-dd"
+
+                        if (!latestProcess || processDate > new Date(latestProcess.date.split('/').reverse().join('-'))) {
+                            latestProcess = process; // Cập nhật phần tử có ngày lớn nhất
+                        }
+                    }
+                }
+            }
+        }
+
+        return latestProcess;
+    };
+
+
+
+    const latestActiveProcess = getLatestActiveProcess(data);
+
+    useLayoutEffect(() => {
+        if (checkRankRef.current && container1Ref.current) {
+            const target = checkRankRef.current;
+
+            const viewport = document.querySelector('.container1')
+
+            if (viewport) {
+                const targetRect = target.getBoundingClientRect()
+                const viewportRect = viewport.getBoundingClientRect()
+
+                const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft
+
+                const startScrollLeft = viewport.scrollLeft
+
+
+                let startTime = null;
+
+                const duration = 8000; // Thời gian cuộn (ms)
+
+                const step = (timestamp) => {
+                    if (!startTime) startTime = timestamp;
+
+                    const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến độ từ 0 đến 1
+                    const ease = progress * (2 - progress); // Tăng tốc rồi giảm tốc (easing)
+
+                    viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
+                    if (progress < 1) {
+                        requestAnimationFrame(step); // Tiếp tục cuộn nếu chưa hoàn thành
+                    }
+                };
+
+                requestAnimationFrame(step);
+            }
+        }
+    }, [data]);
+
+
+
+    const datsa = [
+        {
+            listProducts: [
+                {
+                    processArr: [
+                        { active: false, date: "08/03/2024", day: "T6 03", id: "1", outDate: false },
+                        { active: true, date: "09/03/2024", day: "T7 03", id: "2", outDate: false }
+                    ]
+                }
+            ]
+        },
+        {
+            listProducts: [
+                {
+                    processArr: [
+                        { active: true, date: "10/03/2024", day: "CN 03", id: "3", outDate: false },
+                        { active: true, date: "11/03/2024", day: "T2 03", id: "5", outDate: false }
+                    ]
+                }
+            ]
+        }
+    ];
+
+
+
+
 
     return (
         <React.Fragment>
@@ -355,229 +462,81 @@ const BodyGantt = ({
                             <div
                                 ref={container1Ref}
                                 onScroll={handleScroll}
-                                className="flex-col w-full overflow-x-auto  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
+                                id="container1"
+                                className="container1 flex-col w-full overflow-x-auto  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
                              3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                             >
                                 {data?.map((e, eIndex) => {
                                     return (
-                                        <>
-                                            {/* <div
-                                                className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[41px]`}
-                                            >
-                                                <div className="flex items-center gap-1 ">
-                                                    <p className="text-[#11315B]  3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal">
-                                                        {e.nameOrder}
-                                                    </p>
-                                                    {e.status == "sussces" && (
-                                                        <div className="w-[18px] h-[18px]">
-                                                            <Image
-                                                                src={"/productionPlan/tick-circle.png"}
-                                                                width={36}
-                                                                height={36}
-                                                                alt="hii"
-                                                                className="object-cover w-full h-full"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center ">
-                                                    {e.processDefault.map((ce) => {
-                                                        return ce.days.map((ci) => {
-                                                            return (
-                                                                <div key={ci.id} className={`w-[80px] flex items-center`}>
-                                                                    <div className={`${ci.active ? "bg-[#D0D5DD]" : ""} py-1 w-[80px] `}></div>
-                                                                </div>
-                                                            );
-                                                        });
-                                                    })}
-                                                </div>
-                                            </div>
+                                        <div key={e.id} className={``}>
+                                            <div className={`${!e.show ? "my-1" : "mt-1"}`}>
+                                                <div className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[37px]`}>
 
-                                            {e.show &&
-                                                e.listProducts.map((i, iIndex) => {
-                                                    return (
-                                                        <div
-                                                            key={i.id}
-                                                            className={`${i.name?.split(" ")?.length > 3 ? "mt-3" : "mt-2"} flex items-center  w-[65%] h-[40px]`}>
-                                                            {i.processArr.map((ce) => {
-                                                                return ce.days.map((ci) => {
+                                                </div>
+
+                                                {e.show &&
+                                                    e.listProducts.map((i, iIndex) => {
+                                                        return (
+                                                            <div
+                                                                key={i.id}
+                                                                style={{ height: heights[eIndex + iIndex] }}
+                                                                className={`flex items-center  w-[65%] my-2`}
+                                                                id={`div-${i.id}`}
+
+                                                            >
+                                                                {i.processArr.map((ci, ciIndex) => {
+                                                                    const isActive = ci?.id == latestActiveProcess?.id;
                                                                     return (
-                                                                        <div key={ci.id} className={`w-[80px]`}>
-                                                                            <Popup
-                                                                                className="popover-productionPlan"
-                                                                                arrow={true}
-                                                                                arrowStyle={{
-                                                                                    color: (ci.active && !ci.outDate && "#fecaca") || (ci.active && ci.outDate && "#bae6fd"),
-                                                                                }}
-                                                                                trigger={
-                                                                                    <div
-                                                                                        className={`${ci.active && ci.outDate
-                                                                                            ? "bg-[#5599EC] hover:bg-sky-200" : ""}  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
-                                                                                    >
-                                                                                        <div
-                                                                                            className={`${ci.active && !ci.outDate ? "bg-[#EE1E1E] hover:bg-red-200" : ""} 
-                                                                                        h-[20px] w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}></div>
-                                                                                    </div>
-                                                                                }
-                                                                                position="top center"
-                                                                                on={["hover", "focus"]}
-                                                                            >
-                                                                                <div
-                                                                                    className={`flex flex-col ${(ci.active && !ci.outDate && "bg-red-200") || (ci.active && ci.outDate && "bg-sky-200")
-                                                                                        } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize`}
-                                                                                >
-                                                                                    {ci.date}
-                                                                                </div>
-                                                                            </Popup>
-                                                                        </div>
-                                                                    );
-                                                                });
-                                                            })}
-                                                        </div>
-                                                    );
-                                                })} */}
+                                                                        <div
+                                                                            ref={isActive ? checkRankRef : null}
+                                                                            key={ci?.id} className={`w-[80px]`}
+                                                                        >
 
-                                            <div key={e.id} className={``}>
-                                                <div className={`${!e.show ? "my-1" : "mt-1"}`}>
-                                                    <div
-                                                        className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[37px]`}
-                                                    >
-                                                        {/* <div className="flex items-center gap-1 ">
-                                                            <p className="text-[#11315B]  3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal">
-                                                                {e.nameOrder}
-                                                            </p>
-                                                            {e.status == "sussces" && (
-                                                                <div className="w-[18px] h-[18px]">
-                                                                    <Image
-                                                                        src={"/productionPlan/tick-circle.png"}
-                                                                        width={36}
-                                                                        height={36}
-                                                                        alt="hii"
-                                                                        className="object-cover w-full h-full"
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </div> */}
-                                                        {/* <div className="flex items-center ">
-                                                            {e.processDefault.map((ce) => {
-                                                                <div key={ce.id} className={`w-[80px] flex items-center`}>
-                                                                    <div className={`${ce.active ? "bg-[#D0D5DD]" : ""} py-1 w-[80px] `}></div>
-                                                                </div>
-                                                            })}
-                                                        </div> */}
-                                                    </div>
-
-                                                    {e.show &&
-                                                        e.listProducts.map((i, iIndex) => {
-                                                            return (
-                                                                <div
-                                                                    key={i.id}
-                                                                    style={{ height: heights[eIndex + iIndex] }}
-                                                                    className={`flex items-center  w-[65%] my-2`} id={`div-${i.id}`}>
-                                                                    {i.processArr.map((ci) => {
-                                                                        return (
-                                                                            <div key={ci?.id} className={`w-[80px]`}>
-                                                                                {/* <Popup
+                                                                            {ci.active && !ci.outDate ?
+                                                                                <Popup
                                                                                     className="popover-productionPlan"
                                                                                     arrow={true}
                                                                                     arrowStyle={{
-                                                                                        color: (!ci?.active && "#fecaca") || (ci?.active && "#bae6fd"),
+                                                                                        color:
+                                                                                            (!ci.active && !ci.outDate && "#fecaca") ||
+                                                                                            (ci.active && !ci.outDate && "#bae6fd"),
+                                                                                        transform: "translateY(130%)",
                                                                                     }}
                                                                                     trigger={
                                                                                         <div
-                                                                                            className={`${ci?.active ? "bg-[#5599EC] hover:bg-sky-200" : ""}  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
+                                                                                            className={`${ci.active && !ci.outDate ? "bg-[#5599EC] hover:bg-sky-200" : ""
+                                                                                                }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out`}
                                                                                         >
-                                                                                            <div
-                                                                                                className={`${!ci?.active ? "bg-[#EE1E1E] hover:bg-red-200" : ""} 
-                                                                                        h-[20px] w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}></div>
+
                                                                                         </div>
                                                                                     }
                                                                                     position="top center"
                                                                                     on={["hover", "focus"]}
+
                                                                                 >
                                                                                     <div
-                                                                                        className={`flex flex-col ${(!ci?.active && "bg-red-200") || (ci?.active && "bg-sky-200")
-                                                                                            } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize`}
+                                                                                        className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200") ||
+                                                                                            (ci.active && !ci.outDate && "bg-sky-200")
+                                                                                            } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
                                                                                     >
-                                                                                        {ci?.date}
+                                                                                        {ci.date}
                                                                                     </div>
-                                                                                </Popup> */}
-                                                                                {ci.active && !ci.outDate ?
-                                                                                    <Popup
-                                                                                        className="popover-productionPlan"
-                                                                                        arrow={true}
-                                                                                        arrowStyle={{
-                                                                                            color:
-                                                                                                (!ci.active &&
-                                                                                                    !ci.outDate &&
-                                                                                                    "#fecaca") ||
-                                                                                                (ci.active &&
-                                                                                                    !ci.outDate &&
-                                                                                                    "#bae6fd"),
-                                                                                            transform: "translateY(130%)",
-                                                                                        }}
-                                                                                        trigger={
-                                                                                            <div
-                                                                                                className={`${ci.active && !ci.outDate
-                                                                                                    ? "bg-[#5599EC] hover:bg-sky-200"
-                                                                                                    : ""
-                                                                                                    }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out`}
-                                                                                            >
-                                                                                                {/* <div
-                                                                                                className={`${!ci.active && !ci.outDate
-                                                                                                    ? "bg-[#EE1E1E] hover:bg-red-200"
-                                                                                                    : ""
-                                                                                                    } 
-                                                                                 h-[20px] w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}
-                                                                                            ></div> */}
-                                                                                            </div>
-                                                                                        }
-                                                                                        position="top center"
-                                                                                        on={["hover", "focus"]}
+                                                                                </Popup> : <div className="w-[80px] h-[20px]"></div>
+                                                                            }
+                                                                        </div>
+                                                                    );
+                                                                })}
 
-                                                                                    >
-                                                                                        <div
-                                                                                            className={`flex flex-col ${(!ci.active &&
-                                                                                                !ci.outDate &&
-                                                                                                "bg-red-200") ||
-                                                                                                (ci.active &&
-                                                                                                    !ci.outDate &&
-                                                                                                    "bg-sky-200")
-                                                                                                } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
-                                                                                        >
-                                                                                            {ci.date}
-                                                                                        </div>
-                                                                                    </Popup> : <div className="w-[80px] h-[20px]"></div>
-                                                                                }
-                                                                            </div>
-                                                                        );
-                                                                    })}
-
-                                                                </div>
-                                                            );
-                                                        })}
-                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
                                             </div>
-                                        </>
+                                        </div>
                                     );
                                 })}
                             </div>
                         </div>
                     )}
-                    {/* <div className="flex flex-col w-full border-b">
-                        <div className="border-b">
-                            <button type="button" onClick={handleToggle} className="flex items-center gap-2 my-2">
-                                <Image
-                                    alt=""
-                                    src={"/productionPlan/Vector.png"}
-                                    width={10}
-                                    height={10}
-                                    className="object-cover"
-                                />
-                                <h1 className="text-[#52575E] font-normal text-sm"> Thêm sản phẩm</h1>
-                            </button>
-                        </div>
-                    </div> */}
                 </div>
             ) :
                 <NoData />
