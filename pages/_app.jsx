@@ -6,12 +6,12 @@ import store from "@/services/redux";
 import { Lexend_Deca } from "@next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import React, { Suspense, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import "sweetalert2/src/sweetalert2.scss";
 import "../styles/globals.scss";
+import { CookieCore } from "@/utils/lib/cookie";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -46,16 +46,17 @@ const Index = (props) => {
 };
 
 function MainPage({ Component, pageProps }) {
-    const { } = useSetings()
-
-    const router = useRouter();
-
-
     const dispatch = useDispatch();
+
+    const tokenFMRP = CookieCore.get('tokenFMRP')
+
+    const databaseappFMRP = CookieCore.get('databaseappFMRP')
+
+    const { data: dataSeting } = useSetings()
 
     const auth = useSelector((state) => state.auth);
 
-    const { } = useAuththentication(auth)
+    const { data: dataAuth, isLoading } = useAuththentication(auth)
 
     const langDefault = useSelector((state) => state.lang);
 
@@ -66,11 +67,11 @@ function MainPage({ Component, pageProps }) {
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
 
-    if (auth == null) {
+    if (isLoading || auth == null) {
         return <LoadingPage />;
     }
 
-    if (auth == false) {
+    if (!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) {
         return <LoginPage dataLang={data} />;
     }
 
