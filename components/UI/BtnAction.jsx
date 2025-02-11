@@ -367,7 +367,7 @@ export const BtnAction = React.memo((props) => {
                             </button>
                         }
                         arrow={false}
-                        position="bottom right"
+                        position="left top"
                         className={`dropdown-edit`}
                         keepTooltipInside={props.keepTooltipInside}
                         closeOnDocumentClick
@@ -423,7 +423,7 @@ export const BtnAction = React.memo((props) => {
                                                 code={props?.code}
                                                 type={props?.typeOpen}
                                                 onRefresh={props.onRefresh}
-                                                className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                                className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
                                             />
                                             <Popup_Bom
                                                 dataLang={props.dataLang}
@@ -433,7 +433,7 @@ export const BtnAction = React.memo((props) => {
                                                 onRefresh={props.onRefresh}
                                                 type={props?.typeOpen}
                                                 bom={props?.bom}
-                                                className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                                className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
                                             />
                                             <Popup_Products
                                                 onRefresh={props.onRefresh}
@@ -441,7 +441,7 @@ export const BtnAction = React.memo((props) => {
                                                 dataLang={props.dataLang}
                                                 id={props?.id}
                                                 type={props?.typeOpen}
-                                                className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                                className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
                                             />
                                         </>
                                     )
