@@ -488,9 +488,9 @@ const MainTable = ({ dataLang }) => {
 
                                                     {isState.listDataRight?.title && (
                                                         // status_manufacture
-                                                        <span className={`${color[e?.status_manufacture].class} text-xs pl-2 pr-4 py-1.5 rounded-3xl font-medium w-fit h-fit`}>
-                                                            <span className={`${color[e?.status_manufacture].circle} h-2 w-2 rounded-full inline-block mr-2`} />
-                                                            {color[e?.status_manufacture].title}
+                                                        <span className={`${color[e?.status_manufacture]?.class} text-xs pl-2 pr-4 py-1.5 rounded-3xl font-medium w-fit h-fit`}>
+                                                            <span className={`${color[e?.status_manufacture]?.circle} h-2 w-2 rounded-full inline-block mr-2`} />
+                                                            {color[e?.status_manufacture]?.title}
                                                         </span>
                                                     )}
                                                 </div>
