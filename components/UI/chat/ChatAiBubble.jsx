@@ -14,7 +14,7 @@ import { debounce } from "lodash";
 
 export default function ChatBubbleAI(props) {
     const initialState = {
-        position: { x: window.innerWidth - 80, y: window.innerHeight - 140 },
+        position: { x: window.innerWidth - 80, y: window.innerHeight - 60 },
         dragging: false,
         offset: { x: 0, y: 0 },
         headerHeight: null,
