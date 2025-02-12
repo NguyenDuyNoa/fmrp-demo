@@ -164,14 +164,11 @@ const LoginPage = React.memo((props) => {
                 if (isSuccess) {
                     dispatch({ type: "auth/update", payload: res.data?.data });
                     CookieCore.set("tokenFMRP", token, {
-                        path: "/",
                         expires: new Date(Date.now() + 86400 * 1000),
                         sameSite: true,
                     });
                     CookieCore.set("databaseappFMRP", database_app, {
-                        path: "/",
                         expires: new Date(Date.now() + 86400 * 1000),
-                        sameSite: true,
                     });
                     showToat("success", message);
                     if (isState.rememberMe) {

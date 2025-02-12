@@ -71,6 +71,7 @@ const MainTable = ({ dataLang }) => {
     const convertArrData = (arr) => {
         const newData = arr?.map((e) => {
             return {
+                ...e,
                 id: e?.id,
                 title: e?.reference_no,
                 time: formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
@@ -126,11 +127,7 @@ const MainTable = ({ dataLang }) => {
             //     queryState({ idDetailProductionOrder: arrayItem[0]?.id });
             // }
             if (isState.search == "") {
-                if (isState.idDetailProductionOrder) {
-                    queryState({ idDetailProductionOrder: isState.idDetailProductionOrder });
-                } else {
-                    queryState({ idDetailProductionOrder: arrayItem[0]?.id });
-                }
+                queryState({ idDetailProductionOrder: isState.idDetailProductionOrder ? isState.idDetailProductionOrder : arrayItem[0]?.id });
             } else {
                 queryState({ idDetailProductionOrder: arrayItem[0]?.id });
             }
@@ -186,11 +183,7 @@ const MainTable = ({ dataLang }) => {
 
             });
             if (isState.search == "") {
-                if (isState.idDetailProductionOrder) {
-                    queryState({ idDetailProductionOrder: isState.idDetailProductionOrder });
-                } else {
-                    queryState({ idDetailProductionOrder: arrayItem[0]?.id });
-                }
+                queryState({ idDetailProductionOrder: isState.idDetailProductionOrder ? isState.idDetailProductionOrder : arrayItem[0]?.id });
             } else {
                 queryState({ idDetailProductionOrder: arrayItem[0]?.id });
             }
@@ -273,7 +266,6 @@ const MainTable = ({ dataLang }) => {
                                     itemVariation: i?.product_variation,
                                     code: i?.item_code,
                                     quantity: +i?.quantity,
-
                                     unit: i?.unit_name,
                                     processBar: i?.list_stages?.map((j) => {
                                         return {
@@ -419,6 +411,7 @@ const MainTable = ({ dataLang }) => {
         isLoadingRight,
         refetchProductionsOrders
     };
+    console.log("status_manufacture ", isState.listDataLeft);
 
     if (!isMouted) {
         return null;
@@ -441,7 +434,7 @@ const MainTable = ({ dataLang }) => {
                                 />
                                 <input
                                     onChange={(e) => onChangeSearch(e)}
-                                    className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
+                                    className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]"
                                     type="text"
                                     placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
                                 />
@@ -453,50 +446,72 @@ const MainTable = ({ dataLang }) => {
                                 <Loading />
                                 :
                                 isState.listDataLeft?.length > 0 ?
-                                    isState.listDataLeft.map((e, eIndex) => (
-                                        <div
-                                            key={e.id}
-                                            onClick={() => handleShow(e.id)}
-                                            className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
-                                        >
-                                            <div className="flex justify-between">
-                                                <div className="flex flex-col gap-1">
-                                                    <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
-                                                        {e.title}
-                                                    </h1>
-                                                    <h3 className="text-[#667085] font-normal text-[11px]">
-                                                        {dataLang?.materials_planning_create_on ||
-                                                            "materials_planning_create_on"}{" "}
-                                                        <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
-                                                            {e.time}
-                                                        </span>
-                                                    </h3>
-                                                </div>
-                                                <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
-                                            </div>
-                                            {e.showParent && (
-                                                <div className="flex flex-col w-full gap-2 mt-1">
-                                                    <div className="flex items-center gap-1">
-                                                        <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
-                                                            {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
+                                    isState.listDataLeft.map((e, eIndex) => {
+                                        console.log("e", e);
+                                        const color = {
+                                            "0": {
+                                                class: 'text-[#FF8F0D] bg-[#FEF8EC]',
+                                                circle: "bg-[#FF8F0D]",
+                                                title: dataLang?.productions_orders_produced || "productions_orders_produced"
+                                            },
+                                            "1": {
+                                                class: 'text-red-500 bg-red-50',
+                                                circle: "bg-red-500",
+                                                title: 'Đang sản xuất'
+                                            },
+                                            "2": {
+                                                class: 'text-green-500 bg-green-50 ',
+                                                circle: "bg-green-500",
+                                                title: 'Hoàn thành'
+                                            }
+                                        }
+
+                                        return (
+                                            <div
+                                                key={e.id}
+                                                onClick={() => handleShow(e.id)}
+                                                className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                            >
+                                                <div className="flex justify-between">
+                                                    <div className="flex flex-col gap-1">
+                                                        <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
+                                                            {e.title}
+                                                        </h1>
+                                                        <h3 className="text-[#667085] font-medium 3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm">
+                                                            {dataLang?.materials_planning_create_on ||
+                                                                "materials_planning_create_on"}{" "}
+                                                            <span className="text-[#141522] font-medium">
+                                                                {e.time}
+                                                            </span>
                                                         </h3>
-                                                        <div className="flex items-center gap-1">
-                                                            {e.followUp.map((i, index) => (
-                                                                <div key={index}>
-                                                                    <h2 className="text-[#191D23] font-medium 3xl:text-sm text-xs">
-                                                                        {i.nameFollow}
-                                                                    </h2>
-                                                                </div>
-                                                            ))}
-                                                        </div>
                                                     </div>
+
                                                     {isState.listDataRight?.title && (
-                                                        <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded font-medium w-fit">
-                                                            <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
-                                                            {dataLang?.productions_orders_produced || "productions_orders_produced"}
+                                                        // status_manufacture
+                                                        <span className={`${color[e?.status_manufacture].class} text-xs pl-2 pr-4 py-1.5 rounded-3xl font-medium w-fit h-fit`}>
+                                                            <span className={`${color[e?.status_manufacture].circle} h-2 w-2 rounded-full inline-block mr-2`} />
+                                                            {color[e?.status_manufacture].title}
                                                         </span>
                                                     )}
-                                                    {/* <div className="flex items-center w-full">
+                                                </div>
+                                                {e.showParent && (
+                                                    <div className="flex flex-col w-full gap-2 mt-1">
+                                                        <div className="flex items-center gap-1">
+                                                            <h3 className=" text-[#52575E] font-medium 3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm">
+                                                                {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
+                                                            </h3>
+                                                            <div className="flex items-center gap-1">
+                                                                {e.followUp.map((i, index) => (
+                                                                    <div key={index}>
+                                                                        <h2 className="text-[#191D23] font-medium 3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm">
+                                                                            {i.nameFollow}
+                                                                        </h2>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
+                                                        {/* <div className="flex items-center w-full">
                                                 {e.processBar.map((j, JIndex) => {
                                                     return (
                                                         <div key={j.id} className="flex flex-col items-start w-full">
@@ -527,10 +542,11 @@ const MainTable = ({ dataLang }) => {
                                                     )
                                                 })}
                                             </div> */}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })
                                     : <NoData />
                             }
 
@@ -555,7 +571,7 @@ const MainTable = ({ dataLang }) => {
                                 <>
                                     <div className="flex items-center justify-between px-4 py-1 border-b">
                                         <div className="">
-                                            <h1 className="text-[#52575E] font-normal text-xs uppercase">
+                                            <h1 className="text-[#52575E] font-normal text-xs capitalize">
                                                 {dataLang?.productions_orders || "productions_orders"}
                                             </h1>
                                             <div className="flex items-center gap-2">

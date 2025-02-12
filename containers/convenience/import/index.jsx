@@ -1638,6 +1638,7 @@ const Import = (props) => {
                                                                     zIndex: 9999,
                                                                     position: "absolute",
                                                                 }),
+
                                                             }}
                                                             className={`${errColumn && e?.column == null
                                                                 ? "border-red-500"

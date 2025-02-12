@@ -78,7 +78,7 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
         <div className='h-full'>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-3'>
-                    <h1 className="my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1>
+                    {/* <h1 className="my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1> */}
                     <div className="relative">
                         <select
                             id="select-2"
@@ -108,35 +108,37 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
                     </div>
                 }
             </div>
-            <div className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_450px)] 2xl:h-[calc(100vh_-_430px)] xl:h-[calc(100vh_-_440px)] h-[calc(100vh_-_455px)]" : '3xl:h-[calc(100vh_-_575px)] 2xl:h-[calc(100vh_-_550px)] xl:h-[calc(100vh_-_530px)] h-[calc(100vh_-_525px)]')
-                }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+            <div
+                className={`h-[65vh] scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+                {/* className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_450px)] 2xl:h-[calc(100vh_-_430px)] xl:h-[calc(100vh_-_440px)] h-[calc(100vh_-_455px)]" : '3xl:h-[calc(100vh_-_575px)] 2xl:h-[calc(100vh_-_550px)] xl:h-[calc(100vh_-_530px)] h-[calc(100vh_-_525px)]')
+                }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}> */}
                 <div>
                     <HeaderTable gridCols={isTab == 1 ? 10 : 9} display={'grid'}>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             STT
                         </ColumnTable>
-                        <ColumnTable colSpan={3} textAlign={'center'}>
+                        <ColumnTable colSpan={3} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             {isTab == 1 || isTab == 2 ? "Tên nguyên vật liệu" : "Tên thành phẩm"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Đơn vị tính
                         </ColumnTable>
-                        <ColumnTable colSpan={isTab == 1 ? 1 : 2} textAlign={'center'}>
+                        <ColumnTable colSpan={isTab == 1 ? 1 : 2} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             {isTab == 1 && "Số lượng xuất" || (isTab == 2 || isTab == 3) && "Số lượng gia công"}
                         </ColumnTable>
-                        <ColumnTable colSpan={isTab == 1 ? 1 : 2} textAlign={'center'}>
+                        <ColumnTable colSpan={isTab == 1 ? 1 : 2} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             {isTab == 1 && "Số thu hồi" || isTab == 2 && "CP NVL xuất gia công" || isTab == 3 && "CP gia công"}
                         </ColumnTable>
                         {
                             isTab == 1 &&
                             <>
-                                <ColumnTable colSpan={1} textAlign={'center'}>
+                                <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                                     CP xuất NVL
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={'center'}>
+                                <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                                     CP thu hồi
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={'center'}>
+                                <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                                     Tổng tiền
                                 </ColumnTable>
                             </>

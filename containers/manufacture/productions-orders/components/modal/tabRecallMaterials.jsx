@@ -73,11 +73,18 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
     return (
         <div className='h-full'>
             <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-1'>
+                {/* <div className='flex items-center gap-1'>
                     <h1 className="my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1>
-                </div>
+                </div> */}
+                <SearchComponent
+                    colSpan={1}
+                    dataLang={dataLang}
+                    placeholder={dataLang?.branch_search}
+                    onChange={() => { }}
+                    classInput={'border'}
+                    classNameBox={'w-[25%]'}
+                />
                 <div className="flex items-center justify-end gap-1">
-                    <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={() => { }} classInput={'border'} />
                     <OnResetData sOnFetching={(e) => queryStateExportHistory({ onFetching: e })} />
                     <button onClick={() => { }} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
                         <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
@@ -88,38 +95,40 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                     </div>
                 </div>
             </div>
-            <div className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_410px)] 2xl:h-[calc(100vh_-_390px)] xl:h-[calc(100vh_-_395px)] h-[calc(100vh_-_390px)]" : '3xl:h-[calc(100vh_-_520px)] 2xl:h-[calc(100vh_-_500px)] xl:h-[calc(100vh_-_490px)] h-[calc(100vh_-_490px)]')
-                }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+            <div
+                className={`h-[65vh]  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+                {/* className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_410px)] 2xl:h-[calc(100vh_-_390px)] xl:h-[calc(100vh_-_395px)] h-[calc(100vh_-_390px)]" : '3xl:h-[calc(100vh_-_520px)] 2xl:h-[calc(100vh_-_500px)] xl:h-[calc(100vh_-_490px)] h-[calc(100vh_-_490px)]')
+                }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}> */}
                 <div>
-                    <HeaderTable gridCols={12} display={'grid'}>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                    <HeaderTable gridCols={9} display={'grid'}>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Ngày CT
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        {/* <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Phiếu thu
-                        </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        </ColumnTable> */}
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Phiếu nhập
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'center'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Tên NVL
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Đơn vị tính
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Số lượng
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'center'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Kho hàng
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        {/* <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Vị trí kho
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Người tạo
-                        </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        </ColumnTable> */}
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Ghi chú
                         </ColumnTable>
                     </HeaderTable>
@@ -128,13 +137,13 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                     ) : isExportHistory.dataTable?.length > 0 ? (
                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                             {isExportHistory.dataTable?.map((e, index) => (
-                                <RowTable gridCols={12} key={e.id.toString()} >
+                                <RowTable gridCols={9} key={e.id.toString()} >
                                     <RowItemTable colSpan={1} textAlign={'center'}>
                                         {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                    {/* <RowItemTable colSpan={1} textAlign={'center'}>
                                         {e.codeReceipts}
-                                    </RowItemTable>
+                                    </RowItemTable> */}
                                     <RowItemTable colSpan={1} textAlign={'center'}>
                                         {e.codeImport}
                                     </RowItemTable>
@@ -155,7 +164,7 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                                     <RowItemTable colSpan={2} textAlign={'center'}>
                                         {e.warehouse}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                    {/* <RowItemTable colSpan={1} textAlign={'center'}>
                                         {e.locationWarehouse}
                                     </RowItemTable>
                                     <RowItemTable colSpan={1} textAlign={'center'}>
@@ -164,7 +173,7 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                                             profileImage={e?.user?.image}
                                             fullName={e?.user?.name}
                                         />
-                                    </RowItemTable>
+                                    </RowItemTable> */}
                                     <RowItemTable colSpan={1} textAlign={'center'}>
                                         {e.note}
                                     </RowItemTable>

@@ -86,5 +86,10 @@ const apiProductionsOrders = {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/loadOutOfStock`, data);
         return response.data
     },
+    // api lưu hoàn thành
+    async apiHandlingFinishedStages(data) {
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/handlingFinishedStages`, data);
+        return response.data
+    },
 }
 export default apiProductionsOrders

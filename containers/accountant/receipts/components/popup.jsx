@@ -623,6 +623,7 @@ const Popup_dspt = (props) => {
                                     <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                         {props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                     </label>
+
                                     <SelectCore
                                         placeholder={props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                         options={dataListTypeofDoc}

@@ -27,7 +27,7 @@ const MainTable = ({
         <>
             <div className="flex bg-[#D0D5DD]/20 border-[#d8dae5] border !mt-[14px]">
                 <div className="min-w-[300px] border-r py-2 px-1 flex items-center justify-center">
-                    <form className="flex items-center relative  w-full">
+                    <form className="relative flex items-center w-full">
                         <SearchNormal1
                             size={20}
                             className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
@@ -73,12 +73,12 @@ const MainTable = ({
                                 className={` ${isOpen && e.id == idParent ? "bg-[#EBF5FF]/100" : ""}  cursor-pointer hover:bg-[#EBF5FF]  transition-all    duration-200 ease-linear flex   items-center`}
                             >
                                 <div className="p-5">
-                                    <div className="grid grid-cols-13 items-center gap-1 justify-center">
+                                    <div className="grid items-center justify-center gap-1 grid-cols-13">
                                         <div className="col-span-3 w-[44px] h-[44px]">
                                             <Image
                                                 src={e.image}
                                                 alt="@demo"
-                                                className="object-cover  w-full h-full"
+                                                className="object-cover w-full h-full"
                                                 width={150}
                                                 height={150}
                                             />
@@ -103,13 +103,13 @@ const MainTable = ({
                                             </div>
                                             <div>
                                                 <div className="text-[#3A3E4C] font-light text-sm flex gap-2 items-center my-1.5">
-                                                    Ngày lập: <h3 className="font-normal text-sm">{e.dateStart}</h3>
+                                                    Ngày lập: <h3 className="text-sm font-normal">{e.dateStart}</h3>
                                                 </div>
                                                 <div className="text-[#3A3E4C] font-light text-sm flex gap-2 items-center my-1.5">
-                                                    Ngày giao: <h3 className="font-normal text-sm">{e.dateEnd}</h3>
+                                                    Ngày giao: <h3 className="text-sm font-normal">{e.dateEnd}</h3>
                                                 </div>
                                                 <div className="text-[#3A3E4C] font-light text-sm flex gap-2 items-center my-1.5">
-                                                    Công ty: <h3 className="font-normal text-sm">{e.customer}</h3>
+                                                    Công ty: <h3 className="text-sm font-normal">{e.customer}</h3>
                                                 </div>
                                             </div>
                                         </>
@@ -132,7 +132,7 @@ const MainTable = ({
                             return (
                                 <div key={ceIndex} className={`flex `}>
                                     <div className="min-w-[100px] bg-white z-[999] border-r border-b py-2 px-1 flex items-center justify-center sticky top-0 left-0">
-                                        <div className="flex flex-col justify-center items-center">
+                                        <div className="flex flex-col items-center justify-center">
                                             <h3 className="text-[#595C68] text-xs font-light">{ce.date.month}</h3>
                                             <div className="flex gap-2">
                                                 <h2 className="text-[#667085] font-light text-base">

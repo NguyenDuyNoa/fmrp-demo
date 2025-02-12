@@ -279,7 +279,15 @@ body::-webkit-scrollbar-thumb:hover {
 .CircularProgressbar {
     width: 80px;
 }
-
+.classNamePrefixLotDateSerial__value-container
+    .classNamePrefixLotDateSerial__multi-value
+    .classNamePrefixLotDateSerial__multi-value__label
+    div {
+    display: none;
+}
+// .classNamePrefixLotDateSerial__value-container .customDropdow  {
+//     display: none;
+// }
 /*
  * react-circular-progressbar styles
  * All of the styles in this file are configurable!

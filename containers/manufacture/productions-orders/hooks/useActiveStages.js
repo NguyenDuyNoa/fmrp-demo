@@ -9,7 +9,8 @@ export const useActiveStages = () => {
                 items: data?.data?.items.map((e) => {
                     return {
                         ...e,
-                        quantityError: 0
+                        quantityError: 0,
+                        quantityEnterClient: e?.quantity_enter
                     }
                 }),
 

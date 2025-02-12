@@ -9,11 +9,7 @@ export const useAuththentication = (auth) => {
         queryKey: ["api_authentication"],
         queryFn: async () => {
             const { isSuccess, info } = await apiDashboard.apiAuthentication();
-            if (isSuccess) {
-                dispatch({ type: "auth/update", payload: info });
-            } else {
-                dispatch({ type: "auth/update", payload: false });
-            }
+            dispatch({ type: "auth/update", payload: isSuccess ? info : false });
             return info || false
         },
         placeholderData: keepPreviousData,

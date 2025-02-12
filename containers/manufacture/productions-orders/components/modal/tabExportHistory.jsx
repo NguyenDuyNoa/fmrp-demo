@@ -82,18 +82,20 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
 
 
     return (
-        <div className='h-full'>
+        <div className='h-full overflow-x-hidden'>
             <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-1'>
+                {/* <div className='flex items-center gap-1'>
                     <h1 className="my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1>
-                </div>
+                </div> */}
+                <SearchComponent
+                    colSpan={2}
+                    dataLang={dataLang}
+                    placeholder={dataLang?.branch_search}
+                    onChange={(e) => onChangeSearch(e)}
+                    classInput={'border'}
+                    classNameBox={'w-[25%]'}
+                />
                 <div className="flex items-center justify-end gap-1">
-                    <SearchComponent
-                        colSpan={1} dataLang={dataLang}
-                        placeholder={dataLang?.branch_search}
-                        onChange={(e) => onChangeSearch(e)}
-                        classInput={'border'}
-                    />
                     <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
                     <button onClick={() => { }} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
                         <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
@@ -104,26 +106,28 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                     </div>
                 </div>
             </div>
-            <div className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_410px)] 2xl:h-[calc(100vh_-_390px)] xl:h-[calc(100vh_-_395px)] h-[calc(100vh_-_390px)]" : '3xl:h-[calc(100vh_-_520px)] 2xl:h-[calc(100vh_-_500px)] xl:h-[calc(100vh_-_490px)] h-[calc(100vh_-_490px)]')
-                }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+            <div
+                className={`h-[65vh] w-full overflow-x-auto  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+                {/* className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_410px)] 2xl:h-[calc(100vh_-_390px)] xl:h-[calc(100vh_-_395px)] h-[calc(100vh_-_390px)]" : '3xl:h-[calc(100vh_-_520px)] 2xl:h-[calc(100vh_-_500px)] xl:h-[calc(100vh_-_490px)] h-[calc(100vh_-_490px)]')
+                }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}> */}
                 <div>
                     <HeaderTable gridCols={12} display={'grid'}>
-                        <ColumnTable colSpan={1} textAlign={'center'}>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             STT
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'center'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             {dataLang?.productions_orders_modal_exporting_materials_document_date || 'productions_orders_modal_exporting_materials_document_date'}
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'center'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             {dataLang?.productions_orders_modal_exporting_materials_document_code || 'productions_orders_modal_exporting_materials_document_code'}
                         </ColumnTable>
-                        <ColumnTable colSpan={3} textAlign={'center'}>
+                        <ColumnTable colSpan={3} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             {dataLang?.productions_orders_modal_exporting_materials_item || 'productions_orders_modal_exporting_materials_item'}
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'center'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             {dataLang?.productions_orders_modal_exporting_materials_unit || 'productions_orders_modal_exporting_materials_unit'}
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'center'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             {dataLang?.productions_orders_modal_exporting_materials_quantity || 'productions_orders_modal_exporting_materials_quantity'}
                         </ColumnTable>
                     </HeaderTable>
@@ -137,13 +141,13 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                                     {
                                         data?.rResult?.map((e, index) => (
                                             <RowTable gridCols={12} key={e.id.toString()} >
-                                                <RowItemTable colSpan={1} textAlign={'center'}>
+                                                <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                                     {index + 1}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2} textAlign={'center'}>
+                                                <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
                                                     {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2} textAlign={'center'}>
+                                                <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
                                                     {e.code}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-1'}>
@@ -158,9 +162,10 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                     <div className="flex flex-col gap-1">
                                                         <div className="flex items-center gap-2">
                                                             <div className='flex flex-col'>
-                                                                <span>{e?.item?.item_name}</span>
+                                                                <span className='!text-xs'>{e?.item?.item_name}</span>
                                                                 <div className='flex items-center gap-1 text-xs italic text-gray-500'>
-                                                                    <span>{e?.item?.item_code}</span>-<span>{e?.item?.product_variation}</span>
+                                                                    <span>{e?.item?.product_variation}</span>
+                                                                    {/* <span>{e?.item?.item_code}</span>-<span>{e?.item?.product_variation}</span> */}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -202,10 +207,10 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                         </div>
                                                     </div>
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2} textAlign={'center'}>
+                                                <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
                                                     {e?.item?.unit_name}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2} textAlign={'right'}>
+                                                <RowItemTable colSpan={2} textAlign={'right'} textSize={'!text-xs'}>
                                                     {e?.item?.quantity_export > 0 ? formatNumber(e?.item?.quantity_export) : '-'}
                                                 </RowItemTable>
                                             </RowTable>

@@ -3,6 +3,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
 import Header from "./header";
+import ChatAiBubble from '../UI/chat/ChatAiBubble';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -17,7 +18,9 @@ const Index = ({ children }) => {
         <QueryClientProvider client={queryClient}>
             <div>
                 <Header />
-                <div className="overflow-hidden">{children}</div>
+                <div className="overflow-hidden">{children}
+
+                </div>
             </div>
             <PopupAppTrial />
             <PopupAppRenewal />

@@ -567,13 +567,13 @@ const ProductionWarehouseForm = (props) => {
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {id
                                 ? dataLang?.production_warehouse_edit || "production_warehouse_edit"
                                 : dataLang?.production_warehouse_add || "production_warehouse_add"}
                         </h2>
-                        <div className="flex justify-end items-center mr-2">
+                        <div className="flex items-center justify-end mr-2">
                             <ButtonBack
                                 onClick={() => router.push(routerProductionWarehouse.home)}
                                 dataLang={dataLang}
@@ -581,13 +581,13 @@ const ProductionWarehouseForm = (props) => {
                         </div>
                     </div>
 
-                    <div className=" w-full rounded">
+                    <div className="w-full rounded ">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-8  gap-3 items-center mt-2">
+                            <div className="grid items-center grid-cols-8 gap-3 mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
@@ -603,11 +603,11 @@ const ProductionWarehouseForm = (props) => {
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
-                                <div className="col-span-2 relative">
+                                <div className="relative col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </label>
-                                    <div className="custom-date-picker flex flex-row">
+                                    <div className="flex flex-row custom-date-picker">
                                         <DatePicker
                                             blur
                                             fixedHeight
@@ -744,7 +744,7 @@ const ProductionWarehouseForm = (props) => {
                         </div>
                     </div>
                     <div className=" bg-[#ECF0F4] p-2 grid  grid-cols-12">
-                        <div className="font-normal col-span-12">
+                        <div className="col-span-12 font-normal">
                             {dataLang?.import_item_information || "import_item_information"}
                         </div>
                     </div>
@@ -778,7 +778,7 @@ const ProductionWarehouseForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-12 items-center gap-1 py-2">
+                    <div className="grid items-center grid-cols-12 gap-1 py-2">
                         <div className="col-span-3">
                             <SelectCore
                                 options={dataItems}
@@ -789,7 +789,7 @@ const ProductionWarehouseForm = (props) => {
                                 noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                 menuPortalTarget={document.body}
                                 formatOptionLabel={(option) => (
-                                    <div className="flex items-center  justify-between py-2">
+                                    <div className="flex items-center justify-between py-2">
                                         <div className="flex items-center gap-2">
                                             <div className="w-[40px] h-h-[60px]">
                                                 {option.e?.images != null ? (
@@ -885,7 +885,7 @@ const ProductionWarehouseForm = (props) => {
                             />
                         </div>
                         <div className="col-span-9">
-                            <div className="grid grid-cols-8 divide-x border-t border-b border-r border-l">
+                            <div className="grid grid-cols-8 border-t border-b border-l border-r divide-x">
                                 <div className="col-span-2">
                                     <SelectCore
                                         classNamePrefix="customDropdowDefault"
@@ -902,15 +902,15 @@ const ProductionWarehouseForm = (props) => {
                                         isDisabled={true}
                                     />
                                 </div>
-                                <div className="col-span-1 flex items-center justify-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                        <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                     </button>
                                     <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b w-full border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                        <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                     </button>
                                 </div>
 
@@ -938,15 +938,15 @@ const ProductionWarehouseForm = (props) => {
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
                             {isFetching ? (
-                                <Loading className="h-10 w-full" color="#0f4f9e" />
+                                <Loading className="w-full h-10" color="#0f4f9e" />
                             ) : (
                                 <>
                                     {listData?.map((e) => (
                                         <div
                                             key={e?.id?.toString()}
-                                            className="grid grid-cols-12 gap-1 items-start my-1"
+                                            className="grid items-start grid-cols-12 gap-1 my-1"
                                         >
-                                            <div className="col-span-3 border border-r p-2 pb-1 h-full">
+                                            <div className="h-full col-span-3 p-2 pb-1 border border-r">
                                                 <div className="relative mt-5">
                                                     <SelectCore
                                                         options={dataItems}
@@ -955,7 +955,7 @@ const ProductionWarehouseForm = (props) => {
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}
                                                         formatOptionLabel={(option) => (
-                                                            <div className="flex items-center  justify-between py-2">
+                                                            <div className="flex items-center justify-between py-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <div className="w-[40px] h-h-[60px]">
                                                                         {option.e?.images != null ? (
@@ -1063,7 +1063,7 @@ const ProductionWarehouseForm = (props) => {
                                                     />
                                                     <button
                                                         onClick={_HandleAddChild.bind(this, e?.id, e?.item)}
-                                                        className="w-10 h-10 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-5 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
+                                                        className="absolute flex flex-col items-center justify-center w-10 h-10 transition ease-in-out rounded bg-slate-100 -top-5 right-5 hover:rotate-45 hover:bg-slate-200 hover:scale-105 hover:text-red-500"
                                                     >
                                                         <Add className="" />
                                                     </button>
@@ -1080,14 +1080,14 @@ const ProductionWarehouseForm = (props) => {
                                                     </button>
                                                 )}
                                             </div>
-                                            <div className="col-span-9  items-center">
+                                            <div className="items-center col-span-9">
                                                 <div className="grid grid-cols-8  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                                                     {load ? (
                                                         <Loading className="h-2 col-span-8" color="#0f4f9e" />
                                                     ) : (
                                                         e?.child?.map((ce, index) => (
                                                             <React.Fragment key={ce?.id?.toString()}>
-                                                                <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
+                                                                <div className="flex flex-col justify-center h-full col-span-2 p-1 border-t border-l">
                                                                     <SelectCore
                                                                         options={ce?.dataWarehouse}
                                                                         value={ce?.location}
@@ -1148,7 +1148,7 @@ const ProductionWarehouseForm = (props) => {
                                                                         classNamePrefix="customDropdow"
                                                                     />
                                                                 </div>
-                                                                <div className=" flex flex-col items-center p-1 h-full justify-center">
+                                                                <div className="flex flex-col items-center justify-center h-full p-1 ">
                                                                     <SelectCore
                                                                         options={ce?.dataUnit}
                                                                         value={ce?.unit}
@@ -1179,7 +1179,7 @@ const ProductionWarehouseForm = (props) => {
                                                                             outline: "none",
                                                                         }}
                                                                         formatOptionLabel={(option) => (
-                                                                            <div className="flex justify-start flex-wrap items-center">
+                                                                            <div className="flex flex-wrap items-center justify-start">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full ">
                                                                                     {dataLang?.production_warehouse_unit ||
                                                                                         "production_warehouse_unit"}
@@ -1215,7 +1215,7 @@ const ProductionWarehouseForm = (props) => {
                                                                         )}
                                                                     >
                                                                         <Minus
-                                                                            className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                            className="scale-50 2xl:scale-100 xl:scale-100"
                                                                             size="16"
                                                                         />
                                                                     </button>
@@ -1262,7 +1262,7 @@ const ProductionWarehouseForm = (props) => {
                                                                         )}
                                                                     >
                                                                         <Add
-                                                                            className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                            className="scale-50 2xl:scale-100 xl:scale-100"
                                                                             size="16"
                                                                         />
                                                                     </button>
@@ -1298,7 +1298,7 @@ const ProductionWarehouseForm = (props) => {
                                                                             e?.id,
                                                                             ce?.id
                                                                         )}
-                                                                        className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
+                                                                        className="flex flex-col items-center justify-center p-2 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
                                                                     >
                                                                         <IconDelete />
                                                                     </button>
@@ -1332,7 +1332,7 @@ const ProductionWarehouseForm = (props) => {
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                         />
                     </div>
-                    <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
+                    <div className="flex-col justify-between col-span-3 mt-5 space-y-4 text-right ">
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal">

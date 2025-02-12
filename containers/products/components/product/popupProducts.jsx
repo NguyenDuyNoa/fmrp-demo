@@ -67,8 +67,6 @@ const Popup_Products = React.memo((props) => {
 
     const [onFetching, sOnFetching] = useState(false);
 
-    const [onFetchingCategory, sOnFetchingCategory] = useState(false);
-
     const [onSending, sOnSending] = useState(false);
 
     const [name, sName] = useState("");
@@ -96,8 +94,6 @@ const Popup_Products = React.memo((props) => {
     const [thumb, sThumb] = useState(null);
 
     const [thumbFile, sThumbFile] = useState(null);
-
-    const [isDeleteThumb, sIsDeleteThumb] = useState(false);
 
     ///Biến thể
     const [variantMain, sVariantMain] = useState(null);
@@ -270,7 +266,6 @@ const Popup_Products = React.memo((props) => {
         isOpen && sBranch([]);
         isOpen && sDataCategory([]);
         isOpen && sUnit(null);
-        isOpen && sOnFetchingCategory(false);
         isOpen && sErrGroup(false);
         isOpen && sErrName(false);
         isOpen && sErrCode(false);
@@ -326,7 +321,6 @@ const Popup_Products = React.memo((props) => {
             sThumbFile(file);
             sThumb(URL.createObjectURL(file));
         }
-        sIsDeleteThumb(false);
     };
 
     const _DeleteThumb = (e) => {
@@ -334,7 +328,6 @@ const Popup_Products = React.memo((props) => {
         sThumbFile(null);
         sThumb(null);
         document.getElementById("upload").value = null;
-        sIsDeleteThumb(true);
     };
 
     useEffect(() => {

@@ -18,7 +18,26 @@ const adminState = {
     unit_finishedProduct: null,
     stage_finishedProduct: null,
     location_inventory: null,
-    setings: {}
+    setings: {},
+    stateBoxChatAi: {
+        open: false,
+        typeChat: null,
+        contentChat: "",
+        messenger: [
+            { text: "Chào bạn! Tôi có thể giúp gì?", sender: "ai" },
+        ],
+        openViewModal: false,
+        isShowAi: false
+        // generateContentClient: {
+        //     content: "",
+        //     textDataRequest: "",
+        // },
+        // chat: {
+        //     content: "",
+        //     quantityWord: {}
+        // },
+        // dataTableShowBom: [],
+    }
 };
 
 function adminReducer(state = adminState, action) {
@@ -55,6 +74,8 @@ function adminReducer(state = adminState, action) {
             return { ...state, setings: action.payload };
         case "setings/feature":
             return { ...state, feature: action.payload };
+        case "stateBoxChatAi":
+            return { ...state, stateBoxChatAi: action.payload };
         default:
             return state;
     }

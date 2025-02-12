@@ -213,8 +213,8 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
     return (
         <div className='h-full'>
             <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-1'>
-                    <h1 className="w-1/3 my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1>
+                <div className='flex items-center gap-1 my-2'>
+                    {/* <h1 className="w-1/3 my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1> */}
                     <div className="flex items-center justify-start gap-4">
                         <button
                             type="button"
@@ -261,37 +261,74 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                     </div>
                 }
             </div>
-            <div className={`${isTab === 'chart' && (width > 1100 ? "h-[calc(100vh_-_343px)]" : 'h-[calc(100vh_-_473px)]')
+            <div
+                className={`${isTab === 'chart' && "h-full"
+                    ||
+                    isTab === 'table' && "h-[65vh]"
+                    }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+                {/* className={`${isTab === 'chart' && (width > 1100 ? "h-[calc(100vh_-_343px)]" : 'h-[calc(100vh_-_473px)]')
                 ||
                 isTab === 'table' && (width > 1100 ? "3xl:h-[calc(100vh_-_405px)] xxl:h-[calc(100vh_-_380px)] 2xl:h-[calc(100vh_-_380px)] xl:h-[calc(100vh_-_380px)] lg:h-[calc(100vh_-_426px)] h-[calc(100vh_-_426px)]"
                     :
                     '3xl:h-[calc(100vh_-_510px)] 2xl:h-[calc(100vh_-_480px)] xl:h-[calc(100vh_-_480px)] lg:h-[calc(100vh_-_470px)] h-[calc(100vh_-_470px)]')
-                }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+                }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}> */}
                 {isTab === 'table' &&
                     <div>
                         <HeaderTable gridCols={11} display={'grid'}>
-                            <ColumnTable colSpan={1} textAlign={'center'}>
+                            <ColumnTable
+                                colSpan={1}
+                                textAlign={'center'}
+                                className={'normal-case !text-[13px]'}
+                            >
                                 STT
                             </ColumnTable>
-                            <ColumnTable colSpan={3} textAlign={'center'}>
+                            <ColumnTable
+                                colSpan={3}
+                                textAlign={'center'}
+                                className={'normal-case !text-[13px]'}
+                            >
                                 {dataLang?.productions_orders_details_name_nvl || 'productions_orders_details_name_nvl'}
                             </ColumnTable>
-                            <ColumnTable colSpan={2} textAlign={'center'}>
+                            <ColumnTable
+                                colSpan={2}
+                                textAlign={'center'}
+                                className={'normal-case !text-[13px]'}
+                            >
                                 {dataLang?.productions_orders_details_type || 'productions_orders_details_type'}
                             </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={'center'}>
+                            <ColumnTable
+                                colSpan={1}
+                                textAlign={'center'}
+                                className={'normal-case !text-[13px]'}
+                            >
                                 {dataLang?.productions_orders_details_unit || 'productions_orders_details_unit'}
                             </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={'center'}>
+                            <ColumnTable
+                                colSpan={1}
+                                textAlign={'center'}
+                                className={'normal-case !text-[13px]'}
+                            >
                                 {dataLang?.productions_orders_details_table_export_plan || 'productions_orders_details_table_export_plan'}
                             </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={'center'}>
+                            <ColumnTable
+                                colSpan={1}
+                                textAlign={'center'}
+                                className={'normal-case !text-[13px]'}
+                            >
                                 {dataLang?.productions_orders_details_table_export_exported || 'productions_orders_details_table_export_exported'}
                             </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={'center'}>
+                            <ColumnTable
+                                colSpan={1}
+                                textAlign={'center'}
+                                className={'normal-case !text-[13px]'}
+                            >
                                 {dataLang?.productions_orders_details_table_export_remaining || 'productions_orders_details_table_export_remaining'}
                             </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={'center'}>
+                            <ColumnTable
+                                colSpan={1}
+                                textAlign={'center'}
+                                className={'normal-case !text-[13px]'}
+                            >
                                 {dataLang?.productions_orders_details_table_export_recall || 'productions_orders_details_table_export_recall'}
                             </ColumnTable>
                         </HeaderTable>

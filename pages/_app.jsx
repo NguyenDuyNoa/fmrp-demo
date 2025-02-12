@@ -12,7 +12,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import "sweetalert2/src/sweetalert2.scss";
 import "../styles/globals.scss";
 import { CookieCore } from "@/utils/lib/cookie";
-// import ChatBubbleAI from "@/components/UI/chat/ChatAiBubble";
+import ChatBubbleAI from "@/components/UI/chat/ChatAiBubble";
 // const t = Lark
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -85,11 +85,11 @@ function MainPage({ Component, pageProps }) {
     return (
         <Layout>
             <Component dataLang={data} {...pageProps} />
-            {/* {
+            {
                 stateBoxChatAi.isShowAi && (
                     <ChatBubbleAI dataLang={data} />
                 )
-            } */}
+            }
         </Layout>
     );
 }

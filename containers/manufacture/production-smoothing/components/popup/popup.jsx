@@ -51,10 +51,10 @@ const PopupAdd = ({ data, listStaff }) => {
                             checked={props.isSelected}
                         // onChange={() => props.selectProps.onChange(props.data)}
                         />
-                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                        <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-3 w-3"
+                                className="w-3 h-3"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
                                 stroke="currentColor"
@@ -68,7 +68,7 @@ const PopupAdd = ({ data, listStaff }) => {
                             </svg>
                         </div>
                     </label>
-                    <h1 className="font-normal text-xs ">{props.label}</h1>
+                    <h1 className="text-xs font-normal ">{props.label}</h1>
                 </div>
             </components.Option>
         </div>
@@ -91,7 +91,7 @@ const PopupAdd = ({ data, listStaff }) => {
                     className="bg-[#0F4F9E] rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
                 >
                     <Image src={"/productionSmoothing/Icon.png"} width={16} height={16} className="object-cover" />
-                    <h3 className="text-white font-medium transition-all duration-200 ease-linear text-sm">
+                    <h3 className="text-sm font-medium text-white transition-all duration-200 ease-linear">
                         Phân bổ nhân viên
                     </h3>
                 </button>
@@ -103,7 +103,7 @@ const PopupAdd = ({ data, listStaff }) => {
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
             <div className="space-x-1 3xl:w-[950px]  xxl:w-[650px] 2xl:w-[650px] xl:w-[640px] lg:w-[640px] w-[700px] 3xl:h-auto xxl:h-[480px]  2xl:h-[520px] xl:h-[480px] lg:h-[500px] h-[500px] ">
-                <div className="flex gap-6 items-center my-4">
+                <div className="flex items-center gap-6 my-4">
                     <div className="w-1/2 z-[999]">
                         <label
                             htmlFor="start"
@@ -111,7 +111,7 @@ const PopupAdd = ({ data, listStaff }) => {
                         >
                             Ngày bắt đầu
                         </label>
-                        <div className="w-full relative">
+                        <div className="relative w-full">
                             <DatePicker
                                 id="start"
                                 calendarClassName="rasta-stripes"
@@ -129,7 +129,7 @@ const PopupAdd = ({ data, listStaff }) => {
                                 src={"/productionSmoothing/calendar.png"}
                                 width={24}
                                 height={24}
-                                className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                                className="absolute right-0 -translate-x-1/2 -translate-y-1/2 top-1/2"
                             />
                         </div>
                     </div>
@@ -140,7 +140,7 @@ const PopupAdd = ({ data, listStaff }) => {
                         >
                             Ngày kết thúc
                         </label>
-                        <div className="w-full relative">
+                        <div className="relative w-full">
                             <DatePicker
                                 id="start"
                                 calendarClassName="rasta-stripes"
@@ -158,12 +158,12 @@ const PopupAdd = ({ data, listStaff }) => {
                                 src={"/productionSmoothing/calendar.png"}
                                 width={24}
                                 height={24}
-                                className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                                className="absolute right-0 -translate-x-1/2 -translate-y-1/2 top-1/2"
                             />
                         </div>
                     </div>
                 </div>
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                     <h2 className="text-[#344054] font-normal 3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px]">
                         Chọn lệnh sản xuất
                     </h2>
@@ -187,7 +187,7 @@ const PopupAdd = ({ data, listStaff }) => {
                             whileTap={{ scale: 1.02 }}
                         >
                             <div className="border border-[#D0D5DD] my-3 mx-1 rounded-lg ">
-                                <label htmlFor={checkbox.id} className="flex items-center  p-2 gap-2 cursor-pointer">
+                                <label htmlFor={checkbox.id} className="flex items-center gap-2 p-2 cursor-pointer">
                                     <label
                                         className="relative flex items-center  cursor-pointer rounded-[4px] p-0.5"
                                         htmlFor={checkbox.id}
@@ -199,10 +199,10 @@ const PopupAdd = ({ data, listStaff }) => {
                                             checked={checkbox.checked}
                                             onChange={() => handleCheckboxChange(checkbox.id)}
                                         />
-                                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                        <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
-                                                className="h-3 w-3"
+                                                className="w-3 h-3"
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
                                                 stroke="currentColor"
@@ -216,7 +216,7 @@ const PopupAdd = ({ data, listStaff }) => {
                                             </svg>
                                         </div>
                                     </label>
-                                    <div className="grid grid-cols-13 items-center gap-1 justify-center  ">
+                                    <div className="grid items-center justify-center gap-1 grid-cols-13 ">
                                         <Image
                                             src={checkbox.image}
                                             alt=""
@@ -359,7 +359,7 @@ const PopupAdd = ({ data, listStaff }) => {
                         maxMenuHeight="120px"
                     />
                 </div>
-                <div className="text-right mt-5 space-x-2">
+                <div className="mt-5 space-x-2 text-right">
                     <button
                         type="button"
                         onClick={() => handleOpenPopup(false)}

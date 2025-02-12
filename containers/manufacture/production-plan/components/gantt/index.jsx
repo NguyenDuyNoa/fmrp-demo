@@ -80,7 +80,7 @@ const BodyGantt = ({
                 for (let k = 0; k < product.processArr.length; k++) {
                     const process = product.processArr[k];
 
-                    if (process.active) { // Chỉ xét phần tử có active = true
+                    if (process.active && item?.show) { // Chỉ xét phần tử có active = true và mở
                         const processDate = new Date(process.date.split('/').reverse().join('-')); // Chuyển "dd/MM/yyyy" thành "yyyy-MM-dd"
 
                         if (!latestProcess || processDate > new Date(latestProcess.date.split('/').reverse().join('-'))) {
@@ -95,44 +95,90 @@ const BodyGantt = ({
     };
 
 
-
     const latestActiveProcess = getLatestActiveProcess(data);
 
+    // useLayoutEffect(() => {
+    //     if (checkRankRef.current && container1Ref.current) {
+    //         const target = checkRankRef.current;
+
+    //         const viewport = document.querySelector('.container1')
+
+    //         if (viewport) {
+    //             const targetRect = target.getBoundingClientRect()
+    //             const viewportRect = viewport.getBoundingClientRect()
+
+    //             const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft
+
+    //             const startScrollLeft = viewport.scrollLeft
+
+
+    //             let startTime = null;
+
+    //             const duration = 8000; // Thời gian cuộn (ms)
+
+    //             const step = (timestamp) => {
+    //                 if (!startTime) startTime = timestamp;
+
+    //                 const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến độ từ 0 đến 1
+    //                 const ease = progress * (2 - progress); // Tăng tốc rồi giảm tốc (easing)
+
+    //                 viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
+    //                 if (progress < 1) {
+    //                     requestAnimationFrame(step); // Tiếp tục cuộn nếu chưa hoàn thành
+    //                 }
+    //             };
+
+    //             requestAnimationFrame(step);
+    //         }
+    //     }
+    // }, [data]);
+
+    // useLayoutEffect(() => {
+    //     if (checkRankRef.current && container1Ref.current) {
+    //         const target = checkRankRef.current;
+    //         const viewport = document.querySelector('.container1');
+
+    //         if (viewport) {
+    //             const targetRect = target.getBoundingClientRect();
+    //             const viewportRect = viewport.getBoundingClientRect();
+
+    //             // Thiết lập vị trí scroll ngay lập tức mà không cần animation
+    //             viewport.scrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
+    //         }
+    //     }
+    // }, [data]);
     useLayoutEffect(() => {
         if (checkRankRef.current && container1Ref.current) {
             const target = checkRankRef.current;
-
-            const viewport = document.querySelector('.container1')
+            const viewport = document.querySelector('.container1');
 
             if (viewport) {
-                const targetRect = target.getBoundingClientRect()
-                const viewportRect = viewport.getBoundingClientRect()
+                const targetRect = target.getBoundingClientRect();
+                const viewportRect = viewport.getBoundingClientRect();
+                const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
 
-                const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft
-
-                const startScrollLeft = viewport.scrollLeft
-
-
+                const startScrollLeft = viewport.scrollLeft;
                 let startTime = null;
-
-                const duration = 8000; // Thời gian cuộn (ms)
+                const duration = 500; // Thời gian chạy animation (ms)
 
                 const step = (timestamp) => {
                     if (!startTime) startTime = timestamp;
 
-                    const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến độ từ 0 đến 1
-                    const ease = progress * (2 - progress); // Tăng tốc rồi giảm tốc (easing)
+                    const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến trình từ 0 -> 1
+                    const ease = progress * (2 - progress); // Hiệu ứng easing
 
                     viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
+
                     if (progress < 1) {
-                        requestAnimationFrame(step); // Tiếp tục cuộn nếu chưa hoàn thành
+                        requestAnimationFrame(step);
                     }
                 };
 
                 requestAnimationFrame(step);
             }
         }
-    }, [data]);
+    }, [data]); // Chạy lại khi `data` thay đổi
+
 
 
 

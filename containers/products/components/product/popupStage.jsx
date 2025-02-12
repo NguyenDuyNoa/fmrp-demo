@@ -13,6 +13,7 @@ import { DragDropContext, Draggable, Droppable, } from 'react-beautiful-dnd';
 import { useSelector } from "react-redux";
 import Select from "react-select";
 import { v4 as uddidV4 } from "uuid";
+
 const Popup_Stage = React.memo((props) => {
     const listCd = useSelector((state) => state.stage_finishedProduct);
 
@@ -66,11 +67,7 @@ const Popup_Stage = React.memo((props) => {
     }, [isOpen]);
 
     useEffect(() => {
-        if (listCd?.length == option?.length) {
-            sStatusBtnAdd(true);
-        } else {
-            sStatusBtnAdd(false);
-        }
+        sStatusBtnAdd(listCd?.length == option?.length);
     }, [option]);
 
     const { isFetching, isLoading } = useQuery({
@@ -132,10 +129,10 @@ const Popup_Stage = React.memo((props) => {
         if (hasNullLabel) {
             sErrName(true);
             isShow("error", props.dataLang?.required_field_null);
-        } else {
-            sErrName(false);
-            sOnSending(true);
+            return
         }
+        sErrName(false);
+        sOnSending(true);
     };
 
     const _HandleAddNew = () => {
@@ -146,9 +143,7 @@ const Popup_Stage = React.memo((props) => {
     };
 
     useEffect(() => {
-        isOpen &&
-            listCdChosen &&
-            sListCdRest(listCd?.filter((item1) => !listCdChosen.some((item2) => item1.label === item2?.label && item1.value === item2?.value)));
+        isOpen && listCdChosen && sListCdRest(listCd?.filter((item1) => !listCdChosen.some((item2) => item1.label === item2?.label && item1.value === item2?.value)));
     }, [listCdChosen]);
 
     const handleDelete = (id) => {
@@ -200,8 +195,8 @@ const Popup_Stage = React.memo((props) => {
                             position: 'static'
                         }}
                     >
-                        <div className="grid grid-cols-9 items-center py-1 h-full hover:bg-slate-50 bg-white">
-                            <h6 className="col-span-1 text-center px-2">{index + 1}</h6>
+                        <div className="grid items-center h-full grid-cols-9 py-1 bg-white hover:bg-slate-50">
+                            <h6 className="col-span-1 px-2 text-center">{index + 1}</h6>
                             <div className="col-span-2 px-2 ">
                                 <Select
                                     closeMenuOnSelect={true}
@@ -230,7 +225,7 @@ const Popup_Stage = React.memo((props) => {
                                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                 />
                             </div>
-                            <div className="col-span-3 flex items-center justify-center">
+                            <div className="flex items-center justify-center col-span-3">
                                 <input
                                     type="radio"
                                     id={`radio1 + ${value.id}`}
@@ -241,13 +236,13 @@ const Popup_Stage = React.memo((props) => {
                                 />
                                 <label
                                     htmlFor={`radio1 + ${value.id}`}
-                                    className="relative flex cursor-pointer items-center rounded-full p-3"
+                                    className="relative flex items-center p-3 rounded-full cursor-pointer"
                                     data-ripple-dark="true"
                                 >
                                     {"Chọn"}
                                 </label>
                             </div>
-                            <div className="col-span-2 flex items-center justify-center">
+                            <div className="flex items-center justify-center col-span-2">
                                 <input
                                     type="radio"
                                     id={`radio2 + ${value.id}`}
@@ -258,18 +253,18 @@ const Popup_Stage = React.memo((props) => {
                                 />
                                 <label
                                     htmlFor={`radio2 + ${value.id}`}
-                                    className="relative flex cursor-pointer items-center rounded-full p-3"
+                                    className="relative flex items-center p-3 rounded-full cursor-pointer"
                                     data-ripple-dark="true"
                                 >
                                     {"Chọn"}
                                 </label>
                             </div>
-                            <div className="col-span-1 flex items-center justify-center space-x-4">
+                            <div className="flex items-center justify-center col-span-1 space-x-4">
                                 <div
                                     {...provided.dragHandleProps}
-                                    className="text-blue-500 cursor-move relative flex flex-col justify-center items-center">
+                                    className="relative flex flex-col items-center justify-center text-blue-500 cursor-move">
                                     <IconMax size="18" className="-rotate-45" />
-                                    <IconMax size="18" className="rotate-45 absolute" />
+                                    <IconMax size="18" className="absolute rotate-45" />
                                 </div>
                                 <button onClick={() => handleDelete(value?.id)} type="button" className="text-red-500">
                                     <IconDelete />
@@ -373,7 +368,7 @@ const Popup_Stage = React.memo((props) => {
                                 {props.dataLang?.stage_add_finishedProduct}
                             </button>
                         </Customscrollbar>
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={_ToggleModal.bind(this, false)}

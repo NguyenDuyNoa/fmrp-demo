@@ -1,5 +1,6 @@
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ChatAi from "@/components/UI/chat/ChatAi";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
@@ -13,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AttachCircle, Add as IconAdd, Trash as IconDelete } from "iconsax-react";
 import { debounce } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import Select from "react-select";
 
@@ -28,6 +30,10 @@ const Popup_Bom = React.memo((props) => {
 
     const isShow = useToast();
 
+    const dispatch = useDispatch()
+
+    const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
+
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit } = useActionRole(auth, "products");
@@ -41,6 +47,12 @@ const Popup_Bom = React.memo((props) => {
         if (!e) {
             sTab(null);
         }
+        dispatch({
+            type: "stateBoxChatAi", payload: {
+                ...stateBoxChatAi,
+                isShowAi: false
+            }
+        })
     };
 
     const [onSending, sOnSending] = useState(false);
@@ -56,6 +68,10 @@ const Popup_Bom = React.memo((props) => {
     const [dataTypeCd, sDataTypeCd] = useState([]);
 
     const [dataCd, sDataCd] = useState([]);
+
+    const [currentData, sCurrentData] = useState([]);
+
+    const [errValue, sErrValue] = useState(false);
 
     const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
 
@@ -77,10 +93,6 @@ const Popup_Bom = React.memo((props) => {
     };
 
     const dataRestVariant = dataVariant?.filter((item1) => !dataSelectedVariant?.some((item2) => item1?.label === item2?.label && item1?.value === item2?.value));
-
-    const [currentData, sCurrentData] = useState([]);
-
-    const [errValue, sErrValue] = useState(false);
 
     useEffect(() => {
         isOpen && props?.id && sOnFetchingCd(true);
@@ -305,7 +317,7 @@ const Popup_Bom = React.memo((props) => {
                                 if (x.id == id) {
                                     return {
                                         ...x,
-                                        dataName: getdata,
+                                        dataName: getdata?.length > 0 ? getdata : x?.dataName,
                                     };
                                 }
                                 return x;
@@ -314,11 +326,11 @@ const Popup_Bom = React.memo((props) => {
                     }
                     return e;
                 });
-                sDataSelectedVariant([...newDb]);
+                sDataSelectedVariant(newDb);
             }
-        } catch (error) {
-        }
+        } catch (error) { }
     }, 500);
+
 
     const _HandleChangeItemBOM = async (parentId, childId, type, value) => {
         const newData = dataSelectedVariant.map((parent) => {
@@ -423,6 +435,7 @@ const Popup_Bom = React.memo((props) => {
             }
         }
     };
+    console.log("selectedList", selectedList);
 
     const _HandleDeleteBOM = (id) => {
         const newData = dataSelectedVariant.filter((item) => item?.value !== id);
@@ -558,6 +571,12 @@ const Popup_Bom = React.memo((props) => {
                             return;
                         } else if ((role || checkEdit || checkAdd) && !props.bom) {
                             sIsOpen(true);
+                            dispatch({
+                                type: "stateBoxChatAi", payload: {
+                                    ...stateBoxChatAi,
+                                    isShowAi: !stateBoxChatAi.isShowAi
+                                }
+                            })
                         } else {
                             isShow("warning", WARNING_STATUS_ROLE);
                         }
@@ -622,6 +641,16 @@ const Popup_Bom = React.memo((props) => {
                                 }}
                             />
                         </div>
+                        {/* <ChatAi
+                            type="bom"
+                            dataLang={props.dataLang}
+                            setData={{
+                                sSelectedList, sCurrentData, sDataSelectedVariant
+                            }}
+                            data={{
+                                selectedList, currentData, dataSelectedVariant
+                            }}
+                        /> */}
                         <div className="flex items-center justify-end gap-2">
                             <OnResetData sOnFetching={() => { }} onClick={() => refetch()} />
                             <button

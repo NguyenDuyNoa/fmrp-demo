@@ -49,6 +49,7 @@ const SelectComponent = ({
                 menuPortalTarget={menuPortalTarget}
                 menuShouldBlockScroll={menuShouldBlockScroll}
                 styles={styles ? styles : configSelectFillter.styles}
+
             />
         </div>
     );

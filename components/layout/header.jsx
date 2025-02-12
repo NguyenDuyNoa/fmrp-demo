@@ -350,12 +350,12 @@ const Header = () => {
                     title: "Kế hoạch NVL",
                     link: "/manufacture/materials-planning",
                 },
-                {
-                    viewOwn: -1,
-                    view: -1,
-                    title: "Điều độ sản xuất",
-                    link: "/manufacture/production-smoothing",
-                },
+                // {
+                //     viewOwn: -1,
+                //     view: -1,
+                //     title: "Điều độ sản xuất",
+                //     link: "/manufacture/production-smoothing",
+                // },
                 // {
                 //     viewOwn: -1,
                 //     view: -1,
@@ -368,12 +368,12 @@ const Header = () => {
                     title: "Lệnh sản xuất",
                     link: "/manufacture/productions-orders",
                 },
-                {
-                    title: "Lịch sản xuất",
-                    link: "/manufacture/production-schedule",
-                    viewOwn: -1,
-                    view: -1,
-                },
+                // {
+                //     title: "Lịch sản xuất",
+                //     link: "/manufacture/production-schedule",
+                //     viewOwn: -1,
+                //     view: -1,
+                // },
             ],
         },
         {

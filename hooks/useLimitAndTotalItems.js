@@ -6,7 +6,6 @@ export const useLimitAndTotalItems = (initialLimit = 15, initialTotalItems = {})
 
     const [limit, sLimit] = useState(dataSeting?.tables_pagination_limit);
 
-
     const [totalItems, sTotalItems] = useState(initialTotalItems);
 
     const updateLimit = (newLimit) => sLimit(newLimit);

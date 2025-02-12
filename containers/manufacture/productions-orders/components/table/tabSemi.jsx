@@ -85,7 +85,7 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
                                                     className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                 />
                                                 <div className="flex flex-col gap-0.5">
-                                                    <h1 className={`${isState.dataModal.id == i.id ? "text-[#0F4F9E]" : "text-[#000000]"} group-hover:text-[#0F4F9E] font-semibold xl:text-sm text-xs`}  >
+                                                    <h1 className={`${isState.dataModal.id == i.id ? "text-[#0F4F9E]" : "text-[#000000]"}  font-semibold xl:text-sm text-xs`}  >
                                                         {i.name}
                                                     </h1>
                                                     <h1 className="text-[#9295A4] font-normal text-[11px]">

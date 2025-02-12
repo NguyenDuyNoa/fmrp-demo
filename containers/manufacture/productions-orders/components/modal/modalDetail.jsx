@@ -26,7 +26,7 @@ const initialState = {
 
 const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
 
-    const minWidth = 900; // Đặt giá trị chiều rộng tối thiểu
+    const minWidth = 650; // Đặt giá trị chiều rộng tối thiểu
 
     const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
 
@@ -86,7 +86,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
 
     const router = useRouter();
 
-    const [width, setWidth] = useState(900);
+    const [width, setWidth] = useState(650);
 
     const [isResizing, setIsResizing] = useState(false);
 
@@ -144,7 +144,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         queryStateModal({ isTab: e });
     };
     const { data, isLoading } = useQuery({
-        queryKey: ["api_item_orders_detail", isState.openModal],
+        queryKey: ["api_item_orders_detail", isState.openModal, isState?.dataModal?.id],
         queryFn: async () => {
             const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
 
@@ -167,7 +167,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
             return newData
 
         },
-        enabled: !!isState.openModal,
+        enabled: !!isState.openModal && !!isState?.dataModal?.id,
         placeholderData: keepPreviousData,
         ...optionsQuery,
     })
@@ -192,36 +192,36 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                 transform: isState.openModal ? "translateX(0%)" : "translateX(100%)",
                 maxWidth: "100vw",
             }}
-            className={`bg-[#FFFFFF] absolute top-[9.2%] right-0 shadow-md z-[999] transition-all duration-150 ease-linear`}
+            className={`bg-[#FFFFFF] absolute top-[9.2%] right-0 shadow-md z-[999] transition-all duration-150 ease-linear h-full overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
         >
             <div className="pl-3 pr-4">
                 <div className="flex justify-between py-4 border-b border-gray-300">
                     <div className="flex items-center gap-2">
                         <FaAngleDoubleRight
-                            className="text-sm text-gray-600 cursor-pointer"
+                            className="text-sm cursor-pointer text-gray-650"
                             onClick={() => {
-                                if (width == 900) {
+                                if (width == 650) {
                                     queryState({ openModal: !isState.openModal, dataModal: {} });
                                 } else {
-                                    setWidth(900);
+                                    setWidth(650);
                                 }
                             }}
                         />
                         <FaUpRightAndDownLeftFromCenter
-                            className="text-sm text-gray-600 rotate-90 cursor-pointer"
+                            className="text-sm rotate-90 cursor-pointer text-gray-650"
                             onClick={() => setWidth(window.innerWidth)}
                         />
-                        <h1 className="text-[#0F4F9E] font-medium">
+                        <h1 className="text-[#0F4F9E] font-medium capitalize">
                             {dataLang?.productions_orders_details || "productions_orders_details"}
                         </h1>
                     </div>
                     <button
                         onClick={() => {
                             queryState({ openModal: !isState.openModal, dataModal: {} });
-                            setWidth(900);
+                            setWidth(650);
                         }}
                         type="button"
-                        className="w-[20px] h-[20px] hover:animate-spin transition-all duration-300 ease-linear"
+                        className="w-[20px] h-[20px] hover:scale-125 transition-all duration-300 ease-linear"
                     >
                         <Image
                             alt=""
@@ -298,9 +298,9 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                                     className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id ? "border-[#0F4F9E] border-b bg-[#F7FBFF]" : 'border-b border-transparent'}
                                     hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
                                 >
-                                    <h3 className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} ${width > 1100 ? "text-base" : "text-sm"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
+                                    <h3 className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} text-[13px] group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
                                         {e.name}
-                                        <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-[13px] xl:text-sm lg:text-sm  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
+                                        <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] text-[13px]  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
                                             {e?.count > 0 && e?.count}
                                         </span>
                                     </h3>

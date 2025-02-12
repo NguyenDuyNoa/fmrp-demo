@@ -1,34 +1,42 @@
 import ButtonCancel from "@/components/UI/button/buttonCancel";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
+import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
 import { Trash } from "iconsax-react";
 import { debounce } from "lodash";
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+import ModalImage from "react-modal-image";
 import { useActiveStages } from "../../hooks/useActiveStages";
 import { useListFinishedStages } from "../../hooks/useListFinishedStages";
 import { useLoadOutOfStock } from "../../hooks/useLoadOutOfStock";
+import { useHandingFinishedStages } from "../../hooks/useHandingFinishedStages";
+import useToast from "@/hooks/useToast";
+import { IoMdCheckmark } from "react-icons/io";
+import { FaCheck } from "react-icons/fa6";
 
 
 const initialState = {
     open: false,
     objectWareHouse: null,
-    errWareHouse: false,
     dataTableProducts: null,
-    dataTableBom: null
+    dataTableBom: null,
 }
 
 const PopupConfimStage = ({ dataLang, dataRight }) => {
     const tableRef = useRef(null)
+
+    const isToast = useToast();
 
     const tableRefTotal = useRef(null)
 
@@ -46,12 +54,16 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
 
     const { onGetData, isLoading: isLoadingActiveStages } = useActiveStages()
 
+    const { isLoading: isLoadingSubmit, onSubmit } = useHandingFinishedStages()
+
+    const { dataProductExpiry, dataMaterialExpiry, dataProductSerial } = useFeature();
+
     const { data, isLoading } = useListFinishedStages({ id: dataRight?.idDetailProductionOrder, open: isState.open })
 
     const { data: dataLoadOutOfStock, isLoading: isLoadingLoadOutOfStock, onGetData: onGetDataLoadOutOfStock } = useLoadOutOfStock()
 
-    const handleSelectStep = async (type, e) => {
-        if ((e?.stage_id == activeStep?.item?.stage_id && type == activeStep?.type)) return
+    const handleSelectStep = async (type, e, action) => {
+        if (action == 'click' && e?.stage_id == activeStep?.item?.stage_id && type == activeStep?.type) return
 
         setActiveStep({ type, item: e });
 
@@ -67,7 +79,22 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
 
     };
 
-    const handleSubmit = () => { };
+    const handleSubmit = async () => {
+        if (!isState.objectWareHouse) {
+            isToast("error", "Vui lòng kiểm tra dữ liệu")
+            return
+        }
+
+        const r = await onSubmit({
+            poId: dataRight?.idDetailProductionOrder,
+            objectData: isState
+        })
+        if (r?.isSuccess == 1) {
+            handleSelectStep(activeStep?.type, activeStep?.item, 'auto')
+
+        }
+
+    };
 
     useEffect(() => {
         if (!tableRef?.current || !tableRefTotal?.current) return;
@@ -87,24 +114,31 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
         };
     }, [tableRef.current, tableRefTotal.current]);
 
-    const { totalQuantity, totalQuantityError } = useMemo(() => {
+    const { totalQuantity, totalQuantityError, totalQuantityEntered, totalQuantityEnter } = useMemo(() => {
         const result = isState.dataTableProducts?.data?.items?.reduce((totals, item) => {
-            totals.totalQuantity += +item?.quantity || 0;
+            totals.totalQuantity += +item?.quantityEnterClient || 0;
             totals.totalQuantityError += item?.quantityError || 0;
+            totals.totalQuantityEnter += +item?.quantity_enter || 0;
+            totals.totalQuantityEntered += +item?.quantity_entered || 0;
             return totals;
         },
-            { totalQuantity: 0, totalQuantityError: 0 }
+            { totalQuantity: 0, totalQuantityError: 0, totalQuantityEntered: 0, totalQuantityEnter: 0 }
         );
 
-        return result || { totalQuantity: 0, totalQuantityError: 0 };
+        return result || { totalQuantity: 0, totalQuantityError: 0, totalQuantityEntered: 0, totalQuantityEnter: 0 };
     }, [isState.dataTableProducts]);
+
 
 
     const handleChange = (table, type, value, row) => {
         if (table == 'product') {
-            const newData = isState.dataTableProducts?.data?.items?.map((item) =>
-                item?.item_id === row?.item_id ? { ...item, [type]: value?.floatValue } : item
-            );
+            const newData = isState.dataTableProducts?.data?.items?.map((item) => {
+                if (item?.poi_id === row?.poi_id) {
+                    return { ...item, [type]: value?.floatValue }
+                }
+                return item
+            });
+
             queryState({
                 dataTableProducts: {
                     ...isState.dataTableProducts,
@@ -117,51 +151,106 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
         }
 
         if (table == 'bom') {
-            console.log("value", value);
+            const newData = isState.dataTableBom.data?.boms?.map((item) => {
+                if (item?._id === row?._id) {
+                    return { ...item, [type]: value }
+                }
+                return item
+            });
+
+            queryState({
+                dataTableBom: {
+                    ...isState.dataTableBom,
+                    data: {
+                        ...isState.dataTableBom?.data,
+                        boms: newData,
+                        bomsClientHistory: newData
+                    }
+                }
+            });
 
         }
     }
 
     const handleRemove = (type, row) => {
         const stateKey = type === 'product' ? 'dataTableProducts' : 'dataTableBom';
+        const stateData = type === 'product' ? 'items' : 'boms';
 
-        const newData = isState[stateKey]?.data?.items?.filter((item) => item?.item_id !== row?.item_id);
+        const newData = isState[stateKey]?.data[stateData]?.filter((item) => (item?.poi_id || item?._id) !== (row?.poi_id || row?._id));
 
         queryState({
             [stateKey]: {
                 ...isState[stateKey],
                 data: {
                     ...isState[stateKey]?.data,
-                    items: newData,
+                    [stateData]: newData,
                 },
             },
         });
     };
 
 
-    const onGetBom = useCallback(
-        debounce(async (is_product, items) => {
-            try {
-                const r = await onGetDataLoadOutOfStock({ is_product, items });
-                queryState({ dataTableBom: r });
-            } catch (error) {
-                console.error('Error in onGetBom:', error);
-            }
-        }, 500),
-        []
-    );
+    const onGetBom = useCallback(debounce(async (object, items) => {
+        try {
+            const r = await onGetDataLoadOutOfStock({ object, items });
+
+            const check = r?.data?.boms?.map((e) => {
+                const object = isState.dataTableBom?.data?.bomsClientHistory?.find((item) => item?.item_id == e?.item_id);
+                if (e?.item_id == object?.item_id) {
+                    return {
+                        ...e,
+                        warehouseId: object?.warehouseId
+                    }
+                }
+                return {
+                    ...e,
+                    warehouseId: e?.list_warehouse_bom
+                }
+
+            })
+
+            queryState({
+                dataTableBom: {
+                    ...r,
+                    data: {
+                        ...r?.data,
+                        boms: check,
+                        bomsClientHistory: check
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error('Error in onGetBom:', error);
+        }
+    }, 500), [isState.dataTableProducts]);
+
 
     useEffect(() => {
-        if (isState.dataTableProducts?.data?.items?.length == 0) return
-        onGetBom(activeStep.type === 'TP' ? 1 : 0, isState.dataTableProducts?.data?.items)
+        // if (isState.dataTableProducts?.data?.items?.length == 0) return
+
+        onGetBom({
+            isProduct: activeStep.type === 'TP' ? 1 : 0,
+            activeStep,
+            poId: dataRight?.idDetailProductionOrder,
+        }, isState.dataTableProducts?.data?.items)
     }, [isState.dataTableProducts, activeStep])
 
+    useEffect(() => {
+        if (isState.open) {
+            setState({ ...initialState, open: true })
+            setActiveStep({ type: null, item: null });
+        }
+    }, [isState.open])
 
 
     return (
         <PopupCustom
             title={<p>Hoàn thành công đoạn <span className="text-blue-500">(Số lệnh sản xuất: {data?.po?.reference_no})</span></p>}
-            button={<button className="py-1.5 px-4 transition-all duration-150 ease-in-out border border-blue-500 rounded-lg text-sm hover:bg-blue-500/70 hover:border-blue-500/70 bg-blue-500 text-white">Hoàn thành công đoạn</button>}
+            button={<button className="py-1.5 px-4 flex items-center gap-2 transition-all duration-150 ease-in-out border border-blue-500 rounded-lg text-sm hover:bg-blue-500/70 hover:border-blue-500/70 bg-blue-500 text-white">
+                <FaCheck /> <p>Hoàn thành công đoạn</p>
+            </button>
+            }
             onClickOpen={() => {
                 queryState({ open: true });
             }}
@@ -179,7 +268,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                     <div className="grid h-full grid-cols-2 col-span-4 border-b divide-x bg-gray-50">
                         {/* Công đoạn TP */}
                         <div className="col-span-1 !border-l ">
-                            <div className="p-3 font-semibold border-y">Công đoạn TP</div>
+                            <div className="p-3 font-normal border-y">Công đoạn TP</div>
                             <Customscrollbar className="h-full hover:overflow-y-auto overflow-y-hidden max-h-[calc(80vh_-_60px)]">
                                 {
                                     data?.stage_products?.length > 0
@@ -187,14 +276,14 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                         data?.stage_products?.map((e) => (
                                             <li
                                                 key={e?.stage_id}
-                                                onClick={() => handleSelectStep("TP", e)}
+                                                onClick={() => handleSelectStep("TP", e, 'click')}
                                                 className={`p-3 cursor-pointer ${activeStep.type == "TP" && activeStep?.item?.stage_id == e?.stage_id
                                                     ? "bg-green-100 border-l-4 border-green-500" : "hover:bg-gray-100"
-                                                    } ${e?.avtive ? "text-green-500" : "text-gray-500"} text-sm list-none flex items-center gap-2 transition-all duration-150 ease-linear select-none`}
+                                                    } ${e?.active == "1" ? "text-green-500" : "text-gray-500"} text-sm list-none flex items-center gap-2 transition-all duration-150 ease-linear select-none`}
                                             >
                                                 <div className="min-w-[16px] flex items-center justify-center">
                                                     {
-                                                        e?.avtive
+                                                        e?.active == "1"
                                                             ?
                                                             <FaCheckCircle
                                                                 size="16"
@@ -215,7 +304,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
 
                         {/* Công đoạn BTP */}
                         <div className="col-span-1 !border-r ">
-                            <div className="p-3 font-semibold border-y">Công đoạn BTP</div>
+                            <div className="p-3 font-normal border-y">Công đoạn BTP</div>
                             <Customscrollbar className="h-full hover:overflow-y-auto overflow-y-hidden  max-h-[calc(80vh_-_60px)]">
                                 {
                                     data?.stage_semi_products?.length > 0
@@ -223,14 +312,14 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                         data?.stage_semi_products?.map((e) => (
                                             <li
                                                 key={e?.stage_id}
-                                                onClick={() => handleSelectStep("BTP", e)}
+                                                onClick={() => handleSelectStep("BTP", e, 'click')}
                                                 className={`p-3 cursor-pointer ${activeStep.type == "BTP" && activeStep?.item?.stage_id == e?.stage_id
                                                     ? "bg-green-100 border-l-4 border-green-500" : "hover:bg-gray-100"
-                                                    } ${e?.avtive ? "text-green-500" : "text-gray-500"} text-sm list-none flex items-center gap-2 transition-all duration-200 ease-linear select-none`}
+                                                    } ${e?.active == "1" ? "text-green-500" : "text-gray-500"} text-sm list-none flex items-center gap-2 transition-all duration-200 ease-linear select-none`}
                                             >
                                                 <div className="min-w-[16px] flex items-center justify-center">
                                                     {
-                                                        e?.avtive
+                                                        e?.active == "1"
                                                             ?
                                                             <FaCheckCircle
                                                                 size="16"
@@ -256,7 +345,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                         {/* Nhập thành phẩm */}
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between">
-                                <div className="text-lg font-semibold">Nhập thành phẩm</div>
+                                <div className="text-lg font-normal">Nhập thành phẩm</div>
                                 <SelectCore
                                     options={data?.warehouses || []}
                                     onChange={(e) => queryState({ objectWareHouse: e })}
@@ -265,7 +354,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                     closeMenuOnSelect={true}
                                     hideSelectedOptions={false}
                                     placeholder={'Kho thành phẩm'}
-                                    className={`${isState.errWareHouse ? 'border-red-500' : 'border-transparent'} placeholder:text-slate-300 w-1/3 z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                    className={`${!isState.objectWareHouse ? 'border-red-500' : 'border-transparent'} placeholder:text-slate-300 w-1/3 z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                     isSearchable={true}
                                     style={{
                                         border: "none",
@@ -290,138 +379,122 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                             ...provided,
                                             // zIndex: 9999, // Giá trị z-index tùy chỉnh
                                         }),
-                                        control: (base, state) => ({
-                                            ...base,
-                                            boxShadow: "none",
-                                            padding: "2.7px",
-                                            ...(state.isFocused && {
-                                                border: "0 0 0 1px #92BFF7",
-                                            }),
-                                        }),
+                                        // control: (base, state) => ({
+                                        //     ...base,
+                                        //     boxShadow: "none",
+                                        //     padding: "2.7px",
+                                        //     ...(state.isFocused && {
+                                        //         // border: "0 0 0 1px #92BFF7",
+                                        //     }),
+                                        // }),
                                     }}
                                 />
-                                {isState.errWareHouse && (
-                                    <label className="text-sm text-red-500">
-                                        {'Vui lòng chọn kho'}
-                                    </label>
-                                )}
                             </div>
                             <div className="">
                                 <Customscrollbar ref={tableRef} className="h-[calc(80vh_/_2_-_115px)] overflow-x-hidden overflow-y-hidden bg-white hover:overflow-x-auto hover:overflow-y-auto">
-                                    <table className=" w-full text-sm [&>thead>tr>th]:font-medium border border-separate border-spacing-0 border-gray-200 table-auto">
+                                    <table className="w-full text-sm font-normal border border-separate border-gray-200 table-auto border-spacing-0">
                                         <thead className="sticky top-0 z-10 bg-gray-100">
                                             <tr>
-                                                <th className="border p-2 min-w-[200px]">Số lệnh sản xuất chi tiết</th>
-                                                <th className="border p-2 min-w-[100px]">Hình ảnh</th>
-                                                <th className="border p-2 min-w-[250px]">Mặt hàng</th>
-                                                <th className="border p-2 min-w-[150px]">Đơn vị sản xuất</th>
-                                                <th className="border p-2 min-w-[120px]">SL cần nhập</th>
-                                                <th className="border p-2 min-w-[120px]">SL đã nhập</th>
-                                                <th className="border p-2 min-w-[196px]">Số lượng</th>
-                                                <th className="border p-2 min-w-[196px]">Số lượng lỗi</th>
-                                                <th className="border p-2 min-w-[100px]">Thao tác</th>
+                                                <th className="border p-2 font-normal min-w-[200px] sticky left-0 z-20 bg-gray-100">Số lệnh sản xuất chi tiết</th>
+                                                <th className="border p-2 font-normal min-w-[100px] sticky left-[200px] z-20 bg-gray-100">Hình ảnh</th>
+                                                <th className="border p-2 font-normal min-w-[250px] sticky left-[300px] z-20 bg-gray-100">Mặt hàng</th>
+                                                <th className="border p-2 font-normal min-w-[150px]">Đơn vị sản xuất</th>
+                                                <th className="border p-2 font-normal min-w-[196px]">Số lượng hoàn thành</th>
+                                                <th className="border p-2 font-normal min-w-[120px]">Số lượng lỗi</th>
+                                                <th className="border p-2 font-normal min-w-[120px]">SL cần nhập</th>
+                                                <th className="border p-2 font-normal min-w-[120px]">SL đã nhập</th>
+                                                <th className="border p-2 font-normal min-w-[100px]">Thao tác</th>
                                             </tr>
                                         </thead>
                                         <tbody className="h-[calc(80vh_/_2_-_155px)]">
-                                            {
-                                                (isLoadingActiveStages && activeStep.type == "TP")
-                                                    ?
-                                                    <tr>
-                                                        <td colSpan={9}>
-                                                            <Loading className='!h-[100px] w-full mx-auto' />
+                                            {isLoadingActiveStages && activeStep.type == "TP" ? (
+                                                <tr>
+                                                    <td colSpan={9}>
+                                                        <Loading className="!h-[100px] w-full mx-auto" />
+                                                    </td>
+                                                </tr>
+                                            ) : isState.dataTableProducts?.data?.items?.length > 0 ? (
+                                                isState.dataTableProducts?.data?.items?.map((row, index) => (
+                                                    <tr key={index}>
+                                                        <td className="sticky left-0 p-2 text-sm text-center text-blue-500 bg-white border">
+                                                            {row?.reference_no_detail}
+                                                        </td>
+                                                        <td className="p-2 border sticky left-[200px] bg-white">
+                                                            <div className="flex items-center justify-center">
+                                                                <ModalImage
+                                                                    small={row?.images ?? "/no_img.png"}
+                                                                    large={row?.images ?? "/no_img.png"}
+                                                                    width={36}
+                                                                    height={36}
+                                                                    alt={row?.images ?? "/no_img.png"}
+                                                                    className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                        <td className="p-2 text-sm border sticky left-[300px] bg-white">
+                                                            <p>{row?.item_name}</p>
+                                                            <p className="text-xs italic">{row?.product_variation}</p>
+                                                        </td>
+                                                        <td className="p-2 text-sm text-center border">{row?.unit_name}</td>
+                                                        <td className="p-2 text-sm border">
+                                                            <InPutNumericFormat
+                                                                onValueChange={(e) => handleChange("product", "quantityEnterClient", e, row)}
+                                                                value={row?.quantityEnterClient || ""}
+                                                                className={`${(!row?.quantityEnterClient && !row?.quantityError) ? "border-red-500" : "border-gray-200"} appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal focus:outline-none border-b-2`}
+                                                                isAllowed={isAllowedNumber}
+                                                            />
+                                                        </td>
+                                                        <td className="p-2 border w-[120px]">
+                                                            <InPutNumericFormat
+                                                                onValueChange={(e) => handleChange("product", "quantityError", e, row)}
+                                                                value={row?.quantityError || ""}
+                                                                className={`${(!row?.quantityEnterClient && !row?.quantityError) ? "border-red-500" : "border-gray-200"} appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal focus:outline-none w-full border-b-2`}
+                                                                isAllowed={isAllowedNumber}
+                                                            />
+                                                        </td>
+                                                        <td className="p-2 text-sm text-center border">{formatNumber(row?.quantity_enter)}</td>
+                                                        <td className="p-2 text-sm text-center border">{formatNumber(row?.quantity_entered)}</td>
+                                                        <td className="p-2 text-center border">
+                                                            <button
+                                                                title="Xóa"
+                                                                onClick={() => handleRemove("product", row)}
+                                                                className="p-1 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
+                                                            >
+                                                                <Trash size={24} />
+                                                            </button>
                                                         </td>
                                                     </tr>
-                                                    :
-                                                    isState.dataTableProducts?.data?.items?.length > 0
-                                                        ?
-                                                        isState.dataTableProducts?.data?.items?.map((row, index) => (
-                                                            <tr key={index} >
-                                                                <td className="p-2 text-sm text-center border">
-                                                                    {row?.reference_no_detail}
-                                                                </td>
-                                                                <td className="p-2 border">
-                                                                    <div className="flex items-center justify-center ">
-                                                                        <Image
-                                                                            height={1024}
-                                                                            width={1280}
-                                                                            alt="img"
-                                                                            src={row?.images}
-                                                                            className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
-                                                                        />
-                                                                    </div>
-                                                                </td>
-                                                                <td className="p-2 text-sm border">
-                                                                    <p>
-                                                                        {row?.item_name}
-                                                                    </p>
-                                                                    <p className="text-xs italic">
-                                                                        {row?.product_variation}
-                                                                    </p>
-                                                                </td>
-                                                                <td className="p-2 text-sm text-center border">
-                                                                    {row?.unit_name}
-                                                                </td>
-                                                                <td className="p-2 text-sm text-center border">
-                                                                    {formatNumber(row?.quantity_enter)}
-                                                                </td>
-                                                                <td className="p-2 text-sm text-center border">
-                                                                    {formatNumber(row?.quantity_entered)}
-                                                                </td>
-                                                                <td className="p-2 text-sm border">
-                                                                    <InPutNumericFormat
-                                                                        onValueChange={(e) => handleChange('product', "quantity", e, row)}
-                                                                        value={row?.quantity || null}
-                                                                        className={`${(!row?.quantity || row?.quantity == 0) ? "border-b border-red-500" : "border-b border-gray-200"}
-                                                                        ${(!row?.quantity || row?.quantity == 0) ? "border-b border-red-500" : "border-b border-gray-200"}
-                                                                        appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal   focus:outline-none `}
-                                                                        isAllowed={isAllowedNumber}
-                                                                    />
-                                                                </td>
-                                                                <td className="p-2 border">
-                                                                    <InPutNumericFormat
-                                                                        onValueChange={(e) => handleChange('product', "quantityError", e, row)}
-                                                                        value={row?.quantityError || null}
-                                                                        className={`${(!row?.quantityError || row?.quantityError == 0) ? "border-b border-red-500" : "border-b border-gray-200"}
-                                                                        ${(!row?.quantityError || row?.quantityError == 0) ? "border-b border-red-500" : "border-b border-gray-200"}
-                                                                        appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal   focus:outline-none `}
-                                                                        isAllowed={isAllowedNumber}
-                                                                    />
-                                                                </td>
-                                                                <td className="p-2 text-center border">
-                                                                    <button
-                                                                        title="Xóa"
-                                                                        onClick={() => handleRemove("product", row)}
-                                                                        className="p-1 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
-                                                                    >
-                                                                        <Trash size={24} />
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        ))
-                                                        : (
-                                                            <tr>
-                                                                <td colSpan="9" className="p-2 text-center text-red-500 border">
-                                                                    Không có mặt hàng để hoàn thành
-                                                                </td>
-                                                            </tr>
-                                                        )}
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="9" className="p-2 text-center text-red-500 border">
+                                                        Không có mặt hàng để hoàn thành
+                                                    </td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
                                 </Customscrollbar>
                                 <div ref={tableRefTotal} className="overflow-x-hidden">
-                                    <table >
+                                    <table className="w-full">
                                         <tfoot className="sticky bottom-0 z-10">
-                                            <tr className="bg-gray-100 font-font-medium">
-                                                <td className="p-2 text-center border font-font-medium min-w-[940px]">
+                                            <tr className="font-normal bg-gray-100">
+                                                <td
+                                                    className="sticky left-0 z-20 p-2 font-normal text-center bg-gray-100 border"
+                                                    colSpan={3}
+                                                    style={{
+                                                        minWidth: "calc(200px + 100px + 250px)",
+                                                        width: "calc(200px + 100px + 250px)",
+                                                    }}
+                                                >
                                                     TỔNG CỘNG
                                                 </td>
-                                                <td className="p-2 text-center border font-font-medium min-w-[196px]">
-                                                    {formatNumber(totalQuantity)}
-                                                </td>
-                                                <td className="p-2 text-center border font-font-medium  min-w-[196px]">
-                                                    {formatNumber(totalQuantityError)}
-                                                </td>
-                                                <td className="p-2 text-center border font-font-medium  min-w-[100px]"></td>
+                                                <td className="p-2 text-center border font-normal min-w-[150px]"></td>
+                                                <td className="p-2 text-center border font-normal min-w-[196px]">{formatNumber(totalQuantity)}</td>
+                                                <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityError)}</td>
+                                                <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityEnter)}</td>
+                                                <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityEntered)}</td>
+                                                <td className="p-2 text-center border font-normal min-w-[100px]"></td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -431,18 +504,18 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
 
                         {/* Xuất kho sản xuất */}
                         <div>
-                            <div className="mb-4 text-lg font-semibold">Xuất kho sản xuất</div>
+                            <div className="mb-4 text-lg font-normal">Xuất kho sản xuất</div>
                             <Customscrollbar className="h-[calc(80vh_/_2_-_115px)] overflow-x-hidden bg-white hover:overflow-x-auto overflow-y-hidden hover:overflow-y-auto">
-                                <table className="w-full text-sm [&>thead>tr>th]:font-medium border border-separate border-spacing-0 border-gray-200 table-auto">
+                                <table className="w-full text-sm [&>thead>tr>th]:font-normal border border-separate border-spacing-0 border-gray-200 table-auto">
                                     <thead className="sticky top-0 z-10 bg-gray-100">
                                         <tr>
-                                            <th className="border p-2 min-w-[100px]">Hình ảnh</th>
-                                            <th className="border p-2 min-w-[150px]">Mặt hàng</th>
-                                            <th className="border p-2 min-w-[120px]">SL sản xuất</th>
-                                            <th className="border p-2 min-w-[120px]">SL xuất kho</th>
-                                            <th className="border p-2 min-w-[120px]">Tồn kho</th>
-                                            <th className="border p-2 min-w-[150px]">Kho hàng</th>
-                                            <th className="border p-2 min-w-[100px]">Thao tác</th>
+                                            <th className="border p-2 font-normal min-w-[100px]">Hình ảnh</th>
+                                            <th className="border p-2 font-normal min-w-[250px]">Mặt hàng</th>
+                                            <th className="border p-2 font-normal min-w-[120px]">SL sản xuất</th>
+                                            <th className="border p-2 font-normal min-w-[120px]">SL xuất kho</th>
+                                            <th className="border p-2 font-normal min-w-[120px]">Tồn kho</th>
+                                            <th className="border p-2 font-normal min-w-[290px]">Kho hàng</th>
+                                            <th className="border p-2 font-normal min-w-[100px]">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody className="h-[calc(80vh_/_2_-_155px)]">
@@ -455,16 +528,141 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                     </td>
                                                 </tr>
                                                 :
-                                                isState.dataTableBom?.data?.items?.length > 0 ? (
-                                                    isState.dataTableBom?.data?.items?.map((row, index) => (
+                                                isState.dataTableBom?.data?.boms?.length > 0 ? (
+                                                    isState.dataTableBom?.data?.boms?.map((row, index) => (
                                                         <tr key={index}>
-                                                            <td className="p-2 border">{row.image}</td>
-                                                            <td className="p-2 border">{row.item}</td>
-                                                            <td className="p-2 border">{row.produced}</td>
-                                                            <td className="p-2 border">{row.exported}</td>
-                                                            <td className="p-2 border">{row.remaining}</td>
-                                                            <td className="p-2 border">{row.warehouse}</td>
-                                                            <td className="p-2 text-center border">
+                                                            <td className="p-2 border">
+                                                                <div className="flex items-center justify-center ">
+                                                                    <ModalImage
+                                                                        small={row?.images ?? "/no_img.png"}
+                                                                        large={row?.images ?? "/no_img.png"}
+                                                                        width={36}
+                                                                        height={36}
+                                                                        alt={row?.images ?? "/no_img.png"}
+                                                                        className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
+                                                                    />
+                                                                </div>
+                                                            </td>
+                                                            <td className="p-2 text-sm border">
+                                                                <p>
+                                                                    {row?.item_name}
+                                                                </p>
+                                                                <p className="text-xs italic">
+                                                                    {row?.product_variation}
+                                                                </p>
+                                                            </td>
+                                                            <td className="p-2 text-sm text-center border">
+                                                                {formatNumber(row?.quantity_total_quota)} <span className="relative text-xs top-1">/{row?.unit_name}</span>
+                                                            </td>
+                                                            <td className="p-2 text-sm text-center border">
+                                                                {formatNumber(row?.quantity_quota_primary)} <span className="relative text-xs top-1">/{row?.unit_name_primary}</span>
+                                                            </td>
+                                                            <td className="p-2 text-sm text-center border">
+                                                                {formatNumber(row?.quantity_warehouse)}
+                                                            </td>
+                                                            <td className="p-2 text-sm border w-[290px]">
+                                                                <SelectComponent
+                                                                    options={row?.list_warehouse_bom || []}
+                                                                    value={row?.warehouseId}
+                                                                    maxShowMuti={1}
+                                                                    isClearable={false}
+                                                                    isMulti={true}
+                                                                    components={{ MultiValue }}
+                                                                    onChange={(e) => handleChange('bom', "warehouseId", e, row)}
+                                                                    className={`${row?.warehouseId?.length == 0 ? "border-red-500 border" : ""}  my-1  text-xs placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
+                                                                    noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
+                                                                    menuPortalTarget={document.body}
+                                                                    placeholder={"Kho xuất - Vị trí xuất"}
+                                                                    formatOptionLabel={(option) => {
+                                                                        return (
+                                                                            <>
+                                                                                <h2 className="text-xs">
+                                                                                    {dataLang?.import_Warehouse || "import_Warehouse"}  : {option?.label}
+                                                                                </h2>
+                                                                                <h2 className="text-xs">
+                                                                                    {option?.name_location}
+                                                                                </h2>
+
+                                                                                <div className="">
+                                                                                    <div className="flex items-center">
+                                                                                        <h4 className="text-[10px]">
+                                                                                            {dataLang?.returns_survive}:
+                                                                                        </h4>
+                                                                                        <h4 className="pl-1 text-[10px]">
+                                                                                            {formatNumber(option?.quantity_warehouse)}
+                                                                                        </h4>
+                                                                                    </div>
+                                                                                    {dataProductSerial?.is_enable === "1" && (
+                                                                                        <div className="flex items-center">
+                                                                                            <h4 className="text-[10px] italic">
+                                                                                                {"Serial"}:
+                                                                                            </h4>
+                                                                                            <h4 className="pl-1 text-[10px] italic">
+                                                                                                {option?.serial}
+                                                                                            </h4>
+                                                                                        </div>
+                                                                                    )}
+                                                                                    {
+                                                                                        (dataMaterialExpiry.is_enable === "1" || dataProductExpiry?.is_enable === "1") && (
+                                                                                            <>
+                                                                                                <div className="flex items-center justify-start">
+                                                                                                    <h4 className="text-[10px] italic">
+                                                                                                        {"Lot"}:
+                                                                                                    </h4>
+                                                                                                    <h4 className="pl-1 text-[10px] italic">
+                                                                                                        {option?.lot}
+                                                                                                    </h4>
+                                                                                                </div>
+                                                                                                <div className="flex items-center">
+                                                                                                    <h4 className="text-[10px] italic">
+                                                                                                        {dataLang?.warehouses_detail_date || "warehouses_detail_date"}:
+                                                                                                    </h4>
+                                                                                                    <h4 className="pl-1 text-[10px] italic">
+                                                                                                        {option?.expiration_date}
+                                                                                                    </h4>
+                                                                                                </div>
+                                                                                            </>
+                                                                                        )
+                                                                                    }
+                                                                                </div>
+                                                                            </>
+                                                                        );
+                                                                    }}
+                                                                    style={{
+                                                                        border: "none",
+                                                                        boxShadow: "none",
+                                                                        outline: "none",
+                                                                    }}
+                                                                    styles={{
+                                                                        placeholder: (base) => ({
+                                                                            ...base,
+                                                                            color: "#cbd5e1",
+                                                                        }),
+                                                                        menuPortal: (base) => ({
+                                                                            ...base,
+                                                                            zIndex: 9999,
+                                                                            position: "absolute",
+                                                                        }),
+                                                                        menu: (provided, state) => ({
+                                                                            ...provided,
+                                                                            width: "100%",
+                                                                        }),
+
+
+                                                                    }}
+                                                                    theme={(theme) => ({
+                                                                        ...theme,
+                                                                        colors: {
+                                                                            ...theme.colors,
+                                                                            primary25: "#EBF5FF",
+                                                                            primary50: "#92BFF7",
+                                                                            primary: "#0F4F9E",
+                                                                        },
+                                                                    })}
+                                                                    classNamePrefix="customDropdow classNamePrefixLotDateSerial"
+                                                                />
+                                                            </td>
+                                                            <td className="p-2 text-sm text-center border">
                                                                 <button
                                                                     title="Xóa"
                                                                     onClick={() => handleRemove("bom", row)}
@@ -492,7 +690,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                 dataLang={dataLang}
                             />
                             <ButtonSubmit
-                                loading={false}
+                                loading={isLoadingSubmit}
                                 dataLang={dataLang}
                                 onClick={handleSubmit.bind(this)}
                             />
