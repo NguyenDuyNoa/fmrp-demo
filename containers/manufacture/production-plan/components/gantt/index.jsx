@@ -45,7 +45,6 @@ const BodyGantt = ({
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
-    const [isLastActive, setIsLastActive] = useState()
 
     const handleScroll = (e) => {
         const container1Element = container1Ref.current;
@@ -147,7 +146,33 @@ const BodyGantt = ({
     //         }
     //     }
     // }, [data]);
+
+
+    const [isFirstRender, setIsFirstRender] = useState(true);
+
+    // Chạy khi component mount lần đầu để thiết lập vị trí scroll ngay lập tức
+    useEffect(() => {
+        if (checkRankRef.current && container1Ref.current) {
+            const target = checkRankRef.current;
+            const viewport = document.querySelector('.container1');
+
+            if (viewport) {
+                const targetRect = target.getBoundingClientRect();
+                const viewportRect = viewport.getBoundingClientRect();
+
+                // Thiết lập vị trí scroll ngay lập tức
+                viewport.scrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
+            }
+        }
+    }, []); // Chạy một lần duy nhất khi component mount
+
+    // Chạy animation khi `data` thay đổi, nhưng bỏ qua lần render đầu tiên
     useLayoutEffect(() => {
+        if (isFirstRender) {
+            setIsFirstRender(false); // Đánh dấu rằng lần đầu đã chạy
+            return; // Không chạy animation lần đầu
+        }
+
         if (checkRankRef.current && container1Ref.current) {
             const target = checkRankRef.current;
             const viewport = document.querySelector('.container1');
@@ -178,6 +203,37 @@ const BodyGantt = ({
             }
         }
     }, [data]); // Chạy lại khi `data` thay đổi
+    // useLayoutEffect(() => {
+    //     if (checkRankRef.current && container1Ref.current) {
+    //         const target = checkRankRef.current;
+    //         const viewport = document.querySelector('.container1');
+
+    //         if (viewport) {
+    //             const targetRect = target.getBoundingClientRect();
+    //             const viewportRect = viewport.getBoundingClientRect();
+    //             const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
+
+    //             const startScrollLeft = viewport.scrollLeft;
+    //             let startTime = null;
+    //             const duration = 200; // Thời gian chạy animation (ms)
+
+    //             const step = (timestamp) => {
+    //                 if (!startTime) startTime = timestamp;
+
+    //                 const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến trình từ 0 -> 1
+    //                 const ease = progress * (2 - progress); // Hiệu ứng easing
+
+    //                 viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
+
+    //                 if (progress < 1) {
+    //                     requestAnimationFrame(step);
+    //                 }
+    //             };
+
+    //             requestAnimationFrame(step);
+    //         }
+    //     }
+    // }, [data]); // Chạy lại khi `data` thay đổi
 
 
 
