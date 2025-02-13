@@ -4,23 +4,30 @@ import { useGetTypeOpenAi } from "@/hooks/ai/useGetTypeOpenAi";
 import useToast from "@/hooks/useToast";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IoIosClose, IoIosResize } from "react-icons/io";
+import { IoIosArrowRoundDown, IoIosClose, IoIosResize } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import Popup from "reactjs-popup";
 import { Customscrollbar } from "../common/Customscrollbar";
 import LoadingButton from "../loading/loadingButton";
 import TableBom from "./components/TableBom";
 import { debounce } from "lodash";
+import { motion } from "framer-motion";
 
+export const widthX = 80;
+
+export const heightY = 120
 export default function ChatBubbleAI(props) {
+
     const initialState = {
-        position: { x: window.innerWidth - 80, y: window.innerHeight - 60 },
+        position: { x: window.innerWidth - widthX, y: window.innerHeight - heightY },
         dragging: false,
         offset: { x: 0, y: 0 },
         headerHeight: null,
         boxMessageHeight: null,
-        localContent: ""
+        localContent: "",
+        showScrollButton: false
     }
+
     const { dataLang } = props
 
     const maxTextLength = 150
@@ -36,6 +43,8 @@ export default function ChatBubbleAI(props) {
     const textareaRef = useRef(null);
 
     const headerRef = useRef(null);
+
+    const boxShowMsgRef = useRef(null);
 
     const boxMessageRef = useRef(null);
 
@@ -79,6 +88,51 @@ export default function ChatBubbleAI(props) {
 
     }, [stateBoxChatAi.openViewModal]);
 
+    const handleScroll = () => {
+        if (!boxShowMsgRef.current) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = boxShowMsgRef.current;
+
+        // Nếu người dùng chưa cuộn xuống cuối, hiển thị nút
+        if (scrollTop < scrollHeight - clientHeight - 50) {
+            queryKeyIsState({ showScrollButton: true });
+        } else {
+            queryKeyIsState({ showScrollButton: false });
+        }
+    };
+
+    const scrollToBottom = () => {
+        if (boxShowMsgRef.current) {
+            boxShowMsgRef.current.scrollTo({
+                top: boxShowMsgRef.current.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+    };
+    // Theo dõi sự kiện scroll
+    useEffect(() => {
+        const msgBox = boxShowMsgRef.current;
+        if (msgBox) {
+            msgBox.addEventListener("scroll", handleScroll);
+        }
+        return () => {
+            if (msgBox) {
+                msgBox.removeEventListener("scroll", handleScroll);
+            }
+        };
+    }, []);
+    // useEffect(() => {
+    //     if (boxShowMsgRef.current) {
+    //         boxShowMsgRef.current.scrollTo({
+    //             top: boxShowMsgRef.current.scrollHeight,
+    //             behavior: "smooth"
+    //         });
+    //     }
+    // }, [stateBoxChatAi.messenger]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [stateBoxChatAi.messenger]);
 
     const sendMessage = async () => {
         if (!stateBoxChatAi.typeChat?.id) {
@@ -120,6 +174,7 @@ export default function ChatBubbleAI(props) {
                 ...stateBoxChatAi,
                 messenger: [...stateBoxChatAi.messenger, ...dataChat],
                 contentChat: "",
+                typeData: "",
                 dataReview: res?.data
             }
         })
@@ -163,8 +218,52 @@ export default function ChatBubbleAI(props) {
             textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
         }
     };
+    // const minWidth = 300; // Chiều rộng tối thiểu
+    // const maxWidth = window.innerWidth; // Chiều rộng tối đa (full màn hình)
 
+    // const [width, setWidth] = useState(maxWidth); // Mặc định 100vw
+    // const [isResizing, setIsResizing] = useState(false);
+    // const [initialX, setInitialX] = useState(0);
+    // const [initialWidth, setInitialWidth] = useState(maxWidth);
 
+    // // useEffect(() => {
+    // //     if (!isOpen) {
+    // //         setWidth(maxWidth); // Reset về 100vw khi mở lại
+    // //     }
+    // // }, [isOpen, maxWidth]);
+
+    // useEffect(() => {
+    //     const handleResize = (event) => {
+    //         if (isResizing) {
+    //             const newWidth = initialWidth - (event.clientX - initialX);
+    //             setWidth(Math.min(Math.max(newWidth, minWidth), maxWidth)); // Giữ trong phạm vi min/max
+    //         }
+    //     };
+
+    //     const stopResize = () => {
+    //         setIsResizing(false);
+    //         document.body.classList.remove("no-select");
+    //         document.removeEventListener("mousemove", handleResize);
+    //         document.removeEventListener("mouseup", stopResize);
+    //     };
+
+    //     if (isResizing) {
+    //         document.addEventListener("mousemove", handleResize);
+    //         document.addEventListener("mouseup", stopResize);
+    //     }
+
+    //     return () => {
+    //         document.removeEventListener("mousemove", handleResize);
+    //         document.removeEventListener("mouseup", stopResize);
+    //     };
+    // }, [isResizing, initialWidth, initialX, minWidth, maxWidth]);
+
+    // const startResize = (event) => {
+    //     setIsResizing(true);
+    //     setInitialX(event.clientX);
+    //     setInitialWidth(width);
+    //     document.body.classList.add("no-select"); // Tránh chọn văn bản khi kéo
+    // };
     return (
         <div
             ref={chatRef}
@@ -187,7 +286,8 @@ export default function ChatBubbleAI(props) {
                                 payload: {
                                     ...stateBoxChatAi,
                                     open: !stateBoxChatAi.open,
-                                    openViewModal: false
+                                    openViewModal: false,
+                                    typeData: ""
                                 }
                             })}
                             className="p-3 text-white transition-transform transform rounded-full group animate-bounce"
@@ -213,10 +313,20 @@ export default function ChatBubbleAI(props) {
                         )
                     }
                 </Popup>
-                <div className={`${stateBoxChatAi.openViewModal ? "w-[100vw] -right-2 h-screen px-4" : "w-96 max-w-md right-4 p-4"} absolute bottom-full   border rounded-xl shadow-lg bg-white flex flex-col gap-2 transition-all duration-300 ease-in-out transform
+                <div className={`${stateBoxChatAi.openViewModal ? "-right-2 h-screen px-4" : "max-w-md right-4 p-4 rounded-xl"} absolute bottom-full   border shadow-lg bg-white flex flex-col gap-2 transition-all duration-300 ease-in-out transform
                     ${stateBoxChatAi.open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-75 translate-y-5 pointer-events-none"}`}
                     onMouseDown={(e) => e.stopPropagation()}
+                    style={{
+                        width: stateBoxChatAi.openViewModal ? `100vw` : '384px',
+                    }}
+                // style={{
+                //     width: stateBoxChatAi.openViewModal ? `${width}px` : '384px',
+                // }}
                 >
+                    {/* <div
+                        className="absolute top-0 left-0 w-2 h-full bg-red-500 cursor-ew-resize"
+                        onMouseDown={startResize}
+                    /> */}
                     <div ref={headerRef} className={`relative flex items-center justify-between ${stateBoxChatAi.openViewModal ? "pt-4" : "cursor-grab"} `}
                         onMouseDown={(e) => {
                             if (stateBoxChatAi.openViewModal) return
@@ -235,7 +345,8 @@ export default function ChatBubbleAI(props) {
                                         payload: {
                                             ...stateBoxChatAi,
                                             openViewModal: false,
-                                        }
+                                        },
+                                        typeData: ""
                                     });
                                 } else {
                                     dispatch({
@@ -243,10 +354,11 @@ export default function ChatBubbleAI(props) {
                                         payload: {
                                             ...stateBoxChatAi,
                                             open: false,
+                                            typeData: ""
                                         }
                                     });
                                 }
-                                queryKeyIsState({ position: { x: window.innerWidth - 80, y: window.innerHeight - 140 } });
+                                queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight - heightY } });
                             }}
                             className={`absolute right-0 text-gray-500 ${stateBoxChatAi.openViewModal ? "top-2" : "-top-1"} hover:text-gray-700`}
                         >
@@ -258,8 +370,8 @@ export default function ChatBubbleAI(props) {
                             // 32 padingg trên dưới 
                             height: stateBoxChatAi.openViewModal ? `calc(100vh - ${((isState.headerHeight ?? 0) + 28)}px)` : "auto"
                         }} className={`${stateBoxChatAi.openViewModal ? "w-[30%] " : "w-full"}`}>
-                            <Customscrollbar className={`flex-1 p-2 overflow-y-auto ${stateBoxChatAi.openViewModal ? "bg-gray-100" : ""}`}>
-                                <div className={`space-y-4`}
+                            <Customscrollbar ref={boxShowMsgRef} className={` flex-1 p-2 overflow-y-auto ${stateBoxChatAi.openViewModal ? "bg-gray-100 rounded-t-lg" : ""}`}>
+                                <div className={`space-y-4  pb-[50px]`}
                                     style={{
                                         height: stateBoxChatAi.openViewModal ? `calc(100vh - ${((isState.boxMessageHeight ?? 0) + (((isState.headerHeight ?? 0) + 28)))}px)` : "288px"
                                     }}
@@ -283,11 +395,11 @@ export default function ChatBubbleAI(props) {
                                             }
                                             <div
                                                 className={`px-4 py-2 rounded-xl text-sm transition-all duration-300 ease-in-out transform ${msg?.sender === "user"
-                                                    ? "bg-gray-100 text-gray-800"
-                                                    : "bg-gray-50 text-gray-800"
-                                                    } flex items-center space-x-2 cursor-default relative`}
+                                                    ? (stateBoxChatAi.openViewModal ? "bg-gray-50" : "bg-gray-100")
+                                                    : ((stateBoxChatAi.openViewModal ? "bg-gray-100" : "bg-gray-50"))
+                                                    } text-gray-800 flex items-center space-x-2 cursor-default relative`}
                                             >
-                                                {
+                                                {/* {
                                                     msg?.sender === "ai" && array?.length - 1 == index && (!stateBoxChatAi.openViewModal)
                                                         ?
                                                         <p>
@@ -324,14 +436,56 @@ export default function ChatBubbleAI(props) {
                                                         <p>
                                                             {msg?.text}
                                                         </p>
+                                                } */}
+                                                {
+                                                    (msg?.sender === "ai" && array?.length - 1 == index && !index == 0) && (!stateBoxChatAi.openViewModal) && (stateBoxChatAi?.dataReview?.content)
+                                                        ?
+                                                        <p>
+                                                            <span>{msg?.text}</span>
+                                                            <span
+                                                                onClick={() => {
+                                                                    dispatch({
+                                                                        type: "stateBoxChatAi",
+                                                                        payload: {
+                                                                            ...stateBoxChatAi,
+                                                                            openViewModal: true,
+                                                                            typeData: ""
+                                                                        }
+                                                                    })
+                                                                    queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight } })
+                                                                }}
+                                                                className={` text-blue-500 cursor-pointer select-none pl-2`} >
+                                                                ... <IoIosResize className="inline" size={18} />
+                                                            </span>
+                                                        </p>
+                                                        :
+                                                        <p>
+                                                            {msg?.text}
+                                                        </p>
                                                 }
                                             </div>
                                         </div>
                                     ))}
-                                </div>
 
+                                </div>
                             </Customscrollbar>
-                            <div ref={boxMessageRef} className={`${stateBoxChatAi.openViewModal ? "bg-gray-100 pb-2" : "bg-transparent"} px-2`}>
+                            <div ref={boxMessageRef} className={`${stateBoxChatAi.openViewModal ? "bg-gray-100 pb-2" : "bg-transparent"} relative px-2`}>
+                                {isState.showScrollButton && (
+                                    <div className="absolute -translate-x-1/2 -top-3 left-1/2 z-[999]">
+                                        <motion.button
+                                            onClick={scrollToBottom}
+                                            initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                            className="flex items-center justify-center w-6 h-6 p-1 bg-gray-300 rounded-full cursor-pointer "
+                                        >
+                                            <IoIosArrowRoundDown size={28} className="" />
+                                        </motion.button>
+                                    </div>
+
+                                )}
+
                                 <div className="flex flex-wrap gap-2 py-2 min-h-8 max-h-24">
                                     {
                                         isLoadingDataType
@@ -348,7 +502,7 @@ export default function ChatBubbleAI(props) {
                                                     key={`e-${e?.id}`}
                                                     type="button"
                                                     className={`${stateBoxChatAi.typeChat?.id === e?.id ? "bg-[#3276FA] text-white cursor-pointer" : "bg-slate-100 text-gray-500 hover:bg-[#3276FA] hover:text-white cursor-pointer"}
-                                        flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all duration-150 ease-linear`}
+                                                    flex items-center gap-1 px-2 py-1 rounded-3xl text-xs font-medium transition-all duration-150 ease-linear`}
                                                     onClick={() => dispatch({
                                                         type: "stateBoxChatAi",
                                                         payload: {
@@ -412,7 +566,7 @@ export default function ChatBubbleAI(props) {
                         {
                             stateBoxChatAi.openViewModal && (
                                 <div className="w-[70%]">
-                                    <TableBom />
+                                    <TableBom queryKeyIsState={queryKeyIsState} />
                                 </div>
                             )
                         }

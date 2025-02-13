@@ -17,6 +17,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import Select from "react-select";
+import { v4 } from "uuid";
 
 const Popup_Bom = React.memo((props) => {
     const scrollAreaRef = useRef(null);
@@ -106,6 +107,8 @@ const Popup_Bom = React.memo((props) => {
         queryKey: ["detail_bom_product", props.id],
         queryFn: async () => {
             const { data } = await apiProducts.apiDetailBomProducts({ params: { id: props.id } })
+            console.log("data", data);
+            console.log("props.id", props.id);
 
             const newData = data?.variations?.map((e) => ({
                 label: e?.name_variation,
@@ -133,6 +136,7 @@ const Popup_Bom = React.memo((props) => {
                     },
                 })),
             }));
+            console.log("newData", newData);
 
             sDataSelectedVariant(newData);
 
@@ -211,6 +215,73 @@ const Popup_Bom = React.memo((props) => {
     };
 
     useEffect(() => {
+        if (!stateBoxChatAi?.isShowAi) return
+        const convertArrayBom = (arrParent, arrayChild) => {
+            const child = arrayChild?.map((ce) => ({
+                id: v4(),
+                type: {
+                    label: ce?.str_type_item,
+                    value: ce?.type_item,
+                },
+                name: {
+                    label: ce?.item_name,
+                    value: ce?.item_id,
+                    product_variation: ce?.variation_name,
+                },
+                unit: ce?.unit_name ? {
+                    label: ce?.unit_name,
+                    value: ce?.unit_id,
+                } : null,
+                norm: Number(ce?.quota),
+                loss: Number(ce?.loss),
+                stage: ce?.stage_name ? {
+                    label: ce?.stage_name,
+                    value: ce?.stage_id,
+                } : null,
+                dataName: [],
+                dataUnit: ce?.units?.map(i => ({
+                    label: i?.unit,
+                    value: i?.unitid
+                }))
+            }))
+            return {
+                arrParent: arrParent?.map((e) => ({
+                    label: e?.label,
+                    value: e?.value,
+                    child: child
+                })),
+                child
+            }
+        }
+
+        if (stateBoxChatAi.typeData == "newBom") {
+            console.log("dataSelectedVariant", dataSelectedVariant);
+
+            const { arrParent } = convertArrayBom(dataSelectedVariant, stateBoxChatAi?.dataReview?.items)
+
+            sDataSelectedVariant(arrParent);
+
+            sCurrentData(arrParent);
+
+            return
+        }
+
+        if (stateBoxChatAi.typeData == "presentBom") {
+            const { child } = convertArrayBom(dataSelectedVariant, stateBoxChatAi?.dataReview?.items)
+
+            const newData = dataSelectedVariant?.map((e) => {
+                return {
+                    ...e,
+                    child: [...e?.child, ...child]
+                }
+            })
+            sDataSelectedVariant(newData);
+
+            sCurrentData(newData);
+        }
+    }, [stateBoxChatAi?.isShowAi, stateBoxChatAi.typeData])
+
+    useEffect(() => {
         if (isOpen && dataSelectedVariant?.length == 0 && dataVariant?.length > 0) {
             const newValue = dataVariant?.map((e) => {
                 const checkValue = currentData.find((x) => x?.value == e?.value);
@@ -222,6 +293,7 @@ const Popup_Bom = React.memo((props) => {
             if (props.type == "edit") {
                 dataSelectedVariant.push({ ...newValue[0] });
                 _HandleAddNew(newValue[0]?.value);
+                console.log("1");
             } else {
                 const newData = {
                     ...dataVariant[0],
@@ -229,14 +301,21 @@ const Popup_Bom = React.memo((props) => {
                 };
                 dataSelectedVariant.push({ ...newData });
                 sTab(newData?.value);
+                if (dataSelectedVariant?.some(e => e?.child?.length == 0)) return
                 _HandleAddNew(newData?.value);
+                console.log("2");
             }
         }
     }, [dataSelectedVariant, isOpen, dataVariant]);
 
     useEffect(() => {
-        if (selectedList?.child?.length == 0) {
+        if (selectedList?.child?.length == 0 || dataSelectedVariant?.some(e => e?.child?.length == 0)) {
+            console.log("3", selectedList);
+            console.log("dataSelectedVariant", dataSelectedVariant);
+
             _HandleAddNew(tab);
+            console.log("3");
+
         }
     }, [selectedList, isOpen]);
 
@@ -435,7 +514,6 @@ const Popup_Bom = React.memo((props) => {
             }
         }
     };
-    console.log("selectedList", selectedList);
 
     const _HandleDeleteBOM = (id) => {
         const newData = dataSelectedVariant.filter((item) => item?.value !== id);
@@ -463,40 +541,109 @@ const Popup_Bom = React.memo((props) => {
 
     useEffect(() => {
         if (checkEqual(currentData, dataSelectedVariant)) {
-            dataSelectedVariant.forEach((e) => {
-                e?.child.forEach(async (ce) => {
-                    if (ce.name != null) {
-                        try {
-                            const { data } = await apiProducts.apiSearchItemsVariants({
-                                data: {
-                                    type: type,
+            // dataSelectedVariant.forEach((e) => {
+            //     e?.child.forEach(async (ce) => {
+            //         if (ce.name) {
+            //             try {
+            //                 const { data } = await apiProducts.apiSearchItemsVariants({
+            //                     data: {
+            //                         type: ce?.type?.value,
+            //                     }
+            //                 })
+
+            //                 const name = data?.items.map((item) => ({
+            //                     label: item?.name,
+            //                     value: item?.id,
+            //                     product_variation: item?.product_variation,
+            //                 }));
+            //                 console.log("datadatadatadata name", name);
+
+            //                 ce.dataName = name
+            //             } catch (error) {
+            //             }
+            //         }
+            //         if (ce.unit) {
+            //             try {
+            //                 const { data } = await apiProducts.apiRowItem({
+            //                     data: {
+            //                         item_id: ce?.name?.value || ce?.unit?.value,
+            //                         type: ce?.type?.value,
+            //                     },
+            //                 })
+            //                 ce.dataUnit = data?.units.map((e) => ({
+            //                     label: e?.unit,
+            //                     value: e?.unitid,
+            //                 }));
+            //             } catch (error) {
+            //             }
+            //         }
+            //     });
+            // });
+            // console.log("dataSelectedVariant", dataSelectedVariant);
+            const updateDataSelectedVariant = async () => {
+                let hasChange = false; // Cờ kiểm tra nếu dữ liệu thay đổi
+
+                await Promise.all(
+                    dataSelectedVariant.map(async (e) => {
+                        await Promise.all(
+                            e?.child.map(async (ce) => {
+                                try {
+                                    if (ce.name) {
+                                        const { data } = await apiProducts.apiSearchItemsVariants({
+                                            data: { type: ce?.type?.value },
+                                        });
+
+                                        const newDataName = data?.items.map((item) => ({
+                                            label: item?.name,
+                                            value: item?.id,
+                                            product_variation: item?.product_variation,
+                                        })) || [];
+
+                                        if (!_.isEqual(newDataName, ce.dataName)) {
+                                            ce.dataName = newDataName;
+                                            hasChange = true; // Đánh dấu dữ liệu đã thay đổi
+                                        }
+                                    }
+
+                                    if (ce.unit) {
+                                        const { data } = await apiProducts.apiRowItem({
+                                            data: {
+                                                item_id: ce?.name?.value || ce?.unit?.value,
+                                                type: ce?.type?.value,
+                                            },
+                                        });
+
+                                        const newDataUnit = data?.units.map((unit) => ({
+                                            label: unit?.unit,
+                                            value: unit?.unitid,
+                                        })) || [];
+
+                                        if (!_.isEqual(newDataUnit, ce.dataUnit)) {
+                                            ce.dataUnit = newDataUnit;
+                                            hasChange = true; // Đánh dấu dữ liệu đã thay đổi
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.error("Error fetching data:", error);
                                 }
                             })
-                            ce.dataName = data?.items.map((item) => ({
-                                label: item?.name,
-                                value: item?.id,
-                                product_variation: item?.product_variation,
-                            }));
-                        } catch (error) {
-                        }
-                    }
-                    if (ce.unit != null) {
-                        try {
-                            const { data } = await apiProducts.apiRowItem({
-                                data: {
-                                    item_id: ce?.unit?.value,
-                                    type: ce?.type?.value,
-                                },
-                            })
-                            ce.dataUnit = data?.units.map((e) => ({
-                                label: e?.unit,
-                                value: e?.unitid,
-                            }));
-                        } catch (error) {
-                        }
-                    }
-                });
-            });
+                        );
+                    })
+                );
+
+                // Chỉ cập nhật state nếu dữ liệu thực sự thay đổi
+                if (hasChange) {
+                    console.log("Updating state...");
+                    sDataSelectedVariant([...dataSelectedVariant]); // Tạo lại tham chiếu để React nhận diện thay đổi
+                } else {
+                    console.log("No changes detected, skipping update");
+                }
+            };
+
+            // Gọi hàm cập nhật
+            updateDataSelectedVariant();
+
+
         }
         const checkTab = dataSelectedVariant.some((x) => x.value == tab);
         if (checkTab) {
@@ -706,11 +853,12 @@ const Popup_Bom = React.memo((props) => {
                                 {props.dataLang?.branch_popup_properties || "branch_popup_properties"}
                             </ColumnTablePopup>
                         </HeaderTablePopup>
-                        <Customscrollbar className="max-h-[250px]">
+                        <Customscrollbar className="max-h-[200px] h-[200px]">
                             <div className="divide-y divide-slate-100 min:h-[170px]  max:h-[170px]">
-                                {isLoading || isFetching || loadingData ? (
-                                    <Loading className="h-40" color="#0f4f9e" />
-                                ) : (
+                                {(isLoading || isFetching || loadingData)
+                                    ?
+                                    <Loading className="h-full" color="#0f4f9e" />
+                                    :
                                     <>
                                         {selectedList?.child?.map((e, index) => (
                                             <div
@@ -973,7 +1121,7 @@ const Popup_Bom = React.memo((props) => {
                                             </div>
                                         ))}
                                     </>
-                                )}
+                                }
                             </div>
                         </Customscrollbar>
                         {

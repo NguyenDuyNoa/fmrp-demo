@@ -18,13 +18,13 @@ const Index = ({ children }) => {
         <QueryClientProvider client={queryClient}>
             <div>
                 <Header />
-                <div className="overflow-hidden">{children}
-
+                <div className="overflow-hidden">
+                    {children}
                 </div>
             </div>
             <PopupAppTrial />
             <PopupAppRenewal />
-            <ReactQueryDevtools initialIsOpen={true} />
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
     );
 };

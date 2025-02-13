@@ -27,7 +27,9 @@ const adminState = {
             { text: "Chào bạn! Tôi có thể giúp gì?", sender: "ai" },
         ],
         openViewModal: false,
-        isShowAi: false
+        isShowAi: false,
+        dataReview: null,
+        typeData: "",
         // generateContentClient: {
         //     content: "",
         //     textDataRequest: "",
