@@ -107,8 +107,6 @@ const Popup_Bom = React.memo((props) => {
         queryKey: ["detail_bom_product", props.id],
         queryFn: async () => {
             const { data } = await apiProducts.apiDetailBomProducts({ params: { id: props.id } })
-            console.log("data", data);
-            console.log("props.id", props.id);
 
             const newData = data?.variations?.map((e) => ({
                 label: e?.name_variation,
@@ -136,11 +134,12 @@ const Popup_Bom = React.memo((props) => {
                     },
                 })),
             }));
-            console.log("newData", newData);
 
-            sDataSelectedVariant(newData);
+            if (data?.variations?.length > 0) {
+                sDataSelectedVariant(newData);
 
-            sCurrentData(newData);
+                sCurrentData(newData);
+            }
 
             return data
         },
@@ -255,8 +254,6 @@ const Popup_Bom = React.memo((props) => {
         }
 
         if (stateBoxChatAi.typeData == "newBom") {
-            console.log("dataSelectedVariant", dataSelectedVariant);
-
             const { arrParent } = convertArrayBom(dataSelectedVariant, stateBoxChatAi?.dataReview?.items)
 
             sDataSelectedVariant(arrParent);
@@ -293,7 +290,6 @@ const Popup_Bom = React.memo((props) => {
             if (props.type == "edit") {
                 dataSelectedVariant.push({ ...newValue[0] });
                 _HandleAddNew(newValue[0]?.value);
-                console.log("1");
             } else {
                 const newData = {
                     ...dataVariant[0],
@@ -303,19 +299,13 @@ const Popup_Bom = React.memo((props) => {
                 sTab(newData?.value);
                 if (dataSelectedVariant?.some(e => e?.child?.length == 0)) return
                 _HandleAddNew(newData?.value);
-                console.log("2");
             }
         }
     }, [dataSelectedVariant, isOpen, dataVariant]);
 
     useEffect(() => {
         if (selectedList?.child?.length == 0 && dataSelectedVariant?.some(e => e?.child?.length == 0)) {
-            console.log("3", selectedList);
-            console.log("dataSelectedVariant", dataSelectedVariant);
-
             _HandleAddNew(tab);
-            console.log("3");
-
         }
     }, [selectedList, isOpen]);
 
