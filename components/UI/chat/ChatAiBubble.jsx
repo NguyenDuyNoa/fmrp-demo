@@ -132,8 +132,10 @@ export default function ChatBubbleAI(props) {
     // }, [stateBoxChatAi.messenger]);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [stateBoxChatAi.messenger]);
+        if (stateBoxChatAi.openViewModal) {
+            scrollToBottom();
+        }
+    }, [stateBoxChatAi.openViewModal]);
 
     const sendMessage = async () => {
         if (!stateBoxChatAi.typeChat?.id) {
@@ -210,11 +212,14 @@ export default function ChatBubbleAI(props) {
                 queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight } })
             }, (800));
         }
-    }, [stateBoxChatAi.dataReview]);
+        scrollToBottom();
+    }, [stateBoxChatAi.dataReview, stateBoxChatAi.messenger]);
 
     useEffect(() => {
         queryKeyIsState({ localContent: stateBoxChatAi.contentChat })
+        handleScroll()
     }, [stateBoxChatAi.contentChat]);
+
 
     const debouncedDispatch = useCallback(
         debounce((value) => {
