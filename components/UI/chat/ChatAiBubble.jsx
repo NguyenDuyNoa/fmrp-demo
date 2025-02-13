@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 
 export const widthX = 80;
 
-export const heightY = 120
+export const heightY = 70
 export default function ChatBubbleAI(props) {
 
     const initialState = {
@@ -193,7 +193,7 @@ export default function ChatBubbleAI(props) {
                 type: "stateBoxChatAi",
                 payload: { ...stateBoxChatAi, contentChat: value },
             });
-        }, 300),
+        }, 200),
         [stateBoxChatAi]
     );
 
