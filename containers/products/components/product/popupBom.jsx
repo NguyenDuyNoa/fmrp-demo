@@ -52,7 +52,13 @@ const Popup_Bom = React.memo((props) => {
             type: "stateBoxChatAi", payload: {
                 ...stateBoxChatAi,
                 isShowAi: false,
-
+                typeData: "",
+                openViewModal: false,
+                isShowAi: false,
+                dataReview: null,
+                messenger: [
+                    { text: "Chào bạn! Tôi có thể giúp gì?", sender: "ai" },
+                ],
             }
         })
     };
