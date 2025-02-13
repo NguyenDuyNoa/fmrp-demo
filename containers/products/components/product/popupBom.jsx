@@ -309,7 +309,7 @@ const Popup_Bom = React.memo((props) => {
     }, [dataSelectedVariant, isOpen, dataVariant]);
 
     useEffect(() => {
-        if (selectedList?.child?.length == 0 || dataSelectedVariant?.some(e => e?.child?.length == 0)) {
+        if (selectedList?.child?.length == 0 && dataSelectedVariant?.some(e => e?.child?.length == 0)) {
             console.log("3", selectedList);
             console.log("dataSelectedVariant", dataSelectedVariant);
 
