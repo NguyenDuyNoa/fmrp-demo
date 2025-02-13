@@ -51,7 +51,8 @@ const Popup_Bom = React.memo((props) => {
         dispatch({
             type: "stateBoxChatAi", payload: {
                 ...stateBoxChatAi,
-                isShowAi: false
+                isShowAi: false,
+
             }
         })
     };
@@ -101,7 +102,20 @@ const Popup_Bom = React.memo((props) => {
         isOpen && sErrValue(false);
         sDataSelectedVariant([]);
         sSelectedList({});
+        if (isOpen) {
+            setTimeout(() => {
+                dispatch({
+                    type: "stateBoxChatAi", payload: {
+                        ...stateBoxChatAi,
+                        open: true
+                    }
+                })
+            }, 500);
+        }
+
     }, [isOpen]);
+
+
 
     const { isFetching, isLoading, refetch } = useQuery({
         queryKey: ["detail_bom_product", props.id],
@@ -711,7 +725,7 @@ const Popup_Bom = React.memo((props) => {
                             dispatch({
                                 type: "stateBoxChatAi", payload: {
                                     ...stateBoxChatAi,
-                                    isShowAi: !stateBoxChatAi.isShowAi
+                                    isShowAi: !stateBoxChatAi.isShowAi,
                                 }
                             })
                         } else {

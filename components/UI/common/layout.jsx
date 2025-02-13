@@ -1,8 +1,14 @@
-export const ContainerFilterTab = ({ children }) => {
-    return <div className="flex 2xl:space-x-3 lg:space-x-3 items-center h-fit justify-start overflow-hidden overflow-y-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-        {children}
-    </div>
-}
+import { forwardRef } from "react"
+
+export const ContainerFilterTab = forwardRef(({ children }, ref) => {
+    return (
+        <div
+            ref={ref}
+            className="flex items-center justify-start overflow-hidden overflow-y-hidden 2xl:space-x-3 lg:space-x-3 h-fit scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+            {children}
+        </div>
+    )
+})
 
 
 export const Container = ({ children, className }) => {

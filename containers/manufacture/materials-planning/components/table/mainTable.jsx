@@ -253,7 +253,7 @@ const MainTable = ({ dataLang }) => {
                                 arrListData: e?.items?.map((i) => {
                                     return {
                                         id: uddid(),
-                                        image: i?.images ? i?.images : "/no_img.png",
+                                        image: i?.images ? i?.images : "/nodata.png",
                                         name: i?.item_name,
                                         itemVariation: i?.product_variation,
                                         code: i?.item_code,
@@ -272,7 +272,7 @@ const MainTable = ({ dataLang }) => {
                                 return {
                                     id: e?.item_id,
                                     name: e?.item_name,
-                                    image: e?.images ? e?.images : "/no_img.png",
+                                    image: e?.images ? e?.images : "/nodata.png",
                                     unit: e?.unit_name,
                                     use: e?.total_quota, //sl sử dụng
                                     exist: e?.quantity_warehouse, //sl tồn
@@ -286,7 +286,7 @@ const MainTable = ({ dataLang }) => {
                                 return {
                                     id: e?.item_id,
                                     name: e?.item_name,
-                                    image: e?.images ? e?.images : "/no_img.png",
+                                    image: e?.images ? e?.images : "/nodata.png",
                                     unit: e?.unit_name,
                                     use: e?.total_quota, //sl sử dụng
                                     exchange: e?.quota_primary, //sl quy đổi
@@ -310,7 +310,7 @@ const MainTable = ({ dataLang }) => {
                                 arrListData: e?.items?.map((i) => {
                                     return {
                                         id: i?.id_transfer,
-                                        image: i?.images ? i?.images : "/no_img.png",
+                                        image: i?.images ? i?.images : "/nodata.png",
                                         name: i?.item_name,
                                         quantity: i?.quantity_net,
                                         unit: i?.unit_name,
@@ -335,7 +335,7 @@ const MainTable = ({ dataLang }) => {
                                 arrListData: e?.items?.map((i) => {
                                     return {
                                         id: i?.id_transfer,
-                                        image: i?.images ? i?.images : "/no_img.png",
+                                        image: i?.images ? i?.images : "/nodata.png",
                                         name: i?.item_name,
                                         quantity: i?.quantity_net,
                                         unit: i?.unit_name,

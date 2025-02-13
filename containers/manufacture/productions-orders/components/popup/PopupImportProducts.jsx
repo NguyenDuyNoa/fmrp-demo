@@ -109,12 +109,12 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, refet
                     ...data?.product?.item,
                     quantityDefault: data?.product?.item?.quantity,
                     quantityEnter: data?.product?.item?.quantity,
-                    image: data?.product?.item?.item_image ?? '/no_img.png',
+                    image: data?.product?.item?.item_image ?? '/nodata.png',
                     bom: data?.product?.item?.bom?.map(e => {
                         return {
                             ...e,
                             quantity: e?.quantity_total_quota,
-                            image: e?.images ? e?.images : "/no_img.png",
+                            image: e?.images ? e?.images : "/nodata.png",
                         }
                     })
                 }
@@ -362,7 +362,7 @@ const PopupImportProducts = memo(({ dataLang, dataDetail, type, dataStage, refet
                                 <div className="w-[45%] 2xl:w-[45%] lg:w-[40%] flex items-start gap-3">
                                     <div className="min-h-[44px] h-11 w-11 min-w-[44px]  rounded-md">
                                         <Image
-                                            src={isState.item.image || '/no_img.png'}
+                                            src={isState.item.image || '/nodata.png'}
                                             width={1280}
                                             height={1024}
                                             alt="@image tp"

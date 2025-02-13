@@ -4,12 +4,12 @@ import ModalImage from "react-modal-image"
 
 const CustomAvatar = ({ profileImage, fullName, data }) => {
     return (
-        <div className="flex items-center justify-start gap-2">
-            <div className="relative min-w-[30%] w-[30%]">
+        <div className="flex items-center justify-start w-full gap-2">
+            <div className="relative w-[18%]">
                 <ModalImage
                     small={profileImage ? profileImage : "/user-placeholder.jpg"}
                     large={profileImage ? profileImage : "/user-placeholder.jpg"}
-                    className="object-cover w-full h-full rounded-full min-h-10 min-w-10 "
+                    className="object-cover w-6 h-6 rounded-full"
                     alt={fullName ?? ""}
                 >
                     <div className="">
@@ -29,7 +29,7 @@ const CustomAvatar = ({ profileImage, fullName, data }) => {
                     </span>
                 </span>
             </div>
-            <h6 className="capitalize w-[70%]">
+            <h6 className="capitalize w-[80%]">
                 {fullName}
             </h6>
         </div>

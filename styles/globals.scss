@@ -157,6 +157,10 @@ body::-webkit-scrollbar-thumb:hover {
 //     transform: translateX(-50%);
 //     // color: gray;
 // }
+.popover-ai-content {
+    transform: translateX(-2%);
+    z-index: 9999 !important;
+}
 
 //scroll bar
 .scrollarea .scrollbar-container.vertical .scrollbar {

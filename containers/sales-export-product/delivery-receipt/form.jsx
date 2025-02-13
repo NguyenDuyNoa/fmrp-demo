@@ -743,7 +743,7 @@ const DeliveryReceiptForm = (props) => {
                         ) : (
                             <div className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
                                 <img
-                                    src="/no_img.png"
+                                    src="/nodata.png"
                                     alt="Product Image"
                                     className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] object-cover rounded mr-1"
                                 />

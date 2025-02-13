@@ -801,7 +801,7 @@ const ProductionWarehouseForm = (props) => {
                                                 ) : (
                                                     <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                         <img
-                                                            src="/no_img.png"
+                                                            src="/nodata.png"
                                                             alt="Product Image"
                                                             className="w-[30px] h-[30px] object-cover rounded"
                                                         />
@@ -967,7 +967,7 @@ const ProductionWarehouseForm = (props) => {
                                                                         ) : (
                                                                             <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                                                 <img
-                                                                                    src="/no_img.png"
+                                                                                    src="/nodata.png"
                                                                                     alt="Product Image"
                                                                                     className="w-[30px] h-[30px] object-cover rounded"
                                                                                 />

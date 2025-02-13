@@ -2,6 +2,8 @@
 import { usePostGenerateTextBom } from "@/hooks/ai/useGenerateTextBom";
 import { useGetTypeOpenAi } from "@/hooks/ai/useGetTypeOpenAi";
 import useToast from "@/hooks/useToast";
+import { motion } from "framer-motion";
+import { debounce } from "lodash";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IoIosArrowRoundDown, IoIosClose, IoIosResize } from "react-icons/io";
@@ -10,12 +12,10 @@ import Popup from "reactjs-popup";
 import { Customscrollbar } from "../common/Customscrollbar";
 import LoadingButton from "../loading/loadingButton";
 import TableBom from "./components/TableBom";
-import { debounce } from "lodash";
-import { motion } from "framer-motion";
 
-export const widthX = 80;
+export const widthX = 70;
 
-export const heightY = 70
+export const heightY = 90
 export default function ChatBubbleAI(props) {
 
     const initialState = {
@@ -111,8 +111,9 @@ export default function ChatBubbleAI(props) {
     };
     // Theo dõi sự kiện scroll
     useEffect(() => {
+        if (!boxShowMsgRef.current) return
         const msgBox = boxShowMsgRef.current;
-        if (msgBox) {
+        if (msgBox && msgBox.addEventListener) {
             msgBox.addEventListener("scroll", handleScroll);
         }
         return () => {
@@ -144,6 +145,18 @@ export default function ChatBubbleAI(props) {
             return;
         }
 
+        dispatch({
+            type: "stateBoxChatAi",
+            payload: {
+                ...stateBoxChatAi,
+                messenger: [...stateBoxChatAi.messenger, {
+                    text: stateBoxChatAi.contentChat,
+                    sender: "user"
+                }],
+                contentChat: "",
+                typeData: "",
+            }
+        })
 
         const objectSubmit = {
             "BOM": {
@@ -175,13 +188,29 @@ export default function ChatBubbleAI(props) {
                 messenger: [...stateBoxChatAi.messenger, ...dataChat],
                 contentChat: "",
                 typeData: "",
-                dataReview: res?.data
+                dataReview: res?.data,
+
             }
         })
+
         console.log("res", res);
 
 
     };
+
+    useEffect(() => {
+        if (stateBoxChatAi.dataReview?.items?.length > 0) {
+            setTimeout(() => {
+                dispatch({
+                    type: "stateBoxChatAi", payload: {
+                        ...stateBoxChatAi,
+                        openViewModal: true
+                    }
+                })
+                queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight } })
+            }, (800));
+        }
+    }, [stateBoxChatAi.dataReview]);
 
     useEffect(() => {
         queryKeyIsState({ localContent: stateBoxChatAi.contentChat })
@@ -218,6 +247,8 @@ export default function ChatBubbleAI(props) {
             textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
         }
     };
+    console.log("isLoadingGenerateText", isLoadingGenerateText);
+
     // const minWidth = 300; // Chiều rộng tối thiểu
     // const maxWidth = window.innerWidth; // Chiều rộng tối đa (full màn hình)
 
@@ -290,30 +321,35 @@ export default function ChatBubbleAI(props) {
                                     typeData: ""
                                 }
                             })}
-                            className="p-3 text-white transition-transform transform rounded-full group animate-bounce"
+                            className="p-2 transition-transform duration-200 ease-linear transform bg-white rounded-full shadow-sm group animate-bounce hover:scale-125"
                         >
-                            <Image
-                                width={1280}
-                                height={1024}
-                                src="/ai/icon.png"
-                                draggable={false}
-                                className='object-contain  rounded-full pointer-events-none select-none h-[48px] w-[48px] group-hover:scale-125 transition-transform duration-200 ease-linear'
-                            />
+                            <div className="">
+                                <Image
+                                    width={1280}
+                                    height={1024}
+                                    src="/ai/icon.png"
+                                    draggable={false}
+                                    className='object-contain  rounded-full pointer-events-none select-none h-[32px] w-[32px] '
+                                />
+                            </div>
                         </button>
                     }
                     on={['hover', 'focus']}
                     position="left center"
-                    closeOnDocumentClick
+                    arrow={false}
+                    defaultOpen
+                    className="popover-ai"
+                // closeOnDocumentClick
                 >
                     {
                         !isState.dragging && (
-                            <span className="p-2 text-gray-600 bg-white border rounded-lg shadow ">
+                            <span className="p-2 text-gray-600 bg-white border rounded-lg shadow translate-x-[50%]">
                                 {`${stateBoxChatAi.open ? "Click to close AI assistant - FMRP" : "Click to open AI assistant - FMRP"}`}
                             </span>
                         )
                     }
                 </Popup>
-                <div className={`${stateBoxChatAi.openViewModal ? "-right-2 h-screen px-4" : "max-w-md right-4 p-4 rounded-xl"} absolute bottom-full   border shadow-lg bg-white flex flex-col gap-2 transition-all duration-300 ease-in-out transform
+                <div className={`${stateBoxChatAi.openViewModal ? "-right-4 h-screen px-4" : "max-w-md  right-0 p-4 rounded-xl mb-2"} absolute bottom-full   border shadow-lg bg-white flex flex-col gap-2 transition-all duration-300 ease-in-out transform
                     ${stateBoxChatAi.open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-75 translate-y-5 pointer-events-none"}`}
                     onMouseDown={(e) => e.stopPropagation()}
                     style={{
@@ -466,7 +502,42 @@ export default function ChatBubbleAI(props) {
                                             </div>
                                         </div>
                                     ))}
+                                    {
+                                        isLoadingGenerateText && (
+                                            <div className="flex items-center justify-start w-full gap-2">
+                                                <div className="w-8 h-8 rounded-full min-w-[7%]">
+                                                    <Image
+                                                        width={1280}
+                                                        height={1024}
+                                                        src="/ai/icon.png"
+                                                        className='object-contain w-full h-full rounded-full'
+                                                    />
+                                                </div>
+                                                <div className="flex items-center px-4 py-3 space-x-2 text-sm text-gray-800 bg-gray-100 rounded-xl">
+                                                    <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite]"></span>
+                                                    <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite_200ms]"></span>
+                                                    <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite_400ms]"></span>
+                                                </div>
+                                                <style jsx>
+                                                    {`@keyframes typing {
+                                                        0% { transform: translateY(0); }
+                                                        50% { transform: translateY(-5px); }
+                                                        100% { transform: translateY(0); }
+                                                    }
+                                                    .animate-typing {
+                                                        animation: typing 1.5s infinite;
+                                                    }
+                                                    .delay-200 {
+                                                        animation-delay: 200ms;
+                                                    }
+                                                    .delay-400 {
+                                                        animation-delay: 400ms;
+                                                    }`}
+                                                </style>
 
+                                            </div>
+                                        )
+                                    }
                                 </div>
                             </Customscrollbar>
                             <div ref={boxMessageRef} className={`${stateBoxChatAi.openViewModal ? "bg-gray-100 pb-2" : "bg-transparent"} relative px-2`}>

@@ -981,7 +981,7 @@ const PriceQuoteForm = (props) => {
                                                                     ) : (
                                                                         <div className="3xl:max-w-[35px] 3xl:h-[35px] 2xl:max-w-[35px] 2xl:h-[25px] xl:max-w-[35px] xl:h-[25px] max-w-[25px] h-[25px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
                                                                             <img
-                                                                                src="/no_img.png"
+                                                                                src="/nodata.png"
                                                                                 alt="Product Image"
                                                                                 className="3xl:max-w-[35px] 3xl:h-[35px] 2xl:max-w-[35px] 2xl:h-[25px] xl:max-w-[35px] xl:h-[25px] max-w-[25px] h-[25px] object-cover rounded mr-1"
                                                                             />

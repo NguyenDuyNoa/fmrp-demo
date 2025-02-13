@@ -5,7 +5,7 @@ import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { memo, useContext, useEffect, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { FaUpRightAndDownLeftFromCenter } from "react-icons/fa6";
 import { RxDragHandleDots1 } from "react-icons/rx";
@@ -26,7 +26,7 @@ const initialState = {
 
 const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
 
-    const minWidth = 650; // Đặt giá trị chiều rộng tối thiểu
+    const minWidth = 850; // Đặt giá trị chiều rộng tối thiểu
 
     const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
 
@@ -86,7 +86,9 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
 
     const router = useRouter();
 
-    const [width, setWidth] = useState(650);
+    const tabRefs = useRef([]);
+
+    const [width, setWidth] = useState(minWidth);
 
     const [isResizing, setIsResizing] = useState(false);
 
@@ -102,6 +104,16 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
 
     const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
 
+
+    useEffect(() => {
+        // Chờ các refs được gán đầy đủ
+        const timer = setTimeout(() => {
+            const total = tabRefs.current.reduce((acc, ref) => acc + (ref?.offsetWidth || 0), 0);
+            setWidth(total + (20 * 6));
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, [isState.openModal]);
 
     useEffect(() => {
         setIsMounted(true);
@@ -143,6 +155,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         });
         queryStateModal({ isTab: e });
     };
+
     const { data, isLoading } = useQuery({
         queryKey: ["api_item_orders_detail", isState.openModal, isState?.dataModal?.id],
         queryFn: async () => {
@@ -197,7 +210,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
             <div className="pl-3 pr-4">
                 <div className="flex justify-between py-4 border-b border-gray-300">
                     <div className="flex items-center gap-2">
-                        <FaAngleDoubleRight
+                        {/* <FaAngleDoubleRight
                             className="text-sm cursor-pointer text-gray-650"
                             onClick={() => {
                                 if (width == 650) {
@@ -206,7 +219,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                                     setWidth(650);
                                 }
                             }}
-                        />
+                        /> */}
                         <FaUpRightAndDownLeftFromCenter
                             className="text-sm rotate-90 cursor-pointer text-gray-650"
                             onClick={() => setWidth(window.innerWidth)}
@@ -218,7 +231,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                     <button
                         onClick={() => {
                             queryState({ openModal: !isState.openModal, dataModal: {} });
-                            setWidth(650);
+                            setWidth(minWidth);
                         }}
                         type="button"
                         className="w-[20px] h-[20px] hover:scale-125 transition-all duration-300 ease-linear"
@@ -291,16 +304,17 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                 <div className="mt-4 border-b">
                     <ContainerFilterTab>
                         {
-                            listTab.map((e) => (
+                            listTab.map((e, index) => (
                                 <button
                                     key={e.id}
+                                    ref={el => tabRefs.current[index] = el}
                                     onClick={() => handleActiveTab(e.id)}
                                     className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id ? "border-[#0F4F9E] border-b bg-[#F7FBFF]" : 'border-b border-transparent'}
                                     hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
                                 >
                                     <h3 className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} text-[13px] group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
                                         {e.name}
-                                        <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] text-[13px]  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
+                                        <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 h-[16px] w-[16px]  text-[11px]  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
                                             {e?.count > 0 && e?.count}
                                         </span>
                                     </h3>
@@ -313,9 +327,19 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
             </div>
             <div
                 onMouseDown={startResize}
-                className="absolute top-0 left-0 h-full bg-transparent -translate-x-1/4 cursor-col-resize"
+                className="absolute left-0 h-full translate-y-1/2 bg-transparent top-[3%] -translate-x-1/4 cursor-col-resize"
             >
-                <RxDragHandleDots1 size={21} className="h-full my-auto" />
+                {/* <RxDragHandleDots1 size={21} className="h-full my-auto" /> */}
+                <div className="w-6 h-6">
+                    <Image
+                        src={'/icon/resize.png'}
+                        width={1280}
+                        height={1280}
+                        alt={''}
+                        draggable={false}
+                        className={'h-full w-full object-contain my-auto'}
+                    />
+                </div>
             </div>
         </div>
     );

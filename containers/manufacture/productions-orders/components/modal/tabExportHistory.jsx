@@ -152,8 +152,8 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-1'}>
                                                     <ModalImage
-                                                        small={e?.item?.images ?? '/no_img.png'}
-                                                        large={e?.item?.images ?? '/no_img.png'}
+                                                        small={e?.item?.images ?? '/nodata.png'}
+                                                        large={e?.item?.images ?? '/nodata.png'}
                                                         width={36}
                                                         height={36}
                                                         alt={e?.item?.name}

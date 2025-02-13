@@ -1211,7 +1211,7 @@ const Index = (props) => {
                               <img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
                             ) : (
                               <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
-                                <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                                <img src="/nodata.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
                               </div>
                             )}
                           </div>
@@ -1363,7 +1363,7 @@ const Index = (props) => {
                                     <div className='w-[40px] h-h-[60px]'>
                                       {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" className='object-cover rounded' />) :
                                         <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
-                                          <img src="/no_img.png" alt="Product Image" className='object-cover rounded ' />
+                                          <img src="/nodata.png" alt="Product Image" className='object-cover rounded ' />
                                         </div>
                                       }
                                     </div>

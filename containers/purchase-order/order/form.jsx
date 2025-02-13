@@ -1305,7 +1305,7 @@ const OrderForm = (props) => {
                                                                     ) : (
                                                                         <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                                             <img
-                                                                                src="/no_img.png"
+                                                                                src="/nodata.png"
                                                                                 alt="Product Image"
                                                                                 style={{
                                                                                     width: "40px",

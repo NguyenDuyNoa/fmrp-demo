@@ -138,7 +138,7 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                             {isExportHistory.dataTable?.map((e, index) => (
                                 <RowTable gridCols={9} key={e.id.toString()} >
-                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'} >
                                         {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
                                     </RowItemTable>
                                     {/* <RowItemTable colSpan={1} textAlign={'center'}>
@@ -155,13 +155,13 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                                             </div>
                                         </div>
                                     </RowItemTable>
-                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                         {e.unit}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                    <RowItemTable colSpan={1} textAlign={'right'} textSize={'!text-xs'}>
                                         {e.quantity > 0 ? formatNumber(e.quantity) : '-'}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={2} textAlign={'center'}>
+                                    <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
                                         {e.warehouse}
                                     </RowItemTable>
                                     {/* <RowItemTable colSpan={1} textAlign={'center'}>
@@ -174,7 +174,7 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                                             fullName={e?.user?.name}
                                         />
                                     </RowItemTable> */}
-                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                         {e.note}
                                     </RowItemTable>
                                 </RowTable>

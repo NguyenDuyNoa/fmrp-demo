@@ -95,7 +95,7 @@ const FilterHeader = memo(
                                                     ) : (
                                                         <div className=" max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover  flex items-center justify-center rounded">
                                                             <img
-                                                                src="/no_img.png"
+                                                                src="/nodata.png"
                                                                 alt="Product Image"
                                                                 className="max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover rounded"
                                                             />

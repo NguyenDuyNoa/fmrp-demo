@@ -232,7 +232,7 @@ const MainTable = ({ dataLang }) => {
                             arrListData: e?.items_products?.map((i) => {
                                 return {
                                     id: i?.poi_id,
-                                    image: i?.images ? i?.images : "/no_img.png",
+                                    image: i?.images ? i?.images : "/nodata.png",
                                     name: i?.item_name,
                                     itemVariation: i?.product_variation,
                                     code: i?.item_code,
@@ -261,7 +261,7 @@ const MainTable = ({ dataLang }) => {
                             arrListData: e?.semi_products?.map((i) => {
                                 return {
                                     id: uddid(),
-                                    image: i?.images ? i?.images : "/no_img.png",
+                                    image: i?.images ? i?.images : "/nodata.png",
                                     name: i?.item_name,
                                     itemVariation: i?.product_variation,
                                     code: i?.item_code,
@@ -279,7 +279,7 @@ const MainTable = ({ dataLang }) => {
                                     }),
                                     childProducts: {
                                         ...i?.products_parent,
-                                        image: i?.products_parent?.image ? i?.products_parent?.image : "/no_img.png",
+                                        image: i?.products_parent?.image ? i?.products_parent?.image : "/nodata.png",
                                     },
                                 };
                             }),
@@ -421,11 +421,11 @@ const MainTable = ({ dataLang }) => {
         <React.Fragment>
             <FilterHeader {...shareProps} />
             <div className="!mt-[14px]">
-                <h1 className="text-[#141522] font-medium text-sm my-2">
+                <h1 className="text-[#141522] font-medium text-[13px] my-2">
                     {dataLang?.productions_orders_total || "productions_orders_total"}: {isState?.countAll}
                 </h1>
                 <div className="flex ">
-                    <div className="w-[25%] border-r-0 border-[#d8dae5] border">
+                    <div className="w-[22%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
                             <form className="relative flex items-center w-full">
                                 <SearchNormal1
@@ -447,7 +447,6 @@ const MainTable = ({ dataLang }) => {
                                 :
                                 isState.listDataLeft?.length > 0 ?
                                     isState.listDataLeft.map((e, eIndex) => {
-                                        console.log("e", e);
                                         const color = {
                                             "0": {
                                                 class: 'text-[#FF8F0D] bg-[#FEF8EC]',
@@ -474,13 +473,13 @@ const MainTable = ({ dataLang }) => {
                                             >
                                                 <div className="flex justify-between">
                                                     <div className="flex flex-col gap-1">
-                                                        <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
+                                                        <h1 className="text-[13px] font-medium text-[#0F4F9E]">
                                                             {e.title}
                                                         </h1>
-                                                        <h3 className="text-[#667085] font-medium 3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm">
+                                                        <h3 className="text-[#667085] font-medium text-[13px]">
                                                             {dataLang?.materials_planning_create_on ||
                                                                 "materials_planning_create_on"}{" "}
-                                                            <span className="text-[#141522] font-medium">
+                                                            <span className="text-[#141522] font-medium text-[13px]">
                                                                 {e.time}
                                                             </span>
                                                         </h3>
@@ -497,13 +496,13 @@ const MainTable = ({ dataLang }) => {
                                                 {e.showParent && (
                                                     <div className="flex flex-col w-full gap-2 mt-1">
                                                         <div className="flex items-center gap-1">
-                                                            <h3 className=" text-[#52575E] font-medium 3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm">
+                                                            <h3 className=" text-[#52575E] font-medium text-[13px]">
                                                                 {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
                                                             </h3>
                                                             <div className="flex items-center gap-1">
                                                                 {e.followUp.map((i, index) => (
                                                                     <div key={index}>
-                                                                        <h2 className="text-[#191D23] font-medium 3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm">
+                                                                        <h2 className="text-[#191D23] font-medium text-[13px]">
                                                                             {i.nameFollow}
                                                                         </h2>
                                                                     </div>
@@ -525,7 +524,7 @@ const MainTable = ({ dataLang }) => {
                                                                 `flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active ? 'after:bg-[#00C170]' : 'after:bg-gray-500'}   after:inline-block after:absolute after:top-1 after:left-[25px]`}`}
                                                             >
                                                                 <div className="z-10 block whitespace-nowrap">
-                                                                    <span className={`w-[10px] h-[10px]  border-2  ${j.active ? 'bg-[#00C170] border-[#00C170]' : 'bg-gray-500 border-gray-500'} rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}></span>
+                                                                    <span className={`w-[10px] h-[10px]  border-2  ${j.active ? 'bg-[#00C170] border-[#00C170]' : 'bg-gray-500 border-gray-500'} rounded-full flex justify-center items-center mx-auto mb-1 text-[13px]`}></span>
                                                                     <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[11px] text-[10px]`}>
                                                                         {j.title}
                                                                     </p>
@@ -554,14 +553,14 @@ const MainTable = ({ dataLang }) => {
                                 <button
                                     type="button"
                                     onClick={() => queryState({ page: isState.page + 1 })}
-                                    className="block w-full py-1 mx-auto mt-1 text-sm transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200"
+                                    className="block w-full py-1 mx-auto mt-1 text-[13px] transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200"
                                 >
                                     {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
                                 </button>
                             )}
                         </Customscrollbar>
                     </div>
-                    <div className="w-[75%] border border-[#d8dae5] ">
+                    <div className="w-[78%] border border-[#d8dae5] ">
                         {isLoading
                             ?
                             <Loading />
@@ -621,7 +620,7 @@ const MainTable = ({ dataLang }) => {
                                                         onClick={() => handleActiveTab(e.type)}
                                                         className={`hover:bg-[#F7FBFF] ${isState.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
                                                     >
-                                                        <h3 className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
+                                                        <h3 className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} 3xl:text-base text-[13px] group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
                                                             {e.name}
                                                         </h3>
                                                     </button>

@@ -1,5 +1,17 @@
 import React, { forwardRef } from "react";
-
+import SimpleBar from 'simplebar-react';
+export const SimpleBarCustom = forwardRef(({ children, ...props }, ref) => {
+    return (
+        <SimpleBar
+            scrollableNodePropsprop={{ ref: ref }}
+            style={props.style ? props.style : {}}
+            className={props.className}
+            ref={ref}
+        >
+            {children}
+        </SimpleBar>
+    )
+})
 export const Customscrollbar = forwardRef((props, ref) => {
     return (
         <div

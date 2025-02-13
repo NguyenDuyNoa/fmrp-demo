@@ -104,8 +104,8 @@ const PopupCheckQuality = (props) => {
                                                     ) : (
                                                         <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                             <ModalImage
-                                                                small="/no_img.png"
-                                                                large="/no_img.png"
+                                                                small="/nodata.png"
+                                                                large="/nodata.png"
                                                                 className="w-full h-full rounded object-contain p-1"
                                                             />
                                                         </div>

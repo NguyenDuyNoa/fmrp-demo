@@ -60,7 +60,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
             const newData = data?.boms?.map(e => {
                 return {
                     id: uddid(),
-                    image: '/no_img.png',
+                    image: '/nodata.png',
                     name: e?.item_name,
                     itemVariation: e?.product_variation,
                     code: e?.item_code,
@@ -338,10 +338,10 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                 {isExportSituation.dataTable?.map((e, index) => (
                                     <RowTable gridCols={11} key={e.id.toString()} >
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {index + 1}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'}>
+                                        <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'} textSize={'!text-xs'}>
                                             <ModalImage
                                                 small={e.image}
                                                 large={e.image}
@@ -357,7 +357,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                                 </div>
                                             </div>
                                         </RowItemTable>
-                                        <RowItemTable colSpan={2} textAlign={'center'}>
+                                        <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
                                             <span
                                                 className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
                                                                      ${(e?.type === "products" && "text-lime-500 border-lime-500") ||
@@ -370,19 +370,19 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                                 {dataLang[e?.type] || e?.type}
                                             </span>
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {e.unit}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={e?.quantityPlan > 0 ? "right" : 'center'}>
+                                        <RowItemTable colSpan={1} textAlign={e?.quantityPlan > 0 ? "right" : 'center'} textSize={'!text-xs'}>
                                             {e.quantityPlan > 0 ? formatNumber(e.quantityPlan) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={e?.quantityExport > 0 ? "right" : 'center'}>
+                                        <RowItemTable colSpan={1} textAlign={e?.quantityExport > 0 ? "right" : 'center'} textSize={'!text-xs'}>
                                             {e.quantityExport > 0 ? formatNumber(e.quantityExport) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={e?.quantityRemaining > 0 ? "right" : 'center'}>
+                                        <RowItemTable colSpan={1} textAlign={e?.quantityRemaining > 0 ? "right" : 'center'} textSize={'!text-xs'}>
                                             {e.quantityRemaining > 0 ? formatNumber(e.quantityRemaining) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={e?.quantityImport > 0 ? "right" : 'center'}>
+                                        <RowItemTable colSpan={1} textAlign={e?.quantityImport > 0 ? "right" : 'center'} textSize={'!text-xs'}>
                                             {e.quantityImport > 0 ? formatNumber(e.quantityImport) : '-'}
                                         </RowItemTable>
                                     </RowTable>

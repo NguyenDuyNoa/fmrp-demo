@@ -200,8 +200,8 @@ const PopupDetail = (props) => {
                                                                     <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                                         {/* <IconImage/> */}
                                                                         <ModalImage
-                                                                            small="/no_img.png"
-                                                                            large="/no_img.png"
+                                                                            small="/nodata.png"
+                                                                            large="/nodata.png"
                                                                             className="object-contain w-full h-full p-1 rounded"
                                                                         >
                                                                             {" "}

@@ -184,8 +184,8 @@ const RenderHtml = ({ item }) => {
             <FiCornerDownRight size={15} />
             <div className="flex items-center gap-1 px-2 py-1 border border-gray-400 rounded-xl">
                 <ModalImage
-                    small={item.image ?? "/no_img.png"}
-                    large={item.image ?? "/no_img.png"}
+                    small={item.image ?? "/nodata.png"}
+                    large={item.image ?? "/nodata.png"}
                     width={18}
                     height={18}
                     alt={item.item_name}

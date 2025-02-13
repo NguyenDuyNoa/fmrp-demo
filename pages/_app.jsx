@@ -13,6 +13,8 @@ import "sweetalert2/src/sweetalert2.scss";
 import "../styles/globals.scss";
 import { CookieCore } from "@/utils/lib/cookie";
 import ChatBubbleAI from "@/components/UI/chat/ChatAiBubble";
+import 'simplebar-react/dist/simplebar.min.css';
+
 // const t = Lark
 const deca = Lexend_Deca({
     subsets: ["latin"],

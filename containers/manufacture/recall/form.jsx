@@ -800,7 +800,7 @@ const RecallForm = (props) => {
                                                 ) : (
                                                     <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                         <img
-                                                            src="/no_img.png"
+                                                            src="/nodata.png"
                                                             alt="Product Image"
                                                             className="w-[30px] h-[30px] object-cover rounded"
                                                         />
@@ -962,7 +962,7 @@ const RecallForm = (props) => {
                                                                         ) : (
                                                                             <div className=" object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]">
                                                                                 <img
-                                                                                    src="/no_img.png"
+                                                                                    src="/nodata.png"
                                                                                     alt="Product Image"
                                                                                     className="object-cover rounded "
                                                                                 />

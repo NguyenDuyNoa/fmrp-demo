@@ -26,7 +26,7 @@ const initialState = {
     dataTable: [
         {
             id: uddid(),
-            image: '/no_img.png',
+            image: '/nodata.png',
             name: 'ÁO SƠ MI - S - TRẮNG',
             itemVariation: 'Biến thể 1',
             code: 'SMM',
@@ -151,10 +151,10 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                 {isExportSituation.dataTable?.map((e, index) => (
                                     <RowTable gridCols={isTab == 1 ? 10 : 9} key={e.id.toString()} >
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {index + 1}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'}>
+                                        <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'} textSize={'!text-xs'}>
                                             <ModalImage
                                                 small={e.image}
                                                 large={e.image}
@@ -170,25 +170,25 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                 </div>
                                             </div>
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {e.unit}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={isTab == 1 ? 1 : 2} textAlign={'right'}>
+                                        <RowItemTable colSpan={isTab == 1 ? 1 : 2} textAlign={'right'} textSize={'!text-xs'}>
                                             {isTab == 1 ? e.quantityExport > 0 ? formatNumber(e.quantityExport) : '-' : e.machiningQuantity > 0 ? formatNumber(e.machiningQuantity) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={isTab == 1 ? 1 : 2} textAlign={'right'}>
+                                        <RowItemTable colSpan={isTab == 1 ? 1 : 2} textAlign={'right'} textSize={'!text-xs'}>
                                             {isTab == 1 ? e.quantityRecall > 0 ? formatNumber(e.quantityRecall) : '-' : e.processingCost > 0 ? formatNumber(e.processingCost) : '-'}
                                         </RowItemTable>
                                         {
                                             isTab == 1 &&
                                             <>
-                                                <RowItemTable colSpan={1} textAlign={'right'}>
+                                                <RowItemTable colSpan={1} textAlign={'right'} textSize={'!text-xs'}>
                                                     {e.exportCosts > 0 ? formatNumber(e.exportCosts) : '-'}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={'right'}>
+                                                <RowItemTable colSpan={1} textAlign={'right'} textSize={'!text-xs'}>
                                                     {e.recoveryCosts > 0 ? formatNumber(e.recoveryCosts) : '-'}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={'right'}>
+                                                <RowItemTable colSpan={1} textAlign={'right'} textSize={'!text-xs'}>
                                                     {e.moneyTone > 0 ? formatNumber(e.moneyTone) : '-'}
                                                 </RowItemTable>
                                             </>

@@ -53,11 +53,11 @@ const TableBom = (props) => {
                                             {/* <td className="p-2 border sticky left-[200px] bg-white">
                                                                 <div className="flex items-center justify-center">
                                                                     <ModalImage
-                                                                        small={row?.images ?? "/no_img.png"}
-                                                                        large={row?.images ?? "/no_img.png"}
+                                                                        small={row?.images ?? "/nodata.png"}
+                                                                        large={row?.images ?? "/nodata.png"}
                                                                         width={36}
                                                                         height={36}
-                                                                        alt={row?.images ?? "/no_img.png"}
+                                                                        alt={row?.images ?? "/nodata.png"}
                                                                         className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
                                                                     />
                                                                 </div>

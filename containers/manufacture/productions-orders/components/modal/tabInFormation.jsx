@@ -38,7 +38,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
             dataInformation: {
                 ...isInfomation.dataInformation,
                 id: isStateModal.dataDetail?.poi?.poi_id,
-                image: isStateModal.dataDetail?.poi?.images ?? "/no_img.png",
+                image: isStateModal.dataDetail?.poi?.images ?? "/nodata.png",
                 name: isStateModal.dataDetail?.poi?.item_name + " - " + isStateModal.dataDetail?.poi?.item_code,
                 itemVariation: isStateModal.dataDetail?.poi?.product_variation,
                 quantity: isStateModal.dataDetail?.poi?.quantity,
@@ -49,7 +49,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                     return {
                         ...e,
                         id: e?.id,
-                        image: "/no_img.png",
+                        image: "/nodata.png",
                         name: e?.item_name,
                         code: e?.item_code,
                         itemVariation: e?.product_variation,
@@ -161,7 +161,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                                 type='products'
                                 checkBorder={''}
                                 dataLang={dataLang}
-                                image={"/no_img.png"}
+                                image={"/nodata.png"}
                                 dataDetail={isStateModal.dataDetail}
                                 name={isStateModal.dataDetail?.poi?.item_name}
                                 code={isStateModal.dataDetail?.poi?.item_code}
@@ -225,8 +225,8 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                 <div className={`flex items-start py-2 px-4 h-[90px]  gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-full`}>
                     <div className="min-h-[32px] h-8 w-8 min-w-[32px]">
                         <ModalImage
-                            small={image ?? "/no_img.png"}
-                            large={image ?? "/no_img.png"}
+                            small={image ?? "/nodata.png"}
+                            large={image ?? "/nodata.png"}
                             width={18}
                             height={18}
                             alt={name}
@@ -388,8 +388,8 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                             <div key={e?.id} className="flex items-center gap-2">
                                                                 <div className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
                                                                     <ModalImage
-                                                                        small={e?.image ?? "/no_img.png"}
-                                                                        large={e?.image ?? "/no_img.png"}
+                                                                        small={e?.image ?? "/nodata.png"}
+                                                                        large={e?.image ?? "/nodata.png"}
                                                                         width={18}
                                                                         height={18}
                                                                         alt={e?.item_name}

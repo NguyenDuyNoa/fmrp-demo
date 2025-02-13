@@ -1151,7 +1151,7 @@ const SalesOrderForm = (props) => {
                         ) : (
                             <div className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
                                 <img
-                                    src="/no_img.png"
+                                    src="/nodata.png"
                                     alt="Product Image"
                                     className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover rounded mr-1"
                                 />
@@ -1572,7 +1572,7 @@ const SalesOrderForm = (props) => {
                                                                 ) : (
                                                                     <div className="w-[50px] h-[60px] object-cover flex items-center justify-center rounded">
                                                                         <img
-                                                                            src="/no_img.png"
+                                                                            src="/nodata.png"
                                                                             alt="Product Image"
                                                                             style={{
                                                                                 width: "40px",
