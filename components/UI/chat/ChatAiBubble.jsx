@@ -354,7 +354,7 @@ export default function ChatBubbleAI(props) {
                         )
                     }
                 </Popup>
-                <div className={`${stateBoxChatAi.openViewModal ? "-right-4 h-screen px-4" : "max-w-md  right-0 p-4 rounded-xl mb-2"} absolute bottom-full   border shadow-lg bg-white flex flex-col gap-2 transition-all duration-300 ease-in-out transform
+                <div className={`${stateBoxChatAi.openViewModal ? "-right-5 -translate-y-[0.5%] h-screen px-4" : "max-w-md  right-0 p-4 rounded-xl mb-2"} absolute bottom-full   border shadow-lg bg-white flex flex-col gap-2 transition-all duration-300 ease-in-out transform
                     ${stateBoxChatAi.open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-75 translate-y-5 pointer-events-none"}`}
                     onMouseDown={(e) => e.stopPropagation()}
                     style={{
