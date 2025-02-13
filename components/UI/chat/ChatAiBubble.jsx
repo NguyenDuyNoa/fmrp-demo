@@ -347,7 +347,7 @@ export default function ChatBubbleAI(props) {
                 // closeOnDocumentClick
                 >
                     {
-                        !isState.dragging && (
+                        !isState.dragging && !stateBoxChatAi.openViewModal && (
                             <span className="p-2 text-gray-600 bg-white border rounded-lg shadow translate-x-[50%]">
                                 {`${stateBoxChatAi.open ? "Click to close AI assistant - FMRP" : "Click to open AI assistant - FMRP"}`}
                             </span>
