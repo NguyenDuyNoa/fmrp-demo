@@ -59,7 +59,7 @@ const PopupDetail = (props) => {
                                             <h3 className=" text-[13px] font-medium">
                                                 {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
-                                            <div className="grid grid-cols-2 font-medium">
+                                            <div className="font-medium">
                                                 <CustomAvatar
                                                     profileImage={data?.internalPlans?.created_by_profile_image}
                                                     fullName={data?.internalPlans?.created_by_full_name}
