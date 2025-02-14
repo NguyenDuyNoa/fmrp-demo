@@ -203,6 +203,10 @@ const BodyGantt = ({
             }
         }
     }, [data]); // Chạy lại khi `data` thay đổi
+
+
+
+
     // useLayoutEffect(() => {
     //     if (checkRankRef.current && container1Ref.current) {
     //         const target = checkRankRef.current;
@@ -263,6 +267,7 @@ const BodyGantt = ({
 
 
 
+    console.log("data", data);
 
 
     return (
@@ -385,29 +390,35 @@ const BodyGantt = ({
                                 <div key={e.id} className="">
                                     <div className="text-[#202236] font-semibold text-sm px-1 py-1">{e.title}</div>
                                     <div className="flex items-end gap-2 divide-x">
-                                        {e.days.map((i, iIndex) => {
-                                            const parts = i.day.split(" ");
-                                            return (
-                                                <div key={i.id} className="flex items-center gap-2 w-[70.5px]">
-                                                    <h1 className="text-[#667085] font-light 3xl:text-base text-sm  3xl:px-1.5 px-3">
-                                                        {parts[0]}
-                                                    </h1>
-                                                    {iIndex == e.days.length - 1 ? (
-                                                        <h1
-                                                            className={`bg-[#5599EC] my-0.5  px-1.5 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
-                                                        >
-                                                            {parts[1]}
+                                        {
+                                            e.days.map((i, iIndex) => {
+                                                const day = i?.date.split("/")
+                                                const date = i.day.split(" ");
+                                                return (
+                                                    <div key={i.id} className="flex items-center gap-2 w-[70.5px]">
+                                                        <h1 className="text-[#667085] font-light 3xl:text-base text-sm  3xl:px-1.5 px-3">
+                                                            {date[0]}
                                                         </h1>
-                                                    ) : (
-                                                        <h1
-                                                            className={`text-[#202236] rounded-full py-0.5 font-semibold 3xl:text-base text-sm `}
-                                                        >
-                                                            {parts[1]}
-                                                        </h1>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
+                                                        {
+                                                            iIndex == e.days?.length - 1
+                                                                ? (
+                                                                    <h1
+                                                                        className={`bg-[#5599EC] my-0.5  px-1.5 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
+                                                                    >
+                                                                        {Number(day[0])}
+                                                                    </h1>
+                                                                ) : (
+                                                                    <h1
+                                                                        className={`text-[#667085] rounded-full py-0.5 font-semibold 3xl:text-base text-sm `}
+                                                                    >
+                                                                        {Number(day[0])}
+                                                                    </h1>
+                                                                )
+                                                        }
+                                                    </div>
+                                                );
+                                            })
+                                        }
                                     </div>
                                 </div>
                             ))}
