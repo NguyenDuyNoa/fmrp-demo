@@ -4,6 +4,7 @@ import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
 import Header from "./header";
 import ChatAiBubble from '../UI/chat/ChatAiBubble';
+import SimpleBar from 'simplebar-react';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -18,9 +19,9 @@ const Index = ({ children }) => {
         <QueryClientProvider client={queryClient}>
             <div>
                 <Header />
-                <div className="overflow-hidden">
+                <SimpleBar style={{ height: "100vh" }}>
                     {children}
-                </div>
+                </SimpleBar>
             </div>
             <PopupAppTrial />
             <PopupAppRenewal />
