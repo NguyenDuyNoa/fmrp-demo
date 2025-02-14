@@ -29,6 +29,8 @@ const BodyGantt = ({
 
     const monthRefs = useRef({});
 
+    const dayRefs = useRef([]);
+
     const container1Ref = useRef();
 
     const container2Ref = useRef();
@@ -339,6 +341,41 @@ const BodyGantt = ({
     }, [timeLine, data]);
 
 
+    useEffect(() => {
+        if (!container2Ref.current) return;
+
+        const handleScroll = () => {
+            const scrollLeft = container2Ref.current.scrollLeft;
+            const containerWidth = container2Ref.current.scrollWidth;
+            const visibleWidth = container2Ref.current.clientWidth;
+
+            let newMonth = currentMonth;
+            console.log(Object.entries(monthRefs.current));
+
+            Object.entries(monthRefs.current).forEach(([month, el]) => {
+                const monthStart = el.offsetLeft;
+                const monthEnd = el.offsetLeft + el.offsetWidth;
+
+                // Chỉ cập nhật khi cuộn đến ít nhất 40% chiều rộng của tháng tiếp theo
+                if (scrollLeft >= monthStart - visibleWidth * 0.050 && scrollLeft < monthEnd) {
+                    // if (scrollLeft + visibleWidth * 0.40 >= monthStart && scrollLeft + visibleWidth * 0.40 < monthEnd) {
+                    newMonth = el?.dataset?.month
+                }
+            });
+
+            if (newMonth !== currentMonth) {
+                console.log('Detected month change based on scroll position:', newMonth);
+                setCurrentMonth(newMonth);
+            }
+        };
+
+        const container = container2Ref.current;
+        container.addEventListener('scroll', handleScroll);
+        return () => container.removeEventListener('scroll', handleScroll);
+    }, [currentMonth, data, timeLine]);
+
+
+
     return (
         <React.Fragment>
             {data?.length > 0 ? (
@@ -454,50 +491,62 @@ const BodyGantt = ({
                                 </div>
                             </div>
                         </div>
-                        <div className={` flex  gap-4 divide-x border-l overflow-hidden`} ref={container2Ref}>
-                            {timeLine.map((e, index) => (
-                                <div
-                                    key={e.id}
-                                    className="relative"
-                                    ref={(el) => (monthRefs.current[e.month] = el)}
-                                >
-                                    <div className="text-[#202236] font-semibold text-sm px-1 py-1 sticky top-0 z-10 ">
-                                        {e.title}
-                                    </div>
+                        <div className={` flex  gap-4 divide-x border-l overflow-hidden relative`} ref={container2Ref}>
+                            <div style={{
+                                top: container2Ref.current?.height
+                            }} className="fixed top-[33.28%] z-[9999] text-[#202236] font-semibold text-sm px-1 py-1 h-5 bg-white">
+                                {currentMonth}
+                            </div>
+                            {
+                                timeLine.map((e, index) => (
+                                    <div
+                                        key={e.id}
+                                        className="relative"
+                                        ref={(el) => (monthRefs.current[e.month] = el)}
+                                        data-month={e.title}
+                                    >
+                                        <div className="text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative">
+                                            {currentMonth != e.title ? e.title : ''}
+                                        </div>
 
-                                    <div className="flex items-end gap-2 divide-x">
-                                        {
-                                            e.days.map((i, iIndex) => {
-                                                const day = i?.date.split("/")
-                                                const date = i.day.split(" ");
-                                                return (
-                                                    <div key={i.id} className="flex items-center gap-2 w-[70.5px]">
-                                                        <h1 className="text-[#667085] font-light 3xl:text-base text-sm  3xl:px-1.5 px-3">
-                                                            {date[0]}
-                                                        </h1>
-                                                        {
-                                                            iIndex == e.days?.length - 1
-                                                                ? (
-                                                                    <h1
-                                                                        className={`bg-[#5599EC] my-0.5  px-1.5 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
-                                                                    >
-                                                                        {Number(day[0])}
-                                                                    </h1>
-                                                                ) : (
-                                                                    <h1
-                                                                        className={`text-[#667085] rounded-full py-0.5 font-semibold 3xl:text-base text-sm `}
-                                                                    >
-                                                                        {Number(day[0])}
-                                                                    </h1>
-                                                                )
-                                                        }
-                                                    </div>
-                                                );
-                                            })
-                                        }
+                                        <div className="flex items-end gap-2 divide-x">
+                                            {
+                                                e.days.map((i, iIndex) => {
+                                                    const day = i?.date.split("/")
+                                                    const date = i.day.split(" ");
+                                                    return (
+                                                        <div
+                                                            key={i.id}
+                                                            className="flex items-center justify-center gap-2 w-[70.5px]"
+                                                            ref={(el) => (dayRefs.current[e.days] = el)}
+                                                        >
+                                                            {/* <h1 className="text-[#667085] font-light 3xl:text-base text-sm  3xl:px-1.5 px-3">
+                                                                {date[0]}
+                                                            </h1> */}
+                                                            {
+                                                                iIndex == e.days?.length - 1
+                                                                    ? (
+                                                                        <h1
+                                                                            className={`bg-[#5599EC] my-0.5  px-1.5 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
+                                                                        >
+                                                                            {Number(day[0])}
+                                                                        </h1>
+                                                                    ) : (
+                                                                        <h1
+                                                                            className={`text-[#667085] rounded-full py-0.5 font-semibold 3xl:text-base text-sm `}
+                                                                        >
+                                                                            {Number(day[0])}
+                                                                        </h1>
+                                                                    )
+                                                            }
+                                                        </div>
+                                                    );
+                                                })
+                                            }
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            }
                         </div>
                     </div>
                     {isFetching ? (
@@ -681,7 +730,8 @@ const BodyGantt = ({
                                                                             key={ci?.id} className={`w-[80px]`}
                                                                         >
 
-                                                                            {ci.active && !ci.outDate ?
+                                                                            {ci.active && !ci.outDate
+                                                                                ?
                                                                                 <Popup
                                                                                     className="popover-productionPlan"
                                                                                     arrow={true}
@@ -710,7 +760,9 @@ const BodyGantt = ({
                                                                                     >
                                                                                         {ci.date}
                                                                                     </div>
-                                                                                </Popup> : <div className="w-[80px] h-[20px]"></div>
+                                                                                </Popup>
+                                                                                :
+                                                                                <div className="w-[80px] h-[20px]"></div>
                                                                             }
                                                                         </div>
                                                                     );
