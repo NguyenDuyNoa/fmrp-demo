@@ -164,8 +164,8 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                 className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                             />
                                             <div className='flex flex-col'>
-                                                <span>{e.name}</span>
-                                                <div className='flex items-center gap-1 text-gray-500'>
+                                                <span className='!text-xs'>{e.name}</span>
+                                                <div className='flex items-center gap-1 text-gray-500 !text-xs'>
                                                     <span>{e.code}</span>-<span>{e.itemVariation}</span>
                                                 </div>
                                             </div>
@@ -202,27 +202,27 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
                 </div>
             </div>
             <ContainerTotal className={`${isTab == 1 ? "!grid-cols-10" : "!grid-cols-9"}`}>
-                <ColumnTable colSpan={5} textAlign={'center'} className="p-2">
+                <ColumnTable colSpan={5} textAlign={'center'} className="p-2 !text-[13px]">
                     {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
                 </ColumnTable>
                 {
                     isTab == 1 &&
                     <>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="normal-case !text-[13px] flex flex-wrap justify-end gap-2 p-2 mr-1">
                             0
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="normal-case !text-[13px] flex flex-wrap justify-end gap-2 p-2 mr-1">
                             0
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="normal-case !text-[13px] flex flex-wrap justify-end gap-2 p-2 mr-1">
                             0
                         </ColumnTable>
                     </>
                 }
-                <ColumnTable colSpan={isTab == 1 ? 1 : 2} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
+                <ColumnTable colSpan={isTab == 1 ? 1 : 2} textAlign={'right'} className="normal-case !text-[13px] flex flex-wrap justify-end gap-2 p-2 mr-1">
                     0
                 </ColumnTable>
-                <ColumnTable colSpan={isTab == 1 ? 1 : 2} textAlign={'right'} className="flex flex-wrap justify-end gap-2 p-2 mr-1">
+                <ColumnTable colSpan={isTab == 1 ? 1 : 2} textAlign={'right'} className="normal-case !text-[13px] flex flex-wrap justify-end gap-2 p-2 mr-1">
                     0
                 </ColumnTable>
             </ContainerTotal>

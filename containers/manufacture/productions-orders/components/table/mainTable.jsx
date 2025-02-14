@@ -440,7 +440,7 @@ const MainTable = ({ dataLang }) => {
                                 />
                             </form>
                         </div>
-                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
+                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  ">
                             {isLoading
                                 ?
                                 <Loading />

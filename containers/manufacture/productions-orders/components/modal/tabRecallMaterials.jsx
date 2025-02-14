@@ -144,12 +144,12 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                                     {/* <RowItemTable colSpan={1} textAlign={'center'}>
                                         {e.codeReceipts}
                                     </RowItemTable> */}
-                                    <RowItemTable colSpan={1} textAlign={'center'}>
+                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                         {e.codeImport}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={2}>
+                                    <RowItemTable colSpan={2} textSize={'!text-xs'}>
                                         <div className='flex flex-col'>
-                                            <span>{e.name}</span>
+                                            <span className='!text-xs'>{e.name}</span>
                                             <div className='flex items-center gap-1 text-xs text-gray-500'>
                                                 Mã: <span>{e.code}</span>
                                             </div>

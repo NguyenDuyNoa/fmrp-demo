@@ -16,6 +16,7 @@ import TabProcessingCost from "./tabProcessingCost";
 import TabRecallMaterials from "./tabRecallMaterials";
 import TabWarehouseHistory from "./tabWarehouseHistory";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 
 
@@ -198,14 +199,14 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
     if (!isMounted) return null
 
     return (
-        <div
+        <Customscrollbar
             style={{
                 width: width,
                 height: `calc(100vh - ${68}px)`,
                 transform: isState.openModal ? "translateX(0%)" : "translateX(100%)",
                 maxWidth: "100vw",
             }}
-            className={`bg-[#FFFFFF] absolute top-[9.2%] right-0 shadow-md z-[999] transition-all duration-150 ease-linear h-full overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+            className={`bg-[#FFFFFF] absolute top-[9.2%] right-0 shadow-md z-[999] transition-all duration-150 ease-linear h-full overflow-y-auto`}
         >
             <div className="pl-3 pr-4">
                 <div className="flex justify-between py-4 border-b border-gray-300">
@@ -341,7 +342,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                     />
                 </div>
             </div>
-        </div>
+        </Customscrollbar>
     );
 });
 
