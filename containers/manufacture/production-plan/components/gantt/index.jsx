@@ -27,6 +27,8 @@ const BodyGantt = ({
 }) => {
     const showToast = useToast();
 
+    const monthRefs = useRef({});
+
     const container1Ref = useRef();
 
     const container2Ref = useRef();
@@ -45,6 +47,7 @@ const BodyGantt = ({
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
+    const [currentMonth, setCurrentMonth] = useState('');
 
     const handleScroll = (e) => {
         const container1Element = container1Ref.current;
@@ -69,32 +72,32 @@ const BodyGantt = ({
     }, [router]);
 
     // Hàm lấy phần tử có ngày lớn nhất với điều kiện active: true
-    const getLatestActiveProcess = (data) => {
-        let latestProcess = null;
+    // const getLatestActiveProcess = (data) => {
+    //     let latestProcess = null;
 
-        for (let i = 0; i < data.length; i++) {
-            const item = data[i];
-            for (let j = 0; j < item.listProducts.length; j++) {
-                const product = item.listProducts[j];
-                for (let k = 0; k < product.processArr.length; k++) {
-                    const process = product.processArr[k];
+    //     for (let i = 0; i < data.length; i++) {
+    //         const item = data[i];
+    //         for (let j = 0; j < item.listProducts.length; j++) {
+    //             const product = item.listProducts[j];
+    //             for (let k = 0; k < product.processArr.length; k++) {
+    //                 const process = product.processArr[k];
 
-                    if (process.active && item?.show) { // Chỉ xét phần tử có active = true và mở
-                        const processDate = new Date(process.date.split('/').reverse().join('-')); // Chuyển "dd/MM/yyyy" thành "yyyy-MM-dd"
+    //                 if (process.active && item?.show) { // Chỉ xét phần tử có active = true và mở
+    //                     const processDate = new Date(process.date.split('/').reverse().join('-')); // Chuyển "dd/MM/yyyy" thành "yyyy-MM-dd"
 
-                        if (!latestProcess || processDate > new Date(latestProcess.date.split('/').reverse().join('-'))) {
-                            latestProcess = process; // Cập nhật phần tử có ngày lớn nhất
-                        }
-                    }
-                }
-            }
-        }
+    //                     if (!latestProcess || processDate > new Date(latestProcess.date.split('/').reverse().join('-'))) {
+    //                         latestProcess = process; // Cập nhật phần tử có ngày lớn nhất
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        return latestProcess;
-    };
+    //     return latestProcess;
+    // };
 
 
-    const latestActiveProcess = getLatestActiveProcess(data);
+    const latestActiveProcess = {}
 
     // useLayoutEffect(() => {
     //     if (checkRankRef.current && container1Ref.current) {
@@ -151,58 +154,58 @@ const BodyGantt = ({
     const [isFirstRender, setIsFirstRender] = useState(true);
 
     // Chạy khi component mount lần đầu để thiết lập vị trí scroll ngay lập tức
-    useEffect(() => {
-        if (checkRankRef.current && container1Ref.current) {
-            const target = checkRankRef.current;
-            const viewport = document.querySelector('.container1');
+    // useEffect(() => {
+    //     if (checkRankRef.current && container1Ref.current) {
+    //         const target = checkRankRef.current;
+    //         const viewport = document.querySelector('.container1');
 
-            if (viewport) {
-                const targetRect = target.getBoundingClientRect();
-                const viewportRect = viewport.getBoundingClientRect();
+    //         if (viewport) {
+    //             const targetRect = target.getBoundingClientRect();
+    //             const viewportRect = viewport.getBoundingClientRect();
 
-                // Thiết lập vị trí scroll ngay lập tức
-                viewport.scrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
-            }
-        }
-    }, []); // Chạy một lần duy nhất khi component mount
+    //             // Thiết lập vị trí scroll ngay lập tức
+    //             viewport.scrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
+    //         }
+    //     }
+    // }, []); // Chạy một lần duy nhất khi component mount
 
     // Chạy animation khi `data` thay đổi, nhưng bỏ qua lần render đầu tiên
-    useLayoutEffect(() => {
-        if (isFirstRender) {
-            setIsFirstRender(false); // Đánh dấu rằng lần đầu đã chạy
-            return; // Không chạy animation lần đầu
-        }
+    // useLayoutEffect(() => {
+    //     if (isFirstRender) {
+    //         setIsFirstRender(false); // Đánh dấu rằng lần đầu đã chạy
+    //         return; // Không chạy animation lần đầu
+    //     }
 
-        if (checkRankRef.current && container1Ref.current) {
-            const target = checkRankRef.current;
-            const viewport = document.querySelector('.container1');
+    //     if (checkRankRef.current && container1Ref.current) {
+    //         const target = checkRankRef.current;
+    //         const viewport = document.querySelector('.container1');
 
-            if (viewport) {
-                const targetRect = target.getBoundingClientRect();
-                const viewportRect = viewport.getBoundingClientRect();
-                const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
+    //         if (viewport) {
+    //             const targetRect = target.getBoundingClientRect();
+    //             const viewportRect = viewport.getBoundingClientRect();
+    //             const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
 
-                const startScrollLeft = viewport.scrollLeft;
-                let startTime = null;
-                const duration = 500; // Thời gian chạy animation (ms)
+    //             const startScrollLeft = viewport.scrollLeft;
+    //             let startTime = null;
+    //             const duration = 500; // Thời gian chạy animation (ms)
 
-                const step = (timestamp) => {
-                    if (!startTime) startTime = timestamp;
+    //             const step = (timestamp) => {
+    //                 if (!startTime) startTime = timestamp;
 
-                    const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến trình từ 0 -> 1
-                    const ease = progress * (2 - progress); // Hiệu ứng easing
+    //                 const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến trình từ 0 -> 1
+    //                 const ease = progress * (2 - progress); // Hiệu ứng easing
 
-                    viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
+    //                 viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
 
-                    if (progress < 1) {
-                        requestAnimationFrame(step);
-                    }
-                };
+    //                 if (progress < 1) {
+    //                     requestAnimationFrame(step);
+    //                 }
+    //             };
 
-                requestAnimationFrame(step);
-            }
-        }
-    }, [data]); // Chạy lại khi `data` thay đổi
+    //             requestAnimationFrame(step);
+    //         }
+    //     }
+    // }, [data]); // Chạy lại khi `data` thay đổi
 
 
 
@@ -266,8 +269,74 @@ const BodyGantt = ({
     ];
 
 
+    // useEffect(() => {
+    //     if (container1Ref.current && timeLine?.length > 0) {
+    //         // Lấy tháng và năm hiện tại
+    //         const currentDate = new Date();
+    //         const currentMonth = currentDate.getMonth() + 1;
+    //         const currentYear = currentDate.getFullYear();
 
-    console.log("data", data);
+    //         // Tìm đối tượng trong data khớp với tháng và năm hiện tại
+    //         const currentMonthData = timeLine?.find(item => {
+    //             const itemMonth = parseInt(item.month, 10);
+    //             const itemYear = parseInt(item?.title.split(' ')[2], 10); // Lấy năm từ "Tháng 03 2024"
+    //             return itemMonth === currentMonth && itemYear === currentYear;
+    //         });
+
+    //         if (currentMonthData) {
+    //             const monthKey = currentMonthData.month.padStart(2, '0');
+    //             const targetElement = monthRefs.current[monthKey];
+    //             const viewport = document.querySelector('.container1');
+
+    //             if (targetElement && container1Ref.current) {
+    //                 const targetPosition = targetElement.offsetLeft - container1Ref.current.offsetLeft;
+    //                 viewport.scrollLeft = targetPosition;
+    //             }
+    //         }
+    //     }
+    // }, [data, timeLine]);
+
+    const hasScrolled = useRef(false);
+
+    useEffect(() => {
+        if (!hasScrolled.current && container1Ref.current && timeLine?.length > 0 && data?.length > 0) {
+            // Đánh dấu là đã chạy
+            hasScrolled.current = true;
+
+            // Lấy tháng và năm hiện tại
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1;
+            const currentYear = currentDate.getFullYear();
+
+            // Tìm tháng hiện tại trong năm hiện tại
+            let targetMonthData = timeLine.find(item => {
+                const itemMonth = parseInt(item.month, 10);
+                const itemYear = parseInt(item.title.split(' ')[2], 10);
+                return itemMonth === currentMonth && itemYear === currentYear;
+            });
+
+            // Nếu không tìm thấy, tìm tháng hiện tại trong năm trước
+            if (!targetMonthData) {
+                targetMonthData = timeLine.find(item => {
+                    const itemMonth = parseInt(item.month, 10);
+                    const itemYear = parseInt(item.title.split(' ')[2], 10);
+                    return itemMonth === currentMonth && itemYear === currentYear - 1;
+                });
+            }
+
+            // Nếu tìm thấy dữ liệu, cuộn tới tháng tương ứng
+            if (targetMonthData) {
+                const monthKey = targetMonthData.month.padStart(2, '0');
+                const targetElement = monthRefs.current[monthKey];
+                const viewport = document.querySelector('.container1');
+
+                if (targetElement && container1Ref.current) {
+                    const targetPosition = targetElement.offsetLeft - container1Ref.current.offsetLeft;
+                    viewport.scrollLeft = targetPosition;
+                }
+            }
+        }
+    }, [timeLine, data]);
 
 
     return (
@@ -386,9 +455,16 @@ const BodyGantt = ({
                             </div>
                         </div>
                         <div className={` flex  gap-4 divide-x border-l overflow-hidden`} ref={container2Ref}>
-                            {timeLine.map((e) => (
-                                <div key={e.id} className="">
-                                    <div className="text-[#202236] font-semibold text-sm px-1 py-1">{e.title}</div>
+                            {timeLine.map((e, index) => (
+                                <div
+                                    key={e.id}
+                                    className="relative"
+                                    ref={(el) => (monthRefs.current[e.month] = el)}
+                                >
+                                    <div className="text-[#202236] font-semibold text-sm px-1 py-1 sticky top-0 z-10 ">
+                                        {e.title}
+                                    </div>
+
                                     <div className="flex items-end gap-2 divide-x">
                                         {
                                             e.days.map((i, iIndex) => {
