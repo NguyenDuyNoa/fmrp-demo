@@ -83,10 +83,6 @@ export default function ChatBubbleAI(props) {
             queryKeyIsState({ boxMessageHeight: boxMessageRef.current.clientHeight })
         }
     }
-    useEffect(() => {
-        updateHeight()
-
-    }, [stateBoxChatAi.openViewModal]);
 
     const handleScroll = () => {
         if (!boxShowMsgRef.current) return;
@@ -94,7 +90,7 @@ export default function ChatBubbleAI(props) {
         const { scrollTop, scrollHeight, clientHeight } = boxShowMsgRef.current;
 
         // Nếu người dùng chưa cuộn xuống cuối, hiển thị nút
-        if (scrollTop < scrollHeight - clientHeight - 50) {
+        if (scrollTop < scrollHeight - clientHeight - 30) {
             queryKeyIsState({ showScrollButton: true });
         } else {
             queryKeyIsState({ showScrollButton: false });
@@ -109,7 +105,7 @@ export default function ChatBubbleAI(props) {
             });
         }
     };
-    // Theo dõi sự kiện scroll
+
     useEffect(() => {
         if (!boxShowMsgRef.current) return
         const msgBox = boxShowMsgRef.current;
@@ -122,20 +118,25 @@ export default function ChatBubbleAI(props) {
             }
         };
     }, []);
-    // useEffect(() => {
-    //     if (boxShowMsgRef.current) {
-    //         boxShowMsgRef.current.scrollTo({
-    //             top: boxShowMsgRef.current.scrollHeight,
-    //             behavior: "smooth"
-    //         });
-    //     }
-    // }, [stateBoxChatAi.messenger]);
+
 
     useEffect(() => {
         if (stateBoxChatAi.openViewModal) {
             scrollToBottom();
         }
     }, [stateBoxChatAi.openViewModal]);
+
+    useEffect(() => {
+        adjustHeight()
+        scrollToBottom();
+        updateHeight()
+    }, [stateBoxChatAi.messenger])
+
+    useEffect(() => {
+        adjustHeight()
+        updateHeight()
+        scrollToBottom();
+    }, [isState.localContent])
 
     const sendMessage = async () => {
         if (!stateBoxChatAi.typeChat?.id) {
@@ -212,8 +213,8 @@ export default function ChatBubbleAI(props) {
                 queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight } })
             }, (800));
         }
-        scrollToBottom();
-    }, [stateBoxChatAi.dataReview, stateBoxChatAi.messenger]);
+        // adjustHeight()
+    }, [stateBoxChatAi.dataReview]);
 
     useEffect(() => {
         queryKeyIsState({ localContent: stateBoxChatAi.contentChat })
@@ -227,6 +228,7 @@ export default function ChatBubbleAI(props) {
                 type: "stateBoxChatAi",
                 payload: { ...stateBoxChatAi, contentChat: value },
             });
+
         }, 200),
         [stateBoxChatAi]
     );
@@ -252,54 +254,7 @@ export default function ChatBubbleAI(props) {
             textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
         }
     };
-    console.log("isLoadingGenerateText", isLoadingGenerateText);
 
-    // const minWidth = 300; // Chiều rộng tối thiểu
-    // const maxWidth = window.innerWidth; // Chiều rộng tối đa (full màn hình)
-
-    // const [width, setWidth] = useState(maxWidth); // Mặc định 100vw
-    // const [isResizing, setIsResizing] = useState(false);
-    // const [initialX, setInitialX] = useState(0);
-    // const [initialWidth, setInitialWidth] = useState(maxWidth);
-
-    // // useEffect(() => {
-    // //     if (!isOpen) {
-    // //         setWidth(maxWidth); // Reset về 100vw khi mở lại
-    // //     }
-    // // }, [isOpen, maxWidth]);
-
-    // useEffect(() => {
-    //     const handleResize = (event) => {
-    //         if (isResizing) {
-    //             const newWidth = initialWidth - (event.clientX - initialX);
-    //             setWidth(Math.min(Math.max(newWidth, minWidth), maxWidth)); // Giữ trong phạm vi min/max
-    //         }
-    //     };
-
-    //     const stopResize = () => {
-    //         setIsResizing(false);
-    //         document.body.classList.remove("no-select");
-    //         document.removeEventListener("mousemove", handleResize);
-    //         document.removeEventListener("mouseup", stopResize);
-    //     };
-
-    //     if (isResizing) {
-    //         document.addEventListener("mousemove", handleResize);
-    //         document.addEventListener("mouseup", stopResize);
-    //     }
-
-    //     return () => {
-    //         document.removeEventListener("mousemove", handleResize);
-    //         document.removeEventListener("mouseup", stopResize);
-    //     };
-    // }, [isResizing, initialWidth, initialX, minWidth, maxWidth]);
-
-    // const startResize = (event) => {
-    //     setIsResizing(true);
-    //     setInitialX(event.clientX);
-    //     setInitialWidth(width);
-    //     document.body.classList.add("no-select"); // Tránh chọn văn bản khi kéo
-    // };
     return (
         <div
             ref={chatRef}
@@ -410,37 +365,46 @@ export default function ChatBubbleAI(props) {
                         <div style={{
                             // 32 padingg trên dưới 
                             height: stateBoxChatAi.openViewModal ? `calc(100vh - ${((isState.headerHeight ?? 0) + 28)}px)` : "auto"
-                        }} className={`${stateBoxChatAi.openViewModal ? "w-[30%] " : "w-full"}`}>
-                            <Customscrollbar ref={boxShowMsgRef} className={` flex-1 p-2 overflow-y-auto ${stateBoxChatAi.openViewModal ? "bg-gray-100 rounded-t-lg" : ""}`}>
-                                <div className={`space-y-4  pb-[50px]`}
-                                    style={{
-                                        height: stateBoxChatAi.openViewModal ? `calc(100vh - ${((isState.boxMessageHeight ?? 0) + (((isState.headerHeight ?? 0) + 28)))}px)` : "288px"
-                                    }}
-                                >
-                                    {stateBoxChatAi?.messenger?.map((msg, index, array) => (
+                        }} className={`${stateBoxChatAi.openViewModal ? "w-[30%] " : "w-full"} h-full`}>
+                            {/* <Customscrollbar
+                                ref={boxShowMsgRef}
+                                style={{
+                                    // 32 padingg trên dưới 
+                                    height: stateBoxChatAi.openViewModal ? `calc(100vh - ${((isState.headerHeight ?? 0) + 28)}px)` : "auto"
+                                }}
+                                className={` flex-1 p-2 overflow-y-auto ${stateBoxChatAi.openViewModal ? "bg-gray-100 rounded-t-lg" : ""}`}
+                            > */}
+                            <Customscrollbar
+                                ref={boxShowMsgRef}
+                                className={`space-y-4  pb-[20px]  flex-1 p-2 overflow-y-auto ${stateBoxChatAi.openViewModal ? "bg-gray-100 rounded-t-lg" : ""}`}
+                                style={{
+                                    height: stateBoxChatAi.openViewModal ? `calc(100vh - ${((isState.boxMessageHeight ?? 0) + (((isState.headerHeight ?? 0) + 28)))}px)` : "320px"
+                                }}
+                            >
+                                {stateBoxChatAi?.messenger?.map((msg, index, array) => (
+                                    <div
+                                        key={index}
+                                        className={`flex items-center ${msg?.sender === "user" ? "justify-end" : "justify-start"} gap-1 my-2`}
+                                    >
+                                        {
+                                            msg.sender != "user" && (
+                                                <div className="w-8 h-8 rounded-full min-w-[7%]">
+                                                    <Image
+                                                        width={1280}
+                                                        height={1024}
+                                                        src="/ai/icon.png"
+                                                        className='object-contain w-full h-full rounded-full'
+                                                    />
+                                                </div>
+                                            )
+                                        }
                                         <div
-                                            key={index}
-                                            className={`flex items-center ${msg?.sender === "user" ? "justify-end" : "justify-start"} gap-1`}
+                                            className={`px-4 py-2 rounded-xl text-sm transition-all duration-300 ease-in-out transform ${msg?.sender === "user"
+                                                ? (stateBoxChatAi.openViewModal ? "bg-gray-50" : "bg-gray-100")
+                                                : ((stateBoxChatAi.openViewModal ? "bg-gray-100" : "bg-gray-50"))
+                                                } text-gray-800 flex items-center space-x-2 cursor-default relative`}
                                         >
-                                            {
-                                                msg.sender != "user" && (
-                                                    <div className="w-8 h-8 rounded-full min-w-[7%]">
-                                                        <Image
-                                                            width={1280}
-                                                            height={1024}
-                                                            src="/ai/icon.png"
-                                                            className='object-contain w-full h-full rounded-full'
-                                                        />
-                                                    </div>
-                                                )
-                                            }
-                                            <div
-                                                className={`px-4 py-2 rounded-xl text-sm transition-all duration-300 ease-in-out transform ${msg?.sender === "user"
-                                                    ? (stateBoxChatAi.openViewModal ? "bg-gray-50" : "bg-gray-100")
-                                                    : ((stateBoxChatAi.openViewModal ? "bg-gray-100" : "bg-gray-50"))
-                                                    } text-gray-800 flex items-center space-x-2 cursor-default relative`}
-                                            >
-                                                {/* {
+                                            {/* {
                                                     msg?.sender === "ai" && array?.length - 1 == index && (!stateBoxChatAi.openViewModal)
                                                         ?
                                                         <p>
@@ -478,53 +442,53 @@ export default function ChatBubbleAI(props) {
                                                             {msg?.text}
                                                         </p>
                                                 } */}
-                                                {
-                                                    (msg?.sender === "ai" && array?.length - 1 == index && !index == 0) && (!stateBoxChatAi.openViewModal) && (stateBoxChatAi?.dataReview?.content)
-                                                        ?
-                                                        <p>
-                                                            <span>{msg?.text}</span>
-                                                            <span
-                                                                onClick={() => {
-                                                                    dispatch({
-                                                                        type: "stateBoxChatAi",
-                                                                        payload: {
-                                                                            ...stateBoxChatAi,
-                                                                            openViewModal: true,
-                                                                            typeData: ""
-                                                                        }
-                                                                    })
-                                                                    queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight } })
-                                                                }}
-                                                                className={` text-blue-500 cursor-pointer select-none pl-2`} >
-                                                                ... <IoIosResize className="inline" size={18} />
-                                                            </span>
-                                                        </p>
-                                                        :
-                                                        <p>
-                                                            {msg?.text}
-                                                        </p>
-                                                }
-                                            </div>
+                                            {
+                                                (msg?.sender === "ai" && array?.length - 1 == index && !index == 0) && (!stateBoxChatAi.openViewModal) && (stateBoxChatAi?.dataReview?.content)
+                                                    ?
+                                                    <p>
+                                                        <span>{msg?.text}</span>
+                                                        <span
+                                                            onClick={() => {
+                                                                dispatch({
+                                                                    type: "stateBoxChatAi",
+                                                                    payload: {
+                                                                        ...stateBoxChatAi,
+                                                                        openViewModal: true,
+                                                                        typeData: ""
+                                                                    }
+                                                                })
+                                                                queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight } })
+                                                            }}
+                                                            className={` text-blue-500 cursor-pointer select-none pl-2`} >
+                                                            ... <IoIosResize className="inline" size={18} />
+                                                        </span>
+                                                    </p>
+                                                    :
+                                                    <p>
+                                                        {msg?.text}
+                                                    </p>
+                                            }
                                         </div>
-                                    ))}
-                                    {
-                                        isLoadingGenerateText && (
-                                            <div className="flex items-center justify-start w-full gap-2">
-                                                <div className="w-8 h-8 rounded-full min-w-[7%]">
-                                                    <Image
-                                                        width={1280}
-                                                        height={1024}
-                                                        src="/ai/icon.png"
-                                                        className='object-contain w-full h-full rounded-full'
-                                                    />
-                                                </div>
-                                                <div className="flex items-center px-4 py-3 space-x-2 text-sm text-gray-800 bg-gray-100 rounded-xl">
-                                                    <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite]"></span>
-                                                    <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite_200ms]"></span>
-                                                    <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite_400ms]"></span>
-                                                </div>
-                                                <style jsx>
-                                                    {`@keyframes typing {
+                                    </div>
+                                ))}
+                                {
+                                    isLoadingGenerateText && (
+                                        <div className="flex items-center justify-start w-full gap-2">
+                                            <div className="w-8 h-8 rounded-full min-w-[7%]">
+                                                <Image
+                                                    width={1280}
+                                                    height={1024}
+                                                    src="/ai/icon.png"
+                                                    className='object-contain w-full h-full rounded-full'
+                                                />
+                                            </div>
+                                            <div className="flex items-center px-4 py-3 space-x-2 text-sm text-gray-800 bg-gray-100 rounded-xl">
+                                                <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite]"></span>
+                                                <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite_200ms]"></span>
+                                                <span className="inline-block w-1 h-1 bg-gray-800 rounded-full animate-[typing_1.5s_infinite_400ms]"></span>
+                                            </div>
+                                            <style jsx>
+                                                {`@keyframes typing {
                                                         0% { transform: translateY(0); }
                                                         50% { transform: translateY(-5px); }
                                                         100% { transform: translateY(0); }
@@ -538,13 +502,13 @@ export default function ChatBubbleAI(props) {
                                                     .delay-400 {
                                                         animation-delay: 400ms;
                                                     }`}
-                                                </style>
+                                            </style>
 
-                                            </div>
-                                        )
-                                    }
-                                </div>
+                                        </div>
+                                    )
+                                }
                             </Customscrollbar>
+                            {/* </Customscrollbar> */}
                             <div ref={boxMessageRef} className={`${stateBoxChatAi.openViewModal ? "bg-gray-100 pb-2" : "bg-transparent"} relative px-2`}>
                                 {isState.showScrollButton && (
                                     <div className="absolute -translate-x-1/2 -top-3 left-1/2 z-[999]">

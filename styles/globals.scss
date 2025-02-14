@@ -11,7 +11,7 @@ input::-ms-clear {
 //     scroll-behavior: smooth;
 // }
 body::-webkit-scrollbar {
-    width: 10px;
+    width: 4px;
 }
 
 body::-webkit-scrollbar-track {
@@ -27,6 +27,30 @@ body::-webkit-scrollbar-thumb:hover {
     background: #93c5fd;
 }
 
+/// cuộn dọc
+.simplebar-track.simplebar-vertical .simplebar-scrollbar:before {
+    background-color: #94a3b8;
+    // background-color: #94a3b8;
+}
+.simplebar-track.simplebar-vertical .simplebar-scrollbar:before {
+    // background-image: linear-gradient(yellow, red);
+}
+.simplebar-track {
+    opacity: 1;
+}
+
+.simplebar-track.simplebar-vertical {
+    width: 9px;
+}
+.simplebar-track.simplebar-horizontal {
+    height: 9px;
+}
+/// cuộn ngang
+///
+.simplebar-track.simplebar-horizontal .simplebar-scrollbar:before {
+    background-color: #94a3b8;
+    // background-color: #94a3b8;
+}
 .no-select {
     user-select: none;
     -webkit-user-select: none;

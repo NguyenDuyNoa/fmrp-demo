@@ -22,7 +22,7 @@ export const usePostGenerateTextBom = () => {
             isShow("error", errorMessage);
         },
         gcTime: 5000,
-        retry: 5
+        retry: 8
     });
 
     const onSubmit = async (data) => {
