@@ -506,7 +506,8 @@ const BodyGantt = ({
                                         data-month={e.title}
                                     >
                                         <div className="text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative">
-                                            {currentMonth != e.title ? e.title : ''}
+                                            {e.title}
+                                            {/* {currentMonth != e.title ? e.title : ''} */}
                                         </div>
 
                                         <div className="flex items-end gap-2 divide-x">
