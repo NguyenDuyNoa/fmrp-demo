@@ -492,11 +492,11 @@ const BodyGantt = ({
                             </div>
                         </div>
                         <div className={` flex  gap-4 divide-x border-l overflow-hidden relative`} ref={container2Ref}>
-                            <div style={{
+                            {/* <div style={{
                                 top: container2Ref.current?.height
                             }} className="fixed top-[33.28%] z-[9999] text-[#202236] font-semibold text-sm px-1 py-1 h-5 bg-white">
                                 {currentMonth}
-                            </div>
+                            </div> */}
                             {
                                 timeLine.map((e, index) => (
                                     <div
