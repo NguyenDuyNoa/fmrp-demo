@@ -1,10 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import SimpleBar from 'simplebar-react';
 import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
 import Header from "./header";
-import ChatAiBubble from '../UI/chat/ChatAiBubble';
-import SimpleBar from 'simplebar-react';
+import { Customscrollbar } from '../UI/common/Customscrollbar';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -19,9 +18,9 @@ const Index = ({ children }) => {
         <QueryClientProvider client={queryClient}>
             <div>
                 <Header />
-                <SimpleBar style={{ height: "100vh" }}>
+                <Customscrollbar className="max-h-screen" style={{ height: "100vh" }}>
                     {children}
-                </SimpleBar>
+                </Customscrollbar>
             </div>
             <PopupAppTrial />
             <PopupAppRenewal />
