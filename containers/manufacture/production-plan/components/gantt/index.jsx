@@ -470,7 +470,7 @@ const BodyGantt = ({
                                         />
                                     </div>
                                 </div>
-                                <div className="grid w-full grid-cols-11 col-span-11">
+                                <div className="grid items-center w-full grid-cols-11 col-span-11 ">
                                     <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
                                         {dataLang?.production_plan_gantt_table_order || 'production_plan_gantt_table_order'}
                                     </div>
