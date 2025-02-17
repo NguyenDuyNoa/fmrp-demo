@@ -339,9 +339,10 @@ const TabContent = ({ subItems, checkStt }) => {
                 <NoData
                     type="notificationheader"
                     className='w-[350px]'
+                    classNameImage=''
                 />
             ) : (
-                <div className={`3xl:px-2 3xl:py-1 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}>
+                <div className={`3xl:px-2 3xl:py-1  2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}>
                     {subItems?.map((ce, index) => (
                         <div key={index}>
                             <Link title={ce.title} href={`${ce?.link}`}>
