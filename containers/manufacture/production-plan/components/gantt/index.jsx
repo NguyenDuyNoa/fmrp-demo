@@ -9,6 +9,7 @@ import useToast from "@/hooks/useToast";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import NoData from "@/components/UI/noData/nodata";
+import { useRouter } from "next/router";
 const BodyGantt = ({
     handleShowSub,
     handleCheked,
@@ -24,6 +25,7 @@ const BodyGantt = ({
     handleTab,
     arrIdChecked,
     handleChekedAll,
+    page
 }) => {
     const showToast = useToast();
 
@@ -348,30 +350,29 @@ const BodyGantt = ({
                 }
             }
         }
-    }, [timeLine, data]);
+    }, [timeLine, data, page, router]);
 
 
     useEffect(() => {
         if (!container2Ref.current) return;
-
+        if (!monthRefs.current) return;
+        if (timeLine?.length === 0) return;
         const handleScroll = () => {
             const scrollLeft = container2Ref.current.scrollLeft;
-            const containerWidth = container2Ref.current.scrollWidth;
             const visibleWidth = container2Ref.current.clientWidth;
 
             let newMonth = currentMonth;
 
             Object.entries(monthRefs.current).forEach(([month, el]) => {
+                if (!el) return
                 const monthStart = el.offsetLeft;
                 const monthEnd = el.offsetLeft + el.offsetWidth;
 
                 // Chỉ cập nhật khi cuộn đến ít nhất 40% chiều rộng của tháng tiếp theo
                 if (scrollLeft >= monthStart - visibleWidth * 0.050 && scrollLeft < monthEnd) {
-                    // if (scrollLeft + visibleWidth * 0.40 >= monthStart && scrollLeft + visibleWidth * 0.40 < monthEnd) {
                     newMonth = el?.dataset?.month
                 }
             });
-
             if (newMonth !== currentMonth) {
                 setCurrentMonth(newMonth);
             }
@@ -380,7 +381,57 @@ const BodyGantt = ({
         const container = container2Ref.current;
         container.addEventListener('scroll', handleScroll);
         return () => container.removeEventListener('scroll', handleScroll);
-    }, [currentMonth, data, timeLine]);
+    }, [data, timeLine, currentMonth]);
+
+
+    useEffect(() => {
+        if (!page) return;
+        if (!container2Ref.current || timeLine.length === 0) return;
+
+        const container = container2Ref.current;
+
+        const calculateMonth = () => {
+            if (Object.keys(monthRefs.current).length === 0) {
+                console.warn("Refs chưa cập nhật, bỏ qua việc tính toán tháng.");
+                return;
+            }
+
+            let newMonth = currentMonth;
+            let closestMonth = null;
+            let minDistance = Infinity;
+
+            Object.entries(monthRefs.current).forEach(([month, el]) => {
+                if (!el) return;
+
+                const monthStart = el.offsetLeft;
+                const monthEnd = el.offsetLeft + el.offsetWidth;
+                const containerStart = container.offsetLeft;
+                const containerEnd = containerStart + container.clientWidth;
+                const elementCenter = (monthStart + monthEnd) / 2;
+
+                // Xác định phần tử gần nhất với viewport của container
+                const distance = Math.abs(elementCenter - (containerStart + containerEnd) / 2);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestMonth = el.dataset?.month;
+                }
+            });
+
+            // Nếu tìm thấy tháng gần nhất, cập nhật state
+            if (closestMonth) {
+                newMonth = closestMonth;
+            }
+
+            setCurrentMonth(newMonth);
+        };
+
+        // Chờ 300ms để đảm bảo refs đã cập nhật trước khi tính toán
+        const timeout = setTimeout(calculateMonth, 300);
+
+        return () => clearTimeout(timeout);
+    }, [router, page, timeLine]);
+
+
 
 
     useEffect(() => {
@@ -518,7 +569,7 @@ const BodyGantt = ({
                                 style={{
                                     top: `${currentMonthTop - 20}px`, // Gán vị trí đã lưu
                                 }}
-                                className="fixed z-[9999] text-[#202236] font-semibold text-sm px-1 py-1 h-5 bg-white"
+                                className="fixed z-[9999] text-[#202236] font-semibold text-sm px-2 py-1 h-5 bg-white "
                             >
                                 {currentMonth}
                             </div>
@@ -526,9 +577,15 @@ const BodyGantt = ({
                             {
                                 timeLine.map((e, index) => (
                                     <div
-                                        key={e.id}
+                                        key={`${e.id}-${router + page}`} // Thay đổi key khi page thay đổi
                                         className="relative"
-                                        ref={(el) => (monthRefs.current[e.month] = el)}
+                                        ref={(el) => {
+                                            if (el) {
+                                                monthRefs.current[e.month] = el;
+                                            } else {
+                                                console.warn(`Không thể gán ref cho tháng ${e.month}`);
+                                            }
+                                        }}
                                         data-month={e.title}
                                     >
                                         <div className={`text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative bg-white transition-opacity duration-200 
@@ -547,9 +604,11 @@ const BodyGantt = ({
                                                             key={i.id}
                                                             className="flex items-center justify-center gap-2 w-[70.5px]"
                                                             ref={(el) => {
-                                                                dayRefs.current[e.days] = el
-                                                                if (currentMonth === e.title) {
-                                                                    currentMonthRef.current = el; // Gán ref cho tháng hiện tại
+                                                                if (el) {
+                                                                    dayRefs.current[e.days] = el
+                                                                    if (currentMonth === e.title) {
+                                                                        currentMonthRef.current = el; // Gán ref cho tháng hiện tại
+                                                                    }
                                                                 }
                                                             }}
                                                         >

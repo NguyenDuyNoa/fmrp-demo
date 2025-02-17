@@ -20,7 +20,15 @@ const Header = () => {
 
     const isShow = useToast();
 
+    const dispatch = useDispatch()
+
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const dataPstWH = useSelector((state) => state.statusUser);
+    // Khai báo biến state
+    const [currentDropdownIndex, setCurrentDropdownIndex] = useState(0);
+
+    const [isLastDropdown, setIsLastDropdown] = useState(false);
 
     const ListDanhMuc = [
         {
@@ -1000,17 +1008,10 @@ const Header = () => {
         // },
     ];
 
-    const dataPstWH = useSelector((state) => state.statusUser);
-    // Khai báo biến state
-    const [currentDropdownIndex, setCurrentDropdownIndex] = useState(0);
-
-    const [isLastDropdown, setIsLastDropdown] = useState(false);
 
     useEffect(() => {
         setIsLastDropdown(currentDropdownIndex === dropdowns.length - 1);
     }, [currentDropdownIndex, dropdowns.length]);
-
-    const dispatch = useDispatch();
 
     useEffect(() => {
         if (dataPstWH) {
@@ -1329,7 +1330,17 @@ const DropdownAvatar = React.memo(() => {
                             </div>
                         </div>
                         <div className="">
-                            <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none">
+                            <button
+                                onClick={() => {
+                                    dispatch({
+                                        type: "statePopupAccountInformation",
+                                        payload: {
+                                            open: true
+                                        }
+                                    })
+                                }}
+                                className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none"
+                            >
                                 <Image
                                     alt=""
                                     src="/icon/header/avatar/user.png"

@@ -340,6 +340,7 @@ const ProductionPlan = (props) => {
         arrIdChecked,
         handleChekedAll,
         router: router.query?.tab,
+        page: router.query?.page,
     };
 
     return (

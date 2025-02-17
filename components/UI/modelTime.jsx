@@ -37,10 +37,10 @@ const PopupModelTime = (props) => {
                                 <div className="rounded-tl-xl rounded-bl-xl 3xl:max-w-[520px] 3xl:w-[520px] xxl:max-w-[530px] xxl:w-[500px] 2xl:max-w-[500px] 2xl:w-[500px] max-w-[500px] w-[500px]  h-full max-h-full z-10">
                                     <img
                                         srcSet="/modelTime.png"
-                                        className="w-full h-full object-cover rounded-tl-xl  rounded-bl-xl"
+                                        className="object-cover w-full h-full rounded-tl-xl rounded-bl-xl"
                                     />
                                 </div>
-                                <div className=" flex flex-col gap-6">
+                                <div className="flex flex-col gap-6 ">
                                     <div className="flex items-center gap-2 mb-2">
                                         <h1 className="text-gray-700 font-semibold text-[20px]">
                                             Khởi đầu chuyển đổi số ngay với phần mềm FMRP !
@@ -52,7 +52,7 @@ const PopupModelTime = (props) => {
                                         </div>
                                         <h1 className="col-span-9 pb-2  text-gray-700 font-semibold text-[14px] text-ju">
                                             Chào mừng
-                                            <span className="text-blue-500 uppercase mx-1">{data?.user_full_name}</span>
+                                            <span className="mx-1 text-blue-500 uppercase">{data?.user_full_name}</span>
                                             đến với FMRP! Hãy dành thời gian để khám phá các tính năng hữu ích mà FMRP
                                             mang lại nhé.
                                         </h1>
@@ -72,15 +72,15 @@ const PopupModelTime = (props) => {
                                         </div>
                                         <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
                                             Thời gian dùng thử: Bắt đầu từ ngày
-                                            <span className="text-blue-500 mx-1">
+                                            <span className="mx-1 text-blue-500">
                                                 {formatMoment(data?.start_date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                             </span>
                                             đến ngày
-                                            <span className="text-blue-500 mx-1">
+                                            <span className="mx-1 text-blue-500">
                                                 {formatMoment(data?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                             </span>
                                             và kết thúc sau
-                                            <span className="text-red-500 mx-1">{data?.day_expiration}</span>
+                                            <span className="mx-1 text-red-500">{data?.day_expiration}</span>
                                             ngày.
                                         </h2>
                                     </div>
@@ -91,13 +91,13 @@ const PopupModelTime = (props) => {
                                         <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju flex flex-col ">
                                             <span>
                                                 Mã công ty:
-                                                <span className="capitalize mx-1 text-blue-500">
+                                                <span className="mx-1 text-blue-500 capitalize">
                                                     {data?.code_company}
                                                 </span>
                                             </span>
                                             <span>
                                                 Tên truy cập:
-                                                <span className="capitalize mx-1 text-blue-500">
+                                                <span className="mx-1 text-blue-500 capitalize">
                                                     {data?.user_email}
                                                 </span>
                                             </span>
@@ -108,7 +108,7 @@ const PopupModelTime = (props) => {
                                         <button
                                             type="button"
                                             onClick={_ToggleModal.bind(this, false)}
-                                            className="px-7 py-3 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm"
+                                            className="py-3 text-sm font-medium text-blue-500 rounded-lg px-7 bg-blue-50 hover:bg-blue-100 hover:text-blue-600"
                                         >
                                             Bắt đầu trải nghiệm
                                         </button>

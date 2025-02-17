@@ -6,6 +6,7 @@ import Header from "./header";
 import { Customscrollbar } from '../UI/common/Customscrollbar';
 import { useSelector } from 'react-redux';
 import ChatBubbleAI from '../UI/chat/ChatAiBubble';
+import PopupAccountInformation from '../UI/popup/PopupAccountInformation';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -33,6 +34,7 @@ const Index = ({ children, ...props }) => {
                     <ChatBubbleAI {...props} />
                 )
             }
+            <PopupAccountInformation {...props} />
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
     );

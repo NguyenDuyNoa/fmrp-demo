@@ -66,7 +66,7 @@ const PopupAppTrial = () => {
                 </div>
                 <div className="col-span-1 w-full h-full bg-[url('/popup/background2.png')] bg-cover bg-white rounded-tr-xl rounded-br-xl 3xl:px-12 3xl:py-8 px-10 py-5 flex flex-col items-center justify-center gap-4">
                     <div className="flex flex-col justify-between gap-5 ">
-                        <div className=" flex flex-col 3xl:gap-6 gap-3">
+                        <div className="flex flex-col gap-3 3xl:gap-6">
                             <div className="flex items-center gap-2 mb-2">
                                 <div className="3xl:text-3xl text-2xl font-bold text-[#000000] text-center">
                                     Khởi đầu chuyển đổi số ngay với phần mềm FMRP !
@@ -80,7 +80,7 @@ const PopupAppTrial = () => {
                                 <div className="col-span-9 pb-2  text-gray-700 font-semibold text-[14px] text-ju">
                                     <span>Chào mừng</span>
 
-                                    <span className="text-blue-500 uppercase mx-1">
+                                    <span className="mx-1 text-blue-500 uppercase">
                                         {dataAuthentication?.user_full_name}
                                     </span>
 
@@ -107,19 +107,19 @@ const PopupAppTrial = () => {
                                 <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
                                     <span>Thời gian dùng thử: Bắt đầu từ ngày</span>
 
-                                    <span className="text-blue-500 mx-1">
+                                    <span className="mx-1 text-blue-500">
                                         {formatMoment(dataAuthentication?.start_date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                     </span>
 
                                     <span>đến ngày</span>
 
-                                    <span className="text-blue-500 mx-1">
+                                    <span className="mx-1 text-blue-500">
                                         {formatMoment(dataAuthentication?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                     </span>
 
                                     <span>và kết thúc sau</span>
 
-                                    <span className="text-red-500 mx-1">{dataAuthentication?.day_expiration}</span>
+                                    <span className="mx-1 text-red-500">{dataAuthentication?.day_expiration}</span>
 
                                     <span>ngày.</span>
                                 </h2>
@@ -132,13 +132,13 @@ const PopupAppTrial = () => {
                                 <h2 className=" py-1 text-gray-700 font-semibold text-[14px] flex flex-col ">
                                     <div className="flex items-center gap-1">
                                         <span>Mã công ty:</span>
-                                        <span className="capitalize text-blue-500">
+                                        <span className="text-blue-500 capitalize">
                                             {dataAuthentication?.code_company}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <span>Tên truy cập:</span>
-                                        <span className="capitalize text-blue-500">
+                                        <span className="text-blue-500 capitalize">
                                             {dataAuthentication?.user_email}
                                         </span>
                                     </div>

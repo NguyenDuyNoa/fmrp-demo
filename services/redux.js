@@ -39,6 +39,10 @@ const adminState = {
         //     quantityWord: {}
         // },
         // dataTableShowBom: [],
+    },
+    statePopupAccountInformation: {
+        open: false,
+
     }
 };
 
@@ -78,6 +82,8 @@ function adminReducer(state = adminState, action) {
             return { ...state, feature: action.payload };
         case "stateBoxChatAi":
             return { ...state, stateBoxChatAi: action.payload };
+        case "statePopupAccountInformation":
+            return { ...state, statePopupAccountInformation: action.payload };
         default:
             return state;
     }
