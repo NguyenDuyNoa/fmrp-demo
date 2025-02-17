@@ -32,6 +32,8 @@ const queryClient = new QueryClient({
 });
 
 const Index = (props) => {
+    console.log("!111", props);
+
     return (
         <React.Fragment>
             <QueryClientProvider client={queryClient}>
@@ -57,7 +59,6 @@ function MainPage({ Component, pageProps }) {
 
     const tokenFMRP = CookieCore.get('tokenFMRP')
 
-    const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
     const databaseappFMRP = CookieCore.get('databaseappFMRP')
 
@@ -85,13 +86,8 @@ function MainPage({ Component, pageProps }) {
     }
 
     return (
-        <Layout>
+        <Layout dataLang={data}>
             <Component dataLang={data} {...pageProps} />
-            {
-                stateBoxChatAi.isShowAi && (
-                    <ChatBubbleAI dataLang={data} />
-                )
-            }
         </Layout>
     );
 }

@@ -4,6 +4,8 @@ import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
 import Header from "./header";
 import { Customscrollbar } from '../UI/common/Customscrollbar';
+import { useSelector } from 'react-redux';
+import ChatBubbleAI from '../UI/chat/ChatAiBubble';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -13,7 +15,9 @@ const queryClient = new QueryClient({
     },
 })
 
-const Index = ({ children }) => {
+const Index = ({ children, ...props }) => {
+    const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
+
     return (
         <QueryClientProvider client={queryClient}>
             <div>
@@ -24,6 +28,11 @@ const Index = ({ children }) => {
             </div>
             <PopupAppTrial />
             <PopupAppRenewal />
+            {
+                stateBoxChatAi.isShowAi && (
+                    <ChatBubbleAI {...props} />
+                )
+            }
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
     );

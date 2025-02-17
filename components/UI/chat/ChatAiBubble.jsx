@@ -36,10 +36,6 @@ export default function ChatBubbleAI(props) {
 
     const dispatch = useDispatch();
 
-    const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
-
-    const chatRef = useRef(null);
-
     const textareaRef = useRef(null);
 
     const headerRef = useRef(null);
@@ -49,6 +45,8 @@ export default function ChatBubbleAI(props) {
     const boxMessageRef = useRef(null);
 
     const [isState, sIsState] = useState(initialState)
+
+    const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
     const queryKeyIsState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
@@ -257,8 +255,7 @@ export default function ChatBubbleAI(props) {
 
     return (
         <div
-            ref={chatRef}
-            className={`fixed z-[9999] ${stateBoxChatAi.openViewModal ? "cursor-default" : "cursor-grab "}`}
+            className={`fixed z-[99999] ${stateBoxChatAi.openViewModal ? "cursor-default" : "cursor-grab "}`}
             style={{ left: `${isState.position.x}px`, top: `${isState.position.y}px` }}
             onMouseDown={(e) => {
                 if (stateBoxChatAi.openViewModal) return
@@ -268,7 +265,7 @@ export default function ChatBubbleAI(props) {
                 });
             }}
         >
-            <div className="relative">
+            <div className="relative z-[99999]">
                 <Popup
                     trigger={
                         <button
