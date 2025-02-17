@@ -154,7 +154,7 @@ export const Dropdown = (props) => {
                                         ) : (
                                             <React.Fragment>
                                                 {ce.title && (
-                                                    <div className="flex items-center space-x-2 mb-2 px-3">
+                                                    <div className="flex items-center px-3 mb-2 space-x-2">
                                                         <Image
                                                             alt={ce.title}
                                                             src={ce?.img}
@@ -209,7 +209,7 @@ export const Dropdown = (props) => {
                                                             onClick={() =>
                                                                 showToat("warning", "Bạn không có quyền truy cập")
                                                             }
-                                                            className="outline-none cursor-not-allowed text-left text-gray-100 w-full opacity-60"
+                                                            className="w-full text-left text-gray-100 outline-none cursor-not-allowed opacity-60"
                                                         >
                                                             <Zoom>
                                                                 <li className="cursor-not-allowed text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
@@ -301,12 +301,12 @@ export const DropdownThongBao = (props) => {
                                 ) : (
                                     <>
                                         <TabContent
-                                            subItems={props.data?.tab.find((e) => e.id === tab)?.sub || []}
+                                            subItems={props.data?.tab?.find((e) => e?.id === tab)?.sub || []}
                                             checkStt={checkStt}
                                         />
-                                        {props.data?.tab.find((e) => e.id === tab)?.sub?.length > 0 && (
+                                        {props.data?.tab?.find((e) => e?.id === tab)?.sub?.length > 0 && (
                                             <Link href={`${props.data?.tab[tab]?.link}`}>
-                                                <Zoom className="text-center    items-center ">
+                                                <Zoom className="items-center text-center ">
                                                     <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
                                                         {props.data?.tab[tab]?.more}
                                                     </h5>
@@ -365,19 +365,19 @@ const TabContent = ({ subItems, checkStt }) => {
                                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                             />
                                             <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                    <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                 </span>
                                             </span>
                                         </div>
-                                        <div className="flex items-center w-full justify-between">
+                                        <div className="flex items-center justify-between w-full">
                                             <div className="w-[90%]">
                                                 <h5 className="3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
                                                     {ce?.title.slice(0, 82)}
                                                     {ce?.title.length > 82 && <span className="">...</span>}
                                                 </h5>
 
-                                                <h5 className="text-xs text-gray-600 italic">{ce.time}</h5>
+                                                <h5 className="text-xs italic text-gray-600">{ce.time}</h5>
                                             </div>
                                             <div className="">
                                                 {checkStt || checkStatus[index] ? (
@@ -387,7 +387,7 @@ const TabContent = ({ subItems, checkStt }) => {
                                                         <Cd
                                                             onClick={() => _HandleStatus(index)} // Truyền index vào hàm xử lý
                                                             size="16"
-                                                            className="hover:text-green-600 hover:scale-105 transition-all ease-linear "
+                                                            className="transition-all ease-linear hover:text-green-600 hover:scale-105 "
                                                         />
                                                     </Tooltip>
                                                 )}
