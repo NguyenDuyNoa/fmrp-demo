@@ -1,7 +1,7 @@
 import React from "react";
 import Popup from "reactjs-popup";
 
-import { Lexend_Deca } from "@next/font/google";
+import { Inter, Lexend_Deca } from "@next/font/google";
 import Image from "next/image";
 import Zoom from "../zoomElement/zoomElement";
 import { useSelector } from "react-redux";
@@ -11,6 +11,8 @@ const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
 });
+const inter = Inter({ subsets: ["latin"] });
+
 const PopupConfim = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
@@ -73,7 +75,7 @@ const PopupConfim = (props) => {
                 className={`3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 min-w-[400px] ${props.nameModel == "price_quote_status" && "min-w-[500px]"
                     }`}
             >
-                <div className={`${deca.className} bg-[#ffffff] p-4 shadow-xl rounded-xl flex flex-col gap-3`}>
+                <div className={`${inter.className} bg-[#ffffff] p-4 shadow-xl rounded-xl flex flex-col gap-3`}>
                     <div className="relative inline-block">
                         {props.type == "warning" ? (
                             <Image

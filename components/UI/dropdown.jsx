@@ -1,5 +1,5 @@
 import useToast from "@/hooks/useToast";
-import { Lexend_Deca } from "@next/font/google";
+import { Inter, Lexend_Deca } from "@next/font/google";
 import { Cd, SearchNormal1, TickCircle } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,6 +14,7 @@ const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
 });
+const inter = Inter({ subsets: ["latin"] });
 
 export const Dropdown = (props) => {
     const { is_admin } = useSelector((state) => state.auth);
@@ -36,7 +37,7 @@ export const Dropdown = (props) => {
                 position={props.position}
                 className={`popover-edit -translate-y-10 ` + props.className}
             >
-                <div className={`w-auto ${deca.className} `}>
+                <div className={`w-auto ${inter.className} `}>
                     <div className="bg-white 2xl:py-2 lg:py-0.5 px-0.5 rounded-lg justify-between flex divide-x divide-[#DDDDE2]">
                         {props.data?.map((e, i) => (
                             <div
@@ -272,7 +273,7 @@ export const DropdownThongBao = (props) => {
                 position={props.position}
                 className={`popover-edit -translate-y-10 ${props.className}`}
             >
-                <div className={`w-auto ${deca.className} bg-white mb-1  overflow-auto scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 3xl:max-h-[700px] xxl:max-h-[500px] 2xl:max-h-[500px] xl:max-h-[400px] lg:max-h-[370px] max-h-[500px]  px-0.5 rounded-lg justify-between  `}>
+                <div className={`w-auto ${inter.className} bg-white mb-1  overflow-auto scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 3xl:max-h-[700px] xxl:max-h-[500px] 2xl:max-h-[500px] xl:max-h-[400px] lg:max-h-[370px] max-h-[500px]  px-0.5 rounded-lg justify-between  `}>
                     <div className="flex items-center sticky top-0  bg-white  rounded z-[999]  p-0 pt-2">
                         {props?.data?.tab &&
                             props?.data?.tab.map((e, index, array) => {

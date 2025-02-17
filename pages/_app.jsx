@@ -32,7 +32,6 @@ const queryClient = new QueryClient({
 });
 
 const Index = (props) => {
-    console.log("!111", props);
 
     return (
         <React.Fragment>
