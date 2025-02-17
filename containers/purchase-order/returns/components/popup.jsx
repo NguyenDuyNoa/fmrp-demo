@@ -20,6 +20,7 @@ import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useReturnDetail } from "../hooks/useReturnDetail";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 registerLocale("vi", vi);
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
@@ -58,7 +59,7 @@ const PopupDetail = (props) => {
                                 <GeneralInformation  {...props} />
                                 <div className="grid grid-cols-9  min-h-[100px] px-2 items-center bg-zinc-50">
                                     <div className="col-span-3">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
@@ -66,36 +67,13 @@ const PopupDetail = (props) => {
                                                 {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
-                                        <div className="grid grid-cols-2 col-span-2 items-center">
+                                        <div className="grid items-center grid-cols-2 col-span-2">
                                             <h3 className=" text-[13px] font-medium">
                                                 {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
-                                            <div className="font-medium grid grid-cols-2">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="relative">
-                                                        <ImageErrors
-                                                            src={data?.staff_create?.profile_image}
-                                                            width={25}
-                                                            height={25}
-                                                            defaultSrc="/user-placeholder.jpg"
-                                                            alt="Image"
-                                                            className="object-cover rounded-[100%] text-left cursor-pointer"
-                                                        />
-                                                        <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                            <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                    <h6 className="capitalize">
-                                                        {
-                                                            data?.staff_create?.full_name
-                                                        }
-                                                    </h6>
-                                                </div>
-                                            </div>{" "}
+                                            <CustomAvatar fullName={data?.staff_create?.full_name} profileImage={data?.staff_create?.profile_image} />
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h3>
@@ -105,11 +83,11 @@ const PopupDetail = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.returns_form || "returns_form"}
                                             </h3>
-                                            <div className="flex flex-wrap  gap-2 items-center">
+                                            <div className="flex flex-wrap items-center gap-2">
                                                 {(data?.treatment_methods === "1" && (
                                                     <TagColorSky className={'!py-1'} name={props.dataLang?.pay_down || "pay_down"} />
                                                 )) ||
@@ -118,17 +96,17 @@ const PopupDetail = (props) => {
                                                     ))}
                                             </div>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_from_browse || "import_from_browse"}
                                             </h3>
-                                            <div className="flex flex-wrap  gap-2 items-center ">
+                                            <div className="flex flex-wrap items-center gap-2 ">
                                                 <TagWarehouse className="w-fit" data={data} />
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_supplier || "import_supplier"}
                                             </h3>
@@ -137,7 +115,7 @@ const PopupDetail = (props) => {
                                             </h3>
                                         </div>
 
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
@@ -196,7 +174,7 @@ const PopupDetail = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
                                                         <div
-                                                            className="grid grid-cols-14 hover:bg-slate-50 items-center border-b"
+                                                            className="grid items-center border-b grid-cols-14 hover:bg-slate-50"
                                                             key={e.id?.toString()}
                                                         >
                                                             <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
@@ -216,7 +194,7 @@ const PopupDetail = (props) => {
                                                                                 <ModalImage
                                                                                     small="/nodata.png"
                                                                                     large="/nodata.png"
-                                                                                    className="w-full h-full rounded object-contain p-1"
+                                                                                    className="object-contain w-full h-full p-1 rounded"
                                                                                 >
                                                                                     {" "}
                                                                                 </ModalImage>
@@ -234,7 +212,7 @@ const PopupDetail = (props) => {
                                                                                 e?.item?.product_variation
                                                                             }
                                                                         </h6>
-                                                                        <div className="flex items-center font-oblique flex-wrap">
+                                                                        <div className="flex flex-wrap items-center font-oblique">
                                                                             {dataProductSerial.is_enable === "1" ? (
                                                                                 <div className="flex gap-0.5">
                                                                                     <h6 className="text-[12px]">
@@ -327,7 +305,7 @@ const PopupDetail = (props) => {
                                 <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
-                                <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                     <div className="col-span-7">
                                         <h3 className="text-[13px] p-1">
                                             {props.dataLang?.returns_reason || "returns_reason"}
