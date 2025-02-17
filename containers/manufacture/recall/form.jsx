@@ -518,7 +518,7 @@ const RecallForm = (props) => {
                     )}
 
                     <div className="flex items-center justify-between">
-                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                             {id ? dataLang?.recall_title_edit || "recall_title_edit" : dataLang?.recall_title_add || "recall_title_add"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">

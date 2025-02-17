@@ -1224,7 +1224,7 @@ const SalesOrderForm = (props) => {
                 )}
                 <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
                     <div className="flex items-center justify-between ">
-                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                             {" "}
                             {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
                         </h2>

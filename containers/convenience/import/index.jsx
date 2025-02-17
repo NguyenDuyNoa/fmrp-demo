@@ -1254,7 +1254,7 @@ const Import = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                             {dataLang?.import_catalog || "import_catalog"}
                         </h2>
 

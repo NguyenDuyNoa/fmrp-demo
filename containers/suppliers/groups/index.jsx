@@ -130,7 +130,7 @@ const SuppliersGroups = (props) => {
                 <ContainerBody>
                     <div className="space-y-3 h-full overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
-                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.suppliers_groups_title}
                             </h2>
                             <div className="flex justify-end items-center gap-2">

@@ -27,8 +27,8 @@ const Header = () => {
             title: "Khách hàng",
             sub: [
                 {
-                    title: "Khách hàng",
-                    img: "/icon/header/danhmuc/kh.png",
+                    // title: "Khách hàng",
+                    // img: "/icon/header/danhmuc/kh.png",
                     items: [
                         {
                             viewOwn: auth?.customers?.is_view_own,
@@ -64,8 +64,8 @@ const Header = () => {
             title: "Nhà cung cấp",
             sub: [
                 {
-                    title: "Nhà cung cấp",
-                    img: "/icon/header/danhmuc/ncc.png",
+                    // title: "Nhà cung cấp",
+                    // img: "/icon/header/danhmuc/ncc.png",
                     items: [
                         {
                             viewOwn: auth?.suppliers?.is_view_own,
@@ -141,8 +141,8 @@ const Header = () => {
             title: "Nhân sự",
             sub: [
                 {
-                    title: "Phòng ban",
-                    img: "/icon/header/danhmuc/nv.png",
+                    // title: "Phòng ban",
+                    // img: "/icon/header/danhmuc/nv.png",
                     items: [
                         {
                             viewOwn: 1,
@@ -221,8 +221,8 @@ const Header = () => {
             title: "Mua hàng",
             sub: [
                 {
-                    title: "Mua hàng",
-                    img: "/icon/header/muanhap/mua.png",
+                    // title: "Mua hàng",
+                    // img: "/icon/header/muanhap/mua.png",
                     items: [
                         {
                             viewOwn: auth?.purchases?.is_view_own,
@@ -250,8 +250,8 @@ const Header = () => {
             title: "Nhập hàng & trả hàng",
             sub: [
                 {
-                    title: "Nhập hàng & trả hàng",
-                    img: "/icon/header/kho/Vector-9.png",
+                    // title: "Nhập hàng & trả hàng",
+                    // img: "/icon/header/kho/Vector-9.png",
                     items: [
                         {
                             viewOwn: auth?.import?.is_view_own,
@@ -289,43 +289,43 @@ const Header = () => {
                             name: "Vị trí kho",
                             link: "/warehouses/location",
                         },
+                        {
+                            viewOwn: auth?.transfer?.is_view_own,
+                            view: auth?.transfer?.is_view,
+                            name: "Chuyển kho",
+                            link: "/manufacture/warehouse-transfer",
+                        },
+                        {
+                            viewOwn: auth?.suggest_exporting?.is_view_own,
+                            view: auth?.suggest_exporting?.is_view,
+                            name: "Xuất kho sản xuất",
+                            link: "/manufacture/production-warehouse",
+                        },
+                        {
+                            viewOwn: auth?.purchase_products?.is_view_own,
+                            view: auth?.purchase_products?.is_view,
+                            name: "Nhập kho thành phẩm",
+                            link: "/manufacture/products-warehouse",
+                        },
+                        {
+                            viewOwn: auth?.purchase_internal?.is_view_own,
+                            view: auth?.purchase_internal?.is_view,
+                            name: "Thu hồi nguyên vật liệu",
+                            link: "/manufacture/recall",
+                        },
+                        {
+                            viewOwn: auth?.export_different?.is_view_own,
+                            view: auth?.export_different?.is_view,
+                            name: "Xuất kho khác",
+                            link: "/manufacture/export-to-other",
+                        },
+                        {
+                            viewOwn: auth?.inventory?.is_view_own,
+                            view: auth?.inventory?.is_view,
+                            name: "Kiểm kê kho",
+                            link: "/manufacture/inventory",
+                        },
                     ],
-                },
-                {
-                    viewOwn: auth?.transfer?.is_view_own,
-                    view: auth?.transfer?.is_view,
-                    title: "Chuyển kho",
-                    link: "/manufacture/warehouse-transfer",
-                },
-                {
-                    viewOwn: auth?.suggest_exporting?.is_view_own,
-                    view: auth?.suggest_exporting?.is_view,
-                    title: "Xuất kho sản xuất",
-                    link: "/manufacture/production-warehouse",
-                },
-                {
-                    viewOwn: auth?.purchase_products?.is_view_own,
-                    view: auth?.purchase_products?.is_view,
-                    title: "Nhập kho thành phẩm",
-                    link: "/manufacture/products-warehouse",
-                },
-                {
-                    viewOwn: auth?.purchase_internal?.is_view_own,
-                    view: auth?.purchase_internal?.is_view,
-                    title: "Thu hồi nguyên vật liệu",
-                    link: "/manufacture/recall",
-                },
-                {
-                    viewOwn: auth?.export_different?.is_view_own,
-                    view: auth?.export_different?.is_view,
-                    title: "Xuất kho khác",
-                    link: "/manufacture/export-to-other",
-                },
-                {
-                    viewOwn: auth?.inventory?.is_view_own,
-                    view: auth?.inventory?.is_view,
-                    title: "Kiểm kê kho",
-                    link: "/manufacture/inventory",
                 },
             ],
         },
@@ -333,89 +333,98 @@ const Header = () => {
             title: "Sản xuất",
             sub: [
                 {
-                    viewOwn: auth?.internal_plans?.is_view_own,
-                    view: auth?.internal_plans?.is_view,
-                    title: "Kế hoạch nội bộ",
-                    link: "/manufacture/internal-plan",
-                },
-                {
-                    viewOwn: auth?.production_plan?.is_view_own,
-                    view: auth?.production_plan?.is_view,
-                    title: "Kế hoạch sản xuất",
-                    link: "/manufacture/production-plan",
-                },
-                {
-                    viewOwn: auth?.production_plans_fmrp?.is_view_own,
-                    view: auth?.production_plans_fmrp?.is_view,
-                    title: "Kế hoạch NVL",
-                    link: "/manufacture/materials-planning",
-                },
-                // {
-                //     viewOwn: -1,
-                //     view: -1,
-                //     title: "Điều độ sản xuất",
-                //     link: "/manufacture/production-smoothing",
-                // },
-                // {
-                //     viewOwn: -1,
-                //     view: -1,
-                //     title: "Tổng quan sản xuất",
-                //     link: "/manufacture/production-overview",
-                // },
-                {
-                    viewOwn: -1,
-                    view: -1,
-                    title: "Lệnh sản xuất",
-                    link: "/manufacture/productions-orders",
-                },
-                // {
-                //     title: "Lịch sản xuất",
-                //     link: "/manufacture/production-schedule",
-                //     viewOwn: -1,
-                //     view: -1,
-                // },
-            ],
-        },
-        {
-            title: "Gia công ngoài",
-            sub: [
-                {
                     items: [
                         {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Xuất gia công",
+                            viewOwn: auth?.internal_plans?.is_view_own,
+                            view: auth?.internal_plans?.is_view,
+                            name: "Kế hoạch nội bộ",
+                            link: "/manufacture/internal-plan",
                         },
+                        {
+                            viewOwn: auth?.production_plan?.is_view_own,
+                            view: auth?.production_plan?.is_view,
+                            name: "Kế hoạch sản xuất",
+                            link: "/manufacture/production-plan",
+                        },
+                        {
+                            viewOwn: auth?.production_plans_fmrp?.is_view_own,
+                            view: auth?.production_plans_fmrp?.is_view,
+                            name: "Kế hoạch NVL",
+                            link: "/manufacture/materials-planning",
+                        },
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     title: "Điều độ sản xuất",
+                        //     link: "/manufacture/production-smoothing",
+                        // },
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     title: "Tổng quan sản xuất",
+                        //     link: "/manufacture/production-overview",
+                        // },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Nhập gia công",
+                            name: "Lệnh sản xuất",
+                            link: "/manufacture/productions-orders",
                         },
-                    ],
-                },
+                        // {
+                        //     title: "Lịch sản xuất",
+                        //     link: "/manufacture/production-schedule",
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        // },
+                    ]
+
+                }
             ],
         },
+        // {
+        //     title: "Gia công ngoài",
+        //     sub: [
+        //         {
+        //             items: [
+        //                 {
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     name: "Xuất gia công",
+        //                 },
+        //                 {
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     name: "Nhập gia công",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
         {
             title: "QC",
             sub: [
                 {
-                    title: "Kiểm tra chất lượng",
-                    viewOwn: -1,
-                    view: -1,
-                    link: "/manufacture/check-quality",
-                },
-                {
-                    title: "Danh mục lỗi",
-                    link: "/manufacture/category-errors",
-                    viewOwn: -1,
-                    view: -1,
-                },
-                {
-                    title: "Chi tiết lỗi",
-                    link: "/manufacture/category-detail-errors",
-                    viewOwn: -1,
-                    view: -1,
-                },
+                    items: [
+                        {
+                            name: "Kiểm tra chất lượng",
+                            viewOwn: -1,
+                            view: -1,
+                            link: "/manufacture/check-quality",
+                        },
+                        {
+                            name: "Danh mục lỗi",
+                            link: "/manufacture/category-errors",
+                            viewOwn: -1,
+                            view: -1,
+                        },
+                        {
+                            name: "Chi tiết lỗi",
+                            link: "/manufacture/category-detail-errors",
+                            viewOwn: -1,
+                            view: -1,
+                        },
+                    ]
+                }
             ],
         },
     ];
@@ -425,8 +434,8 @@ const Header = () => {
             title: "Tiện ích",
             sub: [
                 {
-                    title: "Tiện ích",
-                    img: "/icon/header/khac/ti.png",
+                    // title: "Tiện ích",
+                    // img: "/icon/header/khac/ti.png",
                     items: [
                         {
                             viewOwn: -1,
@@ -482,8 +491,8 @@ const Header = () => {
             title: "Công việc",
             sub: [
                 {
-                    title: "Công việc",
-                    img: "/icon/header/khac/cv.png",
+                    // title: "Công việc",
+                    // img: "/icon/header/khac/cv.png",
                     items: [
                         {
                             viewOwn: -1,
@@ -516,8 +525,8 @@ const Header = () => {
             title: "Báo cáo",
             sub: [
                 {
-                    title: "Báo cáo",
-                    img: "/icon/header/khac/bc.png",
+                    // title: "Báo cáo",
+                    // img: "/icon/header/khac/bc.png",
                     items: [
                         // {
                         //     viewOwn: -1,
@@ -888,8 +897,8 @@ const Header = () => {
             title: "Công nợ bán",
             sub: [
                 {
-                    title: "Công nợ bán",
-                    img: "/icon/header/banxuat/cnb.png",
+                    // title: "Công nợ bán",
+                    // img: "/icon/header/banxuat/cnb.png",
                     items: [
                         {
                             viewOwn: auth?.other_payslips_coupon?.is_view_own,
@@ -911,8 +920,8 @@ const Header = () => {
             title: "Công nợ mua",
             sub: [
                 {
-                    title: "Công nợ mua",
-                    img: "/icon/header/muanhap/cnm.png",
+                    // title: "Công nợ mua",
+                    // img: "/icon/header/muanhap/cnm.png",
                     items: [
                         {
                             viewOwn: auth?.other_payslips?.is_view_own,

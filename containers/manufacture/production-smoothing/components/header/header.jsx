@@ -11,7 +11,7 @@ const Header = ({ data, listStaff }) => {
                 <h6>{"Điều độ sản xuất"}</h6>
             </div>
             <div className="flex justify-between items-center">
-                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                     Điều độ sản xuất
                 </h2>
                 <div>

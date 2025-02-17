@@ -146,7 +146,7 @@ const CategoryErrors = (props) => {
                 <ContainerBody>
                     <div className="h-full space-y-3 overflow-hidden">
                         <div className="flex justify-between mt-1 mr-2">
-                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.error_category || "error_category"}
                             </h2>
                             <PopupCategoryErrors

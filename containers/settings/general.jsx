@@ -131,7 +131,7 @@ const General = (props) => {
                     </div>
                     <ContainerBody className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-5 h-[96%] overflow-hidden">
-                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 Thiết Lập Chung
                             </h2>
                             <Customscrollbar

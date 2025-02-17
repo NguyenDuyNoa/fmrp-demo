@@ -691,7 +691,7 @@ const ReturnSalesForm = (props) => {
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex justify-between items-center">
-                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                             {dataLang?.returnSales_titleLits || "returnSales_titleLits"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">

@@ -551,7 +551,7 @@ const Export = (props) => {
                     </div>
                 )}
                 <div className="flex flex-col gap-3 mx-auto">
-                    <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                    <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                         Export dữ liệu danh mục
                     </h2>
                     <div className="flex items-center col-span-6 gap-4 flex-nowrap ">

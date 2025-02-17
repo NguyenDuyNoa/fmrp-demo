@@ -1222,7 +1222,7 @@ const PopupDetailThere = (props) => {
                                                 <NoData />
                                             )}
                                         </div>
-                                        <h2 className="font-medium p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5] text-[13px]">
+                                        <h2 className="font-medium p-2  border-b border-b-[#E7EAEE]  border-t z-10 border-t-[#E7EAEE] text-[13px] border-opacity-70">
                                             {props.dataLang?.purchase_total || "purchase_total"}
                                         </h2>
                                         <div className=" mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">

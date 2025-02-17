@@ -491,7 +491,7 @@ const InventoryForm = (props) => {
                         <h6>Thêm phiếu kiểm kê kho</h6>
                     </div>
                 )}
-                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                     Thêm Phiếu Kiểm Kê Kho
                 </h2>
                 <div className="space-y-5">

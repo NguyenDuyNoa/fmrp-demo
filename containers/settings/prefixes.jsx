@@ -89,7 +89,7 @@ const Prefixes = (props) => {
                     </div>
                     <ContainerBody>
                         <div className="space-y-7 h-[96%] overflow-hidden">
-                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 Thiết Lập Tiếp Đầu Ngữ
                             </h2>
                             <Customscrollbar

@@ -11,7 +11,7 @@ const Header = ({ dataLang }) => {
                 <h6>{dataLang?.materials_planning || 'materials_planning'}</h6>
             </div>
             <div className="flex justify-between items-center">
-                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                     {dataLang?.materials_planning || 'materials_planning'}
                 </h2>
                 <div>

@@ -331,7 +331,7 @@ const ReturnSales = (props) => {
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between  mt-1 mr-2">
-                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.returnSales_titleLits || "returnSales_titleLits"}
                                 </h2>
                                 <ButtonAddNew

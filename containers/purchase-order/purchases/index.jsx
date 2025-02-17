@@ -293,8 +293,8 @@ const Purchases = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
-                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                        <div className="flex justify-between mt-1 mr-2">
+                            <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.purchase_title || "purchase_title"}
                             </h2>
                             <ButtonAddNew
@@ -326,7 +326,7 @@ const Purchases = (props) => {
                             })}
                         </ContainerFilterTab>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
@@ -387,7 +387,7 @@ const Purchases = (props) => {
                                                 isSearchable={true}
                                                 colSpan={1}
                                             />
-                                            <div className="ml-1 col-span-1 z-20">
+                                            <div className="z-20 col-span-1 ml-1">
                                                 <DateToDateComponent
                                                     value={isState.valueDate}
                                                     onChange={(e) => queryState({ valueDate: e })}
@@ -396,9 +396,9 @@ const Purchases = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
-                                            <div className="flex space-x-2 items-center justify-end">
+                                            <div className="flex items-center justify-end space-x-2">
                                                 {role == true || checkExport ? (
                                                     <div className={``}>
                                                         {data?.rResult?.length > 0 && (
@@ -416,7 +416,7 @@ const Purchases = (props) => {
                                                         className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                     >
                                                         <Grid6
-                                                            className="2xl:scale-100 xl:scale-100 scale-75"
+                                                            className="scale-75 2xl:scale-100 xl:scale-100"
                                                             size={18}
                                                         />
                                                         <span>{dataLang?.client_list_exportexcel}</span>
@@ -523,7 +523,7 @@ const Purchases = (props) => {
                                                         <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e?.note}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className=" w-fit mx-auto">
+                                                        <RowItemTable colSpan={1} className="mx-auto w-fit">
                                                             <TagBranch>{e?.branch_name}</TagBranch>
                                                         </RowItemTable>
                                                         <RowItemTable

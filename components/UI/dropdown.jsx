@@ -9,6 +9,7 @@ import { Tooltip } from "react-tippy";
 import Popup from "reactjs-popup";
 import Loading from "./loading/loading";
 import Zoom from "./zoomElement/zoomElement";
+import NoData from "./noData/nodata";
 const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
@@ -40,10 +41,10 @@ export const Dropdown = (props) => {
                         {props.data?.map((e, i) => (
                             <div
                                 key={i}
-                                className={`${e.title ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5" : "px-1"} 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
+                                className={`${e.title ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5" : "px-1"} space-y-1 min-w-[200px]`}
                             >
                                 {e.title && (
-                                    <h3 className="3xl:text-[22px] 2xl:text-[20px] xl:text-[18px] lg:text-[18px] font-medium px-3">
+                                    <h3 className="px-3 text-base font-medium">
                                         {e.title}
                                     </h3>
                                 )}
@@ -335,15 +336,10 @@ const TabContent = ({ subItems, checkStt }) => {
     return (
         <div className="tab-content">
             {subItems?.length === 0 ? (
-                <div className=" max-w-[352px] mt-14 mx-auto">
-                    <div className="text-center">
-                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                            <SearchNormal1 />
-                        </div>
-                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
-                        <div className="flex items-center justify-around mt-6 "></div>
-                    </div>
-                </div>
+                <NoData
+                    type="notificationheader"
+                    className='w-[350px]'
+                />
             ) : (
                 <div className={`3xl:px-2 3xl:py-1 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}>
                     {subItems?.map((ce, index) => (

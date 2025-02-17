@@ -8,7 +8,7 @@ export const RowItemTable = ({ children, className, colSpan, textColor, textAlig
                 backgroundColor: backgroundColor || '',
             }}
             className={`${className} 
-            ${textSize ? textSize : "3xl:text-base 2xl:text-[12.5px] xl:text-[12px]  text-[9px]  font-medium"} px-2`}>
+            ${textSize ? textSize : "3xl:text-base 2xl:text-[13px] xl:text-[13px]  text-[11px]  font-medium"} px-2`}>
             {children}
         </h6>
     )
