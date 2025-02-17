@@ -347,7 +347,7 @@ const PopupDetailThere = (props) => {
                                         <NoData />
                                     )}
                                 </div>
-                                <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
+                                <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
                                 <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
@@ -580,7 +580,7 @@ const PopupDetailThere = (props) => {
                                             <NoData />
                                         )}
                                     </div>
-                                    <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
+                                    <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                         {props.dataLang?.purchase_total || "purchase_total"}
                                     </h2>
                                     <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
@@ -877,7 +877,7 @@ const PopupDetailThere = (props) => {
                                             <NoData />
                                         )}
                                     </div>
-                                    <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
+                                    <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                         {props.dataLang?.purchase_total || "purchase_total"}
                                     </h2>
                                     <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
@@ -1410,7 +1410,7 @@ const PopupDetailThere = (props) => {
                                             <NoData />
                                         )}
                                     </div>
-                                    <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
+                                    <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                         {props.dataLang?.purchase_total || "purchase_total"}
                                     </h2>
                                     <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
@@ -1702,7 +1702,7 @@ const PopupDetailThere = (props) => {
                                     </>
                                 ) : <NoData />}
                             </div>
-                            <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
+                            <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                 {props.dataLang?.purchase_total || "purchase_total"}
                             </h2>
                             <div className="grid flex-col justify-between grid-cols-12 mt-2 text-right">
