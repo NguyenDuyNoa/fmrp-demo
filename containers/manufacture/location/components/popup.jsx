@@ -137,10 +137,10 @@ const PopupLocationWarehouse = (props) => {
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props.className}
             >
-                <div className="mt-4">
+                <div className="w-auto mt-4">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         <Customscrollbar className="h-[280px]">
-                            <div className="w-[30vw] ">
+                            <div className="">
                                 <div className="flex flex-wrap justify-between ">
                                     <div className="w-full">
                                         <div>
@@ -233,7 +233,7 @@ const PopupLocationWarehouse = (props) => {
                                 </div>
                             </div>
                         </Customscrollbar>
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <ButtonCancel dataLang={props.dataLang} onClick={_ToggleModal.bind(this, false)} />
                             <ButtonSubmit
                                 dataLang={props.dataLang}

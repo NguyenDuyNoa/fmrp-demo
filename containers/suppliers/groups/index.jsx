@@ -128,12 +128,12 @@ const SuppliersGroups = (props) => {
                     </div>
                 )}
                 <ContainerBody>
-                    <div className="space-y-3 h-full overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                    <div className="h-full space-y-3 overflow-hidden">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.suppliers_groups_title}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ? (
                                     <Popup_groupKh
                                         listBr={listBr}
@@ -156,7 +156,7 @@ const SuppliersGroups = (props) => {
                             </div>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -185,7 +185,7 @@ const SuppliersGroups = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -203,7 +203,7 @@ const SuppliersGroups = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -214,7 +214,7 @@ const SuppliersGroups = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar className="min:h-[200px] 3xl:h-[80%] xxl:h-[74%] 2xl:h-[76%] xl:h-[72%] lg:h-[82%] max:h-[400px] pb-2">
+                            <Customscrollbar className="min:h-[200px] h-[100%] max:h-[400px] pb-2">
                                 <div className="w-full">
                                     <HeaderTable gridCols={12}>
                                         <ColumnTable colSpan={6} textAlign={"left"}>
@@ -239,7 +239,7 @@ const SuppliersGroups = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={4}
-                                                            className="flex items-center  gap-1 flex-wrap"
+                                                            className="flex flex-wrap items-center gap-1"
                                                         >
                                                             {e.branch?.map((i) => (
                                                                 <TagBranch key={i}>{i.name}</TagBranch>
@@ -247,12 +247,12 @@ const SuppliersGroups = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={2}
-                                                            className="space-x-2 text-center flex items-center justify-center my-auto"
+                                                            className="flex items-center justify-center my-auto space-x-2 text-center"
                                                         >
                                                             {role == true || checkEdit ? (
                                                                 <Popup_groupKh
                                                                     onRefresh={refetch.bind(this)}
-                                                                    className="xl:text-base text-xs "
+                                                                    className="text-xs xl:text-base "
                                                                     isState={isState}
                                                                     sValueBr={e.branch}
                                                                     dataLang={dataLang}

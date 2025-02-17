@@ -171,13 +171,13 @@ const SuppliersContact = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.suppliers_contacts_title || "suppliers_contacts_title"}
                             </h2>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -225,7 +225,7 @@ const SuppliersContact = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -243,7 +243,7 @@ const SuppliersContact = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -254,7 +254,7 @@ const SuppliersContact = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar>
+                            <Customscrollbar className='h-[100%]'>
                                 <div className="w-full">
                                     <HeaderTable gridCols={10}>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
@@ -306,7 +306,7 @@ const SuppliersContact = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             textAlign={"left"}
-                                                            className="flex items-center  gap-1 flex-wrap"
+                                                            className="flex flex-wrap items-center gap-1"
                                                         >
                                                             {e.branch?.map((i) => (
                                                                 <TagBranch key={i}>{i.name}</TagBranch>

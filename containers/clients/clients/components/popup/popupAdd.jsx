@@ -380,7 +380,7 @@ const Popup_dskh = (props) => {
                         {props.dataLang?.client_popup_devivelyInfo || 'client_popup_devivelyInfo'}
                     </button>
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 w-[50vw] ">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         {tab === 0 && (
                             <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]">
@@ -398,7 +398,7 @@ const Popup_dskh = (props) => {
                         {tab === 1 && (
                             <div>
                                 <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]">
-                                    <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
+                                    <div className="flex flex-wrap justify-between p-2 space-x-1">
                                         {isState.option.map((e) => (
                                             <FormContactInfo
                                                 key={e.idFe?.toString()}
@@ -421,7 +421,7 @@ const Popup_dskh = (props) => {
                         {tab === 2 && (
                             <div>
                                 <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto">
-                                    <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
+                                    <div className="flex flex-wrap justify-between p-2 space-x-1 ">
                                         {isState.optionDelivery.map((e) => (
                                             <FormContactDelivery
                                                 key={e.idFe?.toString()}

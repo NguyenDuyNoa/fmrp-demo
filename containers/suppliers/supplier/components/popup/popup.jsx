@@ -286,7 +286,7 @@ const Popup_dsncc = (props) => {
             {props.dataLang?.client_popup_contact}
           </button>
         </div>
-        <div className="mt-4">
+        <div className="mt-4 w-[50vw]">
           <form onSubmit={_HandleSubmit.bind(this)} className="">
             {isState.tab === 0 && (
               <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -307,7 +307,7 @@ const Popup_dsncc = (props) => {
                 <Customscrollbar
                   className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                 >
-                  <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
+                  <div className="flex flex-wrap justify-between p-2 space-x-1 ">
                     {isState.option.map((e) => (
                       <div className="w-[48%]">
                         <FormContact
@@ -323,7 +323,7 @@ const Popup_dsncc = (props) => {
                 </Customscrollbar>
               </div>
             )}
-            <div className="text-right mt-5 space-x-2">
+            <div className="mt-5 space-x-2 text-right">
               <button
                 type="button"
                 onClick={() => queryState({ open: false })}

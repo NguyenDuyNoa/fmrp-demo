@@ -171,7 +171,7 @@ const PopupWarehouse = (props) => {
                 }
                 button={
                     props.id ? (
-                        <IconEdit size={21} className="hover:scale-110 transition-all ease-linear" />
+                        <IconEdit size={21} className="transition-all ease-linear hover:scale-110" />
                     ) : (
                         props.dataLang?.branch_popup_create_new || "branch_popup_create_new"
                     )
@@ -181,10 +181,10 @@ const PopupWarehouse = (props) => {
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props.className}
             >
-                <div className="mt-4">
+                <div className="w-[30vw]  mt-4">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         <Customscrollbar className="h-[420px]">
-                            <div className="w-[30vw] ">
+                            <div className="w-full">
                                 <div className="flex flex-wrap justify-between ">
                                     <div className="w-full">
                                         <div>
@@ -309,7 +309,7 @@ const PopupWarehouse = (props) => {
                             </div>
                         </Customscrollbar>
 
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={_ToggleModal.bind(this, false)}
