@@ -350,7 +350,6 @@ const BodyGantt = ({
             const visibleWidth = container2Ref.current.clientWidth;
 
             let newMonth = currentMonth;
-            console.log(Object.entries(monthRefs.current));
 
             Object.entries(monthRefs.current).forEach(([month, el]) => {
                 const monthStart = el.offsetLeft;
@@ -364,7 +363,6 @@ const BodyGantt = ({
             });
 
             if (newMonth !== currentMonth) {
-                console.log('Detected month change based on scroll position:', newMonth);
                 setCurrentMonth(newMonth);
             }
         };
@@ -494,7 +492,7 @@ const BodyGantt = ({
                         <div className={` flex  gap-4 divide-x border-l overflow-hidden relative`} ref={container2Ref}>
                             <div style={{
                                 top: container2Ref.current?.height
-                            }} className="fixed top-[33.28%] z-[9999] text-[#202236] font-semibold text-sm px-1 py-1 h-5 bg-white">
+                            }} className="fixed 3xl:top-[26.1%]  2xl:top-[33.28%] xxl:top-[31.4%] xl:top-[32.8%] z-[9999] text-[#202236] font-semibold text-sm px-1 py-1 h-5 bg-white">
                                 {currentMonth}
                             </div>
                             {
@@ -505,8 +503,7 @@ const BodyGantt = ({
                                         ref={(el) => (monthRefs.current[e.month] = el)}
                                         data-month={e.title}
                                     >
-                                        <div className="text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative">
-                                            {/* {e.title} */}
+                                        <div className={`text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative bg-white transition-opacity duration-200 ${currentMonth != e.title ? "opacity-100" : "opacity-0"}`}>
                                             {currentMonth != e.title ? e.title : ''}
                                         </div>
 
