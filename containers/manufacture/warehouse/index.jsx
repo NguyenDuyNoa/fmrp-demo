@@ -38,6 +38,7 @@ import PopupWarehouse from "./components/popup";
 import { useWarehouseDetail } from "./hooks/useWarehouseDetail";
 import { useWarehouseList } from "./hooks/useWarehouseList";
 import { useWarehouseLocation } from "./hooks/useWarehouseLocation";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const initialState = {
     idWarehouse: "",
@@ -450,7 +451,7 @@ const Warehouse = (props) => {
                             </div>
                         </div>
                         <div className="grid grid-cols-10">
-                            <ul className="col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <Customscrollbar className="col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto">
                                 {dataWarehouse?.rResult && dataWarehouse?.rResult?.map((item, index) => (
                                     <PopupParent
                                         trigger={
@@ -525,8 +526,8 @@ const Warehouse = (props) => {
                                         )}
                                     </PopupParent>
                                 ))}
-                            </ul>
-                            <div className="col-span-8 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            </Customscrollbar>
+                            <Customscrollbar className="col-span-8 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] overflow-auto pb-2">
                                 <div className={`2xl:w-[100%] pr-2`}>
                                     {/* header table */}
                                     <HeaderTable
@@ -793,7 +794,7 @@ const Warehouse = (props) => {
                                         <NoData />
                                     )}
                                 </div>
-                            </div>
+                            </Customscrollbar>
                         </div>
                     </div>
                     {dataWarehouse?.rResult?.length != 0 && (
