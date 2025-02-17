@@ -44,7 +44,7 @@ const Dashboard = (props) => {
                         }}
                     />
                 )}
-                <div className={`${statusExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
+                {/* <div className={`${statusExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
                     <h3 className="text-[#11315B] text-lg font-medium not-italic	leading-6">Lệnh sản xuất</h3>
                     <button
                         style={{
@@ -59,7 +59,7 @@ const Dashboard = (props) => {
                             {!dataPstWH ? "Hướng dẫn" : "Tắt hướng dẫn"}
                         </span>
                     </button>
-                </div>
+                </div> */}
                 <ListTask />
                 <div className="grid grid-cols-2 gap-5">
                     <PieChart />

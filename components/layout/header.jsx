@@ -1142,7 +1142,7 @@ const Header = () => {
                             className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition relative  "
                         >
                             <DropdownThongBao
-                                data={ListThongBao}
+                                data={[] || ListThongBao}
                                 className="popover-thongbao"
                                 position={"bottom right"}
                             >
@@ -1157,9 +1157,9 @@ const Header = () => {
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
-                                <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
+                                {/* <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
                                     2
-                                </div>
+                                </div> */}
                             </DropdownThongBao>
                         </Link>
                         <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"}>
@@ -1362,7 +1362,7 @@ const DropdownAvatar = React.memo(() => {
                                 />
                                 <span>Góp ý</span>
                             </button>
-                            <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2">
+                            {/* <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2">
                                 <Image
                                     alt=""
                                     src="/icon/header/avatar/usermore.png"
@@ -1407,7 +1407,7 @@ const DropdownAvatar = React.memo(() => {
                                         <IconDown size={15} />
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                             <button
                                 onClick={_HandleLogout.bind(this)}
                                 className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2"
