@@ -166,7 +166,7 @@ const Information = (props) => {
                                             ) : (
                                                 <React.Fragment>
                                                     {data?.company_logo && (
-                                                        <div className="relative h-full w-full">
+                                                        <div className="relative w-full h-full">
                                                             <Image
                                                                 alt="logo"
                                                                 width={120}
@@ -195,7 +195,7 @@ const Information = (props) => {
                                                                         variant="Bold"
                                                                         className="text-white"
                                                                     />
-                                                                    <span className="text-white text-xs">
+                                                                    <span className="text-xs text-white">
                                                                         Upload logo
                                                                     </span>
                                                                 </div>
@@ -209,7 +209,7 @@ const Information = (props) => {
                                                                 variant="Bold"
                                                                 className="text-white"
                                                             />
-                                                            <span className="text-white text-xs">Upload logo</span>
+                                                            <span className="text-xs text-white">Upload logo</span>
                                                         </React.Fragment>
                                                     )}
                                                 </React.Fragment>
@@ -222,7 +222,7 @@ const Information = (props) => {
                                     hệ thống
                                 </p>
                             </div>
-                            <div className="col-span-2 h-full flex flex-col justify-between">
+                            <div className="flex flex-col justify-between h-full col-span-2">
                                 <h3 className="text-[#344054]">Hồ sơ HĐĐT của đơn vị đã hoàn thiện 10%</h3>
                                 <div className="w-full h-2.5 bg-white rounded-full relative">
                                     <div
@@ -244,7 +244,7 @@ const Information = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="space-y-3 pt-3">
+                        <div className="pt-3 space-y-3">
                             <h1 className="text-[15px] uppercase w-full p-3 rounded bg-[#ECF0F4] flex items-center space-x-3">
                                 <span>Thông tin đơn vị</span>
                                 <img src="/icon/Verified.png" className="w-[25px] h-[25px]" />
@@ -320,7 +320,7 @@ const Information = (props) => {
                                 </div>
                             )}
                         </div>
-                        <div className="space-y-3 pt-3">
+                        <div className="pt-3 space-y-3">
                             <h1 className="text-[15px] uppercase w-full p-3 rounded bg-[#ECF0F4] flex items-center space-x-3">
                                 Thông tin người đại diện pháp luật
                             </h1>
@@ -376,7 +376,7 @@ const Information = (props) => {
                                 </div>
                             )}
                         </div>
-                        <div className="flex space-x-5 pt-5">
+                        <div className="flex pt-5 space-x-5">
                             <button
                                 onClick={_HandleSubmit.bind(this)}
                                 className="px-8 py-2.5 rounded transition hover:scale-105 bg-[#0F4F9E] text-white"
@@ -402,9 +402,9 @@ const ListBtn_Setting = React.memo((props) => {
                 <Btn_Setting url="/settings" isActive="/settings/information">
                     {props.dataLang?.list_btn_seting_information}
                 </Btn_Setting>
-                <Btn_Setting url="/settings/service-information" isActive="/settings/service-information">
+                {/* <Btn_Setting url="/settings/service-information" isActive="/settings/service-information">
                     {props.dataLang?.list_btn_seting_services}
-                </Btn_Setting>
+                </Btn_Setting> */}
                 <Btn_Setting url="/settings/branch" isActive="/settings/branch">
                     {props.dataLang?.list_btn_seting_setup}
                 </Btn_Setting>
