@@ -155,7 +155,7 @@ const BodyGantt = ({
 
     const [isFirstRender, setIsFirstRender] = useState(true);
 
-    // Chạy khi component mount lần đầu để thiết lập vị trí scroll ngay lập tức
+    // // Chạy khi component mount lần đầu để thiết lập vị trí scroll ngay lập tức
     // useEffect(() => {
     //     if (checkRankRef.current && container1Ref.current) {
     //         const target = checkRankRef.current;
@@ -300,6 +300,11 @@ const BodyGantt = ({
 
     const hasScrolled = useRef(false);
 
+    const currentMonthRef = useRef(null);
+
+    const [currentMonthTop, setCurrentMonthTop] = useState(0);
+
+
     useEffect(() => {
         if (!hasScrolled.current && container1Ref.current && timeLine?.length > 0 && data?.length > 0) {
             // Đánh dấu là đã chạy
@@ -324,6 +329,11 @@ const BodyGantt = ({
                     const itemYear = parseInt(item.title.split(' ')[2], 10);
                     return itemMonth === currentMonth && itemYear === currentYear - 1;
                 });
+            }
+
+            // Nếu vẫn không tìm thấy, chọn tháng cuối cùng trong danh sách
+            if (!targetMonthData && timeLine.length > 0) {
+                targetMonthData = timeLine[timeLine.length - 1]; // Lấy tháng cuối cùng
             }
 
             // Nếu tìm thấy dữ liệu, cuộn tới tháng tương ứng
@@ -373,6 +383,12 @@ const BodyGantt = ({
     }, [currentMonth, data, timeLine]);
 
 
+    useEffect(() => {
+        if (currentMonthRef.current) {
+            const rect = currentMonthRef.current.getBoundingClientRect();
+            setCurrentMonthTop(rect.top); // Lưu vị trí top của tháng hiện tại
+        }
+    }, [currentMonth, data, timeLine]); // Chạy lại mỗi khi tháng hiện tại thay đổi
 
     return (
         <React.Fragment>
@@ -490,11 +506,23 @@ const BodyGantt = ({
                             </div>
                         </div>
                         <div className={` flex  gap-4 divide-x border-l overflow-hidden relative`} ref={container2Ref}>
-                            <div style={{
-                                top: container2Ref.current?.height
-                            }} className="fixed 3xl:top-[26.1%]  2xl:top-[33.28%] xxl:top-[31.4%] xl:top-[32.8%] z-[9999] text-[#202236] font-semibold text-sm px-1 py-1 h-5 bg-white">
+                            {/* <div
+                                // style={{
+                                //     top: container2Ref.current?.height
+                                // }}
+                                className="fixed 3xl:top-[26.1%] 2xl:top-[33.28%] xxl:top-[31.4%] xl:top-[32.8%] z-[9999] text-[#202236] font-semibold text-sm px-1 py-1 h-5 bg-white"
+                            >
+                                {currentMonth}
+                            </div> */}
+                            <div
+                                style={{
+                                    top: `${currentMonthTop - 20}px`, // Gán vị trí đã lưu
+                                }}
+                                className="fixed z-[9999] text-[#202236] font-semibold text-sm px-1 py-1 h-5 bg-white"
+                            >
                                 {currentMonth}
                             </div>
+
                             {
                                 timeLine.map((e, index) => (
                                     <div
@@ -503,7 +531,9 @@ const BodyGantt = ({
                                         ref={(el) => (monthRefs.current[e.month] = el)}
                                         data-month={e.title}
                                     >
-                                        <div className={`text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative bg-white transition-opacity duration-200 ${currentMonth != e.title ? "opacity-100" : "opacity-0"}`}>
+                                        <div className={`text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative bg-white transition-opacity duration-200 
+                                            ${currentMonth != e.title ? "opacity-100" : "opacity-0"}`}
+                                        >
                                             {currentMonth != e.title ? e.title : ''}
                                         </div>
 
@@ -516,7 +546,12 @@ const BodyGantt = ({
                                                         <div
                                                             key={i.id}
                                                             className="flex items-center justify-center gap-2 w-[70.5px]"
-                                                            ref={(el) => (dayRefs.current[e.days] = el)}
+                                                            ref={(el) => {
+                                                                dayRefs.current[e.days] = el
+                                                                if (currentMonth === e.title) {
+                                                                    currentMonthRef.current = el; // Gán ref cho tháng hiện tại
+                                                                }
+                                                            }}
                                                         >
                                                             {/* <h1 className="text-[#667085] font-light 3xl:text-base text-sm  3xl:px-1.5 px-3">
                                                                 {date[0]}
@@ -700,79 +735,85 @@ const BodyGantt = ({
                                 onScroll={handleScroll}
                                 id="container1"
                                 className="container1 flex-col w-full overflow-x-auto  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
-                             3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                                3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                             >
-                                {data?.map((e, eIndex) => {
-                                    return (
-                                        <div key={e.id} className={``}>
-                                            <div className={`${!e.show ? "my-1" : "mt-1"}`}>
-                                                <div className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[37px]`}>
+                                {
+                                    data?.some(e => e?.show && e?.listProducts?.some(i => i?.processArr.some(ci => ci?.active && !ci?.outDate)))
+                                        ?
+                                        data?.map((e, eIndex) => {
+                                            return (
+                                                <div key={e?.id} className={``}>
+                                                    <div className={`${!e.show ? "my-1" : "mt-1"}`}>
+                                                        <div className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[37px]`}>
 
-                                                </div>
+                                                        </div>
 
-                                                {e.show &&
-                                                    e.listProducts.map((i, iIndex) => {
-                                                        return (
-                                                            <div
-                                                                key={i.id}
-                                                                style={{ height: heights[eIndex + iIndex] }}
-                                                                className={`flex items-center  w-[65%] my-2`}
-                                                                id={`div-${i.id}`}
+                                                        {e.show &&
+                                                            e.listProducts.map((i, iIndex) => {
+                                                                return (
+                                                                    <div
+                                                                        key={i.id}
+                                                                        style={{ height: heights[eIndex + iIndex] }}
+                                                                        className={`flex items-center  w-[65%] my-2`}
+                                                                        id={`div-${i.id}`}
 
-                                                            >
-                                                                {i.processArr.map((ci, ciIndex) => {
-                                                                    const isActive = ci?.id == latestActiveProcess?.id;
-                                                                    return (
-                                                                        <div
-                                                                            ref={isActive ? checkRankRef : null}
-                                                                            key={ci?.id} className={`w-[80px]`}
-                                                                        >
-
-                                                                            {ci.active && !ci.outDate
-                                                                                ?
-                                                                                <Popup
-                                                                                    className="popover-productionPlan"
-                                                                                    arrow={true}
-                                                                                    arrowStyle={{
-                                                                                        color:
-                                                                                            (!ci.active && !ci.outDate && "#fecaca") ||
-                                                                                            (ci.active && !ci.outDate && "#bae6fd"),
-                                                                                        transform: "translateY(130%)",
-                                                                                    }}
-                                                                                    trigger={
-                                                                                        <div
-                                                                                            className={`${ci.active && !ci.outDate ? "bg-[#5599EC] hover:bg-sky-200" : ""
-                                                                                                }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out`}
-                                                                                        >
-
-                                                                                        </div>
-                                                                                    }
-                                                                                    position="top center"
-                                                                                    on={["hover", "focus"]}
-
+                                                                    >
+                                                                        {i.processArr.map((ci, ciIndex) => {
+                                                                            const isActive = ci?.id == latestActiveProcess?.id;
+                                                                            return (
+                                                                                <div
+                                                                                    ref={isActive ? checkRankRef : null}
+                                                                                    key={ci?.id} className={`w-[80px]`}
                                                                                 >
-                                                                                    <div
-                                                                                        className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200") ||
-                                                                                            (ci.active && !ci.outDate && "bg-sky-200")
-                                                                                            } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
-                                                                                    >
-                                                                                        {ci.date}
-                                                                                    </div>
-                                                                                </Popup>
-                                                                                :
-                                                                                <div className="w-[80px] h-[20px]"></div>
-                                                                            }
-                                                                        </div>
-                                                                    );
-                                                                })}
 
-                                                            </div>
-                                                        );
-                                                    })}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                                                                    {ci.active && !ci.outDate
+                                                                                        ?
+                                                                                        <Popup
+                                                                                            className="popover-productionPlan"
+                                                                                            arrow={true}
+                                                                                            arrowStyle={{
+                                                                                                color:
+                                                                                                    (!ci.active && !ci.outDate && "#fecaca") ||
+                                                                                                    (ci.active && !ci.outDate && "#bae6fd"),
+                                                                                                transform: "translateY(130%)",
+                                                                                            }}
+                                                                                            trigger={
+                                                                                                <div
+                                                                                                    className={`${ci.active && !ci.outDate ? "bg-[#5599EC] hover:bg-sky-200" : ""
+                                                                                                        }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out`}
+                                                                                                >
+
+                                                                                                </div>
+                                                                                            }
+                                                                                            position="top center"
+                                                                                            on={["hover", "focus"]}
+
+                                                                                        >
+                                                                                            <div
+                                                                                                className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200") ||
+                                                                                                    (ci.active && !ci.outDate && "bg-sky-200")
+                                                                                                    } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
+                                                                                            >
+                                                                                                {ci.date}
+                                                                                            </div>
+                                                                                        </Popup>
+                                                                                        :
+                                                                                        <div className="w-[80px] h-[20px]"></div>
+                                                                                    }
+                                                                                </div>
+                                                                            );
+                                                                        })}
+
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                        :
+                                        <NoData />
+                                }
                             </div>
                         </div>
                     )}

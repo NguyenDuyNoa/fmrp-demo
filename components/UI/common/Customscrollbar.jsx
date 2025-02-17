@@ -14,6 +14,8 @@ const SimpleBarCustom = forwardRef(({ children, ...props }, ref) => {
     return (
         <SimpleBar
             {...props}
+            id={props.id}
+            onScroll={(e) => props.onScroll(e)}
             scrollableNodeProps={{
                 ref: innerRef,
                 className: props?.scrollableNodePropsClassName
@@ -34,6 +36,8 @@ export const Customscrollbar = forwardRef((props, ref) => {
         <SimpleBarCustom
             {...props}
             ref={ref}
+            id={props.id}
+            // onScroll={props.onScroll}
             style={props.style ? props.style : {}}
             className={`${props.className ? props.className : "min:h-[200px] 3xl:h-[83%] xxl:h-[77%] 2xl:h-[79%] xl:h-[78%] lg:h-[84%] max:h-[400px] pb-2"}
             overflow-y-auto overflow-x-auto`}
