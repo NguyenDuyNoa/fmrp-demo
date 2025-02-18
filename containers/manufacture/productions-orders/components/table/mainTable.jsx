@@ -445,7 +445,7 @@ const MainTable = ({ dataLang }) => {
                                 ?
                                 <Loading />
                                 :
-                                !isState.listDataLeft?.length > 0 ?
+                                isState.listDataLeft?.length > 0 ?
                                     isState.listDataLeft.map((e, eIndex) => {
                                         const color = {
                                             "0": {
@@ -454,8 +454,8 @@ const MainTable = ({ dataLang }) => {
                                                 title: dataLang?.productions_orders_produced || "productions_orders_produced"
                                             },
                                             "1": {
-                                                class: 'text-red-500 bg-red-50',
-                                                circle: "bg-red-500",
+                                                class: 'text-blue-500 bg-blue-100',
+                                                circle: "bg-blue-500",
                                                 title: 'Đang sản xuất'
                                             },
                                             "2": {

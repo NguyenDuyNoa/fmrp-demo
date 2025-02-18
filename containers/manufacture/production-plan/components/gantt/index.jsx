@@ -718,32 +718,40 @@ const BodyGantt = ({
                                                                                                 </div>
                                                                                             </Tooltip> */}
                                                                                             <div
-                                                                                                onClick={() => handleShowModel(ci)}
+                                                                                                onClick={() => {
+                                                                                                    if (ci?.reference_no_detail) {
+                                                                                                        handleShowModel(ci)
+                                                                                                    }
+                                                                                                }}
                                                                                                 className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200 ") ||
                                                                                                     (ci.active && !ci.outDate && "bg-[#5599EC] ")
-                                                                                                    } ${ci?.lastIndex ? "relative" : ""} px-2.5 py-0.5 font-medium text-sm capitalize cursor-pointer`}
+                                                                                                    } ${ci?.lastIndex ? "relative" : ""} px-2.5 py-0.5 font-medium text-sm capitalize ${ci?.reference_no_detail ? "cursor-pointer" : 'cursor-default'} `}
                                                                                             >
                                                                                                 <span className="opacity-0">{ci.date}</span>
-                                                                                                <div className={`${ci?.lastIndex ? "absolute -top-7 text-[11px] whitespace-nowrap py-0.5 px-2 rounded-sm" : "hidden"} ${(!ci.active && !ci.outDate && "bg-red-200") ||
-                                                                                                    (ci.active && !ci.outDate && "bg-sky-200")
-                                                                                                    }`}
-                                                                                                    style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
-                                                                                                >
-                                                                                                    {ci?.reference_no_detail}
-                                                                                                    <div
-                                                                                                        className={``}
-                                                                                                        style={{
-                                                                                                            content: "''",
-                                                                                                            position: "absolute",
-                                                                                                            bottom: "-9px",
-                                                                                                            left: "50%",
-                                                                                                            transform: "translateX(-50%)",
-                                                                                                            borderWidth: "6px",
-                                                                                                            borderStyle: "solid",
-                                                                                                            borderColor: `${ci.active ? "#bae6fd" : "#fecaca"} transparent transparent transparent`,
-                                                                                                        }}
-                                                                                                    />
-                                                                                                </div>
+                                                                                                {
+                                                                                                    ci?.reference_no_detail &&
+                                                                                                    <div className={`${ci?.lastIndex ? "absolute -top-7 text-[11px] whitespace-nowrap py-0.5 px-2 rounded-sm" : "hidden"} ${(!ci.active && !ci.outDate && "bg-red-200") ||
+                                                                                                        (ci.active && !ci.outDate && "bg-sky-200")
+                                                                                                        }`}
+                                                                                                        style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
+                                                                                                    >
+                                                                                                        {ci?.reference_no_detail}
+                                                                                                        <div
+                                                                                                            className={``}
+                                                                                                            style={{
+                                                                                                                content: "''",
+                                                                                                                position: "absolute",
+                                                                                                                bottom: "-9px",
+                                                                                                                left: "50%",
+                                                                                                                transform: "translateX(-50%)",
+                                                                                                                borderWidth: "6px",
+                                                                                                                borderStyle: "solid",
+                                                                                                                borderColor: `${ci.active ? "#bae6fd" : "#fecaca"} transparent transparent transparent`,
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                }
+
                                                                                             </div>
                                                                                             {/* <Popup
                                                                                                 className="popover-productionPlan"
