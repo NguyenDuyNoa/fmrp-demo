@@ -149,7 +149,7 @@ const ProductionPlan = (props) => {
                                         active: j?.active,
                                         outDate: j?.outDate,
                                         poi_id: s?.poi_id,
-                                        reference_no_detail: s?.reference_no_detail
+                                        // reference_no_detail: s?.reference_no_detail
                                     };
                                 }),
                                 unitName: s?.unit_name,
@@ -196,40 +196,40 @@ const ProductionPlan = (props) => {
         }
     }, 500);
 
-    // const sortArrayByDay = (arr, timeLine) => {
-    //     return timeLine.flatMap((month) => {
-    //         return month.days.map((timelineDay) => {
-    //             const matchingDay = arr.find((day) => day.date === timelineDay.date);
-    //             return matchingDay ? matchingDay : { ...timelineDay, active: false, outDate: false };
-    //         });
-    //     });
-    // };
     const sortArrayByDay = (arr, timeLine) => {
-        let result = [];
-
-        timeLine.forEach((month) => {
-            let monthData = month.days.map((timelineDay) => {
+        return timeLine.flatMap((month) => {
+            return month.days.map((timelineDay) => {
                 const matchingDay = arr.find((day) => day.date === timelineDay.date);
-                return matchingDay ? { ...matchingDay } : { ...timelineDay, active: false, outDate: false };
+                return matchingDay ? matchingDay : { ...timelineDay, active: false, outDate: false };
             });
-
-            // Xác định phần tử cuối cùng trong nhóm `matchingDay`
-            let lastMatchIndex = -1;
-            for (let i = 0; i < monthData.length; i++) {
-                if (monthData[i].active) {
-                    lastMatchIndex = i;
-                }
-            }
-
-            if (lastMatchIndex !== -1) {
-                monthData[lastMatchIndex] = { ...monthData[lastMatchIndex], lastIndex: true };
-            }
-
-            result.push(...monthData);
         });
-
-        return result;
     };
+    // const sortArrayByDay = (arr, timeLine) => {
+    //     let result = [];
+
+    //     timeLine.forEach((month) => {
+    //         let monthData = month.days.map((timelineDay) => {
+    //             const matchingDay = arr.find((day) => day.date === timelineDay.date);
+    //             return matchingDay ? { ...matchingDay } : { ...timelineDay, active: false, outDate: false };
+    //         });
+
+    //         // Xác định phần tử cuối cùng trong nhóm `matchingDay`
+    //         let lastMatchIndex = -1;
+    //         for (let i = 0; i < monthData.length; i++) {
+    //             if (monthData[i].active) {
+    //                 lastMatchIndex = i;
+    //             }
+    //         }
+
+    //         if (lastMatchIndex !== -1) {
+    //             monthData[lastMatchIndex] = { ...monthData[lastMatchIndex], lastIndex: true };
+    //         }
+
+    //         result.push(...monthData);
+    //     });
+
+    //     return result;
+    // };
 
 
     const updateListProducts = (order, timeLine) => {
