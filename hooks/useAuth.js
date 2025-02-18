@@ -1,7 +1,7 @@
 import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { CookieCore } from "@/utils/lib/cookie";
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query"
 import { useDispatch } from "react-redux";
 
 export const useAuththentication = (auth) => {
@@ -17,6 +17,36 @@ export const useAuththentication = (auth) => {
         enabled: auth == null,
         ...optionsQuery
     })
+}
+
+// thông tin tài khoản
+export const useGetInfo = ({ open }) => {
+    return useQuery({
+        queryKey: ["api_get_info", open],
+        queryFn: async () => {
+            const res = await apiDashboard.apiGetInfo();
+            return res
+        },
+        placeholderData: keepPreviousData,
+        enabled: open,
+        ...optionsQuery
+    })
+}
+
+// đổi ảnh tài khoản
+export const useUpdateAvatar = () => {
+    const submitMutation = useMutation({
+        mutationFn: (data) => {
+            return apiDashboard.apiUpdateAvatarInfo(data)
+        }
+    })
+    const onSubmit = async (image) => {
+        let formtData = new FormData();
+        formtData.append('profile_image', image)
+        const r = await submitMutation.mutateAsync(formtData)
+        return r
+    }
+    return { onSubmit, isLoaidng: submitMutation.isPending }
 }
 
 export const useLanguage = (lang) => {

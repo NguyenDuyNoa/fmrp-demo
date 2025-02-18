@@ -28,7 +28,7 @@ const Header = (props) => {
                 <span className="text-[#141522]/40">/</span>
                 <h6>{"Kế hoạch sản xuất"}</h6>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
                 <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                     Kế hoạch sản xuất
                 </h2>
@@ -61,7 +61,7 @@ const Header = (props) => {
                                     height={16}
                                     className="object-cover"
                                 />
-                                <h3 className="text-white font-medium transition-all duration-200 ease-linear text-sm">
+                                <h3 className="text-sm font-medium text-white transition-all duration-200 ease-linear">
                                     Lập kế hoạch NVL
                                 </h3>
                             </button>

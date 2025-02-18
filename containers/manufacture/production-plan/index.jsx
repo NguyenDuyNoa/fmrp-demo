@@ -185,6 +185,7 @@ const ProductionPlan = (props) => {
         queryKey: ['api_production_internal_plan', { ...params }, router.query.tab],
         queryFn: _ServerFetching,
         placeholderData: keepPreviousData,
+        enabled: router.query.tab == 'order' || router.query.tab == 'plan',
         ...optionsQuery
     })
 

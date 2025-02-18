@@ -1243,7 +1243,7 @@ const DropdownAvatar = React.memo(() => {
             <Popup
                 trigger={
                     <button className={`hover:drop-shadow-[0_0_5px_#eabd7a99]`}>
-                        <div className="flex items-center self-center space-x-1">
+                        <div className="flex items-center self-center space-x-1 ">
                             {auth?.user_avatar !== null ? (
                                 <Image
                                     alt=""
@@ -1292,7 +1292,7 @@ const DropdownAvatar = React.memo(() => {
                 <div className="w-[300px]">
                     <div className="justify-between bg-white rounded">
                         <div className="flex space-x-3 px-3 py-3.5 border-b border-[#F2F4F7]">
-                            <div className="h-fit min-w-[40px] relative">
+                            <div className="h-fit min-w-[40px] relative border border-gray-300 rounded-full">
                                 {auth?.user_avatar !== null ? (
                                     <Image
                                         alt=""

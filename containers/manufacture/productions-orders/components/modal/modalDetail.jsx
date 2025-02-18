@@ -150,10 +150,18 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
     };
 
     const handleActiveTab = (e) => {
-        router.push({
-            pathname: router.route,
-            query: { tab: e },
-        });
+        if (router.query.tab) {
+            router.push({
+                pathname: router.route,
+                query: { tabModal: e, tab: router.query.tab },
+            });
+        } else {
+            router.push({
+                pathname: router.route,
+                query: { tabModal: e },
+            });
+        }
+
         queryStateModal({ isTab: e });
     };
 

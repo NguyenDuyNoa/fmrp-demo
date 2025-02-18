@@ -20,6 +20,15 @@ const apiDashboard = {
         const response = await axiosCustom('POST', `/api_web/Api_Login/logout?csrf_protection=true`);
         return response.data
     },
-
+    // thông tin user
+    async apiGetInfo() {
+        const response = await axiosCustom('GET', `/api_web/api_staff/info`,);
+        return response.data
+    },
+    // đổi avatar
+    async apiUpdateAvatarInfo(data) {
+        const response = await axiosCustom('POST', `/api_web/api_staff/uploadProfileImage`, data);
+        return response.data
+    },
 }
 export default apiDashboard

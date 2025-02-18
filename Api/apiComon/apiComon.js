@@ -160,5 +160,6 @@ const apiComons = {
         return response.data
     },
 
+
 }
 export default apiComons

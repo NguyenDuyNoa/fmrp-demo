@@ -60,7 +60,8 @@ const BodyGantt = ({
 
     const handleShowModel = (item) => {
         queryState({
-            openModal: true, dataModal: {
+            openModal: true,
+            dataModal: {
                 ...item,
                 id: item?.poi_id
             }
@@ -221,7 +222,7 @@ const BodyGantt = ({
         const container = container2Ref.current;
         container.addEventListener('scroll', handleScroll);
         return () => container.removeEventListener('scroll', handleScroll);
-    }, [data, timeLine, currentMonth]);
+    }, [data, timeLine, currentMonth,]);
 
 
     useEffect(() => {
@@ -271,9 +272,6 @@ const BodyGantt = ({
         return () => clearTimeout(timeout);
     }, [router, page, timeLine]);
 
-
-
-
     useEffect(() => {
         if (currentMonthRef.current) {
             const rect = currentMonthRef.current.getBoundingClientRect();
@@ -300,11 +298,14 @@ const BodyGantt = ({
                                     <Zoom className="w-fit">
                                         <button
                                             key={e.tab}
-                                            onClick={() =>
-                                                arrIdChecked?.length > 0
-                                                    ? handleQueryId({ status: true, initialKey: e.tab })
-                                                    : handleTab(e.tab)
-                                            }
+                                            onClick={() => {
+                                                if (arrIdChecked?.length > 0) {
+                                                    handleQueryId({ status: true, initialKey: e.tab })
+                                                } else {
+                                                    handleTab(e.tab)
+                                                }
+                                                queryState({ openModal: false, });
+                                            }}
                                             type="button"
                                             className={`${router == e.tab ? "bg-sky-200 text-sky-600" : "bg-sky-50 text-sky-500"
                                                 }  hover:bg-sky-200 hover:text-sky-600 font-semibold text-[11px] text-sky-400 px-2 py-[5px] rounded-xl transition-all duration-150 ease-linear`}
@@ -719,19 +720,21 @@ const BodyGantt = ({
                                                                                             <div
                                                                                                 onClick={() => {
                                                                                                     if (ci?.reference_no_detail) {
+                                                                                                        console.log("ci", ci);
+
                                                                                                         handleShowModel(ci)
                                                                                                     }
                                                                                                 }}
-                                                                                                className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200 ") ||
-                                                                                                    (ci.active && !ci.outDate && "bg-[#5599EC] ")
-                                                                                                    } ${ci?.last_index == 1 ? "relative" : ""} px-2.5 py-0.5 font-medium text-sm capitalize ${ci?.reference_no_detail ? "cursor-pointer" : 'cursor-default'} `}
+                                                                                                className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200 ") || (ci.active && !ci.outDate && "bg-[#5599EC] ")}   
+                                                                                                    ${ci?.last_index == 1 ? "relative rounded-tr-[8px] rounded-br-[8px]" : ""}
+                                                                                                    ${ci?.first_index == 1 ? "rounded-tl-[8px] rounded-bl-[8px]" : ""}
+                                                                                                    ${ci?.reference_no_detail ? "cursor-pointer" : 'cursor-default'}
+                                                                                                    px-2.5 py-0.5 font-medium text-sm capitalize `}
                                                                                             >
-                                                                                                <span className="opacity-0">{ci.date}</span>
+                                                                                                <span className="opacity-0">{ci?.date}</span>
                                                                                                 {
                                                                                                     ci?.last_index == 1 &&
-                                                                                                    <div className={`${ci?.last_index == 1 ? "absolute -top-7 text-[11px] whitespace-nowrap py-0.5 px-2 rounded-sm" : "hidden"} ${(!ci.active && !ci.outDate && "bg-red-200") ||
-                                                                                                        (ci?.active && !ci.outDate && "bg-sky-200")
-                                                                                                        }`}
+                                                                                                    <div className={`${ci?.last_index == 1 ? "absolute -top-7 text-[11px] whitespace-nowrap py-0.5 px-2 rounded-sm" : "hidden"} bg-orange-100 text-orange-400`}
                                                                                                         style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
                                                                                                     >
                                                                                                         {ci?.reference_no_detail}
@@ -745,7 +748,7 @@ const BodyGantt = ({
                                                                                                                 transform: "translateX(-50%)",
                                                                                                                 borderWidth: "6px",
                                                                                                                 borderStyle: "solid",
-                                                                                                                borderColor: `${ci.active ? "#bae6fd" : "#fecaca"} transparent transparent transparent`,
+                                                                                                                borderColor: `#ffedd5 transparent transparent transparent`,
                                                                                                             }}
                                                                                                         />
                                                                                                     </div>
