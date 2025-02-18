@@ -726,8 +726,8 @@ const BodyGantt = ({
                                                                                                     }
                                                                                                 }}
                                                                                                 className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200 ") || (ci.active && !ci.outDate && "bg-[#5599EC] ")}   
-                                                                                                    ${ci?.last_index == 1 ? "relative rounded-tr-[8px] rounded-br-[8px]" : ""}
-                                                                                                    ${ci?.first_index == 1 ? "rounded-tl-[8px] rounded-bl-[8px]" : ""}
+                                                                                                    ${ci?.last_index == 1 ? "relative rounded-tr-[6px] rounded-br-[6px]" : ""}
+                                                                                                    ${ci?.first_index == 1 ? "rounded-tl-[6px] rounded-bl-[6px]" : ""}
                                                                                                     ${ci?.reference_no_detail ? "cursor-pointer" : 'cursor-default'}
                                                                                                     px-2.5 py-0.5 font-medium text-sm capitalize `}
                                                                                             >
