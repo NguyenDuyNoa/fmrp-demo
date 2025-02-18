@@ -724,13 +724,13 @@ const BodyGantt = ({
                                                                                                 }}
                                                                                                 className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200 ") ||
                                                                                                     (ci.active && !ci.outDate && "bg-[#5599EC] ")
-                                                                                                    } ${ci?.reference_no_detail ? "relative" : ""} px-2.5 py-0.5 font-medium text-sm capitalize ${ci?.reference_no_detail ? "cursor-pointer" : 'cursor-default'} `}
+                                                                                                    } ${ci?.last_index == 1 ? "relative" : ""} px-2.5 py-0.5 font-medium text-sm capitalize ${ci?.reference_no_detail ? "cursor-pointer" : 'cursor-default'} `}
                                                                                             >
                                                                                                 <span className="opacity-0">{ci.date}</span>
                                                                                                 {
-                                                                                                    ci?.reference_no_detail &&
-                                                                                                    <div className={`${ci?.reference_no_detail ? "absolute -top-7 text-[11px] whitespace-nowrap py-0.5 px-2 rounded-sm" : "hidden"} ${(!ci.active && !ci.outDate && "bg-red-200") ||
-                                                                                                        (ci.active && !ci.outDate && "bg-sky-200")
+                                                                                                    ci?.last_index == 1 &&
+                                                                                                    <div className={`${ci?.last_index == 1 ? "absolute -top-7 text-[11px] whitespace-nowrap py-0.5 px-2 rounded-sm" : "hidden"} ${(!ci.active && !ci.outDate && "bg-red-200") ||
+                                                                                                        (ci?.active && !ci.outDate && "bg-sky-200")
                                                                                                         }`}
                                                                                                         style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
                                                                                                     >

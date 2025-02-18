@@ -149,7 +149,7 @@ const ProductionPlan = (props) => {
                                         active: j?.active,
                                         outDate: j?.outDate,
                                         poi_id: s?.poi_id,
-                                        // reference_no_detail: s?.reference_no_detail
+                                        reference_no_detail: s?.reference_no_detail
                                     };
                                 }),
                                 unitName: s?.unit_name,

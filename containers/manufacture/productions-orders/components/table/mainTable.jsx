@@ -411,7 +411,6 @@ const MainTable = ({ dataLang }) => {
         isLoadingRight,
         refetchProductionsOrders
     };
-    console.log("status_manufacture ", isState.listDataLeft);
 
     if (!isMouted) {
         return null;
