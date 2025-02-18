@@ -1,5 +1,6 @@
 import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { optionsQuery } from "@/configs/optionsQuery";
+import { CookieCore } from "@/utils/lib/cookie";
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { useDispatch } from "react-redux";
 
@@ -23,6 +24,11 @@ export const useLanguage = (lang) => {
         queryKey: ["api_Language", lang],
         queryFn: async () => {
             const res = await apiDashboard.apiLang(lang);
+
+            if (typeof res.isSuccess == "boolean" && !res.isSuccess) {
+                CookieCore.remove('tokenFMRP')
+                CookieCore.remove('databaseappFMRP')
+            }
             return res
         },
         placeholderData: keepPreviousData,

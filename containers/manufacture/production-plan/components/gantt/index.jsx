@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Popup from "reactjs-popup";
-import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect, useContext } from "react";
 import ModalImage from "react-modal-image";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import Loading from "@/components/UI/loading/loading";
@@ -10,6 +10,9 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import NoData from "@/components/UI/noData/nodata";
 import { useRouter } from "next/router";
+import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
+import { ProductionsOrdersContext } from "@/containers/manufacture/productions-orders/context/productionsOrders";
+import { Tooltip } from "react-tippy";
 const BodyGantt = ({
     handleShowSub,
     handleCheked,
@@ -52,6 +55,18 @@ const BodyGantt = ({
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     const [currentMonth, setCurrentMonth] = useState('');
+
+    const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
+
+    const handleShowModel = (item) => {
+        console.log("item", item);
+        queryState({
+            openModal: true, dataModal: {
+                ...item,
+                id: item?.poi_id
+            }
+        });
+    };
 
     const handleScroll = (e) => {
         const container1Element = container1Ref.current;
@@ -103,152 +118,6 @@ const BodyGantt = ({
 
     const latestActiveProcess = {}
 
-    // useLayoutEffect(() => {
-    //     if (checkRankRef.current && container1Ref.current) {
-    //         const target = checkRankRef.current;
-
-    //         const viewport = document.querySelector('.container1')
-
-    //         if (viewport) {
-    //             const targetRect = target.getBoundingClientRect()
-    //             const viewportRect = viewport.getBoundingClientRect()
-
-    //             const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft
-
-    //             const startScrollLeft = viewport.scrollLeft
-
-
-    //             let startTime = null;
-
-    //             const duration = 8000; // Thời gian cuộn (ms)
-
-    //             const step = (timestamp) => {
-    //                 if (!startTime) startTime = timestamp;
-
-    //                 const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến độ từ 0 đến 1
-    //                 const ease = progress * (2 - progress); // Tăng tốc rồi giảm tốc (easing)
-
-    //                 viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
-    //                 if (progress < 1) {
-    //                     requestAnimationFrame(step); // Tiếp tục cuộn nếu chưa hoàn thành
-    //                 }
-    //             };
-
-    //             requestAnimationFrame(step);
-    //         }
-    //     }
-    // }, [data]);
-
-    // useLayoutEffect(() => {
-    //     if (checkRankRef.current && container1Ref.current) {
-    //         const target = checkRankRef.current;
-    //         const viewport = document.querySelector('.container1');
-
-    //         if (viewport) {
-    //             const targetRect = target.getBoundingClientRect();
-    //             const viewportRect = viewport.getBoundingClientRect();
-
-    //             // Thiết lập vị trí scroll ngay lập tức mà không cần animation
-    //             viewport.scrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
-    //         }
-    //     }
-    // }, [data]);
-
-
-    const [isFirstRender, setIsFirstRender] = useState(true);
-
-    // // Chạy khi component mount lần đầu để thiết lập vị trí scroll ngay lập tức
-    // useEffect(() => {
-    //     if (checkRankRef.current && container1Ref.current) {
-    //         const target = checkRankRef.current;
-    //         const viewport = document.querySelector('.container1');
-
-    //         if (viewport) {
-    //             const targetRect = target.getBoundingClientRect();
-    //             const viewportRect = viewport.getBoundingClientRect();
-
-    //             // Thiết lập vị trí scroll ngay lập tức
-    //             viewport.scrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
-    //         }
-    //     }
-    // }, []); // Chạy một lần duy nhất khi component mount
-
-    // Chạy animation khi `data` thay đổi, nhưng bỏ qua lần render đầu tiên
-    // useLayoutEffect(() => {
-    //     if (isFirstRender) {
-    //         setIsFirstRender(false); // Đánh dấu rằng lần đầu đã chạy
-    //         return; // Không chạy animation lần đầu
-    //     }
-
-    //     if (checkRankRef.current && container1Ref.current) {
-    //         const target = checkRankRef.current;
-    //         const viewport = document.querySelector('.container1');
-
-    //         if (viewport) {
-    //             const targetRect = target.getBoundingClientRect();
-    //             const viewportRect = viewport.getBoundingClientRect();
-    //             const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
-
-    //             const startScrollLeft = viewport.scrollLeft;
-    //             let startTime = null;
-    //             const duration = 500; // Thời gian chạy animation (ms)
-
-    //             const step = (timestamp) => {
-    //                 if (!startTime) startTime = timestamp;
-
-    //                 const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến trình từ 0 -> 1
-    //                 const ease = progress * (2 - progress); // Hiệu ứng easing
-
-    //                 viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
-
-    //                 if (progress < 1) {
-    //                     requestAnimationFrame(step);
-    //                 }
-    //             };
-
-    //             requestAnimationFrame(step);
-    //         }
-    //     }
-    // }, [data]); // Chạy lại khi `data` thay đổi
-
-
-
-
-    // useLayoutEffect(() => {
-    //     if (checkRankRef.current && container1Ref.current) {
-    //         const target = checkRankRef.current;
-    //         const viewport = document.querySelector('.container1');
-
-    //         if (viewport) {
-    //             const targetRect = target.getBoundingClientRect();
-    //             const viewportRect = viewport.getBoundingClientRect();
-    //             const targetScrollLeft = targetRect.left - viewportRect.left + viewport.scrollLeft;
-
-    //             const startScrollLeft = viewport.scrollLeft;
-    //             let startTime = null;
-    //             const duration = 200; // Thời gian chạy animation (ms)
-
-    //             const step = (timestamp) => {
-    //                 if (!startTime) startTime = timestamp;
-
-    //                 const progress = Math.min((timestamp - startTime) / duration, 1); // Tiến trình từ 0 -> 1
-    //                 const ease = progress * (2 - progress); // Hiệu ứng easing
-
-    //                 viewport.scrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * ease;
-
-    //                 if (progress < 1) {
-    //                     requestAnimationFrame(step);
-    //                 }
-    //             };
-
-    //             requestAnimationFrame(step);
-    //         }
-    //     }
-    // }, [data]); // Chạy lại khi `data` thay đổi
-
-
-
-
     const datsa = [
         {
             listProducts: [
@@ -271,34 +140,6 @@ const BodyGantt = ({
             ]
         }
     ];
-
-
-    // useEffect(() => {
-    //     if (container1Ref.current && timeLine?.length > 0) {
-    //         // Lấy tháng và năm hiện tại
-    //         const currentDate = new Date();
-    //         const currentMonth = currentDate.getMonth() + 1;
-    //         const currentYear = currentDate.getFullYear();
-
-    //         // Tìm đối tượng trong data khớp với tháng và năm hiện tại
-    //         const currentMonthData = timeLine?.find(item => {
-    //             const itemMonth = parseInt(item.month, 10);
-    //             const itemYear = parseInt(item?.title.split(' ')[2], 10); // Lấy năm từ "Tháng 03 2024"
-    //             return itemMonth === currentMonth && itemYear === currentYear;
-    //         });
-
-    //         if (currentMonthData) {
-    //             const monthKey = currentMonthData.month.padStart(2, '0');
-    //             const targetElement = monthRefs.current[monthKey];
-    //             const viewport = document.querySelector('.container1');
-
-    //             if (targetElement && container1Ref.current) {
-    //                 const targetPosition = targetElement.offsetLeft - container1Ref.current.offsetLeft;
-    //                 viewport.scrollLeft = targetPosition;
-    //             }
-    //         }
-    //     }
-    // }, [data, timeLine]);
 
     const hasScrolled = useRef(false);
 
@@ -441,6 +282,11 @@ const BodyGantt = ({
         }
     }, [currentMonth, data, timeLine]); // Chạy lại mỗi khi tháng hiện tại thay đổi
 
+    const shareProps = {
+        refetchProductionsOrders: () => { },
+        dataLang
+    }
+
     return (
         <React.Fragment>
             {data?.length > 0 ? (
@@ -569,7 +415,7 @@ const BodyGantt = ({
                                 style={{
                                     top: `${currentMonthTop - 20}px`, // Gán vị trí đã lưu
                                 }}
-                                className="fixed z-[9999] text-[#202236] font-semibold text-sm px-2 py-1 h-5 bg-white "
+                                className="fixed z-[9] text-[#202236] font-semibold text-sm px-2 py-1 h-5 bg-white "
                             >
                                 {currentMonth}
                             </div>
@@ -814,48 +660,123 @@ const BodyGantt = ({
                                                                         key={i.id}
                                                                         style={{ height: heights[eIndex + iIndex] }}
                                                                         className={`flex items-center  w-[65%] my-2`}
-                                                                        id={`div-${i.id}`}
+                                                                        id={`div-${i.id} `}
 
                                                                     >
-                                                                        {i.processArr.map((ci, ciIndex) => {
+                                                                        {i.processArr.map((ci, ciIndex, arr) => {
                                                                             const isActive = ci?.id == latestActiveProcess?.id;
                                                                             return (
                                                                                 <div
                                                                                     ref={isActive ? checkRankRef : null}
-                                                                                    key={ci?.id} className={`w-[80px]`}
+                                                                                    key={ci?.id} className={`w-[80px] `}
                                                                                 >
-
                                                                                     {ci.active && !ci.outDate
                                                                                         ?
-                                                                                        <Popup
-                                                                                            className="popover-productionPlan"
-                                                                                            arrow={true}
-                                                                                            arrowStyle={{
-                                                                                                color:
-                                                                                                    (!ci.active && !ci.outDate && "#fecaca") ||
-                                                                                                    (ci.active && !ci.outDate && "#bae6fd"),
-                                                                                                transform: "translateY(130%)",
-                                                                                            }}
-                                                                                            trigger={
-                                                                                                <div
-                                                                                                    className={`${ci.active && !ci.outDate ? "bg-[#5599EC] hover:bg-sky-200" : ""
-                                                                                                        }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out`}
-                                                                                                >
+                                                                                        // <Popup
+                                                                                        //     className="popover-productionPlan"
+                                                                                        //     arrow={true}
+                                                                                        //     arrowStyle={{
+                                                                                        //         color:
+                                                                                        //             (!ci.active && !ci.outDate && "#fecaca") ||
+                                                                                        //             (ci.active && !ci.outDate && "#bae6fd"),
+                                                                                        //         transform: "translateY(130%)",
+                                                                                        //     }}
+                                                                                        //     trigger={
+                                                                                        //         <div
+                                                                                        //             onClick={() => handleShowModel(ci)}
+                                                                                        //             className={`${ci.active && !ci.outDate ? "bg-[#5599EC] hover:bg-sky-200" : ""
+                                                                                        //                 }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out`}
+                                                                                        //         >
 
-                                                                                                </div>
-                                                                                            }
-                                                                                            position="top center"
-                                                                                            on={["hover", "focus"]}
+                                                                                        //         </div>
+                                                                                        //     }
+                                                                                        //     position="top center"
+                                                                                        //     on={["hover", "focus"]}
+                                                                                        // >
+                                                                                        //     <div
+                                                                                        //         className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200") ||
+                                                                                        //             (ci.active && !ci.outDate && "bg-sky-200")
+                                                                                        //             } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
+                                                                                        //     >
+                                                                                        //         {ci.date}
+                                                                                        //     </div>
+                                                                                        // </Popup>
+                                                                                        <div className="group">
 
-                                                                                        >
-                                                                                            <div
-                                                                                                className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200") ||
-                                                                                                    (ci.active && !ci.outDate && "bg-sky-200")
-                                                                                                    } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
+                                                                                            {/* <Tooltip
+                                                                                                title={"d.full_name"}
+                                                                                                // arrow
+                                                                                                theme="dark"
+                                                                                                open={ci?.lastIndex}
                                                                                             >
-                                                                                                {ci.date}
+                                                                                                <div
+                                                                                                    className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200") ||
+                                                                                                        (ci.active && !ci.outDate && "bg-sky-200")
+                                                                                                        } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
+                                                                                                >
+                                                                                                    {ci.date}
+                                                                                                </div>
+                                                                                            </Tooltip> */}
+                                                                                            <div
+                                                                                                onClick={() => handleShowModel(ci)}
+                                                                                                className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200 ") ||
+                                                                                                    (ci.active && !ci.outDate && "bg-[#5599EC] ")
+                                                                                                    } ${ci?.lastIndex ? "relative" : ""} px-2.5 py-0.5 font-medium text-sm capitalize cursor-pointer`}
+                                                                                            >
+                                                                                                <span className="opacity-0">{ci.date}</span>
+                                                                                                <div className={`${ci?.lastIndex ? "absolute -top-7 text-[11px] whitespace-nowrap py-0.5 px-2 rounded-sm" : "hidden"} ${(!ci.active && !ci.outDate && "bg-red-200") ||
+                                                                                                    (ci.active && !ci.outDate && "bg-sky-200")
+                                                                                                    }`}
+                                                                                                    style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
+                                                                                                >
+                                                                                                    {ci?.reference_no_detail}
+                                                                                                    <div
+                                                                                                        className={``}
+                                                                                                        style={{
+                                                                                                            content: "''",
+                                                                                                            position: "absolute",
+                                                                                                            bottom: "-9px",
+                                                                                                            left: "50%",
+                                                                                                            transform: "translateX(-50%)",
+                                                                                                            borderWidth: "6px",
+                                                                                                            borderStyle: "solid",
+                                                                                                            borderColor: `${ci.active ? "#bae6fd" : "#fecaca"} transparent transparent transparent`,
+                                                                                                        }}
+                                                                                                    />
+                                                                                                </div>
                                                                                             </div>
-                                                                                        </Popup>
+                                                                                            {/* <Popup
+                                                                                                className="popover-productionPlan"
+                                                                                                arrow={true}
+                                                                                                arrowStyle={{
+                                                                                                    color:
+                                                                                                        (!ci.active && !ci.outDate && "#fecaca") ||
+                                                                                                        (ci.active && !ci.outDate && "#bae6fd"),
+                                                                                                    transform: "translateY(130%)",
+                                                                                                }}
+                                                                                                trigger={
+                                                                                                    <div
+                                                                                                        onClick={() => handleShowModel(ci)}
+                                                                                                        className={`${ci.active && !ci.outDate ? "bg-[#5599EC] hover:bg-sky-200" : ""
+                                                                                                            }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out`}
+                                                                                                    >
+                                                                                                        {ci?.lastIndex ? ci?.reference_no_detail : ""}
+                                                                                                    </div>
+                                                                                                }
+                                                                                                position="top center"
+                                                                                                on={['hover']}
+                                                                                            // defaultOpen={ci?.lastIndex}
+
+                                                                                            >
+                                                                                                <div
+                                                                                                    className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200") ||
+                                                                                                        (ci.active && !ci.outDate && "bg-sky-200")
+                                                                                                        } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
+                                                                                                >
+                                                                                                    {ci.date}
+                                                                                                </div>
+                                                                                            </Popup> */}
+                                                                                        </div>
                                                                                         :
                                                                                         <div className="w-[80px] h-[20px]"></div>
                                                                                     }
@@ -880,6 +801,7 @@ const BodyGantt = ({
             ) :
                 <NoData />
             }
+            <ModalDetail {...shareProps} />
         </React.Fragment >
     );
 };

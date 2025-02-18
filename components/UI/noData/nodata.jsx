@@ -19,14 +19,14 @@ const NoData = (props) => {
                 justifyContent: "center",
             }}
         >
-            <div className={`h-full flex flex-col justify-center items-center gap-5 mx-auto ${props?.className ? `${props?.className} py-5` : "max-w-[352px] mt-24"}`}>
-                <div className="flex flex-col items-center justify-center w-full h-full">
+            <div className={`h-full flex flex-col justify-center items-center gap-5 mx-auto ${props?.className ? `${props?.className} py-5` : "mt-24"}`}>
+                <div className="flex flex-col items-center justify-center">
                     {/* bg-[#EBF4FF]  */}
                     <Image
                         width={1280}
                         height={1024}
                         alt="@nodata"
-                        className={`${props?.classNameImage ? `${props?.classNameImage}` : ""}   w-full h-full max-w-[55%] max-h-[55%]  object-cover`}
+                        className={`${props?.classNameImage ? `${props?.classNameImage}` : "w-[83%] h-[83%]"} object-cover`}
                         src={type[props?.type] ?? "/data_empty.svg"}
                     />
                 </div>

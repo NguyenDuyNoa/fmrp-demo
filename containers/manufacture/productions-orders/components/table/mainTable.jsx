@@ -445,7 +445,7 @@ const MainTable = ({ dataLang }) => {
                                 ?
                                 <Loading />
                                 :
-                                isState.listDataLeft?.length > 0 ?
+                                !isState.listDataLeft?.length > 0 ?
                                     isState.listDataLeft.map((e, eIndex) => {
                                         const color = {
                                             "0": {

@@ -41,6 +41,7 @@ import { useClientComboboxNoSearchToParams } from "@/hooks/common/useClients";
 import { useProductsVariantByBranchSearch } from "@/hooks/common/useProductTypeProducts";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import FilterHeader from "./components/fillter/filterHeader";
+import { ProductionsOrdersProvider } from "../productions-orders/context/productionsOrders";
 
 
 const initialData = {
@@ -142,10 +143,13 @@ const ProductionPlan = (props) => {
                                 actions: s?.actions,
                                 processArr: s?.processArr?.items.map((j) => {
                                     return {
+                                        ...j,
                                         id: uuid(),
                                         date: formatMoment(j?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
                                         active: j?.active,
                                         outDate: j?.outDate,
+                                        poi_id: s?.poi_id,
+                                        reference_no_detail: s?.reference_no_detail
                                     };
                                 }),
                                 unitName: s?.unit_name,
@@ -162,6 +166,7 @@ const ProductionPlan = (props) => {
                         month: formatMoment(e?.month_year, FORMAT_MOMENT.MONTH),
                         days: e?.days?.map((i) => {
                             return {
+                                ...i,
                                 id: uuid(),
                                 day: `${i?.day_name} ${formatMoment(i?.date, FORMAT_MOMENT.MONTH)}`,
                                 date: formatMoment(i?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
@@ -191,15 +196,40 @@ const ProductionPlan = (props) => {
         }
     }, 500);
 
+    // const sortArrayByDay = (arr, timeLine) => {
+    //     return timeLine.flatMap((month) => {
+    //         return month.days.map((timelineDay) => {
+    //             const matchingDay = arr.find((day) => day.date === timelineDay.date);
+    //             return matchingDay ? matchingDay : { ...timelineDay, active: false, outDate: false };
+    //         });
+    //     });
+    // };
     const sortArrayByDay = (arr, timeLine) => {
-        return timeLine.flatMap((month) => {
-            return month.days.map((timelineDay) => {
-                const matchingDay = arr.find((day) => day.date === timelineDay.date);
-                return matchingDay ? matchingDay : { ...timelineDay, active: false, outDate: false };
-            });
-        });
-    };
+        let result = [];
 
+        timeLine.forEach((month) => {
+            let monthData = month.days.map((timelineDay) => {
+                const matchingDay = arr.find((day) => day.date === timelineDay.date);
+                return matchingDay ? { ...matchingDay } : { ...timelineDay, active: false, outDate: false };
+            });
+
+            // Xác định phần tử cuối cùng trong nhóm `matchingDay`
+            let lastMatchIndex = -1;
+            for (let i = 0; i < monthData.length; i++) {
+                if (monthData[i].active) {
+                    lastMatchIndex = i;
+                }
+            }
+
+            if (lastMatchIndex !== -1) {
+                monthData[lastMatchIndex] = { ...monthData[lastMatchIndex], lastIndex: true };
+            }
+
+            result.push(...monthData);
+        });
+
+        return result;
+    };
 
 
     const updateListProducts = (order, timeLine) => {
@@ -226,6 +256,7 @@ const ProductionPlan = (props) => {
             return listOrder?.map((order) => {
                 const updatedListProducts = updateListProducts(order, timeLine);
                 const processDefaultUpdate = updateProcessDefault(order, timeLine);
+
                 return {
                     ...order,
                     show: updatedListProducts?.length > 0,
@@ -351,17 +382,17 @@ const ProductionPlan = (props) => {
             <Container>
                 {statusExprired ? <EmptyExprired /> : <Header {...shareProps} />}
                 <FilterHeader {...shareProps} onChangeValue={onChangeValue} />
-
-                <BodyGantt
-                    {...shareProps}
-                    handleShowSub={handleShowSub}
-                    handleSort={handleSort}
-                    data={data}
-                    timeLine={isData.timeLine}
-                    isSort={isSort == "reference_no" ? false : true}
-                    handleCheked={handleCheked}
-                />
-
+                <ProductionsOrdersProvider>
+                    <BodyGantt
+                        {...shareProps}
+                        handleShowSub={handleShowSub}
+                        handleSort={handleSort}
+                        data={data}
+                        timeLine={isData.timeLine}
+                        isSort={isSort == "reference_no" ? false : true}
+                        handleCheked={handleCheked}
+                    />
+                </ProductionsOrdersProvider>
                 {data?.length > 0 && (
                     <ContainerPagination className="flex items-center space-x-5">
                         <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
