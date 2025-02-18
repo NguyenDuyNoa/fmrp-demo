@@ -340,7 +340,7 @@ const TabContent = ({ subItems, checkStt }) => {
                 <NoData
                     type="notificationheader"
                     className='w-[350px]'
-                    classNameImage=''
+                    classNameImage="!max-w-[30%] !max-h-[30%]"
                 />
             ) : (
                 <div className={`3xl:px-2 3xl:py-1  2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}>

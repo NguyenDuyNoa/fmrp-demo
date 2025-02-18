@@ -20,17 +20,17 @@ const NoData = (props) => {
             }}
         >
             <div className={`h-full flex flex-col justify-center items-center gap-5 mx-auto ${props?.className ? `${props?.className} py-5` : "max-w-[352px] mt-24"}`}>
-                <div className="rounded-[100%] inline-block ">
+                <div className="flex flex-col items-center justify-center w-full h-full">
                     {/* bg-[#EBF4FF]  */}
                     <Image
                         width={1280}
                         height={1024}
                         alt="@nodata"
-                        className={`${props?.classNameImage ? `${props?.classNameImage}` : ""}  w-full h-full  object-cover`}
+                        className={`${props?.classNameImage ? `${props?.classNameImage}` : ""}   w-full h-full max-w-[55%] max-h-[55%]  object-cover`}
                         src={type[props?.type] ?? "/data_empty.svg"}
                     />
                 </div>
-                <h1 className={`text-[#141522] opacity-90 font-medium ${props?.classNameTitle ? props?.classNameTitle : "text-base"}`}>
+                <h1 className={`text-[#141522] opacity-90 font-medium ${props?.classNameTitle ? props?.classNameTitle : "text-sm"}`}>
                     Không tìm thấy các mục
                 </h1>
                 {/* <div className="flex items-center justify-around mt-6 ">
