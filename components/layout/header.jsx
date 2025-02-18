@@ -1102,16 +1102,16 @@ const Header = () => {
                             </React.Fragment>
                         ))}
                     </div>
-                    <div className="flex items-center 3xl:space-x-5 2xl:space-x-4 xl:space-x-3 lg:space-x-2">
+                    <div className="flex items-center gap-4">
                         <form className="relative flex items-center">
-                            <div className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] absolute left-3">
+                            <div className="w-[16px] h-[16px] min-w-[16px] min-h-[16px] absolute left-3">
                                 <Image
                                     alt=""
                                     src="/icon/header/timkiem.png"
                                     width={24}
                                     height={18}
                                     quality={100}
-                                    className="object-contain w-auto h-auto"
+                                    className="object-contain w-full h-full"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1132,7 +1132,7 @@ const Header = () => {
                                     isShow("warning", WARNING_STATUS_ROLE_ADMIN);
                                 }
                             }}
-                            className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition"
+                            className=""
                         >
                             <Image
                                 alt=""
@@ -1140,7 +1140,7 @@ const Header = () => {
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain min-w-[18px]"
+                                className="object-contain w-[16px] h-[16px] min-w-[16px] min-h-[16px] transition"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1149,7 +1149,7 @@ const Header = () => {
                         <Link
                             href="#"
                             title="Thông báo"
-                            className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition relative  "
+                            className=""
                         >
                             <DropdownThongBao
                                 data={[] || ListThongBao}
@@ -1162,7 +1162,7 @@ const Header = () => {
                                     width={18}
                                     height={18}
                                     quality={100}
-                                    className="object-contain w-full h-full transition"
+                                    className="object-contain w-[16px] h-[16px] min-w-[16px] min-h-[16px] transition"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1172,14 +1172,14 @@ const Header = () => {
                                 </div> */}
                             </DropdownThongBao>
                         </Link>
-                        <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"}>
+                        <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"} >
                             <Image
                                 alt=""
                                 src="/icon/header/ques.png"
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain 3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px]  transition"
+                                className="object-contain w-[16px] h-[16px] min-w-[16px] min-h-[16px] transition"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1209,8 +1209,6 @@ const DropdownAvatar = React.memo(() => {
         try {
             const res = await apiDashboard.apiLogOut();
             dispatch({ type: "auth/update", payload: false });
-            // localStorage.removeItem("tokenFMRP");
-            // localStorage.removeItem("databaseappFMRP");
             CookieCore.remove("tokenFMRP");
             CookieCore.remove("databaseappFMRP");
             router.push("/");
@@ -1235,8 +1233,6 @@ const DropdownAvatar = React.memo(() => {
 
     const [lang, sLang] = useState(defaultLang);
 
-    const _HandleChangeLang = (e) => sLang(e.target?.value);
-
     useEffect(() => {
         dispatch({ type: "lang/update", payload: lang });
         localStorage.setItem("LanguagesFMRP", lang);
@@ -1255,7 +1251,7 @@ const DropdownAvatar = React.memo(() => {
                                     width={40}
                                     height={40}
                                     quality={100}
-                                    className="object-cover min-w-[40px] min-h-[40px] rounded-full"
+                                    className="object-cover min-w-[30px] w-[30px] min-h-[30px] h-[30px] rounded-full"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1267,7 +1263,7 @@ const DropdownAvatar = React.memo(() => {
                                     width={40}
                                     height={40}
                                     quality={100}
-                                    className="object-cover min-w-[40px] min-h-[40px] rounded-full"
+                                    className="object-cover min-w-[30px] w-[30px] min-h-[30px] h-[30px] rounded-full"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1276,8 +1272,8 @@ const DropdownAvatar = React.memo(() => {
                             <Image
                                 alt=""
                                 src="/icon/header/dropdown.png"
-                                width={10}
-                                height={10}
+                                width={12}
+                                height={12}
                                 quality={100}
                                 className="object-cover"
                                 loading="lazy"

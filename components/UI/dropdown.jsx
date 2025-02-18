@@ -26,7 +26,7 @@ export const Dropdown = (props) => {
             <Popup
                 trigger={
                     <button
-                        className={`text-slate-200 3xl:text-[18px] 2xl:text-base xxl:text-base xl:text-sm text-xs  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] `}
+                        className={`text-slate-200 3xl:text-[18px] 2xl:text-base xxl:text-base xl:text-sm text-xs  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center`}
                     >
                         {props.children}
                     </button>
