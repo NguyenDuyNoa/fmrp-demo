@@ -31,50 +31,55 @@ const TableChart = React.memo((props) => {
 
 
     return (
-        <div className="p-3 space-y-8 border rounded-lg bg-slate-50/60 border-slate-50 ">
+        <div className="p-3 space-y-4 border rounded-lg bg-slate-50/60 border-slate-50 ">
             <h2>{dataLang?.table_chart_materials_needed ?? "table_chart_materials_needed"}</h2>
             <div>
-                <div className="grid grid-cols-8 gap-3 py-5 pl-3 pr-4 bg-slate-50">
-                    <h5 className="text-[#667085] text-[13px]">{"STT"}</h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-2 text-center">{dataLang?.table_chart_material_code ?? "table_chart_material_code"}</h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-3">{dataLang?.table_chart_material_name ?? "table_chart_material_name"}</h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-2 text-right">{dataLang?.table_chart_quantity ?? "table_chart_quantity"}</h5>
-                </div>
-                <Customscrollbar className="h-[350px]">
-                    <div className="divide-y divide-slate-100">
-                        {
-                            isLoading
-                                ?
-                                <div className='flex flex-col gap-2'>
-                                    {
-                                        Array.from({ length: 10 }).map((_, index) => (
-                                            <div className='h-[40px] w-full bg-slate-100 animate-pulse'></div>
-                                        ))
+                {
+                    isLoading
+                        ?
+                        <div className='flex flex-col gap-2'>
+                            {
+                                Array.from({ length: 10 }).map((_, index) => (
+                                    <div className='h-[40px] w-full bg-slate-100 animate-pulse'></div>
+                                ))
 
 
-                                    }
+                            }
+                        </div>
+                        :
+                        convertData?.length > 0
+                            ?
+                            <>
+                                <div className="grid grid-cols-8 gap-3 py-5 pl-3 pr-4 bg-slate-50">
+                                    <h5 className="text-[#667085] text-[13px]">{"STT"}</h5>
+                                    <h5 className="text-[#667085] text-[13px] col-span-2 text-center">{dataLang?.table_chart_material_code ?? "table_chart_material_code"}</h5>
+                                    <h5 className="text-[#667085] text-[13px] col-span-3">{dataLang?.table_chart_material_name ?? "table_chart_material_name"}</h5>
+                                    <h5 className="text-[#667085] text-[13px] col-span-2 text-right">{dataLang?.table_chart_quantity ?? "table_chart_quantity"}</h5>
                                 </div>
-                                :
-                                convertData?.length > 0
-                                    ?
-                                    convertData.map((e, index) => (
-                                        <div
-                                            className="grid grid-cols-8 gap-3 py-4 pl-3 pr-4 hover:bg-white"
-                                            key={e?.item_id}
-                                        >
-                                            <h6 className='col-span-1 text-sm'>{index + 1}</h6>
-                                            <h6 className="col-span-2 text-sm text-center">{e?.item_code}</h6>
-                                            <h6 className="col-span-3 text-sm line-clamp-1">{e?.item_name}</h6>
-                                            <h6 className="col-span-2 text-sm text-right">{formatNumber(e?.quantity)}</h6>
-                                        </div>
-                                    ))
-                                    :
-                                    <NoData type='dashboard' />
-                        }
-                        {hasNextPage && <LoadingButton ref={ref} />}
-                    </div>
+                                <Customscrollbar className="h-[350px]">
+                                    <div className="divide-y divide-slate-100">
+                                        {
+                                            convertData.map((e, index) => (
+                                                <div
+                                                    className="grid grid-cols-8 gap-3 py-4 pl-3 pr-4 hover:bg-white"
+                                                    key={e?.item_id}
+                                                >
+                                                    <h6 className='col-span-1 text-sm'>{index + 1}</h6>
+                                                    <h6 className="col-span-2 text-sm text-center">{e?.item_code}</h6>
+                                                    <h6 className="col-span-3 text-sm line-clamp-1">{e?.item_name}</h6>
+                                                    <h6 className="col-span-2 text-sm text-right">{formatNumber(e?.quantity)}</h6>
+                                                </div>
+                                            ))
 
-                </Customscrollbar>
+                                        }
+                                        {hasNextPage && <LoadingButton ref={ref} />}
+                                    </div>
+
+                                </Customscrollbar>
+                            </>
+                            :
+                            <NoData type='dashboard' />
+                }
             </div>
         </div>
     );
