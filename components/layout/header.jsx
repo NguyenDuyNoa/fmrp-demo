@@ -1233,6 +1233,8 @@ const DropdownAvatar = React.memo(() => {
 
     const [lang, sLang] = useState(defaultLang);
 
+    const _HandleChangeLang = (e) => sLang(e.target?.value);
+
     useEffect(() => {
         dispatch({ type: "lang/update", payload: lang });
         localStorage.setItem("LanguagesFMRP", lang);
@@ -1350,7 +1352,17 @@ const DropdownAvatar = React.memo(() => {
                                 />
                                 <span>Thông tin tài khoản</span>
                             </button>
-                            <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2">
+                            <button
+                                onClick={() => {
+                                    dispatch({
+                                        type: "statePopupChangePassword",
+                                        payload: {
+                                            open: true
+                                        }
+                                    })
+                                }}
+                                className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2"
+                            >
                                 <Image
                                     alt=""
                                     src="/icon/header/avatar/pas.png"
@@ -1392,7 +1404,7 @@ const DropdownAvatar = React.memo(() => {
                                 />
                                 <span>Giới thiệu - Tích điểm</span>
                             </button>
-                            <div className="flex px-4 py-2.5 justify-between items-center">
+                             */}<div className="flex px-4 py-2.5 justify-between items-center">
                                 <div className="flex items-center space-x-2">
                                     <Image
                                         alt=""
@@ -1423,7 +1435,7 @@ const DropdownAvatar = React.memo(() => {
                                         <IconDown size={15} />
                                     </div>
                                 </div>
-                            </div> */}
+                            </div>
                             <button
                                 onClick={_HandleLogout.bind(this)}
                                 className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2"
