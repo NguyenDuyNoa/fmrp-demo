@@ -11,6 +11,8 @@ import useToast from "@/hooks/useToast";
 import Loading from "../loading/loading";
 
 const PopupAccountInformation = (props) => {
+    const { dataLang } = props
+
     const isShow = useToast()
 
     const dispatch = useDispatch()
@@ -21,7 +23,7 @@ const PopupAccountInformation = (props) => {
 
     const { data, isLoading: isLoadingInfo } = useGetInfo({ open: statePopupAccountInformation.open })
 
-    const { onSubmit, isLoaidng } = useUpdateAvatar()
+    const { onSubmit, isLoading } = useUpdateAvatar()
 
     const [image, setImage] = useState('/user-placeholder.jpg');
 
@@ -54,12 +56,14 @@ const PopupAccountInformation = (props) => {
 
     return (
         <PopupCustom
-            title={"Thông tin tài khoản"}
+            title={dataLang?.popup_account_information ?? "popup_account_information"}
             onClickOpen={() => { }}
             open={statePopupAccountInformation.open}
             onClose={() => {
                 dispatch({ type: "statePopupAccountInformation", payload: { open: false } })
             }}
+            lockScroll={true}
+            closeOnDocumentClick={true}
             classNameBtn={props?.className + "relative"}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
@@ -84,7 +88,7 @@ const PopupAccountInformation = (props) => {
                                     <label className="absolute bottom-0 right-0 p-1 bg-gray-200 border border-gray-300 rounded-full cursor-pointer">
                                         <Camera size={16} className="text-gray-600" />
                                         <input
-                                            disabled={isLoaidng}
+                                            disabled={isLoading}
                                             type="file"
                                             accept="image/*"
                                             className="hidden"
@@ -96,21 +100,21 @@ const PopupAccountInformation = (props) => {
                             </div>
                             <div className="mt-4 space-y-2 text-gray-700">
                                 <div>
-                                    <span className="text-sm font-normal">Chức vụ:</span> <span className="text-sm font-semibold">{data?.data?.staff?.position_name}</span>
+                                    <span className="text-sm font-normal">{dataLang?.popup_account_information_position ?? "popup_account_information_position"}:</span> <span className="text-sm font-semibold">{data?.data?.staff?.position_name}</span>
                                 </div>
 
                                 <div>
-                                    <span className="text-sm font-normal">Email:</span> <span className="text-sm font-semibold">{data?.data?.staff?.email}</span>
+                                    <span className="text-sm font-normal">{dataLang?.popup_account_information_email ?? "popup_account_information_email"}:</span> <span className="text-sm font-semibold">{data?.data?.staff?.email}</span>
                                 </div>
 
                                 <div>
-                                    <span className="text-sm font-normal">Điện thoại:</span> <span className="text-sm font-semibold">{data?.data?.staff?.phonenumber}</span>
+                                    <span className="text-sm font-normal">{dataLang?.popup_account_information_phone ?? "popup_account_information_phone"}:</span> <span className="text-sm font-semibold">{data?.data?.staff?.phonenumber}</span>
                                 </div>
                                 <div>
-                                    <span className="text-sm font-normal">Lần đăng nhập trước đó:</span> <span className="text-sm font-semibold">{formatMoment(data?.data?.staff?.created_at, FORMAT_MOMENT.DATE_SLASH_LONG)}</span>
+                                    <span className="text-sm font-normal">{dataLang?.popup_account_information_last_login ?? "popup_account_information_last_login"}:</span> <span className="text-sm font-semibold">{formatMoment(data?.data?.staff?.created_at, FORMAT_MOMENT.DATE_SLASH_LONG)}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="text-sm font-normal">Chi nhánh:</div>
+                                    <div className="text-sm font-normal">{dataLang?.popup_account_information_branch ?? "popup_account_information_branch"}:</div>
                                     <div className="flex items-center gap-2">
                                         {
                                             data?.data?.staff?.branch?.map(e => {

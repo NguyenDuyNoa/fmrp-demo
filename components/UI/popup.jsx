@@ -18,7 +18,7 @@ const Popup = (props) => {
             </button>
             <PopupParent
                 open={props.open}
-                closeOnDocumentClick={false}
+                closeOnDocumentClick={props?.closeOnDocumentClick || false}
                 onClose={props.onClose}
                 lockScroll={props.lockScroll}
                 // repositionOnResiz={props.repositionOnResiz}

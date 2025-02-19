@@ -14,6 +14,7 @@ import "../styles/globals.scss";
 import { CookieCore } from "@/utils/lib/cookie";
 import ChatBubbleAI from "@/components/UI/chat/ChatAiBubble";
 import 'simplebar-react/dist/simplebar.min.css';
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 // const t = Lark
 const deca = Lexend_Deca({
@@ -44,7 +45,9 @@ const Index = (props) => {
                         {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
                         {/* <main className={deca.className}> */}
                         <main className={inter.className}>
-                            <MainPage {...props} />
+                            <Customscrollbar className="max-h-screen" style={{ height: "100vh" }}>
+                                <MainPage {...props} />
+                            </Customscrollbar>
                         </main>
                     </Provider>
                 </Suspense>

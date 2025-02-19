@@ -38,7 +38,9 @@ export const useUpdateAvatar = () => {
     const submitMutation = useMutation({
         mutationFn: (data) => {
             return apiDashboard.apiUpdateAvatarInfo(data)
-        }
+        },
+        retry: 5,
+        retryDelay: 5000
     })
     const onSubmit = async (image) => {
         let formtData = new FormData();
@@ -46,7 +48,25 @@ export const useUpdateAvatar = () => {
         const r = await submitMutation.mutateAsync(formtData)
         return r
     }
-    return { onSubmit, isLoaidng: submitMutation.isPending }
+    return { onSubmit, isLoading: submitMutation.isPending }
+}
+// đổi mk
+export const useChangePassword = () => {
+    const submitMutation = useMutation({
+        mutationFn: (data) => {
+            return apiDashboard.apiChangePassword(data)
+        },
+        retry: 5,
+        retryDelay: 5000
+    })
+    const onSubmit = async (data) => {
+        let formtData = new FormData();
+        formtData.append('password', data?.newPassword)
+        formtData.append('password_confirm', data?.confirmPassword)
+        const r = await submitMutation.mutateAsync(formtData)
+        return r
+    }
+    return { onSubmit, isLoading: submitMutation.isPending }
 }
 
 export const useLanguage = (lang) => {

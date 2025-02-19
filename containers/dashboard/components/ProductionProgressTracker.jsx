@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ArrowRight2 } from "iconsax-react";
+import NoData from '@/components/UI/noData/nodata';
 
 const ProductionProgressTracker = React.memo(() => {
     const [tab, sTab] = useState(0);
@@ -23,15 +24,20 @@ const ProductionProgressTracker = React.memo(() => {
         },
     ];
     return (
-        <div className="bg-slate-50/60 p-3 space-y-4 border border-slate-50 rounded-lg">
-            <div className="flex justify-between items-center">
+        <div className="p-3 space-y-4 border rounded-lg bg-slate-50/60 border-slate-50">
+            <div className="flex items-center justify-between">
                 <h2>Tiến độ SX theo nhóm</h2>
-                <button className="text-[#667085] bg-[#F3F4F6] px-4 py-2 rounded flex space-x-2 items-center hover:scale-105 transition">
+                {/* <button className="text-[#667085] bg-[#F3F4F6] px-4 py-2 rounded flex space-x-2 items-center hover:scale-105 transition">
                     <span>Xem chi tiết</span>
                     <ArrowRight2 size={18} />
-                </button>
+                </button> */}
             </div>
-            <div className="flex rounded-lg overflow-hidden border w-fit">
+            {/* {
+                <div className="">
+                    <NoData type='dashboard' />
+                </div>
+            } */}
+            <div className="flex overflow-hidden border rounded-lg w-fit">
                 <button
                     onClick={_HandleTab.bind(this, 0)}
                     className={`${tab === 0 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"

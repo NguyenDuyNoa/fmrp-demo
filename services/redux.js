@@ -43,6 +43,9 @@ const adminState = {
     statePopupAccountInformation: {
         open: false,
 
+    },
+    statePopupChangePassword: {
+        open: false
     }
 };
 
@@ -84,6 +87,8 @@ function adminReducer(state = adminState, action) {
             return { ...state, stateBoxChatAi: action.payload };
         case "statePopupAccountInformation":
             return { ...state, statePopupAccountInformation: action.payload };
+        case "statePopupChangePassword":
+            return { ...state, statePopupChangePassword: action.payload };
         default:
             return state;
     }

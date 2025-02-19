@@ -67,7 +67,7 @@ const _ServerInstance = async (method, url, dataObject = {}, callback) => {
         withCredentials: false,
         ...(dataObject && dataObject instanceof FormData ? { data: dataObject } : dataObject),
         headers,
-        timeout: 5000
+        // timeout: 10000
     }).then(async (response) => {
         if (callback) {
             callback(null, response);

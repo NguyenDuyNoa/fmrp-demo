@@ -87,14 +87,14 @@ const PopupAppRenewal = () => {
                     </div>
                 </div>
                 <div className="bg-[#F3F9FF] border border-[#C7DFFB] rounded-xl 3xl:p-6 p-4 flex flex-col gap-2">
-                    <div className="w-full grid grid-cols-3 gap-4">
-                        <div className="col-span-1 w-full flex flex-col gap-1">
+                    <div className="grid w-full grid-cols-3 gap-4">
+                        <div className="flex flex-col w-full col-span-1 gap-1">
                             <div className="3xl:text-sm text-xs text-[#344054] font-semibold">Chọn gói</div>
                             <Select
                                 options={[
                                     {
                                         value: "",
-                                        label: "Chọn chọn gói",
+                                        label: "Chọn gói",
                                         isDisabled: true,
                                     },
                                     ...isState.listPackageName,
@@ -105,7 +105,7 @@ const PopupAppRenewal = () => {
                                 hideSelectedOptions={false}
                                 isClearable={true}
                                 placeholder={"Chọn gói"}
-                                className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                className="z-20 text-xs bg-white rounded-md 3xl:text-base xxl:text-sm"
                                 isSearchable={true}
                                 noOptionsMessage={() => "Không có dữ liệu"}
                                 closeMenuOnSelect={false}
@@ -140,7 +140,7 @@ const PopupAppRenewal = () => {
                                 }}
                             />
                         </div>
-                        <div className="col-span-1 w-full flex flex-col gap-1">
+                        <div className="flex flex-col w-full col-span-1 gap-1">
                             <div className="3xl:text-sm text-xs text-[#344054] font-semibold">Thời hạn</div>
                             <Select
                                 options={[
@@ -157,7 +157,7 @@ const PopupAppRenewal = () => {
                                 hideSelectedOptions={false}
                                 isClearable={true}
                                 placeholder={"Chọn thời hạn"}
-                                className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                className="z-20 text-xs bg-white rounded-md 3xl:text-base xxl:text-sm"
                                 isSearchable={true}
                                 noOptionsMessage={() => "Không có dữ liệu"}
                                 closeMenuOnSelect={false}
@@ -192,7 +192,7 @@ const PopupAppRenewal = () => {
                                 }}
                             />
                         </div>
-                        <div className="col-span-1 w-full flex flex-col gap-1">
+                        <div className="flex flex-col w-full col-span-1 gap-1">
                             <div className="3xl:text-sm text-xs text-[#344054] font-semibold">Số user</div>
                             <Select
                                 options={[
@@ -210,7 +210,7 @@ const PopupAppRenewal = () => {
                                 isMulti
                                 isClearable={true}
                                 placeholder={"Chọn số user"}
-                                className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                className="z-20 text-xs bg-white rounded-md 3xl:text-base xxl:text-sm"
                                 isSearchable={true}
                                 noOptionsMessage={() => "Không có dữ liệu"}
                                 closeMenuOnSelect={false}
@@ -281,15 +281,15 @@ const PopupAppRenewal = () => {
                 </div>
 
                 <div className="grid grid-cols-7 gap-4">
-                    <div className="col-span-4 flex flex-col w-full border rounded-lg">
+                    <div className="flex flex-col w-full col-span-4 border rounded-lg">
                         <div className="flex flex-row items-center gap-2 bg-[#F7F9FC] p-2 rounded-lg">
-                            <PresentionChart color="#3A3E4C" variant="Bold" className="3xl:w-6 3xl:h-6 w-5 h-5" />
+                            <PresentionChart color="#3A3E4C" variant="Bold" className="w-5 h-5 3xl:w-6 3xl:h-6" />
                             <div className="3xl:text-base text-sm text-[#3A3E4C] font-medium">
                                 Đối với khách hàng doanh nghiệp
                             </div>
                         </div>
-                        <div className="p-4 flex flex-row 3xl:gap-6 gap-3">
-                            <div className="flex flex-col 3xl:gap-4 gap-2">
+                        <div className="flex flex-row gap-3 p-4 3xl:gap-6">
+                            <div className="flex flex-col gap-2 3xl:gap-4">
                                 <Image
                                     src="/pay/acb.png"
                                     alt="ACB"
@@ -306,7 +306,7 @@ const PopupAppRenewal = () => {
                                     style={{ mixBlendMode: "luminosity" }}
                                 />
                             </div>
-                            <div className="flex flex-col justify-between 3xl:gap-2 gap-0">
+                            <div className="flex flex-col justify-between gap-0 3xl:gap-2">
                                 <div className="flex flex-col">
                                     <div className="3xl:text-base text-sm text-[#667085]">Tên tài khoản:</div>
                                     <div className="3xl:text-base text-sm uppercase font-bold text-[#141522]">
@@ -328,15 +328,15 @@ const PopupAppRenewal = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-span-3 flex flex-col w-full border rounded-lg">
+                    <div className="flex flex-col w-full col-span-3 border rounded-lg">
                         <div className="flex flex-row items-center gap-2 bg-[#F7F9FC] p-2 rounded-lg">
-                            <User color="#3A3E4C" variant="Bold" className="3xl:w-6 3xl:h-6 w-5 h-5" />
+                            <User color="#3A3E4C" variant="Bold" className="w-5 h-5 3xl:w-6 3xl:h-6" />
                             <div className="3xl:text-base text-sm text-[#3A3E4C] font-medium">
                                 Đối với khách hàng cá nhân
                             </div>
                         </div>
-                        <div className="p-4 flex flex-row 3xl:gap-6 gap-3">
-                            <div className="flex flex-col 3xl:gap-4 gap-2">
+                        <div className="flex flex-row gap-3 p-4 3xl:gap-6">
+                            <div className="flex flex-col gap-2 3xl:gap-4">
                                 <Image
                                     src="/pay/acb.png"
                                     alt="ACB"
@@ -353,7 +353,7 @@ const PopupAppRenewal = () => {
                                     style={{ mixBlendMode: "luminosity" }}
                                 />
                             </div>
-                            <div className="flex flex-col justify-between 3xl:gap-2 gap-0">
+                            <div className="flex flex-col justify-between gap-0 3xl:gap-2">
                                 <div className="flex flex-col">
                                     <div className="3xl:text-base text-sm text-[#667085]">Tên tài khoản:</div>
                                     <div className="3xl:text-base text-sm uppercase font-bold text-[#141522]">

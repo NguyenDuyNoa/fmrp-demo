@@ -3,7 +3,8 @@ import Image from "next/image";
 
 const NoData = (props) => {
     const type = {
-        'notificationheader': '/icon/noti.svg'
+        'notificationheader': '/icon/noti.svg',
+        'dashboard': '/icon/data_empty_dashboard-1.svg',
     }
     return (
         <motion.div

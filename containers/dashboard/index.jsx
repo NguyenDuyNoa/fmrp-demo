@@ -60,16 +60,16 @@ const Dashboard = (props) => {
                         </span>
                     </button>
                 </div> */}
-                <ListTask />
+                <ListTask {...props} />
                 <div className="grid grid-cols-2 gap-5">
-                    <PieChart />
-                    <TableChart />
-                    <LineChart />
-                    <ColumnChart />
-                    <ProductionProgressTracker />
-                    <ManufacturingStatusMonitor />
-                    <AreaChart />
-                    <BarChart />
+                    <PieChart {...props} />
+                    <ProductionProgressTracker {...props} />
+                    <LineChart {...props} />
+                    <ColumnChart {...props} />
+                    <TableChart {...props} />
+                    {/* <ManufacturingStatusMonitor {...props} /> */}
+                    {/* <AreaChart {...props} /> */}
+                    <BarChart {...props} />
                 </div>
             </div>
         </React.Fragment>

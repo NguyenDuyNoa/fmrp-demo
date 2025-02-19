@@ -1,30 +1,53 @@
-import React from 'react'
+import React, { memo } from 'react'
 import dynamic from "next/dynamic";
+import { useGetTopProducedProducts } from '@/hooks/dashboard/useGetTopProducedProducts';
+import useSetingServer from '@/hooks/useConfigNumber';
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import NoData from '@/components/UI/noData/nodata';
 
 const Pie = dynamic(() => import("@ant-design/plots").then(({ Pie }) => Pie), { ssr: false, });
 
-const PieChart = React.memo(() => {
-    const data = [
-        {
-            type: "Áo hoa nhí  ",
-            value: 56,
-        },
-        {
-            type: "Áo bảo hộ lao động",
-            value: 26,
-        },
-        {
-            type: "Quần âu nam",
-            value: 46,
-        },
-        {
-            type: "Quần bảo hộ",
-            value: 10,
-        },
-    ];
+const PieChart = (props) => {
+    const { dataLang } = props
+
+    const { data: dataTopProducedProducts, isLoading } = useGetTopProducedProducts()
+
+    return (
+        <div className="p-3 border rounded-lg bg-slate-50/60 border-slate-50">
+            <div className="mt-[12px] mb-[32px] mx-2 ">
+                <h2>{dataLang?.pie_chart_top_produced_products ?? "pie_chart_top_produced_products"}</h2>
+                {
+                    isLoading
+                        ?
+                        <div className='h-[420px] w-full bg-slate-100 animate-pulse rounded-md'></div>
+                        :
+                        dataTopProducedProducts?.data?.items?.length > 0
+                            ?
+                            <div className="rounded-md bg-[#F9FAFB] w-full ">
+                                <div className="mt-[28px]">
+                                    <Chart data={dataTopProducedProducts?.data?.items} dataLang={dataLang} />
+                                </div>
+                            </div>
+                            :
+                            <NoData type='dashboard' />
+                }
+            </div>
+        </div>
+    );
+}
+
+const Chart = memo((props) => {
+    const { data, dataLang } = props
+
+    const dataSeting = useSetingServer();
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    };
+
     const config = {
         appendPadding: 10,
-        data,
+        data: data ? data : [],
         angleField: "value",
         colorField: "type",
         radius: 1,
@@ -34,6 +57,7 @@ const PieChart = React.memo(() => {
             offset: "-50%",
             style: {
                 textAlign: "center",
+                fontSize: 14,
             },
             autoRotate: false,
             content: "{value}",
@@ -56,33 +80,32 @@ const PieChart = React.memo(() => {
                     textOverflow: "ellipsis",
                     lineHeight: "1.2",
                 },
-                content: `Tổng\n ${132}`,
+                content: `${dataLang?.pie_chart_total ?? "pie_chart_total"}\n${data ? formatNumber(data?.reduce((a, b) => a + b.value, 0)) : 0}`,
             },
         },
         legend: {
-            position: "right",
+            // position: "right",
+            offsetX: -40,
             itemName: {
                 style: {
-                    fontSize: 16,
+                    fontSize: 14,
                     color: "#1A202C",
                     fontStyle: "normal",
                     fontWeight: 600,
+                    maxWidth: 150,
                 },
+            },
+            color: {
+                title: false,
+                position: 'right',
+                rowPadding: 5,
+
             },
         },
     };
     return (
-        <div className="bg-slate-50/60 p-3 border border-slate-50 rounded-lg">
-            <div className="mt-[12px] mb-[32px] mx-2 ">
-                <h2>Top sản phẩm sản xuất nhiều nhất</h2>
-                <div className="rounded-md bg-[#F9FAFB] w-full ">
-                    <div className="mt-[28px]">
-                        <Pie className="" {...config} />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-});
+        <Pie className="" {...config} />
+    )
+})
 
 export default PieChart

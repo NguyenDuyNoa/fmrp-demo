@@ -1,98 +1,79 @@
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
-import React from 'react';
-const TableChart = React.memo(() => {
-    const data = [
-        {
-            stt: 1,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 2,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 3,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 4,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 5,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 6,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 7,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 8,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 9,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 10,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-        {
-            stt: 11,
-            id: "asd",
-            name: "Áo thun cotton chất lượng caooooo",
-            quantity: 20000,
-        },
-    ];
+import LoadingButton from '@/components/UI/loading/loadingButton';
+import NoData from '@/components/UI/noData/nodata';
+import { useGetMaterialsToPurchase } from '@/hooks/dashboard/useGetMaterialsToPurchase';
+import useSetingServer from '@/hooks/useConfigNumber';
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import React, { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
+
+
+const TableChart = React.memo((props) => {
+    const { dataLang } = props
+
+    const { ref, inView } = useInView()
+
+    const dataSeting = useSetingServer();
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    };
+
+    const { data: dataMaterial, isLoading, hasNextPage, fetchNextPage } = useGetMaterialsToPurchase()
+
+    const convertData = dataMaterial ? dataMaterial?.pages?.map((item) => item?.items).flat() : []
+
+    useEffect(() => {
+        if (inView && hasNextPage) {
+            fetchNextPage()
+        }
+    }, [inView, hasNextPage, fetchNextPage])
+
+
     return (
         <div className="p-3 space-y-8 border rounded-lg bg-slate-50/60 border-slate-50 ">
-            <h2>Nguyên vật liệu cần mua</h2>
+            <h2>{dataLang?.table_chart_materials_needed ?? "table_chart_materials_needed"}</h2>
             <div>
                 <div className="grid grid-cols-8 gap-3 py-5 pl-3 pr-4 bg-slate-50">
-                    <h5 className="text-[#667085] text-[13px]">STT</h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-2 text-center">Mã NVL</h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-3">Tên NVL</h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-2 text-right">Số lượng</h5>
+                    <h5 className="text-[#667085] text-[13px]">{"STT"}</h5>
+                    <h5 className="text-[#667085] text-[13px] col-span-2 text-center">{dataLang?.table_chart_material_code ?? "table_chart_material_code"}</h5>
+                    <h5 className="text-[#667085] text-[13px] col-span-3">{dataLang?.table_chart_material_name ?? "table_chart_material_name"}</h5>
+                    <h5 className="text-[#667085] text-[13px] col-span-2 text-right">{dataLang?.table_chart_quantity ?? "table_chart_quantity"}</h5>
                 </div>
                 <Customscrollbar className="h-[350px]">
                     <div className="divide-y divide-slate-100">
-                        {data.map((e) => (
-                            <div
-                                className="grid grid-cols-8 gap-3 py-4 pl-3 pr-4 hover:bg-white"
-                                key={e.stt.toString()}
-                            >
-                                <h6>{e.stt}</h6>
-                                <h6 className="col-span-2 text-center">{e.id}</h6>
-                                <h6 className="col-span-3 line-clamp-1">{e.name}</h6>
-                                <h6 className="col-span-2 text-right">{e.quantity?.toLocaleString()}</h6>
-                            </div>
-                        ))}
+                        {
+                            isLoading
+                                ?
+                                <div className='flex flex-col gap-2'>
+                                    {
+                                        Array.from({ length: 10 }).map((_, index) => (
+                                            <div className='h-[40px] w-full bg-slate-100 animate-pulse'></div>
+                                        ))
+
+
+                                    }
+                                </div>
+                                :
+                                convertData?.length > 0
+                                    ?
+                                    convertData.map((e, index) => (
+                                        <div
+                                            className="grid grid-cols-8 gap-3 py-4 pl-3 pr-4 hover:bg-white"
+                                            key={e?.item_id}
+                                        >
+                                            <h6 className='col-span-1 text-sm'>{index + 1}</h6>
+                                            <h6 className="col-span-2 text-sm text-center">{e?.item_code}</h6>
+                                            <h6 className="col-span-3 text-sm line-clamp-1">{e?.item_name}</h6>
+                                            <h6 className="col-span-2 text-sm text-right">{formatNumber(e?.quantity)}</h6>
+                                        </div>
+                                    ))
+                                    :
+                                    <NoData type='dashboard' />
+                        }
+                        {hasNextPage && <LoadingButton ref={ref} />}
                     </div>
+
                 </Customscrollbar>
             </div>
         </div>

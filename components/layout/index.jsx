@@ -7,6 +7,7 @@ import { Customscrollbar } from '../UI/common/Customscrollbar';
 import { useSelector } from 'react-redux';
 import ChatBubbleAI from '../UI/chat/ChatAiBubble';
 import PopupAccountInformation from '../UI/popup/PopupAccountInformation';
+import PopupChangePassword from '../UI/popup/PopupChangePassword';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -23,18 +24,19 @@ const Index = ({ children, ...props }) => {
         <QueryClientProvider client={queryClient}>
             <div>
                 <Header />
-                <Customscrollbar className="max-h-screen" style={{ height: "100vh" }}>
+                <div>
                     {children}
-                </Customscrollbar>
+                </div>
             </div>
-            <PopupAppTrial />
-            <PopupAppRenewal />
+            <PopupAppTrial {...props} />
+            <PopupAppRenewal {...props} />
             {
                 stateBoxChatAi.isShowAi && (
                     <ChatBubbleAI {...props} />
                 )
             }
             <PopupAccountInformation {...props} />
+            <PopupChangePassword {...props} />
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
     );

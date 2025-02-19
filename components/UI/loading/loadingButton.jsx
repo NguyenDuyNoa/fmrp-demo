@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 
-const LoadingButton = ({ hiddenTitle = false, className }) => {
+const LoadingButton = forwardRef(({ hiddenTitle = false, className }, ref) => {
     return (
-        <>
+        <div className='flex items-center gap-0.5 justify-center' ref={ref}>
             <svg
                 aria-hidden="true"
                 role="status"
@@ -23,8 +23,8 @@ const LoadingButton = ({ hiddenTitle = false, className }) => {
             {
                 !hiddenTitle && <p>Loading...</p>
             }
-        </>
+        </div>
     )
-}
+})
 
 export default LoadingButton
