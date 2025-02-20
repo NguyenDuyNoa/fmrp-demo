@@ -338,7 +338,7 @@ const SalesOrder = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.sales_product_list || "sales_product_list"}
                             </h2>
@@ -380,7 +380,7 @@ const SalesOrder = (props) => {
                         {/* table */}
                         <ContainerTable>
                             {/* combobox search, excel */}
-                            <div className="xl:space-y-1 space-y-2">
+                            <div className="space-y-2 xl:space-y-1">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
@@ -456,7 +456,7 @@ const SalesOrder = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData sOnFetching={() => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -474,7 +474,7 @@ const SalesOrder = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -620,7 +620,7 @@ const SalesOrder = (props) => {
                                                                         />
                                                                     ))}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} className="w-fit mx-auto">
+                                                            <RowItemTable colSpan={1} className="mx-auto w-fit">
                                                                 <TagBranch>{e?.branch_name}</TagBranch>
                                                             </RowItemTable>
 
@@ -661,7 +661,7 @@ const SalesOrder = (props) => {
                                                                                                         : "text-slate-500"
                                                                                                         } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
                                                                                                 >
-                                                                                                    <div className="flex justify-center items-center w-full gap-1">
+                                                                                                    <div className="flex items-center justify-center w-full gap-1">
                                                                                                         <h6>
                                                                                                             {
                                                                                                                 dataLang[item?.name]
@@ -685,7 +685,7 @@ const SalesOrder = (props) => {
                                                                                         {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
                                                                                         {isValue && item?.reference && item?.reference.slice(0, isExpanded ? item?.reference?.length : 2).map((ci, index) => (
                                                                                             <div
-                                                                                                className="flex-col flex"
+                                                                                                className="flex flex-col"
                                                                                                 key={index}
                                                                                             >
                                                                                                 {ci?.code}
@@ -724,11 +724,11 @@ const SalesOrder = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <ContainerTotal className={"grid-cols-12"}>
+                    <ContainerTotal className={"grid-cols-13"}>
                         <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
                             {dataLang?.total_outside || "total_outside"}
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={"right"} className="ustify-end pr-4 flex gap-2 flex-wrap ">
+                        <ColumnTable colSpan={1} textAlign={"right"} className="">
                             {formatNumber(data?.rTotal?.total_amount)}
                         </ColumnTable>
                     </ContainerTotal>
