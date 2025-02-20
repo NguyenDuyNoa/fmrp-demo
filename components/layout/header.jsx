@@ -630,8 +630,8 @@ const Header = () => {
             title: "Quy trình",
             sub: [
                 {
-                    title: "Quy trình",
-                    img: "/icon/header/quytrinh/process.svg",
+                    // title: "Quy trình",
+                    // img: "/icon/header/quytrinh/process.svg",
                     items: [
                         {
                             name: "Quy trình sử dụng phần mềm FMRP",
@@ -1146,6 +1146,25 @@ const Header = () => {
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
                         </button>
+                        <button
+                            title="Góp ý"
+                            onClick={() => {
+
+                            }}
+                            className=""
+                        >
+                            <Image
+                                alt=""
+                                src="/icon/header/message-text.svg"
+                                width={18}
+                                height={18}
+                                quality={100}
+                                className="object-contain w-[16px] h-[16px] min-w-[16px] min-h-[16px] transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </button>
                         <Link
                             href="#"
                             title="Thông báo"
@@ -1175,11 +1194,11 @@ const Header = () => {
                         <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"} >
                             <Image
                                 alt=""
-                                src="/icon/header/ques.png"
+                                src="/icon/header/question.png"
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain w-[16px] h-[16px] min-w-[16px] min-h-[16px] transition"
+                                className="object-contain w-[21px] h-[21px] min-w-[21px] min-h-[21px] transition"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1376,7 +1395,7 @@ const DropdownAvatar = React.memo(() => {
                                 />
                                 <span>Đổi mật khẩu</span>
                             </button>
-                            <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2">
+                            {/* <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2">
                                 <Image
                                     alt=""
                                     src="/icon/header/avatar/inbox.png"
@@ -1389,7 +1408,7 @@ const DropdownAvatar = React.memo(() => {
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
                                 <span>Góp ý</span>
-                            </button>
+                            </button> */}
                             {/* <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2">
                                 <Image
                                     alt=""

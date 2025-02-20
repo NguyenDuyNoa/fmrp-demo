@@ -1,6 +1,7 @@
 export const FORMAT_MOMENT = {
     DATE_LONG: "YYYY-MM-DD",
     MONTH: "MM",
+    YY: "YYYY",
     MM_YYYY: "MM/YYYY",
     YYYY_MM_DD_SLASH: "YYYY/MM/DD",
     DATE_SLASH_LONG: "DD/MM/YYYY",

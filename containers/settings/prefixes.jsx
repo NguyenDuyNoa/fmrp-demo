@@ -20,16 +20,19 @@ const Prefixes = (props) => {
     const { data } = usePrefixesList()
 
     const _HandleChangeInput = (id, value) => {
-        let newData = []
-        const index = data?.rResult.findIndex((x) => x.id === id);
-        if (data?.rResult) {
-            if (data.rResult[index]) {
-                data.rResult[index].prefix = value.target?.value;
-            }
-            newData = data.rResult;
-        }
-        queryClient.setQueryData(['api_prefixes'], newData)
+        if (!data?.rResult) return;
+
+        const newData = data.rResult.map(item =>
+            item.id === id ? { ...item, prefix: value.target?.value } : item
+        );
+
+        queryClient.setQueryData(['api_prefixes'], {
+            ...data,
+            rResult: newData
+        });
+
     };
+
 
     const _ServerSending = async () => {
         let formData = new FormData();
@@ -43,9 +46,9 @@ const Prefixes = (props) => {
             if (isSuccess) {
                 isShow("success", dataLang[message] || message);
                 sOnSending(false);
-            } else {
-                isShow("error", dataLang[message] || message);
+                return
             }
+            isShow("error", dataLang[message] || message);
         } catch (error) {
         }
     };
@@ -92,17 +95,12 @@ const Prefixes = (props) => {
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 Thiết Lập Tiếp Đầu Ngữ
                             </h2>
-                            <Customscrollbar
-                                className="max-h-[600px] min:h-[500px] h-[85%] max:h-[800px]"
-                            >
+                            <Customscrollbar className="max-h-[600px] min:h-[500px] h-[85%] max:h-[800px]">
                                 <div className="grid grid-cols-2 gap-5">
                                     {data?.rResult?.map((e) => (
-                                        <div>
-                                            <div
-                                                key={e.id?.toString()}
-                                                className="flex items-center space-x-3 pr-10"
-                                            >
-                                                <label className="w-40">
+                                        <div key={e.id?.toString()}>
+                                            <div className="flex items-center pr-10 space-x-3" >
+                                                <label className="w-[40%]">
                                                     {dataLang[e.type] || e.type}{" "}
                                                     <span className="text-red-500">
                                                         *
@@ -110,15 +108,10 @@ const Prefixes = (props) => {
                                                 </label>
                                                 <input
                                                     value={e.prefix}
-                                                    onChange={_HandleChangeInput.bind(
-                                                        this,
-                                                        e.id
-                                                    )}
+                                                    onChange={_HandleChangeInput.bind(this, e.id)}
                                                     type="text"
-                                                    placeholder={`Nhập ${dataLang[e.type] ||
-                                                        e.type
-                                                        }`}
-                                                    className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-60 bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                                    placeholder={`Nhập ${dataLang[e.type] || e.type}`}
+                                                    className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[60%] bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                                 />
                                             </div>
                                             {err && e.prefix === "" && (
@@ -132,7 +125,7 @@ const Prefixes = (props) => {
                                 </div>
                             </Customscrollbar>
                         </div>
-                        <div className="flex space-x-5 py-5 ml-1">
+                        <div className="flex py-5 ml-1 space-x-5">
                             <button
                                 onClick={_HandleSubmit.bind(this)}
                                 className="px-8 py-2.5 rounded transition hover:scale-105 bg-[#0F4F9E] text-white"
