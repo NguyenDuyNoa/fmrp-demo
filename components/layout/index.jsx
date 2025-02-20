@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import ChatBubbleAI from '../UI/chat/ChatAiBubble';
 import PopupAccountInformation from '../UI/popup/PopupAccountInformation';
 import PopupChangePassword from '../UI/popup/PopupChangePassword';
+import PopupRecommendation from '../UI/popup/PopupRecommendation';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -37,6 +38,7 @@ const Index = ({ children, ...props }) => {
             }
             <PopupAccountInformation {...props} />
             <PopupChangePassword {...props} />
+            <PopupRecommendation {...props} />
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
     );

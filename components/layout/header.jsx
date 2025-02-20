@@ -1149,7 +1149,12 @@ const Header = () => {
                         <button
                             title="Góp ý"
                             onClick={() => {
-
+                                dispatch({
+                                    type: "statePopupRecommendation",
+                                    payload: {
+                                        open: true
+                                    }
+                                })
                             }}
                             className=""
                         >

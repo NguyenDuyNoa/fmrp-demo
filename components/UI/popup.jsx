@@ -9,6 +9,7 @@ const deca = Lexend_Deca({
 const inter = Inter({ subsets: ["latin"] });
 
 import 'simplebar-react/dist/simplebar.min.css';
+import { Customscrollbar } from "./common/Customscrollbar";
 
 const Popup = (props) => {
     return (
@@ -24,8 +25,10 @@ const Popup = (props) => {
                 // repositionOnResiz={props.repositionOnResiz}
                 className={`${props.className} popup-edit`}
             >
+                {/* <Customscrollbar scrollableNodePropsClassName='[&>div]:w-auto [&>div]:min-w-fit' className='max-h-[99vh]'> */}
                 <div className="3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 ">
-                    <div className={`${inter.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl `}>
+                    <div
+                        className={`${inter.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl w-full`}>
                         <div className={`${props.classNameTittle ? props.classNameTittle : "items-center"} flex justify-between`}>
                             <h1 className="text-[#101828] font-medium !text-base !capitalize">
                                 {/* <h1 className="text-[#101828] font-medium 3xl:text-[22px] 2xl:text-[18px] text-lg"> */}
@@ -43,9 +46,12 @@ const Popup = (props) => {
                                 </button>
                             }
                         </div>
+
                         {props.children}
+
                     </div>
                 </div>
+                {/* </Customscrollbar> */}
             </PopupParent>
         </React.Fragment>
     );
