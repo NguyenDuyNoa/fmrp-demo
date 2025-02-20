@@ -77,7 +77,7 @@ const PopupDetail = (props) => {
                                                         height={25}
                                                         defaultSrc="/user-placeholder.jpg"
                                                         alt="Image"
-                                                        className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                        className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
                                                     />
                                                     <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
                                                         <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">

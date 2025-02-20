@@ -31,7 +31,7 @@ export const styles = {
         alignment: "right",
         fontSize: 12,
         bold: true,
-        color: "#0F4F9E",
+        color: "#0251be",
         margin: [0, 1],
     },
     headerInfoText: {

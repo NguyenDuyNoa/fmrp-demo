@@ -98,7 +98,7 @@ const PopupDetailThere = (props) => {
                                     <GeneralInformation  {...props} />
                                     <div className="grid grid-cols-9  min-h-[130px] px-2">
                                         <div className="col-span-3">
-                                            <div className="my-4 font-semibold grid grid-cols-2">
+                                            <div className="grid grid-cols-2 my-4 font-semibold">
                                                 <h3 className=" text-[13px] ">
                                                     {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                                 </h3>
@@ -106,7 +106,7 @@ const PopupDetailThere = (props) => {
                                                     {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                 </h3>
                                             </div>
-                                            <div className="my-4 font-semibold grid grid-cols-2">
+                                            <div className="grid grid-cols-2 my-4 font-semibold">
                                                 <h3 className=" text-[13px] ">
                                                     {props.dataLang?.import_code_vouchers || "import_code_vouchers"}
                                                 </h3>
@@ -114,7 +114,7 @@ const PopupDetailThere = (props) => {
                                                     {data?.code}
                                                 </h3>
                                             </div>
-                                            <div className="my-4 font-semibold grid grid-cols-2">
+                                            <div className="grid grid-cols-2 my-4 font-semibold">
                                                 <h3 className=" text-[13px] ">
                                                     {props.dataLang?.import_the_order || "import_the_order"}
                                                 </h3>
@@ -125,11 +125,11 @@ const PopupDetailThere = (props) => {
                                         </div>
 
                                         <div className="col-span-3">
-                                            <div className="my-4 font-medium grid grid-cols-2">
+                                            <div className="grid grid-cols-2 my-4 font-medium">
                                                 <h3 className=" text-[13px] ">
                                                     {props.dataLang?.import_payment_status || "import_payment_status"}
                                                 </h3>
-                                                <div className="flex flex-wrap  gap-2 items-center justify-center">
+                                                <div className="flex flex-wrap items-center justify-center gap-2">
                                                     {(data?.status_pay === "not_spent" && (<TagColorSky className={'!py-1'} name={"Chưa chi"} />)) ||
                                                         (data?.status_pay === "spent_part" && (
                                                             <TagColorOrange className={'!py-1'} name={`Chi 1 phần (${formatNumber(data?.amount_paid)})`} />
@@ -139,17 +139,17 @@ const PopupDetailThere = (props) => {
                                                         ))}
                                                 </div>
                                             </div>
-                                            <div className="my-4 font-medium grid grid-cols-2">
+                                            <div className="grid grid-cols-2 my-4 font-medium">
                                                 <h3 className=" text-[13px] ">
                                                     {props.dataLang?.import_from_browse || "import_from_browse"}
                                                 </h3>
-                                                <div className="flex flex-wrap  gap-2 items-center justify-center">
+                                                <div className="flex flex-wrap items-center justify-center gap-2">
                                                     <TagWarehouse data={data} />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="col-span-3 ">
-                                            <div className="my-4 font-medium grid grid-cols-2">
+                                            <div className="grid grid-cols-2 my-4 font-medium">
                                                 <h3 className="text-[13px]">
                                                     {props.dataLang?.import_supplier || "import_supplier"}
                                                 </h3>
@@ -171,11 +171,11 @@ const PopupDetailThere = (props) => {
                                                             height={25}
                                                             defaultSrc="/user-placeholder.jpg"
                                                             alt="Image"
-                                                            className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                            className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
                                                         />
                                                         <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                            <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                            <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                                <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                             </span>
                                                         </span>
                                                     </div>
@@ -186,7 +186,7 @@ const PopupDetailThere = (props) => {
                                                     </h6>
                                                 </div>{" "}
                                             </div>
-                                            <div className="my-4 font-medium grid grid-cols-2">
+                                            <div className="grid grid-cols-2 my-4 font-medium">
                                                 <h3 className="text-[13px]">
                                                     {props.dataLang?.import_branch || "import_branch"}
                                                 </h3>
@@ -253,7 +253,7 @@ const PopupDetailThere = (props) => {
                                                                 // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                                                                 // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 `} key={e.id?.toString()}>
                                                                 <div
-                                                                    className="grid grid-cols-13 hover:bg-slate-50 items-center border-b"
+                                                                    className="grid items-center border-b grid-cols-13 hover:bg-slate-50"
                                                                     key={e.id?.toString()}
                                                                 >
                                                                     <h6 className="text-[13px]   py-0.5 col-span-1 text-center">
@@ -273,7 +273,7 @@ const PopupDetailThere = (props) => {
                                                                                 <ModalImage
                                                                                     small="/nodata.png"
                                                                                     large="/nodata.png"
-                                                                                    className="w-full h-full rounded object-contain p-1"
+                                                                                    className="object-contain w-full h-full p-1 rounded"
                                                                                 >
                                                                                     {" "}
                                                                                 </ModalImage>
@@ -286,7 +286,7 @@ const PopupDetailThere = (props) => {
                                                                                 e?.item?.name
                                                                             }
                                                                         </h6>
-                                                                        <div className="flex-col items-center font-oblique flex-wrap">
+                                                                        <div className="flex-col flex-wrap items-center font-oblique">
                                                                             {dataProductSerial.is_enable === "1" ? (
                                                                                 <div className="flex gap-0.5">
                                                                                     <h6 className="text-[12px]">
@@ -374,7 +374,7 @@ const PopupDetailThere = (props) => {
                                     <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                         {props.dataLang?.purchase_total || "purchase_total"}
                                     </h2>
-                                    <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                    <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                         <div className="col-span-7">
                                             <h3 className="text-[13px] p-1 font-semibold">
                                                 {props.dataLang?.import_from_note || "import_from_note"}
@@ -453,7 +453,7 @@ const PopupDetailThere = (props) => {
                                         <GeneralInformation  {...props} />
                                         <div className="grid grid-cols-8  min-h-[100px] px-2">
                                             <div className="col-span-3">
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}
                                                     </h3>
@@ -461,7 +461,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
-                                                <div className="my-2 items-center font-medium grid grid-cols-2">
+                                                <div className="grid items-center grid-cols-2 my-2 font-medium">
                                                     <h3 className=" text-[13px] ">
                                                         {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                                     </h3>
@@ -475,11 +475,11 @@ const PopupDetailThere = (props) => {
                                                                 height={25}
                                                                 defaultSrc="/user-placeholder.jpg"
                                                                 alt="Image"
-                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                                className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
                                                             />
                                                             <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                                    <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                                 </span>
                                                             </span>
                                                         </div>
@@ -490,7 +490,7 @@ const PopupDetailThere = (props) => {
                                                         </h6>
                                                     </div>
                                                 </div>{" "}
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}
                                                     </h3>
@@ -503,7 +503,7 @@ const PopupDetailThere = (props) => {
                                                 <div className="my-4 font-semibold text-[13px]">
                                                     {props.dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}
                                                 </div>
-                                                <div className="flex flex-wrap  gap-2 items-center justify-center">
+                                                <div className="flex flex-wrap items-center justify-center gap-2">
 
                                                     {(data?.status_pay ===
                                                         "not_spent" && (
@@ -521,7 +521,7 @@ const PopupDetailThere = (props) => {
                                             </div>
                                             <div className="col-span-3 ">
                                                 {" "}
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="text-[13px] ">
                                                         {props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                                     </h3>
@@ -529,7 +529,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.supplier_name}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="text-[13px]">
                                                         {props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                                     </h3>
@@ -631,7 +631,7 @@ const PopupDetailThere = (props) => {
                                         <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                             {props.dataLang?.purchase_total || "purchase_total"}
                                         </h2>
-                                        <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                        <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                             <div className="col-span-7">
                                                 <div>
                                                     <div className="text-[#344054] font-semibold 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">
@@ -714,7 +714,7 @@ const PopupDetailThere = (props) => {
                                         <GeneralInformation  {...props} />
                                         <div className="grid grid-cols-8  min-h-[170px] px-2">
                                             <div className="col-span-3">
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}
                                                     </h3>
@@ -722,7 +722,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}
                                                     </h3>
@@ -730,7 +730,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.delivery_date != null ? formatMoment(data?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}
                                                     </h3>
@@ -738,7 +738,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.code}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                                     </h3>
@@ -757,7 +757,7 @@ const PopupDetailThere = (props) => {
                                                 <div className="my-4 font-medium text-[13px]">
                                                     {"Trạng thái nhập hàng"}
                                                 </div>
-                                                <div className="flex flex-wrap  gap-2 items-center justify-start">
+                                                <div className="flex flex-wrap items-center justify-start gap-2">
                                                     {(data?.import_status === "not_stocked" && (
                                                         <TagColorSky className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                     )) ||
@@ -781,7 +781,7 @@ const PopupDetailThere = (props) => {
                                                 </div>
                                             </div>
                                             <div className="col-span-3 ">
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="text-[13px]">
                                                         {props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                                     </h3>
@@ -801,11 +801,11 @@ const PopupDetailThere = (props) => {
                                                                 height={25}
                                                                 defaultSrc="/user-placeholder.jpg"
                                                                 alt="Image"
-                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                                className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
                                                             />
                                                             <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                                    <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                                 </span>
                                                             </span>
                                                         </div>
@@ -816,11 +816,11 @@ const PopupDetailThere = (props) => {
                                                         </h6>
                                                     </div>{" "}
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="text-[13px]">
                                                         {props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                                     </h3>
-                                                    <TagBranch className="w-fit col-span-1">
+                                                    <TagBranch className="col-span-1 w-fit">
                                                         {data?.branch_name}
                                                     </TagBranch>
                                                 </div>
@@ -895,7 +895,7 @@ const PopupDetailThere = (props) => {
                                                                                     <ModalImage
                                                                                         small="/nodata.png"
                                                                                         large="/nodata.png"
-                                                                                        className="w-full h-full rounded object-contain p-1"
+                                                                                        className="object-contain w-full h-full p-1 rounded"
                                                                                     >
                                                                                         {" "}
                                                                                     </ModalImage>
@@ -953,7 +953,7 @@ const PopupDetailThere = (props) => {
                                         <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                             {props.dataLang?.purchase_total || "purchase_total"}
                                         </h2>
-                                        <div className="mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                        <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                             <div className="col-span-7">
                                                 <h3 className="text-[13px] p-1 font-medium">
                                                     {props.dataLang?.purchase_order_note || "purchase_order_note"}
@@ -1032,7 +1032,7 @@ const PopupDetailThere = (props) => {
                                         <GeneralInformation  {...props} />
                                         <div className="grid grid-cols-8  min-h-[140px] p-2">
                                             <div className="col-span-3">
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="col-span-1 text-[13px]">
                                                         {props.dataLang?.purchase_day || "purchase_day"}
                                                     </h3>
@@ -1040,7 +1040,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="col-span-1 text-[13px]">
                                                         {props.dataLang?.purchase_code || "purchase_code"}
                                                     </h3>
@@ -1048,7 +1048,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.code}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="col-span-1 text-[13px]">
                                                         {props.dataLang?.purchase_planNumber || "purchase_planNumber"}
                                                     </h3>
@@ -1062,7 +1062,7 @@ const PopupDetailThere = (props) => {
                                                 <div className="my-4 font-semibold text-[13px]">
                                                     {props.dataLang?.purchase_orderStatus || "purchase_orderStatus"}
                                                 </div>
-                                                <div className="flex flex-wrap  gap-2 items-center justify-start">
+                                                <div className="flex flex-wrap items-center justify-start gap-2">
                                                     {(data?.order_status
                                                         ?.status === "purchase_ordered" && (
                                                             <TagColorSky className={'!py-1'} name={props.dataLang[data?.order_status?.status]} />
@@ -1077,7 +1077,7 @@ const PopupDetailThere = (props) => {
                                                 </div>
                                             </div>
                                             <div className="col-span-3 ">
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="col-span-1 text-[13px]">
                                                         {props.dataLang?.purchase_status || "purchase_status"}
                                                     </h3>
@@ -1089,7 +1089,7 @@ const PopupDetailThere = (props) => {
                                                         )}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="col-span-1 text-[13px]">
                                                         {props.dataLang?.purchase_propnent || "purchase_propnent"}
                                                     </h3>
@@ -1103,11 +1103,11 @@ const PopupDetailThere = (props) => {
                                                                 height={25}
                                                                 defaultSrc="/user-placeholder.jpg"
                                                                 alt="Image"
-                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                                className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
                                                             />
                                                             <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                                    <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                                 </span>
                                                             </span>
                                                         </div>
@@ -1116,7 +1116,7 @@ const PopupDetailThere = (props) => {
                                                         </h6>
                                                     </div>{" "}
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="col-span-1 text-[13px]">
                                                         {props.dataLang?.purchase_branch || "purchase_branch"}
                                                     </h3>
@@ -1183,7 +1183,7 @@ const PopupDetailThere = (props) => {
                                                                                     <ModalImage
                                                                                         small="/nodata.png"
                                                                                         large="/nodata.png"
-                                                                                        className="w-full h-full rounded object-contain p-1"
+                                                                                        className="object-contain w-full h-full p-1 rounded"
                                                                                     >
                                                                                         {" "}
                                                                                     </ModalImage>
@@ -1225,7 +1225,7 @@ const PopupDetailThere = (props) => {
                                         <h2 className="font-medium p-2  border-b border-b-[#E7EAEE]  border-t z-10 border-t-[#E7EAEE] text-[13px] border-opacity-70">
                                             {props.dataLang?.purchase_total || "purchase_total"}
                                         </h2>
-                                        <div className=" mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">
+                                        <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-5 ">
                                             <div className="col-span-9">
                                                 <h3 className="text-[13px] p-1 font-medium">
                                                     {props.dataLang?.purchase_note || "import_from_note"}
@@ -1276,7 +1276,7 @@ const PopupDetailThere = (props) => {
                                         <GeneralInformation  {...props} />
                                         <div className="grid grid-cols-8  min-h-[170px] px-2">
                                             <div className="col-span-3">
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}
                                                     </h3>
@@ -1284,7 +1284,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}
                                                     </h3>
@@ -1292,7 +1292,7 @@ const PopupDetailThere = (props) => {
                                                         {data?.delivery_date != null ? formatMoment(data?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}
                                                     </h3>
@@ -1300,11 +1300,11 @@ const PopupDetailThere = (props) => {
                                                         {data?.code}
                                                     </h3>
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                                     </h3>
-                                                    <h3 className=" font-medium">
+                                                    <h3 className="font-medium ">
                                                         {data?.order_type == "0" ? (
 
                                                             <TagColorRed className={'!py-1'} name='Tạo mới' />
@@ -1320,7 +1320,7 @@ const PopupDetailThere = (props) => {
                                                 <div className="my-4 font-medium text-[13px]">
                                                     {"Trạng thái nhập hàng"}
                                                 </div>
-                                                <div className="flex flex-wrap  gap-2 items-center justify-start">
+                                                <div className="flex flex-wrap items-center justify-start gap-2">
                                                     {(data?.import_status === "not_stocked" && (
                                                         <TagColorSky className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                     )) ||
@@ -1342,7 +1342,7 @@ const PopupDetailThere = (props) => {
                                                 </div>
                                             </div>
                                             <div className="col-span-3 ">
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="text-[13px]">
                                                         {props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                                     </h3>
@@ -1354,7 +1354,7 @@ const PopupDetailThere = (props) => {
                                                     <h3 className="col-span-1 text-[13px] font-medium">
                                                         {props.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                                     </h3>
-                                                    <div className="my-2 font-medium grid grid-cols-2">
+                                                    <div className="grid grid-cols-2 my-2 font-medium">
                                                         <div className="flex items-center gap-2">
                                                             <div className="relative">
                                                                 <ImageErrors
@@ -1363,11 +1363,11 @@ const PopupDetailThere = (props) => {
                                                                     height={25}
                                                                     defaultSrc="/user-placeholder.jpg"
                                                                     alt="Image"
-                                                                    className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                                    className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
                                                                 />
                                                                 <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                    <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                        <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                    <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                                        <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -1379,7 +1379,7 @@ const PopupDetailThere = (props) => {
                                                         </div>
                                                     </div>{" "}
                                                 </div>
-                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                <div className="grid grid-cols-2 my-4 font-semibold">
                                                     <h3 className="text-[13px]">
                                                         {props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                                     </h3>
@@ -1458,7 +1458,7 @@ const PopupDetailThere = (props) => {
                                                                                     <ModalImage
                                                                                         small="/nodata.png"
                                                                                         large="/nodata.png"
-                                                                                        className="w-full h-full rounded object-contain p-1"
+                                                                                        className="object-contain w-full h-full p-1 rounded"
                                                                                     >
                                                                                         {" "}
                                                                                     </ModalImage>
@@ -1518,7 +1518,7 @@ const PopupDetailThere = (props) => {
                                         <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                             {props.dataLang?.purchase_total || "purchase_total"}
                                         </h2>
-                                        <div className="mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                        <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                             <div className="col-span-7">
                                                 <h3 className="text-[13px] p-1 font-medium">
                                                     {props.dataLang?.purchase_order_note || "purchase_order_note"}

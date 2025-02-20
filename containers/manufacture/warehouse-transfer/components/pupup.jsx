@@ -54,7 +54,7 @@ const PopupDetail = (props) => {
                                 <GeneralInformation {...props} />
                                 <div className="grid grid-cols-9  min-h-[100px] px-2 items-center bg-zinc-50">
                                     <div className="col-span-3">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
@@ -62,7 +62,7 @@ const PopupDetail = (props) => {
                                                 {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h3>
@@ -70,7 +70,7 @@ const PopupDetail = (props) => {
                                                 {data?.code}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
@@ -82,11 +82,11 @@ const PopupDetail = (props) => {
                                                         height={25}
                                                         defaultSrc="/user-placeholder.jpg"
                                                         alt="Image"
-                                                        className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                        className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
                                                     />
                                                     <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                        <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                            <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                         </span>
                                                     </span>
                                                 </div>
@@ -95,20 +95,20 @@ const PopupDetail = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props?.dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_from_browse || "import_from_browse"}
                                             </h3>
-                                            <div className="flex flex-wrap  gap-2 items-center ">
+                                            <div className="flex flex-wrap items-center gap-2 ">
                                                 <TagWarehouse data={data} />
                                             </div>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
                                             </h3>
@@ -122,7 +122,7 @@ const PopupDetail = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props?.dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                             </h3>
@@ -130,13 +130,13 @@ const PopupDetail = (props) => {
                                                 {formatNumber(data?.grand_total)}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
                                             <TagBranch className="w-fit">{data?.branch_name_id}</TagBranch>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
                                             </h3>
@@ -180,7 +180,7 @@ const PopupDetail = (props) => {
                                             <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                 {data?.items?.map((e) => (
                                                     <div
-                                                        className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
+                                                        className="grid items-center grid-cols-12 border-b hover:bg-slate-50"
                                                         key={e.id?.toString()}
                                                     >
                                                         <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
@@ -198,7 +198,7 @@ const PopupDetail = (props) => {
                                                                             <ModalImage
                                                                                 small="/nodata.png"
                                                                                 large="/nodata.png"
-                                                                                className="w-full h-full rounded object-contain p-1"
+                                                                                className="object-contain w-full h-full p-1 rounded"
                                                                             >
                                                                                 {" "}
                                                                             </ModalImage>
@@ -212,7 +212,7 @@ const PopupDetail = (props) => {
                                                                     <h6 className="text-[13px] text-left font-medium capitalize">
                                                                         {e?.item?.product_variation}
                                                                     </h6>
-                                                                    <div className="flex items-center font-oblique flex-wrap">
+                                                                    <div className="flex flex-wrap items-center font-oblique">
                                                                         {dataProductSerial.is_enable === "1" ? (
                                                                             <div className="flex gap-0.5">
                                                                                 <h6 className="text-[12px]">
@@ -289,7 +289,7 @@ const PopupDetail = (props) => {
                                 <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
-                                <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                     <div className="col-span-7">
                                         <h3 className="text-[13px] p-1">
                                             {props.dataLang?.returns_reason || "returns_reason"}

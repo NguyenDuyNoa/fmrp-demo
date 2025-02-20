@@ -208,7 +208,7 @@ const Popup_chitiet = (props) => {
                                                                                 height={40}
                                                                                 defaultSrc="/user-placeholder.jpg"
                                                                                 alt="Image"
-                                                                                className="object-cover min-w-[40px] min-h-[40px] rounded-[100%] text-left"
+                                                                                className="object-cover min-w-8 max-w-8 min-h-8 max-h-8 h-8 w-8 rounded-[100%] text-left"
                                                                             />
                                                                         </Tooltip>
                                                                     </span>

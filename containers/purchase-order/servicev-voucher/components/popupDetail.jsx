@@ -52,7 +52,7 @@ const PopupDetail = (props) => {
                                 <GeneralInformation  {...props} />
                                 <div className="grid grid-cols-8  min-h-[100px] px-2">
                                     <div className="col-span-3">
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}
                                             </h3>
@@ -60,7 +60,7 @@ const PopupDetail = (props) => {
                                                 {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
-                                        <div className="my-2 items-center font-medium grid grid-cols-2">
+                                        <div className="grid items-center grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
@@ -72,11 +72,11 @@ const PopupDetail = (props) => {
                                                         height={25}
                                                         defaultSrc="/user-placeholder.jpg"
                                                         alt="Image"
-                                                        className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                        className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
                                                     />
                                                     <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                        <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
+                                                            <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                                                         </span>
                                                     </span>
                                                 </div>
@@ -87,7 +87,7 @@ const PopupDetail = (props) => {
                                                 </h6>
                                             </div>
                                         </div>{" "}
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}
                                             </h3>
@@ -100,7 +100,7 @@ const PopupDetail = (props) => {
                                         <div className="my-4 font-semibold text-[13px]">
                                             {props.dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}
                                         </div>
-                                        <div className="flex flex-wrap  gap-2 items-center justify-center">
+                                        <div className="flex flex-wrap items-center justify-center gap-2">
                                             {(data?.status_pay === "not_spent" && (
                                                 <TagColorSky className={'!py-1'} name={"Chưa chi"} />
                                             )) ||
@@ -114,7 +114,7 @@ const PopupDetail = (props) => {
                                     </div>
 
                                     <div className="col-span-3 ">
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className="text-[13px] ">
                                                 {props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                             </h3>
@@ -123,7 +123,7 @@ const PopupDetail = (props) => {
                                             </h3>
                                         </div>
 
-                                        <div className="my-4 font-semibold grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-4 font-semibold">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                             </h3>
@@ -215,7 +215,7 @@ const PopupDetail = (props) => {
                                 <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
-                                <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                     <div className="col-span-7">
                                         <div>
                                             <div className="text-[#344054] font-semibold 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">

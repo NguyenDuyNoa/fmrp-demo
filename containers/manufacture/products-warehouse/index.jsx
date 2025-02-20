@@ -539,7 +539,7 @@ const ProductsWarehouse = (props) => {
                                                                             height={25}
                                                                             defaultSrc="/user-placeholder.jpg"
                                                                             alt="Image"
-                                                                            className="object-cover  rounded-[100%] text-left cursor-pointer"
+                                                                            className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6  rounded-[100%] text-left cursor-pointer"
                                                                         />
                                                                     </div>
                                                                 </ModalImage>

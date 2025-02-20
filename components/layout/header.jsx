@@ -445,16 +445,16 @@ const Header = () => {
                     // title: "Tiện ích",
                     // img: "/icon/header/khac/ti.png",
                     items: [
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Yêu cầu khiếu nại",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Lịch",
-                        },
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     name: "Yêu cầu khiếu nại",
+                        // },
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     name: "Lịch",
+                        // },
                         {
                             viewOwn:
                                 auth?.customers?.is_view_own == "1" ||
@@ -495,37 +495,37 @@ const Header = () => {
                 },
             ],
         },
-        {
-            title: "Công việc",
-            sub: [
-                {
-                    // title: "Công việc",
-                    // img: "/icon/header/khac/cv.png",
-                    items: [
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Danh sách công việc",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Danh sách kanban",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Lịch công việc",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Sơ đồ gant",
-                        },
-                    ],
-                },
-            ],
-        },
+        // {
+        //     title: "Công việc",
+        //     sub: [
+        //         {
+        //             // title: "Công việc",
+        //             // img: "/icon/header/khac/cv.png",
+        //             items: [
+        //                 {
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     name: "Danh sách công việc",
+        //                 },
+        //                 {
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     name: "Danh sách kanban",
+        //                 },
+        //                 {
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     name: "Lịch công việc",
+        //                 },
+        //                 {
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     name: "Sơ đồ gant",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
     ];
 
     const ListBaoCao = [
@@ -1302,7 +1302,7 @@ const DropdownAvatar = React.memo(() => {
                                         width={40}
                                         height={40}
                                         quality={100}
-                                        className="object-cover min-w-[40px] min-h-[40px] rounded-full"
+                                        className="object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
                                         loading="lazy"
                                         crossOrigin="anonymous"
                                         blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1314,7 +1314,7 @@ const DropdownAvatar = React.memo(() => {
                                         width={40}
                                         height={40}
                                         quality={100}
-                                        className="object-cover min-w-[40px] min-h-[40px] rounded-full"
+                                        className="object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
                                         loading="lazy"
                                         crossOrigin="anonymous"
                                         blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1404,7 +1404,8 @@ const DropdownAvatar = React.memo(() => {
                                 />
                                 <span>Giới thiệu - Tích điểm</span>
                             </button>
-                             */}<div className="flex px-4 py-2.5 justify-between items-center">
+                             */}
+                            {/* <div className="flex px-4 py-2.5 justify-between items-center">
                                 <div className="flex items-center space-x-2">
                                     <Image
                                         alt=""
@@ -1435,7 +1436,7 @@ const DropdownAvatar = React.memo(() => {
                                         <IconDown size={15} />
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                             <button
                                 onClick={_HandleLogout.bind(this)}
                                 className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2"

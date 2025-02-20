@@ -351,7 +351,7 @@ const PriceQuote = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.price_quote || "price_quote"}
                             </h2>
@@ -385,7 +385,7 @@ const PriceQuote = (props) => {
                             })}
                         </ContainerFilterTab>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9  xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
@@ -461,7 +461,7 @@ const PriceQuote = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -479,7 +479,7 @@ const PriceQuote = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -625,7 +625,7 @@ const PriceQuote = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e?.note}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="w-fit mx-auto">
+                                                        <RowItemTable colSpan={1} className="mx-auto w-fit">
                                                             <TagBranch>{e?.branch_name}</TagBranch>
                                                         </RowItemTable>
                                                         <RowItemTable
@@ -658,23 +658,23 @@ const PriceQuote = (props) => {
                         <ColumnTable
                             colSpan={1}
                             textAlign={"right"}
-                            className="justify-end p-2 flex gap-2 flex-wrap mr-1"
+                            className="flex flex-wrap justify-end gap-2 p-2 mr-1"
                         >
-                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                {formatNumber(dataPriceQuote?.rTotal?.total_price)}
-                            </h3>
+                            {/* <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"> */}
+                            {formatNumber(dataPriceQuote?.rTotal?.total_price)}
+                            {/* </h3> */}
                         </ColumnTable>
                         <ColumnTable
                             colSpan={1}
                             textAlign={"right"}
-                            className="justify-end p-2 flex gap-2 flex-wrap mr-1"
+                            className="flex flex-wrap justify-end gap-2 p-2 mr-1"
                         >
                             {formatNumber(dataPriceQuote?.rTotal?.total_tax_price)}
                         </ColumnTable>
                         <ColumnTable
                             colSpan={1}
                             textAlign={"right"}
-                            className="justify-end p-2 flex gap-2 flex-wrap mr-1"
+                            className="flex flex-wrap justify-end gap-2 p-2 mr-1"
                         >
                             {formatNumber(dataPriceQuote?.rTotal?.total_amount)}
                         </ColumnTable>

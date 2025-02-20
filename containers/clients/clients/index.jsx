@@ -402,7 +402,7 @@ const Client = (props) => {
                                                                         height={40}
                                                                         defaultSrc="/user-placeholder.jpg"
                                                                         alt="Image"
-                                                                        className="min-w-[40px] min-h-[40px] object-cover rounded-[100%] text-left cursor-pointer"
+                                                                        className="min-w-8 max-w-8 min-h-8 max-h-8 h-8 w-8 object-cover rounded-[100%] text-left cursor-pointer"
                                                                     />
                                                                 </Tooltip>
                                                             );
