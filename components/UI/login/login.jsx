@@ -19,6 +19,7 @@ import { Customscrollbar } from "../common/Customscrollbar";
 import LoadingButton from "../loading/loadingButton";
 import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { FiRefreshCcw } from "react-icons/fi";
 
 const LoginPage = React.memo((props) => {
     const initialState = {
@@ -821,7 +822,7 @@ const LoginPage = React.memo((props) => {
                                                                     initial={{ opacity: 0, y: -20 }}  // Bắt đầu từ trên, mờ
                                                                     animate={{ opacity: 1, y: 0 }}   // Hiện ra, trượt xuống
                                                                     exit={{ opacity: 0, y: -20 }}    // Khi biến mất, trượt lên
-                                                                    transition={{ duration: 0.6, ease: "easeOut" }} // Hiệu ứng mượt
+                                                                    transition={{ duration: 0.2, ease: "easeOut" }} // Hiệu ứng mượt
                                                                     className="flex flex-row items-start gap-5"
                                                                 >
                                                                     <div className="w-1/2 flex justify-center items-center bg-[#E2F0FE] text-[#1760B9] rounded text-sm px-2 py-3">
@@ -894,14 +895,14 @@ const LoginPage = React.memo((props) => {
                                                                     }}
                                                                     disabled={isState.countOtp > 0 || submitResendOtp.isPending}
                                                                     type="button"
-                                                                    className={`${isState.countOtp > 0 || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded  bg-gradient-to-l from-blue-700  via-blue-500 to-blue-700 btn-animation hover:scale-105 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                                    className={`${isState.countOtp > 0 || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} group w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded  bg-gradient-to-l from-[#0375f3]  via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                                                 >
                                                                     {
                                                                         submitResendOtp.isPending
                                                                             ?
                                                                             <LoadingButton />
                                                                             :
-                                                                            'Gửi lại mã xác thực'
+                                                                            <p className="flex items-center justify-center gap-2"><FiRefreshCcw className="w-4 h-4" /> <span>Gửi lại mã xác thực</span> </p>
                                                                     }
                                                                 </button>
                                                             )}
