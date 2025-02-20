@@ -361,7 +361,7 @@ const LoginPage = React.memo((props) => {
                                                 <button
                                                     type="submit"
                                                     onClick={handleSubmit((data) => onSubmit(data, "login"))}
-                                                    className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0375f3] via-[#0375f3] via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105"
+                                                    className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0375f3]  via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105"
                                                 >
                                                     {dataLang?.auth_login || "auth_login"}
                                                 </button>
@@ -864,7 +864,7 @@ const LoginPage = React.memo((props) => {
                                                     <>
                                                         <button
                                                             onClick={_HandleSelectStep.bind(this, 1)}
-                                                            className="hover:bg-blue-600 transition-all duration-200 ease-linear w-full py-3 text-center rounded bg bg-[#0F4F9E] text-white 3xl:mt-5 xl:mt-2 2xl:mt-2 mt-5"
+                                                            className=" bg-gradient-to-l from-[#0375f3]  via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105 w-full py-3 text-center rounded bg text-white 3xl:mt-5 xl:mt-2 2xl:mt-2 mt-5"
                                                         >
                                                             Tiếp theo
                                                         </button>
@@ -894,7 +894,7 @@ const LoginPage = React.memo((props) => {
                                                                     }}
                                                                     disabled={isState.countOtp > 0 || submitResendOtp.isPending}
                                                                     type="button"
-                                                                    className={`${isState.countOtp > 0 || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600/80 transition-all duration-200 ease-linear bg-blue-600 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                                    className={`${isState.countOtp > 0 || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded  bg-gradient-to-l from-blue-700  via-blue-500 to-blue-700 btn-animation hover:scale-105 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                                                 >
                                                                     {
                                                                         submitResendOtp.isPending
@@ -919,7 +919,7 @@ const LoginPage = React.memo((props) => {
                                                                     )();
                                                                 }}
                                                                 disabled={submitOtp.isPending || submitResendOtp.isPending}
-                                                                className={`${submitOtp.isPending || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} w-full py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                                className={`${submitOtp.isPending || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} w-full py-3 text-center rounded  bg-gradient-to-l from-blue-800  via-[#296dc1] to-blue-800 btn-animation hover:scale-105 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                                             >
                                                                 {
                                                                     (isState.isRegister ? submitOtp.isPending : submitResendOtp.isPending)
