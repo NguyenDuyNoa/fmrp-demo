@@ -288,7 +288,7 @@ const LoginPage = React.memo((props) => {
                                         <div className="space-y-1 3xl:space-y-8 xxl:space-y-2 2xl:space-y-3 xl:space-y-2 lg:space-y-1">
                                             <form onSubmit={handleSubmit((data) => onSubmit(data, "login"))} className="bg-white px-16 pt-20 pb-12 xxl:pb-10 xxl:pt-4 2xl:pb-15 2xl:pt-10 xl:pb-8 lg:pt-2 xl:pt-4 rounded-lg space-y-10 w-[600px]">
                                                 <div className="space-y-3">
-                                                    <h1 className="text-[#11315B] font-medium text-3xl text-center">
+                                                    <h1 className="text-[#11315B] font-medium text-3xl text-center capitalize">
                                                         {dataLang?.auth_login || "auth_login"}
                                                     </h1>
                                                 </div>
@@ -536,7 +536,7 @@ const LoginPage = React.memo((props) => {
                                 <div className="h-full col-span-3 bg-white ">
                                     <Customscrollbar scrollableNodePropsClassName={`  ${Object.keys(errors).length === 0 ? '[&>div]:h-full' : '[&>div]:my-3'}`} className="h-screen">
                                         <div className={`flex flex-col items-center  h-full  ${Object.keys(errors).length === 0 ? 'justify-center ' : 'justify-start'}`}>
-                                            <h1 className="text-[#11315B] 3xl:text-4xl xxl:text-3xl 2xl:text-3xl text-2xl font-[500]">
+                                            <h1 className="text-[#11315B] font-medium text-3xl text-center capitalize">
                                                 Đăng ký
                                             </h1>
                                             <h3 className="3xl:mt-8 xxl:mt-0 2xl:mt-0 mt-1 text-[#667085] 2xl:text-lg">
