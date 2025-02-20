@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import "sweetalert2/src/sweetalert2.scss";
 import { Customscrollbar } from "../common/Customscrollbar";
 import LoadingButton from "../loading/loadingButton";
+import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const LoginPage = React.memo((props) => {
     const initialState = {
@@ -426,7 +428,7 @@ const LoginPage = React.memo((props) => {
                                                 ))}
                                             </div> */}
                                         </div>
-                                        <div className="space-y-9">
+                                        <div className="space-y-4">
                                             <div className="pointer-events-none select-none">
                                                 <Image
                                                     alt=""
@@ -442,11 +444,13 @@ const LoginPage = React.memo((props) => {
                                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                                 />
                                             </div>
-                                            <div className="space-y-6">
-                                                <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
-                                                <div className="space-y-1 3xl:space-y-1 xxl:space-y-1 2xl:space-y-0">
-                                                    <p className="text-[#667085] font-light text-[16px]">
-                                                        Tối ưu sản xuất, tối đa năng suất, tối thiểu lãng phí
+                                            <div className="space-y-1">
+                                                <h1 className="text-[#344054] font-medium text-[19px] capitalize">Trợ lý sản xuất</h1>
+                                                <div className="space-y-1">
+                                                    <p className="text-[#344054] font-normal text-xl flex items-center">
+                                                        <FaQuoteLeft className="w-3 h-3 text-[#344054]" />
+                                                        <span className="mx-2">Tối ưu sản xuất, tối đa năng suất, tối thiểu lãng phí</span>
+                                                        <FaQuoteRight className="w-3 h-3 text-[#344054]" />
                                                     </p>
                                                     <p className="text-[#667085] font-light text-[16px]">
                                                         Hotline:
@@ -811,37 +815,49 @@ const LoginPage = React.memo((props) => {
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <div className="flex flex-row items-start gap-5">
-                                                            <div className="w-1/2 flex justify-center items-center bg-[#E2F0FE] text-[#1760B9] rounded text-sm px-2 py-3">
-                                                                Nhập mã xác thực qua Email
-                                                            </div>
-                                                            <div className="w-1/2">
-                                                                <input
-                                                                    type="number"
-                                                                    placeholder="Nhập mã xác thực"
-                                                                    name="otp"
-                                                                    {...register("otp", {
-                                                                        required: {
-                                                                            value: isState.checkValidateOtp,
-                                                                            message: "Vui lòng nhập mã xác thực",
-                                                                        },
-                                                                        minLength: {
-                                                                            value: isState.checkValidateOtp ? 6 : undefined,
-                                                                            message: isState.checkValidateOtp && "Mã xác thực tối thiểu 6 số",
-                                                                        },
-                                                                        maxLength: {
-                                                                            value: isState.checkValidateOtp ? 6 : undefined,
-                                                                            message: isState.checkValidateOtp && "Mã xác thực tối đa 6 số",
-                                                                        },
-                                                                    })}
-                                                                    className="w-full border border-[#D0D5DD] p-2.5 outline-none focus:border-[#3276FA] rounded placeholder:text-[13px] text-[13px]"
-                                                                />
+                                                        {
+                                                            isState.isRegister && (
+                                                                <motion.div
+                                                                    initial={{ opacity: 0, y: -20 }}  // Bắt đầu từ trên, mờ
+                                                                    animate={{ opacity: 1, y: 0 }}   // Hiện ra, trượt xuống
+                                                                    exit={{ opacity: 0, y: -20 }}    // Khi biến mất, trượt lên
+                                                                    transition={{ duration: 0.6, ease: "easeOut" }} // Hiệu ứng mượt
+                                                                    className="flex flex-row items-start gap-5"
+                                                                >
+                                                                    <div className="w-1/2 flex justify-center items-center bg-[#E2F0FE] text-[#1760B9] rounded text-sm px-2 py-3">
+                                                                        Nhập mã xác thực qua Email
+                                                                    </div>
+                                                                    <div className="w-1/2">
+                                                                        <input
+                                                                            type="number"
+                                                                            placeholder="Nhập mã xác thực"
+                                                                            name="otp"
+                                                                            {...register("otp", {
+                                                                                required: {
+                                                                                    value: isState.checkValidateOtp,
+                                                                                    message: "Vui lòng nhập mã xác thực",
+                                                                                },
+                                                                                minLength: {
+                                                                                    value: isState.checkValidateOtp ? 6 : undefined,
+                                                                                    message: isState.checkValidateOtp && "Mã xác thực tối thiểu 6 số",
+                                                                                },
+                                                                                maxLength: {
+                                                                                    value: isState.checkValidateOtp ? 6 : undefined,
+                                                                                    message: isState.checkValidateOtp && "Mã xác thực tối đa 6 số",
+                                                                                },
+                                                                            })}
+                                                                            className="w-full border border-[#D0D5DD] p-2.5 outline-none focus:border-[#3276FA] rounded placeholder:text-[13px] text-[13px]"
+                                                                        />
 
-                                                                {errors.otp && (
-                                                                    <span className="text-xs text-red-500">{errors.otp.message}</span>
-                                                                )}
-                                                            </div>
-                                                        </div>
+                                                                        {errors.otp && (
+                                                                            <span className="text-xs text-red-500">{errors.otp.message}</span>
+                                                                        )}
+                                                                    </div>
+                                                                </motion.div>
+                                                            )
+
+                                                        }
+
                                                     </div>
                                                 )}
                                                 {isState.stepRegister == 0 ? (
@@ -878,7 +894,7 @@ const LoginPage = React.memo((props) => {
                                                                     }}
                                                                     disabled={isState.countOtp > 0 || submitResendOtp.isPending}
                                                                     type="button"
-                                                                    className={` w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                                    className={` w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600/80 transition-all duration-200 ease-linear bg-blue-600 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                                                 >
                                                                     {
                                                                         submitResendOtp.isPending
