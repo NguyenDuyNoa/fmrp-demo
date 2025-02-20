@@ -894,7 +894,7 @@ const LoginPage = React.memo((props) => {
                                                                     }}
                                                                     disabled={isState.countOtp > 0 || submitResendOtp.isPending}
                                                                     type="button"
-                                                                    className={` w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600/80 transition-all duration-200 ease-linear bg-blue-600 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                                    className={`${isState.countOtp > 0 || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600/80 transition-all duration-200 ease-linear bg-blue-600 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                                                 >
                                                                     {
                                                                         submitResendOtp.isPending
@@ -919,7 +919,7 @@ const LoginPage = React.memo((props) => {
                                                                     )();
                                                                 }}
                                                                 disabled={submitOtp.isPending || submitResendOtp.isPending}
-                                                                className={`w-full py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                                className={`${submitOtp.isPending || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} w-full py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                                             >
                                                                 {
                                                                     (isState.isRegister ? submitOtp.isPending : submitResendOtp.isPending)
