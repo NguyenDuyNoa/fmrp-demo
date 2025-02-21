@@ -173,6 +173,29 @@ const LoginPage = React.memo((props) => {
         retryDelay: 5000
     })
 
+
+    const fnSetDataAuth = (value, res) => {
+        const { isSuccess, message, token, database_app } = res;
+        dispatch({ type: "auth/update", payload: res.data?.data });
+        CookieCore.set("tokenFMRP", token, {
+            expires: new Date(Date.now() + 86400 * 1000),
+            sameSite: true,
+        });
+        CookieCore.set("databaseappFMRP", database_app, {
+            expires: new Date(Date.now() + 86400 * 1000),
+        });
+        showToat("success", message);
+        if (isState.rememberMe) {
+            localStorage.setItem("usernameFMRP", value.name);
+            localStorage.setItem("usercodeFMRP", value.code);
+            localStorage.setItem("remembermeFMRP", isState.rememberMe);
+        } else {
+            ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach((key) =>
+                localStorage.removeItem(key)
+            );
+        }
+    }
+
     const onSubmit = async (data, type) => {
         if (type == "login") {
             try {
@@ -183,29 +206,11 @@ const LoginPage = React.memo((props) => {
                         password: data.password,
                     },
                 });
-                const { isSuccess, message, token, database_app } = res;
-                if (isSuccess) {
-                    dispatch({ type: "auth/update", payload: res.data?.data });
-                    CookieCore.set("tokenFMRP", token, {
-                        expires: new Date(Date.now() + 86400 * 1000),
-                        sameSite: true,
-                    });
-                    CookieCore.set("databaseappFMRP", database_app, {
-                        expires: new Date(Date.now() + 86400 * 1000),
-                    });
-                    showToat("success", message);
-                    if (isState.rememberMe) {
-                        localStorage.setItem("usernameFMRP", data.name);
-                        localStorage.setItem("usercodeFMRP", data.code);
-                        localStorage.setItem("remembermeFMRP", isState.rememberMe);
-                    } else {
-                        ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach((key) =>
-                            localStorage.removeItem(key)
-                        );
-                    }
+                if (res?.isSuccess) {
+                    fnSetDataAuth(data, res)
                     return
                 }
-                showToat("error", `${message || "Đăng nhập thất bại"}`);
+                showToat("error", `${res?.message || "Đăng nhập thất bại"}`);
             } catch (error) { }
         }
 
@@ -233,11 +238,13 @@ const LoginPage = React.memo((props) => {
             showToat("error", r?.message);
             queryState({ checkValidateOtp: false, });
         }
+
         if (type == "checkOtp") {
 
             // await handleVeryfyOtp(data?.otp);
 
         }
+
         if (type == "register") {
             queryState({ sendOtp: true });
 
@@ -256,25 +263,16 @@ const LoginPage = React.memo((props) => {
             }
             try {
 
-                const { isSuccess, message, code, email } = await submitOtp.mutateAsync(dataSubmit);
-                if (isSuccess) {
-                    showToat("success", message);
-                    queryState({ name: email, code: code, isRegister: false, isLogin: true, countOtp: 0 });
-                    setValue("code", code);
-                    setValue("name", email);
-                    setValue("password", data?.password);
-                    // làm 
-                    // onSubmit({
-                    //     ...data,
-                    //     company_code: code,
-                    //     user_name: email,
-                    //     password: data.password,
-                    // }, 'login')
+                const res = await submitOtp.mutateAsync(dataSubmit);
+                if (res?.isSuccess) {
+                    showToat("success", res?.message);
+                    queryState({ name: res?.email, code: res?.code, isRegister: false, isLogin: true, countOtp: 0 });
+                    fnSetDataAuth(data, res)
                     router.push("/");
                     return
                 }
                 queryState({ sendOtp: false });
-                showToat("error", message);
+                showToat("error", res?.message);
             } catch (error) { }
         }
     };
