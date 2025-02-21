@@ -52,38 +52,6 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         },
     ];
 
-    const listTab = [
-        {
-            id: 1,
-            name: dataLang?.productions_orders_modal_information || 'productions_orders_modal_information',
-            count: 0,
-        },
-        {
-            id: 2,
-            name: dataLang?.productions_orders_modal_appeared || 'productions_orders_modal_appeared',
-            count: 0,
-        },
-        {
-            id: 3,
-            name: dataLang?.productions_orders_modal_history_exporting_materials || 'productions_orders_modal_history_exporting_materials',
-            count: 1,
-        },
-        {
-            id: 4,
-            name: dataLang?.productions_orders_modal_history_import_product || 'productions_orders_modal_history_import_product',
-            count: 1,
-        },
-        {
-            id: 5,
-            name: dataLang?.productions_orders_modal_recovery_materials || 'productions_orders_modal_recovery_materials',
-            count: 2,
-        },
-        {
-            id: 6,
-            name: dataLang?.productions_orders_modal_costs_processing || 'productions_orders_modal_costs_processing',
-            count: 0,
-        },
-    ];
 
     const router = useRouter();
 
@@ -104,6 +72,8 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
     const queryStateModal = (key) => setIsStateModal((x) => ({ ...x, ...key }));
 
     const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
+
+
 
 
     useEffect(() => {
@@ -193,6 +163,39 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         placeholderData: keepPreviousData,
         ...optionsQuery,
     })
+
+    const listTab = [
+        {
+            id: 1,
+            name: dataLang?.productions_orders_modal_information || 'productions_orders_modal_information',
+            count: 0,
+        },
+        {
+            id: 2,
+            name: dataLang?.productions_orders_modal_appeared || 'productions_orders_modal_appeared',
+            count: 0,
+        },
+        {
+            id: 3,
+            name: dataLang?.productions_orders_modal_history_exporting_materials || 'productions_orders_modal_history_exporting_materials',
+            count: data?.dataDetail?.count_suggest_exporting ?? 0,
+        },
+        {
+            id: 4,
+            name: dataLang?.productions_orders_modal_history_import_product || 'productions_orders_modal_history_import_product',
+            count: data?.dataDetail?.count_purchase_products ?? 0,
+        },
+        {
+            id: 5,
+            name: dataLang?.productions_orders_modal_recovery_materials || 'productions_orders_modal_recovery_materials',
+            count: 0,
+        },
+        {
+            id: 6,
+            name: dataLang?.productions_orders_modal_costs_processing || 'productions_orders_modal_costs_processing',
+            count: 0,
+        },
+    ];
 
     const shareProps = { queryStateModal, isState, refetchProductionsOrders, isLoading, dataLang, isStateModal, width, listTab };
 

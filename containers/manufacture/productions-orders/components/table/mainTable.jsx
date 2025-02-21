@@ -240,12 +240,12 @@ const MainTable = ({ dataLang }) => {
                                     unit: i?.unit_name,
                                     processBar: i?.list_stages?.map((j) => {
                                         return {
+                                            ...j,
                                             id: uddid(),
-                                            active: false,
-                                            date: new Date(),
+                                            active: j?.active == "1",
+                                            date: j?.date_active,
                                             title: j?.name_stage,
-                                            status: "",
-                                            quantity: 0,
+
                                         };
                                     }),
                                     childProducts: i?.semi_products,
@@ -269,12 +269,11 @@ const MainTable = ({ dataLang }) => {
                                     unit: i?.unit_name,
                                     processBar: i?.list_stages?.map((j) => {
                                         return {
+                                            ...j,
                                             id: uddid(),
-                                            active: false,
-                                            date: new Date(),
+                                            active: j?.active == "1",
+                                            date: j?.date_active,
                                             title: j?.name_stage,
-                                            status: "",
-                                            quantity: 0,
                                         };
                                     }),
                                     childProducts: {
@@ -450,17 +449,17 @@ const MainTable = ({ dataLang }) => {
                                             "0": {
                                                 class: 'text-[#FF8F0D] bg-[#FEF8EC]',
                                                 circle: "bg-[#FF8F0D]",
-                                                title: dataLang?.productions_orders_produced || "productions_orders_produced"
+                                                title: dataLang?.productions_orders_produced ?? "productions_orders_produced"
                                             },
                                             "1": {
                                                 class: 'text-blue-500 bg-blue-100',
                                                 circle: "bg-blue-500",
-                                                title: 'Đang sản xuất'
+                                                title: dataLang?.productions_orders_in_progress ?? "productions_orders_in_progress"
                                             },
                                             "2": {
                                                 class: 'text-green-500 bg-green-50 ',
                                                 circle: "bg-green-500",
-                                                title: 'Hoàn thành'
+                                                title: dataLang?.productions_orders_completed ?? "productions_orders_completed"
                                             }
                                         }
 

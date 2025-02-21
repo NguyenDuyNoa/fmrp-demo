@@ -20,6 +20,8 @@ export const useLoadOutOfStock = () => {
         formData.append("pp_id", data?.items[0]?.pp_id ?? "");
 
         // }
+        console.log("data?.items", data?.items);
+
 
         for (let index = 0; index < data?.items?.length; index++) {
             const item = data.items[index];
@@ -39,6 +41,8 @@ export const useLoadOutOfStock = () => {
             formData.append(`items[${index}][number]`, item?.number ?? "");
             formData.append(`items[${index}][item_variation_id]`, item?.item_variation_id ?? "");
             formData.append(`items[${index}][unit_name]`, item?.unit_name ?? "");
+            formData.append(`items[${index}][unit_id]`, item?.unit_id ?? "");
+            formData.append(`items[${index}][image]`, item?.images ?? "");
         }
 
         const r = await getListLoadOutOfStock.mutateAsync(formData);

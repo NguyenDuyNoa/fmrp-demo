@@ -49,6 +49,9 @@ const adminState = {
     },
     statePopupRecommendation: {
         open: false
+    },
+    statePopupUpdateVersion: {
+        open: false
     }
 };
 
@@ -94,6 +97,8 @@ function adminReducer(state = adminState, action) {
             return { ...state, statePopupChangePassword: action.payload };
         case "statePopupRecommendation":
             return { ...state, statePopupRecommendation: action.payload };
+        case "statePopupUpdateVersion":
+            return { ...state, statePopupUpdateVersion: action.payload };
         default:
             return state;
     }

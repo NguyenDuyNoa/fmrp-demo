@@ -9,6 +9,7 @@ import ChatBubbleAI from '../UI/chat/ChatAiBubble';
 import PopupAccountInformation from '../UI/popup/PopupAccountInformation';
 import PopupChangePassword from '../UI/popup/PopupChangePassword';
 import PopupRecommendation from '../UI/popup/PopupRecommendation';
+import PopupUpdateVersion from '../UI/popup/PopupUpdateVersion';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -36,6 +37,7 @@ const Index = ({ children, ...props }) => {
                     <ChatBubbleAI {...props} />
                 )
             }
+            <PopupUpdateVersion {...props} />
             <PopupAccountInformation {...props} />
             <PopupChangePassword {...props} />
             <PopupRecommendation {...props} />

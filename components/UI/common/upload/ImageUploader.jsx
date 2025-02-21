@@ -5,7 +5,8 @@ import { IoIosClose } from "react-icons/io";
 
 
 export const FILE_IMAGES = ["image/png", "image/jpeg", 'image/jpg', 'image/gif', 'image/webp', 'image/svg+xml']
-const ImageUploader = ({ onChange, maxFiles = 5, acceptedFormats = FILE_IMAGES, maxSizeMB = 2, classNameReview }) => {
+
+const ImageUploader = ({ onChange, maxFiles = 5, acceptedFormats = FILE_IMAGES, maxSizeMB = 2, classNameReview, dataLang }) => {
     const isShow = useToast();
     const [selectedImages, setSelectedImages] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
@@ -19,7 +20,7 @@ const ImageUploader = ({ onChange, maxFiles = 5, acceptedFormats = FILE_IMAGES, 
 
         // Kiểm tra tổng số file
         if (selectedImages.length + newFiles.length > maxFiles) {
-            isShow('error', `Bạn chỉ có thể tải lên tối đa ${maxFiles} ảnh.`);
+            isShow('error', `${dataLang?.image_up_loader_max_files ?? "image_up_loader_max_files"} ${maxFiles} ${dataLang?.image_up_loader_images ?? "image_up_loader_images"}.`);
             return;
         }
 
@@ -29,15 +30,15 @@ const ImageUploader = ({ onChange, maxFiles = 5, acceptedFormats = FILE_IMAGES, 
             const isDuplicate = selectedImages.some(img => img.file.name === file.name);
 
             if (!isValidType) {
-                isShow('error', `Chỉ chấp nhận định dạng: ${acceptedFormats.join(", ")}.`);
+                isShow('error', `${dataLang?.image_up_loader_accept_formats ?? "image_up_loader_accept_formats"}: ${acceptedFormats.join(", ")}.`);
                 return false;
             }
             if (!isValidSize) {
-                isShow('error', `File "${file.name}" vượt quá dung lượng tối đa ${maxSizeMB}MB.`);
+                isShow('error', `File "${file.name}" ${dataLang?.image_up_loader_exceed_size ?? "image_up_loader_exceed_size"} ${maxSizeMB}MB.`);
                 return false;
             }
             if (isDuplicate) {
-                isShow('error', `File "${file.name}" đã tồn tại trong danh sách.`);
+                isShow('error', `File "${file.name}" ${dataLang?.image_up_loader_already_exists ?? "image_up_loader_already_exists"}.`);
                 return false;
             }
 
@@ -100,7 +101,7 @@ const ImageUploader = ({ onChange, maxFiles = 5, acceptedFormats = FILE_IMAGES, 
                 />
                 <div className="flex flex-col items-center text-gray-500">
                     <FiUpload className="w-6 h-6" />
-                    <span className="text-xs">Kéo & Thả hoặc Click để chọn hình ảnh</span>
+                    <span className="text-xs">{dataLang?.image_up_loader_drag_drop ?? "image_up_loader_drag_drop"}</span>
                 </div>
             </div>
 

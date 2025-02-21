@@ -40,7 +40,7 @@ const TableChart = React.memo((props) => {
                         <div className='flex flex-col gap-2'>
                             {
                                 Array.from({ length: 10 }).map((_, index) => (
-                                    <div className='h-[40px] w-full bg-slate-100 animate-pulse'></div>
+                                    <div key={index} className='h-[40px] w-full bg-slate-100 animate-pulse'></div>
                                 ))
 
 

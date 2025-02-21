@@ -26,7 +26,8 @@ const Popup = (props) => {
                 className={`${props.className} popup-edit`}
             >
                 {/* <Customscrollbar scrollableNodePropsClassName='[&>div]:w-auto [&>div]:min-w-fit' className='max-h-[99vh]'> */}
-                <div className="3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 ">
+                <div className="">
+                    {/* <div className="3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 "> */}
                     <div
                         className={`${inter.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl w-full`}>
                         <div className={`${props.classNameTittle ? props.classNameTittle : "items-center"} flex justify-between`}>
@@ -34,7 +35,7 @@ const Popup = (props) => {
                                 {/* <h1 className="text-[#101828] font-medium 3xl:text-[22px] 2xl:text-[18px] text-lg"> */}
                                 {props.title}
                             </h1>
-                            {props?.type
+                            {(props?.type || !props.onClose)
                                 ?
                                 ""
                                 :

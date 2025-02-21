@@ -1,10 +1,20 @@
 import React, { useState } from 'react'
 import { ArrowRight2 } from "iconsax-react";
 import NoData from '@/components/UI/noData/nodata';
+import { useGetProductionProgressByGroup } from '@/hooks/dashboard/useGetProductionProgressByGroup';
+import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 
-const ProductionProgressTracker = React.memo(() => {
+const ProductionProgressTracker = React.memo((props) => {
+
+    const { dataLang } = props
+
     const [tab, sTab] = useState(0);
+
     const _HandleTab = (e) => sTab(e);
+
+    const { data: dataProduction, isLoading } = useGetProductionProgressByGroup();
+
+    console.log("dataProduction", dataProduction);
 
     const data = [
         {
@@ -24,9 +34,9 @@ const ProductionProgressTracker = React.memo(() => {
         },
     ];
     return (
-        <div className="p-3 space-y-4 border rounded-lg bg-slate-50/60 border-slate-50">
-            <div className="flex items-center justify-between">
-                <h2>Tiến độ SX theo nhóm</h2>
+        <div className="p-3 border rounded-lg bg-slate-50/60 border-slate-50">
+            <div className="flex items-center justify-between mt-[12px] mb-[32px] mx-2 ">
+                <h2>{dataLang?.production_progress_tracker_group_progress ?? "production_progress_tracker_group_progress"}</h2>
                 {/* <button className="text-[#667085] bg-[#F3F4F6] px-4 py-2 rounded flex space-x-2 items-center hover:scale-105 transition">
                     <span>Xem chi tiết</span>
                     <ArrowRight2 size={18} />
@@ -37,7 +47,7 @@ const ProductionProgressTracker = React.memo(() => {
                     <NoData type='dashboard' />
                 </div>
             } */}
-            <div className="flex overflow-hidden border rounded-lg w-fit">
+            {/* <div className="flex overflow-hidden border rounded-lg w-fit">
                 <button
                     onClick={_HandleTab.bind(this, 0)}
                     className={`${tab === 0 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
@@ -66,37 +76,58 @@ const ProductionProgressTracker = React.memo(() => {
                 >
                     Tạm dừng
                 </button>
-            </div>
-            <div className="py-3 divide-y divide-slate-200">
-                {data.map((e) => (
-                    <div className="flex items-center justify-between py-2 hover:bg-slate-100/30" key={e.name}>
-                        <div className="flex space-x-2 items-center w-[45%]">
-                            <div className="min-w-[48px] h-12 rounded-full bg-slate-300" />
-                            <div className="w-fit">
-                                <h6 className="line-clamp-1">{e.name}</h6>
-                                <p className="text-[#9295A4] font-[300] text-[13px]">{e.date}</p>
+            </div> */}
+            <div className="divide-y divide-slate-200">
+                <Customscrollbar className="max-h-[395px] h-[395px]">
+                    {
+                        isLoading
+                            ?
+                            <div className='flex flex-col gap-2'>
+                                {
+                                    Array.from({ length: 9 }).map((_, index) => (
+                                        <div key={index} className='h-[40px] w-full bg-slate-100 animate-pulse'></div>
+                                    ))
+                                }
                             </div>
-                        </div>
-                        <div
-                            className={`${e.percent >= 50 ? "bg-[#EBF5FF]" : "bg-[#f6e8cd6d]"
-                                } w-[28%] relative h-2 rounded-full bg-[#EBF5FF]`}
-                        >
-                            <div
-                                className={`${e.percent >= 50 ? "bg-[#5599EC]" : "bg-[#FF8F0D]"
-                                    } h-2 rounded-full absolute left-0`}
-                                style={{ width: `${e.percent}%` }}
-                            />
-                        </div>
-                        <h6
-                            className={`${e.percent >= 50
-                                ? "text-[#5599EC] bg-[#EBF5FF] border-[#d4e8fd]"
-                                : "text-[#FF8F0D] bg-[#FEF8EC] border-[#f6e8cd]"
-                                } py-2 w-[10%] text-center rounded-md border`}
-                        >
-                            {e.percent}%
-                        </h6>
-                    </div>
-                ))}
+                            :
+                            dataProduction?.data?.items?.length > 0
+                                ?
+                                dataProduction?.data?.items?.map((e) => (
+                                    <div
+                                        className="flex items-center justify-between py-2"
+                                        key={e?.name_category}
+                                    >
+                                        <div className="flex space-x-2 items-center w-[45%]">
+                                            {/* <div className="min-w-[48px] h-12 rounded-full bg-slate-300" /> */}
+                                            <div className="w-fit">
+                                                <h6 className="line-clamp-1">{e.name_category}</h6>
+                                                {/* <p className="text-[#9295A4] font-[300] text-[13px]">{e.date}</p> */}
+                                            </div>
+                                        </div>
+                                        <div
+                                            className={`${e.pecent >= 50 ? "bg-[#EBF5FF]" : "bg-[#f6e8cd6d]"
+                                                } w-[28%] relative h-2 rounded-full bg-[#EBF5FF]`}
+                                        >
+                                            <div
+                                                className={`${e.pecent >= 50 ? "bg-[#5599EC]" : "bg-[#FF8F0D]"
+                                                    } h-2 rounded-full absolute left-0`}
+                                                style={{ width: `${e.pecent}%` }}
+                                            />
+                                        </div>
+                                        <h6
+                                            className={`${e.pecent >= 50
+                                                ? "text-[#5599EC] bg-[#EBF5FF] border-[#d4e8fd]"
+                                                : "text-[#FF8F0D] bg-[#FEF8EC] border-[#f6e8cd]"
+                                                } py-2 w-[10%] text-center rounded-md border`}
+                                        >
+                                            {e.pecent}%
+                                        </h6>
+                                    </div>
+                                ))
+                                :
+                                <NoData type='dashboard' />
+                    }
+                </Customscrollbar>
             </div>
         </div>
     );

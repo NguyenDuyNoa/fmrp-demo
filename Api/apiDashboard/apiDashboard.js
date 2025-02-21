@@ -10,6 +10,11 @@ const apiDashboard = {
         const response = await axiosCustom('GET', `/api_web/Api_Dashboard/dashboardTopProducedProducts`, params);
         return response.data
     },
+    // tiến độ sx theo nhóm
+    async apiGetDashboardProductionProgressByGroup(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_Dashboard/dashboardProductionProgressByGroup`, params);
+        return response.data
+    },
     // nvl cần mua
     async apiGetDashboardMaterialsToPurchase(params) {
         const response = await axiosCustom('GET', `/api_web/Api_Dashboard/dashboardMaterialsToPurchase`, params);

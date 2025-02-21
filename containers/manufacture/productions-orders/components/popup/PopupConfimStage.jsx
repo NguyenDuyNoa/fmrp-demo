@@ -243,6 +243,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
         }
     }, [isState.open])
 
+    console.log("1222222", isState.dataTableBom?.data?.boms);
 
     return (
         <PopupCustom
@@ -391,7 +392,10 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                 />
                             </div>
                             <div className="">
-                                <Customscrollbar ref={tableRef} className="h-[calc(80vh_/_2_-_115px)] overflow-x-hidden overflow-y-hidden bg-white hover:overflow-x-auto hover:overflow-y-auto">
+                                <Customscrollbar
+                                    ref={tableRef}
+                                    className="h-[calc(80vh_/_2_-_115px)] overflow-auto bg-white"
+                                >
                                     <table className="w-full text-sm font-normal border border-separate border-gray-200 table-auto border-spacing-0">
                                         <thead className="sticky top-0 z-10 bg-gray-100">
                                             <tr>
@@ -422,11 +426,11 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                         <td className="p-2 border sticky left-[200px] bg-white">
                                                             <div className="flex items-center justify-center">
                                                                 <ModalImage
-                                                                    small={row?.images ?? "/nodata.png"}
-                                                                    large={row?.images ?? "/nodata.png"}
+                                                                    small={row?.images ? row?.images : "/nodata.png"}
+                                                                    large={row?.images ? row?.images : "/nodata.png"}
                                                                     width={36}
                                                                     height={36}
-                                                                    alt={row?.images ?? "/nodata.png"}
+                                                                    alt={row?.images ? row?.images : "/nodata.png"}
                                                                     className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
                                                                 />
                                                             </div>
@@ -505,7 +509,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                         {/* Xuất kho sản xuất */}
                         <div>
                             <div className="mb-4 text-lg font-normal">Xuất kho sản xuất</div>
-                            <Customscrollbar className="h-[calc(80vh_/_2_-_115px)] overflow-x-hidden bg-white hover:overflow-x-auto overflow-y-hidden hover:overflow-y-auto">
+                            <Customscrollbar className="h-[calc(80vh_/_2_-_115px)] overflow-auto bg-white ">
                                 <table className="w-full text-sm [&>thead>tr>th]:font-normal border border-separate border-spacing-0 border-gray-200 table-auto">
                                     <thead className="sticky top-0 z-10 bg-gray-100">
                                         <tr>
@@ -534,22 +538,51 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                             <td className="p-2 border">
                                                                 <div className="flex items-center justify-center ">
                                                                     <ModalImage
-                                                                        small={row?.images ?? "/nodata.png"}
-                                                                        large={row?.images ?? "/nodata.png"}
+                                                                        small={row?.images ? row?.images : "/nodata.png"}
+                                                                        large={row?.images ? row?.images : "/nodata.png"}
                                                                         width={36}
                                                                         height={36}
-                                                                        alt={row?.images ?? "/nodata.png"}
+                                                                        alt={row?.images ? row?.images : "/nodata.png"}
                                                                         className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
                                                                     />
                                                                 </div>
                                                             </td>
-                                                            <td className="p-2 text-sm border">
+                                                            <td className="p-2 text-sm border flex flex-col gap-0.5">
                                                                 <p>
                                                                     {row?.item_name}
                                                                 </p>
                                                                 <p className="text-xs italic">
                                                                     {row?.product_variation}
                                                                 </p>
+                                                                {
+                                                                    row?.reference_no_detail && (
+                                                                        <p className="text-xs">
+                                                                            {row?.reference_no_detail}
+                                                                        </p>
+                                                                    )
+                                                                }
+                                                                {/* type_item */}
+                                                                <div className="flex items-center gap-1">
+                                                                    <span className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
+                                                                     ${(row?.type_products === "products" && "text-lime-500 border-lime-500") ||
+                                                                        (row?.type_products == "semi_products" && "text-orange-500 border-orange-500") ||
+                                                                        (row?.type_products == "out_side" && "text-sky-500 border-sky-500") ||
+                                                                        (row?.type_products == "materials" && "text-purple-500 border-purple-500") ||
+                                                                        (row?.type_products == "material" && "text-purple-500 border-purple-500") ||
+                                                                        (row?.type_products == "semi_products_outside" && "text-green-500 border-green-500")
+                                                                        }`}
+                                                                    >
+                                                                        {dataLang[row?.type_products] ?? row?.type_products}
+                                                                    </span>
+                                                                    {
+                                                                        row?.stage_name && (
+                                                                            <span className="py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-teal-500 border-teal-500 text-xs">
+                                                                                {row?.stage_name}
+                                                                            </span>
+                                                                        )
+                                                                    }
+                                                                </div>
+
                                                             </td>
                                                             <td className="p-2 text-sm text-center border">
                                                                 {formatNumber(row?.quantity_total_quota)} <span className="relative text-xs top-1">/{row?.unit_name}</span>

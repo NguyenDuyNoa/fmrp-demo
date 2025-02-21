@@ -8,6 +8,7 @@ import { memo, useContext } from "react";
 import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
+import TimelineChartStage from "./components/TimelineChartStage";
 
 const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
     const dataSeting = useSetingServer();
@@ -100,67 +101,64 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
                                         <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
                                             {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
                                         </h4>
-                                        <h4 className="flex items-center col-span-5">
+                                        <div className="col-span-5">
+                                            <TimelineChartStage data={i?.processBar} dataLang={dataLang} />
+                                        </div>
+                                        {/* <h4 className="flex items-center col-span-5">
                                             {i.processBar.map((j, JIndex) => {
                                                 return (
                                                     <div key={j.id} className="flex flex-col items-start w-full">
-                                                        {/* <div className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
-                                                                {moment(j.date).format('DD/MM/YYYY, HH:mm:ss')}
-                                                                <span>{j.status}</span>
-                                                                <span>({moment(j.date).format('DD/MM/YYYY')})</span>
-                                                            </div> */}
-                                                        {/* <p
-                                                                className={`${
-                                                                    j.active ? "text-[#0BAA2E]" : "text-gray-500"
+                                                        <div className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
+                                                            {moment(j.date).format('DD/MM/YYYY, HH:mm:ss')}
+                                                            <span>{j.status}</span>
+                                                            <span>({moment(j.date).format('DD/MM/YYYY')})</span>
+                                                        </div>
+                                                        <p
+                                                            className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"
                                                                 } font-normal 3xl:text-[10px] text-[9px] flex flex-col`}
-                                                            >
-                                                                <span>{j.status}</span>
-                                                                <span>({moment(j.date).format("DD/MM/YYYY")})</span>
-                                                            </p> */}
+                                                        >
+                                                            <span>{j.status}</span>
+                                                            <span>({moment(j.date).format("DD/MM/YYYY")})</span>
+                                                        </p>
 
-                                                        {/* <li
-                                                                className={`${
-                                                                    JIndex == i.processBar.length - 1
-                                                                        ? "flex w-full relative text-gray-900 "
-                                                                        : `flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${
-                                                                              j.active
-                                                                                  ? "after:bg-[#00C170]"
-                                                                                  : "after:bg-gray-500"
-                                                                          }   after:inline-block after:absolute after:top-1 after:left-[25px]`
+                                                        <li
+                                                            className={`${JIndex == i.processBar.length - 1
+                                                                ? "flex w-full relative text-gray-900 "
+                                                                : `flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active
+                                                                    ? "after:bg-[#00C170]"
+                                                                    : "after:bg-gray-500"
+                                                                }   after:inline-block after:absolute after:top-1 after:left-[25px]`
                                                                 }`}
-                                                            >
-                                                                <div className="z-10 block whitespace-nowrap">
-                                                                    <span
-                                                                        className={`w-[10px] h-[10px]  border-2  ${
-                                                                            j.active
-                                                                                ? "bg-[#00C170] border-[#00C170]"
-                                                                                : "bg-gray-500 border-gray-500"
+                                                        >
+                                                            <div className="z-10 block whitespace-nowrap">
+                                                                <span
+                                                                    className={`w-[10px] h-[10px]  border-2  ${j.active
+                                                                        ? "bg-[#00C170] border-[#00C170]"
+                                                                        : "bg-gray-500 border-gray-500"
                                                                         } rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}
-                                                                    ></span>
-                                                                    <p
-                                                                        className={`${
-                                                                            j.active
-                                                                                ? "text-[#0BAA2E]"
-                                                                                : "text-gray-500"
+                                                                ></span>
+                                                                <p
+                                                                    className={`${j.active
+                                                                        ? "text-[#0BAA2E]"
+                                                                        : "text-gray-500"
                                                                         } font-normal 3xl:text-[11px] text-[10px]`}
-                                                                    >
-                                                                        {j.title}
-                                                                    </p>
+                                                                >
+                                                                    {j.title}
+                                                                </p>
 
-                                                                    <p
-                                                                        className={` ${
-                                                                            j.quantity > 0 ? "opacity-100" : "opacity-0"
+                                                                <p
+                                                                    className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"
                                                                         } text-[#0BAA2E] font-normal text-[10px]`}
-                                                                    >
-                                                                        SL:
-                                                                        <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
-                                                                            {j.quantity > 0
-                                                                                ? formatNumber(j.quantity)
-                                                                                : "-"}
-                                                                        </span>
-                                                                    </p>
-                                                                </div>
-                                                            </li> */}
+                                                                >
+                                                                    SL:
+                                                                    <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
+                                                                        {j.quantity > 0
+                                                                            ? formatNumber(j.quantity)
+                                                                            : "-"}
+                                                                    </span>
+                                                                </p>
+                                                            </div>
+                                                        </li>
                                                         <li className={`${JIndex == i.processBar.length - 1 ? "list-none flex w-full relative text-gray-900 "
                                                             : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 
                                                                     ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} after:inline-block after:absolute after:top-1 after:left-[15px]`}`}
@@ -181,7 +179,7 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
                                                     </div>
                                                 );
                                             })}
-                                        </h4>
+                                        </h4> */}
                                     </div>
                                 ))}
                             </div>

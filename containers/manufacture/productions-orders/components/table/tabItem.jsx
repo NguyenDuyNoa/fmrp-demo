@@ -8,13 +8,18 @@ import { memo, useContext } from "react";
 import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
+import TimelineChartStage from "./components/TimelineChartStage";
 
 const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel }) => {
+
+
     const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     const { isStateProvider: isState } = useContext(ProductionsOrdersContext);
+
+    console.log("ok1", isState?.listDataRight?.dataPPItems);
 
     return (
         <>
@@ -40,7 +45,7 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel 
                 <Customscrollbar className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[36vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto">
                     {isState?.listDataRight?.dataPPItems?.length > 0 ? (
                         isState?.listDataRight?.dataPPItems?.map((e) => (
-                            <div key={e.id} className="grid items-center grid-cols-12 ">
+                            <div key={e.id} className="grid items-center h-auto grid-cols-12">
                                 <div
                                     onClick={() => handShowItem(e.id, "dataPPItems")}
                                     className="col-span-12 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded cursor-pointer"
@@ -112,57 +117,55 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel 
                                         <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
                                             {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
                                         </h4>
-                                        <h4 className="flex items-center col-span-5">
-                                            {i.processBar.map((j, JIndex) => {
+                                        <div className="col-span-5">
+                                            <TimelineChartStage data={i?.processBar} dataLang={dataLang} />
+
+                                            {/* {i.processBar.map((j, JIndex) => {
                                                 return (
                                                     <div key={j.id} className="flex flex-col items-start w-full">
-                                                        {/* <div className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
-                                                                {moment(j.date).format('DD/MM/YYYY, HH:mm:ss')}
-                                                                <span>{j.status}</span>
-                                                                <span>({moment(j.date).format('DD/MM/YYYY')})</span>
-                                                            </div> */}
-                                                        {/* <p
-                                                                className={`${
-                                                                    j.active ? "text-[#0BAA2E]" : "text-gray-500"
-                                                                } font-normal 3xl:text-[10px] text-[9px] flex flex-col`}
-                                                            >
-                                                                <span>{j.status}</span>
-                                                                <span>({moment(j.date).format("DD/MM/YYYY")})</span>
-                                                            </p> */}
+                                                        <p
+                                                            className={`${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-gray-500"}  font-normal 3xl:text-[10px] text-[9px] flex flex-col`}
+                                                        >
+                                                            <span>{j.status}</span>
+                                                            <span className={j.date ? '' : 'opacity-0'}>{formatMoment(j.date, FORMAT_MOMENT.DATE_SLASH_LONG)}</span>
+                                                        </p>
 
                                                         <li
                                                             className={`${JIndex == i.processBar.length - 1
                                                                 ? "list-none flex w-full relative text-gray-900 "
                                                                 : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 
-                                                                    ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} after:inline-block after:absolute after:top-1 after:left-[15px]`
+                                                                    ${j?.active ? ' after:bg-[#10b981]' : j?.begin_production == 1 ? "after:bg-orange-600 " : "after:bg-gray-500"} after:inline-block after:absolute after:top-1 after:left-[15px]`
                                                                 }`}
                                                         >
-                                                            <div className="z-10 block whitespace-nowrap ">
-                                                                <span className={`w-[10px] h-[10px]  border-2  ${j.active
-                                                                    ? "bg-[#00C170] border-[#00C170]"
-                                                                    : "bg-gray-500 border-gray-500"
-                                                                    } rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}
+                                                            <div className="z-10 flex flex-col whitespace-nowrap">
+                                                                <span className={`w-[10px] h-[10px]  border-2  ${j?.active ? ' bg-[#10b981] border-[#10b981]' : j?.begin_production == 1 ? "bg-orange-600 border-orange-600 " : "bg-gray-500 border-gray-500"} rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}
                                                                 ></span>
-                                                                <p className={`${j.active
-                                                                    ? "text-[#0BAA2E]"
-                                                                    : "text-gray-500"
-                                                                    } font-normal absolute  3xl:text-[11px] text-[10px]`}
+
+                                                            </div>
+                                                            <div className="relative block w-full top-5">
+
+                                                                <p className={` ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-gray-500"} font-normal absolute  3xl:text-[11px] text-[10px]`}
                                                                 >
                                                                     {j.title}
                                                                 </p>
 
-                                                                <p className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"} text-[#0BAA2E] font-normal text-[10px]`} >
+                                                                <p className={` ${j?.dtPurchaseProduct?.quantity > 0 ? "opacity-100" : "opacity-0"}
+                                                                
+                                                                ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-gray-500"}
+                                                                
+                                                              font-normal text-[10px] `} >
                                                                     SL:
-                                                                    <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
-                                                                        {j.quantity > 0 ? formatNumber(j.quantity) : "-"}
+                                                                    <span className={` ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-gray-500"} font-semibold text-[11px] px-1`}>
+                                                                        {j.dtPurchaseProduct?.quantity > 0 ? formatNumber(j.dtPurchaseProduct?.quantity) : "-"}
                                                                     </span>
                                                                 </p>
                                                             </div>
+
                                                         </li>
                                                     </div>
                                                 );
-                                            })}
-                                        </h4>
+                                            })} */}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -175,6 +178,9 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel 
         </>
     );
 });
+
+
+
 
 const RenderHtml = ({ item }) => {
     const dataSeting = useSetingServer();

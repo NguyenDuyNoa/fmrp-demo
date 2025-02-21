@@ -61,7 +61,6 @@ function MainPage({ Component, pageProps }) {
 
     const tokenFMRP = CookieCore.get('tokenFMRP')
 
-
     const databaseappFMRP = CookieCore.get('databaseappFMRP')
 
     const { data: dataSeting } = useSetings()
