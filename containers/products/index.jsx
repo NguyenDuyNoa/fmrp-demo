@@ -41,6 +41,7 @@ import Popup_Detail from "./components/product/PopupDetail";
 import Popup_Products from "./components/product/popupProducts";
 import { useCategoryOptions } from "./hooks/product/useCategoryOptions";
 import { useProductList } from "./hooks/product/useProductList";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 const Products = (props) => {
     const dataLang = props.dataLang;
 

@@ -100,7 +100,7 @@ const PopupAppTrial = () => {
                                 </h2>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            {/* <div className="flex items-center gap-2">
                                 <div>
                                     <Verify size="18" color="green" className="animate-bounce" />
                                 </div>
@@ -123,7 +123,7 @@ const PopupAppTrial = () => {
 
                                     <span>ngày.</span>
                                 </h2>
-                            </div>
+                            </div> */}
 
                             <div className="flex items-center gap-2">
                                 <div>

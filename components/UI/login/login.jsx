@@ -263,6 +263,13 @@ const LoginPage = React.memo((props) => {
                     setValue("code", code);
                     setValue("name", email);
                     setValue("password", data?.password);
+                    // làm 
+                    // onSubmit({
+                    //     ...data,
+                    //     company_code: code,
+                    //     user_name: email,
+                    //     password: data.password,
+                    // }, 'login')
                     router.push("/");
                     return
                 }

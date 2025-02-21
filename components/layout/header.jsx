@@ -1213,9 +1213,9 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div className="px-10 py-0 pt-1 overflow-x-auto">
+            {/* <div className="px-10 py-0 pt-1 overflow-x-auto">
                 <Expirred />
-            </div>
+            </div> */}
         </header>
     );
 };
