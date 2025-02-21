@@ -265,7 +265,6 @@ const LoginPage = React.memo((props) => {
 
                 const res = await submitOtp.mutateAsync(dataSubmit);
                 if (res?.isSuccess) {
-                    showToat("success", res?.message);
                     queryState({ name: res?.email, code: res?.code, isRegister: false, isLogin: true, countOtp: 0 });
                     fnSetDataAuth(data, res)
                     router.push("/");
