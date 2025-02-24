@@ -106,7 +106,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                 if (isSuccess == 1) {
                     isShow("success", message);
                     queryValue({ page: 1 });
-                    fetchDataTable(1);
+                    fetchDataTable(1, 'submit');
                     _ToggleModal(false);
                     form.reset();
                     return

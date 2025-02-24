@@ -152,7 +152,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                 if (isSuccess) {
                     isShow("success", message);
                     queryValue({ page: 1 });
-                    fetchDataTable(1);
+                    fetchDataTable(1, 'submit');
                     _ToggleModal(false);
                     form.reset();
                     return

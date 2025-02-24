@@ -160,30 +160,28 @@ const MainTable = ({ dataLang }) => {
         branch_id: isValue.valueBr?.value || "",
     };
 
-    const fetchDataTable = async (page = 1) => {
+    useEffect(() => {
+        sIsParentId(null)
+    }, [isValue.search])
+
+    const fetchDataTable = async (page = 1, type) => {
         try {
             const { data } = await apiMaterialsPlanning.apiProductionPlans(page, isValue.limit, { params: params });
             const arrayItem = convertArrData(data?.productionPlans);
+
             queryState({
                 countAll: data?.countAll,
-                listDataLeft: arrayItem.map((e, index) => {
-                    return {
-                        ...e,
-                        showParent: isParentId ? e?.id == isParentId : index == 0,
-                    };
-                }),
+                listDataLeft: arrayItem,
                 next: data?.next == 1,
             });
-            if (isValue.search == "" && arrayItem[0]?.id) {
-                if (isParentId) {
-                    refetch()
-                } else {
-                    sIsParentId(arrayItem[0]?.id);
-                }
 
-            } else {
-                sIsParentId(arrayItem[0]?.id);
+            sIsParentId(isValue.search ? arrayItem[0]?.id : !isParentId ? arrayItem[0]?.id : isParentId ?? null)
+
+
+            if (type == 'submit') {
+                refetch()
             }
+
             if (data?.productionPlans?.length == 0) {
                 queryState({
                     listDataRight: {
@@ -214,24 +212,13 @@ const MainTable = ({ dataLang }) => {
             let arrayItem = [...dataTable.listDataLeft, ...item];
             queryState({
                 countAll: data?.countAll,
-                listDataLeft: arrayItem.map((e, index) => {
-                    return {
-                        ...e,
-                        showParent: isParentId ? e?.id == isParentId : index == 0,
-                    };
-                }),
+                listDataLeft: arrayItem,
                 next: data?.next == 1,
             });
-            if (isValue.search == "" && arrayItem[0]?.id) {
-                if (isParentId) {
-                    refetch()
-                } else {
-                    sIsParentId(arrayItem[0]?.id);
-                }
 
-            } else {
-                sIsParentId(arrayItem[0]?.id);
-            }
+            sIsParentId(isValue.search ? arrayItem[0]?.id : !isParentId ? arrayItem[0]?.id : isParentId ?? null)
+
+
             if (data?.productionPlans?.length == 0) {
                 queryState({
                     listDataRight: {
@@ -503,10 +490,7 @@ const MainTable = ({ dataLang }) => {
         listBranch,
         listOrder,
         queryValue,
-        fetchDataTable: (page) => {
-            fetchDataTable(page);
-            refetch()
-        },
+        fetchDataTable,
         fetchDataOrder,
         fetchDataPlan
     };
@@ -540,8 +524,12 @@ const MainTable = ({ dataLang }) => {
                             {dataTable.listDataLeft.map((e, eIndex) => (
                                 <div
                                     key={e.id}
-                                    onClick={() => handleShow(e.id)}
-                                    className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                    onClick={() => {
+                                        // refetch()
+                                        sIsParentId(e.id);
+                                    }}
+                                    // onClick={() => handleShow(e.id)}
+                                    className={`py-2 pl-2 pr-3 ${e.id == isParentId && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
                                 >
                                     <div className="flex justify-between">
                                         <div className="flex flex-col gap-1">
@@ -557,7 +545,7 @@ const MainTable = ({ dataLang }) => {
                                             <TagBranch className="w-fit">{e?.nameBranch}</TagBranch>
                                         </div>
                                     </div>
-                                    {e.showParent && (
+                                    {e.id == isParentId && (
                                         <div className="flex flex-col gap-2 mt-1">
                                             <div className="flex items-center gap-1">
                                                 <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
