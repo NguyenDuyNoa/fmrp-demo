@@ -26,11 +26,11 @@ import ButtonCancel from "@/components/UI/button/buttonCancel";
 const initialState = {
     onFetching: false,
     type: [
-        {
-            id: uuidv4(),
-            label: "materials_planning_semi",
-            value: "product",
-        },
+        // {
+        //     id: uuidv4(),
+        //     label: "materials_planning_semi",
+        //     value: "product",
+        // },
         {
             id: uuidv4(),
             label: "materials_planning_materials",
@@ -163,344 +163,342 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
 
     };
     return (
-        <>
-            <PopupCustom
-                title={dataLang?.materials_planning_add_purchase || "materials_planning_add_purchase"}
-                button={
-                    <button
-                        className="bg-blue-100 rounded-lg outline-none focus:outline-none"
-                        onClick={() => {
-                            if (+dataTable?.countAll == 0) {
-                                return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
-                            }
-                            _ToggleModal(true);
-                        }}
-                    >
-                        <div className="flex items-center gap-2 px-3 py-2 ">
-                            {icon}
-                            <h3 className="text-xs font-medium text-blue-600 3xl:text-base">{title}</h3>
+        <PopupCustom
+            title={dataLang?.materials_planning_add_purchase || "materials_planning_add_purchase"}
+            button={
+                <button
+                    className="bg-blue-100 rounded-lg outline-none focus:outline-none"
+                    onClick={() => {
+                        if (+dataTable?.countAll == 0) {
+                            return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
+                        }
+                        _ToggleModal(true);
+                    }}
+                >
+                    <div className="flex items-center gap-2 px-3 py-2 ">
+                        {icon}
+                        <h3 className="text-xs font-medium text-blue-600 3xl:text-base">{title}</h3>
+                    </div>
+                </button>
+            }
+            open={open}
+            onClose={_ToggleModal.bind(this, false)}
+            classNameBtn={className}
+        >
+            <div className="mt-4">
+                <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
+                <div className="grid grid-cols-12 gap-4">
+                    <div className="flex flex-col col-span-4">
+                        <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
+                            {dataLang?.materials_planning_date_purchase || "materials_planning_date_purchase"}{" "}
+                            <span className="text-red-500 ">*</span>
                         </div>
-                    </button>
-                }
-                open={open}
-                onClose={_ToggleModal.bind(this, false)}
-                classNameBtn={className}
-            >
-                <div className="mt-4">
-                    <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-                    <div className="grid grid-cols-12 gap-4">
-                        <div className="flex flex-col col-span-4">
-                            <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
-                                {dataLang?.materials_planning_date_purchase || "materials_planning_date_purchase"}{" "}
-                                <span className="text-red-500 ">*</span>
-                            </div>
-                            <Controller
-                                name="date"
-                                control={form.control}
-                                rules={{
-                                    required: {
-                                        value: true,
-                                        message: dataLang?.materials_planning_pease_select_purchase || "materials_planning_pease_select_purchase",
-                                    },
-                                }}
-                                render={({ field, fieldState }) => {
-                                    return (
-                                        <>
-                                            <div className="relative flex flex-row custom-date-picker">
-                                                <DatePicker
-                                                    {...field}
-                                                    ref={(ref) => {
-                                                        if (ref !== null) {
-                                                            field.ref({
-                                                                focus: ref.setFocus,
-                                                            });
-                                                        }
-                                                    }}
-                                                    fixedHeight
-                                                    id={field.name}
-                                                    showTimeSelect
-                                                    selected={field.value}
-                                                    placeholderText="DD/MM/YYYY HH:mm:ss"
-                                                    dateFormat="dd/MM/yyyy h:mm:ss aa"
-                                                    timeInputLabel={"Time: "}
-                                                    className={`border ${fieldState.error ? "border-red-500" : "border-[#d0d5dd]"
-                                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
-                                                />
-                                                {field.value && (
-                                                    <MdClear
-                                                        className="absolute right-10 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                        onClick={() => form.setValue("date", null)}
-                                                    />
-                                                )}
-                                                <BsCalendarEvent className="absolute right-5 top-1/2 -translate-y-1/2 text-[#CCCCCC] scale-110 cursor-pointer" />
-                                            </div>
-                                            {fieldState.error && (
-                                                <span className="text-[12px]  text-red-500">
-                                                    {fieldState.error.message}{" "}
-                                                </span>
-                                            )}
-                                        </>
-                                    );
-                                }}
-                            />
-                            <Controller
-                                name="type"
-                                control={form.control}
-                                render={({ field }) => {
-                                    return (
-                                        <div className="flex gap-8 mt-6 items-centerem">
-                                            {isState.type.map((e, index) => {
-                                                return (
-                                                    <div key={index} className="flex items-center cursor-pointer">
-                                                        <input
-                                                            id={e.value}
-                                                            type="radio"
-                                                            {...field}
-                                                            checked={field.value === e.value}
-                                                            onChange={() => field.onChange(e.value)}
-                                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 focus:ring-2"
-                                                        />
-                                                        <label
-                                                            htmlFor={e.value}
-                                                            className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
-                                                        >
-                                                            {dataLang[e.label] || e.label}
-                                                        </label>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    );
-                                }}
-                            />
-                        </div>
-                        <div className="col-span-4">
-                            <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
-                                {dataLang?.purchase_name || "purchase_name"} <span className="text-red-500 ">*</span>
-                            </div>
-                            <Controller
-                                name="purchaseName"
-                                rules={{
-                                    required: {
-                                        value: true,
-                                        message: dataLang?.materials_planning_enter_ticket || "materials_planning_enter_ticket",
-                                    },
-                                }}
-                                control={form.control}
-                                render={({ field, fieldState }) => {
-                                    return (
-                                        <>
-                                            <input
+                        <Controller
+                            name="date"
+                            control={form.control}
+                            rules={{
+                                required: {
+                                    value: true,
+                                    message: dataLang?.materials_planning_pease_select_purchase || "materials_planning_pease_select_purchase",
+                                },
+                            }}
+                            render={({ field, fieldState }) => {
+                                return (
+                                    <>
+                                        <div className="relative flex flex-row custom-date-picker">
+                                            <DatePicker
                                                 {...field}
-                                                name="fname"
-                                                type="text"
-                                                placeholder={dataLang?.purchase_name || "purchase_name"}
-                                                className={`${fieldState.error
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                                ref={(ref) => {
+                                                    if (ref !== null) {
+                                                        field.ref({
+                                                            focus: ref.setFocus,
+                                                        });
+                                                    }
+                                                }}
+                                                fixedHeight
+                                                id={field.name}
+                                                showTimeSelect
+                                                selected={field.value}
+                                                placeholderText="DD/MM/YYYY HH:mm:ss"
+                                                dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                                timeInputLabel={"Time: "}
+                                                className={`border ${fieldState.error ? "border-red-500" : "border-[#d0d5dd]"
+                                                    } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                             />
-                                            {fieldState.error && (
-                                                <span className="text-[12px]  text-red-500">
-                                                    {fieldState.error.message}{" "}
-                                                </span>
+                                            {field.value && (
+                                                <MdClear
+                                                    className="absolute right-10 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                    onClick={() => form.setValue("date", null)}
+                                                />
                                             )}
-                                        </>
-                                    );
-                                }}
-                            />
+                                            <BsCalendarEvent className="absolute right-5 top-1/2 -translate-y-1/2 text-[#CCCCCC] scale-110 cursor-pointer" />
+                                        </div>
+                                        {fieldState.error && (
+                                            <span className="text-[12px]  text-red-500">
+                                                {fieldState.error.message}{" "}
+                                            </span>
+                                        )}
+                                    </>
+                                );
+                            }}
+                        />
+                        <Controller
+                            name="type"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <div className="flex gap-8 mt-6 items-centerem">
+                                        {isState.type.map((e, index) => {
+                                            return (
+                                                <div key={index} className="flex items-center cursor-pointer">
+                                                    <input
+                                                        id={e.value}
+                                                        type="radio"
+                                                        {...field}
+                                                        checked={field.value === e.value}
+                                                        onChange={() => field.onChange(e.value)}
+                                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 focus:ring-2"
+                                                    />
+                                                    <label
+                                                        htmlFor={e.value}
+                                                        className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
+                                                    >
+                                                        {dataLang[e.label] || e.label}
+                                                    </label>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            }}
+                        />
+                    </div>
+                    <div className="col-span-4">
+                        <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
+                            {dataLang?.purchase_name || "purchase_name"} <span className="text-red-500 ">*</span>
                         </div>
-                        <div className="col-span-4">
-                            <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
-                                {dataLang?.sales_product_note || "sales_product_note"}
-                            </div>
-                            <Controller
-                                name="note"
-                                control={form.control}
-                                render={({ field }) => {
-                                    return (
-                                        <textarea
+                        <Controller
+                            name="purchaseName"
+                            rules={{
+                                required: {
+                                    value: true,
+                                    message: dataLang?.materials_planning_enter_ticket || "materials_planning_enter_ticket",
+                                },
+                            }}
+                            control={form.control}
+                            render={({ field, fieldState }) => {
+                                return (
+                                    <>
+                                        <input
                                             {...field}
-                                            placeholder={dataLang?.sales_product_note || "sales_product_note"}
                                             name="fname"
                                             type="text"
-                                            className="focus:border-[#92BFF7] border-[#d0d5dd] resize-none placeholder:text-slate-300 w-full min-h-[100px] max-h-[100px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
+                                            placeholder={dataLang?.purchase_name || "purchase_name"}
+                                            className={`${fieldState.error
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                         />
-                                    );
-                                }}
-                            />
-                        </div>
+                                        {fieldState.error && (
+                                            <span className="text-[12px]  text-red-500">
+                                                {fieldState.error.message}{" "}
+                                            </span>
+                                        )}
+                                    </>
+                                );
+                            }}
+                        />
                     </div>
-                    <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
-                        <HeaderTablePopup gridCols={12}>
-                            <ColumnTablePopup colSpan={4}>
-                                {dataLang?.price_quote_item || "price_quote_item"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup colSpan={1}>
-                                {dataLang?.materials_planning_dvt || "materials_planning_dvt"}
-                            </ColumnTablePopup>
-
-                            <ColumnTablePopup colSpan={2}>
-                                {dataLang?.materials_planning_qty_need_by || "materials_planning_qty_need_by"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup colSpan={2}>
-                                {dataLang?.materials_planning_qty_requested || "materials_planning_qty_requested"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup colSpan={2}>
-                                {dataLang?.materials_planning_qty_buys || "materials_planning_qty_buys"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup colSpan={1}>
-                                {dataLang?.inventory_operatione || "inventory_operatione"}
-                            </ColumnTablePopup>
-                        </HeaderTablePopup>
-                        {isState.onFetching ? (
-                            <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
-                        ) : findValue.arrayItem && findValue.arrayItem?.length > 0 ? (
-                            <>
-                                <Customscrollbar className="h-[300px] max-h-[300px] overflow-hidden">
-                                    <div className="h-full divide-y divide-slate-200">
-                                        {findValue.arrayItem?.map((e, index) => (
-                                            <div
-                                                key={e?.id?.toString()}
-                                                className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
-                                            >
-                                                <h6 className="text-[13px] flex items-center font-medium py-1 col-span-4 text-left">
-                                                    <div className={`flex items-center gap-2`}>
-                                                        <div>
-                                                            {e?.item?.image != null ? (
-                                                                <ModalImage
-                                                                    small={e?.item?.image}
-                                                                    large={e?.item?.image}
-                                                                    alt="Product Image"
-                                                                    className="custom-modal-image object-cover rounded w-[50px] h-[50px] mx-auto"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-[50px] h-[50px] object-cover  mx-auto">
-                                                                    <ModalImage
-                                                                        small="/nodata.png"
-                                                                        large="/nodata.png"
-                                                                        className="object-contain w-full h-full p-1 rounded"
-                                                                    ></ModalImage>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div>
-                                                            <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                {e?.item?.name}
-                                                            </h6>
-                                                            <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                {e?.item?.variation}
-                                                            </h6>
-                                                        </div>
-                                                    </div>
-                                                </h6>
-                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                    {e?.unit}
-                                                </h6>
-                                                {/* <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
-                                                    {e?.quantityKeepp == 0 ? "-" : e?.quantityKeepp}
-                                                </h6> */}
-                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
-                                                    {e?.quantityRest == 0 ? "-" : e?.quantityRest}
-                                                </h6>
-                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
-                                                    {e?.quantityPurchased == 0 ? "-" : e?.quantityPurchased}
-                                                </h6>
-                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
-                                                    <Controller
-                                                        name={`arrayItem.${index}.quantity`}
-                                                        control={form.control}
-                                                        rules={{
-                                                            required: {
-                                                                value: true,
-                                                                message: dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity",
-                                                            },
-                                                            validate: {
-                                                                fn: (value) => {
-                                                                    try {
-                                                                        let mss = "";
-                                                                        if (value == null) {
-                                                                            mss = dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity";
-                                                                        }
-                                                                        if (value == 0) {
-                                                                            mss = dataLang?.materials_planning_must_be_greater || "materials_planning_must_be_greater";
-                                                                        }
-                                                                        return mss || true;
-                                                                    } catch (error) {
-                                                                        throw error;
-                                                                    }
-                                                                },
-                                                            },
-                                                        }}
-                                                        render={({ field, fieldState }) => {
-                                                            return (
-                                                                <duv className="flex flex-col items-center justify-center">
-                                                                    <InPutNumericFormat
-                                                                        className={`${fieldState.error && "border-red-500"} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                                                        {...field}
-                                                                        onValueChange={(event) =>
-                                                                            field.onChange(event.value == "" ? null : +event.value)
-                                                                        }
-                                                                        isAllowed={(values) => {
-                                                                            // const { floatValue, value } = values;
-                                                                            // if (floatValue == 0) {
-                                                                            //     return true;
-                                                                            // }
-                                                                            // if (floatValue > x.value) {
-                                                                            //     isShow('warning', `Vui lòng nhập số nhỏ hơn hoặc bằng ${formatNumber(x.value)}`);
-                                                                            //     return false
-                                                                            // }
-                                                                            // if (floatValue < 0) {
-                                                                            //     isShow('warning', 'Vui lòng nhập lớn hơn 0');
-                                                                            //     return false
-                                                                            // }
-                                                                            return true;
-                                                                        }}
-                                                                    />
-                                                                    {fieldState.error && (
-                                                                        <span className="text-[12px]  text-red-500">
-                                                                            {fieldState.error.message}{" "}
-                                                                        </span>
-                                                                    )}
-                                                                </duv>
-                                                            );
-                                                        }}
-                                                    />
-                                                </h6>
-                                                <div className="flex items-center justify-center col-span-1">
-                                                    <button
-                                                        onClick={(event) => removeItem(e.id)}
-                                                        type="button"
-                                                        title="Xóa"
-                                                        className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                                                    >
-                                                        <IconDelete />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </Customscrollbar>
-                            </>
-                        ) : (
-                            <NoData />
-                        )}
-                        <div className="mt-5 space-x-2 text-right">
-                            <ButtonCancel
-                                loading={false}
-                                onClick={() => _ToggleModal(false)}
-                                dataLang={dataLang}
-                            />
-                            <ButtonSubmit
-                                loading={hangdingMutation.isPending}
-                                dataLang={dataLang}
-                                onClick={() => form.handleSubmit((data) => onSubmit(data))()}
-                            />
+                    <div className="col-span-4">
+                        <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
+                            {dataLang?.sales_product_note || "sales_product_note"}
                         </div>
+                        <Controller
+                            name="note"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <textarea
+                                        {...field}
+                                        placeholder={dataLang?.sales_product_note || "sales_product_note"}
+                                        name="fname"
+                                        type="text"
+                                        className="focus:border-[#92BFF7] border-[#d0d5dd] resize-none placeholder:text-slate-300 w-full min-h-[100px] max-h-[100px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
+                                    />
+                                );
+                            }}
+                        />
                     </div>
                 </div>
-            </PopupCustom>
-        </>
+                <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
+                    <HeaderTablePopup gridCols={12}>
+                        <ColumnTablePopup colSpan={4}>
+                            {dataLang?.price_quote_item || "price_quote_item"}
+                        </ColumnTablePopup>
+                        <ColumnTablePopup colSpan={1}>
+                            {dataLang?.materials_planning_dvt || "materials_planning_dvt"}
+                        </ColumnTablePopup>
+
+                        <ColumnTablePopup colSpan={2}>
+                            {dataLang?.materials_planning_qty_need_by || "materials_planning_qty_need_by"}
+                        </ColumnTablePopup>
+                        <ColumnTablePopup colSpan={2}>
+                            {dataLang?.materials_planning_qty_requested || "materials_planning_qty_requested"}
+                        </ColumnTablePopup>
+                        <ColumnTablePopup colSpan={2}>
+                            {dataLang?.materials_planning_qty_buys || "materials_planning_qty_buys"}
+                        </ColumnTablePopup>
+                        <ColumnTablePopup colSpan={1}>
+                            {dataLang?.inventory_operatione || "inventory_operatione"}
+                        </ColumnTablePopup>
+                    </HeaderTablePopup>
+                    {isState.onFetching ? (
+                        <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
+                    ) : findValue.arrayItem && findValue.arrayItem?.length > 0 ? (
+                        <>
+                            <Customscrollbar className="h-[300px] max-h-[300px] overflow-hidden">
+                                <div className="h-full divide-y divide-slate-200">
+                                    {findValue.arrayItem?.map((e, index) => (
+                                        <div
+                                            key={e?.id?.toString()}
+                                            className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
+                                        >
+                                            <h6 className="text-[13px] flex items-center font-medium py-1 col-span-4 text-left">
+                                                <div className={`flex items-center gap-2`}>
+                                                    <div>
+                                                        {e?.item?.image != null ? (
+                                                            <ModalImage
+                                                                small={e?.item?.image}
+                                                                large={e?.item?.image}
+                                                                alt="Product Image"
+                                                                className="custom-modal-image object-cover rounded w-[50px] h-[50px] mx-auto"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-[50px] h-[50px] object-cover  mx-auto">
+                                                                <ModalImage
+                                                                    small="/nodata.png"
+                                                                    large="/nodata.png"
+                                                                    className="object-contain w-full h-full p-1 rounded"
+                                                                ></ModalImage>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <h6 className="text-[13px] text-left font-medium capitalize">
+                                                            {e?.item?.name}
+                                                        </h6>
+                                                        <h6 className="text-[13px] text-left font-medium capitalize">
+                                                            {e?.item?.variation}
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                            </h6>
+                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                {e?.unit}
+                                            </h6>
+                                            {/* <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
+                                                    {e?.quantityKeepp == 0 ? "-" : e?.quantityKeepp}
+                                                </h6> */}
+                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
+                                                {e?.quantityRest == 0 ? "-" : e?.quantityRest}
+                                            </h6>
+                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
+                                                {e?.quantityPurchased == 0 ? "-" : e?.quantityPurchased}
+                                            </h6>
+                                            <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
+                                                <Controller
+                                                    name={`arrayItem.${index}.quantity`}
+                                                    control={form.control}
+                                                    rules={{
+                                                        required: {
+                                                            value: true,
+                                                            message: dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity",
+                                                        },
+                                                        validate: {
+                                                            fn: (value) => {
+                                                                try {
+                                                                    let mss = "";
+                                                                    if (value == null) {
+                                                                        mss = dataLang?.materials_planning_enter_quantity || "materials_planning_enter_quantity";
+                                                                    }
+                                                                    if (value == 0) {
+                                                                        mss = dataLang?.materials_planning_must_be_greater || "materials_planning_must_be_greater";
+                                                                    }
+                                                                    return mss || true;
+                                                                } catch (error) {
+                                                                    throw error;
+                                                                }
+                                                            },
+                                                        },
+                                                    }}
+                                                    render={({ field, fieldState }) => {
+                                                        return (
+                                                            <duv className="flex flex-col items-center justify-center">
+                                                                <InPutNumericFormat
+                                                                    className={`${fieldState.error && "border-red-500"} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                                    {...field}
+                                                                    onValueChange={(event) =>
+                                                                        field.onChange(event.value == "" ? null : +event.value)
+                                                                    }
+                                                                    isAllowed={(values) => {
+                                                                        // const { floatValue, value } = values;
+                                                                        // if (floatValue == 0) {
+                                                                        //     return true;
+                                                                        // }
+                                                                        // if (floatValue > x.value) {
+                                                                        //     isShow('warning', `Vui lòng nhập số nhỏ hơn hoặc bằng ${formatNumber(x.value)}`);
+                                                                        //     return false
+                                                                        // }
+                                                                        // if (floatValue < 0) {
+                                                                        //     isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                        //     return false
+                                                                        // }
+                                                                        return true;
+                                                                    }}
+                                                                />
+                                                                {fieldState.error && (
+                                                                    <span className="text-[12px]  text-red-500">
+                                                                        {fieldState.error.message}{" "}
+                                                                    </span>
+                                                                )}
+                                                            </duv>
+                                                        );
+                                                    }}
+                                                />
+                                            </h6>
+                                            <div className="flex items-center justify-center col-span-1">
+                                                <button
+                                                    onClick={(event) => removeItem(e.id)}
+                                                    type="button"
+                                                    title="Xóa"
+                                                    className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
+                                                >
+                                                    <IconDelete />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Customscrollbar>
+                        </>
+                    ) : (
+                        <NoData />
+                    )}
+                    <div className="mt-5 space-x-2 text-right">
+                        <ButtonCancel
+                            loading={false}
+                            onClick={() => _ToggleModal(false)}
+                            dataLang={dataLang}
+                        />
+                        <ButtonSubmit
+                            loading={hangdingMutation.isPending}
+                            dataLang={dataLang}
+                            onClick={() => form.handleSubmit((data) => onSubmit(data))()}
+                        />
+                    </div>
+                </div>
+            </div>
+        </PopupCustom>
     );
 };
 

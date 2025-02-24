@@ -216,9 +216,6 @@ const MainTable = ({ dataLang }) => {
                 next: data?.next == 1,
             });
 
-            sIsParentId(isValue.search ? arrayItem[0]?.id : !isParentId ? arrayItem[0]?.id : isParentId ?? null)
-
-
             if (data?.productionPlans?.length == 0) {
                 queryState({
                     listDataRight: {
@@ -254,6 +251,7 @@ const MainTable = ({ dataLang }) => {
                         idCommand: data?.productionPlan?.id,
                         dataPPItems: data?.listPPItems?.map((e) => {
                             return {
+                                ...e,
                                 id: e?.object_id,
                                 title: e?.reference_no,
                                 showChild: true,
@@ -277,6 +275,7 @@ const MainTable = ({ dataLang }) => {
                         dataBom: {
                             productsBom: data?.listBom?.productsBom?.map((e) => {
                                 return {
+                                    ...e,
                                     id: e?.item_id,
                                     name: e?.item_name,
                                     image: e?.images ? e?.images : "/nodata.png",
@@ -291,6 +290,7 @@ const MainTable = ({ dataLang }) => {
                             }),
                             materialsBom: data?.listBom?.materialsBom?.map((e) => {
                                 return {
+                                    ...e,
                                     id: e?.item_id,
                                     name: e?.item_name,
                                     image: e?.images ? e?.images : "/nodata.png",
@@ -307,6 +307,7 @@ const MainTable = ({ dataLang }) => {
                         },
                         dataKeepStock: data?.keepWarehouses?.map((e) => {
                             return {
+                                ...e,
                                 id: e?.id,
                                 title: e?.code,
                                 time: formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
@@ -334,6 +335,7 @@ const MainTable = ({ dataLang }) => {
                         }),
                         dataPurchases: data?.purchases?.map((e) => {
                             return {
+                                ...e,
                                 id: e?.id,
                                 title: e?.code,
                                 time: formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
@@ -388,31 +390,8 @@ const MainTable = ({ dataLang }) => {
         ...optionsQuery
     })
 
-
-    const handleShow = (id) => {
-        queryState({
-            listDataLeft: dataTable.listDataLeft.map((e) => {
-                const showParent = e.id == id;
-                showParent && sIsParentId(id);
-                return {
-                    ...e,
-                    showParent: showParent,
-                };
-            }),
-        });
-        // fetchingData();
-    };
-
     const handleActiveTab = (e) => {
         queryState({ isTab: e });
-        // fetchingData();
-    };
-
-    const fetchingData = () => {
-        sIsFetChing(true);
-        setTimeout(() => {
-            sIsFetChing(false);
-        }, 1500);
     };
 
     const handleConfim = async () => {
@@ -510,7 +489,7 @@ const MainTable = ({ dataLang }) => {
                             <form className="relative flex items-center w-full">
                                 <SearchNormal1
                                     size={20}
-                                    className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                                    className="absolute 2xl:left-3 z-0 text-[#cccccc] xl:left-[4%] left-[1%]"
                                 />
                                 <input
                                     onChange={(e) => onChangeSearch(e)}
@@ -648,7 +627,7 @@ const MainTable = ({ dataLang }) => {
                                         <button
                                             key={e.id}
                                             onClick={() => handleActiveTab(e.type)}
-                                            className={`hover:bg-[#F7FBFF] ${dataTable.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
+                                            className={`hover:bg-[#F7FBFF] ${dataTable.isTab == e.type ? "border-[#0F4F9E] border-b bg-[#F7FBFF]" : 'border-b border-transparent'} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
                                         >
                                             <h3 className={`py-[10px] px-2  font-normal ${dataTable.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}>
                                                 {e.name}

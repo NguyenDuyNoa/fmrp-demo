@@ -226,11 +226,13 @@ const MainTable = ({ dataLang }) => {
                     idCommand: data?.productionOrder?.id,
                     dataPPItems: data?.listPOItems?.map((e) => {
                         return {
+                            ...e,
                             id: e?.object_id,
                             title: e?.reference_no,
                             showChild: true,
                             arrListData: e?.items_products?.map((i) => {
                                 return {
+                                    ...i,
                                     id: i?.poi_id,
                                     image: i?.images ? i?.images : "/nodata.png",
                                     name: i?.item_name,
@@ -255,11 +257,13 @@ const MainTable = ({ dataLang }) => {
                     }),
                     dataSemiItems: data?.listSemiItems?.map((e) => {
                         return {
+                            ...e,
                             id: e?.object_id,
                             title: e?.reference_no,
                             showChild: true,
                             arrListData: e?.semi_products?.map((i) => {
                                 return {
+                                    ...i,
                                     id: uddid(),
                                     image: i?.images ? i?.images : "/nodata.png",
                                     name: i?.item_name,

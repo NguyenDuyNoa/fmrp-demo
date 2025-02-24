@@ -547,48 +547,49 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                                     />
                                                                 </div>
                                                             </td>
-                                                            <td className="p-2 text-sm border flex flex-col gap-0.5">
-                                                                <p>
-                                                                    {row?.item_name}
-                                                                </p>
-                                                                <p className="text-xs italic">
-                                                                    {row?.product_variation}
-                                                                </p>
-                                                                {
-                                                                    row?.reference_no_detail && (
-                                                                        <p className="text-xs">
-                                                                            {row?.reference_no_detail}
-                                                                        </p>
-                                                                    )
-                                                                }
-                                                                {/* type_item */}
-                                                                <div className="flex items-center gap-1">
-                                                                    <span className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
-                                                                     ${(row?.type_products === "products" && "text-lime-500 border-lime-500") ||
-                                                                        (row?.type_products == "semi_products" && "text-orange-500 border-orange-500") ||
-                                                                        (row?.type_products == "out_side" && "text-sky-500 border-sky-500") ||
-                                                                        (row?.type_products == "materials" && "text-purple-500 border-purple-500") ||
-                                                                        (row?.type_products == "material" && "text-purple-500 border-purple-500") ||
-                                                                        (row?.type_products == "semi_products_outside" && "text-green-500 border-green-500")
-                                                                        }`}
-                                                                    >
-                                                                        {dataLang[row?.type_products] ?? row?.type_products}
-                                                                    </span>
+                                                            <td className="p-2 text-sm border">
+                                                                <div className="flex flex-col gap-0.5 h-full">
+                                                                    <p>
+                                                                        {row?.item_name}
+                                                                    </p>
+                                                                    <p className="text-xs italic">
+                                                                        {row?.product_variation}
+                                                                    </p>
                                                                     {
-                                                                        row?.stage_name && (
-                                                                            <span className="py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-teal-500 border-teal-500 text-xs">
-                                                                                {row?.stage_name}
-                                                                            </span>
+                                                                        row?.reference_no_detail && (
+                                                                            <p className="text-xs">
+                                                                                {row?.reference_no_detail}
+                                                                            </p>
                                                                         )
                                                                     }
+                                                                    {/* type_item */}
+                                                                    <div className="flex items-center gap-1">
+                                                                        <span className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
+                                                                     ${(row?.type_products === "products" && "text-lime-500 border-lime-500") ||
+                                                                            (row?.type_products == "semi_products" && "text-orange-500 border-orange-500") ||
+                                                                            (row?.type_products == "out_side" && "text-sky-500 border-sky-500") ||
+                                                                            (row?.type_products == "materials" && "text-purple-500 border-purple-500") ||
+                                                                            (row?.type_products == "material" && "text-purple-500 border-purple-500") ||
+                                                                            (row?.type_products == "semi_products_outside" && "text-green-500 border-green-500")
+                                                                            }`}
+                                                                        >
+                                                                            {dataLang[row?.type_products] ?? row?.type_products}
+                                                                        </span>
+                                                                        {
+                                                                            row?.stage_name && (
+                                                                                <span className="py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-teal-500 border-teal-500 text-xs">
+                                                                                    {row?.stage_name}
+                                                                                </span>
+                                                                            )
+                                                                        }
+                                                                    </div>
                                                                 </div>
-
                                                             </td>
                                                             <td className="p-2 text-sm text-center border">
-                                                                {formatNumber(row?.quantity_total_quota)} <span className="relative text-xs top-1">/{row?.unit_name}</span>
+                                                                {formatNumber(row?.quantity_total_quota)}/ <span className="relative text-xs top-1">{row?.unit_name}</span>
                                                             </td>
                                                             <td className="p-2 text-sm text-center border">
-                                                                {formatNumber(row?.quantity_quota_primary)} <span className="relative text-xs top-1">/{row?.unit_name_primary}</span>
+                                                                {formatNumber(row?.quantity_quota_primary)}/ <span className="relative text-xs top-1">{row?.unit_name_primary}</span>
                                                             </td>
                                                             <td className="p-2 text-sm text-center border">
                                                                 {formatNumber(row?.quantity_warehouse)}

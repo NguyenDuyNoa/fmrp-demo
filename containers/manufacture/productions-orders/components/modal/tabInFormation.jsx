@@ -9,14 +9,18 @@ import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import { AiOutlineFileText } from "react-icons/ai";
 import { FaCheck, FaCheckCircle } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa6";
-import { FiCornerDownRight } from "react-icons/fi";
+import { FiCheckCircle, FiCornerDownRight, FiFileText } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import ModalImage from "react-modal-image";
 import PopupImportProducts from "../popup/PopupImportProducts";
+import * as d3 from "d3";
+import { ArrowDown } from "iconsax-react";
+import { BiCheckCircle } from "react-icons/bi";
+import { BsCheckCircle, BsCheckCircleFill, BsFileText, BsFileTextFill } from "react-icons/bs";
 
 
 const initialState = {
@@ -146,6 +150,8 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                                         image={e?.image}
                                         dataLang={dataLang}
                                         quantity={e?.quantity}
+                                        quantity_keep={e?.quantity_keep}
+                                        quantity_need_manufactures={e?.quantity_need_manufactures}
                                         processBar={e?.processBar}
                                         checkBorder={shownElements}
                                         itemVariation={e?.itemVariation}
@@ -178,7 +184,21 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
     );
 });
 
-const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, quantity, processBar, checkBorder, dataLang, refetchProductionsOrders }) => {
+const RenderItem = ({
+    type, id,
+    dataDetail,
+    image,
+    name,
+    code,
+    itemVariation,
+    quantity,
+    processBar,
+    checkBorder,
+    dataLang,
+    refetchProductionsOrders,
+    quantity_keep,
+    quantity_need_manufactures
+}) => {
     const isShow = useToast()
 
     const queryClient = useQueryClient()
@@ -240,22 +260,74 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                         <div className={`text-[10px] italic text-gray-500 w-fit`}>
                             {code} - {itemVariation}
                         </div>
-                        <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
-                            Số lượng: {quantity > 0 ? formatNumber(quantity) : "-"}
-                        </div>
+                        {
+                            type === "semi" ?
+                                <div className="flex items-center gap-2">
+                                    <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
+                                        SL cần: {quantity > 0 ? formatNumber(quantity) : "-"}
+                                    </div>
+                                    <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
+                                        SL giữ kho: {quantity_keep > 0 ? formatNumber(quantity_keep) : "-"}
+                                    </div>
+                                    <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
+                                        SL sản xuất: {quantity_need_manufactures > 0 ? formatNumber(quantity_need_manufactures) : "-"}
+                                    </div>
+                                </div>
+                                :
+                                <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
+                                    Số lượng: {quantity > 0 ? formatNumber(quantity) : "-"}
+                                </div>
+                        }
+
                     </div>
                 </div>
             </div>
             {
-                processBar?.map((j, jIndex) => {
-                    const checkLast = processBar?.length - 1 != jIndex
-                    const checkDate = processBar?.filter((e) => e?.date_production)?.length > 0
+                type === "semi"
+                    ?
+                    (quantity_need_manufactures > 0)
+                        ?
+                        <ProcessBar data={processBar} checkBorder={checkBorder} />
+                        :
+                        <p className="text-xs font-normal text-center text-red-500 xl:text-sm">
+                            Số lượng sản xuất đã hết, quá trình sản xuất đã kết thúc
+                        </p>
+                    :
+                    <ProcessBar data={processBar} checkBorder={checkBorder} />
+            }
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={() => { handleConfimDeleteItem() }}
+                cancel={() => { handleQueryId({ status: false }) }}
+            />
+        </div>
+    )
+}
+
+const ProcessBar = ({ data, checkBorder }) => {
+
+    const dataSeting = useSetingServer()
+
+
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
+
+    return (
+        <>
+            {
+                data?.map((j, jIndex) => {
+                    const checkLast = data?.length - 1 != jIndex
+                    const checkDate = data?.filter((e) => e?.date_production)?.length > 0
                     return (
                         <div key={jIndex} className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
                             <div className="flex min-h-[70px] gap-3">
                                 <div className={` ${checkDate ? "" : 'hidden'} text-[10px] 
-                                ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-black/70"} 
-                                font-normal text-right` }
+                        ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-black/70"} 
+                        font-normal text-right` }
                                 >
                                     <div className={`${j?.date_production ? 'block' : 'hidden'}`}>
                                         {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
@@ -272,7 +344,7 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                         <div className="">
                                             <div className={`flex h-5 w-5 ${j?.active ? "border-[#10b981] bg-[#10b981]" : j?.begin_production == 1 ? 'border-orange-600' : "border-gray-400"}  items-center justify-center rounded-full border `}>
                                                 {
-                                                    processBar?.length - 1 != jIndex
+                                                    data?.length - 1 != jIndex
                                                         ?
                                                         <>
                                                             {
@@ -303,81 +375,13 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                             <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>
                                                 {j.stage_name}
                                             </p>
-                                            {/* <PopupImportProducts
-                                                dataStage={j}
-                                                dataLang={dataLang}
-                                                dataDetail={dataDetail}
-                                                // type={j?.active ? 'done_production' : (+j?.type == 3) ? 'begin_production' : (+j?.type == 2 && 'end_production')}
-                                                type={
-                                                    j?.active
-                                                        ?
-                                                        'done_production'
-                                                        :
-                                                        (+j?.type == 3) ? 'begin_production' : (+j?.type == 2 && 'end_production')
-                                                }
-                                            >
-                                                <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"}
-                                                 cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`}
-                                                />
-                                            </PopupImportProducts> */}
-
                                             {(+j?.type == 2 || +j?.type == 3)
                                                 ?
-                                                // <PopupImportProducts
-                                                //     dataDetail={dataDetail}
-                                                //     type={j?.active ? 'done_production' : 'end_production'}
-                                                //     dataStage={j}
-                                                //     dataLang={dataLang}
-                                                //     refetchProductionsOrders={refetchProductionsOrders}
-                                                // >
-                                                //     <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
-                                                // </PopupImportProducts>
                                                 <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-500"} cursor-default hover:scale-110 transition-all duration-150 ease-linear`} />
                                                 :
                                                 +j?.type == 0 &&
-                                                // <PopupImportProducts
-                                                //     dataDetail={dataDetail}
-                                                //     type={j?.active ? 'done_production' : 'end_production'}
-                                                //     dataStage={j}
-                                                //     dataLang={dataLang}
-                                                //     refetchProductionsOrders={refetchProductionsOrders}
-                                                // >
-                                                //     <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-[#10b981]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
-                                                // </PopupImportProducts>
                                                 <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-500"} cursor-default hover:scale-110 transition-all duration-150 ease-linear`} />
                                             }
-
-                                            {/* {(+j?.type == 2 || +j?.type == 3)
-                                                ?
-                                                <div className="flex items-center gap-1">
-                                                    <PopupImportProducts
-                                                        dataDetail={dataDetail}
-                                                        type='begin_production'
-                                                        dataStage={j}
-                                                        dataLang={dataLang}
-                                                    >
-                                                        <FaArrowAltCircleRight className={`${j?.begin_production == 1 ? 'text-orange-600' : "text-[#5599EC]"} cursor-pointer hover:scale-110 transition-all duration-150 ease-linear`} />
-                                                    </PopupImportProducts>
-                                                    <PopupImportProducts
-                                                        dataDetail={dataDetail}
-                                                        type='end_production'
-                                                        dataStage={j}
-                                                        dataLang={dataLang}
-                                                    >
-                                                        <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
-                                                    </PopupImportProducts>
-                                                </div>
-                                                :
-                                                +j?.type == 0 &&
-                                                <PopupImportProducts
-                                                    dataDetail={dataDetail}
-                                                    type='end_production'
-                                                    dataStage={j}
-                                                    dataLang={dataLang}
-                                                >
-                                                    <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
-                                                </PopupImportProducts>
-                                            } */}
                                         </div>
                                         <div className="flex items-start gap-1 py-2">
                                             {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
@@ -388,8 +392,8 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                             <div key={e?.id} className="flex items-center gap-2">
                                                                 <div className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
                                                                     <ModalImage
-                                                                        small={e?.image ?? "/nodata.png"}
-                                                                        large={e?.image ?? "/nodata.png"}
+                                                                        small={e?.image ? e?.image : "/nodata.png"}
+                                                                        large={e?.image ? e?.image : "/nodata.png"}
                                                                         width={18}
                                                                         height={18}
                                                                         alt={e?.item_name}
@@ -404,14 +408,14 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                                                                     </span>
                                                                 </div>
                                                                 {/* <button
-                                                                    onClick={() => { handleQueryId({ status: true, id: e?.pp_id }); }}
-                                                                    className={`group transition-all ease-in-out hover:bg-slate-50 text-left cursor-pointer w-full`}
-                                                                >
-                                                                    <RiDeleteBin6Line
-                                                                        size={14}
-                                                                        className="group-hover:text-[#f87171] group-hover:scale-110"
-                                                                    />
-                                                                </button> */}
+                                                            onClick={() => { handleQueryId({ status: true, id: e?.pp_id }); }}
+                                                            className={`group transition-all ease-in-out hover:bg-slate-50 text-left cursor-pointer w-full`}
+                                                        >
+                                                            <RiDeleteBin6Line
+                                                                size={14}
+                                                                className="group-hover:text-[#f87171] group-hover:scale-110"
+                                                            />
+                                                        </button> */}
                                                             </div>
                                                         )
                                                     })
@@ -425,17 +429,10 @@ const RenderItem = ({ type, id, dataDetail, image, name, code, itemVariation, qu
                     )
                 })
             }
-            <PopupConfim
-                dataLang={dataLang}
-                type="warning"
-                title={TITLE_DELETE}
-                subtitle={CONFIRM_DELETION}
-                isOpen={isOpen}
-                save={() => { handleConfimDeleteItem() }}
-                cancel={() => { handleQueryId({ status: false }) }}
-            />
-        </div>
+        </>
     )
 }
+
+
 
 export default TabInFormation;

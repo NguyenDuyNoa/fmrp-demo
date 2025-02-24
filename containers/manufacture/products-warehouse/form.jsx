@@ -544,7 +544,7 @@ const ProductsWarehouseForm = (props) => {
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.production_warehouse || "production_warehouse"}
+                            {dataLang?.productsWarehouse_title || "productsWarehouse_title"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>

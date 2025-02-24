@@ -87,53 +87,51 @@ const PopupUpdateVersion = (props) => {
                                 </div>
                             </div>
                             :
-                            <div className="relative">
-                                <div className="relative flex flex-col items-center justify-center gap-4">
-                                    <div className="h-[110] w-[122px] absolute -top-1/2 translate-y-[85%] left-1/2 -translate-x-1/2">
-                                        <Image
-                                            src={isSubmitted ? '/icon/roketCenter.png' : '/icon/roketRight.png'}
-                                            alt=""
-                                            width={1280}
-                                            height={1024}
-                                            className="object-cover w-full h-full"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center gap-2">
-                                        <h3 className="text-[#101828] font-semibold text-[28px] text-center capitalize">
-                                            Cập nhật phiên bản mới v3.0 - Trải nghiệm mượt hơn!
-                                        </h3>
-                                        <p className="text-[#9295A4] font-medium text-base text-center max-w-[70%]">
-                                            Chúng tôi vừa phát hành Phiên bản v3.0 với nhiều cải tiến quan trọng:
-                                        </p>
-                                    </div>
-                                    <div className="bg-[#EBF5FF] rounded-2xl p-6 flex flex-col gap-3">
-                                        {
-                                            data?.map(e => {
-                                                return (
-                                                    <div className="flex items-center gap-2" key={e?.id}>
-                                                        <div className="h-[21px] w-[21px] min-w-[21px]">
-                                                            <Image
-                                                                src={'/icon/check.png'}
-                                                                alt=""
-                                                                width={1280}
-                                                                height={1024}
-                                                                className="object-cover w-full h-full"
-                                                            />
-                                                        </div>
-                                                        <div className="text-[#3A3E4C] font-medium text-sm">
-                                                            {e.name}
-                                                        </div>
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                    <ButtonSubmit
-                                        onClick={() => onSubmit()}
-                                        title='Cập nhật ngay'
-                                        className='text-base font-normal w-fit rounded-[8px]'
+                            <div className="relative flex flex-col items-center justify-center gap-4">
+                                <div className="h-[110] w-[122px] absolute -top-1/2 translate-y-[85%] left-1/2 -translate-x-1/2">
+                                    <Image
+                                        src={isSubmitted ? '/icon/roketCenter.png' : '/icon/roketRight.png'}
+                                        alt=""
+                                        width={1280}
+                                        height={1024}
+                                        className="object-cover w-full h-full"
                                     />
                                 </div>
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <h3 className="text-[#101828] font-semibold text-[28px] text-center capitalize">
+                                        Cập nhật phiên bản mới v3.0 - Trải nghiệm mượt hơn!
+                                    </h3>
+                                    <p className="text-[#9295A4] font-medium text-base text-center max-w-[70%]">
+                                        Chúng tôi vừa phát hành Phiên bản v3.0 với nhiều cải tiến quan trọng:
+                                    </p>
+                                </div>
+                                <div className="bg-[#EBF5FF] rounded-2xl p-6 flex flex-col gap-3">
+                                    {
+                                        data?.map(e => {
+                                            return (
+                                                <div className="flex items-center gap-2" key={e?.id}>
+                                                    <div className="h-[21px] w-[21px] min-w-[21px]">
+                                                        <Image
+                                                            src={'/icon/check.png'}
+                                                            alt=""
+                                                            width={1280}
+                                                            height={1024}
+                                                            className="object-cover w-full h-full"
+                                                        />
+                                                    </div>
+                                                    <div className="text-[#3A3E4C] font-medium text-sm">
+                                                        {e.name}
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                                <ButtonSubmit
+                                    onClick={() => onSubmit()}
+                                    title='Cập nhật ngay'
+                                    className='text-base font-normal w-fit rounded-[8px]'
+                                />
                             </div>
                     }
                 </div>

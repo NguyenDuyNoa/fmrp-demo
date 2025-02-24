@@ -32,7 +32,7 @@ const TabItem = ({ dataTable, handShowItem, isFetching, dataLang }) => {
                 >
                     {dataTable?.listDataRight?.dataPPItems?.length > 0 ? (
                         dataTable?.listDataRight?.dataPPItems?.map((e) => (
-                            <div key={e.id} className="grid grid-cols-10 items-center ">
+                            <div key={e.id} className="grid items-center grid-cols-10 ">
                                 <div
                                     onClick={() => handShowItem(e.id, 'dataPPItems')}
                                     className="col-span-10 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded cursor-pointer"

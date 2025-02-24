@@ -36,6 +36,12 @@ const apiMaterialsPlanning = {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/keepItemsWarehouses`, data);
         return response.data
     },
+    // ds lệnh chọn btp chi tiết
+    async apiManufacturesProductionOrderKeepStok(data) {
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/keepStock`, data);
+        return response.data
+    },
+
     // vi tri kho
     async apiLocationItemsWarehouse(data) {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/getLocationItemsWarehouse`, data);

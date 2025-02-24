@@ -46,9 +46,11 @@ const initForm = {
     note: "",
     type: "material",
     arrayItem: [],
+    idProductionOrder: null
 }
 
 const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValue, fetchDataTable, ...rest }) => {
+
     const [open, sOpen] = useState(false);
 
     const isShow = useToast();
@@ -82,6 +84,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
         formData.append("type", value.type == "material" ? 1 : 2);
         formData.append("plan_id", dataTable?.listDataRight?.idCommand);
         formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_SLASH_LONG));
+
+        if (value.type == "product" && value.idProductionOrder) {
+            formData.append("ppi_id", value?.idProductionOrder?.ppi_id);
+        }
 
         value.arrayItem?.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
@@ -120,6 +126,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
     useEffect(() => {
         if (open) {
             form.setValue("arrayItem", []);
+            form.setValue("idProductionOrder", null);
             form.clearErrors()
         }
     }, [findValue.type, open]);
@@ -133,6 +140,31 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
         form.setValue("arrayItem", updatedData);
     };
 
+    const { data: dataProductionOrderKeepStok } = useQuery({
+        queryKey: ['api_manufactures_production_order_keep_stok', dataTable?.listDataRight?.idCommand, findValue.type],
+        queryFn: async () => {
+            let formData = new FormData();
+            formData.append('pPlan_id', dataTable?.listDataRight?.idCommand)
+            const r = await apiMaterialsPlanning.apiManufacturesProductionOrderKeepStok(formData)
+
+            return {
+                ...r,
+                data: {
+                    ...r?.data,
+                    items_poi: r?.data?.items_poi?.map(e => {
+                        return {
+                            ...e,
+                            value: e?.ppi_id,
+                            label: e?.item_name
+                        }
+                    })
+                }
+            }
+        },
+        enabled: form.watch("type") == "product",
+    })
+
+
     const fetchListItem = async () => {
         try {
             await new Promise((resolve) => setTimeout(resolve, 500));
@@ -140,6 +172,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
             // type: 1 nvl, 2 BTP
             formData.append("type", findValue.type == "material" ? 1 : 2);
             formData.append("pPlan_id", dataTable.listDataRight.idCommand);
+
+            if (findValue.type == "product" && findValue.idProductionOrder) {
+                formData.append("ppi_id", findValue.idProductionOrder?.ppi_id);
+            }
 
             const { isSuccess, message, data } = await apiMaterialsPlanning.apiKeepItemsWarehouses(formData);
             const newData = data?.items?.map((e) => {
@@ -177,19 +213,19 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                 };
             })
             form.setValue("arrayItem", newData);
+            return data
         } catch (error) {
             throw error
         }
     };
 
     const { isLoading, isFetching, data } = useQuery({
-        queryKey: ['api_keep_item_warrehouse', findValue.type, open],
+        queryKey: ['api_keep_item_warrehouse', findValue.type, open, findValue.idProductionOrder],
         queryFn: fetchListItem,
         enabled: open,
-        placeholderData: keepPreviousData,
-        staleTime: 10000,
         ...optionsQuery
     })
+
 
     const fetchListLocationWarehouse = async (item, idWarehouse) => {
         try {
@@ -287,6 +323,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
         form.setValue("arrayItem", newData);
     };
 
+
+
     return (
         <PopupCustom
             title={dataLang?.materials_planning_raw_materials || "materials_planning_raw_materials"}
@@ -365,9 +403,13 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                 );
                             }}
                         />
+
                         <Controller
                             name="type"
                             control={form.control}
+                            rules={{
+                                required: true
+                            }}
                             render={({ field }) => {
                                 return (
                                     <div className="flex gap-8 mt-6 items-centerem">
@@ -394,9 +436,78 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                             })
                                         }
                                     </div>
+
                                 );
                             }}
                         />
+                        {
+                            form.watch('type') == 'product' && (
+                                <Controller
+                                    name="idProductionOrder"
+                                    rules={{
+                                        required: {
+                                            value: form.watch('type') == 'product',
+                                            message: dataLang?.materials_planning_pease_select_product || 'materials_planning_pease_select_product'
+                                        }
+                                    }}
+                                    control={form.control}
+                                    render={({ field, fieldState }) => {
+                                        return (
+                                            <div className="my-4 ">
+                                                <SelectComponent
+                                                    className={`${fieldState.error ? "border-red-500" : "border-transparent"}  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                    isClearable={true}
+                                                    placeholder={dataLang?.materials_planning_pease_select_product_placehoder ?? "materials_planning_pease_select_product_placehoder"}
+                                                    options={dataProductionOrderKeepStok?.data?.items_poi || []}
+                                                    formatOptionLabel={(option) => (
+                                                        <div className="flex items-center justify-between py-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-[50px] h-[60px]">
+                                                                    <img
+                                                                        src={option.images ? option.images : '/nodata.png'}
+                                                                        alt="Product Image"
+                                                                        className="object-cover w-full h-full rounded"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                        {option?.label}
+                                                                    </h3>
+                                                                    <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                        {option?.item_code} - {option?.item_variation}
+                                                                    </h5>
+                                                                    <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                        {option?.reference_no_detail}
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {...field}
+                                                    onChange={(event) => {
+                                                        field.onChange(event);
+                                                    }}
+                                                    styles={{
+                                                        menu: (provided, state) => ({
+                                                            ...provided,
+                                                            width: "100%",
+                                                            zIndex: 999,
+                                                        }),
+                                                    }}
+                                                    value={field.value}
+                                                    maxMenuHeight={150}
+                                                />
+                                                {fieldState.error && (
+                                                    <span className="text-[12px]  text-red-500">
+                                                        {fieldState.error.message}{" "}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        );
+                                    }}
+                                />
+                            )
+                        }
                     </div>
                     <div className="col-span-6">
                         <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
@@ -412,7 +523,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                         placeholder={dataLang?.sales_product_note || "sales_product_note"}
                                         name="fname"
                                         type="text"
-                                        className="focus:border-[#92BFF7] border-[#d0d5dd] resize-none placeholder:text-slate-300 w-full min-h-[100px] max-h-[100px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
+                                        className={`${findValue.idProductionOrder ? "min-h-[180px] max-h-[180px]" : "min-h-[135px] max-h-[135px]"}  focus:border-[#92BFF7] border-[#d0d5dd] resize-none placeholder:text-slate-300 w-full  bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none`}
                                     />
                                 );
                             }}
@@ -420,7 +531,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                     </div>
                 </div>
                 <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
-                    <HeaderTablePopup gridCols={13}>
+                    <HeaderTablePopup gridCols={13} className={'!z-0'}>
                         <ColumnTablePopup colSpan={3}>
                             {dataLang?.price_quote_item || "price_quote_item"}
                         </ColumnTablePopup>
@@ -464,7 +575,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                     {
                                                         !e?.child &&
                                                         <button
-                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                                                            className=" text-blue-600 hover:bg-blue-300 hover:text-blue-500 font-bold flex items-center justify-center p-0.5  bg-blue-200 rounded-full"
                                                             onClick={() => {
                                                                 handleIncrease(e);
                                                             }}
@@ -474,7 +585,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                     }
                                                     {e?.child && <IconDown className="rotate-45" />}
                                                     <div className={`flex items-center gap-2`}>
-                                                        <div>
+                                                        <div className="relative z-10 ">
                                                             {
                                                                 e?.item?.image != null
                                                                     ?
@@ -482,7 +593,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                         small={e?.item?.image}
                                                                         large={e?.item?.image}
                                                                         alt="Product Image"
-                                                                        className="custom-modal-image object-cover rounded w-[50px] h-[50px] mx-auto"
+                                                                        className="custom-modal-image z-10 object-cover rounded w-[50px] h-[50px] mx-auto"
                                                                     />
                                                                     :
                                                                     <div className="w-[50px] h-[50px] object-cover  mx-auto">

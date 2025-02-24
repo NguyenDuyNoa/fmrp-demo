@@ -20,15 +20,22 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
     return (
         <>
             <div className="my-4">
-                <div className="grid grid-cols-12 my-4">
+                <div className="grid my-4 grid-cols-13">
                     <h4 className="col-span-4 px-4 text-[#344054] font-normal text-xs uppercase">
                         {dataLang?.materials_planning_order || "materials_planning_order"}
                     </h4>
                     <h4 className="col-span-1 text-center text-[#344054] font-normal text-xs uppercase">
                         {dataLang?.category_unit || "category_unit"}
                     </h4>
-                    <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                        {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}
+                    <h4 className="col-span-1 text-center text-[#344054] font-normal text-xs uppercase">
+                        {'SL cần'}
+                        {/* {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"} */}
+                    </h4>
+                    <h4 className="col-span-1 text-center text-[#344054] font-normal text-xs uppercase">
+                        {'SL giữ kho'}
+                    </h4>
+                    <h4 className="col-span-1 text-center text-[#344054] font-normal text-xs uppercase">
+                        {'SL sản xuất'}
                     </h4>
                     <h4 className="col-span-5 text-center text-[#344054] font-normal text-xs uppercase">
                         {"Tiến trình"}
@@ -57,55 +64,69 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
                                 </div>
                                 {e.showChild && e.arrListData.map((i, index) => (
                                     <div
-                                        key={i.id}
-                                        className={`grid grid-cols-12 ${isState.dataModal.id == i.id ? "bg-gray-100" : ""} ${e.arrListData?.length - 1 == index ? "" : "border-b"} items-center col-span-12 group transition-all duration-150 ease-in-out`}
+                                        key={i?.id}
+                                        className={`grid grid-cols-13 ${isState.dataModal.id == i?.id ? "bg-gray-100" : ""} ${e.arrListData?.length - 1 == index ? "" : "border-b"} items-center col-span-12 group transition-all duration-150 ease-in-out`}
                                     >
                                         <h4 className="col-span-4 text-[#344054] font-normal text-xs flex flex-col py-2 px-4 gap-2">
                                             <div className="flex items-center gap-1 px-2 py-1 border border-gray-400 w-fit rounded-xl">
                                                 <ModalImage
-                                                    small={i.childProducts?.image}
-                                                    large={i.childProducts?.image}
+                                                    small={i?.childProducts?.image}
+                                                    large={i?.childProducts?.image}
                                                     width={18}
                                                     height={18}
-                                                    alt={i.childProducts?.name}
+                                                    alt={i?.childProducts?.name}
                                                     className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
                                                 />
                                                 <span className="text-[#9295A4] text-[11px]">
-                                                    {i.childProducts?.item_name} - SL:{" "}
-                                                    {i.childProducts?.quantity > 0 ? formatNumber(i.childProducts?.quantity) : "-"}{" "}
+                                                    {i?.childProducts?.item_name} - SL:{" "}
+                                                    {i?.childProducts?.quantity > 0 ? formatNumber(i?.childProducts?.quantity) : "-"}{" "}
                                                 </span>
                                             </div>
                                             <div className="flex items-start gap-2">
                                                 <FiCornerDownRight size={15} />
                                                 <ModalImage
-                                                    small={i.image}
-                                                    large={i.image}
+                                                    small={i?.image}
+                                                    large={i?.image}
                                                     width={36}
                                                     height={36}
-                                                    alt={i.name}
+                                                    alt={i?.name}
                                                     className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                 />
                                                 <div className="flex flex-col gap-0.5">
-                                                    <h1 className={`${isState.dataModal.id == i.id ? "text-[#0F4F9E]" : "text-[#000000]"}  font-semibold xl:text-sm text-xs`}  >
-                                                        {i.name}
+                                                    <h1 className={`${isState.dataModal.id == i?.id ? "text-[#0F4F9E]" : "text-[#000000]"}  font-semibold xl:text-sm text-xs`}  >
+                                                        {i?.name}
                                                     </h1>
                                                     <h1 className="text-[#9295A4] font-normal text-[11px]">
-                                                        {i.code} - {i.itemVariation}
+                                                        {i?.code} - {i?.itemVariation}
                                                     </h1>
                                                 </div>
                                             </div>
                                         </h4>
                                         <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
-                                            {i.unit}
+                                            {i?.unit}
                                         </h4>
-                                        <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
-                                            {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
+                                        <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                            {i?.quantity > 0 ? formatNumber(i?.quantity) : "-"}
+                                        </h4>
+                                        <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                            {i?.quantity_keep > 0 ? formatNumber(i?.quantity_keep) : "-"}
+                                        </h4>
+                                        <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                            {i?.quantity_need_manufactures > 0 ? formatNumber(i?.quantity_need_manufactures) : "-"}
                                         </h4>
                                         <div className="col-span-5">
-                                            <TimelineChartStage data={i?.processBar} dataLang={dataLang} />
+                                            {
+                                                i?.quantity_need_manufactures > 0
+                                                    ?
+                                                    <TimelineChartStage data={i?.processBar} dataLang={dataLang} />
+                                                    :
+                                                    <p className="text-xs font-normal text-center text-red-500 xl:text-sm">
+                                                        Số lượng sản xuất đã hết, quá trình sản xuất đã kết thúc
+                                                    </p>
+                                            }
                                         </div>
                                         {/* <h4 className="flex items-center col-span-5">
-                                            {i.processBar.map((j, JIndex) => {
+                                            {i?.processBar.map((j, JIndex) => {
                                                 return (
                                                     <div key={j.id} className="flex flex-col items-start w-full">
                                                         <div className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
@@ -122,7 +143,7 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
                                                         </p>
 
                                                         <li
-                                                            className={`${JIndex == i.processBar.length - 1
+                                                            className={`${JIndex == i?.processBar.length - 1
                                                                 ? "flex w-full relative text-gray-900 "
                                                                 : `flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active
                                                                     ? "after:bg-[#00C170]"
@@ -159,7 +180,7 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
                                                                 </p>
                                                             </div>
                                                         </li>
-                                                        <li className={`${JIndex == i.processBar.length - 1 ? "list-none flex w-full relative text-gray-900 "
+                                                        <li className={`${JIndex == i?.processBar.length - 1 ? "list-none flex w-full relative text-gray-900 "
                                                             : `list-none flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 
                                                                     ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} after:inline-block after:absolute after:top-1 after:left-[15px]`}`}
                                                         >
