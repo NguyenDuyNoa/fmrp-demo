@@ -27,6 +27,8 @@ import { MdAdd } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { optionsQuery } from "@/configs/optionsQuery";
 
 const initialState = {
     isTab: "item",
@@ -101,6 +103,8 @@ const MainTable = ({ dataLang }) => {
 
     const isShow = useToast();
 
+    const [isParentId, sIsParentId] = useState(null);
+
     const [isFetching, sIsFetChing] = useState(false);
 
     const [isMounted, sIsMounted] = useState(false);
@@ -165,13 +169,20 @@ const MainTable = ({ dataLang }) => {
                 listDataLeft: arrayItem.map((e, index) => {
                     return {
                         ...e,
-                        showParent: index == 0,
+                        showParent: isParentId ? e?.id == isParentId : index == 0,
                     };
                 }),
                 next: data?.next == 1,
             });
             if (isValue.search == "" && arrayItem[0]?.id) {
-                fetchDataTableRight(arrayItem[0]?.id);
+                if (isParentId) {
+                    refetch()
+                } else {
+                    sIsParentId(arrayItem[0]?.id);
+                }
+
+            } else {
+                sIsParentId(arrayItem[0]?.id);
             }
             if (data?.productionPlans?.length == 0) {
                 queryState({
@@ -206,13 +217,20 @@ const MainTable = ({ dataLang }) => {
                 listDataLeft: arrayItem.map((e, index) => {
                     return {
                         ...e,
-                        showParent: index == 0,
+                        showParent: isParentId ? e?.id == isParentId : index == 0,
                     };
                 }),
                 next: data?.next == 1,
             });
             if (isValue.search == "" && arrayItem[0]?.id) {
-                fetchDataTableRight(arrayItem[0]?.id);
+                if (isParentId) {
+                    refetch()
+                } else {
+                    sIsParentId(arrayItem[0]?.id);
+                }
+
+            } else {
+                sIsParentId(arrayItem[0]?.id);
             }
             if (data?.productionPlans?.length == 0) {
                 queryState({
@@ -236,6 +254,8 @@ const MainTable = ({ dataLang }) => {
             fetchDataTableSeeMore();
         }
     }, [isValue.page]);
+
+
 
     const fetchDataTableRight = async (id) => {
         try {
@@ -370,23 +390,35 @@ const MainTable = ({ dataLang }) => {
         }
     };
 
+
+
+    const { isLoading: isLoadingDataTableRight, refetch } = useQuery({
+        queryKey: ['fetch_data_table_right', isParentId],
+        queryFn: () => fetchDataTableRight(isParentId),
+        enabled: !!isParentId,
+        staleTime: 10000,
+        placeholderData: keepPreviousData,
+        ...optionsQuery
+    })
+
+
     const handleShow = (id) => {
         queryState({
             listDataLeft: dataTable.listDataLeft.map((e) => {
                 const showParent = e.id == id;
-                showParent && fetchDataTableRight(id);
+                showParent && sIsParentId(id);
                 return {
                     ...e,
                     showParent: showParent,
                 };
             }),
         });
-        fetchingData();
+        // fetchingData();
     };
 
     const handleActiveTab = (e) => {
         queryState({ isTab: e });
-        fetchingData();
+        // fetchingData();
     };
 
     const fetchingData = () => {
@@ -465,13 +497,16 @@ const MainTable = ({ dataLang }) => {
         filterItem: () => { },
         handShowItem,
         handDeleteItem,
-        isFetching,
+        isFetching: isLoadingDataTableRight,
         isValue,
         listPlan,
         listBranch,
         listOrder,
         queryValue,
-        fetchDataTable,
+        fetchDataTable: (page) => {
+            fetchDataTable(page);
+            refetch()
+        },
         fetchDataOrder,
         fetchDataPlan
     };

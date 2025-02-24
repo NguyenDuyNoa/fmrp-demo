@@ -357,8 +357,8 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                             <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
                         ) : findValue.arrayItem && findValue.arrayItem?.length > 0 ? (
                             <>
-                                <Customscrollbar className="min-h-[300px] max-h-[300px] overflow-hidden">
-                                    <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
+                                <Customscrollbar className="h-[300px] max-h-[300px] overflow-hidden">
+                                    <div className="h-full divide-y divide-slate-200">
                                         {findValue.arrayItem?.map((e, index) => (
                                             <div
                                                 key={e?.id?.toString()}

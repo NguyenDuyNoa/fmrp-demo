@@ -16,7 +16,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { Add, Trash as IconDelete, ArrowDown2 as IconDown, TickCircle } from "iconsax-react";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
@@ -182,10 +182,12 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
         }
     };
 
-    const { isLoading, isFetching } = useQuery({
+    const { isLoading, isFetching, data } = useQuery({
         queryKey: ['api_keep_item_warrehouse', findValue.type, open],
         queryFn: fetchListItem,
         enabled: open,
+        placeholderData: keepPreviousData,
+        staleTime: 10000,
         ...optionsQuery
     })
 
@@ -444,14 +446,14 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                             {dataLang?.inventory_operatione || "inventory_operatione"}
                         </ColumnTablePopup>
                     </HeaderTablePopup>
-                    {(isLoading || isFetching)
+                    {(isLoading)
                         ?
                         <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
                         :
                         findValue.arrayItem && findValue.arrayItem?.length > 0
                             ?
-                            <Customscrollbar className="min-h-[300px] max-h-[300px] overflow-hidden">
-                                <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
+                            <Customscrollbar className="h-[300px] max-h-[300px]">
+                                <div className="h-full divide-y divide-slate-200">
                                     {
                                         findValue.arrayItem?.map((e, index) => (
                                             <div
@@ -541,10 +543,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                         )}
                                                                         {...field}
                                                                         onChange={(event) => {
-                                                                            const check = findValue.arrayItem.some((x) => x?.valueWarehouse?.id == event?.id);
-                                                                            if (check) {
-                                                                                return isShow("error", dataLang?.materials_planning_warehouse_has_been_selected || "materials_planning_warehouse_has_been_selected");
-                                                                            }
+                                                                            // const check = findValue.arrayItem.some((x) => x?.valueWarehouse?.id == event?.id);
+                                                                            // if (check) {
+                                                                            //     return isShow("error", dataLang?.materials_planning_warehouse_has_been_selected || "materials_planning_warehouse_has_been_selected");
+                                                                            // }
                                                                             fetchListLocationWarehouse(e, event?.id);
                                                                             field.onChange(event);
                                                                         }}
