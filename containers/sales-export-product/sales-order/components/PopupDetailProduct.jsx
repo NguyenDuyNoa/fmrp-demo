@@ -51,11 +51,11 @@ const PopupDetailProduct = (props) => {
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
 
                 <div className="3xl:w-[1200px] 2xl:w-[1100px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
-                    <div className=" customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
+                    <div className="flex flex-col pb-1 overflow-auto customsroll scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <GeneralInformation  {...props} />
                         <div className="grid grid-cols-12 min-h-[100px]">
                             <div className="col-span-4">
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4 ">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 whitespace-nowrap">
                                         {props.dataLang?.sales_product_date || "sales_product_date"}:
                                     </h3>
@@ -63,7 +63,7 @@ const PopupDetailProduct = (props) => {
                                         {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                     </h3>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.sales_product_code || "sales_product_code"}:
                                     </h3>
@@ -71,7 +71,7 @@ const PopupDetailProduct = (props) => {
                                         {data?.code}
                                     </h3>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 ">
                                         {props.dataLang?.sales_product_order_type || "sales_product_order_type"}:
                                     </h3>
@@ -87,7 +87,7 @@ const PopupDetailProduct = (props) => {
                                         )}
                                     </h3>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 ">
                                         {props.dataLang?.sales_product_statusTT || "sales_product_statusTT"}:
                                     </h3>
@@ -105,7 +105,7 @@ const PopupDetailProduct = (props) => {
                                         (data?.status_payment === "payment_paid" && (
                                             <span className="3xl:text-[12px] 2xl:text-[11px] xl:text-[10px] text-[10px] col-span-4 ml-3 flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 3xl:w-[130px] 2xl:w-[120px] xl:w-[110px] lg:w-[110px] w-[100px]  bg-lime-200 text-center">
                                                 <TickCircle
-                                                    className="bg-lime-500 rounded-full"
+                                                    className="rounded-full bg-lime-500"
                                                     color="white"
                                                     size={15}
                                                 />
@@ -116,7 +116,7 @@ const PopupDetailProduct = (props) => {
                             </div>
 
                             <div className="col-span-4 ">
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_code || "price_quote_code"}:
                                     </h3>
@@ -124,7 +124,7 @@ const PopupDetailProduct = (props) => {
                                         {data?.quote_code}
                                     </h3>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_customer || "price_quote_customer"}:
                                     </h3>
@@ -132,7 +132,7 @@ const PopupDetailProduct = (props) => {
                                         {data?.client_name}
                                     </h3>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_contact_person || "price_quote_contact_person"}:
                                     </h3>
@@ -142,7 +142,7 @@ const PopupDetailProduct = (props) => {
                                 </div>
                             </div>
                             <div className="col-span-4 ">
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.sales_product_staff_in_charge ||
                                             "sales_product_staff_in_charge"}
@@ -153,7 +153,7 @@ const PopupDetailProduct = (props) => {
                                     </h3>
                                 </div>
 
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_order_status || "price_quote_order_status"}:
                                     </h3>
@@ -170,7 +170,7 @@ const PopupDetailProduct = (props) => {
                                             ))}
                                     </h3>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_branch || "price_quote_branch"}:
                                     </h3>
@@ -183,7 +183,7 @@ const PopupDetailProduct = (props) => {
                             </div>
                         </div>
                         <div className="pr-2 w-[100%] ">
-                            <HeaderTablePopup gridCols={12} display="grid">
+                            <HeaderTablePopup gridCols={12} display="grid" className={'z-[0]'}>
                                 <ColumnTablePopup >
                                     {props.dataLang?.price_quote_image || "price_quote_image"}
                                 </ColumnTablePopup>
@@ -224,79 +224,77 @@ const PopupDetailProduct = (props) => {
                             {isFetching ? (
                                 <Loading className="h-20 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
-                                <>
-                                    <Customscrollbar
-                                        className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                    >
-                                        <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
-                                            {data?.items?.map((e) => (
-                                                <div
-                                                    className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
-                                                    key={e.id?.toString()}
-                                                >
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]   py-0.5 col-span-1  rounded-md text-center">
-                                                        {e?.item?.images != null ? (
+                                <Customscrollbar
+                                    className="max-h-[200px] h-[200px] overflow-x-hidden"
+                                >
+                                    <div className="h-full divide-y divide-slate-200">
+                                        {data?.items?.map((e) => (
+                                            <div
+                                                className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
+                                                key={e.id?.toString()}
+                                            >
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]   py-0.5 col-span-1  rounded-md text-center">
+                                                    {e?.item?.images != null ? (
+                                                        <ModalImage
+                                                            small={e?.item?.images}
+                                                            large={e?.item?.images}
+                                                            alt="Product Image"
+                                                            className="custom-modal-image object-cover rounded w-[50px] h-[60px]"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                             <ModalImage
-                                                                small={e?.item?.images}
-                                                                large={e?.item?.images}
-                                                                alt="Product Image"
-                                                                className="custom-modal-image object-cover rounded w-[50px] h-[60px]"
+                                                                small="/nodata.png"
+                                                                large="/nodata.png"
+                                                                className="object-contain w-full h-full p-1 rounded"
                                                             />
-                                                        ) : (
-                                                            <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
-                                                                <ModalImage
-                                                                    small="/nodata.png"
-                                                                    large="/nodata.png"
-                                                                    className="w-full h-full rounded object-contain p-1"
-                                                                />
-                                                            </div>
-                                                        )}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-left">
-                                                        {e?.item?.name}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">
-                                                        {e?.item?.product_variation}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                        {e?.item?.unit_name}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
-                                                        {formatNumber(e?.quantity)}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-right">
-                                                        {formatNumberMoney(e?.price)}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
-                                                        {e?.discount_percent + "%"}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-right">
-                                                        {formatNumberMoney(e?.price_after_discount)}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
-                                                        {formatNumber(e?.tax_rate) + "%"}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1 pr-2 rounded-md text-right">
-                                                        {formatNumberMoney(e?.amount)}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] col-span-1 rounded-md text-center whitespace-normal">
-                                                        {e?.delivery_date != null ? formatMoment(e?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] pl-4 col-span-1 rounded-md text-left whitespace-normal">
-                                                        {e?.note != undefined ? e?.note : ""}
-                                                    </h6>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </Customscrollbar>
-                                </>
+                                                        </div>
+                                                    )}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-left">
+                                                    {e?.item?.name}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">
+                                                    {e?.item?.product_variation}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                    {e?.item?.unit_name}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
+                                                    {formatNumber(e?.quantity)}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-right">
+                                                    {formatNumberMoney(e?.price)}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
+                                                    {e?.discount_percent + "%"}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-right">
+                                                    {formatNumberMoney(e?.price_after_discount)}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
+                                                    {formatNumber(e?.tax_rate) + "%"}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1 pr-2 rounded-md text-right">
+                                                    {formatNumberMoney(e?.amount)}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] col-span-1 rounded-md text-center whitespace-normal">
+                                                    {e?.delivery_date != null ? formatMoment(e?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] pl-4 col-span-1 rounded-md text-left whitespace-normal">
+                                                    {e?.note != undefined ? e?.note : ""}
+                                                </h6>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Customscrollbar>
                             ) : <NoData />}
                         </div>
-                        <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
+                        <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-[#E7EAEE] border-opacity-70 border-y-[1px] ">
                             {props.dataLang?.purchase_total || "purchase_total"}
                         </h2>
-                        <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between">
-                            <div className="col-span-7 font-medium grid grid-cols-7 text-left">
+                        <div className="grid flex-col justify-between grid-cols-12 mt-2 text-right">
+                            <div className="grid grid-cols-7 col-span-7 font-medium text-left">
                                 <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] ">
                                     {props.dataLang?.price_quote_note || "price_quote_note"}
                                 </h3>
