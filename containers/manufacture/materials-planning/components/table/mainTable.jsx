@@ -175,11 +175,15 @@ const MainTable = ({ dataLang }) => {
                 next: data?.next == 1,
             });
 
-            sIsParentId(isValue.search ? arrayItem[0]?.id : !isParentId ? arrayItem[0]?.id : isParentId ?? null)
+            sIsParentId((isValue.search || type == 'delete') ? arrayItem[0]?.id : !isParentId ? arrayItem[0]?.id : isParentId ?? null)
 
 
             if (type == 'submit') {
                 refetch()
+            }
+
+            if (type == 'delete') {
+                await fetchDataTableRight(arrayItem[0]?.id)
             }
 
             if (data?.productionPlans?.length == 0) {
@@ -397,7 +401,7 @@ const MainTable = ({ dataLang }) => {
     const handleConfim = async () => {
         const { isSuccess, message } = await apiMaterialsPlanning.apiDeleteProductionPlans(isId);
         if (isSuccess == 1) {
-            fetchDataTable(1);
+            fetchDataTable(1, 'delete');
             isShow("success", `${dataLang[message] || message}`);
         } else {
             isShow("error", `${dataLang[message] || message}`);
