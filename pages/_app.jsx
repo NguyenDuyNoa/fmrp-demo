@@ -38,7 +38,8 @@ const Index = (props) => {
         <React.Fragment>
             <QueryClientProvider client={queryClient}>
                 <Head>
-                    <link rel="shortcut icon" href="/Favicon.png" />
+                    <link rel="shortcut icon" href="/faicon.png" />
+                    {/* <link rel="shortcut icon" href="/Favicon.png" /> */}
                 </Head>
                 <Suspense fallback={<LoadingPage />}>
                     <Provider store={store}>
