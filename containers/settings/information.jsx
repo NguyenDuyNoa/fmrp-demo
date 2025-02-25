@@ -65,6 +65,7 @@ const Information = (props) => {
     };
 
     const _HandleChangeValue = (type, value) => {
+        console.log(type);
         if (type == "name") {
             sData({ ...data, company_name: value.target?.value });
         } else if (type == "phone") {
@@ -89,16 +90,16 @@ const Information = (props) => {
     const _ServerSending = async () => {
         let formData = new FormData();
 
-        formData.append("company_name", data?.company_name);
-        formData.append("company_email", data?.company_email);
-        formData.append("company_address", data?.company_address);
-        formData.append("company_phone_number", data?.company_phone_number);
-        formData.append("company_website", data?.company_website);
-        formData.append("representative_address", data?.representative_address);
-        formData.append("representative_email", data?.representative_email);
-        formData.append("representative_name", data?.representative_name);
-        formData.append("representative_phone_number", data?.representative_phone_number);
-        formData.append("company_logo", data?.thumb);
+        formData.append("company_name", data?.company_name ?? "");
+        formData.append("company_email", data?.company_email ?? "");
+        formData.append("company_address", data?.company_address ?? "");
+        formData.append("company_phone_number", data?.company_phone_number ?? "");
+        formData.append("company_website", data?.company_website ?? "");
+        formData.append("representative_address", data?.representative_address ?? "");
+        formData.append("representative_email", data?.representative_email ?? "");
+        formData.append("representative_name", data?.representative_name ?? "");
+        formData.append("representative_phone_number", data?.representative_phone_number ?? "");
+        formData.append("company_logo", data?.thumb ?? "");
         try {
             const { isSuccess } = await apiInformation.apiHandingInfo(formData);
             if (isSuccess) {
@@ -302,6 +303,7 @@ const Information = (props) => {
                                                 type="text"
                                                 placeholder="Nhập địa chỉ Doanh Nghiệp"
                                                 rows={1}
+                                                onChange={_HandleChangeValue.bind(this, "address")}
                                                 value={data?.company_address}
                                                 className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full resize-none"
                                             />
