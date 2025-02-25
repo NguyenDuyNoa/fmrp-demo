@@ -91,5 +91,10 @@ const apiProductionsOrders = {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/handlingFinishedStages`, data);
         return response.data
     },
+    // xóa lsx
+    async apiDeleteProductionOrders(id) {
+        const response = await axiosCustom('DELETE', `/api_web/api_manufactures/deleteProductionOrders/${id}`);
+        return response.data
+    },
 }
 export default apiProductionsOrders

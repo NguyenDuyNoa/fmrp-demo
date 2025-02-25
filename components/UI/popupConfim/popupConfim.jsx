@@ -72,7 +72,8 @@ const PopupConfim = (props) => {
             className={`${props.className} popup-edit`}
         >
             <div
-                className={`3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 min-w-[400px] ${props.nameModel == "price_quote_status" && "min-w-[500px]"
+                className={`min-w-[400px] ${props.nameModel == "price_quote_status" && "min-w-[500px]"
+                    // className={`3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 min-w-[400px] ${props.nameModel == "price_quote_status" && "min-w-[500px]"
                     }`}
             >
                 <div className={`${inter.className} bg-[#ffffff] p-4 shadow-xl rounded-xl flex flex-col gap-3`}>

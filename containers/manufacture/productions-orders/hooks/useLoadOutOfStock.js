@@ -20,8 +20,15 @@ export const useLoadOutOfStock = () => {
         formData.append("pp_id", data?.items[0]?.pp_id ?? "");
 
         // }
-        console.log("data?.items", data?.items);
-
+        console.log("data?.items", data?.object);
+        const arrayMoveBom = data?.object?.arrayMoveBom || []
+        if (arrayMoveBom.length > 0) {
+            for (let index = 0; index < arrayMoveBom?.length; index++) {
+                const item = arrayMoveBom[index];
+                formData.append(`removeOutOfStock[]`, item?._id ?? "")
+            }
+        }
+        // removeOutOfStock[] 
 
         for (let index = 0; index < data?.items?.length; index++) {
             const item = data.items[index];

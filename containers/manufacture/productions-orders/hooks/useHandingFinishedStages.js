@@ -49,7 +49,7 @@ export const useHandingFinishedStages = () => {
                 formData.append(`items[${index}][quantity_error]`, element?.quantityError ?? 0)
                 formData.append(`items[${index}][quantity_rest]`, element?.quantity_rest ?? 0)
                 formData.append(`items[${index}][product_variation]`, element?.product_variation ?? "")
-                formData.append(`items[${index}][pois_id]`, element?.pois_id ?? "")
+                formData.append(`items[${index}][pois_id]`, element?.pois_id ?? 0)
                 formData.append(`items[${index}][type]`, element?.type ?? "")
                 formData.append(`items[${index}][type_products]`, element?.type_products ?? "")
                 formData.append(`items[${index}][number]`, element?.number ?? "")
@@ -86,6 +86,8 @@ export const useHandingFinishedStages = () => {
                 formData.append(`boms[${index}][quantity_warehouse]`, element?.quantity_warehouse ?? "")
                 formData.append(`boms[${index}][quantity_keep]`, element?.quantity_keep ?? "")
                 formData.append(`boms[${index}][_id]`, element?._id)
+                formData.append(`boms[${index}][pois_id]`, element?.pois_id ?? 0)
+
 
                 for (let j = 0; j < element?.warehouseId?.length; j++) {
                     const elementJ = element?.warehouseId[j];

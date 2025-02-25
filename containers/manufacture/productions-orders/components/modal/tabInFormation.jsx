@@ -137,7 +137,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                             ? "3xl:h-[calc(100vh_-_343px)] 2xl:h-[calc(100vh_-_343px)] xxl:h-[calc(100vh_-_345px)] 3xl:w-[85%] 2xl:w-[77%] xl:w-[75%] lg:w-[75%]"
                             : "3xl:h-[calc(100vh_-_500px)] h-[calc(100vh_-_460px)] 3xl:w-[70%] 2xl:w-[70%] xl:w-[65%] lg:w-[70%]"}  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 overflow-x-auto pr-2`}
                     > */}
-                        {
+                        {/* {
                             isInfomation.dataInformation?.arrayProducts?.map((e) => {
                                 const shownElements = isInfomation.dataInformation?.arrayProducts?.filter((e) => e?.show);
                                 return (
@@ -160,7 +160,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                                     />
                                 );
                             })
-                        }
+                        } */}
                         <div className="">
                             <RenderItem
                                 id={undefined}

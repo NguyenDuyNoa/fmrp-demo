@@ -45,9 +45,7 @@ const Index = (props) => {
                         {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
                         {/* <main className={deca.className}> */}
                         <main className={inter.className}>
-                            <Customscrollbar className="max-h-screen" style={{ height: "100vh" }}>
-                                <MainPage {...props} />
-                            </Customscrollbar>
+                            <MainPage {...props} />
                         </main>
                     </Provider>
                 </Suspense>
@@ -69,6 +67,8 @@ function MainPage({ Component, pageProps }) {
 
     const { data: dataAuth, isLoading } = useAuththentication(auth)
 
+    const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
+
     const langDefault = useSelector((state) => state.lang);
 
     const { data } = useLanguage(langDefault)
@@ -77,6 +77,14 @@ function MainPage({ Component, pageProps }) {
         const showLang = localStorage.getItem("LanguagesFMRP");
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
+
+    useEffect(() => {
+        const scroll = document.querySelector('.simplebar-mask')
+        if (stateBoxChatAi.open && scroll) {
+            scroll.style.zIndex = 'unset'
+            return
+        }
+    }, [stateBoxChatAi.open])
 
     if (isLoading || auth == null) {
         return <LoadingPage />;
@@ -87,9 +95,14 @@ function MainPage({ Component, pageProps }) {
     }
 
     return (
-        <Layout dataLang={data}>
-            <Component dataLang={data} {...pageProps} />
-        </Layout>
+        <Customscrollbar
+            className="relative max-h-screen"
+            style={{ height: "100vh" }}
+        >
+            <Layout dataLang={data}>
+                <Component dataLang={data} {...pageProps} />
+            </Layout>
+        </Customscrollbar>
     );
 }
 export default Index;

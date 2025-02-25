@@ -27,6 +27,8 @@ import ModalDetail from "../modal/modalDetail";
 import TabItem from "./tabItem";
 import TabSemi from "./tabSemi";
 import PopupConfimStage from "../popup/PopupConfimStage";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import useToast from "@/hooks/useToast";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 
@@ -44,11 +46,15 @@ const MainTable = ({ dataLang }) => {
         },
     ];
 
+    const [isParentId, sIsParentId] = useState(null);
+
+    const isShow = useToast()
+
     const { data: listBr = [] } = useBranchList()
 
     const [isMouted, setIsMouted] = useState(false);
 
-    const { isOpen, handleQueryId, isIdChild } = useToggle();
+    const { isOpen, handleQueryId, isIdChild, isId } = useToggle();
 
     const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
 
@@ -109,7 +115,11 @@ const MainTable = ({ dataLang }) => {
         item_variation_id: isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
     };
 
-    const fetchState = async () => {
+    useEffect(() => {
+        sIsParentId(null)
+    }, [isState.search])
+
+    const fetchState = async (type) => {
         try {
             const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, { params: params });
             const arrayItem = convertArrData(data?.productionOrders);
@@ -118,16 +128,21 @@ const MainTable = ({ dataLang }) => {
                 listDataLeft: arrayItem.map((e, index) => {
                     return {
                         ...e,
-                        showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
+                        // showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
                     };
                 }),
                 next: data?.next == 1,
             });
+
+            if (type == 'delete') {
+                queryState({ idDetailProductionOrder: arrayItem[0]?.id ?? null });
+                await fetchisStateRight()
+            }
             // if (isState.search == "" && arrayItem[0]?.id) {
             //     queryState({ idDetailProductionOrder: arrayItem[0]?.id });
             // }
             if (isState.search == "") {
-                queryState({ idDetailProductionOrder: isState.idDetailProductionOrder ? isState.idDetailProductionOrder : arrayItem[0]?.id });
+                queryState({ idDetailProductionOrder: type == 'delete' ? arrayItem[0]?.id : isState.idDetailProductionOrder ? isState.idDetailProductionOrder : arrayItem[0]?.id });
             } else {
                 queryState({ idDetailProductionOrder: arrayItem[0]?.id });
             }
@@ -176,7 +191,7 @@ const MainTable = ({ dataLang }) => {
                 listDataLeft: arrayItem.map((e, index) => {
                     return {
                         ...e,
-                        showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
+                        // showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
                     };
                 }),
                 next: data?.next == 1,
@@ -209,7 +224,7 @@ const MainTable = ({ dataLang }) => {
         }
     }, [isState.page]);
 
-    const { isLoading: isLoadingRight } = useQuery({
+    const { isLoading: isLoadingRight, refetch } = useQuery({
         queryKey: ['api_detail_production_orders', isState.idDetailProductionOrder],
         queryFn: () => fetchisStateRight(),
         enabled: !!isState.idDetailProductionOrder,
@@ -219,7 +234,9 @@ const MainTable = ({ dataLang }) => {
     const fetchisStateRight = async () => {
         try {
             const { data, isSuccess } = await apiProductionsOrders.apiDetailProductionOrders(isState.idDetailProductionOrder);
-            if (!isSuccess == 1) return;
+            if (!isSuccess == 1) {
+                return;
+            }
             queryState({
                 listDataRight: {
                     title: data?.productionOrder?.reference_no,
@@ -322,10 +339,11 @@ const MainTable = ({ dataLang }) => {
     }, 500);
 
     const handleShow = (id) => {
+        queryState({ idDetailProductionOrder: id })
         queryState({
             listDataLeft: isState.listDataLeft.map((e) => {
                 const showParent = e.id == id;
-                showParent && queryState({ idDetailProductionOrder: id })
+                // showParent && queryState({ idDetailProductionOrder: id })
                 return {
                     ...e,
                     showParent: showParent,
@@ -341,7 +359,18 @@ const MainTable = ({ dataLang }) => {
     };
 
     const handleConfim = async () => {
-        handleQueryId({ status: false });
+        try {
+            const res = await apiProductionsOrders.apiDeleteProductionOrders(isId)
+            if (res?.isSuccess == 1) {
+                fetchState('delete')
+                isShow("success", `${dataLang[res?.message] || res?.message}`);
+            } else {
+                isShow("error", `${dataLang[res?.message] || res?.message}`);
+            }
+            handleQueryId({ status: false });
+        } catch (error) {
+
+        }
     };
 
     const handShowItem = (id, type) => {
@@ -370,30 +399,9 @@ const MainTable = ({ dataLang }) => {
         handleQueryId({ status: true, id: id, idChild: type });
     };
 
-    const handleConfimDeleteItem = async () => {
-        // const type = {
-        //     // dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
-        //     // dataPurchases: `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`,
-        // };
-        // await Axios("DELETE", type[isIdChild], {}, (err, response) => {
-        //     if (!err) {
-        //         let { isSuccess, message } = response.data;
-        //         if (isSuccess) {
-        //             fetchState(1);
-        //             queryState({ page: 1 });
-        //             isShow("success", dataLang[message] || message);
-        //         } else {
-        //             isShow("error", dataLang[message] || message);
-        //         }
-        //     }
-        // });
-        // handleQueryId({ status: false });
-    };
-
     const handleShowModel = (item) => {
         queryState({ openModal: true, dataModal: item });
     };
-
 
     const shareProps = {
         dataLang,
@@ -471,7 +479,7 @@ const MainTable = ({ dataLang }) => {
                                             <div
                                                 key={e.id}
                                                 onClick={() => handleShow(e.id)}
-                                                className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                                className={`py-2 pl-2 pr-3 ${e.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
                                             >
                                                 <div className="flex justify-between">
                                                     <div className="flex flex-col gap-1">
@@ -495,7 +503,7 @@ const MainTable = ({ dataLang }) => {
                                                         </span>
                                                     )}
                                                 </div>
-                                                {e.showParent && (
+                                                {e.id == isState.idDetailProductionOrder && (
                                                     <div className="flex flex-col w-full gap-2 mt-1">
                                                         <div className="flex items-center gap-1">
                                                             <h3 className=" text-[#52575E] font-medium text-[13px]">
@@ -584,7 +592,23 @@ const MainTable = ({ dataLang }) => {
                                         {/* <div className="text-base font-medium text-blue-500 cursor-pointer">
                                             Hoàn thành công đoạn
                                         </div> */}
-                                        <PopupConfimStage dataLang={dataLang} dataRight={isState} />
+                                        <div className="flex items-center gap-2">
+                                            <PopupConfimStage dataLang={dataLang} dataRight={isState} />
+
+                                            <button
+                                                className="bg-red-100 rounded-lg outline-none focus:outline-none"
+                                                onClick={() => {
+                                                    handleQueryId({ status: true, id: isState.idDetailProductionOrder });
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-2 px-3 py-2 ">
+                                                    <RiDeleteBin5Line className="text-base text-red-600" />
+                                                    <h3 className="text-xs font-medium text-red-600 3xl:text-base">
+                                                        {dataLang?.materials_planning_delete || "materials_planning_delete"}
+                                                    </h3>
+                                                </div>
+                                            </button>
+                                        </div>
                                         {/* <button
                                 className="bg-red-100 rounded-lg outline-none focus:outline-none"
                                 onClick={() => {
@@ -649,11 +673,7 @@ const MainTable = ({ dataLang }) => {
                 subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}
                 save={() => {
-                    if (isIdChild) {
-                        handleConfimDeleteItem();
-                    } else {
-                        handleConfim();
-                    }
+                    handleConfim();
                 }}
                 cancel={() => handleQueryId({ status: false })}
             />

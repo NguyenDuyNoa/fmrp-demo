@@ -240,7 +240,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                 const newData = findValue.arrayItem.map((e) => {
                     if (e.id === item.id) {
                         const location = data?.locationsWarehouse?.map((i) => {
-                            const quantityWarehouse = parseFloat(i?.quantity_warehouse.replace(/,/g, '')); // Đảm bảo là số
+                            const quantityWarehouse = parseFloat(i?.quantity_warehouse.replace(/,/g, '')) - +e?.quantityKeepp; // Đảm bảo là số
                             let newValue = 0; // Khởi tạo newValue
 
                             // Tính toán newValue dựa trên remainingQuantity và quantityWarehouse
@@ -794,10 +794,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                                 if (floatValue == 0) {
                                                                                                     return true;
                                                                                                 }
-                                                                                                if (floatValue > parseFloat(x.value.replace(/,/g, ''))) {
-                                                                                                    isShow("warning", `${dataLang?.materials_planning_llease_enter || "materials_planning_llease_enter"} ${formatNumber(parseFloat(x.value.replace(/,/g, '')))}`);
-                                                                                                    return false;
-                                                                                                }
+                                                                                                // if (floatValue > parseFloat(x.value.replace(/,/g, '') - e?.quantityKeepp)) {
+                                                                                                //     isShow("warning", `${dataLang?.materials_planning_llease_enter || "materials_planning_llease_enter"} ${formatNumber(parseFloat(x.value.replace(/,/g, '')))}`);
+                                                                                                //     return false;
+                                                                                                // }
                                                                                                 if (floatValue < 0) {
                                                                                                     isShow("warning", dataLang?.materials_planning_please_enter_greater || "materials_planning_please_enter_greater");
                                                                                                     return false;

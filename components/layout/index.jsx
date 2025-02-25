@@ -28,15 +28,17 @@ const Index = ({ children, ...props }) => {
                 <Header />
                 <div>
                     {children}
+
                 </div>
             </div>
-            <PopupAppTrial {...props} />
-            <PopupAppRenewal {...props} />
             {
                 stateBoxChatAi.isShowAi && (
                     <ChatBubbleAI {...props} />
                 )
             }
+
+            <PopupAppTrial {...props} />
+            <PopupAppRenewal {...props} />
             <PopupUpdateVersion {...props} />
             <PopupAccountInformation {...props} />
             <PopupChangePassword {...props} />

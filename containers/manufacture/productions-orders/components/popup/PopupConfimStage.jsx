@@ -9,6 +9,7 @@ import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useToast from "@/hooks/useToast";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
@@ -16,14 +17,13 @@ import { Trash } from "iconsax-react";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa6";
 import ModalImage from "react-modal-image";
 import { useActiveStages } from "../../hooks/useActiveStages";
+import { useHandingFinishedStages } from "../../hooks/useHandingFinishedStages";
 import { useListFinishedStages } from "../../hooks/useListFinishedStages";
 import { useLoadOutOfStock } from "../../hooks/useLoadOutOfStock";
-import { useHandingFinishedStages } from "../../hooks/useHandingFinishedStages";
-import useToast from "@/hooks/useToast";
-import { IoMdCheckmark } from "react-icons/io";
-import { FaCheck } from "react-icons/fa6";
+import Image from "next/image";
 
 
 const initialState = {
@@ -31,6 +31,7 @@ const initialState = {
     objectWareHouse: null,
     dataTableProducts: null,
     dataTableBom: null,
+    arrayMoveBom: []
 }
 
 const PopupConfimStage = ({ dataLang, dataRight }) => {
@@ -75,7 +76,17 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
 
         const r = await onGetData(payload)
 
-        queryState({ dataTableProducts: r });
+        queryState({ dataTableProducts: r, arrayMoveBom: [] });
+
+        onGetBom({
+            isProduct: type === 'TP' ? 1 : 0,
+            activeStep: {
+                type,
+                item: e
+            },
+            poId: dataRight?.idDetailProductionOrder,
+            arrayMoveBom: []
+        }, r?.data?.items)
 
     };
 
@@ -89,9 +100,9 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
             poId: dataRight?.idDetailProductionOrder,
             objectData: isState
         })
+
         if (r?.isSuccess == 1) {
             handleSelectStep(activeStep?.type, activeStep?.item, 'auto')
-
         }
 
     };
@@ -131,6 +142,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
 
 
     const handleChange = (table, type, value, row) => {
+
         if (table == 'product') {
             const newData = isState.dataTableProducts?.data?.items?.map((item) => {
                 if (item?.poi_id === row?.poi_id) {
@@ -146,8 +158,18 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                         ...isState.dataTableProducts?.data,
                         items: newData
                     }
-                }
+                },
             });
+
+            onGetBom({
+                isProduct: type === 'TP' ? 1 : 0,
+                activeStep: {
+                    type,
+                    item: activeStep.item
+                },
+                poId: dataRight?.idDetailProductionOrder,
+                arrayMoveBom: isState.arrayMoveBom,
+            }, newData)
         }
 
         if (table == 'bom') {
@@ -166,14 +188,19 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                         boms: newData,
                         bomsClientHistory: newData
                     }
-                }
+                },
             });
-
         }
     }
 
     const handleRemove = (type, row) => {
+        if (type == 'bom' && row?.type_bom == "product_before") {
+            isToast('error', "Đây là thành phẩm công đoạn bước trước, không thể xóa")
+            return
+        }
+
         const stateKey = type === 'product' ? 'dataTableProducts' : 'dataTableBom';
+
         const stateData = type === 'product' ? 'items' : 'boms';
 
         const newData = isState[stateKey]?.data[stateData]?.filter((item) => (item?.poi_id || item?._id) !== (row?.poi_id || row?._id));
@@ -187,6 +214,20 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                 },
             },
         });
+
+
+        queryState({ arrayMoveBom: [...isState.arrayMoveBom, row] })
+
+        onGetBom({
+            isProduct: type === 'product' ? 1 : 0,
+            activeStep: {
+                type,
+                item: activeStep.item
+            },
+            arrayMoveBom: [...isState.arrayMoveBom, row],
+            poId: dataRight?.idDetailProductionOrder,
+        }, type === 'product' ? newData : isState.dataTableProducts?.data?.items)
+
     };
 
 
@@ -223,18 +264,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
         } catch (error) {
             console.error('Error in onGetBom:', error);
         }
-    }, 500), [isState.dataTableProducts]);
-
-
-    useEffect(() => {
-        // if (isState.dataTableProducts?.data?.items?.length == 0) return
-
-        onGetBom({
-            isProduct: activeStep.type === 'TP' ? 1 : 0,
-            activeStep,
-            poId: dataRight?.idDetailProductionOrder,
-        }, isState.dataTableProducts?.data?.items)
-    }, [isState.dataTableProducts, activeStep])
+    }, 500), [isState.dataTableProducts, isState.dataTableBom]);
 
     useEffect(() => {
         if (isState.open) {
@@ -243,7 +273,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
         }
     }, [isState.open])
 
-    console.log("1222222", isState.dataTableBom?.data?.boms);
+    const checkItemFinalStage = isState.dataTableProducts?.data?.items?.some(e => e.final_stage == 1)
 
     return (
         <PopupCustom
@@ -397,7 +427,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                     className="h-[calc(80vh_/_2_-_115px)] overflow-auto bg-white"
                                 >
                                     <table className="w-full text-sm font-normal border border-separate border-gray-200 table-auto border-spacing-0">
-                                        <thead className="sticky top-0 z-10 bg-gray-100">
+                                        <thead className="sticky top-0 z-0 bg-gray-100">
                                             <tr>
                                                 <th className="border p-2 font-normal min-w-[200px] sticky left-0 z-20 bg-gray-100">Số lệnh sản xuất chi tiết</th>
                                                 <th className="border p-2 font-normal min-w-[100px] sticky left-[200px] z-20 bg-gray-100">Hình ảnh</th>
@@ -425,9 +455,9 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                         </td>
                                                         <td className="p-2 border sticky left-[200px] bg-white">
                                                             <div className="flex items-center justify-center">
-                                                                <ModalImage
-                                                                    small={row?.images ? row?.images : "/nodata.png"}
-                                                                    large={row?.images ? row?.images : "/nodata.png"}
+                                                                <Image
+                                                                    src={row?.images ? row?.images : "/nodata.png"}
+                                                                    // large={row?.images ? row?.images : "/nodata.png"}
                                                                     width={36}
                                                                     height={36}
                                                                     alt={row?.images ? row?.images : "/nodata.png"}
@@ -537,9 +567,9 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                         <tr key={index}>
                                                             <td className="p-2 border">
                                                                 <div className="flex items-center justify-center ">
-                                                                    <ModalImage
-                                                                        small={row?.images ? row?.images : "/nodata.png"}
-                                                                        large={row?.images ? row?.images : "/nodata.png"}
+                                                                    <Image
+                                                                        src={row?.images ? row?.images : "/nodata.png"}
+                                                                        // large={row?.images ? row?.images : "/nodata.png"}
                                                                         width={36}
                                                                         height={36}
                                                                         alt={row?.images ? row?.images : "/nodata.png"}

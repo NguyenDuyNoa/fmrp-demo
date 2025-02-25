@@ -439,7 +439,8 @@ const LoginPage = React.memo((props) => {
                                                     alt=""
                                                     width={200}
                                                     // src="/FMRP_Logo.png"
-                                                    src="/LOGO_LOGIN.png"
+                                                    src="/LOGOLOGIN-1.png"
+                                                    // src="/LOGO_LOGIN.png"
                                                     height={70}
                                                     quality={100}
                                                     className="object-contain"
