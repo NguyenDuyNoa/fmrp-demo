@@ -23,10 +23,10 @@ export const useHandingFinishedStages = () => {
             console.log("dataTableBom", dataTableBom);
             console.log("dataTableProducts", dataTableProducts);
 
-            if (!dataTableProducts || !dataTableBom || dataTableProducts?.data?.items?.length == 0 || dataTableBom?.data?.boms?.length == 0) {
-                isToast('error', 'Vui lòng kiểm tra dữ liệu')
-                return
-            }
+            // if (!dataTableProducts || !dataTableBom || dataTableProducts?.data?.items?.length == 0 || dataTableBom?.data?.boms?.length == 0) {
+            //     isToast('error', 'Vui lòng kiểm tra dữ liệu')
+            //     return
+            // }
 
             /// ds nhập thành phẩm
             for (let index = 0; index < dataTableProducts?.data?.items?.length; index++) {
