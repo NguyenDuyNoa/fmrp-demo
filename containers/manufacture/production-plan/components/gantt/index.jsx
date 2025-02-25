@@ -726,14 +726,14 @@ const BodyGantt = ({
                                                                                                     }
                                                                                                 }}
                                                                                                 className={`flex flex-col ${(!ci.active && !ci.outDate && "bg-red-200 ") || (ci.active && !ci.outDate && "bg-[#5599EC] ")}   
-                                                                                                    ${ci?.last_index == 1 && ci?.reference_no_detail ? "relative rounded-tr-[6px] rounded-br-[6px]" : ""}
-                                                                                                    ${ci?.first_index == 1 && ci?.reference_no_detail ? "rounded-tl-[6px] rounded-bl-[6px]" : ""}
+                                                                                                    ${ci?.last_index == 1 ? "relative rounded-tr-[6px] rounded-br-[6px]" : ""}
+                                                                                                    ${ci?.first_index == 1 ? "rounded-tl-[6px] rounded-bl-[6px]" : ""}
                                                                                                     ${ci?.reference_no_detail ? "cursor-pointer" : 'cursor-default'}
                                                                                                     px-2.5 py-0.5 font-medium text-sm capitalize `}
                                                                                             >
                                                                                                 <span className="opacity-0">{ci?.date}</span>
                                                                                                 {
-                                                                                                    ci?.last_index == 1 &&
+                                                                                                    ci?.last_index == 1 && ci?.reference_no_detail &&
                                                                                                     <div className={`${ci?.last_index == 1 ? "absolute -top-7 text-[11px] whitespace-nowrap py-0.5 px-2 rounded-sm" : "hidden"} bg-orange-100 text-orange-400`}
                                                                                                         style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
                                                                                                     >
