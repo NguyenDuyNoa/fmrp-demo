@@ -24,13 +24,9 @@ const Index = ({ children, ...props }) => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <div>
-                <Header />
-                <div>
-                    {children}
 
-                </div>
-            </div>
+            <Header />
+            {children}
             {
                 stateBoxChatAi.isShowAi && (
                     <ChatBubbleAI {...props} />

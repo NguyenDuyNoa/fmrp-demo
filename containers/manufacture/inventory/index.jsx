@@ -257,7 +257,7 @@ const Inventory = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex items-center justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.inventory_title || "inventory_title"}
                             </h2>
@@ -275,7 +275,7 @@ const Inventory = (props) => {
                             />
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -308,7 +308,7 @@ const Inventory = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -326,7 +326,7 @@ const Inventory = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -337,7 +337,7 @@ const Inventory = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar className="min:h-[200px] h-[90%] max:h-[750px] pb-2">
+                            <Customscrollbar className="h-[90%] pb-2">
                                 <div className="w-full">
                                     <HeaderTable gridCols={11} display={"grid"}>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
@@ -372,7 +372,7 @@ const Inventory = (props) => {
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
+                                            <div className="divide-y divide-slate-200 h-[100%]">
                                                 {data?.rResult?.map((e) => (
                                                     <RowTable gridCols={11} key={e?.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
@@ -397,7 +397,7 @@ const Inventory = (props) => {
                                                                 className="dropdown-avt "
                                                                 key={e?.staff_create_id}
                                                                 trigger={(open) => (
-                                                                    <span className="border border-orange-500 text-orange-500 p-1 rounded-md">
+                                                                    <span className="p-1 text-orange-500 border border-orange-500 rounded-md">
                                                                         {" "}
                                                                         {e?.adjusted.split("|||").length + " " + " Điều chỉnh"}
                                                                     </span>
@@ -433,7 +433,7 @@ const Inventory = (props) => {
                                                                 onClick={() =>
                                                                     handleQueryId({ id: e.id, status: true })
                                                                 }
-                                                                className="xl:text-base text-xs "
+                                                                className="text-xs xl:text-base "
                                                             >
                                                                 <IconDelete color="red" />
                                                             </button>

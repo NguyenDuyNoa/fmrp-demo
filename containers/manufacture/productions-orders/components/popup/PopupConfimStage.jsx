@@ -13,17 +13,17 @@ import useToast from "@/hooks/useToast";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
-import { Trash } from "iconsax-react";
+import { Calendar, Trash } from "iconsax-react";
 import { debounce } from "lodash";
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import DatePicker from "react-datepicker";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
-import ModalImage from "react-modal-image";
 import { useActiveStages } from "../../hooks/useActiveStages";
 import { useHandingFinishedStages } from "../../hooks/useHandingFinishedStages";
 import { useListFinishedStages } from "../../hooks/useListFinishedStages";
 import { useLoadOutOfStock } from "../../hooks/useLoadOutOfStock";
-import Image from "next/image";
 
 
 const initialState = {
@@ -34,7 +34,7 @@ const initialState = {
     arrayMoveBom: []
 }
 
-const PopupConfimStage = ({ dataLang, dataRight }) => {
+const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) => {
     const tableRef = useRef(null)
 
     const isToast = useToast();
@@ -46,6 +46,8 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
+
+    const stateRef = useRef(initialState);
 
     const [isState, setState] = useState(initialState);
 
@@ -59,7 +61,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
 
     const { dataProductExpiry, dataMaterialExpiry, dataProductSerial } = useFeature();
 
-    const { data, isLoading } = useListFinishedStages({ id: dataRight?.idDetailProductionOrder, open: isState.open })
+    const { data, isLoading, refetch } = useListFinishedStages({ id: dataRight?.idDetailProductionOrder, open: isState.open })
 
     const { data: dataLoadOutOfStock, isLoading: isLoadingLoadOutOfStock, onGetData: onGetDataLoadOutOfStock } = useLoadOutOfStock()
 
@@ -102,6 +104,8 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
         })
 
         if (r?.isSuccess == 1) {
+            refetch()
+            refetchMainTable()
             handleSelectStep(activeStep?.type, activeStep?.item, 'auto')
         }
 
@@ -141,12 +145,35 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
 
 
 
-    const handleChange = (table, type, value, row) => {
+    const handleChange = ({ table, type, value, row, index }) => {
 
         if (table == 'product') {
+            console.log("value?.floatValue", value?.floatValue);
+            const checkType = ['quantityEnterClient', 'quantityError'].includes(type)
+
             const newData = isState.dataTableProducts?.data?.items?.map((item) => {
                 if (item?.poi_id === row?.poi_id) {
-                    return { ...item, [type]: value?.floatValue }
+                    if (type === 'serial' || type === 'serialError') {
+                        let updatedArray = Array.isArray(item[type]) ? [...item[type]] : [];
+
+                        // Cập nhật giá trị mới trong mảng
+                        updatedArray[index] = { value, isDuplicate: false };
+
+                        // Kiểm tra trùng lặp trong cùng một hàng
+                        const valuesList = updatedArray.map(s => s?.value).filter(Boolean);
+                        updatedArray = updatedArray.map((s, i) => ({
+                            ...s,
+                            isDuplicate: valuesList.indexOf(s?.value) !== valuesList.lastIndexOf(s?.value)
+                        }));
+
+                        // Hiển thị cảnh báo nếu trùng
+                        if (updatedArray[index].isDuplicate) {
+                            isToast("error", `${type === 'serial' ? "Serial" : "Serial lỗi"} đã tồn tại!`);
+                        }
+
+                        return { ...item, [type]: updatedArray };
+                    }
+                    return { ...item, [type]: checkType ? value?.floatValue : value }
                 }
                 return item
             });
@@ -161,15 +188,16 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                 },
             });
 
-            onGetBom({
-                isProduct: type === 'TP' ? 1 : 0,
-                activeStep: {
-                    type,
-                    item: activeStep.item
-                },
-                poId: dataRight?.idDetailProductionOrder,
-                arrayMoveBom: isState.arrayMoveBom,
-            }, newData)
+            if (checkType)
+                onGetBom({
+                    isProduct: type === 'TP' ? 1 : 0,
+                    activeStep: {
+                        type,
+                        item: activeStep.item
+                    },
+                    poId: dataRight?.idDetailProductionOrder,
+                    arrayMoveBom: isState.arrayMoveBom,
+                }, newData)
         }
 
         if (table == 'bom') {
@@ -278,9 +306,15 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
     return (
         <PopupCustom
             title={<p>Hoàn thành công đoạn <span className="text-blue-500">(Số lệnh sản xuất: {data?.po?.reference_no})</span></p>}
-            button={<button className="py-1.5 px-4 flex items-center gap-2 transition-all duration-150 ease-in-out border border-blue-500 rounded-lg text-sm hover:bg-blue-500/70 hover:border-blue-500/70 bg-blue-500 text-white">
-                <FaCheck /> <p>Hoàn thành công đoạn</p>
-            </button>
+            button={
+
+                <div className="flex items-center gap-2 px-3 py-2 ">
+                    <FaCheck className="text-base text-white" />
+                    <h3 className="text-xs font-medium text-white 3xl:text-base">
+                        Hoàn thành công đoạn
+                    </h3>
+                </div>
+
             }
             onClickOpen={() => {
                 queryState({ open: true });
@@ -290,7 +324,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
             onClose={() => {
                 queryState({ open: false });
             }}
-            classNameBtn={``}
+            classNameBtn={`rounded-lg bg-blue-500`}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
             <div className={`w-[85vw] xl:h-[80vh] h-[575px] overflow-hidden `}>
@@ -427,14 +461,41 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                     className="h-[calc(80vh_/_2_-_115px)] overflow-auto bg-white"
                                 >
                                     <table className="w-full text-sm font-normal border border-separate border-gray-200 table-auto border-spacing-0">
-                                        <thead className="sticky top-0 z-0 bg-gray-100">
+                                        <thead className="sticky top-0 z-10 bg-gray-100">
                                             <tr>
-                                                <th className="border p-2 font-normal min-w-[200px] sticky left-0 z-20 bg-gray-100">Số lệnh sản xuất chi tiết</th>
-                                                <th className="border p-2 font-normal min-w-[100px] sticky left-[200px] z-20 bg-gray-100">Hình ảnh</th>
-                                                <th className="border p-2 font-normal min-w-[250px] sticky left-[300px] z-20 bg-gray-100">Mặt hàng</th>
+                                                {/* <th className="border p-2 font-normal min-w-[150px] sticky left-0 z-20 bg-gray-100">Lệnh SXCT</th> */}
+                                                <th className="border p-2 font-normal min-w-[100px] sticky left-[0px] z-20 bg-gray-100">Hình ảnh</th>
+                                                <th className="border p-2 font-normal min-w-[250px] sticky left-[100px] z-20 bg-gray-100">Mặt hàng</th>
                                                 <th className="border p-2 font-normal min-w-[150px]">Đơn vị sản xuất</th>
-                                                <th className="border p-2 font-normal min-w-[196px]">Số lượng hoàn thành</th>
-                                                <th className="border p-2 font-normal min-w-[120px]">Số lượng lỗi</th>
+                                                <th className="border p-2 font-normal min-w-[120px]">SL hoàn thành</th>
+                                                {
+                                                    (checkItemFinalStage && dataProductSerial.is_enable === "1") ? (
+                                                        <th className="border p-2 font-normal min-w-[120px]">
+                                                            Serial hoàn thành
+                                                        </th>
+                                                    )
+                                                        : null
+                                                }
+                                                <th className="border p-2 font-normal min-w-[120px]">SL lỗi</th>
+                                                {
+                                                    (checkItemFinalStage && dataProductSerial.is_enable === "1") ? (
+                                                        <th className="border p-2 font-normal min-w-[120px]">
+                                                            Serial lỗi
+                                                        </th>
+                                                    ) : null
+                                                }
+                                                {
+                                                    (checkItemFinalStage && (dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1")) ?
+                                                        <>
+                                                            <th className="border p-2 font-normal min-w-[120px]">
+                                                                {'Lot'}
+                                                            </th>
+                                                            <th className="border p-2 font-normal min-w-[150px]">
+                                                                {dataLang?.warehouses_detail_date ?? "warehouses_detail_date"}
+                                                            </th>
+                                                        </>
+                                                        : null
+                                                }
                                                 <th className="border p-2 font-normal min-w-[120px]">SL cần nhập</th>
                                                 <th className="border p-2 font-normal min-w-[120px]">SL đã nhập</th>
                                                 <th className="border p-2 font-normal min-w-[100px]">Thao tác</th>
@@ -450,10 +511,10 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                             ) : isState.dataTableProducts?.data?.items?.length > 0 ? (
                                                 isState.dataTableProducts?.data?.items?.map((row, index) => (
                                                     <tr key={index}>
-                                                        <td className="sticky left-0 p-2 text-sm text-center text-blue-500 bg-white border">
+                                                        {/* <td className="sticky z-[1] left-0 p-2 text-sm text-center text-blue-500 bg-white border">
                                                             {row?.reference_no_detail}
-                                                        </td>
-                                                        <td className="p-2 border sticky left-[200px] bg-white">
+                                                        </td> */}
+                                                        <td className="p-2 border sticky z-[1] left-[0px] bg-white">
                                                             <div className="flex items-center justify-center">
                                                                 <Image
                                                                     src={row?.images ? row?.images : "/nodata.png"}
@@ -465,27 +526,152 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                                 />
                                                             </div>
                                                         </td>
-                                                        <td className="p-2 text-sm border sticky left-[300px] bg-white">
+                                                        <td className="p-2 text-sm border sticky z-[1] left-[100px] bg-white">
                                                             <p>{row?.item_name}</p>
                                                             <p className="text-xs italic">{row?.product_variation}</p>
+                                                            <p className="text-xs text-blue-500">{row?.reference_no_detail}</p>
                                                         </td>
                                                         <td className="p-2 text-sm text-center border">{row?.unit_name}</td>
-                                                        <td className="p-2 text-sm border">
+                                                        <td className="p-2 text-sm border  w-[120px]">
                                                             <InPutNumericFormat
-                                                                onValueChange={(e) => handleChange("product", "quantityEnterClient", e, row)}
-                                                                value={row?.quantityEnterClient || ""}
-                                                                className={`${(!row?.quantityEnterClient && !row?.quantityError) ? "border-red-500" : "border-gray-200"} appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal focus:outline-none border-b-2`}
+                                                                onValueChange={(e) =>
+                                                                    handleChange({
+                                                                        table: "product",
+                                                                        type: 'quantityEnterClient',
+                                                                        row,
+                                                                        value: e
+                                                                    })}
+                                                                value={row?.quantityEnterClient || ''}
+                                                                className={`${(!row?.quantityEnterClient && !row?.quantityError) ? "border-red-500" : "border-gray-200"} w-full appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal focus:outline-none border-b-2`}
                                                                 isAllowed={isAllowedNumber}
                                                             />
                                                         </td>
+                                                        {
+                                                            (checkItemFinalStage && dataProductSerial.is_enable === "1") ? (
+                                                                <td className="p-2 text-sm border  w-[120px]">
+                                                                    <div className="flex flex-col gap-1">
+                                                                        {
+                                                                            Array(row?.quantityEnterClient || 0).fill(0).map((_, sIndex) => {
+                                                                                return (
+                                                                                    <input
+                                                                                        key={sIndex}
+                                                                                        value={row.serial?.[sIndex]?.value || ""}
+                                                                                        onChange={(e) => {
+                                                                                            handleChange({
+                                                                                                table: "product",
+                                                                                                type: "serial",
+                                                                                                value: e.target.value.trim(),
+                                                                                                row,
+                                                                                                index: sIndex
+                                                                                            });
+                                                                                        }}
+                                                                                        className={`
+                                                                                            border text-center py-1 px-1 font-medium w-full focus:outline-none 
+                                                                                            ${row.serial?.[sIndex]?.isDuplicate ? "border-red-500" : "border-gray-200 border-b-2"}
+                                                                                        `}
+                                                                                    />
+
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                            )
+                                                                : null
+                                                        }
+
                                                         <td className="p-2 border w-[120px]">
                                                             <InPutNumericFormat
-                                                                onValueChange={(e) => handleChange("product", "quantityError", e, row)}
-                                                                value={row?.quantityError || ""}
+                                                                onValueChange={(e) =>
+                                                                    handleChange({
+                                                                        table: "product",
+                                                                        type: 'quantityError',
+                                                                        row,
+                                                                        value: e
+                                                                    })}
+                                                                value={row?.quantityError ? row?.quantityError : ""}
                                                                 className={`${(!row?.quantityEnterClient && !row?.quantityError) ? "border-red-500" : "border-gray-200"} appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal focus:outline-none w-full border-b-2`}
                                                                 isAllowed={isAllowedNumber}
                                                             />
                                                         </td>
+                                                        {
+                                                            (checkItemFinalStage && dataProductSerial.is_enable === "1") ? (
+                                                                <td className="p-2 text-sm border  w-[120px]">
+                                                                    <div className="flex flex-col gap-1">
+                                                                        {
+                                                                            Array(row?.quantityError || 0).fill(0).map((_, sIndex) => {
+                                                                                return (
+                                                                                    <input
+                                                                                        key={sIndex}
+                                                                                        value={row.serialError?.[sIndex]?.value || ""}
+                                                                                        onChange={(e) => {
+                                                                                            handleChange({
+                                                                                                table: "product",
+                                                                                                type: "serialError",
+                                                                                                value: e.target.value.trim(),
+                                                                                                row,
+                                                                                                index: sIndex
+                                                                                            });
+                                                                                        }}
+                                                                                        className={`
+                                                                                            border text-center py-1 px-1 font-medium w-full focus:outline-none 
+                                                                                            ${row.serialError?.[sIndex]?.isDuplicate ? "border-red-500" : "border-gray-200 border-b-2"}
+                                                                                        `}
+                                                                                    />
+
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                            ) :
+                                                                null
+                                                        }
+                                                        {
+                                                            (checkItemFinalStage && (dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1")) &&
+                                                            <>
+                                                                <td className="p-2 text-sm border  w-[120px]">
+                                                                    <input
+                                                                        value={row?.lot || ""}
+                                                                        disabled={(dataProductExpiry?.is_enable == "1" && false) ||
+                                                                            (dataProductExpiry?.is_enable == "0" && true)}
+                                                                        onChange={(e) => {
+                                                                            handleChange({
+                                                                                table: "product",
+                                                                                type: "lot",
+                                                                                value: e.target.value,
+                                                                                row,
+                                                                            });
+                                                                        }}
+                                                                        className={`border text-center py-1 px-1 font-medium w-full focus:outline-none border-gray-200 border-b-2} `}
+                                                                    />
+                                                                </td>
+                                                                <td className="p-2 text-sm border w-[150px]">
+                                                                    <div className="relative">
+                                                                        <DatePicker
+                                                                            dateFormat="dd/MM/yyyy"
+                                                                            placeholderText={dataLang?.warehouses_detail_date ?? "warehouses_detail_date"}
+                                                                            selected={row?.date}
+                                                                            disabled={(dataProductExpiry?.is_enable == "1" && false) ||
+                                                                                (dataProductExpiry?.is_enable == "0" && true)}
+                                                                            onChange={(e) => {
+                                                                                handleChange({
+                                                                                    table: "product",
+                                                                                    type: "date",
+                                                                                    value: e,
+                                                                                    row,
+                                                                                });
+                                                                            }}
+                                                                            className={`border-gray-200 bg-transparent disabled:bg-gray-100 relative z-1  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-xs `}
+                                                                        />
+                                                                        <Calendar
+                                                                            size={14}
+                                                                            className="absolute top-1/2 -translate-y-1/2 right-1 text-[#cccccc]"
+                                                                        />
+                                                                    </div>
+                                                                </td>
+                                                            </>
+                                                        }
                                                         <td className="p-2 text-sm text-center border">{formatNumber(row?.quantity_enter)}</td>
                                                         <td className="p-2 text-sm text-center border">{formatNumber(row?.quantity_entered)}</td>
                                                         <td className="p-2 text-center border">
@@ -517,15 +703,31 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                     className="sticky left-0 z-20 p-2 font-normal text-center bg-gray-100 border"
                                                     colSpan={3}
                                                     style={{
-                                                        minWidth: "calc(200px + 100px + 250px)",
-                                                        width: "calc(200px + 100px + 250px)",
+                                                        minWidth: "calc(100px + 100px + 150px)",
+                                                        width: "calc(100px + 100px + 150px)",
                                                     }}
                                                 >
                                                     TỔNG CỘNG
                                                 </td>
                                                 <td className="p-2 text-center border font-normal min-w-[150px]"></td>
-                                                <td className="p-2 text-center border font-normal min-w-[196px]">{formatNumber(totalQuantity)}</td>
+                                                <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantity)}</td>
+                                                {
+                                                    (checkItemFinalStage && dataProductSerial.is_enable === "1") && (
+                                                        <th className="border p-2 font-normal min-w-[120px]">
+                                                        </th>
+                                                    )
+                                                }
                                                 <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityError)}</td>
+                                                {
+                                                    (checkItemFinalStage && (dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1")) && (
+                                                        <>
+                                                            <th className="border p-2 font-normal min-w-[120px]">
+                                                            </th>
+                                                            <th className="border p-2 font-normal min-w-[120px]">
+                                                            </th>
+                                                        </>
+                                                    )
+                                                }
                                                 <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityEnter)}</td>
                                                 <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityEntered)}</td>
                                                 <td className="p-2 text-center border font-normal min-w-[100px]"></td>
@@ -587,9 +789,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                                     </p>
                                                                     {
                                                                         row?.reference_no_detail && (
-                                                                            <p className="text-xs">
-                                                                                {row?.reference_no_detail}
-                                                                            </p>
+                                                                            <p className="text-xs text-blue-500">{row?.reference_no_detail}</p>
                                                                         )
                                                                     }
                                                                     {/* type_item */}
@@ -632,7 +832,13 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                                                                     isClearable={false}
                                                                     isMulti={true}
                                                                     components={{ MultiValue }}
-                                                                    onChange={(e) => handleChange('bom', "warehouseId", e, row)}
+                                                                    onChange={(e) =>
+                                                                        handleChange({
+                                                                            table: "bom",
+                                                                            type: 'warehouseId',
+                                                                            row,
+                                                                            value: e
+                                                                        })}
                                                                     className={`${row?.warehouseId?.length == 0 ? "border-red-500 border" : ""}  my-1  text-xs placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
                                                                     noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                                                     menuPortalTarget={document.body}
@@ -762,7 +968,7 @@ const PopupConfimStage = ({ dataLang, dataRight }) => {
                     </div>
                 </div>
             </div>
-        </PopupCustom>
+        </PopupCustom >
     );
 };
 

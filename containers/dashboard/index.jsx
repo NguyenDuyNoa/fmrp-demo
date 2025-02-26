@@ -11,6 +11,7 @@ import ManufacturingStatusMonitor from "./components/ManufacturingStatusMonitor"
 import PieChart from "./components/PieChart";
 import ProductionProgressTracker from "./components/ProductionProgressTracker";
 import TableChart from "./components/TableChart";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Dashboard = (props) => {
     const dispatch = useDispatch();
@@ -30,7 +31,7 @@ const Dashboard = (props) => {
                 <title>Tổng quan</title>
             </Head>
 
-            <div className="px-10 py-8 pt-24 space-y-5 overflow-x-auto text ">
+            <Customscrollbar className="h-screen px-10 py-8 pt-24 space-y-5 overflow-x-auto overflow-y-auto text">
                 {dataPstWH && (
                     <div
                         style={{
@@ -71,7 +72,7 @@ const Dashboard = (props) => {
                     {/* <AreaChart {...props} /> */}
                     <BarChart {...props} />
                 </div>
-            </div>
+            </Customscrollbar>
         </React.Fragment>
     );
 };

@@ -15,6 +15,7 @@ import { CookieCore } from "@/utils/lib/cookie";
 import ChatBubbleAI from "@/components/UI/chat/ChatAiBubble";
 import 'simplebar-react/dist/simplebar.min.css';
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { useRouter } from "next/router";
 
 // const t = Lark
 const deca = Lexend_Deca({
@@ -58,6 +59,11 @@ const Index = (props) => {
 function MainPage({ Component, pageProps }) {
     const dispatch = useDispatch();
 
+    const router = useRouter()
+
+    console.log("router", router);
+
+
     const tokenFMRP = CookieCore.get('tokenFMRP')
 
     const databaseappFMRP = CookieCore.get('databaseappFMRP')
@@ -87,6 +93,12 @@ function MainPage({ Component, pageProps }) {
         }
     }, [stateBoxChatAi.open])
 
+    // useEffect(() => {
+    //     if (['/dashboard'].includes(router.pathname)) {
+    //         // body.style.
+    //     }
+    // }, [router.pathname])
+
     if (isLoading || auth == null) {
         return <LoadingPage />;
     }
@@ -96,14 +108,18 @@ function MainPage({ Component, pageProps }) {
     }
 
     return (
-        <Customscrollbar
-            className="relative max-h-screen"
-            style={{ height: "100vh" }}
-        >
-            <Layout dataLang={data}>
-                <Component dataLang={data} {...pageProps} />
-            </Layout>
-        </Customscrollbar>
+        // <Customscrollbar
+        //     // className="relative max-h-screen "
+        //     // className={`${['/dashboard'].includes(router.pathname) ? "max-h-screen" : "!overflow-y-hidden !overflow-x-hidden"}`}
+        //     style={{
+        //         overflowY: 'hidden',
+        //         height: "100vh"
+        //     }}
+        // >
+        <Layout dataLang={data}>
+            <Component dataLang={data} {...pageProps} />
+        </Layout>
+        // </Customscrollbar>
     );
 }
 export default Index;

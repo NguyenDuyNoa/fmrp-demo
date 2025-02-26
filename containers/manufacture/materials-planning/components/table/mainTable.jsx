@@ -503,7 +503,7 @@ const MainTable = ({ dataLang }) => {
                                 />
                             </form>
                         </div>
-                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
+                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[54.5vh] 2xl:h-[56vh] xl:h-[56vh] lg:h-[55vh] h-[35vh] overflow-y-auto">
                             {dataTable.listDataLeft.map((e, eIndex) => (
                                 <div
                                     key={e.id}
@@ -640,7 +640,7 @@ const MainTable = ({ dataLang }) => {
                                     ))}
                                 </div>
                             </div>
-                            <div>
+                            <div className="">
                                 {dataTable.isTab == "item" && <TabItem {...shareProps} />}
                                 {dataTable.isTab == "plan" && <TabPlan {...shareProps} />}
                                 {dataTable.isTab == "keepStock" && <TabKeepStock {...shareProps} />}

@@ -1,9 +1,14 @@
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
 import useToast from "@/hooks/useToast";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useMutation } from "@tanstack/react-query";
 
 export const useHandingFinishedStages = () => {
     const isToast = useToast()
+
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
     const submitMutation = useMutation({
         mutationFn: (data) => {
@@ -55,6 +60,26 @@ export const useHandingFinishedStages = () => {
                 formData.append(`items[${index}][number]`, element?.number ?? "")
                 formData.append(`items[${index}][final_stage]`, element?.final_stage ?? "")
                 formData.append(`items[${index}][item_variation_id]`, element?.item_variation_id ?? "")
+
+                // công đoạn cuối
+                if (element?.final_stage == 1) {
+                    if (dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1") {
+                        if (dataProductExpiry?.is_enable == "0") {
+                            formData.append(`items[${index}][lot]`, element?.lot ?? "")
+                            formData.append(`items[${index}][date_expiration]`, formatMoment(element?.date, FORMAT_MOMENT.DATE_SLASH_LONG) ?? "")
+                        }
+                    }
+                    if (dataProductSerial.is_enable === "1") {
+                        for (let serialIndex = 0; serialIndex < element?.serial?.length; serialIndex++) {
+                            const elementSerial = element?.serial[serialIndex];
+                            formData.append(`items[${index}][serial_quantity][${serialIndex}]`, elementSerial?.value ?? "")
+                        }
+                        for (let serialErrorIndex = 0; serialErrorIndex < element?.serialError?.length; serialErrorIndex++) {
+                            const elementSerialError = element?.serialError[serialErrorIndex];
+                            formData.append(`items[${index}][serial_quantity_error][${serialErrorIndex}]`, elementSerialError?.value ?? "")
+                        }
+                    }
+                }
             }
 
             // ds Xuất kho sản xuất
@@ -87,7 +112,6 @@ export const useHandingFinishedStages = () => {
                 formData.append(`boms[${index}][quantity_keep]`, element?.quantity_keep ?? "")
                 formData.append(`boms[${index}][_id]`, element?._id)
                 formData.append(`boms[${index}][pois_id]`, element?.pois_id ?? 0)
-
 
                 for (let j = 0; j < element?.warehouseId?.length; j++) {
                     const elementJ = element?.warehouseId[j];

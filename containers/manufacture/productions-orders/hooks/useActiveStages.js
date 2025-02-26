@@ -10,7 +10,11 @@ export const useActiveStages = () => {
                     return {
                         ...e,
                         quantityError: 0,
-                        quantityEnterClient: e?.quantity_enter
+                        quantityEnterClient: e?.quantity_enter,
+                        serial: [],
+                        serialError: [],
+                        lot: null,
+                        date: null
                     }
                 }),
 

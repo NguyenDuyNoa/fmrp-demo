@@ -28,7 +28,7 @@ const TabItem = ({ dataTable, handShowItem, isFetching, dataLang }) => {
                 <Loading className="h-80" color="#0f4f9e" />
             ) : (
                 <Customscrollbar
-                    className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[36vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto"
+                    className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[35vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto"
                 >
                     {dataTable?.listDataRight?.dataPPItems?.length > 0 ? (
                         dataTable?.listDataRight?.dataPPItems?.map((e) => (

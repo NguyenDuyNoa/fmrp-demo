@@ -45,7 +45,7 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                     {isFetching ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : dataBom?.productsBom.length > 0 ? (
-                        <Customscrollbar className="3xl:h-[49.5vh] xxl:h-[30vh] 2xl:h-[38.5vh] xl:h-[31.5vh] lg:h-[33vh] h-[34vh]">
+                        <Customscrollbar className="3xl:h-[49.5vh] xxl:h-[30vh] 2xl:h-[37.5vh] xl:h-[31.5vh] lg:h-[33vh] h-[34vh]">
                             {dataBom?.productsBom.map((e, index) => (
                                 <div
                                     key={e.id}
@@ -131,7 +131,7 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                     {isFetching ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : dataBom?.materialsBom?.length > 0 ? (
-                        <Customscrollbar className="3xl:h-[49.5vh] xxl:h-[30vh] 2xl:h-[38.5vh] xl:h-[31.5vh] lg:h-[33vh] h-[34vh]">
+                        <Customscrollbar className="3xl:h-[49.5vh] xxl:h-[30vh] 2xl:h-[37.5vh] xl:h-[31.5vh] lg:h-[33vh] h-[34vh]">
                             {dataBom?.materialsBom.map((e, index) => (
                                 <div
                                     key={e.id}

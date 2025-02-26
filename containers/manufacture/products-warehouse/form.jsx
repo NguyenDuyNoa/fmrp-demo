@@ -783,8 +783,8 @@ const ProductsWarehouseForm = (props) => {
                         <div className="col-span-10">
                             <div
                                 className={`${dataProductSerial?.is_enable == "1"
-                                    ? "grid-cols-6"
-                                    : dataProductExpiry?.is_enable == "1"
+                                    ? "grid-cols-8"
+                                    : (dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")
                                         ? "grid-cols-7"
                                         : "grid-cols-5"
                                     } grid `}
@@ -798,8 +798,8 @@ const ProductsWarehouseForm = (props) => {
                                     </h4>
                                 )}
                                 {
-                                    // dataMaterialExpiry.is_enable === "1" ||
-                                    dataProductExpiry?.is_enable === "1" ? (
+                                    dataMaterialExpiry.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1" ? (
                                         <>
                                             <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
                                                 {"Lot"}
@@ -920,8 +920,9 @@ const ProductsWarehouseForm = (props) => {
                         <div className="col-span-10">
                             <div
                                 className={`${dataProductSerial?.is_enable == "1"
-                                    ? "grid-cols-6"
-                                    : dataProductExpiry?.is_enable == "1"
+                                    ? "grid-cols-8"
+                                    : dataMaterialExpiry.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
                                         ? "grid-cols-7"
                                         : "grid-cols-5"
                                     } grid  divide-x border-t border-b border-r border-l`}
@@ -950,8 +951,8 @@ const ProductsWarehouseForm = (props) => {
                                     ""
                                 )}
                                 {
-                                    // dataMaterialExpiry.is_enable === "1" ||
-                                    dataProductExpiry?.is_enable === "1" ? (
+                                    dataMaterialExpiry.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1" ? (
                                         <>
                                             <div className="flex items-center col-span-1 ">
                                                 <InPutNumericFormat
@@ -1137,8 +1138,9 @@ const ProductsWarehouseForm = (props) => {
                                             <div className="items-center col-span-10">
                                                 <div
                                                     className={`${dataProductSerial?.is_enable == "1"
-                                                        ? "grid-cols-6"
-                                                        : dataProductExpiry?.is_enable == "1"
+                                                        ? "grid-cols-8"
+                                                        : dataMaterialExpiry.is_enable === "1" ||
+                                                            dataProductExpiry?.is_enable === "1"
                                                             ? "grid-cols-7"
                                                             : "grid-cols-5"
                                                         }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
@@ -1222,9 +1224,9 @@ const ProductsWarehouseForm = (props) => {
                                                                 ""
                                                             )}
                                                             {
-                                                                // dataMaterialExpiry.is_enable ===
-                                                                //     "1" ||
-                                                                dataProductExpiry?.is_enable === "1" ? (
+                                                                dataMaterialExpiry.is_enable ===
+                                                                    "1" ||
+                                                                    dataProductExpiry?.is_enable === "1" ? (
                                                                     <>
                                                                         <div className="col-span-1 ">
                                                                             <div className="flex flex-col items-center justify-center h-full p-1">

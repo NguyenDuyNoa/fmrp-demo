@@ -488,14 +488,14 @@ const BodyGantt = ({
                         </div>
                     </div>
                     {isFetching ? (
-                        <Loading className="3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]" />
+                        <Loading className="3xl:h-[64vh] xxl:h-[55vh] 2xl:h-[54vh] xl:h-[54vh] lg:h-[52vh] h-[55vh]" />
                     ) : (
                         <div className="flex divide-x">
                             <div
                                 ref={container3Ref}
                                 onScroll={handleScrollContainer2}
                                 className="flex-col min-w-[35%] w-[35%]  overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
-                                3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                                3xl:h-[64vh] xxl:h-[55vh] 2xl:h-[54vh] xl:h-[54vh] lg:h-[52vh] h-[55vh]"
                             >
                                 {data?.map((e, eIndex) => {
                                     const outDate = ["outDate"].includes(e.status);
@@ -640,7 +640,7 @@ const BodyGantt = ({
                                 onScroll={handleScroll}
                                 id="container1"
                                 className="container1 flex-col w-full overflow-x-auto  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
-                                3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                                3xl:h-[64vh] xxl:h-[55vh] 2xl:h-[54vh] xl:h-[54vh] lg:h-[52vh] h-[55vh]"
                             >
                                 {
                                     data?.some(e => e?.show && e?.listProducts?.some(i => i?.processArr.some(ci => ci?.active && !ci?.outDate)))
@@ -811,7 +811,10 @@ const BodyGantt = ({
             ) :
                 <NoData />
             }
-            <ModalDetail {...shareProps} />
+            {
+                isState.openModal && <ModalDetail {...shareProps} />
+            }
+
         </React.Fragment >
     );
 };

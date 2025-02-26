@@ -29,6 +29,8 @@ import TabSemi from "./tabSemi";
 import PopupConfimStage from "../popup/PopupConfimStage";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import useToast from "@/hooks/useToast";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 
@@ -450,7 +452,7 @@ const MainTable = ({ dataLang }) => {
                                 />
                             </form>
                         </div>
-                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  ">
+                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh] overflow-y-auto">
                             {isLoading
                                 ?
                                 <Loading />
@@ -589,25 +591,40 @@ const MainTable = ({ dataLang }) => {
                                                 </h1>
                                             </div>
                                         </div>
-                                        {/* <div className="text-base font-medium text-blue-500 cursor-pointer">
-                                            Hoàn thành công đoạn
-                                        </div> */}
                                         <div className="flex items-center gap-2">
-                                            <PopupConfimStage dataLang={dataLang} dataRight={isState} />
-
-                                            <button
-                                                className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                                                onClick={() => {
-                                                    handleQueryId({ status: true, id: isState.idDetailProductionOrder });
-                                                }}
+                                            <OnResetData sOnFetching={(e) => { }} onClick={() => {
+                                                refetchProductionsOrders();
+                                                refetch()
+                                            }} />
+                                            <Zoom
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 1.08 }}
+                                                className="w-fit"
                                             >
-                                                <div className="flex items-center gap-2 px-3 py-2 ">
-                                                    <RiDeleteBin5Line className="text-base text-red-600" />
-                                                    <h3 className="text-xs font-medium text-red-600 3xl:text-base">
-                                                        {dataLang?.materials_planning_delete || "materials_planning_delete"}
-                                                    </h3>
-                                                </div>
-                                            </button>
+                                                <PopupConfimStage dataLang={dataLang} dataRight={isState} refetch={() => {
+                                                    refetchProductionsOrders();
+                                                    refetch()
+                                                }} />
+                                            </Zoom>
+                                            <Zoom
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 1.08 }}
+                                                className="w-fit"
+                                            >
+                                                <button
+                                                    className="bg-red-100 rounded-lg outline-none focus:outline-none"
+                                                    onClick={() => {
+                                                        handleQueryId({ status: true, id: isState.idDetailProductionOrder });
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-2 px-3 py-2 ">
+                                                        <RiDeleteBin5Line className="text-base text-red-600" />
+                                                        <h3 className="text-xs font-medium text-red-600 3xl:text-base">
+                                                            {dataLang?.materials_planning_delete || "materials_planning_delete"}
+                                                        </h3>
+                                                    </div>
+                                                </button>
+                                            </Zoom>
                                         </div>
                                         {/* <button
                                 className="bg-red-100 rounded-lg outline-none focus:outline-none"

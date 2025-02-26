@@ -496,7 +496,7 @@ const InventoryForm = (props) => {
                 </h2>
                 <div className="space-y-5">
                     <div className="space-y-2">
-                        <h2 className="bg-slate-100 py-2 px-4 rounded">Thông tin chung</h2>
+                        <h2 className="px-4 py-2 rounded bg-slate-100">Thông tin chung</h2>
                         <div className="grid grid-cols-4 gap-5">
                             <div className="space-y-1">
                                 <label className="text-[#344054] font-normal text-sm mb-1 ">
@@ -614,11 +614,11 @@ const InventoryForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex justify-between bg-slate-100 py-2 px-4 rounded items-center">
+                    <div className="flex items-center justify-between px-4 py-2 rounded bg-slate-100">
                         <h2 className="">Mặt hàng cần kiểm kê</h2>
                         <div>
                             {errProduct && dataChoose?.length == 0 && (
-                                <span className="text-red-500 mr-5">Vui lòng thêm mặt hàng để kiểm kê</span>
+                                <span className="mr-5 text-red-500">Vui lòng thêm mặt hàng để kiểm kê</span>
                             )}
                             <PopupProduct
                                 dataLang={props.dataLang}
@@ -632,7 +632,7 @@ const InventoryForm = (props) => {
                         </div>
                     </div>
                     <div className="">
-                        <h2 className="bg-slate-100 py-2 px-4 rounded">Thông tin mặt hàng</h2>
+                        <h2 className="px-4 py-2 rounded bg-slate-100">Thông tin mặt hàng</h2>
                         {dataChoose.length > 0 && (
                             <>
                                 <div className="grid grid-cols-6 pt-3 pb-2 shadow">
@@ -681,9 +681,9 @@ const InventoryForm = (props) => {
                                 </div>
                                 <div className="2xl:max-h-[300px] max-h-[320px] overflow-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-slate-50">
                                     {dataChoose.map((e) => (
-                                        <div key={e.id} className="grid grid-cols-6 items-start mt-3 ">
+                                        <div key={e.id} className="grid items-start grid-cols-6 mt-3 ">
                                             <div className="col-span-1 grid grid-cols-12 items-center p-1.5 space-y-1 border  h-full">
-                                                <div className="flex justify-between  col-span-3">
+                                                <div className="flex justify-between col-span-3">
                                                     <div className="w-[60px] h-[60px] bg-gray-200 flex flex-col items-center justify-center rounded">
                                                         {" "}
                                                         {e?.img ? (
@@ -693,7 +693,7 @@ const InventoryForm = (props) => {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="col-span-9 m-0 relative border rounded">
+                                                <div className="relative col-span-9 m-0 border rounded">
                                                     <h3 className="pl-1 font-medium 2xl:[14px] xl:text-xs text-[8px]">
                                                         {e.name}
                                                     </h3>
@@ -925,7 +925,7 @@ const InventoryForm = (props) => {
                                                                         ce?.id,
                                                                         "price"
                                                                     )}
-                                                                    className="appearance-none text-right py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
+                                                                    className="w-full px-2 py-1 font-medium text-right border-b-2 border-gray-200 appearance-none focus:outline-none"
                                                                     isAllowed={isAllowedNumber}
                                                                 />
                                                             </div>
@@ -989,7 +989,7 @@ const InventoryForm = (props) => {
                     </div>
                     <hr className="" />
                     <div className="grid grid-cols-2">
-                        <div className="space-y-1 flex flex-col">
+                        <div className="flex flex-col space-y-1">
                             <label>Ghi chú</label>
                             <textarea
                                 value={note}
@@ -999,7 +999,7 @@ const InventoryForm = (props) => {
                                 rows={4}
                             />
                         </div>
-                        <div className="space-y-2 flex flex-col items-end">
+                        <div className="flex flex-col items-end space-y-2">
                             <div className="flex">
                                 <h5 className="min-w-[230px]">Tổng số lượng : </h5>
                                 <span className="min-w-[150px] text-right">
@@ -1192,7 +1192,7 @@ const PopupStatus = (props) => {
                             <NoData />
                         )}
                     </div>
-                    <div className="space-x-2 text-right mt-4">
+                    <div className="mt-4 space-x-2 text-right">
                         <button
                             onClick={_HandleClose.bind(this)}
                             className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
