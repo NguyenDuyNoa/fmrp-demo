@@ -3,7 +3,8 @@ import Image from "next/image";
 
 const NoData = (props) => {
     const type = {
-        'notificationheader': '/icon/noti.svg',
+        'notificationheader': '/icon/data_empty_noti.svg',
+        // 'notificationheader': '/icon/noti.svg',
         'dashboard': '/icon/data_empty_dashboard-1.svg',
     }
     return (
@@ -28,7 +29,9 @@ const NoData = (props) => {
                         height={1024}
                         alt="@nodata"
                         className={`${props?.classNameImage ? `${props?.classNameImage}` : "w-[83%] h-[83%]"} object-cover`}
-                        src={type[props?.type] ?? "/data_empty.svg"}
+                        // src={"/no_data.svg"}
+                        src={type[props?.type] ?? "/no_data.svg"}
+                    // src={type[props?.type] ?? "/data_empty.svg"}
                     />
                 </div>
                 <h1 className={`text-[#141522] opacity-90 font-medium ${props?.classNameTitle ? props?.classNameTitle : "text-sm"}`}>
