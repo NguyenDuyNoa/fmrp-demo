@@ -101,9 +101,9 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                         <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                         <span>{dataLang?.client_list_exportexcel}</span>
                     </button>
-                    <div>
+                    {/* <div>
                         <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div
@@ -223,10 +223,10 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                 </div>
             </div>
             <ContainerPagination>
-                <TitlePagination
+                {/* <TitlePagination
                     dataLang={dataLang}
                     totalItems={data?.output?.iTotalDisplayRecords}
-                />
+                /> */}
                 <Pagination
                     postsPerPage={limit}
                     totalPosts={data?.output?.iTotalDisplayRecords}
