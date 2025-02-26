@@ -108,18 +108,14 @@ function MainPage({ Component, pageProps }) {
     }
 
     return (
-        // <Customscrollbar
-        //     // className="relative max-h-screen "
-        //     // className={`${['/dashboard'].includes(router.pathname) ? "max-h-screen" : "!overflow-y-hidden !overflow-x-hidden"}`}
-        //     style={{
-        //         overflowY: 'hidden',
-        //         height: "100vh"
-        //     }}
-        // >
-        <Layout dataLang={data}>
-            <Component dataLang={data} {...pageProps} />
-        </Layout>
-        // </Customscrollbar>
+        <Customscrollbar
+            className="relative max-h-screen "
+        // className={`${['/dashboard'].includes(router.pathname) ? "max-h-screen" : "!overflow-y-hidden !overflow-x-hidden"}`}
+        >
+            <Layout dataLang={data}>
+                <Component dataLang={data} {...pageProps} />
+            </Layout>
+        </Customscrollbar>
     );
 }
 export default Index;
