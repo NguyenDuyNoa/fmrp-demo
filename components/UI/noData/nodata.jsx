@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const NoData = (props) => {
     const type = {
-        'notificationheader': '/icon/data_empty_noti.svg',
+        'notificationheader': '/icon/nodata-noti-final.svg',
         // 'notificationheader': '/icon/noti.svg',
         'dashboard': '/icon/task.svg',
     }
@@ -30,7 +30,7 @@ const NoData = (props) => {
                         alt="@nodata"
                         className={`${props?.classNameImage ? `${props?.classNameImage}` : "w-[83%] h-[83%]"} object-cover`}
                         // src={"/no_data.svg"}
-                        src={type[props?.type] ?? "/no_data.svg"}
+                        src={type[props?.type] ?? "/icon/nodata.svg"}
                     // src={type[props?.type] ?? "/data_empty.svg"}
                     />
                 </div>
