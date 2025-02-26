@@ -219,11 +219,11 @@ const InternalPlan = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex items-center justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.internal_plan || "internal_plan"}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 <ButtonAddNew
                                     onClick={() => {
                                         if (role || checkAdd) {
@@ -237,7 +237,7 @@ const InternalPlan = (props) => {
                             </div>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -266,6 +266,7 @@ const InternalPlan = (props) => {
                                                 closeMenuOnSelect={true}
                                             />
                                             <DateToDateComponent
+                                                className=''
                                                 value={idFillter.valueDate}
                                                 onChange={onChangeFilter("valueDate")}
                                                 colSpan={3}
@@ -273,7 +274,7 @@ const InternalPlan = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData sOnFetching={() => { }} onClick={() => refetch()} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -291,7 +292,7 @@ const InternalPlan = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -302,7 +303,7 @@ const InternalPlan = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar className="min:h-[200px] 3xl:h-[90%] 2xl:h-[87%] xl:h-[78%] lg:h-[90%] max:h-[400px]">
+                            <Customscrollbar className="3xl:h-[90%] 2xl:h-[89%] xl:h-[82%] lg:h-[90%]">
                                 <div className="w-full">
                                     <HeaderTable gridCols={9}>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
@@ -334,7 +335,7 @@ const InternalPlan = (props) => {
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : data?.rResult?.length > 0 ? (
                                         <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[900px]">
+                                            <div className="divide-y divide-slate-200 h-[100%]">
                                                 {data?.rResult?.map((e, index) => (
                                                     <RowTable key={e.id.toString()} gridCols={9}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
@@ -369,6 +370,7 @@ const InternalPlan = (props) => {
                                                             className="flex items-center space-x-1"
                                                         >
                                                             <CustomAvatar
+                                                                classNameAvatar='max-w-[26%] w-[26%]'
                                                                 profileImage={e?.created_by_profile_image}
                                                                 fullName={e?.created_by_full_name}
                                                             />

@@ -1,9 +1,9 @@
 import styleDatePicker from "@/configs/configDatePicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
-const DateToDateComponent = ({ value, onChange, colSpan }) => {
+const DateToDateComponent = ({ value, onChange, colSpan, className }) => {
     return (
-        <div className="z-20 ml-1 " style={{ gridColumn: `span ${colSpan || 1}` }}>
+        <div className={`z-20 ml-1 ${className}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
             <Datepicker {...styleDatePicker} value={value} onChange={onChange} />
         </div>
     );

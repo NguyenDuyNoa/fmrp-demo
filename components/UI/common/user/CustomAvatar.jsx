@@ -2,10 +2,10 @@ import ImageErrors from "../../imageErrors"
 
 import ModalImage from "react-modal-image"
 
-const CustomAvatar = ({ profileImage, fullName, data }) => {
+const CustomAvatar = ({ profileImage, fullName, data, classNameAvatar }) => {
     return (
         <div className="flex items-center justify-start w-full gap-2">
-            <div className="relative w-[18%]">
+            <div className={`relative ${classNameAvatar} w-[18%] max-w-[18%]`}>
                 <ModalImage
                     small={profileImage ? profileImage : "/user-placeholder.jpg"}
                     large={profileImage ? profileImage : "/user-placeholder.jpg"}
