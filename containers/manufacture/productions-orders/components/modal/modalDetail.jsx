@@ -192,7 +192,8 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         },
         {
             id: 6,
-            name: dataLang?.productions_orders_modal_costs_processing || 'productions_orders_modal_costs_processing',
+            name: 'Chi phí NVL',
+            // name: dataLang?.productions_orders_modal_costs_processing || 'productions_orders_modal_costs_processing',
             count: 0,
         },
     ];
