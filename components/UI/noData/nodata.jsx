@@ -5,7 +5,7 @@ const NoData = (props) => {
     const type = {
         'notificationheader': '/icon/data_empty_noti.svg',
         // 'notificationheader': '/icon/noti.svg',
-        'dashboard': '/icon/data_empty_dashboard-1.svg',
+        'dashboard': '/icon/task.svg',
     }
     return (
         <motion.div
