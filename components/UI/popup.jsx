@@ -22,6 +22,7 @@ const Popup = (props) => {
                 closeOnDocumentClick={props?.closeOnDocumentClick || false}
                 onClose={props.onClose}
                 lockScroll={props.lockScroll}
+                repositionOnResiz
                 // repositionOnResiz={props.repositionOnResiz}
                 className={`${props.className} popup-edit`}
             >

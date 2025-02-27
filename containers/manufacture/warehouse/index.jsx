@@ -282,7 +282,6 @@ const Warehouse = (props) => {
         });
     };
 
-
     return (
         <React.Fragment>
             <Head>
@@ -454,10 +453,11 @@ const Warehouse = (props) => {
                             <Customscrollbar className="col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto">
                                 {dataWarehouse?.rResult && dataWarehouse?.rResult?.map((item, index) => (
                                     <PopupParent
+                                        key={item.id}
                                         trigger={
-                                            <div key={item.id} className="relative grid grid-cols-12">
+                                            <div className="relative grid grid-cols-12">
                                                 <li
-                                                    className={`group col-span-12 ${isState.idWarehouse === item.id
+                                                    className={` col-span-12 ${isState.idWarehouse === item.id
                                                         ? "bg-[#3276FA] text-white"
                                                         : ""
                                                         } font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
@@ -468,7 +468,6 @@ const Warehouse = (props) => {
                                                         <div className="flex flex-col items-start w-full">
                                                             <div className="w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs ">
                                                                 {item.name}
-                                                                {/* {item.is_system == 1 && <span className={`${isState.idWarehouse === item.id ? "text-white" : "text-[#6C9AC4] group-hover:text-white"} lowercase`}>(Kho hệ thống)</span>} */}
                                                             </div>
                                                             {item.is_system == 1 && (
                                                                 <div className="items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#F9ECC9]/35  bg-orange-100 text-[#FF9900] 3xl:text-sm text-xs font-medium cursor-default">
@@ -493,14 +492,16 @@ const Warehouse = (props) => {
                                         }
                                         closeOnDocumentClick={false}
                                         position="right top"
-                                        on={["hover"]}
+                                        // keepTooltipInside
+                                        on={['click']}
                                         arrow={false}
+                                    // mouseLeaveDelay={5000}
                                     >
                                         {isState.idWarehouse === item.id && item.is_system == 0 && (
                                             <div className="flex items-center gap-2 px-4 py-2 ml-2 bg-gray-200 rounded-md 3xl:py-3">
                                                 {role == true || checkEdit ? (
                                                     <PopupWarehouse
-                                                        W dataLang={dataLang}
+                                                        dataLang={dataLang}
                                                         id={item?.id}
                                                         name={item?.name}
                                                         code={item?.code}

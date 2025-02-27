@@ -198,7 +198,8 @@ const PopupWarehouse = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_code}
                                                 name="fname"
                                                 type="text"
-                                                className={`${errInputCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                autoComplete="off"
+                                                className={`${errInputCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"}  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -217,6 +218,7 @@ const PopupWarehouse = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_name}
                                                 name="fname"
                                                 type="text"
+                                                autoComplete="off"
                                                 className={`${errInputName
                                                     ? "border-red-500"
                                                     : "focus:border-[#92BFF7] border-[#d0d5dd]"
@@ -239,6 +241,7 @@ const PopupWarehouse = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_address}
                                                 name="fname"
                                                 type="text"
+                                                autoComplete="off"
                                                 className={`${errInputAddress
                                                     ? "border-red-500"
                                                     : "focus:border-[#92BFF7] border-[#d0d5dd]"
@@ -299,6 +302,7 @@ const PopupWarehouse = (props) => {
                                     </label>
                                     <textarea
                                         value={note}
+                                        autoComplete="off"
                                         placeholder={props.dataLang?.client_popup_note}
                                         onChange={_HandleChangeInput.bind(this, "note")}
                                         name="fname"
