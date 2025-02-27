@@ -86,7 +86,7 @@ const TabItem = ({ dataTable, handShowItem, isFetching, dataLang }) => {
                                 ))}
                             </div>
                         ))
-                    ) : <NoData />}
+                    ) : <NoData className='!mt-0' />}
                 </Customscrollbar>
             )}
         </>

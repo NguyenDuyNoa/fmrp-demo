@@ -4,6 +4,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import Head from "next/head";
 import Header from "./components/header/header";
 import MainTable from "./components/table/mainTable";
+import { ProductionsOrdersProvider } from "../productions-orders/context/productionsOrders";
 
 const MaterialsPlanning = (props) => {
     const dataLang = props.dataLang;
@@ -19,7 +20,9 @@ const MaterialsPlanning = (props) => {
             </Head>
             <Container>
                 {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}
-                <MainTable {...propsDefault} />
+                <ProductionsOrdersProvider>
+                    <MainTable {...propsDefault} />
+                </ProductionsOrdersProvider>
             </Container>
         </>
     );

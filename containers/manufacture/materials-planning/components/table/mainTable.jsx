@@ -1,5 +1,5 @@
 import { SearchNormal1 } from "iconsax-react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { v4 as uddid } from "uuid";
 
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
@@ -30,6 +30,8 @@ import PopupPurchase from "../popup/popupPurchase";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { TagColorOrange } from "@/components/UI/common/Tag/TagStatus";
+import { ProductionsOrdersContext } from "@/containers/manufacture/productions-orders/context/productionsOrders";
+import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
 
 const initialState = {
     isTab: "item",
@@ -37,6 +39,7 @@ const initialState = {
     listDataLeft: [],
     listDataRight: {
         title: "",
+        poId: null,
         referenceNoPo: '',
         dataPPItems: [],
         dataBom: {
@@ -127,6 +130,8 @@ const MainTable = ({ dataLang }) => {
 
     const { data: listPlan = [] } = useInternalPlansSearchCombobox(isValue.searchPlan)
 
+    const { isStateProvider: isStateProviderProductions, queryState: queryStateProviderProductions } = useContext(ProductionsOrdersContext);
+
     useEffect(() => {
         sIsMounted(true);
     }, []);
@@ -194,6 +199,7 @@ const MainTable = ({ dataLang }) => {
                         ...dataTable.listDataRight,
                         title: null,
                         referenceNoPo: null,
+                        poId: null,
                         dataPPItems: [],
                         dataBom: { productsBom: [], materialsBom: [] },
                         dataKeepStock: [],
@@ -228,6 +234,7 @@ const MainTable = ({ dataLang }) => {
                     listDataRight: {
                         ...dataTable.listDataRight,
                         title: null,
+                        poId: null,
                         referenceNoPo: null,
                         dataPPItems: [],
                         dataBom: { productsBom: [], materialsBom: [], },
@@ -252,9 +259,12 @@ const MainTable = ({ dataLang }) => {
     const fetchDataTableRight = async (id) => {
         try {
             const { data, isSuccess } = await apiMaterialsPlanning.apiDetailProductionPlans(id);
+            console.log("data?.productionPlan", data?.productionPlan);
+
             if (isSuccess == 1) {
                 queryState({
                     listDataRight: {
+                        poId: data?.productionPlan?.po_id,
                         referenceNoPo: data?.productionPlan?.reference_no_po,
                         title: data?.productionPlan?.reference_no,
                         idCommand: data?.productionPlan?.id,
@@ -480,7 +490,8 @@ const MainTable = ({ dataLang }) => {
         queryValue,
         fetchDataTable,
         fetchDataOrder,
-        fetchDataPlan
+        fetchDataPlan,
+        refetchProductionsOrders: () => { },
     };
 
     if (!isMounted) return null;
@@ -575,16 +586,24 @@ const MainTable = ({ dataLang }) => {
                                     {
                                         dataTable.listDataRight?.title
                                             ?
-                                            <>
-                                                {dataTable.listDataRight?.title}{
-                                                    dataTable.listDataRight?.referenceNoPo && <>
+                                            <div className="flex items-center">
+                                                <p>{dataTable.listDataRight?.title}</p>{
+                                                    dataTable.listDataRight?.referenceNoPo && <span>
                                                         /  <TagColorOrange
+                                                            onClick={() => {
+                                                                queryStateProviderProductions({
+                                                                    openModal: true,
+                                                                    dataModal: {
+                                                                        id: dataTable.listDataRight?.poId
+                                                                    }
+                                                                });
+                                                            }}
                                                             name={dataTable.listDataRight?.referenceNoPo}
-                                                            className={'relative text-sm top-1'}
+                                                            className={'relative !text-[11px] top-0 py-1 cursor-pointer select-none'}
                                                         />
-                                                    </>
+                                                    </span>
                                                 }
-                                            </>
+                                            </div>
                                             :
                                             (dataLang?.materials_planning_no_nvl || "materials_planning_no_nvl")
                                     }
@@ -670,6 +689,9 @@ const MainTable = ({ dataLang }) => {
                     </div>
                 </div>
             </div>
+            {
+                isStateProviderProductions.openModal && <ModalDetail {...shareProps} />
+            }
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

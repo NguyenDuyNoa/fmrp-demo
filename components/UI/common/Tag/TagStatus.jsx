@@ -6,8 +6,8 @@ const TagColorSky = ({ name, className }) => {
     </span>
 }
 
-const TagColorOrange = ({ name, className }) => {
-    return <span className={`${className} font-normal 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl 3xl:py-0 py-0.5 px-3  w-fit bg-orange-200`}>
+const TagColorOrange = ({ name, className, ...props }) => {
+    return <span {...props} className={`${className} font-normal 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl 3xl:py-0 py-0.5 px-3  w-fit bg-orange-200`}>
         {name}
     </span>
 }

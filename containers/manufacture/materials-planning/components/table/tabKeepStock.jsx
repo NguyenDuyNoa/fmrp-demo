@@ -273,7 +273,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                     ))}
                 </Customscrollbar>
             ) : (
-                <NoData />
+                <NoData className='!mt-0' />
             )}
         </>
     );

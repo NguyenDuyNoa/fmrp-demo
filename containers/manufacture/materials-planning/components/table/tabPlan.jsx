@@ -103,7 +103,7 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                             ))}
                         </Customscrollbar>
                     ) : (
-                        <NoData />
+                        <NoData className='!mt-0' />
                     )}
                 </div>
                 <div className="w-1/2 ">
@@ -129,7 +129,7 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                         </h4>
                     </div>
                     {isFetching ? (
-                        <Loading className="h-80" color="#0f4f9e" />
+                        <Loading className="h-40" color="#0f4f9e" />
                     ) : dataBom?.materialsBom?.length > 0 ? (
                         <Customscrollbar className="3xl:h-[49.5vh] xxl:h-[30vh] 2xl:h-[37.5vh] xl:h-[31.5vh] lg:h-[33vh] h-[34vh]">
                             {dataBom?.materialsBom.map((e, index) => (
@@ -196,7 +196,7 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                             ))}
                         </Customscrollbar>
                     ) : (
-                        <NoData />
+                        <NoData className='!mt-0' />
                     )}
                 </div>
             </div>

@@ -91,6 +91,12 @@ const CheckQuality = (props) => {
         router.replace("/manufacture/check-quality");
     }, 500);
 
+    const stringMap = {
+        0: "Chưa Duyệt",
+        1: 'Đã duyệt',
+        2: "Không Duyệt",
+    }
+
     const multiDataSet = [
         {
             columns: [
@@ -103,7 +109,7 @@ const CheckQuality = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.error_category || "error_category"}`,
+                    title: `${"Ngày"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -111,7 +117,7 @@ const CheckQuality = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.error_category_name || "error_category_name"}`,
+                    title: `${'Số phiếu QC'}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -119,7 +125,7 @@ const CheckQuality = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.error_category_note || "error_category_note"}`,
+                    title: `${"Số lệnh sản xuất"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -127,7 +133,47 @@ const CheckQuality = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.import_branch || "import_branch"}`,
+                    title: `${'Số phiếu CK'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Số lượng QC'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Số lượng đạt'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Số lượng lỗi'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Ghi chú'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Trạng thái'}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -137,10 +183,15 @@ const CheckQuality = (props) => {
             ],
             data: data?.rResult?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
-                { value: `${e.code ? e.code : ""}` },
-                { value: `${e.name ? e.name : ""}` },
+                { value: `${formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}` },
+                { value: `${e.reference_no ? e.reference_no : ""}` },
+                { value: `${e.reference_no_po ? e.reference_no_po : ""}` },
+                { value: `${e.transfer_warehouse ? e.transfer_warehouse?.map(e => e?.code).join(",") : ""}` },
+                { value: `${e.total_quantity ? formatNumber(e.total_quantity) : ""}` },
+                { value: `${e.total_quantity_success ? formatNumber(e.total_quantity_success) : ""}` },
+                { value: `${e.total_quantity_error ? formatNumber(e.total_quantity_error) : ""}` },
                 { value: `${e.note ? e.note : ""}` },
-                { value: `${e.name_branch ? e.name_branch : ""}` },
+                { value: `${e?.status ? stringMap[e?.status] : ""}` },
             ]),
         },
     ];
@@ -266,14 +317,14 @@ const CheckQuality = (props) => {
                             </div>
                             <Customscrollbar className="3xl:h-[90%] 2xl:h-[95%] xl:h-[85%] lg:h-[90%] pb-2">
                                 <div className="w-full">
-                                    <HeaderTable gridCols={12}>
+                                    <HeaderTable gridCols={10}>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"Ngày"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"Số phiếu QC"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"Số lệnh sản xuất"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
@@ -307,11 +358,11 @@ const CheckQuality = (props) => {
                                             <div className="h-full divide-y divide-slate-200">
                                                 {
                                                     data?.rResult?.map((e) => (
-                                                        <RowTable gridCols={12} key={e.id.toString()}>
+                                                        <RowTable gridCols={10} key={e.id.toString()}>
                                                             <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 {formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={2} textAlign={"center"}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 <PopupCheckQuality
                                                                     name={e?.reference_no}
                                                                     dataLang={dataLang}
@@ -319,7 +370,7 @@ const CheckQuality = (props) => {
                                                                     id={e?.id}
                                                                 />
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={2} textAlign={"center"}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 {e?.reference_no_po}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} textAlign={"center"}>

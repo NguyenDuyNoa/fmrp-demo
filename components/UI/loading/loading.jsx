@@ -12,7 +12,7 @@ export default function Loading(props) {
         >
             {/* <p className="absolute -mt-24">Đang tải dữ liệu ...</p> */}
             {/* <ReactLoading type="cylon" color={props.color}  height={'50%'} width={'10%'} /> */}
-            <img src="/loading-final.gif" className="3xl:h-44 h-36" />
+            <img src="/loading-test.gif" className="3xl:h-44 h-36" />
             {/* <img src="/loadingLogo.gif.jpg" className="h-16 3xl:h-20" /> */}
         </div>
     );
