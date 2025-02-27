@@ -325,11 +325,13 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
     useEffect(() => {
         if (isState.open) {
             const s = getPriorityItem(data?.stage_semi_products || [], data?.stage_products || []);
+            console.log("s", s);
+
             if (s) {
-                handleSelectStep(s?.type, s?.object, 'click');
+                handleSelectStep(s?.type, s?.object, 'auto');
             }
         }
-    }, [isState.open, data?.stage_products, data?.stage_semi_products])
+    }, [isState.open, data])
 
     useEffect(() => {
         if (isState.open) {
