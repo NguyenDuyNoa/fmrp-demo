@@ -32,7 +32,7 @@ const Popup_phongban = (props) => {
         sErrInput(false);
         sName(props.name ? props.name : "");
         sEmail(props.email ? props.email : "");
-        sListBrand(props?.isState?.listBr || []);
+        sListBrand(props?.listBranch || []);
         sValueBr(props.sValueBr?.map(e => ({ label: e.name, value: e.id })) || [])
     }, [open]);
 
@@ -116,7 +116,7 @@ const Popup_phongban = (props) => {
             onClose={_ToggleModal.bind(this, false)}
             classNameBtn={props.className}
         >
-            <div className="w-96 mt-4">
+            <div className="mt-4 w-96">
                 <form onSubmit={_HandleSubmit.bind(this)}>
                     <div>
                         <div className="flex flex-wrap justify-between">
@@ -203,7 +203,7 @@ const Popup_phongban = (props) => {
                             <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_bran}</label>
                         )}
 
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={_ToggleModal.bind(this, false)}

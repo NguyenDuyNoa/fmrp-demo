@@ -135,16 +135,17 @@ const PersonnelDepartments = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.personnels_deparrtments_title}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ? (
                                     <Popup_phongban
                                         isState={isState}
                                         onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
+                                        listBranch={listBranch}
                                         nameModel={"client_contact"}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
@@ -163,8 +164,8 @@ const PersonnelDepartments = (props) => {
                         </div>
 
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
-                                <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
+                            <div className="space-y-2 xl:space-y-3">
+                                <div className="grid items-center justify-between w-full grid-cols-6 p-2 rounded bg-slate-100 xl:p-3">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
                                             <SearchComponent
@@ -192,7 +193,7 @@ const PersonnelDepartments = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -210,7 +211,7 @@ const PersonnelDepartments = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -259,13 +260,14 @@ const PersonnelDepartments = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={2}
-                                                            className="space-x-2 text-center flex items-center justify-center"
+                                                            className="flex items-center justify-center space-x-2 text-center"
                                                         >
                                                             {role == true || checkEdit ? (
                                                                 <Popup_phongban
                                                                     onRefresh={refetch.bind(this)}
-                                                                    className="xl:text-base text-xs "
+                                                                    className="text-xs xl:text-base "
                                                                     isState={isState}
+                                                                    listBranch={listBranch}
                                                                     sValueBr={e.branch}
                                                                     dataLang={dataLang}
                                                                     name={e.name}
