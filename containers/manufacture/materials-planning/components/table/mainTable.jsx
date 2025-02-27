@@ -31,7 +31,9 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { TagColorOrange } from "@/components/UI/common/Tag/TagStatus";
 import { ProductionsOrdersContext } from "@/containers/manufacture/productions-orders/context/productionsOrders";
-import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
+import dynamic from "next/dynamic";
+// import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
+const ModalDetail = dynamic(() => import("@/containers/manufacture/productions-orders/components/modal/modalDetail"), { ssr: false });
 
 const initialState = {
     isTab: "item",
@@ -689,9 +691,7 @@ const MainTable = ({ dataLang }) => {
                     </div>
                 </div>
             </div>
-            {
-                isStateProviderProductions.openModal && <ModalDetail {...shareProps} />
-            }
+            <ModalDetail {...shareProps} />
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

@@ -137,7 +137,7 @@ const PopupLocationWarehouse = (props) => {
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props.className}
             >
-                <div className="w-auto mt-4">
+                <div className="w-[30vw] mt-4">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         <Customscrollbar className="h-[280px]">
                             <div className="">

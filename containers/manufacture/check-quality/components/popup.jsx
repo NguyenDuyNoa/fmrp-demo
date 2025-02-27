@@ -177,7 +177,7 @@ const PopupCheckQuality = (props) => {
                                                             <h6 className="text-[13px] text-left font-medium capitalize">
                                                                 {e?.item_name}
                                                             </h6>
-                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                            <h6 className="text-xs font-medium text-left capitalize">
                                                                 {e?.item_variation}
                                                             </h6>
                                                             <div className="flex flex-wrap items-center font-oblique">

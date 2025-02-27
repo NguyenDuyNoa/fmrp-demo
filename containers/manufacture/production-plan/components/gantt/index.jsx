@@ -10,9 +10,12 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import NoData from "@/components/UI/noData/nodata";
 import { useRouter } from "next/router";
-import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
+// import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
 import { ProductionsOrdersContext } from "@/containers/manufacture/productions-orders/context/productionsOrders";
 import { Tooltip } from "react-tippy";
+import dynamic from "next/dynamic";
+const ModalDetail = dynamic(() => import("@/containers/manufacture/productions-orders/components/modal/modalDetail"), { ssr: false });
+
 const BodyGantt = ({
     handleShowSub,
     handleCheked,
@@ -811,10 +814,7 @@ const BodyGantt = ({
             ) :
                 <NoData />
             }
-            {
-                isState.openModal && <ModalDetail {...shareProps} />
-            }
-
+            <ModalDetail {...shareProps} />
         </React.Fragment >
     );
 };

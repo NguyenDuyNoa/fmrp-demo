@@ -758,22 +758,22 @@ const ProcessBar = ({ data, checkBorder }) => {
             {
                 data?.map((j, jIndex) => {
                     const checkLast = data?.length - 1 != jIndex
-                    const checkDate = data?.filter((e) => e?.date_production)?.length > 0
+                    // const checkDate = data?.filter((e) => e?.date_active)?.length > 0
                     return (
                         <div key={jIndex} className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
                             <div className="flex min-h-[70px] gap-3">
-                                <div className={` ${checkDate ? "" : 'hidden'} text-[10px] 
-                        ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-black/70"} 
-                        font-normal text-right` }
+                                <div className={` ${(j?.active || j?.begin_production == 1) ? "" : ''} text-[10px] 
+                                ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-black/70"} 
+                                font-normal text-right` }
                                 >
-                                    <div className={`${j?.date_production ? 'block' : 'hidden'}`}>
-                                        {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
+                                    <div className={`${(j?.active || j?.begin_production == 1) ? 'block' : 'hidden'}`}>
+                                        {formatMoment((j?.active || j?.begin_production == 1) ? (j?.active ? j?.date_active : j?.date_production ? j?.date_production : new Date()) : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
                                     </div>
-                                    <div className={`${j?.date_production ? 'block' : 'hidden'} `}>
-                                        {formatMoment(j?.date_production ? j?.date_production : new Date(), FORMAT_MOMENT.TIME_SHORT)}
-                                    </div>
+                                    {/* <div className={`${(j?.active || j?.begin_production == 1) ? 'block' : 'hidden'} `}>
+                                        {formatMoment((j?.active || j?.begin_production == 1) ? (j?.active ? j?.date_active : j?.date_production ? j?.date_production : new Date()) : new Date(), FORMAT_MOMENT.TIME_SHORT)}
+                                    </div> */}
                                     <div>
-                                        {j?.active ? 'Đã hoàn thành' : j?.begin_production == 1 ? 'Đang sản xuất' : 'Chưa sản xuất'}
+                                        {(j?.active) ? 'Đã hoàn thành' : (j?.begin_production == 1) ? 'Đang sản xuất' : 'Chưa sản xuất'}
                                     </div>
                                 </div>
                                 <div className="flex">
@@ -828,28 +828,62 @@ const ProcessBar = ({ data, checkBorder }) => {
                                                         return (
                                                             <div key={e?.id} className="">
                                                                 <div className="flex items-center justify-start gap-1 px-2 py-px border border-gray-400 rounded-xl">
-                                                                    <ModalImage
-                                                                        small={e?.image ? e?.image : "/nodata.png"}
-                                                                        large={e?.image ? e?.image : "/nodata.png"}
-                                                                        width={18}
-                                                                        height={18}
-                                                                        alt={e?.item_name}
-                                                                        className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
-                                                                    />
-                                                                    <div className="flex flex-col items-center gap-1">
-                                                                        <div className="flex flex-row items-center gap-1">
-                                                                            <span className="text-[#9295A4] text-[10px]">
+                                                                    <div className="h-full">
+                                                                        <ModalImage
+                                                                            small={e?.image ? e?.image : "/nodata.png"}
+                                                                            large={e?.image ? e?.image : "/nodata.png"}
+                                                                            width={24}
+                                                                            height={24}
+                                                                            alt={e?.reference_no}
+                                                                            className="object-cover rounded-md min-w-[28px] min-h-[28px] w-[28px] h-[28px] max-w-[28px] max-h-[28px]"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex flex-col items-start">
+                                                                        <div className="flex items-center gap-1">
+                                                                            <span className="text-[#9295A4] text-[11px] font-semibold">
                                                                                 {e?.reference_no}
                                                                             </span>
                                                                             -
-                                                                            <span className="text-[#9295A4] text-[10px]">
+                                                                            <span className="text-[#9295A4] text-[11px] font-semibold">
                                                                                 SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
                                                                             </span>
                                                                             {
-                                                                                e?.quantity_error > 0 && <span className="text-red-500 text-[10px]">
+                                                                                e?.quantity_error > 0 && <span className="text-red-500 text-[11px] font-semibold">
                                                                                     - SL lỗi:<span className="pl-0.5">{formatNumber(e?.quantity_error)}</span>
                                                                                 </span>
                                                                             }
+                                                                        </div>
+                                                                        <div className="flex items-center gap-1">
+                                                                            {dataProductSerial.is_enable === "1" && (
+                                                                                <div className="flex gap-0.5">
+                                                                                    <h6 className="text-[10px]">
+                                                                                        Serial:
+                                                                                    </h6>
+                                                                                    <h6 className="text-[10px] px-2 w-[full] text-left ">
+                                                                                        {e?.serial ? e?.serial : "-"}
+                                                                                    </h6>
+                                                                                </div>
+                                                                            )}
+                                                                            {(dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1") && (
+                                                                                <>
+                                                                                    <div className="flex gap-0.5">
+                                                                                        <h6 className="text-[10px]">
+                                                                                            Lot:
+                                                                                        </h6>{" "}
+                                                                                        <h6 className="text-[10px] px-2 w-[full] text-left ">
+                                                                                            {e?.lot ? e?.lot : "-"}
+                                                                                        </h6>
+                                                                                    </div>
+                                                                                    <div className="flex gap-0.5">
+                                                                                        <h6 className="text-[10px]">
+                                                                                            Date:
+                                                                                        </h6>{" "}
+                                                                                        <h6 className="text-[10px] px-2 w-[full] text-center ">
+                                                                                            {e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                                        </h6>
+                                                                                    </div>
+                                                                                </>
+                                                                            )}
                                                                         </div>
                                                                     </div>
 

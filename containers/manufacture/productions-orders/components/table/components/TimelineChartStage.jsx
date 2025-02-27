@@ -83,7 +83,15 @@ const TimelineChartStage = ({ data, dataLang }) => {
             .style("font-weight", "600")
             .attr("fill", d => getColor(d))
             .attr("font-size", "10px")
-            .text(d => d.date ? formatMoment(d.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "");
+            .text(d => {
+                if (d?.active) {
+                    return d?.date ? formatMoment(d?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""
+                }
+                else if (d?.begin_production == "1") {
+                    return d?.date_production ? formatMoment(d?.date_production, FORMAT_MOMENT.DATE_SLASH_LONG) : ""
+
+                }
+            });
 
         // Thêm tên dưới ô tròn
         svg.selectAll(".title-label")

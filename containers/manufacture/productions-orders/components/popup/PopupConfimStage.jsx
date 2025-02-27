@@ -106,6 +106,11 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
         if (r?.isSuccess == 1) {
             refetch()
             refetchMainTable()
+            queryState({
+                dataTableProducts: null,
+                dataTableBom: null,
+                arrayMoveBom: []
+            })
             handleSelectStep(activeStep?.type, activeStep?.item, 'auto')
         }
 
@@ -281,14 +286,16 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
         try {
             const r = await onGetDataLoadOutOfStock({ object, items });
 
-            const check = r?.data?.boms?.map((e) => {
+            const check = r?.data?.boms?.map((e, index) => {
                 const object = isState.dataTableBom?.data?.bomsClientHistory?.find((item) => item?.item_id == e?.item_id);
+
                 if (e?.item_id == object?.item_id) {
                     return {
                         ...e,
                         warehouseId: object?.warehouseId
                     }
                 }
+
                 return {
                     ...e,
                     warehouseId: e?.list_warehouse_bom

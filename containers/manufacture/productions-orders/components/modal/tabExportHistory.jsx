@@ -3,6 +3,7 @@ import apiProductionsOrders from '@/Api/apiManufacture/manufacture/productionsOr
 import OnResetData from '@/components/UI/btnResetData/btnReset';
 import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination';
 import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination';
+import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
@@ -106,8 +107,8 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                     </div> */}
                 </div>
             </div>
-            <div
-                className={`h-[65vh] w-full overflow-x-auto  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
+            <Customscrollbar
+                className={`h-[65vh] w-full overflow-x-auto bg-white`}>
                 {/* className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_410px)] 2xl:h-[calc(100vh_-_390px)] xl:h-[calc(100vh_-_395px)] h-[calc(100vh_-_390px)]" : '3xl:h-[calc(100vh_-_520px)] 2xl:h-[calc(100vh_-_500px)] xl:h-[calc(100vh_-_490px)] h-[calc(100vh_-_490px)]')
                 }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}> */}
                 <div>
@@ -137,7 +138,7 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                             <Loading className="h-80" color="#0f4f9e" />
                             : data?.rResult?.length > 0
                                 ?
-                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                <div className="divide-y divide-slate-200 h-[100%]">
                                     {
                                         data?.rResult?.map((e, index) => (
                                             <RowTable gridCols={12} key={e.id.toString()} >
@@ -221,7 +222,7 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                                 <NoData />
                     }
                 </div>
-            </div>
+            </Customscrollbar>
             <ContainerPagination>
                 {/* <TitlePagination
                     dataLang={dataLang}

@@ -35,6 +35,7 @@ import PopupCheckQuality from "./components/popup";
 import { useCheckQualityList } from "./hooks/useCheckQualityList";
 import Pagination from "/components/UI/pagination";
 import { BtnAction } from "@/components/UI/BtnAction";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 
 const initilaState = {
@@ -317,7 +318,7 @@ const CheckQuality = (props) => {
                             </div>
                             <Customscrollbar className="3xl:h-[90%] 2xl:h-[95%] xl:h-[85%] lg:h-[90%] pb-2">
                                 <div className="w-full">
-                                    <HeaderTable gridCols={10}>
+                                    <HeaderTable gridCols={11}>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"Ngày"}
                                         </ColumnTable>
@@ -340,10 +341,13 @@ const CheckQuality = (props) => {
                                             {"Số lượng lỗi"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {"Trạng thái"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"Ghi chú"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {"Trạng thái"}
+                                            {"Chi nhánh"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"Tác vụ"}
@@ -358,7 +362,7 @@ const CheckQuality = (props) => {
                                             <div className="h-full divide-y divide-slate-200">
                                                 {
                                                     data?.rResult?.map((e) => (
-                                                        <RowTable gridCols={10} key={e.id.toString()}>
+                                                        <RowTable gridCols={11} key={e.id.toString()}>
                                                             <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 {formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                                             </RowItemTable>
@@ -394,9 +398,6 @@ const CheckQuality = (props) => {
                                                             <RowItemTable colSpan={1} textAlign={"center"} className={'!text-red-500'}>
                                                                 {e?.total_quantity_error > 0 ? formatNumber(e?.total_quantity_error) : '-'}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={"left"}>
-                                                                {e?.note}
-                                                            </RowItemTable>
                                                             <RowItemTable colSpan={1} className={'flex justify-center items-center'}>
                                                                 {/* 0: chưa duyệt
                                                                     1: đã duyệt
@@ -405,6 +406,14 @@ const CheckQuality = (props) => {
                                                                     type={e?.status}
                                                                     className={'!cursor-not-allowed'}
                                                                 />
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"left"}>
+                                                                {e?.note}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} className={'w-full flex flex-row justify-center items-center'}>
+                                                                <TagBranch className='w-fit'>
+                                                                    {e?.branch_name}
+                                                                </TagBranch>
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className={'flex justify-center items-center'}>
                                                                 <BtnAction
