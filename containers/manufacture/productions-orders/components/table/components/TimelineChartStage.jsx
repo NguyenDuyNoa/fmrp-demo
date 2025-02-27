@@ -35,7 +35,7 @@ const TimelineChartStage = ({ data, dataLang }) => {
 
         const height = 90; // Chiều cao tổng thể
 
-        const circleRadius = 6; // Kích thước ô tròn
+        const circleRadius = 4; // Kích thước ô tròn
 
         const margin = { left: 20, right: 20 };
 
@@ -58,7 +58,7 @@ const TimelineChartStage = ({ data, dataLang }) => {
             .attr("y2", height / 2)
             .attr("stroke", d => getColor(d))
             // .attr("stroke", (d, i) => getColor(data[i + 1]))
-            .attr("stroke-width", 2);
+            .attr("stroke-width", 1.5);
 
         // Vẽ các điểm tròn trên timeline
         svg.selectAll(".circle")

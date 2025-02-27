@@ -186,7 +186,7 @@ const RenderHtml = ({ item }) => {
     const dataSeting = useSetingServer();
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 my-1">
             <FiCornerDownRight size={15} />
             <div className="flex items-center gap-1 px-2 py-1 border border-gray-400 rounded-xl">
                 <ModalImage
