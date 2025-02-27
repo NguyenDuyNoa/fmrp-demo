@@ -1,6 +1,7 @@
 import ImageErrors from "../../imageErrors"
 
 import ModalImage from "react-modal-image"
+import { Lightbox } from "react-modal-image";
 
 const CustomAvatar = ({ profileImage, fullName, data, classNameAvatar }) => {
     return (
@@ -9,8 +10,9 @@ const CustomAvatar = ({ profileImage, fullName, data, classNameAvatar }) => {
                 <ModalImage
                     small={profileImage ? profileImage : "/user-placeholder.jpg"}
                     large={profileImage ? profileImage : "/user-placeholder.jpg"}
-                    className="object-cover rounded-full w-7 h-7 max-w-7 max-h-7 min-w-7 min-h-7"
+                    className="object-cover rounded-full w-7 h-7 max-w-7 max-h-7 min-w-7 min-h-7 clickModalImage"
                     alt={fullName ?? ""}
+
                 >
                     <div className="">
                         <ImageErrors

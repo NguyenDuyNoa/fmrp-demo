@@ -48,7 +48,7 @@ import { useSelector } from "react-redux";
 import { routerWarehouseTransfer } from "routers/manufacture";
 import LinkWarehouse from "../components/linkWarehouse";
 import PopupStatus from "../components/popupStatus";
-import PopupDetail from "./components/pupup";
+import PopupDetailWarehouseTransfer from "./components/pupup";
 import { useWarehouseTransferCombobox } from "./hooks/useWarehouseTransferCombobox";
 import { useWarehouseTransferFilterbar } from "./hooks/useWarehouseTransferFilterbar";
 import { useWarehouseTransferList } from "./hooks/useWarehouseTransferList";
@@ -537,7 +537,7 @@ const WarehouseTransfer = (props) => {
                                                             {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <PopupDetail
+                                                            <PopupDetailWarehouseTransfer
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
                                                                 name={e?.code}

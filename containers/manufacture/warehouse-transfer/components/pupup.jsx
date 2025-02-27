@@ -21,7 +21,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useWarehouseTransferDetail } from "../hooks/useWarehouseTransferDetail";
 
-const PopupDetail = (props) => {
+const PopupDetailWarehouseTransfer = (props) => {
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
@@ -354,4 +354,4 @@ const PopupDetail = (props) => {
         </>
     );
 };
-export default PopupDetail;
+export default PopupDetailWarehouseTransfer;

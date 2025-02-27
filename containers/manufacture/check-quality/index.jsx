@@ -1,7 +1,5 @@
-import apiComons from "@/Api/apiComon/apiComon";
-import apiCategoryErrors from "@/Api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import { BtnStatusApprovedCustom } from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -9,30 +7,35 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useBranchList } from "@/hooks/common/useBranch";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
-import { routerQc } from "@/routers/manufacture";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
+import PopupDetailWarehouseTransfer from "../warehouse-transfer/components/pupup";
 import PopupCheckQuality from "./components/popup";
-import Pagination from "/components/UI/pagination";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import { useBranchList } from "@/hooks/common/useBranch";
 import { useCheckQualityList } from "./hooks/useCheckQualityList";
+import Pagination from "/components/UI/pagination";
+import { BtnAction } from "@/components/UI/BtnAction";
+
 
 const initilaState = {
     data: [],
@@ -53,6 +56,10 @@ const CheckQuality = (props) => {
     const statusExprired = useStatusExprired();
 
     const [isState, sIsState] = useState(initilaState);
+
+    const dataSeting = useSetingServer();
+
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     const { paginate } = usePagination();
 
@@ -128,7 +135,7 @@ const CheckQuality = (props) => {
                     },
                 },
             ],
-            data: data?.dtResult?.map((e) => [
+            data: data?.rResult?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
                 { value: `${e.code ? e.code : ""}` },
                 { value: `${e.name ? e.name : ""}` },
@@ -159,7 +166,7 @@ const CheckQuality = (props) => {
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {"Kiểm tra chất lượng"}
                             </h2>
-                            <ButtonAddNew
+                            {/* <ButtonAddNew
                                 onClick={() => {
                                     // if (role) {
                                     //     router.push(routerExportToOther.form)
@@ -172,7 +179,7 @@ const CheckQuality = (props) => {
                                     router.push(routerQc.form);
                                 }}
                                 dataLang={dataLang}
-                            />
+                            /> */}
                             {/* <div className="flex items-center justify-end">
                                 {role == true || checkAdd ? (
                                     <Popup_groupKh
@@ -229,10 +236,10 @@ const CheckQuality = (props) => {
                                     </div>
                                     <div className="col-span-2">
                                         <div className="flex items-center justify-end space-x-2">
-                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
-                                                    {data?.dtResult?.length > 0 && (
+                                                    {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
                                                             filename="Kiểm tra chất lượng"
@@ -257,7 +264,7 @@ const CheckQuality = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar className="min:h-[200px] 3xl:h-[90%] 2xl:h-[85%] xl:h-[82%] lg:h-[88%] max:h-[400px] pb-2">
+                            <Customscrollbar className="3xl:h-[90%] 2xl:h-[95%] xl:h-[85%] lg:h-[90%] pb-2">
                                 <div className="w-full">
                                     <HeaderTable gridCols={12}>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
@@ -269,8 +276,8 @@ const CheckQuality = (props) => {
                                         <ColumnTable colSpan={2} textAlign={"center"}>
                                             {"Số lệnh sản xuất"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {"Sản phẩm"}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {"Số phiếu CK"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"Số lượng QC"}
@@ -287,33 +294,77 @@ const CheckQuality = (props) => {
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"Trạng thái"}
                                         </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {"Tác vụ"}
+                                        </ColumnTable>
                                     </HeaderTable>
                                     {(isLoading || isFetching)
                                         ?
                                         <Loading className="h-80" color="#0f4f9e" />
                                         :
-                                        data?.dtResult > 0
+                                        data?.rResult?.length > 0
                                             ?
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
+                                            <div className="h-full divide-y divide-slate-200">
                                                 {
-                                                    data?.dtResult?.map((e) => (
+                                                    data?.rResult?.map((e) => (
                                                         <RowTable gridCols={12} key={e.id.toString()}>
-                                                            <RowItemTable colSpan={1} textAlign={"left"}></RowItemTable>
-                                                            <RowItemTable colSpan={2} textAlign={"left"}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
+                                                                {formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={2} textAlign={"center"}>
                                                                 <PopupCheckQuality
-                                                                    name="QC-110624142 - Long An"
+                                                                    name={e?.reference_no}
                                                                     dataLang={dataLang}
                                                                     className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
                                                                     id={e?.id}
                                                                 />
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={2} textAlign={"left"}></RowItemTable>
-                                                            <RowItemTable colSpan={2} textAlign={"left"}></RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={"left"}></RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={"left"}></RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={"left"}></RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={"left"}></RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={"left"}></RowItemTable>
+                                                            <RowItemTable colSpan={2} textAlign={"center"}>
+                                                                {e?.reference_no_po}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
+                                                                {e?.transfer_warehouse?.map(i => (
+                                                                    <Fragment key={i?.id}>
+                                                                        <PopupDetailWarehouseTransfer
+                                                                            dataLang={dataLang}
+                                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                                            name={i?.code}
+                                                                            id={i?.id}
+                                                                        />
+                                                                    </Fragment>
+                                                                ))}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
+                                                                {e?.total_quantity > 0 ? formatNumber(e?.total_quantity) : '-'}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
+                                                                {e?.total_quantity_success > 0 ? formatNumber(e?.total_quantity_success) : '-'}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"center"} className={'!text-red-500'}>
+                                                                {e?.total_quantity_error > 0 ? formatNumber(e?.total_quantity_error) : '-'}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"left"}>
+                                                                {e?.note}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} className={'flex justify-center items-center'}>
+                                                                {/* 0: chưa duyệt
+                                                                    1: đã duyệt
+                                                                    2: hủy */}
+                                                                <BtnStatusApprovedCustom
+                                                                    type={e?.status}
+                                                                    className={'!cursor-not-allowed'}
+                                                                />
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} className={'flex justify-center items-center'}>
+                                                                <BtnAction
+                                                                    onRefresh={refetch.bind(this)}
+                                                                    onRefreshGroup={() => { }}
+                                                                    dataLang={dataLang}
+                                                                    id={e?.id}
+                                                                    type="check_quality"
+                                                                />
+
+                                                            </RowItemTable>
                                                         </RowTable>
                                                     ))
                                                 }
@@ -326,12 +377,21 @@ const CheckQuality = (props) => {
                         </ContainerTable>
                     </div>
                     {
-                        data?.dtResult?.length != 0 && (
+                        data?.rResult?.length != 0 && (
+                            // <ContainerPagination>
+                            //     <TitlePagination dataLang={dataLang} totalItems={data?.countAll} />
+                            //     <Pagination
+                            //         postsPerPage={limit}
+                            //         totalPosts={Number(data?.countAll)}
+                            //         paginate={paginate}
+                            //         currentPage={router.query?.page || 1}
+                            //     />
+                            // </ContainerPagination>
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.countAll} />
+                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(data?.countAll)}
+                                    totalPosts={Number(data?.output?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />

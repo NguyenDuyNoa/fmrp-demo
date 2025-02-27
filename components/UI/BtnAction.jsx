@@ -146,6 +146,7 @@ export const BtnAction = React.memo((props) => {
             exportToOther: `/api_web/Api_export_other/exportOther/${props.id}?csrf_protection=true`,
             receipts: `/api_web/Api_expense_payslips/expenseCoupon/${props.id}?csrf_protection=true`,
             payment: `/api_web/Api_expense_voucher/expenseVoucher/${props.id}?csrf_protection=true`,
+            check_quality: `/api_web/Api_Qc/delete/${props.id}`,
         };
         ///báo giá
 
@@ -212,6 +213,8 @@ export const BtnAction = React.memo((props) => {
             price_quote: routerPriceQuote.form,
             //đơn hàng bán
             sales_product: routerSalesOrder.form,
+            // kiểm tra chất lượng
+            // check_quality: '#'
         };
 
         const handleQueryPage = () => router.push(`${typeModel[props.type]}?id=${props.id}`);
@@ -349,6 +352,8 @@ export const BtnAction = React.memo((props) => {
                     "settings_variant",
                     "category_errors",
                     "category_detail_errors",
+                    "check_quality"
+
                 ].includes(props?.type)
                     ?
                     <button

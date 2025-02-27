@@ -16,6 +16,7 @@ import ChatBubbleAI from "@/components/UI/chat/ChatAiBubble";
 import 'simplebar-react/dist/simplebar.min.css';
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { useRouter } from "next/router";
+import { useLayoutEffect } from "react";
 
 // const t = Lark
 const deca = Lexend_Deca({
@@ -61,9 +62,6 @@ function MainPage({ Component, pageProps }) {
 
     const router = useRouter()
 
-    console.log("router", router);
-
-
     const tokenFMRP = CookieCore.get('tokenFMRP')
 
     const databaseappFMRP = CookieCore.get('databaseappFMRP')
@@ -81,6 +79,39 @@ function MainPage({ Component, pageProps }) {
     const { data } = useLanguage(langDefault)
 
     useEffect(() => {
+        setTimeout(() => {
+
+            const parentDatepicker = document.querySelector(".parentDatepicker");
+            const parentSelect = document.querySelector(".parentSelect");
+            if (!parentDatepicker || !parentSelect) return;
+
+            const updateZIndex = () => {
+                const modalContainer = document.getElementById("react-modal-image-img");
+
+                if (modalContainer) {
+                    parentDatepicker.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
+                    parentSelect.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
+                } else {
+                    parentSelect.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
+                    parentDatepicker.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
+                }
+            };
+
+            // Theo dõi sự thay đổi trong body
+            const observer = new MutationObserver(updateZIndex);
+            observer.observe(document.body, { childList: true, subtree: true });
+
+            // Kiểm tra ngay khi component mount
+            updateZIndex();
+
+            return () => {
+                observer.disconnect(); // Dừng theo dõi khi component bị unmount
+            };
+        }, 1500);
+    }, []);
+
+
+    useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
@@ -92,12 +123,6 @@ function MainPage({ Component, pageProps }) {
             return
         }
     }, [stateBoxChatAi.open])
-
-    // useEffect(() => {
-    //     if (['/dashboard'].includes(router.pathname)) {
-    //         // body.style.
-    //     }
-    // }, [router.pathname])
 
     if (isLoading || auth == null) {
         return <LoadingPage />;

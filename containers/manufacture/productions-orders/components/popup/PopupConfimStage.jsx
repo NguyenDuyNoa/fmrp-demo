@@ -144,11 +144,26 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
     }, [isState.dataTableProducts]);
 
 
+    const updateQuantityAndSerial = (item, type, value, serialType) => {
+        const newQuantity = value?.floatValue || 0;
+        const currentSerials = Array.isArray(item[serialType]) ? [...item[serialType]] : [];
+
+        // Điều chỉnh số lượng serial theo `newQuantity` và reset `isDuplicate`
+        const updatedSerials =
+            currentSerials.length < newQuantity
+                ? [
+                    ...currentSerials.map(s => ({ ...s, isDuplicate: false })), // Reset isDuplicate
+                    ...Array(newQuantity - currentSerials.length).fill({ value: "", isDuplicate: false })
+                ]
+                : currentSerials.slice(0, newQuantity).map(s => ({ ...s, isDuplicate: false })); // Reset isDuplicate
+
+        return { ...item, [type]: newQuantity, [serialType]: updatedSerials };
+    };
+
 
     const handleChange = ({ table, type, value, row, index }) => {
 
         if (table == 'product') {
-            console.log("value?.floatValue", value?.floatValue);
             const checkType = ['quantityEnterClient', 'quantityError'].includes(type)
 
             const newData = isState.dataTableProducts?.data?.items?.map((item) => {
@@ -172,6 +187,9 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
                         }
 
                         return { ...item, [type]: updatedArray };
+                    }
+                    if (checkType) {
+                        return updateQuantityAndSerial(item, type, value, type === 'quantityEnterClient' ? 'serial' : 'serialError');
                     }
                     return { ...item, [type]: checkType ? value?.floatValue : value }
                 }
@@ -294,11 +312,32 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
         }
     }, 500), [isState.dataTableProducts, isState.dataTableBom]);
 
+    const getPriorityItem = (semi, products) => {
+        const semiItem = semi.find(item => item.active == "0");
+        if (semiItem) return { object: semiItem, type: "BTP" };
+
+        const productItem = products.find(item => item.active == "0");
+        if (productItem) return { object: productItem, type: "TP" };
+
+        return null;
+    };
+
+    useEffect(() => {
+        if (isState.open) {
+            const s = getPriorityItem(data?.stage_semi_products || [], data?.stage_products || []);
+            if (s) {
+                handleSelectStep(s?.type, s?.object, 'click');
+            }
+        }
+    }, [isState.open, data?.stage_products, data?.stage_semi_products])
+
     useEffect(() => {
         if (isState.open) {
             setState({ ...initialState, open: true })
-            setActiveStep({ type: null, item: null });
+            return
         }
+        setState({ ...initialState })
+
     }, [isState.open])
 
     const checkItemFinalStage = isState.dataTableProducts?.data?.items?.some(e => e.final_stage == 1)

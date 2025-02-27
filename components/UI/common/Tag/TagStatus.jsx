@@ -15,7 +15,7 @@ const TagColorOrange = ({ name, className }) => {
 const TagColorLime = ({ name, className }) => {
     return <span className={`${className} flex 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl 3xl:py-0 py-0.5 px-3  w-fit bg-lime-200`}>
         <TickCircle
-            className="bg-lime-500 rounded-full"
+            className="rounded-full bg-lime-500"
             color="white"
             size={15}
         />

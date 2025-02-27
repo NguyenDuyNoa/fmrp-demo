@@ -1,7 +1,7 @@
 import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
+import {BtnStatusApproved} from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";

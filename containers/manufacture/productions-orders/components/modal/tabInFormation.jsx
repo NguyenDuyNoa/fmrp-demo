@@ -3,25 +3,22 @@ import Loading from "@/components/UI/loading/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { memo, useEffect, useRef, useState } from "react";
+import * as d3 from "d3";
+import Image from "next/image";
+import { memo, useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client"; // Dùng để render icon R
 import { AiOutlineFileText } from "react-icons/ai";
 import { FaCheck, FaCheckCircle } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa6";
-import { FiCheckCircle, FiCornerDownRight, FiFileText } from "react-icons/fi";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
-import PopupImportProducts from "../popup/PopupImportProducts";
-import * as d3 from "d3";
-import { ArrowDown } from "iconsax-react";
-import { BiCheckCircle } from "react-icons/bi";
-import { BsCheckCircle, BsCheckCircleFill, BsFileText, BsFileTextFill } from "react-icons/bs";
-
 
 const initialState = {
     dataInformation: {},
@@ -42,7 +39,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
             dataInformation: {
                 ...isInfomation.dataInformation,
                 id: isStateModal.dataDetail?.poi?.poi_id,
-                image: isStateModal.dataDetail?.poi?.images ?? "/nodata.png",
+                image: isStateModal.dataDetail?.poi?.images ? isStateModal.dataDetail?.poi?.images : "/nodata.png",
                 name: isStateModal.dataDetail?.poi?.item_name + " - " + isStateModal.dataDetail?.poi?.item_code,
                 itemVariation: isStateModal.dataDetail?.poi?.product_variation,
                 quantity: isStateModal.dataDetail?.poi?.quantity,
@@ -70,6 +67,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
             },
         });
     }, [isStateModal.dataDetail]);
+    console.log("isStateModal.dataDetail?.poi?.stasges", isStateModal.dataDetail?.poi);
 
     return (
         <div>
@@ -172,6 +170,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                                 name={isStateModal.dataDetail?.poi?.item_name}
                                 code={isStateModal.dataDetail?.poi?.item_code}
                                 quantity={isStateModal.dataDetail?.poi?.quantity}
+                                quantity_error={isStateModal.dataDetail?.poi?.quantity_error}
                                 processBar={isStateModal.dataDetail?.poi?.stages}
                                 itemVariation={isStateModal.dataDetail?.poi?.product_variation}
                                 refetchProductionsOrders={refetchProductionsOrders}
@@ -197,7 +196,8 @@ const RenderItem = ({
     dataLang,
     refetchProductionsOrders,
     quantity_keep,
-    quantity_need_manufactures
+    quantity_need_manufactures,
+    quantity_error
 }) => {
     const isShow = useToast()
 
@@ -274,9 +274,14 @@ const RenderItem = ({
                                     </div>
                                 </div>
                                 :
-                                <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
-                                    Số lượng: {quantity > 0 ? formatNumber(quantity) : "-"}
-                                </div>
+                                <>
+                                    <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
+                                        Số lượng: {quantity > 0 ? formatNumber(quantity) : "-"}
+                                    </div>
+                                    {/* <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
+                                        Số lượng lỗi: {quantity_error > 0 ? formatNumber(quantity_error) : "-"}
+                                    </div> */}
+                                </>
                         }
 
                     </div>
@@ -293,6 +298,7 @@ const RenderItem = ({
                             Số lượng sản xuất đã hết, quá trình sản xuất đã kết thúc
                         </p>
                     :
+                    // <ProcessFlow data={processBar} />
                     <ProcessBar data={processBar} checkBorder={checkBorder} />
             }
             <PopupConfim
@@ -308,13 +314,444 @@ const RenderItem = ({
     )
 }
 
+
+
+
+// const ProcessFlow = ({ data }) => {
+//     const svgRef = useRef();
+
+//     const getColor = (item) => {
+//         if (item?.active) return "#10b981"; // Màu xanh khi active
+//         if (item?.begin_production == "1") return "orange"; // Màu cam khi bắt đầu sản xuất
+//         return "gray"; // Màu xám mặc định
+//     };
+//     useEffect(() => {
+//         if (!data || data.length === 0) return;
+
+//         const baseStepHeight = 40;
+//         const itemHeight = 35; // Tăng khoảng cách giữa các item
+//         const circleRadius = 9;
+//         const marginLeft = 50;
+//         const marginTop = 30;
+//         const paddingRight = 50;
+//         const iconOffset = 40; // Tăng khoảng cách để đẩy box sang phải thêm
+
+//         // Đo kích thước text để tính width tối thiểu
+//         const tempSvg = d3.select("body").append("svg").attr("visibility", "hidden");
+//         let maxTextWidth = 0;
+
+//         data.forEach(step => {
+//             const stageText = tempSvg.append("text").text(step.stage_name);
+//             maxTextWidth = Math.max(maxTextWidth, stageText.node().getComputedTextLength());
+
+//             if (step.purchase_items?.length) {
+//                 step.purchase_items.forEach(item => {
+//                     const itemText = tempSvg.append("text").text(`${item.code} - SL:${item.quantity}${item.hasError ? ' lỗi' : ''}`);
+//                     maxTextWidth = Math.max(maxTextWidth, itemText.node().getComputedTextLength() + iconOffset + 20); // Thêm không gian cho icon
+//                 });
+//             }
+//         });
+
+//         tempSvg.remove();
+
+//         const width = Math.max(maxTextWidth + marginLeft + paddingRight + 50, 300);
+
+//         // Khởi tạo SVG
+//         let svg = d3.select(svgRef.current)
+//             .attr("width", "100%")
+//             .attr("height", "auto")
+//             .style("width", "100%")
+//             .style("max-height", "none")
+//             .style("overflow", "visible");
+
+//         svg.selectAll("*").remove();
+
+//         let currentY = marginTop;
+//         let lastCircleY = null;
+
+//         data.forEach((step, i) => {
+//             const stepY = currentY;
+
+//             // Vẽ đường nối
+//             if (lastCircleY !== null) {
+//                 svg.append("line")
+//                     .attr("x1", marginLeft)
+//                     .attr("y1", lastCircleY + circleRadius)
+//                     .attr("x2", marginLeft)
+//                     .attr("y2", stepY - circleRadius)
+//                     .attr("stroke", getColor(step))
+//                     .attr("stroke-width", 1.5);
+//             }
+
+//             // Vẽ vòng tròn
+//             svg.append("circle")
+//                 .attr("cx", marginLeft)
+//                 .attr("cy", stepY)
+//                 .attr("r", circleRadius)
+//                 .attr("fill", "none")
+//                 .attr("stroke", getColor(step))
+//                 .attr("stroke-width", 1.5);
+
+//             lastCircleY = stepY;
+
+//             // Thêm tên bước
+//             const textElement = svg.append("text")
+//                 .attr("x", marginLeft + 20)
+//                 .attr("y", stepY + 4)
+//                 .text(step.stage_name)
+//                 .attr("font-size", "12px")
+//                 .attr("font-weight", "bold")
+//                 .attr("fill", getColor(step));
+
+//             const textWidth = textElement.node().getComputedTextLength();
+//             const checkIconX = marginLeft + 20 + textWidth + 5;
+
+//             // Icon check
+//             const checkIconContainer = svg.append("foreignObject")
+//                 .attr("x", checkIconX)
+//                 .attr("y", stepY - 8)
+//                 .attr("width", 16)
+//                 .attr("height", 16)
+//                 .append("xhtml:div");
+//             createRoot(checkIconContainer.node()).render(<FaCheckCircle color={getColor(step)} size={12} />);
+
+//             // Icon trong vòng tròn
+//             const circleIconContainer = svg.append("foreignObject")
+//                 .attr("x", marginLeft - 5)
+//                 .attr("y", stepY - 5)
+//                 .attr("width", 12)
+//                 .attr("height", 12)
+//                 .append("xhtml:div");
+
+//             const isLastStep = i === data.length - 1;
+//             const iconColor = getColor(step);
+//             createRoot(circleIconContainer.node()).render(
+//                 isLastStep
+//                     ? <FaCheck color={iconColor} size={10} />
+//                     : (i % 2 === 0 ? <FaArrowDown color={iconColor} size={10} /> : <AiOutlineFileText color={iconColor} size={10} />)
+//             );
+
+//             let itemY = stepY + circleRadius + 15;
+
+//             // Xử lý purchase_items
+//             if (step.purchase_items?.length) {
+//                 step.purchase_items.forEach((item, index) => {
+//                     const itemGroup = svg.append("g");
+
+//                     // Icon chỉ xuất hiện ở item index === 0
+//                     if (index === 0) {
+//                         const iconContainer = itemGroup.append("foreignObject")
+//                             .attr("x", marginLeft + 10) // Vị trí cố định cho icon
+//                             .attr("y", itemY - 12)
+//                             .attr("width", 20)
+//                             .attr("height", 20)
+//                             .append("xhtml:div");
+//                         createRoot(iconContainer.node()).render(
+//                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+//                                 <FiCornerDownRight color={getColor(step)} size={16} />
+//                             </div>
+//                         );
+//                     }
+
+//                     // Dịch text và box sang phải để tránh lọt vào icon
+//                     const itemTextGroup = itemGroup.append("g")
+//                         .attr("transform", `translate(${marginLeft + iconOffset}, ${itemY})`); // Dịch sang phải
+
+//                     const mainText = item.code;
+//                     const quantityText = item.quantity;
+//                     const hasError = item.hasError || false;
+
+//                     // Sử dụng foreignObject để render div linh hoạt
+//                     const contentContainer = itemTextGroup.append("foreignObject")
+//                         .attr("width", 250) // Tăng độ rộng tối đa để chứa nội dung
+//                         .attr("height", 50) // Tăng chiều cao để chứa nhiều dòng
+//                         .append("xhtml:div")
+//                         .style("display", "flex")
+//                         .style("flexDirection", "column") // Hỗ trợ bố cục theo cột
+//                         .style("align-items", "flex-start");
+
+//                     // Tạo root để render React components
+//                     const root = createRoot(contentContainer.node());
+//                     root.render(
+//                         <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+//                             <div style={{ display: 'flex', alignItems: 'center' }}>
+//                                 {/* Text chính (màu đen nếu không lỗi, xám nếu có lỗi) */}
+//                                 <span style={{ fontSize: '11px', color: hasError ? '#808080' : '#000000' }}>
+//                                     {`${mainText} - SL: ${quantityText}`}
+//                                 </span>
+//                                 {hasError && (
+//                                     <span style={{ fontSize: '11px', color: '#FF0000', marginLeft: '5px' }}>
+//                                         SL lỗi
+//                                     </span>
+//                                 )}
+//                                 {/* Ví dụ thêm ảnh (thay bằng đường dẫn ảnh thực tế) */}
+//                                 <img src="https://via.placeholder.com/20" alt="sample" style={{ marginLeft: '10px', width: '20px', height: '20px' }} />
+//                                 {/* Ví dụ thêm div tùy ý */}
+//                                 <div style={{ marginLeft: '10px', color: '#333', fontSize: '11px' }}>Extra Info</div>
+//                             </div>
+//                             <div style={{ color: 'black', fontSize: '11px', marginTop: '5px' }}>helo</div>
+//                         </div>
+//                     );
+
+//                     // Lấy kích thước từ DOM sau khi render
+//                     const contentDiv = contentContainer.node().firstChild;
+//                     requestAnimationFrame(() => {
+//                         if (contentDiv) {
+//                             const contentWidth = contentDiv.clientWidth || 250; // Sử dụng clientWidth, fallback 250
+//                             const contentHeight = contentDiv.clientHeight || 50; // Sử dụng clientHeight, fallback 50
+
+//                             // Tạo box bao quanh chỉ cho SL thông thường
+//                             if (!hasError) {
+//                                 itemGroup.insert("rect", "g")
+//                                     .attr("x", marginLeft + iconOffset - 5)
+//                                     .attr("y", itemY - 12)
+//                                     .attr("width", contentWidth + 30)
+//                                     .attr("height", contentHeight + 14)
+//                                     .attr("fill", "none")
+//                                     .attr("stroke", "#808080") // Thêm border màu gray
+//                                     .attr("stroke-width", 1)
+//                                     .attr("rx", 4) // Bo góc
+//                                     .attr("ry", 4); // Bo góc (tương thích với rx)
+//                             }
+//                         }
+//                     });
+
+//                     itemY += itemHeight + 5;
+//                 });
+//             }
+
+//             // Cập nhật currentY dựa trên vị trí cuối cùng của item
+//             currentY = itemY;
+//         });
+
+//         // Cập nhật chiều cao SVG dựa trên currentY cuối cùng
+//         svg.attr("height", currentY + marginTop)
+//             .attr("viewBox", `0 0 ${width} ${currentY + marginTop}`);
+//     }, [data]);
+
+//     // useEffect(() => {
+//     //     if (!data || data.length === 0) return;
+//     //     const baseStepHeight = 40; // Khoảng cách giữa các bước
+//     //     const itemHeight = 25; // Khoảng cách giữa các sản phẩm
+//     //     const circleRadius = 9; // Kích thước vòng tròn
+//     //     const marginLeft = 50;
+//     //     const marginTop = 30;
+//     //     const paddingRight = 50;  // Khoảng cách bên phải tránh bị cắt
+
+//     //     // Tạo SVG tạm để đo kích thước thực tế
+//     //     const tempSvg = d3.select("body").append("svg").attr("visibility", "hidden");
+
+//     //     let maxTextWidth = 0;
+
+//     //     console.log("🔍 Bắt đầu tính toán maxTextWidth...");
+
+//     //     data.forEach((step) => {
+//     //         const textElement = tempSvg.append("text")
+//     //             .attr("font-size", "12px")
+//     //             .text(step.stage_name);
+
+//     //         const bbox = textElement.node().getBBox();
+//     //         maxTextWidth = Math.max(maxTextWidth, bbox.width);
+
+//     //         console.log(`✅ "${step.stage_name}" - width: ${bbox.width}`);
+
+//     //         if (step.purchase_items && step.purchase_items.length > 0) {
+//     //             step.purchase_items.forEach((item) => {
+//     //                 const itemText = tempSvg.append("text")
+//     //                     .attr("font-size", "10px")
+//     //                     .text(`${item.reference_no} - SL: ${item.quantity} - SL lỗi: ${item.quantity_error}`);
+
+//     //                 const itemBBox = itemText.node().getBBox();
+//     //                 maxTextWidth = Math.max(maxTextWidth, itemBBox.width);
+
+//     //                 console.log(`📦 "${item.reference_no}" - width: ${itemBBox.width}`);
+//     //             });
+//     //         }
+//     //     });
+
+//     //     tempSvg.remove(); // Xóa SVG tạm sau khi đo
+
+//     //     console.log("🔍 Tổng maxTextWidth:", maxTextWidth);
+
+//     //     const width = Math.max(maxTextWidth + marginLeft + paddingRight, 300); // Đảm bảo không nhỏ hơn 300px
+//     //     const height = data.reduce(
+//     //         (acc, step) => acc + baseStepHeight + (step.purchase_items?.length || 0) * (itemHeight + 5),
+//     //         marginTop
+//     //     );
+
+//     //     console.log(`🛠 SVG Width: ${width}, Height: ${height}`);
+
+//     //     const svg = d3.select(svgRef.current)
+//     //         .attr("width", width) // Áp dụng width tự động
+//     //         .attr("height", height)
+//     //         .attr("viewBox", `0 0 ${width} ${height}`)
+//     //         .attr("preserveAspectRatio", "xMinYMin meet")
+//     //         .style("width", "100%") // Đảm bảo mở rộng
+//     //         .style("max-width", `${width}px`) // Không bị cắt mất
+//     //         .style("overflow", "visible");
+
+//     //     svg.selectAll("*").remove(); // Xóa nội dung cũ
+
+
+//     //     let currentY = marginTop;
+//     //     let lastCircleY = null
+
+//     //     data.forEach((step, i) => {
+//     //         const stepY = currentY;
+//     //         console.log(step);
+
+
+//     //         // Vẽ đường nối với màu theo trạng thái (chỉ vẽ nếu không phải bước cuối)
+//     //         if (lastCircleY !== null) {
+//     //             svg.append("line")
+//     //                 .attr("x1", marginLeft)
+//     //                 .attr("y1", lastCircleY + circleRadius)
+//     //                 .attr("x2", marginLeft)
+//     //                 .attr("y2", stepY - circleRadius)
+//     //                 .attr("stroke", getColor(step)) // Áp dụng màu động
+//     //                 .attr("stroke-width", 1.5);
+//     //         }
+
+//     //         // Vẽ vòng tròn chỉ có viền
+//     //         svg.append("circle")
+//     //             .attr("cx", marginLeft)
+//     //             .attr("cy", stepY)
+//     //             .attr("r", circleRadius)
+//     //             .attr("fill", "none")
+//     //             .attr("stroke", getColor(step))
+//     //             .attr("stroke-width", 1.5);
+
+//     //         // Lưu vị trí vòng tròn
+//     //         lastCircleY = stepY;
+
+//     //         // Thêm tên bước (Giảm kích thước font)
+//     //         const textElement = svg.append("text")
+//     //             .attr("x", marginLeft + 20)
+//     //             .attr("y", stepY + 4)
+//     //             .text(step.stage_name)
+//     //             .attr("font-size", "12px") // Giảm kích thước chữ
+//     //             .attr("font-weight", "bold")
+//     //             .attr("fill", getColor(step));
+
+//     //         // Căn chỉnh icon check ✔️ cuối cùng theo độ dài của stage_name
+//     //         const textWidth = textElement.node().getComputedTextLength();
+//     //         const checkIconX = marginLeft + 20 + textWidth + 5;
+
+//     //         const checkIconContainer = svg.append("foreignObject")
+//     //             .attr("x", checkIconX)
+//     //             .attr("y", stepY - 8)
+//     //             .attr("width", 16)
+//     //             .attr("height", 16)
+//     //             .append("xhtml:div");
+
+//     //         createRoot(checkIconContainer.node()).render(<FaCheckCircle color={getColor(step)} size={12} />);
+
+//     //         // Thêm icon trong vòng tròn (FaArrowDown hoặc AiOutlineFileText)
+//     //         const circleIconContainer = svg.append("foreignObject")
+//     //             .attr("x", marginLeft - 5)
+//     //             .attr("y", stepY - 5)
+//     //             .attr("width", 12)
+//     //             .attr("height", 12)
+//     //             .append("xhtml:div");
+
+//     //         const isLastStep = i === data.length - 1;
+//     //         const iconColor = getColor(step);
+
+//     //         createRoot(circleIconContainer.node()).render(
+//     //             isLastStep
+//     //                 ? <FaCheck color={iconColor} size={10} />
+//     //                 : (i % 2 === 0 ? <FaArrowDown color={iconColor} size={10} /> : <AiOutlineFileText color={iconColor} size={10} />)
+//     //         );
+
+//     //         let itemY = stepY + circleRadius + 5;
+
+//     //         // step?.purchase_items?.forEach((item, index) => {
+//     //         //     // Thêm icon FiCornerDownRight trước sản phẩm đầu tiên
+//     //         //     if (index === 0) {
+//     //         //         const cornerIconContainer = svg.append("foreignObject")
+//     //         //             .attr("x", marginLeft + 10)
+//     //         //             .attr("y", itemY)
+//     //         //             .attr("width", 16)
+//     //         //             .attr("height", 16)
+//     //         //             .append("xhtml:div");
+
+//     //         //         createRoot(cornerIconContainer.node()).render(<FiCornerDownRight color="#888" size={12} />);
+//     //         //     }
+
+
+//     //         //     // Tạo text ẩn để đo chiều rộng thật
+//     //         //     const tempText = svg.append("text")
+//     //         //         .attr("font-size", "11px")
+//     //         //         .text(`${item.reference_no} - SL: ${item.quantity} ${item.quantity_error > 0 ? `- SL lỗi: ${item.quantity_error}` : ""}`)
+//     //         //         .attr("visibility", "hidden"); // Ẩn text để chỉ đo kích thước
+
+//     //         //     const textWidth = tempText.node().getBBox().width; // Lấy chiều rộng nội dung
+//     //         //     const padding = 20; // Padding hai bên
+//     //         //     const imageWidth = 20; // Dành chỗ cho hình ảnh
+//     //         //     const boxWidth = textWidth + padding * 1.5 + imageWidth; // Tổng chiều rộng
+
+//     //         //     tempText.remove(); // Xóa text tạm sau khi đo
+
+//     //         //     // Tạo foreignObject để chứa component Image + Text
+//     //         //     const itemContainer = svg.append("foreignObject")
+//     //         //         .attr("x", marginLeft + 30)
+//     //         //         .attr("y", itemY)
+//     //         //         .attr("width", boxWidth) // Dùng width động
+//     //         //         .attr("height", 30)
+//     //         //         .append("xhtml:div")
+//     //         //         .style("display", "inline-flex")
+//     //         //         .style("align-items", "center")
+//     //         //         .style("border", "1px solid #333")
+//     //         //         .style("border-radius", "8px")
+//     //         //         .style("padding", "4px 12px")
+//     //         //         .style("font-size", "11px")
+//     //         //         .style("white-space", "nowrap");
+
+
+
+//     //         //     // Thêm component hình ảnh
+//     //         //     createRoot(itemContainer.node()).render(
+//     //         //         <>
+//     //         //             <Image
+//     //         //                 src={item.image ? item.image : '/nodata.png'}
+//     //         //                 alt="Product Image"
+//     //         //                 width={14}
+//     //         //                 height={14}
+//     //         //                 style={{ marginRight: 8 }}
+//     //         //             />
+//     //         //             <span style={{ color: "#333" }}>{item.reference_no} - SL: {item.quantity}</span>
+//     //         //             {item.quantity_error > 0 && (
+//     //         //                 <span style={{ color: "red", marginLeft: 4 }}>- SL lỗi: {item.quantity_error}</span>
+//     //         //             )}
+//     //         //         </>
+//     //         //     );
+
+//     //         //     itemY += itemHeight + 8; // Cập nhật vị trí Y cho sản phẩm tiếp theo
+//     //         // });
+
+
+
+
+
+
+
+
+//     //         currentY = itemY + baseStepHeight;
+//     //     });
+//     // }, [data]);
+
+//     return <svg ref={svgRef}></svg>;
+// };
+
+
+
 const ProcessBar = ({ data, checkBorder }) => {
 
     const dataSeting = useSetingServer()
 
-
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
     return (
         <>
@@ -385,12 +822,12 @@ const ProcessBar = ({ data, checkBorder }) => {
                                         </div>
                                         <div className="flex items-start gap-1 py-2">
                                             {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
-                                            <div className="flex flex-col items-center gap-2">
+                                            <div className="flex flex-col items-start gap-2">
                                                 {
                                                     j?.purchase_items?.map(e => {
                                                         return (
-                                                            <div key={e?.id} className="flex items-center gap-2">
-                                                                <div className="flex items-center gap-1 px-2 py-px border border-gray-400 rounded-xl">
+                                                            <div key={e?.id} className="">
+                                                                <div className="flex items-center justify-start gap-1 px-2 py-px border border-gray-400 rounded-xl">
                                                                     <ModalImage
                                                                         small={e?.image ? e?.image : "/nodata.png"}
                                                                         large={e?.image ? e?.image : "/nodata.png"}
@@ -399,23 +836,24 @@ const ProcessBar = ({ data, checkBorder }) => {
                                                                         alt={e?.item_name}
                                                                         className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
                                                                     />
-                                                                    <span className="text-[#9295A4] text-[10px]">
-                                                                        {e?.reference_no}
-                                                                    </span>
-                                                                    -
-                                                                    <span className="text-[#9295A4] text-[10px]">
-                                                                        SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
-                                                                    </span>
+                                                                    <div className="flex flex-col items-center gap-1">
+                                                                        <div className="flex flex-row items-center gap-1">
+                                                                            <span className="text-[#9295A4] text-[10px]">
+                                                                                {e?.reference_no}
+                                                                            </span>
+                                                                            -
+                                                                            <span className="text-[#9295A4] text-[10px]">
+                                                                                SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
+                                                                            </span>
+                                                                            {
+                                                                                e?.quantity_error > 0 && <span className="text-red-500 text-[10px]">
+                                                                                    - SL lỗi:<span className="pl-0.5">{formatNumber(e?.quantity_error)}</span>
+                                                                                </span>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+
                                                                 </div>
-                                                                {/* <button
-                                                            onClick={() => { handleQueryId({ status: true, id: e?.pp_id }); }}
-                                                            className={`group transition-all ease-in-out hover:bg-slate-50 text-left cursor-pointer w-full`}
-                                                        >
-                                                            <RiDeleteBin6Line
-                                                                size={14}
-                                                                className="group-hover:text-[#f87171] group-hover:scale-110"
-                                                            />
-                                                        </button> */}
                                                             </div>
                                                         )
                                                     })

@@ -333,6 +333,15 @@ const CategoryErrors = (props) => {
                                 currentPage={router.query?.page || 1}
                             />
                         </ContainerPagination>
+                        // <ContainerPagination>
+                        //     <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
+                        //     <Pagination
+                        //         postsPerPage={limit}
+                        //         totalPosts={Number(data?.output?.iTotalDisplayRecords)}
+                        //         paginate={paginate}
+                        //         currentPage={router.query?.page || 1}
+                        //     />
+                        // </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>

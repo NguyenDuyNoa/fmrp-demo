@@ -29,6 +29,7 @@ import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { optionsQuery } from "@/configs/optionsQuery";
+import { TagColorOrange } from "@/components/UI/common/Tag/TagStatus";
 
 const initialState = {
     isTab: "item",
@@ -36,6 +37,7 @@ const initialState = {
     listDataLeft: [],
     listDataRight: {
         title: "",
+        referenceNoPo: '',
         dataPPItems: [],
         dataBom: {
             materialsBom: [],
@@ -191,6 +193,7 @@ const MainTable = ({ dataLang }) => {
                     listDataRight: {
                         ...dataTable.listDataRight,
                         title: null,
+                        referenceNoPo: null,
                         dataPPItems: [],
                         dataBom: { productsBom: [], materialsBom: [] },
                         dataKeepStock: [],
@@ -225,6 +228,7 @@ const MainTable = ({ dataLang }) => {
                     listDataRight: {
                         ...dataTable.listDataRight,
                         title: null,
+                        referenceNoPo: null,
                         dataPPItems: [],
                         dataBom: { productsBom: [], materialsBom: [], },
                         dataKeepStock: [],
@@ -251,6 +255,7 @@ const MainTable = ({ dataLang }) => {
             if (isSuccess == 1) {
                 queryState({
                     listDataRight: {
+                        referenceNoPo: data?.productionPlan?.reference_no_po,
                         title: data?.productionPlan?.reference_no,
                         idCommand: data?.productionPlan?.id,
                         dataPPItems: data?.listPPItems?.map((e) => {
@@ -566,7 +571,23 @@ const MainTable = ({ dataLang }) => {
                                     {dataLang?.materials_planning_nvl || "materials_planning_nvl"}
                                 </h1>
                                 <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                    {dataTable.listDataRight?.title ?? (dataLang?.materials_planning_no_nvl || "materials_planning_no_nvl")}
+                                    {/* {dataTable.listDataRight?.title ?? (dataLang?.materials_planning_no_nvl || "materials_planning_no_nvl")} <span>{}</span> */}
+                                    {
+                                        dataTable.listDataRight?.title
+                                            ?
+                                            <>
+                                                {dataTable.listDataRight?.title}{
+                                                    dataTable.listDataRight?.referenceNoPo && <>
+                                                        /  <TagColorOrange
+                                                            name={dataTable.listDataRight?.referenceNoPo}
+                                                            className={'relative text-sm top-1'}
+                                                        />
+                                                    </>
+                                                }
+                                            </>
+                                            :
+                                            (dataLang?.materials_planning_no_nvl || "materials_planning_no_nvl")
+                                    }
                                 </h1>
                             </div>
                             <div className="flex gap-4">

@@ -148,8 +148,8 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                         stages: data?.poi.stages?.map(e => {
                             return {
                                 ...e,
-                                active: false,
-                                quantity: 100,
+                                active: e?.active == "1",
+                                // quantity: 100,
                             }
                         })
                     }

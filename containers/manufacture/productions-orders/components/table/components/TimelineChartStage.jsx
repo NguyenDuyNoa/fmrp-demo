@@ -57,6 +57,7 @@ const TimelineChartStage = ({ data, dataLang }) => {
             .attr("x2", (d, i) => xScale(data[i + 1].title) - circleRadius) // Kết thúc tại mép trái của đường tròn tiếp theo
             .attr("y2", height / 2)
             .attr("stroke", d => getColor(d))
+            // .attr("stroke", (d, i) => getColor(data[i + 1]))
             .attr("stroke-width", 2);
 
         // Vẽ các điểm tròn trên timeline
