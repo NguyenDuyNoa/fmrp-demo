@@ -40,7 +40,7 @@ const Index = (props) => {
         <React.Fragment>
             <QueryClientProvider client={queryClient}>
                 <Head>
-                    <link rel="shortcut icon" href="/faicon.png" />
+                    <link rel="shortcut icon" href="/faicon-nobg.png" />
                     {/* <link rel="shortcut icon" href="/Favicon.png" /> */}
                 </Head>
                 <Suspense fallback={<LoadingPage />}>
@@ -83,7 +83,8 @@ function MainPage({ Component, pageProps }) {
 
             const parentDatepicker = document.querySelector(".parentDatepicker");
             const parentSelect = document.querySelector(".parentSelect");
-            if (!parentDatepicker || !parentSelect) return;
+            const headerTablePopup = document.querySelector(".headerTablePopup");
+            if (!parentDatepicker || !parentSelect || !headerTablePopup) return;
 
             const updateZIndex = () => {
                 const modalContainer = document.getElementById("react-modal-image-img");
@@ -91,9 +92,11 @@ function MainPage({ Component, pageProps }) {
                 if (modalContainer) {
                     parentDatepicker.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
                     parentSelect.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
+                    headerTablePopup.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
                 } else {
                     parentSelect.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
                     parentDatepicker.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
+                    headerTablePopup.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
                 }
             };
 

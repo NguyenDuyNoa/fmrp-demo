@@ -28,9 +28,9 @@ const NoData = (props) => {
                         width={1280}
                         height={1024}
                         alt="@nodata"
-                        className={`${props?.classNameImage ? `${props?.classNameImage}` : "w-[83%] h-[83%]"} object-cover`}
+                        className={`${props?.classNameImage ? `${props?.classNameImage}` : "w-[95%] h-[95%]"} object-contain`}
                         // src={"/no_data.svg"}
-                        src={type[props?.type] ?? "/icon/nodata.svg"}
+                        src={type[props?.type] ?? "/icon/nodata_ok.svg"}
                     // src={type[props?.type] ?? "/data_empty.svg"}
                     />
                 </div>
