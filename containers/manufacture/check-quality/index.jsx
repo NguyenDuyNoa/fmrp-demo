@@ -200,7 +200,7 @@ const CheckQuality = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{"Kiểm tra chất lượng"}</title>
+                <title>{"Phiếu kiểm tra chất lượng"}</title>
             </Head>
             <Container>
                 {statusExprired ? (
@@ -209,14 +209,14 @@ const CheckQuality = (props) => {
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">{"QC"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{"Kiểm tra chất lượng"}</h6>
+                        <h6>{"Phiếu kiểm tra chất lượng"}</h6>
                     </div>
                 )}
                 <ContainerBody>
                     <div className="h-full space-y-3 overflow-hidden">
                         <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                                {"Kiểm tra chất lượng"}
+                                {"Phiếu kiểm tra chất lượng"}
                             </h2>
                             {/* <ButtonAddNew
                                 onClick={() => {
@@ -294,7 +294,7 @@ const CheckQuality = (props) => {
                                                     {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
-                                                            filename="Kiểm tra chất lượng"
+                                                            filename="Phiếu kiểm tra chất lượng"
                                                             title="KTTCL"
                                                             dataLang={dataLang}
                                                         />
@@ -404,7 +404,7 @@ const CheckQuality = (props) => {
                                                                     2: hủy */}
                                                                 <BtnStatusApprovedCustom
                                                                     type={e?.status}
-                                                                    className={'!cursor-not-allowed'}
+                                                                    className={'!pointer-events-none'}
                                                                 />
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} textAlign={"left"}>

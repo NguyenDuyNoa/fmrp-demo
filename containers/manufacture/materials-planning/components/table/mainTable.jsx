@@ -601,7 +601,7 @@ const MainTable = ({ dataLang }) => {
                                                                 });
                                                             }}
                                                             name={dataTable.listDataRight?.referenceNoPo}
-                                                            className={'relative !text-[11px] top-0 py-1 cursor-pointer select-none'}
+                                                            className={'relative !text-[11px] top-0 3xl:!py-1 !py-1 cursor-pointer select-none'}
                                                         />
                                                     </span>
                                                 }

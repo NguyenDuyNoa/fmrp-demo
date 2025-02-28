@@ -414,23 +414,23 @@ const Header = () => {
                 {
                     items: [
                         {
-                            name: "Kiểm tra chất lượng",
+                            name: "Phiếu kiểm tra chất lượng",
                             viewOwn: -1,
                             view: -1,
                             link: "/manufacture/check-quality",
                         },
-                        {
-                            name: "Danh mục lỗi",
-                            link: "/manufacture/category-errors",
-                            viewOwn: -1,
-                            view: -1,
-                        },
-                        {
-                            name: "Chi tiết lỗi",
-                            link: "/manufacture/category-detail-errors",
-                            viewOwn: -1,
-                            view: -1,
-                        },
+                        // {
+                        //     name: "Danh mục lỗi",
+                        //     link: "/manufacture/category-errors",
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        // },
+                        // {
+                        //     name: "Chi tiết lỗi",
+                        //     link: "/manufacture/category-detail-errors",
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        // },
                     ]
                 }
             ],

@@ -398,7 +398,7 @@ const CheckQualityForm = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{id ? dataLang?.internal_plan_edit || "internal_plan_edit" : "Tạo kiểm tra chất lượng"}</title>
+                <title>{id ? "Sửa phiếu kiểm tra chất lượng" : "Tạo phiếu kiểm tra chất lượng"}</title>
             </Head>
             <Container className={"!h-auto"}>
                 {statusExprired ? (
@@ -407,13 +407,13 @@ const CheckQualityForm = (props) => {
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">{"QC"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{id ? dataLang?.internal_plan_edit || "internal_plan_edit" : "Tạo kiểm tra chất lượng"}</h6>
+                        <h6>{id ? "Sửa phiếu kiểm tra chất lượng" : "Tạo phiếu kiểm tra chất lượng"}</h6>
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
                         <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                            {id ? dataLang?.internal_plan_edit || "internal_plan_edit" : "Tạo kiểm tra chất lượng"}
+                            {id ? "Sửa phiếu kiểm tra chất lượng" : "Tạo phiếu kiểm tra chất lượng"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">
                             <ButtonBack onClick={() => router.push(routerQc.home)} dataLang={dataLang} />
@@ -1109,7 +1109,7 @@ const CheckQualityForm = (props) => {
                                                         <button
                                                             title="Xóa"
                                                             onClick={_HandleDeleteParent.bind(this, e.id)}
-                                                            className="flex items-center justify-center p-1 text-red-500 transition-all ease-linear rounded-md  hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
+                                                            className="flex items-center justify-center p-1 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
                                                         >
                                                             <IconDelete size={24} />
                                                         </button>
