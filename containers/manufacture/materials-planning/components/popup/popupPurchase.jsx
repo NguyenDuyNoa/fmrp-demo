@@ -105,7 +105,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                     quantityRest: formatNumber(e?.quantity_rest),
                     // sl đã mua
                     quantityPurchased: e?.quantity_purchase,
-                    quantity: formatNumber(e?.quantity_rest - e?.quantity_purchase) > 0 ? formatNumber(e?.quantity_rest - e?.quantity_purchase) : e?.quantity_rest,
+                    quantity: formatNumber(e?.quantity_rest - e?.quantity_purchase) > 0 ? formatNumber(e?.quantity_rest - e?.quantity_purchase) : '',
                     itemVariationOptionValueId: e?.item_variation_option_value_id,
                 };
             });
