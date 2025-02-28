@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { ProductionsOrdersContext } from "@/containers/manufacture/productions-orders/context/productionsOrders";
 import { Tooltip } from "react-tippy";
 import dynamic from "next/dynamic";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const ModalDetail = dynamic(() => import("@/containers/manufacture/productions-orders/components/modal/modalDetail"), { ssr: false });
 
 const BodyGantt = ({
@@ -150,51 +151,67 @@ const BodyGantt = ({
 
     const [currentMonthTop, setCurrentMonthTop] = useState(0);
 
-
     useEffect(() => {
-        if (!hasScrolled.current && container1Ref.current && timeLine?.length > 0 && data?.length > 0) {
-            // Đánh dấu là đã chạy
-            hasScrolled.current = true;
+        if (!hasScrolled.current && container1Ref.current && timeLine?.length > 0) {
+            hasScrolled.current = true; // Đánh dấu đã cuộn một lần
 
-            // Lấy tháng và năm hiện tại
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth() + 1;
-            const currentYear = currentDate.getFullYear();
-
-            // Tìm tháng hiện tại trong năm hiện tại
-            let targetMonthData = timeLine.find(item => {
-                const itemMonth = parseInt(item.month, 10);
-                const itemYear = parseInt(item.title.split(' ')[2], 10);
-                return itemMonth === currentMonth && itemYear === currentYear;
-            });
-
-            // Nếu không tìm thấy, tìm tháng hiện tại trong năm trước
-            if (!targetMonthData) {
-                targetMonthData = timeLine.find(item => {
-                    const itemMonth = parseInt(item.month, 10);
-                    const itemYear = parseInt(item.title.split(' ')[2], 10);
-                    return itemMonth === currentMonth && itemYear === currentYear - 1;
-                });
-            }
-
-            // Nếu vẫn không tìm thấy, chọn tháng cuối cùng trong danh sách
-            if (!targetMonthData && timeLine.length > 0) {
-                targetMonthData = timeLine[timeLine.length - 1]; // Lấy tháng cuối cùng
-            }
-
-            // Nếu tìm thấy dữ liệu, cuộn tới tháng tương ứng
-            if (targetMonthData) {
-                const monthKey = targetMonthData.month.padStart(2, '0');
-                const targetElement = monthRefs.current[monthKey];
-                const viewport = document.querySelector('.container1');
-
-                if (targetElement && container1Ref.current) {
-                    const targetPosition = targetElement.offsetLeft - container1Ref.current.offsetLeft;
-                    viewport.scrollLeft = targetPosition;
+            // Chọn phần tử cuối cùng
+            const lastMonthData = timeLine[timeLine.length - 1];
+            if (lastMonthData) {
+                const lastMonthKey = lastMonthData.month.padStart(2, '0');
+                const lastElement = monthRefs.current?.[lastMonthKey];
+                if (lastElement) {
+                    const targetPosition = lastElement.offsetLeft - container1Ref.current.offsetLeft;
+                    container1Ref.current.scrollLeft = targetPosition;
                 }
             }
         }
     }, [timeLine, data, page, router]);
+
+    // useEffect(() => {
+    //     if (!hasScrolled.current && container1Ref.current && timeLine?.length > 0 && data?.length > 0) {
+    //         // Đánh dấu là đã chạy
+    //         hasScrolled.current = true;
+
+    //         // Lấy tháng và năm hiện tại
+    //         const currentDate = new Date();
+    //         const currentMonth = currentDate.getMonth() + 1;
+    //         const currentYear = currentDate.getFullYear();
+
+    //         // Tìm tháng hiện tại trong năm hiện tại
+    //         let targetMonthData = timeLine.find(item => {
+    //             const itemMonth = parseInt(item.month, 10);
+    //             const itemYear = parseInt(item.title.split(' ')[2], 10);
+    //             return itemMonth === currentMonth && itemYear === currentYear;
+    //         });
+
+    //         // Nếu không tìm thấy, tìm tháng hiện tại trong năm trước
+    //         if (!targetMonthData) {
+    //             targetMonthData = timeLine.find(item => {
+    //                 const itemMonth = parseInt(item.month, 10);
+    //                 const itemYear = parseInt(item.title.split(' ')[2], 10);
+    //                 return itemMonth === currentMonth && itemYear === currentYear - 1;
+    //             });
+    //         }
+
+    //         // Nếu vẫn không tìm thấy, chọn tháng cuối cùng trong danh sách
+    //         if (!targetMonthData && timeLine.length > 0) {
+    //             targetMonthData = timeLine[timeLine.length - 1]; // Lấy tháng cuối cùng
+    //         }
+
+    //         // Nếu tìm thấy dữ liệu, cuộn tới tháng tương ứng
+    //         if (targetMonthData) {
+    //             const monthKey = targetMonthData.month.padStart(2, '0');
+    //             const targetElement = monthRefs.current[monthKey];
+    //             const viewport = document.querySelector('.container1');
+
+    //             if (targetElement && container1Ref.current) {
+    //                 const targetPosition = targetElement.offsetLeft - container1Ref.current.offsetLeft;
+    //                 viewport.scrollLeft = targetPosition;
+    //             }
+    //         }
+    //     }
+    // }, [timeLine, data, page, router]);
 
 
     useEffect(() => {
@@ -437,7 +454,7 @@ const BodyGantt = ({
                                         }}
                                         data-month={e.title}
                                     >
-                                        <div className={`text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative bg-white transition-opacity duration-200 
+                                        <div className={`text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative bg-white transition-opacity duration-200  whitespace-nowrap
                                             ${currentMonth != e.title ? "opacity-100" : "opacity-0"}`}
                                         >
                                             {currentMonth != e.title ? e.title : ''}
@@ -468,7 +485,7 @@ const BodyGantt = ({
                                                                 iIndex == e.days?.length - 1
                                                                     ? (
                                                                         <h1
-                                                                            className={`bg-[#5599EC] my-0.5  px-1.5 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
+                                                                            className={`bg-[#5599EC] my-0.5  w-[22px] h-[22px] p-1 flex items-center justify-center rounded-full text-white font-semibold 3xl:text-sm text-xs`}
                                                                         >
                                                                             {Number(day[0])}
                                                                         </h1>
@@ -496,7 +513,9 @@ const BodyGantt = ({
                         <div className="flex divide-x">
                             <div
                                 ref={container3Ref}
-                                onScroll={handleScrollContainer2}
+                                onScroll={(e) => {
+                                    handleScrollContainer2(e)
+                                }}
                                 className="flex-col min-w-[35%] w-[35%]  overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
                                 3xl:h-[64vh] xxl:h-[55vh] 2xl:h-[54vh] xl:h-[54vh] lg:h-[52vh] h-[55vh]"
                             >
@@ -664,7 +683,7 @@ const BodyGantt = ({
                                     );
                                 })}
                             </div>
-                            <div
+                            <Customscrollbar
                                 ref={container1Ref}
                                 onScroll={handleScroll}
                                 id="container1"
@@ -833,7 +852,7 @@ const BodyGantt = ({
                                         :
                                         <NoData />
                                 }
-                            </div>
+                            </Customscrollbar>
                         </div>
                     )}
                 </div>
