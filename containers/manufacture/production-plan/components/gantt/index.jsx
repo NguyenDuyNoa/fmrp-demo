@@ -213,6 +213,8 @@ const BodyGantt = ({
     //     }
     // }, [timeLine, data, page, router]);
 
+
+
     useEffect(() => {
         if (!container2Ref.current) return;
         if (!monthRefs.current) return;
