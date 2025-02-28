@@ -168,7 +168,11 @@ const Popup_Bom = React.memo((props) => {
 
     const _ServerFetchingCd = async () => {
         try {
-            const { data } = await apiProducts.apiDataDesignBomProducts()
+            const { data } = await apiProducts.apiDataDesignBomProducts({
+                params: {
+                    product_id: props?.id
+                }
+            })
             sDataTypeCd(Object.entries(data.typeDesignBom).map(([key, value]) => ({
                 label: value,
                 value: key,

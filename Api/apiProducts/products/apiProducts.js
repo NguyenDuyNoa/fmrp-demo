@@ -29,8 +29,8 @@ const apiProducts = {
         const response = await axiosCustom('POST', id ? `/api_web/api_product/product/${id}?csrf_protection=true` : "/api_web/api_product/product/?csrf_protection=true", data);
         return response.data
     },
-    async apiDataDesignBomProducts() {
-        const response = await axiosCustom('GET', `/api_web/api_product/getDataDesignBom?csrf_protection=true`);
+    async apiDataDesignBomProducts(params) {
+        const response = await axiosCustom('GET', `/api_web/api_product/getDataDesignBom?csrf_protection=true`, params);
         return response.data
     },
     async apiProductVariationOption(id) {
