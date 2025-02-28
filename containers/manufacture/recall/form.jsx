@@ -33,6 +33,7 @@ import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
 import { v4 as uuidv4 } from "uuid";
 import { useRecallItems } from "./hooks/useRecallItems";
+import { optionsQuery } from "@/configs/optionsQuery";
 const RecallForm = (props) => {
     const router = useRouter();
 
@@ -64,6 +65,7 @@ const RecallForm = (props) => {
 
     const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
     //new
+    const [idProductionOrder, sIdProductionOrder] = useState(null);
 
     const statusExprired = useStatusExprired();
 
@@ -89,7 +91,7 @@ const RecallForm = (props) => {
 
     const { data: dataBranch = [] } = useBranchList()
 
-    const { data: dataItems } = useRecallItems(searchItems, idBranch)
+    const { data: dataItems } = useRecallItems(searchItems, idBranch, idProductionOrder)
 
     const { data: dataLocation = [] } = useLocationByWarehouseTo(idRecalltWarehouse, idBranch)
 
@@ -151,8 +153,38 @@ const RecallForm = (props) => {
             sCode(rResult?.code);
             sStartDate(moment(rResult?.date).toDate());
             sNote(rResult?.note);
+            sIdProductionOrder({
+                value: rResult?.poi_id,
+                label: rResult?.reference_no_detail
+            })
         },
         enabled: !!id
+    })
+
+
+    // lsx chi tiết
+    const { data: dataProductionOrderItemsByBranch } = useQuery({
+        queryKey: ['api_production_order_items_by_branch', idBranch],
+        queryFn: async () => {
+            const res = await apiRecall.apiProductionOrderItemsByBranch({
+                params: {
+                    branch_id: idBranch?.value
+                }
+            });
+            return {
+                ...res,
+                data: {
+                    ...res?.data,
+                    items: res?.data?.items.map((e) => ({
+                        ...e,
+                        label: e?.reference_no_detail,
+                        value: e?.id
+                    }))
+                }
+            }
+        },
+        enabled: !!idBranch,
+        ...optionsQuery
     })
 
     const _HandleSeachApi = debounce(async (inputValue) => {
@@ -164,6 +196,7 @@ const RecallForm = (props) => {
             sListData([]);
             sIdBranch(isKeyState?.value);
             sIdRecalltWarehouse(null);
+            sIdProductionOrder(null);
         }
         if (isKeyState?.type === "idRecalltWarehouse") {
             sListData([]);
@@ -186,6 +219,7 @@ const RecallForm = (props) => {
                 }
             } else {
                 sIdRecalltWarehouse(null);
+                sIdProductionOrder(null);
                 sIdBranch(value);
             }
         } else if (type == "idRecalltWarehouse" && idRecalltWarehouse != value) {
@@ -194,7 +228,10 @@ const RecallForm = (props) => {
             } else {
                 sIdRecalltWarehouse(value);
             }
+        } else if (type == 'idProductionOrderItem') {
+            sIdProductionOrder(value);
         }
+
     };
 
     const handleClearDate = (type) => {
@@ -276,6 +313,7 @@ const RecallForm = (props) => {
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch?.value);
         formData.append("warehouse_id", idRecalltWarehouse?.value);
+        formData.append("poi_id", idProductionOrder?.value ?? 0);
         formData.append("note", note);
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
@@ -687,9 +725,9 @@ const RecallForm = (props) => {
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
                                     <SelectCore
-                                        options={[]}
-                                        onChange={_HandleChangeInput.bind(this, "")}
-                                        value={""}
+                                        options={dataProductionOrderItemsByBranch?.data?.items || []}
+                                        onChange={_HandleChangeInput.bind(this, "idProductionOrderItem")}
+                                        value={idProductionOrder}
                                         isClearable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}

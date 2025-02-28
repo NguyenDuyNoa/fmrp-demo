@@ -74,6 +74,8 @@ function MainPage({ Component, pageProps }) {
 
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
+    const statePopupParent = useSelector((state) => state?.popupParent);
+
     const langDefault = useSelector((state) => state.lang);
 
     const { data } = useLanguage(langDefault)
@@ -83,8 +85,9 @@ function MainPage({ Component, pageProps }) {
 
             const parentDatepicker = document.querySelector(".parentDatepicker");
             const parentSelect = document.querySelector(".parentSelect");
+
             const headerTablePopup = document.querySelector(".headerTablePopup");
-            if (!parentDatepicker || !parentSelect || !headerTablePopup) return;
+            if (!parentDatepicker || !parentSelect) return;
 
             const updateZIndex = () => {
                 const modalContainer = document.getElementById("react-modal-image-img");
@@ -92,11 +95,15 @@ function MainPage({ Component, pageProps }) {
                 if (modalContainer) {
                     parentDatepicker.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
                     parentSelect.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
-                    headerTablePopup.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
+                    if (statePopupParent?.open && headerTablePopup) {
+                        headerTablePopup.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
+                    }
                 } else {
                     parentSelect.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
                     parentDatepicker.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
-                    headerTablePopup.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
+                    if (statePopupParent?.open && headerTablePopup) {
+                        headerTablePopup.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
+                    }
                 }
             };
 
@@ -107,11 +114,12 @@ function MainPage({ Component, pageProps }) {
             // Kiểm tra ngay khi component mount
             updateZIndex();
 
+
             return () => {
                 observer.disconnect(); // Dừng theo dõi khi component bị unmount
             };
         }, 1500);
-    }, []);
+    }, [router.pathname, statePopupParent?.open]);
 
 
     useEffect(() => {

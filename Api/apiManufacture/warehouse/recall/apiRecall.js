@@ -34,6 +34,12 @@ const apiRecall = {
         const response = await axiosCustom(method, `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`, data);
         return response.data
     },
+    // item by lsxct 
+    async apiItemsByProductionOrder(param) {
+        const response = await axiosCustom('GET', `/api_web/Api_Suggest_Exporting/getItemsPOI`, param);
+        return response.data
+    },
+
     async apiWarehouseLocationCombobox(param) {
         const response = await axiosCustom('GET', `/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true`, param);
         return response.data
@@ -42,5 +48,11 @@ const apiRecall = {
         const response = await axiosCustom('POST', id ? `/api_web/Api_material_recall/materialRecall/${id}?csrf_protection=true` : `/api_web/Api_material_recall/materialRecall/?csrf_protection=true`, data);
         return response.data
     },
+    /// số lsx chi tiết
+    async apiProductionOrderItemsByBranch(param) {
+        const response = await axiosCustom('GET', `/api_web/Api_Production_orders/getProductionOrderItems`, param);
+        return response.data
+    },
+
 }
 export default apiRecall

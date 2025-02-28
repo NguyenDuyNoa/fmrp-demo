@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { PopupParent } from "@/utils/lib/Popup";
 import { Add as IconClose } from "iconsax-react";
 import { Inter, Lexend_Deca } from "@next/font/google";
@@ -10,8 +10,14 @@ const inter = Inter({ subsets: ["latin"] });
 
 import 'simplebar-react/dist/simplebar.min.css';
 import { Customscrollbar } from "./common/Customscrollbar";
+import { useDispatch, useSelector } from "react-redux";
 
 const Popup = (props) => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch({ type: "statePopupParent", payload: props.open });
+    }, [props.open])
     return (
         <React.Fragment>
             <button className={props.classNameBtn} onClick={props.onClickOpen}>

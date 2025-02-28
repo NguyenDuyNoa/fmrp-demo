@@ -5212,7 +5212,7 @@ const FilePDF = ({
                             fontSize: 10,
                         },
                         {
-                            text: `${""}`,
+                            text: `${data?.reference_no_detail ?? ""}`,
                             bold: true,
                             fontSize: 10,
                         },
@@ -5607,7 +5607,7 @@ const FilePDF = ({
                             fontSize: 10,
                         },
                         {
-                            text: `${""}`,
+                            text: `${data?.reference_no_detail ?? ""}`,
                             bold: true,
                             fontSize: 10,
                         },
@@ -6057,7 +6057,7 @@ const FilePDF = ({
                             fontSize: 10,
                         },
                         {
-                            text: `${""}`,
+                            text: `${data?.reference_no_detail ?? ""}`,
                             bold: true,
                             fontSize: 10,
                         },
@@ -6445,7 +6445,7 @@ const FilePDF = ({
                             fontSize: 10,
                         },
                         {
-                            text: `${""}`,
+                            text: `${data?.reference_no_detail ?? ""}`,
                             bold: true,
                             fontSize: 10,
                         },

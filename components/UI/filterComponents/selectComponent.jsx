@@ -24,10 +24,12 @@ const SelectComponent = ({
     classParent,
     onMenuOpen,
     maxShowMuti,
+    id
 }) => {
     return (
         <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
             <SelectCore
+                id={id ?? "parentSelect"}
                 options={options}
                 value={value}
                 onInputChange={onInputChange ? onInputChange : ""}
