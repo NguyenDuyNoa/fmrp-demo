@@ -75,7 +75,6 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
 
 
 
-
     useEffect(() => {
         // Chờ các refs được gán đầy đủ
         const timer = setTimeout(() => {

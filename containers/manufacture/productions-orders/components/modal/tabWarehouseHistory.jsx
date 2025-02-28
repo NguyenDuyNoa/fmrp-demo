@@ -56,7 +56,7 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
 
             formData.append("search", isSearch);
 
-            formData.append("page", router.query?.page);
+            formData.append("page", router.query?.page ?? "");
 
             formData.append("pod_id", isStateModal?.dataDetail?.poi?.poi_id);
 

@@ -82,10 +82,9 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
         queryFn: async () => {
             let formData = new FormData();
 
-
             formData.append("search", isSearch);
 
-            formData.append("page", router.query?.page);
+            formData.append("page", router.query?.page ?? "");
 
             formData.append("pod_id", isStateModal?.dataDetail?.poi?.poi_id);
 
