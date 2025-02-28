@@ -188,7 +188,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         {
             id: 5,
             name: dataLang?.productions_orders_modal_recovery_materials || 'productions_orders_modal_recovery_materials',
-            count: 0,
+            count: data?.dataDetail?.count_purchase_internal ?? 0,
         },
         {
             id: 6,

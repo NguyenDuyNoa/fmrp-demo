@@ -10,6 +10,7 @@ import PopupAccountInformation from '../UI/popup/PopupAccountInformation';
 import PopupChangePassword from '../UI/popup/PopupChangePassword';
 import PopupRecommendation from '../UI/popup/PopupRecommendation';
 import PopupUpdateVersion from '../UI/popup/PopupUpdateVersion';
+import ImagesModal from '../UI/images/ImagesModal';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -22,6 +23,8 @@ const queryClient = new QueryClient({
 const Index = ({ children, ...props }) => {
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
+    const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
+
     return (
         <QueryClientProvider client={queryClient}>
 
@@ -31,6 +34,9 @@ const Index = ({ children, ...props }) => {
                 stateBoxChatAi.isShowAi && (
                     <ChatBubbleAI {...props} />
                 )
+            }
+            {
+                statePopupPreviewImage.open && <ImagesModal {...props} />
             }
 
             <PopupAppTrial {...props} />

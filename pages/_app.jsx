@@ -80,46 +80,42 @@ function MainPage({ Component, pageProps }) {
 
     const { data } = useLanguage(langDefault)
 
+    const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
+
     useEffect(() => {
-        setTimeout(() => {
 
-            const parentDatepicker = document.querySelector(".parentDatepicker");
-            const parentSelect = document.querySelector(".parentSelect");
+        const parentDatepicker = document.querySelector(".parentDatepicker");
+        const parentSelect = document.querySelector(".parentSelect");
 
-            const headerTablePopup = document.querySelector(".headerTablePopup");
-            if (!parentDatepicker || !parentSelect) return;
+        const headerTablePopup = document.querySelector(".headerTablePopup");
+        if (!parentDatepicker || !parentSelect || !headerTablePopup) return;
 
-            const updateZIndex = () => {
-                const modalContainer = document.getElementById("react-modal-image-img");
+        const updateZIndex = () => {
+            const modalContainer = document.getElementById("react-modal-image-img");
 
-                if (modalContainer) {
-                    parentDatepicker.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
-                    parentSelect.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
-                    if (statePopupParent?.open && headerTablePopup) {
-                        headerTablePopup.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
-                    }
-                } else {
-                    parentSelect.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
-                    parentDatepicker.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
-                    if (statePopupParent?.open && headerTablePopup) {
-                        headerTablePopup.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
-                    }
-                }
-            };
+            if (modalContainer) {
+                parentDatepicker.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
+                parentSelect.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
+                headerTablePopup.style.zIndex = "0"; // Khi modal mở, thay đổi z-index của phần tử mong muốn
+            } else {
+                parentSelect.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
+                parentDatepicker.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
+                headerTablePopup.style.zIndex = ""; // Khi modal đóng, reset lại giá trị mặc định
+            }
+        };
 
-            // Theo dõi sự thay đổi trong body
-            const observer = new MutationObserver(updateZIndex);
-            observer.observe(document.body, { childList: true, subtree: true });
+        // Theo dõi sự thay đổi trong body
+        const observer = new MutationObserver(updateZIndex);
+        observer.observe(document.body, { childList: true, subtree: true });
 
-            // Kiểm tra ngay khi component mount
-            updateZIndex();
+        // Kiểm tra ngay khi component mount
+        updateZIndex();
 
 
-            return () => {
-                observer.disconnect(); // Dừng theo dõi khi component bị unmount
-            };
-        }, 1500);
-    }, [router.pathname, statePopupParent?.open]);
+        return () => {
+            observer.disconnect(); // Dừng theo dõi khi component bị unmount
+        };
+    }, [router.pathname, statePopupPreviewImage.open]);
 
 
     useEffect(() => {
@@ -133,7 +129,7 @@ function MainPage({ Component, pageProps }) {
             scroll.style.zIndex = 'unset'
             return
         }
-    }, [stateBoxChatAi.open])
+    }, [stateBoxChatAi.open, statePopupPreviewImage.open])
 
     if (isLoading || auth == null) {
         return <LoadingPage />;

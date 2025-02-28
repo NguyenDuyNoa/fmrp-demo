@@ -6,6 +6,7 @@ import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePag
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
+import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
 import Loading from '@/components/UI/loading/loading';
 import NoData from '@/components/UI/noData/nodata';
@@ -42,18 +43,20 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
 
     // const { checkAdd, checkExport } = useActionRole(auth, "")
 
-    const { dataProductExpiry, dataProductSerial } = useFeature()
+    const { dataProductExpiry, dataProductSerial, dataMaterialExpiry } = useFeature()
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     const onChangeSearch = debounce((e) => { setIsSearch(e.target.value) }, 500)
 
-    const { data, isLoading, isFetching, refetch } = useQuery({
-        queryKey: ['api_get_purchase_products', isSearch],
+    const { data, isLoading, isFetching, refetch, isRefetching } = useQuery({
+        queryKey: ['api_get_purchase_products', isSearch, router.query?.page],
         queryFn: async () => {
             let formData = new FormData();
 
             formData.append("search", isSearch);
+
+            formData.append("page", router.query?.page);
 
             formData.append("pod_id", isStateModal?.dataDetail?.poi?.poi_id);
 
@@ -80,6 +83,131 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
         ...optionsQuery
     })
 
+
+    const multiDataSet = [
+        {
+            columns: [
+                {
+                    title: "ID",
+                    width: { wch: 4 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Ngày chứng từ'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Mã chứng từ'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Mặt hàng'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Biến thể'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                ...[dataProductSerial.is_enable === "1" && {
+                    title: `${'Serial'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
+                    title: `${'Lot'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
+                    title: `${'Date'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                ],
+                {
+                    title: `${'Kho thảnh phẩm'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Số lượng'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Kho QC'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Số lượng lỗi'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+            ],
+            data: data?.rResult?.map((e, index) => [
+                { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
+                { value: `${e?.date ? formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ''}` },
+                { value: `${e?.code ?? ""}` },
+                { value: `${e?.item?.item_name ?? ""}` },
+                { value: `${e?.item?.product_variation ?? ""}` },
+                ...[dataProductSerial.is_enable === "1" && {
+                    value: `${e?.item?.serial ?? ""}`
+                },
+                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
+                    value: `${e?.item?.lot ?? ""}`
+                },
+                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
+                    value: `${e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}`
+                }],
+                { value: `${e?.item?.warehouse_name ?? ""}` },
+                { value: `${e?.item?.quantity ? formatNumber(e?.item?.quantity) : ""}` },
+                { value: `${e?.item?.warehouse_name_qc ?? ""}` },
+                { value: `${e?.item?.quantity_error ? formatNumber(e?.item?.quantity_error) : ""}` },
+            ]),
+        },
+    ];
+
     return (
         <div className='h-full'>
             <div className='flex items-center justify-between'>
@@ -96,10 +224,16 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
                 />
                 <div className="flex items-center justify-end gap-1">
                     <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
-                    <button onClick={() => { }} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                        <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
-                        <span>{dataLang?.client_list_exportexcel}</span>
-                    </button>
+                    {
+                        data?.rResult?.length > 0 && (
+                            <ExcelFileComponent
+                                dataLang={dataLang}
+                                filename={"Danh sách dữ liệu lịch sử nhập kho TP"}
+                                multiDataSet={multiDataSet}
+                                title="DSDLLS nhập kho TP"
+                            />
+                        )
+                    }
                     {/* <div>
                         <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                     </div> */}
@@ -110,7 +244,7 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
                 {/* className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_410px)] 2xl:h-[calc(100vh_-_390px)] xl:h-[calc(100vh_-_395px)] h-[calc(100vh_-_390px)]" : '3xl:h-[calc(100vh_-_520px)] 2xl:h-[calc(100vh_-_500px)] xl:h-[calc(100vh_-_490px)] h-[calc(100vh_-_490px)]')
                 }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}> */}
                 <div>
-                    <HeaderTable gridCols={12} display={'grid'}>
+                    <HeaderTable gridCols={14} display={'grid'}>
                         <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             STT
                         </ColumnTable>
@@ -124,16 +258,19 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
                             {dataLang?.productions_orders_modal_exporting_materials_item || 'productions_orders_modal_exporting_materials_item'}
                         </ColumnTable>
                         <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
-                            Kho hàng
+                            Kho thành phẩm
                         </ColumnTable>
-                        {/* <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
-                            Vị trí kho
-                        </ColumnTable> */}
                         <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
                             Số lượng
                         </ColumnTable>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
+                            Kho QC
+                        </ColumnTable>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
+                            SL lỗi
+                        </ColumnTable>
                     </HeaderTable>
-                    {(isFetching || isLoading)
+                    {(isLoading || isRefetching)
                         ?
                         <Loading className="h-80" color="#0f4f9e" />
                         : data?.rResult?.length > 0
@@ -141,17 +278,37 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                 {
                                     data?.rResult?.map((e, index) => (
-                                        <RowTable gridCols={12} key={e.id.toString()} >
-                                            <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                        <RowTable gridCols={14} key={e.id.toString()} className={'!py-0'} >
+                                            <RowItemTable
+                                                colSpan={1}
+                                                textAlign={'center'}
+                                                textSize={'!text-xs'}
+                                                className={'!py-2.5'}
+                                            >
                                                 {index + 1}
                                             </RowItemTable>
-                                            <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
-                                                {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
+                                            <RowItemTable
+                                                colSpan={2}
+                                                textAlign={'center'}
+                                                textSize={'!text-xs'}
+                                                className={'!py-2.5'}
+                                            >
+                                                {formatMoment(e?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
                                             </RowItemTable>
-                                            <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
-                                                {e.code}
+                                            <RowItemTable
+                                                colSpan={2}
+                                                textAlign={'center'}
+                                                textSize={'!text-xs'}
+                                                className={'!py-2.5'}
+                                            >
+                                                {e?.code}
                                             </RowItemTable>
-                                            <RowItemTable colSpan={3} textAlign={'left'} textSize={' !text-xs'} className={'flex items-center gap-1'}>
+                                            <RowItemTable
+                                                colSpan={3}
+                                                textAlign={'left'}
+                                                textSize={' !text-xs'}
+                                                className={'flex items-center gap-1 !py-2.5'}
+                                            >
                                                 <ModalImage
                                                     small={e?.item?.images ?? '/nodata.png'}
                                                     large={e?.item?.images ?? '/nodata.png'}
@@ -184,7 +341,7 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
                                                             )
                                                         }
                                                         {
-                                                            dataProductExpiry.is_enable === "1" && (
+                                                            (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable == "1") && (
                                                                 <>
                                                                     <div className="flex gap-0.5">
                                                                         <h6 className="text-[12px]">
@@ -208,14 +365,37 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
                                                     </div>
                                                 </div>
                                             </RowItemTable>
-                                            <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
+                                            <RowItemTable
+                                                colSpan={2}
+                                                textAlign={'center'}
+                                                textSize={'!text-xs'}
+                                                className={'!py-2.5'}
+                                            >
                                                 {e?.item?.warehouse_name}
                                             </RowItemTable>
-                                            {/* <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
-                                                {e?.item?.location_name}
-                                            </RowItemTable> */}
-                                            <RowItemTable colSpan={1} textAlign={'right'} textSize={"!text-xs"}>
+                                            <RowItemTable
+                                                colSpan={1}
+                                                textAlign={'center'}
+                                                textSize={"!text-xs"}
+                                                className={'!py-2.5 font-semibold'}
+                                            >
                                                 {e?.item?.quantity > 0 ? formatNumber(e?.item?.quantity) : '-'}
+                                            </RowItemTable>
+                                            <RowItemTable
+                                                colSpan={2}
+                                                textAlign={'center'}
+                                                textSize={'!text-xs'}
+                                                className={'bg-[#FFEEF0] h-full !py-2.5 flex flex-col justify-center'}
+                                            >
+                                                {e?.item?.warehouse_name_qc}
+                                            </RowItemTable>
+                                            <RowItemTable
+                                                colSpan={1}
+                                                textAlign={'center'}
+                                                textSize={"!text-xs"}
+                                                className={'bg-[#FFEEF0] font-semibold h-full !py-2.5 flex flex-col justify-center'}
+                                            >
+                                                {e?.item?.quantity_error > 0 ? formatNumber(e?.item?.quantity_error) : '-'}
                                             </RowItemTable>
                                         </RowTable>
                                     ))

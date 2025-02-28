@@ -41,6 +41,11 @@ const apiProductionsOrders = {
         const response = await axiosCustom('POST', `/api_web/Api_Purchase_Products/getPurchaseProducts`, data);
         return response.data
     },
+    // thu hồi nvl
+    async apiGetRecallProduction(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Purchase_Internal/getItems`, data);
+        return response.data
+    },
 
     // api đổi trạng thái sản xuất
     async apiAgreeProcess(data) {

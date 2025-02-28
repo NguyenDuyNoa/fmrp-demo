@@ -13,7 +13,7 @@ import { useItemsVariantSearchCombobox } from "@/hooks/common/useItems";
 import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
 import dynamic from "next/dynamic";
@@ -31,6 +31,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import useToast from "@/hooks/useToast";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+import PopupRecallRawMaterials from "../popup/PopupRecallRawMaterials";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 
@@ -230,6 +231,7 @@ const MainTable = ({ dataLang }) => {
         queryKey: ['api_detail_production_orders', isState.idDetailProductionOrder],
         queryFn: () => fetchisStateRight(),
         enabled: !!isState.idDetailProductionOrder,
+        placeholderData: keepPreviousData,
         ...optionsQuery
     })
 
@@ -602,11 +604,29 @@ const MainTable = ({ dataLang }) => {
                                                 whileTap={{ scale: 1.08 }}
                                                 className="w-fit"
                                             >
-                                                <PopupConfimStage dataLang={dataLang} dataRight={isState} refetch={() => {
-                                                    refetchProductionsOrders();
-                                                    refetch()
-                                                }} />
+                                                <PopupConfimStage
+                                                    dataLang={dataLang}
+                                                    dataRight={isState}
+                                                    refetch={() => {
+                                                        refetchProductionsOrders();
+                                                        refetch()
+                                                    }} />
                                             </Zoom>
+
+                                            {/* <Zoom
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 1.08 }}
+                                                className="w-fit"
+                                            >
+                                                <PopupRecallRawMaterials
+                                                    dataLang={dataLang}
+                                                    dataRight={isState}
+                                                    refetch={() => {
+                                                        refetchProductionsOrders();
+                                                        refetch()
+                                                    }}
+                                                />
+                                            </Zoom> */}
                                             <Zoom
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 1.08 }}

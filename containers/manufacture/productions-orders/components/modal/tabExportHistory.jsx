@@ -6,6 +6,7 @@ import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePag
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
+import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
 import Loading from '@/components/UI/loading/loading';
 import NoData from '@/components/UI/noData/nodata';
@@ -48,11 +49,13 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
     const { data, isLoading, isFetching, refetch } = useQuery({
-        queryKey: ['api_get_suggest_exporting', isSearch],
+        queryKey: ['api_get_suggest_exporting', isSearch, router.query?.page],
         queryFn: async () => {
             let formData = new FormData();
 
             formData.append("search", isSearch);
+
+            formData.append("page", router.query?.page);
 
             formData.append("pod_id", isStateModal?.dataDetail?.poi?.poi_id);
 
@@ -80,6 +83,111 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
     })
 
 
+    const multiDataSet = [
+        {
+            columns: [
+                {
+                    title: "ID",
+                    width: { wch: 4 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Ngày chứng từ'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Mã chứng từ'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Mặt hàng'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Biến thể'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                ...[dataProductSerial.is_enable === "1" && {
+                    title: `${'Serial'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
+                    title: `${'Lot'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
+                    title: `${'Date'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                ],
+                {
+                    title: `${'Đơn vị tính'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${'Số lượng'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+            ],
+            data: data?.rResult?.map((e, index) => [
+                { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
+                { value: `${e?.date ? formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ''}` },
+                { value: `${e?.code ?? ""}` },
+                { value: `${e?.item?.item_name ?? ""}` },
+                { value: `${e?.item?.product_variation ?? ""}` },
+                ...[dataProductSerial.is_enable === "1" && {
+                    value: `${e?.item?.serial ?? ""}`
+                },
+                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
+                    value: `${e?.item?.lot ?? ""}`
+                },
+                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
+                    value: `${e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}`
+                }],
+                { value: `${e?.item?.unit_name ?? ""}` },
+                { value: `${e?.item?.quantity_export ? formatNumber(e?.item?.quantity_export) : ""}` },
+            ]),
+        },
+    ];
 
 
     return (
@@ -98,10 +206,18 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                 />
                 <div className="flex items-center justify-end gap-1">
                     <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
-                    <button onClick={() => { }} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                        <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
-                        <span>{dataLang?.client_list_exportexcel}</span>
-                    </button>
+                    {
+                        data?.rResult?.length > 0 &&
+                        (
+                            <ExcelFileComponent
+                                dataLang={dataLang}
+                                filename={"Danh sách dữ liệu lịch sử xuất NVL/BTP"}
+                                multiDataSet={multiDataSet}
+                                title="DSDLLS NVL/BTP"
+                            />
+
+                        )
+                    }
                     {/* <div>
                         <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                     </div> */}
@@ -184,7 +300,7 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                                 )
                                                             }
                                                             {
-                                                                dataProductExpiry.is_enable === "1" && (
+                                                                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && (
                                                                     <>
                                                                         <div className="flex gap-0.5">
                                                                             <h6 className="text-[12px]">
@@ -211,7 +327,7 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                 <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
                                                     {e?.item?.unit_name}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2} textAlign={'right'} textSize={'!text-xs'}>
+                                                <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'} className={'font-semibold'}>
                                                     {e?.item?.quantity_export > 0 ? formatNumber(e?.item?.quantity_export) : '-'}
                                                 </RowItemTable>
                                             </RowTable>

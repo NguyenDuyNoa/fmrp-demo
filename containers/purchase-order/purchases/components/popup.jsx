@@ -3,19 +3,24 @@ import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/compon
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import Loading from "@/components/UI/loading/loading";
 import ExpandableContent from "components/UI/more";
 import { TickCircle } from "iconsax-react";
 import { useState } from "react";
-import ModalImage from "react-modal-image";
 import { usePurChasesDetail } from "../hooks/usePurChasesDetail";
 import PopupCustom from "/components/UI/popup";
+import Image from "next/image";
+import { useDispatch } from "react-redux";
+import ImagesItem from "@/components/UI/images/ImagesItem";
+
 const PopupDetail = (props) => {
+    const dispatch = useDispatch();
+
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
@@ -189,7 +194,7 @@ const PopupDetail = (props) => {
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center mx-auto">
-                                                                {e?.item?.images != null ? (
+                                                                {/* {e?.item?.images != null ? (
                                                                     <ModalImage
                                                                         small={e?.item?.images}
                                                                         large={e?.item?.images}
@@ -198,7 +203,6 @@ const PopupDetail = (props) => {
                                                                     />
                                                                 ) : (
                                                                     <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
-                                                                        {/* <IconImage/> */}
                                                                         <ModalImage
                                                                             small="/nodata.png"
                                                                             large="/nodata.png"
@@ -207,7 +211,15 @@ const PopupDetail = (props) => {
                                                                             {" "}
                                                                         </ModalImage>
                                                                     </div>
-                                                                )}
+                                                                )} */}
+                                                                {/* <ImagesModal
+                                                                    data={{
+                                                                        images: e?.item?.images,
+                                                                        nameAlt: e?.item?.name
+                                                                    }}
+                                                                /> */}
+                                                                <ImagesItem data={e?.item} />
+
                                                             </h6>
 
                                                             <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left">
@@ -247,7 +259,7 @@ const PopupDetail = (props) => {
                                 <h2 className="font-medium p-2  border-b border-b-[#E7EAEE]  border-t z-10 border-t-[#E7EAEE] text-[13px] border-opacity-70">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
-                                <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-5 ">
+                                <div className="grid flex-col justify-between grid-cols-12 mt-5 ">
                                     <div className="col-span-9">
                                         <h3 className="text-[13px] p-1 font-medium">
                                             {props.dataLang?.purchase_note || "import_from_note"}

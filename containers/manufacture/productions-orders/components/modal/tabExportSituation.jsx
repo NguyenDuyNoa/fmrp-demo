@@ -1,6 +1,7 @@
 // tình hình xuất NVL
 import apiProductionsOrders from '@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders';
 import OnResetData from '@/components/UI/btnResetData/btnReset';
+import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 import { ContainerTotal } from '@/components/UI/common/layout';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
@@ -60,7 +61,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
             const newData = data?.boms?.map(e => {
                 return {
                     id: uddid(),
-                    image: '/nodata.png',
+                    image: e?.images ? e?.images : '/nodata.png',
                     name: e?.item_name,
                     itemVariation: e?.product_variation,
                     code: e?.item_code,
@@ -97,7 +98,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
         }
     }
 
-    const { isLoading, refetch } = useQuery({
+    const { isLoading, refetch, isRefetching } = useQuery({
         queryKey: ["apiExportSituation", isStateModal.dataDetail?.poi?.poi_id, limit, isTab],
         queryFn: () => fetchData(),
         enabled: isStateModal.dataDetail?.poi?.poi_id ? true : false,
@@ -255,13 +256,13 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                 />
                             )}
                         </div>
-                        <div>
+                        {/* <div>
                             <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                        </div>
+                        </div> */}
                     </div>
                 }
             </div>
-            <div
+            <Customscrollbar
                 className={`${isTab === 'chart' && "h-full"
                     ||
                     isTab === 'table' && "h-[65vh]"
@@ -332,7 +333,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                 {dataLang?.productions_orders_details_table_export_recall || 'productions_orders_details_table_export_recall'}
                             </ColumnTable>
                         </HeaderTable>
-                        {isLoading ? (
+                        {(isLoading || isRefetching) ? (
                             <Loading className="h-80" color="#0f4f9e" />
                         ) : isExportSituation.dataTable?.length > 0 ? (
                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
@@ -373,16 +374,16 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                         <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {e.unit}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={e?.quantityPlan > 0 ? "right" : 'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {e.quantityPlan > 0 ? formatNumber(e.quantityPlan) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={e?.quantityExport > 0 ? "right" : 'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {e.quantityExport > 0 ? formatNumber(e.quantityExport) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={e?.quantityRemaining > 0 ? "right" : 'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {e.quantityRemaining > 0 ? formatNumber(e.quantityRemaining) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={e?.quantityImport > 0 ? "right" : 'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
                                             {e.quantityImport > 0 ? formatNumber(e.quantityImport) : '-'}
                                         </RowItemTable>
                                     </RowTable>
@@ -399,7 +400,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                         }
                     </div>
                 }
-            </div>
+            </Customscrollbar>
             {
                 isTab === 'table' &&
                 <ContainerTotal className="!grid-cols-11">
