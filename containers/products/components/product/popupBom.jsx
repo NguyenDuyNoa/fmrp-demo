@@ -181,6 +181,7 @@ const Popup_Bom = React.memo((props) => {
             sDataCd(data.stages.map((e) => ({ label: e?.name, value: e?.id })));
 
             const { rResult } = await apiProducts.apiProductVariationOption(props.id)
+            console.log("rResult", rResult);
 
             const newData = rResult[0]?.product_variation?.includes("NONE")
                 ? [
@@ -205,6 +206,8 @@ const Popup_Bom = React.memo((props) => {
                 }
                 return e;
             });
+            console.log("convertArr", convertArr);
+
 
             sDataVariant(convertArr);
 
@@ -315,11 +318,14 @@ const Popup_Bom = React.memo((props) => {
                 dataSelectedVariant.push({ ...newValue[0] });
                 _HandleAddNew(newValue[0]?.value);
             } else {
+
                 const newData = {
-                    ...dataVariant[0],
+                    ...dataVariant.find((x) => x?.label == "Mặc định"),
                     label: "NONE",
                 };
+
                 dataSelectedVariant.push({ ...newData });
+
                 sTab(newData?.value);
                 if (dataSelectedVariant?.some(e => e?.child?.length == 0)) return
                 _HandleAddNew(newData?.value);
@@ -669,6 +675,7 @@ const Popup_Bom = React.memo((props) => {
             sTab(dataSelectedVariant[0]?.value);
         }
     }, [dataSelectedVariant]);
+    console.log("dataSelectedVariant", dataSelectedVariant);
 
 
     const _ServerSending = async () => {
