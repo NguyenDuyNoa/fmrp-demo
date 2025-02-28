@@ -9,6 +9,7 @@ import ModalImage from "react-modal-image";
 const TabItem = ({ dataTable, handShowItem, isFetching, dataLang }) => {
     const dataSeting = useSetingServer();
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
     return (
         <>
             <h1 className="text-[#11315B] font-normal 3xl:text-lg text-base">{dataLang?.materials_planning_list_products || 'materials_planning_list_products'}</h1>

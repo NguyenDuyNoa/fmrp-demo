@@ -2,6 +2,7 @@ import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { CookieCore } from "@/utils/lib/cookie";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query"
+import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 
 export const useAuththentication = (auth) => {
@@ -87,9 +88,10 @@ export const useLanguage = (lang) => {
 }
 
 export const useSetings = () => {
+    const router = useRouter()
     const dispatch = useDispatch()
     return useQuery({
-        queryKey: ["api_settings"],
+        queryKey: ["api_settings", router.pathname],
         queryFn: async () => {
             const res = await apiDashboard.apiSettings();
             dispatch({ type: "setings/server", payload: res?.settings });
@@ -106,3 +108,10 @@ export const useSetings = () => {
         ...optionsQuery
     })
 }
+
+
+// // Đảm bảo hook chạy ngay khi ứng dụng khởi động
+// export const SettingsInitializer = () => {
+//     useSettings();
+//     return null; // Không render UI, chỉ chạy hook
+// };
