@@ -14,7 +14,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Trash as IconDelete } from "iconsax-react";
 import DatePicker from "react-datepicker";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import ModalImage from "react-modal-image";
@@ -63,6 +63,13 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
 
     const form = useForm({ defaultValues: { ...initForm } });
 
+
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "arrayItem",
+    });
+
+
     /// lắng nghe thay đổi
     const findValue = form.watch();
 
@@ -70,10 +77,15 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
         return formatNumberConfig(+number, dataSeting);
     };
 
-    const removeItem = (id) => {
-        const updatedData = form.getValues("arrayItem").filter((item) => item.id !== id);
-        form.setValue("arrayItem", updatedData);
+    const removeItem = (e) => {
+        // const updatedData = findValue.arrayItem.filter((item) => item.id !== e?.id);
+        // console.log("updatedData", updatedData);
+        // form.setValue("arrayItem", updatedData, { shouldDirty: true, shouldTouch: true }); // Cập nhật lại state
+        // form.clearErrors("arrayItem");
+        remove(e)
+        form.clearErrors("arrayItem");
     };
+
 
     const fetchListItem = async () => {
         try {
@@ -118,6 +130,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
 
     useEffect(() => {
         if (open) {
+            form.clearErrors("arrayItem");
             form.setValue("arrayItem", []);
             fetchListItem();
         }
@@ -140,7 +153,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
         formData.append("type", value.type == "material" ? 1 : 2);
         formData.append("plan_id", dataTable?.listDataRight?.idCommand);
         formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG));
-        value.arrayItem.forEach((e, index) => {
+        value.arrayItem?.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
             formData.append(`items[${index}][quantity]`, typeof e?.quantity == 'number' ? e?.quantity : parseFloat(e?.quantity.replace(/,/g, '')));
             formData.append(`items[${index}][item_id]`, e?.item?.item_id);
@@ -354,11 +367,11 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                     </HeaderTablePopup>
                     {isState.onFetching ? (
                         <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
-                    ) : findValue.arrayItem && findValue.arrayItem?.length > 0 ? (
+                    ) : fields?.length > 0 ? (
                         <>
                             <Customscrollbar className="h-[300px] max-h-[300px] overflow-hidden">
                                 <div className="h-full divide-y divide-slate-200">
-                                    {findValue.arrayItem?.map((e, index) => (
+                                    {fields?.map((e, index) => (
                                         <div
                                             key={e?.id?.toString()}
                                             className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
@@ -409,6 +422,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                 <Controller
                                                     name={`arrayItem.${index}.quantity`}
                                                     control={form.control}
+                                                    // defaultValue={e.quantity}
                                                     rules={{
                                                         required: {
                                                             value: true,
@@ -468,7 +482,8 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                             </h6>
                                             <div className="flex items-center justify-center col-span-1">
                                                 <button
-                                                    onClick={(event) => removeItem(e.id)}
+                                                    // onClick={(event) => removeItem(e)}
+                                                    onClick={() => removeItem(index)}
                                                     type="button"
                                                     title="Xóa"
                                                     className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
