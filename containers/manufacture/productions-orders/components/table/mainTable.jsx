@@ -164,7 +164,7 @@ const MainTable = ({ dataLang }) => {
         }
     };
 
-    const { isLoading, refetch: refetchProductionsOrders } = useQuery({
+    const { isLoading, isFetching, isRefetching, refetch: refetchProductionsOrders } = useQuery({
         queryKey: ["api_production_orders",
             isState.page,
             isState.search,
@@ -226,7 +226,7 @@ const MainTable = ({ dataLang }) => {
         }
     }, [isState.page]);
 
-    const { isLoading: isLoadingRight, refetch } = useQuery({
+    const { isLoading: isLoadingRight, refetch, isRefetching: isRefetchingRight } = useQuery({
         queryKey: ['api_detail_production_orders', isState.idDetailProductionOrder],
         queryFn: () => fetchisStateRight(),
         enabled: !!isState.idDetailProductionOrder,
@@ -453,7 +453,7 @@ const MainTable = ({ dataLang }) => {
                             </form>
                         </div>
                         <Customscrollbar className="3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh] overflow-y-auto">
-                            {isLoading
+                            {(isLoading || isRefetching)
                                 ?
                                 <Loading />
                                 :
@@ -573,7 +573,7 @@ const MainTable = ({ dataLang }) => {
                         </Customscrollbar>
                     </div>
                     <div className="w-[78%] border border-[#d8dae5] ">
-                        {isLoading
+                        {(isLoading || isRefetchingRight)
                             ?
                             <Loading />
                             :
@@ -592,10 +592,11 @@ const MainTable = ({ dataLang }) => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <OnResetData sOnFetching={(e) => { }} onClick={() => {
-                                                refetchProductionsOrders();
-                                                refetch()
-                                            }} />
+                                            <OnResetData sOnFetching={(e) => { }}
+                                                onClick={() => {
+                                                    refetchProductionsOrders();
+                                                    refetch()
+                                                }} />
                                             <Zoom
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 1.08 }}

@@ -11,8 +11,8 @@ const TimelineChartStage = ({ data, dataLang }) => {
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     const getColor = (item) => {
-        if (item?.active) return "#10b981"; // Màu xanh khi active
-        if (item?.begin_production == "1") return "orange"; // Màu cam khi bắt đầu sản xuất
+        if (item?.active) return "#008000"; // Màu xanh khi active
+        if (item?.begin_production == "1") return "#FF8F0D"; // Màu cam khi bắt đầu sản xuất
         return "gray"; // Màu xám mặc định
     };
 

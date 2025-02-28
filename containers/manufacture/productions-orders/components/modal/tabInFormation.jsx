@@ -321,7 +321,7 @@ const RenderItem = ({
 //     const svgRef = useRef();
 
 //     const getColor = (item) => {
-//         if (item?.active) return "#10b981"; // Màu xanh khi active
+//         if (item?.active) return "#008000"; // Màu xanh khi active
 //         if (item?.begin_production == "1") return "orange"; // Màu cam khi bắt đầu sản xuất
 //         return "gray"; // Màu xám mặc định
 //     };
@@ -763,8 +763,8 @@ const ProcessBar = ({ data, checkBorder }) => {
                         <div key={jIndex} className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
                             <div className="flex min-h-[70px] gap-3">
                                 <div className={` ${(j?.active || j?.begin_production == 1) ? "" : ''} text-[10px] 
-                                ${j?.active ? ' text-[#10b981]' : j?.begin_production == 1 ? "text-orange-600 " : "text-black/70"} 
-                                font-normal text-right` }
+                                ${j?.active ? ' text-[#008000]' : j?.begin_production == 1 ? "text-[#FF8F0D] " : "text-black/70"} 
+                                font-medium text-right` }
                                 >
                                     <div className={`${(j?.active || j?.begin_production == 1) ? 'block' : 'hidden'}`}>
                                         {formatMoment((j?.active || j?.begin_production == 1) ? (j?.active ? j?.date_active : j?.date_production ? j?.date_production : new Date()) : new Date(), FORMAT_MOMENT.DATE_SLASH_LONG)}
@@ -779,7 +779,7 @@ const ProcessBar = ({ data, checkBorder }) => {
                                 <div className="flex">
                                     <div className={`mr-3 flex flex-col items-center`}>
                                         <div className="">
-                                            <div className={`flex h-5 w-5 ${j?.active ? "border-[#10b981] bg-[#10b981]" : j?.begin_production == 1 ? 'border-orange-600' : "border-gray-400"}  items-center justify-center rounded-full border `}>
+                                            <div className={`flex h-5 w-5  ${j?.active ? "border-[#008000] bg-[#008000]" : j?.begin_production == 1 ? 'border-[#FF8F0D]' : "border-gray-400"}  items-center justify-center rounded-full border `}>
                                                 {
                                                     data?.length - 1 != jIndex
                                                         ?
@@ -787,37 +787,37 @@ const ProcessBar = ({ data, checkBorder }) => {
                                                             {
                                                                 jIndex % 2 == 0 && <FaArrowDown
                                                                     size={9}
-                                                                    className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`}
+                                                                    className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-[#FF8F0D]' : "text-gray-400"}`}
                                                                 />
                                                             }
                                                             {
                                                                 jIndex % 2 != 0 && <AiOutlineFileText
                                                                     size={9}
-                                                                    className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`}
+                                                                    className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-[#FF8F0D]' : "text-gray-400"}`}
                                                                 />
                                                             }
                                                         </>
                                                         :
                                                         <FaCheck
                                                             size={8}
-                                                            className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-400"}`}
+                                                            className={`${j?.active ? 'text-white' : j?.begin_production == 1 ? 'text-[#FF8F0D]' : "text-gray-400"}`}
                                                         />
                                                 }
                                             </div>
                                         </div>
-                                        {checkLast && <div className={`h-full w-px ${j?.active ? 'bg-[#10b981]' : j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`} />}
+                                        {checkLast && <div className={`h-full w-px ${j?.active ? 'bg-[#008000]' : j?.begin_production == 1 ? 'bg-orange-400' : 'bg-gray-300'} relative`} />}
                                     </div>
                                     <div className="mt-0.5">
                                         <div className="flex items-center gap-2">
-                                            <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-black/60"}`}>
+                                            <p className={`-mt-1 text-sm font-semibold ${j?.active ? "text-[#008000]" : j?.begin_production == 1 ? 'text-[#FF8F0D]' : "text-black/60"}`}>
                                                 {j.stage_name}
                                             </p>
                                             {(+j?.type == 2 || +j?.type == 3)
                                                 ?
-                                                <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-500"} cursor-default hover:scale-110 transition-all duration-150 ease-linear`} />
+                                                <FaCheckCircle size={14} className={`${j?.active ? "text-[#008000]" : j?.begin_production == 1 ? 'text-[#FF8F0D]' : "text-gray-500"} cursor-default hover:scale-110 transition-all duration-150 ease-linear`} />
                                                 :
                                                 +j?.type == 0 &&
-                                                <FaCheckCircle className={`${j?.active ? "text-[#10b981]" : j?.begin_production == 1 ? 'text-orange-600' : "text-gray-500"} cursor-default hover:scale-110 transition-all duration-150 ease-linear`} />
+                                                <FaCheckCircle size={14} className={`${j?.active ? "text-[#008000]" : j?.begin_production == 1 ? 'text-[#FF8F0D]' : "text-gray-500"} cursor-default hover:scale-110 transition-all duration-150 ease-linear`} />
                                             }
                                         </div>
                                         <div className="flex items-start gap-1 py-2">
