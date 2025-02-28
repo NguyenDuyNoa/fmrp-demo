@@ -459,7 +459,7 @@ const MainTable = ({ dataLang }) => {
         };
         const { isSuccess, message } = await apiMaterialsPlanning.apiDeletePurchasesTransfer(type[isIdChild]);
         if (isSuccess) {
-            fetchDataTable(1);
+            fetchDataTable(1, 'delete');
             queryValue({ page: 1 });
             isShow("success", dataLang[message] || message);
         } else {
