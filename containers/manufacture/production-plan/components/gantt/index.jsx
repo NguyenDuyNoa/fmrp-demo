@@ -566,21 +566,47 @@ const BodyGantt = ({
                                                             // <label ref={heightItems} key={i.id} htmlFor={i.id} className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2 h-[50px]`}
                                                             >
                                                                 <div className="col-span-1 mx-auto">
-                                                                    <button
-                                                                        type="button"
-                                                                        id={i.id}
-                                                                        onClick={async () => {
-                                                                            if (i?.quantityRemaining == 0) {
-                                                                                showToast("error", "Vui lòng chọn đơn hàng có số lượng còn lại lớn hơn 0", 4000);
-                                                                                return;
-                                                                            }
-                                                                            await handleCheked(e.id, i.id);
-                                                                        }}
-                                                                        className={`min-w-4 w-4 max-w-4 relative min-h-4 max-h-4  h-4 rounded-full cursor-pointer outline-none focus:outline-none   flex justify-center items-center ${i.checked
-                                                                            ? "bg-blue-500 before:w-2 before:h-2 before:-translate-x-[5%] before:translate-y-[5%] before:rounded-full before:border-gray-300 before:border before:bg-white border border-gray-100"
-                                                                            : "bg-white border border-gray-300 "
-                                                                            }`}
-                                                                    ></button>
+                                                                    {
+                                                                        i?.quantityRemaining == 0
+                                                                            ?
+                                                                            <button
+                                                                                id={i.id}
+                                                                                onClick={async () => {
+                                                                                    showToast("error", "Mặt hàng này đã được lên kế hoạch sản xuất đủ", 4000)
+                                                                                }}
+                                                                                type="button"
+                                                                            >
+                                                                                <svg
+                                                                                    width="16"
+                                                                                    height="16"
+                                                                                    viewBox="0 0 16 16"
+                                                                                    fill="none"
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                >
+                                                                                    <circle cx="8" cy="8" r="8" fill="#4CAF50" />
+                                                                                    <path
+                                                                                        d="M4 8.5L7 11L12 5"
+                                                                                        stroke="white"
+                                                                                        strokeWidth="2"
+                                                                                        strokeLinecap="round"
+                                                                                        strokeLinejoin="round"
+                                                                                    />
+                                                                                </svg>
+                                                                            </button>
+                                                                            :
+                                                                            <button
+                                                                                type="button"
+                                                                                id={i.id}
+                                                                                onClick={async () => {
+
+                                                                                    await handleCheked(e.id, i.id);
+                                                                                }}
+                                                                                className={`min-w-4 w-4 max-w-4 relative min-h-4 max-h-4  h-4 rounded-full cursor-pointer outline-none focus:outline-none   flex justify-center items-center ${i.checked
+                                                                                    ? "bg-blue-500 before:w-2 before:h-2 before:-translate-x-[5%] before:translate-y-[5%] before:rounded-full before:border-gray-300 before:border before:bg-white border border-gray-100"
+                                                                                    : "bg-white border border-gray-300 "
+                                                                                    }`}
+                                                                            ></button>
+                                                                    }
                                                                 </div>
                                                                 <div className="flex items-center col-span-3 gap-1 3xl:gap-2">
                                                                     {i.images != null ? (
