@@ -590,7 +590,7 @@ const MainTable = ({ dataLang }) => {
                                             {
                                                 isRefetchingRight
                                                     ?
-                                                    <div className="animate-pulse w-[200px] h-[20px] bg-gray-200 rounded-2xl" />
+                                                    <div className="animate-pulse w-[200px] h-[20px] bg-gray-100 rounded-2xl" />
                                                     :
                                                     <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
                                                         {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
