@@ -835,7 +835,7 @@ const ProcessBar = ({ data, checkBorder }) => {
                                                                             width={24}
                                                                             height={24}
                                                                             alt={e?.reference_no}
-                                                                            className="object-cover rounded-md min-w-[28px] min-h-[28px] w-[28px] h-[28px] max-w-[28px] max-h-[28px]"
+                                                                            className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
                                                                         />
                                                                     </div>
                                                                     <div className="flex flex-col items-start">

@@ -455,13 +455,13 @@ const BodyGantt = ({
                                         }}
                                         data-month={e.title}
                                     >
-                                        <div className={`text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative bg-white transition-opacity duration-200  whitespace-nowrap
+                                        <div className={`text-[#202236] font-semibold text-sm px-1 py-1 h-5 relative bg-white transition-opacity duration-200   whitespace-nowrap 
                                             ${currentMonth != e.title ? "opacity-100" : "opacity-0"}`}
                                         >
                                             {currentMonth != e.title ? e.title : ''}
                                         </div>
 
-                                        <div className="flex items-end gap-2 divide-x">
+                                        <div className="flex items-end gap-2 divide-x ">
                                             {
                                                 e.days.map((i, iIndex) => {
                                                     const day = i?.date.split("/")

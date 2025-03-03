@@ -107,6 +107,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
             refetch()
             refetchMainTable()
             queryState({
+                open: r?.data?.status_manufacture == "2" ? false : true,
                 dataTableProducts: null,
                 dataTableBom: null,
                 arrayMoveBom: []
@@ -120,6 +121,8 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
         if (!tableRef?.current || !tableRefTotal?.current) return;
         const handleScroll = () => {
             if (tableRef.current && tableRefTotal.current) {
+                console.log("tableRefTotal", tableRefTotal);
+
                 tableRefTotal.current.scrollLeft = tableRef.current.scrollLeft;
             }
         };
@@ -128,7 +131,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
 
         table.addEventListener("scroll", handleScroll);
 
-        // Cleanup
         return () => {
             table.removeEventListener("scroll", handleScroll);
         };
@@ -244,6 +246,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
         }
     }
 
+
     const handleRemove = (type, row) => {
         if (type == 'bom' && row?.type_bom == "product_before") {
             isToast('error', "Đây là thành phẩm công đoạn bước trước, không thể xóa")
@@ -332,7 +335,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
     useEffect(() => {
         if (isState.open) {
             const s = getPriorityItem(data?.stage_semi_products || [], data?.stage_products || []);
-            console.log("s", s);
 
             if (s) {
                 handleSelectStep(s?.type, s?.object, 'auto');
@@ -342,14 +344,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
 
     useEffect(() => {
         if (isState.open) {
-            setState({ ...initialState, open: true })
+            queryState({ ...initialState, open: true })
             return
         }
-        setState({ ...initialState })
-
+        queryState({ ...initialState })
     }, [isState.open])
 
-    const checkItemFinalStage = isState.dataTableProducts?.data?.items?.some(e => e.final_stage == 1)
+
+    const checkItemFinalStage = isState.dataTableProducts?.data?.items?.some(e => e?.final_stage == 1)
 
     return (
         <PopupCustom
@@ -365,6 +367,10 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
 
             }
             onClickOpen={() => {
+                if (dataRight?.listDataRight?.statusManufacture == "2") {
+                    isToast('error', "Lệnh SX đã được hoàn thành")
+                    return
+                }
                 queryState({ open: true });
             }}
             lockScroll={true}
@@ -372,7 +378,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
             onClose={() => {
                 queryState({ open: false });
             }}
-            classNameBtn={`rounded-lg bg-blue-500`}
+            classNameBtn={`${dataRight?.listDataRight?.statusManufacture == "2" ? "bg-gray-400" : "bg-blue-500"} rounded-lg`}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
             <div className={`w-[85vw] xl:h-[80vh] h-[575px] overflow-hidden `}>
@@ -599,7 +605,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
                                                                 <td className="p-2 text-sm border  w-[120px]">
                                                                     <div className="flex flex-col gap-1">
                                                                         {
-                                                                            Array(row?.quantityEnterClient || 0).fill(0).map((_, sIndex) => {
+                                                                            [...Array(row?.quantityEnterClient || 0)].map((_, sIndex) => {
                                                                                 return (
                                                                                     <input
                                                                                         key={sIndex}
@@ -647,7 +653,8 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
                                                                 <td className="p-2 text-sm border  w-[120px]">
                                                                     <div className="flex flex-col gap-1">
                                                                         {
-                                                                            Array(row?.quantityError || 0).fill(0).map((_, sIndex) => {
+
+                                                                            [...Array(row?.quantityError || 0)].map((_, sIndex) => {
                                                                                 return (
                                                                                     <input
                                                                                         key={sIndex}

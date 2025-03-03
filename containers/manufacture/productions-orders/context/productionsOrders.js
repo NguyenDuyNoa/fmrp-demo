@@ -8,6 +8,7 @@ const initialState = {
     listDataLeft: [],
     listDataRight: {
         title: "",
+        statusManufacture: null,
         dataPPItems: [],
         dataSemiItems: [],
     },

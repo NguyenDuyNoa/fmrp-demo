@@ -154,6 +154,7 @@ const MainTable = ({ dataLang }) => {
                     listDataRight: {
                         ...isState.listDataRight,
                         title: null,
+                        statusManufacture: null,
                         dataPPItems: [],
                         dataSemiItems: [],
                     },
@@ -164,6 +165,7 @@ const MainTable = ({ dataLang }) => {
             throw new Error(error);
         }
     };
+
 
     const { isLoading, isFetching, isRefetching, refetch: refetchProductionsOrders } = useQuery({
         queryKey: ["api_production_orders",
@@ -210,6 +212,7 @@ const MainTable = ({ dataLang }) => {
                     listDataRight: {
                         ...isState.listDataRight,
                         title: null,
+                        statusManufacture: null,
                         dataPPItems: [],
                         dataSemiItems: [],
                     },
@@ -245,6 +248,7 @@ const MainTable = ({ dataLang }) => {
                 listDataRight: {
                     title: data?.productionOrder?.reference_no,
                     idCommand: data?.productionOrder?.id,
+                    statusManufacture: data?.productionOrder?.status_manufacture,
                     dataPPItems: data?.listPOItems?.map((e) => {
                         return {
                             ...e,
@@ -575,106 +579,116 @@ const MainTable = ({ dataLang }) => {
                         </Customscrollbar>
                     </div>
                     <div className="w-[78%] border border-[#d8dae5] ">
-                        {(isLoading || isRefetchingRight)
+                        {
+                            (!isLoading) && (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0) && (
+                                <div className="flex items-center justify-between px-4 py-1 border-b">
+                                    <div className="">
+                                        <h1 className="text-[#52575E] font-normal text-xs capitalize">
+                                            {dataLang?.productions_orders || "productions_orders"}
+                                        </h1>
+                                        <div className="flex items-center gap-2">
+                                            {
+                                                isRefetchingRight
+                                                    ?
+                                                    <div className="animate-pulse w-[200px] h-[20px] bg-gray-200 rounded-2xl" />
+                                                    :
+                                                    <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
+                                                        {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
+                                                    </h1>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <OnResetData sOnFetching={(e) => { }}
+                                            onClick={() => {
+                                                refetchProductionsOrders();
+                                                refetch()
+                                            }} />
+                                        <Zoom
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 1.08 }}
+                                            className="w-fit"
+                                        >
+                                            <PopupConfimStage
+                                                dataLang={dataLang}
+                                                dataRight={isState}
+                                                refetch={() => {
+                                                    refetchProductionsOrders();
+                                                    refetch()
+                                                }} />
+                                        </Zoom>
+
+                                        {/* <Zoom
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 1.08 }}
+                                        className="w-fit"
+                                    >
+                                        <PopupRecallRawMaterials
+                                            dataLang={dataLang}
+                                            dataRight={isState}
+                                            refetch={() => {
+                                                refetchProductionsOrders();
+                                                refetch()
+                                            }}
+                                        />
+                                    </Zoom> */}
+                                        <Zoom
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 1.08 }}
+                                            className="w-fit"
+                                        >
+                                            <button
+                                                className="bg-red-100 rounded-lg outline-none focus:outline-none"
+                                                onClick={() => {
+                                                    handleQueryId({ status: true, id: isState.idDetailProductionOrder });
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-2 px-3 py-2 ">
+                                                    <RiDeleteBin5Line className="text-base text-red-600" />
+                                                    <h3 className="text-xs font-medium text-red-600 3xl:text-base">
+                                                        {dataLang?.materials_planning_delete || "materials_planning_delete"}
+                                                    </h3>
+                                                </div>
+                                            </button>
+                                        </Zoom>
+                                    </div>
+                                    {/* <button
+                        className="bg-red-100 rounded-lg outline-none focus:outline-none"
+                        onClick={() => {
+                            if (+isState?.countAll == 0) {
+                                return isShow(
+                                    "error",
+                                    dataLang?.materials_planning_please_add || "materials_planning_please_add"
+                                );
+                            }
+                            if (!isState.listDataRight?.title) {
+                                return isShow(
+                                    "error",
+                                    dataLang?.productions_orders_please_select ||
+                                        "productions_orders_please_select"
+                                );
+                            }
+                            queryState({ page: 1 });
+                            handleQueryId({ status: true, id: isState.listDataRight?.idCommand });
+                        }}
+                    >
+                        <div className="flex items-center gap-2 px-3 py-2 ">
+                            <RiDeleteBin5Line className="text-base text-red-600" />
+                            <h3 className="text-xs font-medium text-red-600 3xl:text-base">
+                                {dataLang?.materials_planning_delete || "materials_planning_delete"}
+                            </h3>
+                        </div>
+                    </button> */}
+                                </div>
+                            )
+                        }
+                        {(isLoading || (isRefetchingRight))
                             ?
                             <Loading />
                             :
                             (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0)
                                 ?
                                 <>
-                                    <div className="flex items-center justify-between px-4 py-1 border-b">
-                                        <div className="">
-                                            <h1 className="text-[#52575E] font-normal text-xs capitalize">
-                                                {dataLang?.productions_orders || "productions_orders"}
-                                            </h1>
-                                            <div className="flex items-center gap-2">
-                                                <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                                    {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
-                                                </h1>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <OnResetData sOnFetching={(e) => { }}
-                                                onClick={() => {
-                                                    refetchProductionsOrders();
-                                                    refetch()
-                                                }} />
-                                            <Zoom
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 1.08 }}
-                                                className="w-fit"
-                                            >
-                                                <PopupConfimStage
-                                                    dataLang={dataLang}
-                                                    dataRight={isState}
-                                                    refetch={() => {
-                                                        refetchProductionsOrders();
-                                                        refetch()
-                                                    }} />
-                                            </Zoom>
-
-                                            {/* <Zoom
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 1.08 }}
-                                                className="w-fit"
-                                            >
-                                                <PopupRecallRawMaterials
-                                                    dataLang={dataLang}
-                                                    dataRight={isState}
-                                                    refetch={() => {
-                                                        refetchProductionsOrders();
-                                                        refetch()
-                                                    }}
-                                                />
-                                            </Zoom> */}
-                                            <Zoom
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 1.08 }}
-                                                className="w-fit"
-                                            >
-                                                <button
-                                                    className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                                                    onClick={() => {
-                                                        handleQueryId({ status: true, id: isState.idDetailProductionOrder });
-                                                    }}
-                                                >
-                                                    <div className="flex items-center gap-2 px-3 py-2 ">
-                                                        <RiDeleteBin5Line className="text-base text-red-600" />
-                                                        <h3 className="text-xs font-medium text-red-600 3xl:text-base">
-                                                            {dataLang?.materials_planning_delete || "materials_planning_delete"}
-                                                        </h3>
-                                                    </div>
-                                                </button>
-                                            </Zoom>
-                                        </div>
-                                        {/* <button
-                                className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                                onClick={() => {
-                                    if (+isState?.countAll == 0) {
-                                        return isShow(
-                                            "error",
-                                            dataLang?.materials_planning_please_add || "materials_planning_please_add"
-                                        );
-                                    }
-                                    if (!isState.listDataRight?.title) {
-                                        return isShow(
-                                            "error",
-                                            dataLang?.productions_orders_please_select ||
-                                                "productions_orders_please_select"
-                                        );
-                                    }
-                                    queryState({ page: 1 });
-                                    handleQueryId({ status: true, id: isState.listDataRight?.idCommand });
-                                }}
-                            >
-                                <div className="flex items-center gap-2 px-3 py-2 ">
-                                    <RiDeleteBin5Line className="text-base text-red-600" />
-                                    <h3 className="text-xs font-medium text-red-600 3xl:text-base">
-                                        {dataLang?.materials_planning_delete || "materials_planning_delete"}
-                                    </h3>
-                                </div>
-                            </button> */}
-                                    </div>
                                     <div className="mx-4">
                                         <div className="my-6 border-b ">
                                             <div className="flex items-center gap-4 ">
