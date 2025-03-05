@@ -17,12 +17,22 @@ import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate"
 import { formatMoment } from "@/utils/helpers/formatMoment"
 
 
-
+// e74c3c đỏ nhạt
+// 3b82f6  xanh dương
+// 4CAF50  xanh lá
+// 6b7280   xám
+// 0: chưa thuc hien, 1 đang thic hien, 2 hoàn thành
+// const colorScale = d3
+//     .scaleOrdinal()
+//     .domain([])
+//     // .range(["#e74c3c", "#3b82f6", "#4CAF50", '#2563eb', '#6b7280'])
+//     .range([])
 const colorScale = d3
     .scaleOrdinal()
-    .domain(["0", "1", "2", '3', '5'])
-    .range(["#e74c3c", "#3b82f6", "#4CAF50", '#2563eb', '#1d4ed8'])
-// .range(["#2563eb", "#e74c3c", "#2ecc71"])
+    .domain(["2", "3"]) // Xác định rõ các giá trị có màu riêng
+    .range(["#4CAF50", "#e74c3c"]) // Xanh lá cho "2", đỏ cho "3"
+    .unknown("#3b82f6"); // Mặc định xanh dương cho các giá trị khác
+
 
 const GanttChart = ({
     handleCheked,
