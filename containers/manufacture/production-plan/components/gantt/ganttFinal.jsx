@@ -20,8 +20,9 @@ import { formatMoment } from "@/utils/helpers/formatMoment"
 
 const colorScale = d3
     .scaleOrdinal()
-    .domain(["in_progress", "delayed", "completed"])
-    .range(["#2563eb", "#e74c3c", "#2ecc71"])
+    .domain(["0", "1", "2", '3', '5'])
+    .range(["#e74c3c", "#3b82f6", "#4CAF50", '#2563eb', '#1d4ed8'])
+// .range(["#2563eb", "#e74c3c", "#2ecc71"])
 
 const GanttChart = ({
     handleCheked,
@@ -474,27 +475,19 @@ const GanttChart = ({
                                             }}
                                             onMouseEnter={(e) => {
                                                 const rect = e.currentTarget.querySelector("rect");
-                                                const tooltip = e.currentTarget.querySelector(".tooltip-box");
                                                 if (rect) {
-                                                    rect.style.fill = d3.color(colorScale(item.status)).brighter(1);
+                                                    rect.style.fill = d3.color(colorScale(poi?.status_item ? poi?.status_item : '5')).brighter(1);
                                                     rect.setAttribute("stroke-width", "0.3");
                                                 }
-                                                if (tooltip) {
-                                                    tooltip.style.visibility = "visible";
-                                                    tooltip.style.opacity = "1";
-                                                }
+
                                             }}
                                             onMouseLeave={(e) => {
                                                 const rect = e.currentTarget.querySelector("rect");
-                                                const tooltip = e.currentTarget.querySelector(".tooltip-box");
                                                 if (rect) {
-                                                    rect.style.fill = colorScale(item.status);
+                                                    rect.style.fill = colorScale(poi?.status_item ? poi?.status_item : '5');
                                                     rect.setAttribute("stroke-width", "0");
                                                 }
-                                                if (tooltip) {
-                                                    tooltip.style.visibility = "hidden";
-                                                    tooltip.style.opacity = "0";
-                                                }
+
                                             }}
                                         >
                                             <rect
@@ -504,8 +497,8 @@ const GanttChart = ({
                                                 height={BAR_HEIGHT}
                                                 rx="4"
                                                 ry="4"
-                                                fill={colorScale(item.status)}
-                                                stroke={d3.color(colorScale(item.status)).darker(0.5)} // Mặc định stroke tối hơn một chút
+                                                fill={colorScale(poi?.status_item ? poi?.status_item : '5')}
+                                                stroke={d3.color(colorScale(poi?.status_item ? poi?.status_item : '5')).darker(0.5)} // Mặc định stroke tối hơn một chút
                                                 strokeWidth="0" // Ban đầu không có stroke
                                                 strokeLinecap="round"
                                                 style={{
@@ -534,11 +527,11 @@ const GanttChart = ({
                                                     >
                                                         <div className="relative">
                                                             <div
-                                                                className="absolute z-[21] px-2 rounded-3xl bg-orange-100 text-orange-400 text-[11px]"
+                                                                className={`absolute z-[21] px-2 rounded-3xl ${poi?.reference_no_detail ? "bg-orange-100 text-orange-400" : 'bg-[#e5e7eb] text-[#374151]'}  text-[11px]`}
                                                                 style={{
-                                                                    whiteSpace: "nowrap", // ✅ Luôn trên 1 dòng
-                                                                    maxWidth: "unset", // ✅ Không giới hạn độ rộng
-                                                                    minWidth: textWidth, // ✅ Giữ chiều rộng tối thiểu
+                                                                    whiteSpace: "nowrap", //  Luôn trên 1 dòng
+                                                                    maxWidth: "unset", //  Không giới hạn độ rộng
+                                                                    minWidth: textWidth, //  Giữ chiều rộng tối thiểu
                                                                 }}
                                                             >
                                                                 {labelText}
@@ -550,7 +543,7 @@ const GanttChart = ({
                                                                         bottom: "-9px",
                                                                         borderWidth: "6px",
                                                                         borderStyle: "solid",
-                                                                        borderColor: `#ffedd5 transparent transparent transparent`,
+                                                                        borderColor: `${poi?.reference_no_detail ? "#ffedd5" : '#e5e7eb'} transparent transparent transparent`,
                                                                     }}
                                                                 />
                                                             </div>
@@ -627,10 +620,15 @@ const GanttChart = ({
         const handleParentScroll = () => {
             if (isSyncingScroll) return;
             isSyncingScroll = true;
+            const parentScrollTop = ganttParentContainer.scrollTop;
+            const parentScrollHeight = ganttParentContainer.scrollHeight;
+            const parentClientHeight = ganttParentContainer.clientHeight;
 
-            // Khi `ganttParentContainer` cuộn dọc, `tableContainer` cũng cuộn dọc theo
-            tableContainer.scrollTop = ganttParentContainer.scrollTop;
+            // Kiểm tra nếu `ganttParentContainer` đã cuộn đến đáy
+            const isAtBottom = parentScrollTop + parentClientHeight >= parentScrollHeight - 1;
 
+            // Cuộn `tableContainer` theo `ganttParentContainer`
+            tableContainer.scrollTop = parentScrollTop;
             isSyncingScroll = false;
         };
 
@@ -794,7 +792,7 @@ const GanttChart = ({
                                         return (
                                             <React.Fragment key={order?.id}>
                                                 <div
-                                                    className="flex items-center my-1 px-1 w-full cursor-pointer group gap-2 bg-[#F3F4F6] rounded"
+                                                    className="flex items-center my-0.5 px-1 w-full cursor-pointer group gap-2 bg-[#F3F4F6] rounded"
                                                     onClick={() => toggleOrder(order?.id)}
                                                     style={{ height: `${ROW_HEIGHT}px` }}
                                                 >
