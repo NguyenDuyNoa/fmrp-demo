@@ -12,6 +12,7 @@ import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import { TagColorRed } from "@/components/UI/common/Tag/TagStatus";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable }) => {
     const showToast = useToast();
     const { getItem } = FnlocalStorage();
@@ -57,7 +58,7 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                     {dataLang?.production_plan_form_materials_task || 'production_plan_form_materials_task'}
                 </h3>
             </div>
-            <div className="3xl:h-[44vh] xxl:h-[22vh] 2xl:h-[30vh] xl:h-[24vh] lg:h-[24vh] h-[30vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
+            <Customscrollbar className="3xl:h-[44vh] xxl:h-[22vh] 2xl:h-[30vh] xl:h-[24vh] lg:h-[24vh] h-[30vh] overflow-y-auto overflow-hidden">
                 {isLoading ? (
                     <Loading className="h-80" color="#0f4f9e" />
                 ) : data.dataProduction?.length > 0 ? (
@@ -65,10 +66,10 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                         return (
                             <div key={i?.id} className="grid grid-cols-13 items-center border-b border-[#E7EAEE] ">
                                 <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs capitalize flex items-center">
-                                    <h3 className="text-[#64748B] text-center w-fit py-2 px-8 font-medium 3xl:text-sm text-xs capitalize">
+                                    <h3 className="text-[#64748B] text-center w-fit py-2 px-8 font-medium text-[13px] capitalize">
                                         {index + 1}
                                     </h3>
-                                    <h3 className="text-[#64748B] w-full py-2 px-1 font-medium 3xl:text-sm text-xs capitalize">
+                                    <h3 className="text-[#64748B] w-full py-2 px-1 font-medium text-[13px] capitalize">
                                         {i?.nameOrder}
                                     </h3>
                                 </h3>
@@ -156,7 +157,7 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                                         <TagColorRed name={'Biến thể không có BOM'} className={'w-fit truncate flex items-center'} />
                                     )}
                                 </h3>
-                                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize ">
+                                <h3 className="text-[#64748B] py-2 text-center font-medium text-[13px] capitalize ">
                                     {i.unitName}
                                 </h3>
                                 {/* <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize ">
@@ -215,12 +216,12 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                                         <TagColorRed name={'Không có CĐ'} className={'w-fit truncate flex items-center'} />
                                     )}
                                 </h3>
-                                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
+                                <h3 className="text-[#64748B] py-2 text-center font-medium text-[13px] capitalize">
                                     {formatNumber(i?.quantityWarehouse)}
                                 </h3>
                                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
                                     <InPutNumericFormat
-                                        className={`appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]
+                                        className={`appearance-none text-center text-[13px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]
                                         focus:outline-none border ${i?.quantityRemaining == null || i?.quantityRemaining == "" || i?.quantityRemaining == 0
                                                 ? "border-red-500"
                                                 : "border-[#D8DAE5]"
@@ -261,7 +262,7 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                                             isClearable
                                             clearButtonClassName="mr-6 hover:scale-150 transition-all duration-150 ease-linear"
                                             placeholderText={dataLang?.production_plan_form_materials_date_to_date || 'production_plan_form_materials_date_to_date'}
-                                            className={`py-[8px] px-4  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px]  text-[10px] placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
+                                            className={`py-[8px] px-4  text-[13px] placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
                                             ${i.date.startDate == null ? "border-red-500" : "border-[#E1E1E1]"}  focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] z-[999]`}
                                         />
 
@@ -283,7 +284,7 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                                             09:10:23
                                         </h3>
                                     </div> */}
-                                    <h2 className="text-[#141522] font-medium 3xl:text-sm text-xs">
+                                    <h2 className="text-[#141522] font-medium text-[13px]">
                                         {i?.deliveryDate}
                                     </h2>
                                 </h3>
@@ -313,7 +314,7 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                 ) : (
                     <NoData />
                 )}
-            </div>
+            </Customscrollbar>
         </>
     );
 };

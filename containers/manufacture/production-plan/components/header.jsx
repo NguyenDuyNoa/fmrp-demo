@@ -14,7 +14,7 @@ const Header = (props) => {
 
     const showToat = useToast();
 
-    const isCheck = props.data?.some((order) => order.listProducts.some((product) => product.checked));
+    const isCheck = props.checkedItems?.length > 0;
 
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);

@@ -1,5 +1,27 @@
 import configSelectFillter from "@/configs/configSelectFillter";
 import { SelectCore } from "@/utils/lib/Select";
+import { FaCheck } from "react-icons/fa";
+import { components } from "react-select";
+import { Customscrollbar } from "../common/Customscrollbar";
+
+
+export const CustomOption = (props) => {
+    return (
+        <components.Option {...props}>
+            <div className={`flex items-center justify-between w-full ${props.isDisabled ? "cursor-default" : "cursor-pointer"}`}>
+                <div>{props.children}</div>
+                {props.isSelected && <FaCheck className="w-2.5 h-2.5 ml-2 text-primary" />}
+            </div>
+        </components.Option>
+    )
+}
+export const CustomMenuList = (props) => {
+    return (
+        <Customscrollbar className='max-h-[300px]'>
+            {props.children}
+        </Customscrollbar>
+    )
+}
 
 const SelectComponent = ({
     options,
@@ -26,6 +48,25 @@ const SelectComponent = ({
     maxShowMuti,
     id
 }) => {
+    // const styles = {
+    //     menuList: (base) => ({
+    //         ...base,
+    //         height: "100px",
+
+    //         "::-webkit-scrollbar": {
+    //             width: "9px"
+    //         },
+    //         "::-webkit-scrollbar-track": {
+    //             background: "red"
+    //         },
+    //         "::-webkit-scrollbar-thumb": {
+    //             background: "#888"
+    //         },
+    //         "::-webkit-scrollbar-thumb:hover": {
+    //             background: "#555"
+    //         }
+    //     })
+    // }
     return (
         <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
             <SelectCore
@@ -40,7 +81,11 @@ const SelectComponent = ({
                 defaultValue={defaultValue}
                 className={className ? className : configSelectFillter.className}
                 isMulti={isMulti ? isMulti : false}
-                components={components}
+                components={{
+                    ...components,
+                    Option: CustomOption,
+                    MenuList: CustomMenuList
+                }}
                 maxShowMuti={maxShowMuti}
                 noOptionsMessage={noOptionsMessage ? noOptionsMessage : configSelectFillter.noOptionsMessage}
                 closeMenuOnSelect={closeMenuOnSelect}

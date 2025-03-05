@@ -1,12 +1,22 @@
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import { ArrowDown2 } from "iconsax-react";
 import dynamic from "next/dynamic";
-import React from "react";
+import React, { useEffect } from "react";
 import DatePicker from "react-datepicker";
 const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), { ssr: false });
 
 const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options, dataLang }) => {
+    const { setItem, removeItem, getItem } = FnlocalStorage();
+
+    useEffect(() => {
+        const dataFilter = getItem('planProductionStatusFilter') || '[]'
+        if (JSON.parse(dataFilter).length > 0) {
+            onChangeValue("planStatus")(JSON.parse(dataFilter))
+        }
+    }, [])
+
 
     return (
         <>
@@ -44,6 +54,12 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         formatOptionLabel={SelectOptionLever}
                         onChange={onChangeValue("idProductGroup")}
                         classNamePrefix={"productionSmoothing"}
+                        // styles={{
+                        //     menu: (provided) => ({
+                        //         ...provided,
+                        //         width: "170%",
+                        //     }),
+                        // }}
                         placeholder={dataLang?.production_plan_form_materials_finished_product_group || 'production_plan_form_materials_finished_product_group'}
                     />
                 </div>
@@ -133,8 +149,21 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                     <SelectComponent
                         isClearable={true}
                         value={isValue.planStatus}
-                        onChange={onChangeValue("planStatus")}
-                        options={[{ label: dataLang?.production_plan_form_materials_status_plan || 'production_plan_form_materials_status_plan', value: "", isDisabled: true }, ...isData?.planStatus]}
+                        onChange={(e) => {
+                            onChangeValue("planStatus")(e)
+                            setItem("planProductionStatusFilter", JSON.stringify(e));
+
+                        }}
+                        options={[
+                            {
+                                label: dataLang?.production_plan_form_materials_status_plan || 'production_plan_form_materials_status_plan',
+                                value: "", isDisabled: true
+                            }, ...isData?.planStatus
+                        ]}
+                        isMulti={true}
+                        maxShowMuti={1}
+                        components={{ MultiValue }}
+                        className={'[&>div>div]:flex-nowrap [&>div>div>div:nth-of-type(2)]:whitespace-nowrap z-20'}
                         classNamePrefix={"productionSmoothing"}
                         placeholder={dataLang?.production_plan_form_materials_status_plan || 'production_plan_form_materials_status_plan'}
                     />

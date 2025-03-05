@@ -305,6 +305,8 @@ const BodyGantt = ({
         dataLang
     }
 
+
+
     return (
         <React.Fragment>
             {data?.length > 0 ? (

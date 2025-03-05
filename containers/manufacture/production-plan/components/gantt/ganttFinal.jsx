@@ -1,0 +1,999 @@
+"use client"
+
+import React, { useContext, useEffect, useRef, useState } from "react"
+import * as d3 from "d3"
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar"
+import Zoom from "@/components/UI/zoomElement/zoomElement"
+import Image from "next/image"
+import { ProductionsOrdersContext } from "@/containers/manufacture/productions-orders/context/productionsOrders"
+import useSetingServer from "@/hooks/useConfigNumber"
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useToast from "@/hooks/useToast"
+import ModalImage from "react-modal-image"
+import NoData from "@/components/UI/noData/nodata"
+import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail"
+import Loading from "@/components/UI/loading/loading"
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate"
+import { formatMoment } from "@/utils/helpers/formatMoment"
+
+
+
+const colorScale = d3
+    .scaleOrdinal()
+    .domain(["in_progress", "delayed", "completed"])
+    .range(["#2563eb", "#e74c3c", "#2ecc71"])
+
+const GanttChart = ({
+    handleCheked,
+    handleSort,
+    data,
+    isSort,
+    timeLine,
+    handleToggle,
+    dataLang,
+    handleQueryId,
+    router,
+    isFetching,
+    handleTab,
+    arrIdChecked,
+    handleChekedAll,
+    page,
+    dataOrder,
+    checkedItems,
+    isData,
+    isValue
+}) => {
+    const ROW_HEIGHT = 30
+
+    const BAR_HEIGHT = 8
+
+    const orders = dataOrder
+
+    const showToast = useToast();
+
+    const dataSeting = useSetingServer()
+
+    const monthHeaderRef = useRef(null);
+
+    const ganttContainerRef = useRef(null)
+
+    const tableContainerRef = useRef(null)
+
+    const headerContainerRef = useRef(null)
+
+    const ganttParentContainerRef = useRef(null)
+
+    const [ganttWidth, setGanttWidth] = useState(0)
+
+    const [containerHeight, setContainerHeight] = useState(500) // Giá trị mặc định
+
+    const [expandedOrders, setExpandedOrders] = useState({})
+
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
+    const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
+
+    // const orders = [
+    //     {
+    //         id: "PO-223428",
+    //         status: "Đang thực hiện",
+    //         progress: "84%",
+    //         listProducts: [
+    //             {
+    //                 name: "Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo",
+    //                 status: "Hoàn thành",
+    //                 quantity: 800,
+    //                 processArr: [
+    //                     {
+    //                         items: [
+    //                             { date_start: "2023-09-25", date_end: "2023-09-27", status: "completed" },
+    //                             { date_start: "2023-09-28", date_end: "2023-09-30", status: "in_progress" },
+    //                             { date_start: "2023-09-28", date_end: "2023-09-30", status: "in_progress" },
+    //                         ],
+    //                         poi: {}
+    //                     },
+    //                     {
+    //                         items: [
+    //                             { date_start: "2023-09-25", date_end: "2023-09-27", status: "completed" },
+    //                             { date_start: "2023-09-28", date_end: "2023-09-30", status: "in_progress" },
+    //                             { date_start: "2023-09-28", date_end: "2023-09-30", status: "in_progress" },
+    //                         ],
+    //                         poi: {}
+    //                     },
+    //                 ],
+    //             },
+    //             {
+    //                 name: "Cổ tay",
+    //                 status: "Đã quá hạn",
+    //                 quantity: 600,
+    //                 processArr: [
+    //                     {
+    //                         items: [{ date_start: "2023-09-26", date_end: "2023-09-29", status: "delayed" }],
+    //                         poi: {}
+    //                     },
+    //                 ],
+    //             },
+    //         ],
+    //     },
+    //     {
+    //         id: "PO-2234281",
+    //         status: "Đang thực hiện",
+    //         progress: "84%",
+    //         listProducts: [
+    //             {
+    //                 name: "Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo",
+    //                 status: "Hoàn thành",
+    //                 quantity: 800,
+    //                 processArr: [
+    //                     {
+    //                         items: [
+    //                             { date_start: "2023-09-25", date_end: "2023-09-27", status: "completed" },
+    //                             { date_start: "2023-09-28", date_end: "2023-09-30", status: "in_progress" },
+    //                             { date_start: "2023-09-28", date_end: "2023-09-30", status: "in_progress" },
+    //                         ],
+    //                         poi: {}
+    //                     },
+    //                     {
+    //                         items: [
+    //                             { date_start: "2023-09-25", date_end: "2023-09-27", status: "completed" },
+    //                             { date_start: "2023-09-28", date_end: "2023-09-30", status: "in_progress" },
+    //                             { date_start: "2023-09-28", date_end: "2023-10-30", status: "in_progress" },
+    //                         ],
+    //                         poi: {}
+    //                     },
+    //                 ],
+    //             },
+    //             {
+    //                 name: "Cổ tay",
+    //                 status: "Đã quá hạn",
+    //                 quantity: 600,
+    //                 processArr: [
+    //                     {
+    //                         items: [{ date_start: "2023-09-26", date_end: "2023-09-29", status: "delayed" }],
+    //                         poi: {}
+    //                     },
+    //                 ],
+    //             },
+    //         ],
+    //     },
+    // ]
+
+    const allDates = orders?.flatMap((order) =>
+        order?.listProducts?.flatMap((product) =>
+            product?.processArr?.flatMap((g) => g?.items?.flatMap((item) => [new Date(item?.date_start), new Date(item?.date_end)])),
+        ),
+    ) || []
+
+    const minDate = d3.min(allDates)
+
+    const maxDate = d3.max(allDates)
+
+    const timeRange = [d3.timeDay.offset(minDate, -1), d3.timeDay.offset(maxDate, 1)]
+
+    const toggleOrder = (orderId) => {
+        setExpandedOrders((prev) => ({
+            ...prev,
+            [orderId]: !prev[orderId],
+        }))
+    }
+
+    const xScale = d3
+        .scaleTime()
+        .domain(timeRange)
+        .range([0, Math.max(ganttWidth - 40, 800)])
+
+
+    const calculateTotalHeight = () => {
+        return orders?.reduce((acc, order) => {
+            let height = ROW_HEIGHT;
+            if (expandedOrders[order.id]) {
+                height += order?.listProducts?.reduce((prodAcc, product) =>
+                    prodAcc + (product?.processArr?.length || 1) * ROW_HEIGHT, 0
+                );
+            }
+            return acc + height;
+        }, 0);
+    };
+
+    useEffect(() => {
+        if (orders?.length > 0) {
+            // Khi orders có dữ liệu, mở rộng tất cả
+            const initialExpandedState = orders?.reduce((acc, order) => {
+                acc[order.id] = true; // Mặc định mở rộng
+                return acc;
+            }, {});
+            setExpandedOrders(initialExpandedState);
+        }
+    }, [orders]); // Chạy lại khi orders thay đổi
+
+
+    useEffect(() => {
+        if (ganttParentContainerRef.current) {
+            const updateWidth = () => {
+                setGanttWidth(ganttParentContainerRef.current.clientWidth)
+            }
+            updateWidth()
+            window.addEventListener("resize", updateWidth)
+            return () => window.removeEventListener("resize", updateWidth)
+        }
+    }, [orders])
+
+    useEffect(() => {
+        const ganttParentContainer = ganttParentContainerRef.current;
+
+        const monthHeader = monthHeaderRef.current;
+
+        if (!ganttParentContainer || !monthHeader) return;
+
+        const monthElements = Array.from(monthHeader.children);
+
+        const handleScroll = () => {
+            const scrollX = ganttParentContainer.scrollLeft;
+
+            monthElements.forEach((monthEl) => {
+                const monthStart = parseFloat(monthEl.getAttribute("data-month-start"));
+                const monthWidth = parseFloat(monthEl.getAttribute("data-month-width"));
+
+                if (scrollX >= monthStart && scrollX < monthStart + monthWidth) {
+                    // Khi còn trong tháng, giữ nguyên vị trí
+                    monthEl.style.transform = `translateX(${scrollX - monthStart}px)`;
+                } else if (scrollX >= monthStart + monthWidth) {
+                    // Khi cuộn hết tháng, để tháng trượt đi
+                    monthEl.style.transform = `translateX(0px)`;
+                }
+            });
+        };
+
+        ganttParentContainer.addEventListener("scroll", handleScroll);
+
+        return () => {
+            ganttParentContainer.removeEventListener("scroll", handleScroll);
+        };
+    }, [orders]);
+
+
+
+    useEffect(() => {
+        if (ganttParentContainerRef.current) {
+            const updateHeight = () => {
+                const clientHeight = ganttParentContainerRef.current.clientHeight || 500;
+                const totalHeight = calculateTotalHeight();
+                setContainerHeight(totalHeight > clientHeight ? totalHeight : clientHeight);
+            };
+
+            updateHeight();
+            window.addEventListener("resize", updateHeight);
+            return () => window.removeEventListener("resize", updateHeight);
+        }
+    }, [orders, expandedOrders]);
+
+    const renderGanttHeader = () => {
+        const ticks = xScale.ticks(d3.timeDay);
+        const minWidthPerDay = 80;
+        const totalMinWidth = Math.max(ticks.length * minWidthPerDay, 800);
+
+        // Xác định các tháng duy nhất
+        const months = [];
+        let currentMonth = "";
+        ticks.forEach((tick, i) => {
+            const monthYear = d3.timeFormat("%m/%Y")(tick);
+            if (monthYear !== currentMonth) {
+                months.push({
+                    label: `Tháng ${d3.timeFormat("%m/%Y")(tick)}`,
+                    startIndex: i,
+                    xPosition: i * minWidthPerDay, // Vị trí ban đầu
+                });
+                currentMonth = monthYear;
+            }
+        });
+
+        return (
+            <div className="overflow-x-auto" style={{ minWidth: totalMinWidth }}>
+                <svg width={totalMinWidth} height={60} className="text-gray-600">
+                    <g transform="translate(0, 0)">
+                        {/* Tháng (Sẽ di chuyển dựa trên cuộn) */}
+                        <g ref={monthHeaderRef}>
+                            {months.map((month, i) => {
+                                const nextMonthIndex = i < months.length - 1 ? months[i + 1].startIndex : ticks.length;
+                                const monthWidth = (nextMonthIndex - month.startIndex) * minWidthPerDay;
+                                const x = month.startIndex * minWidthPerDay;
+
+                                return (
+                                    <g key={`month-${i}`} data-month-start={x} data-month-width={monthWidth}>
+                                        {/* ✅ Thêm nền chữ trước khi vẽ chữ */}
+                                        <rect
+                                            x={x} // Căn chỉnh theo vị trí chữ
+                                            y="6" // Điều chỉnh để nằm sau chữ
+                                            width={monthWidth} // Độ rộng theo tháng
+                                            height="20" // Độ cao phù hợp
+                                            fill="#ffffff" // ✅ Màu nền (có thể đổi)
+                                            rx="4" // ✅ Bo góc
+                                        />
+
+                                        <text
+                                            x={x + 10} // Đặt nhãn ở đầu tháng
+                                            y="25"
+                                            textAnchor="start" // Căn lề trái thay vì giữa
+                                            className="text-sm font-semibold"
+                                            fill={"black"}
+                                        >
+                                            {month.label}
+                                        </text>
+
+                                        {/* Đường kẻ phân cách tháng */}
+                                        {/* {i > 0 && (
+                                            <rect
+                                                x={x - 0.1}
+                                                y={0}
+                                                width={0.8} // Mỏng như strokeWidth
+                                                height={35}
+                                                fill="#e5e7eb"
+                                                shapeRendering="crispEdges"
+                                            />
+                                        )} */}
+                                    </g>
+                                );
+                            })}
+                        </g>
+
+                        {/* Ngày (Cuộn ngang bình thường) */}
+                        {ticks.map((tick, i) => {
+                            const positionX = i * minWidthPerDay;
+
+                            // Xác định nếu là ngày cuối tháng
+                            const nextDay = new Date(tick);
+
+                            nextDay.setDate(nextDay.getDate() + 1); // Lấy ngày tiếp theo
+
+                            const isEndOfMonth = nextDay.getDate() === 1; // Nếu ngày tiếp theo là ngày 1 => tick là cuối tháng
+                            return (
+                                <g key={i}>
+                                    {i > 0 && (
+                                        <rect
+                                            x={positionX - 0.1}
+                                            y={35}
+                                            width={0.8}
+                                            height={25}
+                                            fill="#e5e7eb"
+                                            shapeRendering="crispEdges"
+                                        />
+                                    )}
+                                    {isEndOfMonth && (
+                                        <circle
+                                            cx={positionX + minWidthPerDay / 2}
+                                            cy={45}
+                                            r={14} // Độ lớn của hình tròn
+                                            fill="#3b82f6" // Màu nền xanh
+                                        />
+                                    )}
+                                    <text
+                                        x={positionX + minWidthPerDay / 2}
+                                        y="50"
+                                        textAnchor="middle"
+                                        className="text-sm font-medium"
+                                        fill={isEndOfMonth ? "#fff" : "#555"}
+                                    >
+                                        {d3.timeFormat("%d")(tick)}
+                                    </text>
+                                </g>
+                            );
+                        })}
+                    </g>
+                </svg>
+            </div>
+        );
+    };
+
+
+    const renderFullHeightGridLines = () => {
+        const minWidthPerDay = 80;
+        const totalMinWidth = Math.max(ganttWidth, ganttContainerRef.current?.clientWidth || 800);
+
+        // ✅ Lấy chiều cao chính xác từ scrollHeight thay vì clientHeight
+        const totalHeight = ganttParentContainerRef.current?.scrollHeight || containerHeight;
+
+        let numLines = Math.ceil(totalMinWidth / minWidthPerDay);
+        let ticks = Array.from({ length: numLines }, (_, i) => i * minWidthPerDay);
+
+        return (
+            <svg
+                width={totalMinWidth}
+                height={totalHeight}
+                className="absolute top-0 left-0 z-10 pointer-events-none"
+            >
+                <g transform="translate(0, 0)">
+                    {ticks.map((x, i) => (
+                        <rect
+                            key={i}
+                            x={x - 0.1}
+                            y={0}
+                            width={1}
+                            height={totalHeight} // ✅ Dùng scrollHeight để tránh lộ khoảng trống
+                            fill="#e5e7eb"
+                            shapeRendering="crispEdges"
+                        />
+                    ))}
+                </g>
+            </svg>
+        );
+    };
+
+
+    const renderGanttBars = (product) => {
+        const totalHeight = product?.processArr?.length * ROW_HEIGHT
+
+        // Lấy danh sách các ngày trên trục thời gian
+        const ticks = xScale.ticks(d3.timeDay)
+
+        // Định nghĩa min-width cho từng ngày
+        const minWidthPerDay = 80 // Đảm bảo mỗi ngày có ít nhất 30px
+        const totalMinWidth = Math.max(ticks.length * minWidthPerDay, 800) // Tổng min-width tối thiểu
+
+        // Scale mới đảm bảo khoảng cách tối thiểu
+        const adjustedXScale = (date) => {
+            const index = ticks.findIndex((d) => d3.timeFormat("%Y-%m-%d")(d) === d3.timeFormat("%Y-%m-%d")(date))
+            return index !== -1 ? index * minWidthPerDay : xScale(date)
+        }
+
+        return (
+            <svg width={totalMinWidth} height="100%"
+
+
+                className="z-20" style={{ overflow: "visible" }}>
+                <g transform="translate(0, 0)">
+                    {Array.isArray(product?.processArr) && product?.processArr?.map((ganttGroup, groupIndex) => {
+                        const poi = product?.processArr[groupIndex]?.poi
+                        return (
+                            <g key={groupIndex} transform={`translate(0, ${groupIndex * ROW_HEIGHT})`}>
+                                {ganttGroup?.items?.map((item, itemIndex) => {
+                                    const startDate = new Date(item.date_start)
+                                    const endDate = new Date(item.date_end)
+                                    const startX = adjustedXScale(startDate)
+                                    // const endX = adjustedXScale(endDate);
+                                    const endX = adjustedXScale(d3.timeDay.offset(endDate, 1))
+                                    const barWidth = Math.max(endX - startX, minWidthPerDay)
+
+                                    return (
+                                        <g
+                                            key={itemIndex}
+                                            cursor={'pointer'}
+                                            onClick={() => {
+                                                if (poi?.reference_no_detail) {
+                                                    queryState({
+                                                        openModal: true,
+                                                        dataModal: {
+                                                            ...poi,
+                                                            id: poi?.poi_id
+                                                        }
+                                                    });
+                                                    return
+                                                }
+                                                showToast('error', 'Chưa có lệnh sản xuất')
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                const rect = e.currentTarget.querySelector("rect");
+                                                if (rect) {
+                                                    rect.style.fill = d3.color(colorScale(item.status)).brighter(1);
+                                                    rect.setAttribute("stroke-width", "0.3");
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                const rect = e.currentTarget.querySelector("rect");
+                                                if (rect) {
+                                                    rect.style.fill = colorScale(item.status);
+                                                    rect.setAttribute("stroke-width", "0");
+                                                }
+                                            }}
+                                        >
+                                            <rect
+                                                x={startX}
+                                                y={(ROW_HEIGHT - BAR_HEIGHT) / 2}
+                                                width={barWidth}
+                                                height={BAR_HEIGHT}
+                                                rx="4"
+                                                ry="4"
+                                                fill={colorScale(item.status)}
+                                                stroke={d3.color(colorScale(item.status)).darker(0.5)} // Mặc định stroke tối hơn một chút
+                                                strokeWidth="0" // Ban đầu không có stroke
+                                                strokeLinecap="round"
+                                                style={{
+                                                    transition: "fill 0.3s ease-in-out, transform 0.2s ease-in-out", // Làm fill mượt mà
+                                                    transformOrigin: "center",
+                                                }}
+                                            >
+                                                <title>{`${product?.name}: ${formatMoment(item?.date_start, FORMAT_MOMENT.DATE_SLASH_LONG)} - ${formatMoment(item?.date_end, FORMAT_MOMENT.DATE_SLASH_LONG)}`}</title>
+                                            </rect>
+
+                                            {(() => {
+                                                const labelText = poi?.reference_no_detail || "Chưa có LSX";
+                                                // Đo độ rộng text để căn chỉnh tooltip
+                                                const canvas = document.createElement("canvas");
+                                                const context = canvas.getContext("2d");
+                                                context.font = "11px Arial"; // Font giống Tailwind
+                                                const textWidth = context.measureText(labelText).width + 20; // Cộng padding px-2 (20px)
+
+                                                return (
+                                                    <foreignObject
+                                                        x={endX - textWidth / 2 - 2} // Căn giữa tooltip với cuối thanh Gantt
+                                                        y={(ROW_HEIGHT - BAR_HEIGHT) / 2 - 19.5} // Nửa trên, nửa dưới thanh Gantt
+                                                        width={textWidth} // Tự mở rộng theo nội dung
+                                                        height={50}
+                                                        overflow="visible"
+                                                    >
+                                                        <div className="relative">
+                                                            <div
+                                                                className="absolute z-[21] px-2 rounded-3xl bg-orange-100 text-orange-400 text-[11px]"
+                                                                style={{
+                                                                    whiteSpace: "nowrap", // ✅ Luôn trên 1 dòng
+                                                                    maxWidth: "unset", // ✅ Không giới hạn độ rộng
+                                                                    minWidth: textWidth, // ✅ Giữ chiều rộng tối thiểu
+                                                                }}
+                                                            >
+                                                                {labelText}
+
+                                                                {/* Mũi tên chỉ vào thanh Gantt */}
+                                                                <div
+                                                                    className="absolute transform -translate-x-1/2 left-1/2"
+                                                                    style={{
+                                                                        bottom: "-9px",
+                                                                        borderWidth: "6px",
+                                                                        borderStyle: "solid",
+                                                                        borderColor: `#ffedd5 transparent transparent transparent`,
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </foreignObject>
+                                                );
+                                            })()}
+
+                                        </g>
+                                    )
+                                })}
+                            </g>
+                        )
+                    })}
+                </g>
+            </svg>
+        )
+    }
+
+    const totalHeight = calculateTotalHeight()
+    // Lấy danh sách các ngày từ xScale
+    const ticks = xScale.ticks(d3.timeDay)
+
+    // Xác định min-width cho từng ngày
+    const minWidthPerDay = 80 // Mỗi ngày có ít nhất 30px
+    const totalMinWidth = Math.max(ticks.length * minWidthPerDay, 800) // Tổng min-width tối thiểu
+
+    // Chọn giá trị lớn hơn giữa kích thước container và min-width
+    const adjustedGanttWidth = Math.max(ganttWidth, totalMinWidth)
+
+    useEffect(() => {
+        // Find all product name elements and their corresponding Gantt containers
+        const productRows = document.querySelectorAll("[data-product-row]")
+
+        productRows.forEach((row, index) => {
+            const productId = row.getAttribute("data-product-id")
+            const ganttContainer = document.querySelector(`[data-gantt-id="${productId}"]`)
+
+            if (row && ganttContainer) {
+                // Set the Gantt container height to match the product row height
+                ganttContainer.style.height = `${row.offsetHeight}px`
+            }
+        })
+    }, [expandedOrders]) // Re-run when orders are expanded/collapsed
+
+    const handleParentScroll = (e) => {
+        if (!ganttContainerRef.current || !headerContainerRef.current) return;
+
+        const scrollLeft = e.target.scrollLeft;
+
+        // Đồng bộ scrollLeft giữa các container
+        ganttContainerRef.current.scrollLeft = scrollLeft;
+        headerContainerRef.current.scrollLeft = scrollLeft;
+    };
+
+    useEffect(() => {
+        const tableContainer = tableContainerRef.current;
+        const ganttParentContainer = ganttParentContainerRef.current;
+
+        if (!tableContainer || !ganttParentContainer) return;
+
+        let isSyncingScroll = false;
+
+        const handleTableScroll = () => {
+            if (isSyncingScroll) return;
+            isSyncingScroll = true;
+
+            // Khi `tableContainer` cuộn dọc, `ganttParentContainer` cũng cuộn dọc theo
+            ganttParentContainer.scrollTop = tableContainer.scrollTop;
+
+            isSyncingScroll = false;
+        };
+
+        const handleParentScroll = () => {
+            if (isSyncingScroll) return;
+            isSyncingScroll = true;
+
+            // Khi `ganttParentContainer` cuộn dọc, `tableContainer` cũng cuộn dọc theo
+            tableContainer.scrollTop = ganttParentContainer.scrollTop;
+
+            isSyncingScroll = false;
+        };
+
+        tableContainer.addEventListener("scroll", handleTableScroll);
+        ganttParentContainer.addEventListener("scroll", handleParentScroll);
+
+        return () => {
+            tableContainer.removeEventListener("scroll", handleTableScroll);
+            ganttParentContainer.removeEventListener("scroll", handleParentScroll);
+        };
+    }, [orders]);
+
+    useEffect(() => {
+        const tableContainer = tableContainerRef.current;
+        const ganttParentContainer = ganttParentContainerRef.current;
+        const ganttContainer = ganttContainerRef.current;
+
+        if (!tableContainer || !ganttParentContainer || !ganttContainer) return;
+
+        // Đợi 1 chút trước khi cuộn để đảm bảo nội dung đã render
+        setTimeout(() => {
+
+            // Cuộn ngang sang phải nhất
+            ganttContainer.scrollLeft = ganttContainer.scrollWidth;
+            ganttParentContainer.scrollLeft = ganttParentContainer.scrollWidth;
+        }, 100); // Delay một chút để đảm bảo nội dung đã render
+    }, [orders]);
+
+
+    const shareProps = {
+        refetchProductionsOrders: () => { },
+        dataLang
+    }
+    return (
+        <React.Fragment>
+            <div className="flex flex-col  3xl:h-[70vh] xxl:h-[62.5vh] 2xl:h-[64vh] xl:h-[65vh] lg:h-[61vh] h-[60vh] overflow-hidden border">
+                <div className="sticky top-0 z-10 flex border-b border-b-[#e5e7eb]">
+                    <div className="w-[40%]  border-r border-[#e5e7eb]">
+                        <div className="flex items-center gap-2 py-0.5 pl-2">
+                            {[
+                                { name: dataLang?.production_plan_gantt_order || 'production_plan_gantt_order', tab: "order" },
+                                { name: dataLang?.production_plan_gantt_internal || 'production_plan_gantt_internal', tab: "plan" },
+                            ].map((e) => (
+                                <Zoom className="w-fit">
+                                    <button
+                                        key={e.tab}
+                                        onClick={() => {
+                                            if (arrIdChecked?.length > 0) {
+                                                handleQueryId({ status: true, initialKey: e.tab })
+                                            } else {
+                                                handleTab(e.tab)
+                                            }
+                                            queryState({ openModal: false, });
+                                        }}
+                                        type="button"
+                                        className={`${router == e.tab ? "bg-sky-200 text-sky-600" : "bg-sky-50 text-sky-500"
+                                            }  hover:bg-sky-200 hover:text-sky-600 font-semibold text-[11px] text-sky-400 px-2 py-[5px] rounded-xl transition-all duration-150 ease-linear`}
+                                    >
+                                        {e.name}
+                                    </button>
+                                </Zoom>
+                            ))}
+                        </div>
+                        {orders?.length > 0 && (
+                            <div className="flex items-center gap-2 px-1">
+                                <div className="w-[30%] flex items-center gap-1">
+                                    <div className="flex items-center gap-1">
+                                        <div className="mr-1">
+                                            <label
+                                                className="relative flex items-center  cursor-pointer rounded-[4px] "
+                                                htmlFor={"checkbox"}
+                                            >
+                                                <input
+                                                    id="checkbox"
+                                                    type="checkbox"
+                                                    checked={checkedItems?.length === orders?.flatMap(order => order?.listProducts)?.length}
+                                                    className="peer relative h-[15px] w-[15px] cursor-pointer appearance-none rounded-[4px] border border-blue-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
+                                                    onChange={() => {
+                                                        handleChekedAll();
+                                                    }}
+                                                />
+                                                <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="w-3 h-3"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                        stroke="currentColor"
+                                                        stroke-width="1"
+                                                    >
+                                                        <path
+                                                            fill-rule="evenodd"
+                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                            clip-rule="evenodd"
+                                                        ></path>
+                                                    </svg>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        <div onClick={() => handleSort()} className="flex flex-col gap-1 cursor-pointer ">
+                                            <Image
+                                                alt={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
+                                                width={7}
+                                                height={4}
+                                                src={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
+                                                className={`${isSort ? "" : "rotate-180"} object-cover hover:scale-110 transition-all ease-linear duration-200`}
+                                            />
+                                            <Image
+                                                alt={isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
+                                                width={7}
+                                                height={4}
+                                                src={isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
+                                                className={`${!isSort ? "rotate-180" : ""} object-cover hover:scale-110 transition-all ease-linear duration-200`}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                        {dataLang?.production_plan_gantt_table_order || 'production_plan_gantt_table_order'}
+                                    </div>
+                                </div>
+                                <div className="w-[70%] grid grid-cols-8 items-center">
+                                    <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                        {dataLang?.production_plan_gantt_table_status || 'production_plan_gantt_table_status'}
+                                    </div>
+                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                        {dataLang?.production_plan_gantt_table_quantity || 'production_plan_gantt_table_quantity'}
+                                    </div>
+                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                        {dataLang?.production_plan_gantt_table_quantity_plan || 'production_plan_gantt_table_quantity_plan'}
+                                    </div>
+                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                        {dataLang?.production_plan_gantt_table_quantity_remaining || 'production_plan_gantt_table_quantity_remaining'}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div ref={headerContainerRef} className="w-[60%] overflow-x-hidden">
+                        {orders?.length > 0 && (renderGanttHeader())}
+                    </div>
+                </div>
+                {
+                    isFetching
+                        ?
+                        <Loading className="3xl:h-[70vh] xxl:h-[62.5vh] 2xl:h-[64vh] xl:h-[65vh] lg:h-[61vh] h-[60vh]" />
+                        :
+                        orders?.length > 0
+                            ?
+                            <div className="flex h-full overflow-hidden">
+                                <Customscrollbar
+                                    ref={tableContainerRef}
+                                    hideScrollbar={true}
+                                    onFocus={(e) => e.preventDefault()}
+                                    className="w-[40%] h-full overflow-auto border-r border-[#e5e7eb]"
+                                >
+                                    {/* <div ref={tableContainerRef} className="w-[40%] h-full overflow-auto border-r border-[#e5e7eb]"> */}
+                                    {orders.map((order) => {
+                                        const outDate = ["0"].includes(order?.status); // Chưa sản xuất
+                                        const processing = ["1"].includes(order?.status); // Đang sản xuất
+                                        const sussces = ["2"].includes(order?.status); // Hoàn thành 
+                                        return (
+                                            <React.Fragment key={order?.id}>
+                                                <div
+                                                    className="flex items-center my-1 px-1 w-full cursor-pointer group gap-2 bg-[#F3F4F6] rounded"
+                                                    onClick={() => toggleOrder(order?.id)}
+                                                    style={{ height: `${ROW_HEIGHT}px` }}
+                                                >
+                                                    <div className="w-[30%] flex items-center justify-start gap-2 text-xs font-bold group">
+                                                        <div className="">
+                                                            <Image
+                                                                alt="sub"
+                                                                width={7}
+                                                                height={4}
+                                                                src={"/productionPlan/Shapedow.png"}
+                                                                className={`${expandedOrders[order?.id] ? "rotate-0 t" : "-rotate-90 "} object-cover duration-500 col-span-1 mx-auto  transition-all ease-in-out`}
+                                                            />
+                                                        </div>
+                                                        <h2 className={`text-[#52575E] ${(outDate && "group-hover:text-[#FF8F0D]") ||
+                                                            (processing && "group-hover:text-blue-500") ||
+                                                            (sussces && "group-hover:text-green-500")
+                                                            } line-clamp-1 3xl:text-sm  transition-all ease-in-out xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] font-semibold col-span-3`}
+                                                        >
+                                                            {order?.nameOrder}
+                                                        </h2>
+                                                    </div>
+
+                                                    <div className="flex items-center w-[70%] gap-1 pl-1.5">
+                                                        <h2
+                                                            className={`${(outDate && "text-[#FF8F0D]") ||
+                                                                (processing && "text-blue-500") ||
+                                                                (sussces && "text-green-500")
+                                                                }  3xl:text-[13px] whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] font-medium`}
+                                                        >
+                                                            {(outDate && "Chưa sản xuất") ||
+                                                                (processing && "Đang sản xuất") ||
+                                                                (sussces && "Hoàn thành")}
+                                                        </h2>
+                                                        <h3
+                                                            className={`${(outDate &&
+                                                                "text-[#FF8F0D] border-[#FF8F0D] bg-[#FFEEF0]") ||
+                                                                (processing && "text-blue-500 border-blue-500 bg-[#EBF5FF]") ||
+                                                                (sussces && "text-green-500 border-green-500 bg-[#EBFEF2]")
+                                                                } 3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal  py-0.5 px-2 rounded-lg border`}
+                                                        >
+                                                            {order?.process}
+                                                        </h3>
+                                                    </div>
+                                                    <div className="p-2"></div>
+                                                </div>
+
+                                                {expandedOrders[order?.id] &&
+                                                    order?.listProducts?.map((product, pIndex) => (
+                                                        <label
+                                                            key={pIndex}
+                                                            htmlFor={product?.id}
+                                                            className="flex items-center w-full gap-2 px-1 text-sm cursor-pointer"
+                                                            style={{ minHeight: `${product?.processArr?.length * ROW_HEIGHT}px` }}
+                                                            data-product-row
+                                                            data-product-id={`${order?.id}-${pIndex}`}
+                                                        >
+
+                                                            <div className="w-[30%] flex items-center  gap-2">
+                                                                <div className="flex items-center">
+                                                                    {
+                                                                        product?.quantityRemaining == 0
+                                                                            ?
+                                                                            <button
+                                                                                id={product?.id}
+                                                                                onClick={async () => {
+                                                                                    showToast("error", "Mặt hàng này đã được lên kế hoạch sản xuất đủ", 4000)
+                                                                                }}
+                                                                                type="button"
+                                                                            >
+                                                                                <svg
+                                                                                    width="16"
+                                                                                    height="16"
+                                                                                    viewBox="0 0 16 16"
+                                                                                    fill="none"
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                >
+                                                                                    <circle cx="8" cy="8" r="8" fill="#4CAF50" />
+                                                                                    <path
+                                                                                        d="M4 8.5L7 11L12 5"
+                                                                                        stroke="white"
+                                                                                        strokeWidth="2"
+                                                                                        strokeLinecap="round"
+                                                                                        strokeLinejoin="round"
+                                                                                    />
+                                                                                </svg>
+                                                                            </button>
+                                                                            :
+                                                                            <button
+                                                                                type="button"
+                                                                                id={product?.id}
+                                                                                onClick={async () => {
+
+                                                                                    await handleCheked(order, product);
+                                                                                }}
+                                                                                className={`min-w-4 w-4 max-w-4 relative min-h-4 max-h-4  h-4 rounded-full cursor-pointer outline-none focus:outline-none   flex justify-center items-center 
+                                                                ${checkedItems.some(item => item?.id === product?.id) ? "bg-blue-500 before:w-2 before:h-2 before:-translate-x-[5%] before:translate-y-[5%] before:rounded-full before:border-gray-300 before:border before:bg-white border border-gray-100"
+                                                                                        : "bg-white border border-gray-300 "
+                                                                                    }`}
+                                                                            ></button>
+                                                                    }
+                                                                </div>
+                                                                <div className="flex items-center gap-1">
+                                                                    {product?.images != null ? (
+                                                                        <ModalImage
+                                                                            small={product?.images}
+                                                                            large={product?.images}
+                                                                            width={36}
+                                                                            height={36}
+                                                                            alt={product?.name}
+                                                                            className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                                                        />
+                                                                    ) : (
+                                                                        <ModalImage
+                                                                            width={36}
+                                                                            height={36}
+                                                                            small="/nodata.png"
+                                                                            large="/nodata.png"
+                                                                            className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                                                        ></ModalImage>
+                                                                    )}
+                                                                    <div className="flex flex-col">
+                                                                        <h1 className="text-[#000000] line-clamp-2 font-semibold 3xl:text-xs  xxl:text-[11px] 2xl:text-[10px] xl:text-[9px] lg:text-[9px] text-[11px]">
+                                                                            {product?.name}
+                                                                        </h1>
+                                                                        <h1 className="text-[#9295A4] font-normal 3xl:text-[10px] xxl:text-[8px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px]">
+                                                                            {/* {product?.productVariation} */}
+                                                                            {/* {product?.desription} -  */}
+                                                                            {product?.productVariation}
+                                                                        </h1>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="w-[70%] grid grid-cols-8 items-center">
+                                                                <div className="col-span-2">
+                                                                    <h3 className={`${(product?.status_item_po == "0" && "text-[#FF8F0D]") ||
+                                                                        (product?.status_item_po == "1" && "text-blue-500") ||
+                                                                        (product?.status_item_po == "2" && "text-green-500")
+                                                                        } font-medium col-span-2 3xl:text-[13px] whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px]`}
+                                                                    >
+                                                                        {product?.status_item_po == "0" && "Chưa sản xuất"}
+                                                                        {product?.status_item_po == "1" && 'Đang sản xuất'}
+                                                                        {product?.status_item_po == "2" && 'Hoàn thành'}
+                                                                    </h3>
+                                                                </div>
+                                                                <h3 className="text-[#52575E]  col-span-2 text-center font-medium text-[13px]">
+                                                                    {product?.quantity > 0 ? formatNumber(product?.quantity) : "-"}
+                                                                </h3>
+                                                                <h3 className="text-blue-600  col-span-2 text-center font-medium text-[13px]">
+                                                                    {product?.quantityPlan > 0 ? formatNumber(product?.quantityPlan) : "-"}
+                                                                </h3>
+                                                                <h3 className="text-[#FF8F0D]  col-span-2 text-center  font-medium text-[13px] ">
+                                                                    {product?.quantityRemaining > 0 ? formatNumber(product?.quantityRemaining) : "-"}
+                                                                </h3>
+                                                            </div>
+                                                        </label>
+                                                    ))}
+                                            </React.Fragment>
+                                        )
+                                    })}
+                                </Customscrollbar>
+                                <div className="w-[60%] h-full overflow-hidden" >
+                                    {
+                                        (orders.some((order) => (order?.listProducts?.some((product) => product?.processArr?.length > 0)))) && !isFetching
+                                            ?
+                                            <Customscrollbar
+                                                onFocus={(e) => e.preventDefault()}
+                                                onScroll={handleParentScroll}
+                                                ref={ganttParentContainerRef}
+                                                className="relative h-full"
+                                            >
+                                                {renderFullHeightGridLines()}
+                                                <div style={{ width: adjustedGanttWidth }} ref={ganttContainerRef} className="relative w-full h-full">
+                                                    {orders.map((order, index) => (
+                                                        <React.Fragment key={order.id}>
+                                                            <div style={{ height: `${ROW_HEIGHT}px`, width: adjustedGanttWidth }} className="bg-white"></div>
+                                                            {expandedOrders[order?.id] && order?.listProducts?.map((product, pIndex) => {
+                                                                // const detail = product?.processArr[pIndex]?.poi
+
+                                                                return (
+                                                                    <div
+                                                                        key={pIndex}
+                                                                        style={{ minHeight: `${product?.processArr?.length * ROW_HEIGHT}px` }}
+                                                                        className="relative z-20"
+                                                                        data-gantt-id={`${order?.id}-${pIndex}`}
+
+                                                                    >
+
+                                                                        {renderGanttBars(product)}
+                                                                    </div>
+                                                                )
+                                                            })}
+                                                        </React.Fragment>
+                                                    ))}
+                                                </div>
+                                            </Customscrollbar>
+                                            :
+                                            <NoData />
+                                    }
+
+                                </div>
+                            </div>
+                            :
+                            <NoData />
+                }
+
+            </div>
+            <ModalDetail {...shareProps} />
+        </React.Fragment >
+    )
+}
+
+export default GanttChart
+
+

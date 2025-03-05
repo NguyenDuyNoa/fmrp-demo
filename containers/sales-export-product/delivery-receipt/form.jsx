@@ -1925,7 +1925,7 @@ const DeliveryReceiptForm = (props) => {
                                                                             e?.id,
                                                                             ce?.id
                                                                         )}
-                                                                        className="flex flex-col items-center justify-center p-2 text-red-500 transition-all ease-linear rounded-md  hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
+                                                                        className="flex flex-col items-center justify-center p-2 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
                                                                     >
                                                                         <IconDelete />
                                                                     </button>
@@ -1948,7 +1948,7 @@ const DeliveryReceiptForm = (props) => {
                                 <InPutNumericFormat
                                     value={generalDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "generalDiscount")}
-                                    className="w-20 px-2 py-1 font-medium text-center bg-transparent border-b-2 border-gray-300  focus:outline-none"
+                                    className="w-20 px-2 py-1 font-medium text-center bg-transparent border-b-2 border-gray-300 focus:outline-none"
                                     isAllowed={isAllowedDiscount}
                                 />
                             </div>

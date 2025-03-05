@@ -42,19 +42,17 @@ import { useProductsVariantByBranchSearch } from "@/hooks/common/useProductTypeP
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import FilterHeader from "./components/fillter/filterHeader";
 import { ProductionsOrdersProvider } from "../productions-orders/context/productionsOrders";
-import GanttChart from "./components/gantt/ganttFinal";
+import GanttChart from "./components/gantt/ganttTest";
 
 
 const initialData = {
     timeLine: [],
     listOrder: [],
     planStatus: [
-        { id: '-1', value: "-1", label: "Tất cả" },
-        // { id: uuid(), value: "outDate", label: "Đã quá hạn" },
-        { id: '0', value: "0", label: "Chưa thực hiện" },
-        { id: '1', value: "1", label: "Đang thực hiện" },
-        { id: '2', value: "2", label: "Hoàn thành" },
-        // 0: chưa thuc hien, 1 đang thic hien, 2 hoàn thành
+        { id: uuid(), value: "outDate", label: "Đã quá hạn" },
+        { id: uuid(), value: "processing", label: "Đang thực hiện" },
+        { id: uuid(), value: "sussces", label: "Hoàn thành" },
+        { id: uuid(), value: "unfulfilled", label: "Chưa thực hiện" },
     ],
     keySearchProducts: "",
     dataBackend: null
@@ -76,6 +74,8 @@ const ProductionPlan = (props) => {
     const router = useRouter();
 
     const statusExprired = useStatusExprired();
+
+    const [data, sData] = useState([]);
 
     const { paginate } = usePagination();
 
@@ -111,7 +111,6 @@ const ProductionPlan = (props) => {
         page: router.query?.page || 1,
         limit: limit,
         sort: isSort,
-        status: isValue?.planStatus?.map(e => e?.value),
         date_start: isValue.startDate ? formatMoment(isValue.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
         date_end: isValue.endDate ? formatMoment(isValue.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
         customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
@@ -124,11 +123,12 @@ const ProductionPlan = (props) => {
         const url = router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true";
         try {
             const { data } = await apiProductionPlan.apiListOrderPlan(url, { params: params });
+            console.log("data 12222", data);
 
             updateData({
+                dataBackend: data,
                 listOrder: data?.rResult?.map((i) => {
                     return {
-                        ...i,
                         id: i?.id,
                         nameOrder: i?.nameOrder,
                         status: i?.status,
@@ -137,7 +137,6 @@ const ProductionPlan = (props) => {
                         listProducts: i?.listProducts.map((s) => {
                             const check = arrIdChecked.includes(s?.id);
                             return {
-                                ...s,
                                 id: s?.id,
                                 name: s?.name,
                                 images: s?.images,
@@ -147,6 +146,17 @@ const ProductionPlan = (props) => {
                                 quantityRemaining: +s?.quantity_rest,
                                 quantityPlan: +s?.quantity_plan,
                                 actions: s?.actions,
+                                // processArr: s?.processArr?.items.map((j) => {
+                                //     return {
+                                //         ...j,
+                                //         id: uuid(),
+                                //         date: formatMoment(j?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
+                                //         active: j?.active,
+                                //         outDate: j?.outDate,
+                                //         poi_id: s?.poi_id,
+                                //         reference_no_detail: s?.reference_no_detail
+                                //     };
+                                // }),
                                 processArr: s?.processArr,
                                 unitName: s?.unit_name,
                                 checked: check,
@@ -193,52 +203,132 @@ const ProductionPlan = (props) => {
         }
     }, 500);
 
-    const [checkedItems, setCheckedItems] = useState([]);
-
-    const handleCheked = (order, product) => {
-
-        setCheckedItems(prev => {
-            const index = prev.findIndex(item => item?.id === product?.id);
-
-            if (index !== -1) {
-                // Nếu sản phẩm đã có trong danh sách, bỏ chọn (xoá khỏi danh sách)
-                return prev.filter(item => item?.id !== product?.id);
-            } else {
-                // Nếu chưa có, thêm nguyên phần tử vào danh sách
-                return [...prev, { ...product, idParent: order?.id, nameOrder: order?.nameOrder }];
-            }
+    const sortArrayByDay = (arr, timeLine) => {
+        return timeLine.flatMap((month) => {
+            return month.days.map((timelineDay) => {
+                const matchingDay = arr.find((day) => day.date === timelineDay.date);
+                return matchingDay ? matchingDay : { ...timelineDay, active: false, outDate: false };
+            });
         });
+    };
+
+
+    const updateListProducts = (order, timeLine) => {
+        const newDb = order.listProducts.map((product) => {
+            const newArrDays = sortArrayByDay(product.processArr, timeLine);
+            const check = arrIdChecked.includes(product.id);
+            return {
+                ...product,
+                checked: check || product.checked,
+                processArr: newArrDays,
+            };
+        });
+        return newDb;
+    };
+
+    const updateProcessDefault = (order, timeLine) => {
+        const processDefaultUpdate = sortArrayByDay(order.processDefault, timeLine);
+
+        return processDefaultUpdate;
+    };
+
+    const updateListOrder = useMemo(() => {
+        return (listOrder, timeLine) => {
+            return listOrder?.map((order) => {
+                const updatedListProducts = updateListProducts(order, timeLine);
+                const processDefaultUpdate = updateProcessDefault(order, timeLine);
+
+                return {
+                    ...order,
+                    show: updatedListProducts?.length > 0,
+                    processDefault: processDefaultUpdate || [],
+                    listProducts: updatedListProducts,
+                };
+            });
+        };
+    }, []);
+
+    const handleShowSub = useMemo(() => {
+        return (id) => {
+            const updatedData = [...data];
+            updatedData.forEach((order) => {
+                if (order.id === id) {
+                    order.show = !order.show;
+                }
+            });
+            sData(updatedData);
+        };
+    }, [data]);
+
+    const handleCheked = (idParent, idChild) => {
+        const updatedData = data.map((e) => {
+            if (e.id === idParent) {
+                const newListProducts = e.listProducts.map((i) => {
+                    if (i.id === idChild) {
+                        const checkedState = !i.checked;
+
+                        const updatedArrId = checkedState
+                            ? [...arrIdChecked, idChild]
+                            : arrIdChecked.filter((s) => s != idChild);
+
+                        sArrIdChecked(updatedArrId);
+                        return { ...i, checked: checkedState };
+                    }
+                    return i;
+                });
+                return { ...e, listProducts: newListProducts };
+            }
+            return e;
+        });
+        sData([...updatedData]);
     };
 
     const handleChekedAll = () => {
-        setCheckedItems(prev => {
-            if (prev.length === isData.listOrder?.flatMap(order => order?.listProducts)?.length) {
-                // Nếu tất cả đã được chọn, thì bỏ chọn hết
-                return [];
-            } else {
-                // Nếu chưa chọn hết, chọn tất cả và push nguyên phần tử
-                return isData.listOrder?.flatMap(order =>
-                    order.listProducts?.map(product => ({
-                        ...product,
-                    }))
-                );
-            }
+        const updatedData = [...data];
+
+        let updatedArrId = [...arrIdChecked];
+
+        updatedData.forEach((e) => {
+            e.listProducts.forEach((i) => {
+                if (i?.quantityRemaining > 0) {
+                    const checkedState = !i.checked;
+                    if (checkedState) {
+                        updatedArrId = [...updatedArrId, i.id];
+                    } else {
+                        updatedArrId = updatedArrId.filter((s) => s != i.id);
+                    }
+                    i.checked = checkedState;
+                }
+            });
         });
+        sArrIdChecked(updatedArrId);
+        sData(updatedData);
     };
 
     const handleSort = () => sIsSort(isSort == "reference_no" ? "-reference_no" : "reference_no");
+
+    useEffect(() => {
+        const istOrders = updateListOrder(isData.listOrder, isData.timeLine);
+        sData(istOrders);
+    }, [isData.listOrder, isData.timeLine]);
 
     useEffect(() => {
         removeItem("arrData");
     }, []);
 
     useEffect(() => {
-        setItem("arrData", JSON.stringify(checkedItems));
-        setItem("tab", router.query?.tab);
-    }, [checkedItems]);
+        const check = data?.some((e) => e.listProducts.some((i) => i.checked == true));
+        if (check) {
+            const converData = data.flatMap((e) => {
+                return e.listProducts.filter((i) => i.checked).map((i) => ({ ...i, idParent: e.id, nameOrder: e.nameOrder }));
+            });
+            setItem("arrData", JSON.stringify(converData));
+            setItem("tab", router.query?.tab);
+        }
+    }, [data]);
 
     const handleConfimTab = () => {
-        checkedItems?.length > 0 && setCheckedItems([]);
+        arrIdChecked?.length > 0 && sArrIdChecked([]);
         removeItem("arrData");
         handleTab(isKeyState);
         handleQueryId({ status: false });
@@ -252,7 +342,7 @@ const ProductionPlan = (props) => {
             client: listClient,
             listBr: listBranch,
         },
-        data: [],
+        data,
         isValue,
         isFetching: isLoading,
         options: listProduct,
@@ -261,7 +351,6 @@ const ProductionPlan = (props) => {
         handleTab,
         arrIdChecked,
         handleChekedAll,
-        checkedItems,
         router: router.query?.tab,
         page: router.query?.page,
     };
@@ -288,14 +377,15 @@ const ProductionPlan = (props) => {
                     /> */}
                     <GanttChart
                         {...shareProps}
+                        handleShowSub={handleShowSub}
                         handleSort={handleSort}
-                        data={[]}
+                        data={data}
                         timeLine={isData.timeLine}
                         isSort={isSort == "reference_no" ? false : true}
                         handleCheked={handleCheked}
                         dataOrder={isData.listOrder} />
                 </ProductionsOrdersProvider>
-                {isData.listOrder?.length > 0 && (
+                {data?.length > 0 && (
                     <ContainerPagination className="flex items-center space-x-5">
                         <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                         <Pagination
