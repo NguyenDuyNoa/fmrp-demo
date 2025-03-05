@@ -1,6 +1,6 @@
 import SimpleBar from 'simplebar-react';
-import React, { forwardRef, useEffect, useRef } from "react";
 import 'simplebar-react/dist/simplebar.min.css';
+import React, { forwardRef, useEffect, useRef } from "react";
 
 const SimpleBarCustom = forwardRef(({ children, ...props }, ref) => {
     const innerRef = useRef(null);
@@ -11,10 +11,13 @@ const SimpleBarCustom = forwardRef(({ children, ...props }, ref) => {
         }
     }, [innerRef, ref]);
 
+
+
     return (
         <SimpleBar
             {...props}
             id={props.id}
+            data-simplebar-force-visible
             tabIndex={-1}
 
             scrollableNodeProps={{

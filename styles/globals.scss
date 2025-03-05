@@ -32,6 +32,17 @@ body {
 // body::-webkit-scrollbar-thumb:hover {
 //     background: #93c5fd;
 // }
+/* Ngăn focus trên toàn bộ SimpleBar */
+.simplebar-scrollbar:focus,
+.simplebar-track:focus,
+.simplebar-content-wrapper:focus,
+.simplebar-content:focus,
+.simplebar-offset:focus,
+.simplebar-mask:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 @layer utilities {
     .hide-scrollbar .simplebar-track {
         display: none !important;
