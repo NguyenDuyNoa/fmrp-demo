@@ -419,7 +419,9 @@ const GanttChart = ({
     };
 
 
-    const renderGanttBars = (product) => {
+    const renderGanttBars = (order, product) => {
+
+
         const totalHeight = product?.processArr?.length * ROW_HEIGHT
 
         // Lấy danh sách các ngày trên trục thời gian
@@ -472,16 +474,26 @@ const GanttChart = ({
                                             }}
                                             onMouseEnter={(e) => {
                                                 const rect = e.currentTarget.querySelector("rect");
+                                                const tooltip = e.currentTarget.querySelector(".tooltip-box");
                                                 if (rect) {
                                                     rect.style.fill = d3.color(colorScale(item.status)).brighter(1);
                                                     rect.setAttribute("stroke-width", "0.3");
                                                 }
+                                                if (tooltip) {
+                                                    tooltip.style.visibility = "visible";
+                                                    tooltip.style.opacity = "1";
+                                                }
                                             }}
                                             onMouseLeave={(e) => {
                                                 const rect = e.currentTarget.querySelector("rect");
+                                                const tooltip = e.currentTarget.querySelector(".tooltip-box");
                                                 if (rect) {
                                                     rect.style.fill = colorScale(item.status);
                                                     rect.setAttribute("stroke-width", "0");
+                                                }
+                                                if (tooltip) {
+                                                    tooltip.style.visibility = "hidden";
+                                                    tooltip.style.opacity = "0";
                                                 }
                                             }}
                                         >
@@ -501,7 +513,7 @@ const GanttChart = ({
                                                     transformOrigin: "center",
                                                 }}
                                             >
-                                                <title>{`${product?.name}: ${formatMoment(item?.date_start, FORMAT_MOMENT.DATE_SLASH_LONG)} - ${formatMoment(item?.date_end, FORMAT_MOMENT.DATE_SLASH_LONG)}`}</title>
+                                                <title>{`${order?.nameOrder} - ${product?.name}: ${formatMoment(item?.date_start, FORMAT_MOMENT.DATE_SLASH_LONG)} - ${formatMoment(item?.date_end, FORMAT_MOMENT.DATE_SLASH_LONG)}`}</title>
                                             </rect>
 
                                             {(() => {
@@ -970,7 +982,7 @@ const GanttChart = ({
 
                                                                     >
 
-                                                                        {renderGanttBars(product)}
+                                                                        {renderGanttBars(order, product)}
                                                                     </div>
                                                                 )
                                                             })}
