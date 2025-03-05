@@ -14,7 +14,11 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
         const dataFilter = getItem('planProductionStatusFilter') || '[]'
         if (JSON.parse(dataFilter).length > 0) {
             onChangeValue("planStatus")(JSON.parse(dataFilter))
+            return
         }
+        const all = [{ id: '-1', value: "-1", label: "Tất cả" }]
+        onChangeValue("planStatus")(all)
+        setItem(JSON.stringify(all))
     }, [])
 
 
