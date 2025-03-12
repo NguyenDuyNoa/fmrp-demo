@@ -258,8 +258,8 @@ const PopupDetailThere = (props) => {
                                                             ) : (
                                                                 <div className="w-[50px] h-[60px] object-cover  mx-auto">
                                                                     <ModalImage
-                                                                        small="/nodata.png"
-                                                                        large="/nodata.png"
+                                                                        small="/icon/noimagelogo.png"
+                                                                        large="/icon/noimagelogo.png"
                                                                         className="object-contain w-full h-full p-1 rounded"
                                                                     >
                                                                         {" "}
@@ -829,8 +829,8 @@ const PopupDetailThere = (props) => {
                                                                 ) : (
                                                                     <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                                         <ModalImage
-                                                                            small="/nodata.png"
-                                                                            large="/nodata.png"
+                                                                            small="/icon/noimagelogo.png"
+                                                                            large="/icon/noimagelogo.png"
                                                                             className="object-contain w-full h-full p-1 rounded"
                                                                         >
                                                                             {" "}
@@ -1101,8 +1101,8 @@ const PopupDetailThere = (props) => {
                                                                 ) : (
                                                                     <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                                         <ModalImage
-                                                                            small="/nodata.png"
-                                                                            large="/nodata.png"
+                                                                            small="/icon/noimagelogo.png"
+                                                                            large="/icon/noimagelogo.png"
                                                                             className="object-contain w-full h-full p-1 rounded"
                                                                         >
                                                                             {" "}
@@ -1361,8 +1361,8 @@ const PopupDetailThere = (props) => {
                                                                 ) : (
                                                                     <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                                         <ModalImage
-                                                                            small="/nodata.png"
-                                                                            large="/nodata.png"
+                                                                            small="/icon/noimagelogo.png"
+                                                                            large="/icon/noimagelogo.png"
                                                                             className="object-contain w-full h-full p-1 rounded"
                                                                         >
                                                                             {" "}
@@ -1586,9 +1586,12 @@ const PopupDetailThere = (props) => {
                                         <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                             {props.dataLang?.price_quote_branch || "price_quote_branch"}:
                                         </h3>
-                                        <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[10px]  col-span-4 mr-2 px-2 max-w-[250px] w-fit max-h-[100px] text-center text-[#0F4F9E]  font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] ">
-                                            {data?.branch_name}
-                                        </h3>
+                                        <div className="col-span-4">
+                                            <TagBranch className="w-fit">
+                                                {data?.branch_name}
+                                            </TagBranch>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -1655,8 +1658,8 @@ const PopupDetailThere = (props) => {
                                                             ) : (
                                                                 <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                                     <ModalImage
-                                                                        small="/nodata.png"
-                                                                        large="/nodata.png"
+                                                                        small="/icon/noimagelogo.png"
+                                                                        large="/icon/noimagelogo.png"
                                                                         className="object-contain w-full h-full p-1 rounded"
                                                                     />
                                                                 </div>

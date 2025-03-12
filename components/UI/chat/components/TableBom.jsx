@@ -53,11 +53,11 @@ const TableBom = (props) => {
                                             {/* <td className="p-2 border sticky left-[200px] bg-white">
                                                                 <div className="flex items-center justify-center">
                                                                     <ModalImage
-                                                                        small={row?.images ?? "/nodata.png"}
-                                                                        large={row?.images ?? "/nodata.png"}
+                                                                        small={row?.images ?? "/icon/noimagelogo.png"}
+                                                                        large={row?.images ?? "/icon/noimagelogo.png"}
                                                                         width={36}
                                                                         height={36}
-                                                                        alt={row?.images ?? "/nodata.png"}
+                                                                        alt={row?.images ?? "/icon/noimagelogo.png"}
                                                                         className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
                                                                     />
                                                                 </div>
@@ -89,7 +89,7 @@ const TableBom = (props) => {
                         });
                         queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight - heightY } });
                     }}
-                    className="button text-[#0F4F9E] font-normal text-xs py-1.5 px-3 rounded-3xl bg-[#0F4F9E]/20 hover:bg-[#0F4F9E] hover:text-white hover:scale-105 transition-all duration-200 ease-linear"
+                    className="button text-[#0F4F9E] font-normal text-xs py-1.5 px-3 rounded-3xl bg-[#003DA0]/20 hover:bg-[#003DA0] hover:text-white hover:scale-105 transition-all duration-200 ease-linear"
                 >
                     Bổ sung vào BOM hiện tại
                 </button>
@@ -106,7 +106,7 @@ const TableBom = (props) => {
                         });
                         queryKeyIsState({ position: { x: window.innerWidth - widthX, y: window.innerHeight - heightY } });
                     }}
-                    className="button text-[#0F4F9E] font-normal text-xs py-1.5 px-3 rounded-3xl bg-[#0F4F9E]/20 hover:bg-[#0F4F9E] hover:text-white hover:scale-105 transition-all duration-200 ease-linear"
+                    className="button text-[#0F4F9E] font-normal text-xs py-1.5 px-3 rounded-3xl bg-[#003DA0]/20 hover:bg-[#003DA0] hover:text-white hover:scale-105 transition-all duration-200 ease-linear"
                 >
                     Áp dụng làm mới BOM
                 </button>

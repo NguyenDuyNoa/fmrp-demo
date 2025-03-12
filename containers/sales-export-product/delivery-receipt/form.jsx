@@ -41,6 +41,7 @@ import { useDeliveryReceipPerson } from "./hooks/useDeliveryReceipPerson";
 import { useClientComboboxByFilterBranch } from "@/hooks/common/useClients";
 import { useTaxList } from "@/hooks/common/useTaxs";
 import { useStaffOptions } from "@/hooks/common/useStaffs";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const DeliveryReceiptForm = (props) => {
     const router = useRouter();
 
@@ -743,7 +744,7 @@ const DeliveryReceiptForm = (props) => {
                         ) : (
                             <div className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
                                 <img
-                                    src="/nodata.png"
+                                    src="/icon/noimagelogo.png"
                                     alt="Product Image"
                                     className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] object-cover rounded mr-1"
                                 />
@@ -1532,8 +1533,8 @@ const DeliveryReceiptForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+                        <div className="w-full h-full">
                             {isFetching ? (
                                 <Loading className="w-full h-10" color="#0f4f9e" />
                             ) : (
@@ -1940,7 +1941,7 @@ const DeliveryReceiptForm = (props) => {
                                 </>
                             )}
                         </div>
-                    </div>
+                    </Customscrollbar>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
                         <div className="flex items-center col-span-2 gap-2">
                             <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>

@@ -45,7 +45,7 @@ const PopupProduct = React.memo((props) => {
         if (props.warehouse !== null) {
             sOpen(true);
         } else {
-            isShow("error", "Vui lý chọn kho hàng");
+            isShow("error", "Vui lòng chọn kho hàng");
             props.sErrWareHouse(true);
         }
     };
@@ -415,14 +415,14 @@ const PopupProduct = React.memo((props) => {
                                             className="object-cover rounded w-14 h-14"
                                         />
                                     ) : (
-                                        <div className="w-14 h-14 bg-gray-200 flex flex-col items-center justify-center rounded">
+                                        <div className="flex flex-col items-center justify-center bg-gray-200 rounded w-14 h-14">
                                             <IconImage />
                                         </div>
                                     )}
                                     <div>
                                         <h3 className="font-medium">{option?.name}</h3>
                                         <h5 className="text-gray-400 font-[400]">{option.code}</h5>
-                                        <h5 className="text-gray-400 font-medium text-xs">
+                                        <h5 className="text-xs font-medium text-gray-400">
                                             {props.dataLang[option.type]}
                                         </h5>
                                     </div>
@@ -436,12 +436,12 @@ const PopupProduct = React.memo((props) => {
                 ) : (
                     <>
                         {listAllProduct?.length > 0 && (
-                            <Customscrollbar className="max-h-[400px] min-h-[350px]">
+                            <Customscrollbar className="max-h-[400px] h-[400px]  min-h-[350px]">
                                 <div className="space-y-1.5">
                                     {listAllProduct?.map((e) => (
                                         <div className="space-y-2" key={e.id}>
-                                            <div className="flex justify-between items-center pr-3">
-                                                <div className="flex items-center space-x-3 w-full">
+                                            <div className="flex items-center justify-between pr-3">
+                                                <div className="flex items-center w-full space-x-3">
                                                     {e.img != null ? (
                                                         <Image
                                                             src={e.img}
@@ -456,7 +456,7 @@ const PopupProduct = React.memo((props) => {
                                                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                                         />
                                                     ) : (
-                                                        <div className="w-14 h-14 bg-gray-200 flex flex-col items-center justify-center rounded">
+                                                        <div className="flex flex-col items-center justify-center bg-gray-200 rounded w-14 h-14">
                                                             <IconImage />
                                                         </div>
                                                     )}
@@ -468,7 +468,7 @@ const PopupProduct = React.memo((props) => {
                                                                 {e.variant}
                                                             </span>
                                                         </h5>
-                                                        <h5 className="text-gray-400 font-medium text-xs">
+                                                        <h5 className="text-xs font-medium text-gray-400">
                                                             {props.dataLang[e.type]}
                                                         </h5>
                                                     </div>
@@ -485,7 +485,7 @@ const PopupProduct = React.memo((props) => {
                                                     )}
                                                     <button
                                                         onClick={_HandleActionItem.bind(this, e.id, "add")}
-                                                        className="w-10 h-10 rounded bg-slate-50 hover:bg-slate-100 transition flex flex-col justify-center items-center "
+                                                        className="flex flex-col items-center justify-center w-10 h-10 transition rounded bg-slate-50 hover:bg-slate-100 "
                                                     >
                                                         <IconAdd />
                                                     </button>
@@ -683,14 +683,14 @@ const PopupProduct = React.memo((props) => {
                                                                                 ce?.id,
                                                                                 "serial"
                                                                             )}
-                                                                            className="text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
+                                                                            className="w-full px-2 py-1 font-medium text-center border-b-2 border-gray-200 focus:outline-none"
                                                                         />
                                                                     </div>
                                                                 )}
-                                                                <h6 className="px-1 self-center text-center">
+                                                                <h6 className="self-center px-1 text-center">
                                                                     {formatNumber(ce?.quantity)}
                                                                 </h6>
-                                                                <div className="px-1 self-center text-center">
+                                                                <div className="self-center px-1 text-center">
                                                                     <InPutNumericFormat
                                                                         value={ce?.amount}
                                                                         onValueChange={_HandleChangeChild.bind(
@@ -699,7 +699,7 @@ const PopupProduct = React.memo((props) => {
                                                                             ce?.id,
                                                                             "amount"
                                                                         )}
-                                                                        className="text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                                                                        className="w-20 px-2 py-1 font-medium text-center border-b-2 border-gray-200 focus:outline-none"
                                                                         isAllowed={(values) => {
                                                                             const { floatValue } = values;
                                                                             if (e?.checkSerial == "1") {
@@ -712,11 +712,11 @@ const PopupProduct = React.memo((props) => {
                                                                         }}
                                                                     />
                                                                 </div>
-                                                                <h6 className="px-1 self-center text-center">
+                                                                <h6 className="self-center px-1 text-center">
                                                                     {ce?.amount != null &&
                                                                         formatNumber(ce?.amount - ce?.quantity)}
                                                                 </h6>
-                                                                <div className="px-1 self-center flex justify-center space-x-3">
+                                                                <div className="flex self-center justify-center px-1 space-x-3">
                                                                     <button
                                                                         title="Xóa"
                                                                         onClick={_HandleDeleteChild.bind(
@@ -744,13 +744,13 @@ const PopupProduct = React.memo((props) => {
                 <div className="flex justify-end space-x-2">
                     <button
                         onClick={_TogglePopup.bind(this, false)}
-                        className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
+                        className="px-4 py-2 text-base transition rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105"
                     >
                         {props.dataLang?.branch_popup_exit}
                     </button>
                     <button
                         onClick={_HandleChooseItem.bind(this)}
-                        className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#0F4F9E] hover:opacity-90 hover:scale-105 transition"
+                        className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#003DA0] hover:opacity-90 hover:scale-105 transition"
                     >
                         Chọn
                     </button>

@@ -36,6 +36,12 @@ module.exports = {
                 29: "repeat(29, minmax(0, 1fr))",
                 30: "repeat(30, minmax(0, 1fr))",
             },
+            gridColumn: {
+                "span-13": "span 13 / span 13",
+                "span-14": "span 14 / span 14",
+                "span-15": "span 15 / span 15",
+                "span-16": "span 16 / span 16",
+            },
             backgroundImage: {
                 logo: "url('/logo_1.png')",
             },

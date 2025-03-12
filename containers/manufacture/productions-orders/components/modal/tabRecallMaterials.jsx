@@ -23,6 +23,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from '@tanstack/react-query';
 import { Grid6 } from 'iconsax-react';
 import { debounce } from 'lodash';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useState } from 'react';
 import ModalImage from 'react-modal-image';
@@ -52,7 +53,7 @@ const initialState = {
     ]
 }
 
-const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => {
+const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab, typePageMoblie }) => {
     const router = useRouter()
 
     const { paginate } = usePagination()
@@ -93,15 +94,6 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
         },
         ...optionsQuery
     })
-
-
-    useEffect(() => {
-        sTotalItems(10)
-        queryStateExportHistory({ onFetching: true })
-        setTimeout(() => {
-            queryStateExportHistory({ onFetching: false })
-        }, 2000)
-    }, [])
 
     const multiDataSet = [
         {
@@ -243,11 +235,13 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                 </div> */}
                 <SearchComponent
                     colSpan={1}
+                    sizeIcon={typePageMoblie ? 16 : 20}
                     dataLang={dataLang}
                     placeholder={dataLang?.branch_search}
                     onChange={(e) => { onChangeSearch(e) }}
-                    classInput={'border'}
-                    classNameBox={'w-[25%]'}
+                    classInput={`border ${typePageMoblie ? " !pl-7 !py-1.5" : ""}`}
+                    classNameIcon={`${typePageMoblie ? "!z-[999]" : "!z-[999]"}`}
+                    classNameBox={`${typePageMoblie ? "w-1/2" : "w-[25%]"}`}
                 />
                 <div className="flex items-center justify-end gap-1">
                     <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
@@ -270,93 +264,107 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                 {/* className={`${(width > 1100 ? "3xl:h-[calc(100vh_-_410px)] 2xl:h-[calc(100vh_-_390px)] xl:h-[calc(100vh_-_395px)] h-[calc(100vh_-_390px)]" : '3xl:h-[calc(100vh_-_520px)] 2xl:h-[calc(100vh_-_500px)] xl:h-[calc(100vh_-_490px)] h-[calc(100vh_-_490px)]')
                 }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}> */}
                 <div>
-                    <HeaderTable gridCols={12} display={'grid'}>
-                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
-                            Ngày CT
+                    <HeaderTable gridCols={14} display={'grid'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}>
+                            {typePageMoblie ? "Ngày CT" : "Ngày chứng từ"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}>
                             Phiếu nhập
                         </ColumnTable>
-                        <ColumnTable colSpan={3} textAlign={'center'} className={'normal-case !text-[13px]'}>
+                        <ColumnTable colSpan={3} textAlign={'center'} className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}>
                             Tên NVL
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
-                            Đơn vị tính
+                        <ColumnTable colSpan={1} textAlign={'center'} className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}>
+                            {typePageMoblie ? "ĐVT" : "Đơn vị tính"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
-                            Số lượng
+                        <ColumnTable colSpan={1} textAlign={'center'} className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}>
+                            {typePageMoblie ? "SL" : "Số lượng"}
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}>
                             Kho hàng
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'center'} className={'normal-case !text-[13px]'}>
+                        <ColumnTable colSpan={2} textAlign={'center'} className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}>
                             Vị trí kho
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'center'} className={'normal-case !text-[13px]'}>
+                        <ColumnTable colSpan={1} textAlign={'center'} className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}>
                             Ghi chú
                         </ColumnTable>
                     </HeaderTable>
                     {(isLoading || isRefetching) ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : data?.rResult?.length > 0 ? (
-                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                        <div className="h-full divide-y divide-slate-200">
                             {data?.rResult?.map((e, index) => (
-                                <RowTable gridCols={12} key={e.id.toString()} >
-                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'} >
-                                        {e?.date ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                <RowTable gridCols={14} key={`${e?.id?.toString() + "-" + index}`} >
+                                    <RowItemTable
+                                        colSpan={2}
+                                        textAlign={'center'}
+                                        textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}
+                                        className={''}
+                                    >
+                                        {e?.date ? formatMoment(e?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                     </RowItemTable>
                                     {/* <RowItemTable colSpan={1} textAlign={'center'}>
                                         {e.codeReceipts}
                                     </RowItemTable> */}
-                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                    <RowItemTable
+                                        colSpan={2}
+                                        textAlign={'center'}
+                                        textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}
+                                        className={'line-clamp-1 !px-px'}
+                                    >
                                         {e?.reference_no}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={3} textSize={'!text-xs'} className={'flex items-center gap-1 !py-2.5'}>
-                                        <ModalImage
-                                            small={e?.images ? e?.images : '/nodata.png'}
-                                            large={e?.images ? e?.images : '/nodata.png'}
+                                    <RowItemTable
+                                        colSpan={3}
+                                        textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}
+                                        className={'flex items-center gap-1 !py-2.5 !px-1'}
+                                    >
+                                        <Image
+                                            src={e?.images ? e?.images : '/icon/noimagelogo.png'}
+                                            // large={e?.images ? e?.images : '/icon/noimagelogo.png'}
                                             width={36}
                                             height={36}
                                             alt={e?.item_name}
-                                            className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                            className={`object-cover rounded-md ${typePageMoblie ? 'w-[24px] h-[24px] min-w-[24px] min-h-[24px]' : "min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"}`}
                                         />
                                         <div className="flex flex-col gap-1">
 
                                             <div className='flex flex-col'>
-                                                <span className='text-xs'>{e?.item_name}</span>
-                                                <div className='flex flex-row items-start gap-1 text-xs italic text-gray-500'>
-                                                    <span>{e?.variation}</span>
+                                                <span className={`${typePageMoblie ? "text-[8px] leading-tight" : "text-xs"}`}>{e?.item_name}</span>
+                                                <div className={`flex items-center gap-1 ${typePageMoblie ? "text-[6px] leading-tight" : "text-[11px]"}  italic text-gray-500`}>
+                                                    <span className='leading-tight'>{e?.variation}</span>
                                                 </div>
                                             </div>
                                             <div className="flex flex-wrap items-center font-oblique">
                                                 {
                                                     dataProductSerial.is_enable === "1" && (
                                                         <div className="flex gap-0.5">
-                                                            <h6 className="text-[12px]">
+                                                            <h6 className={`${typePageMoblie ? "text-[6px] leading-tight" : 'text-[12px]'}`}>
                                                                 Serial:
                                                             </h6>
-                                                            <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                            <h6 className={`${typePageMoblie ? "text-[6px] leading-tight px-px" : 'text-[12px]  px-2'} w-[full] text-left`}>
                                                                 {e?.serial == null || e?.serial == "" ? "-" : e?.serial}
                                                             </h6>
                                                         </div>
                                                     )
                                                 }
                                                 {
-                                                    (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable == "1") && (
+                                                    (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && (
                                                         <>
                                                             <div className="flex gap-0.5">
-                                                                <h6 className="text-[12px]">
+                                                                <h6 className={`${typePageMoblie ? "text-[6px] leading-tight" : 'text-[12px]'}`}>
                                                                     Lot:
                                                                 </h6>{" "}
-                                                                <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                <h6 className={`${typePageMoblie ? "text-[6px] leading-tight px-px" : 'text-[12px]  px-2'} w-[full] text-left`}>
                                                                     {e?.lot == null || e?.lot == "" ? "-" : e?.lot}
                                                                 </h6>
                                                             </div>
                                                             <div className="flex gap-0.5">
-                                                                <h6 className="text-[12px]">
+                                                                <h6 className={`${typePageMoblie ? "text-[6px] leading-tight" : 'text-[12px]'}`}>
                                                                     Date:
                                                                 </h6>{" "}
-                                                                <h6 className="text-[12px]  px-2   w-[full] text-center ">
+                                                                <h6 className={`${typePageMoblie ? "text-[6px] leading-tight px-px" : 'text-[12px] px-2'} w-[full] text-left`}>
                                                                     {e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                 </h6>
                                                             </div>
@@ -367,26 +375,45 @@ const TabRecallMaterials = memo(({ isStateModal, width, dataLang, listTab }) => 
                                         </div>
 
                                     </RowItemTable>
-                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                    <RowItemTable
+                                        colSpan={1}
+                                        textAlign={'center'}
+                                        textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}
+                                    >
                                         {e?.unit_name}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                    <RowItemTable
+                                        colSpan={1}
+                                        textAlign={'center'}
+                                        textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}
+                                    >
                                         {e?.quantity > 0 ? formatNumber(e?.quantity) : '-'}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
+                                    <RowItemTable
+                                        colSpan={2}
+                                        textAlign={'center'}
+                                        textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}
+                                    >
                                         {e?.warehouse?.name}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
+                                    <RowItemTable
+                                        colSpan={2}
+                                        textAlign={'center'}
+                                        textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}
+                                    >
                                         {e?.location?.name}
                                     </RowItemTable>
-                                    <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                    <RowItemTable
+                                        colSpan={1}
+                                        textAlign={'center'}
+                                        textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}
+                                    >
                                         {e?.note}
                                     </RowItemTable>
                                 </RowTable>
                             ))}
                         </div>
                     ) : <NoData />}
-
                 </div>
             </Customscrollbar>
             {

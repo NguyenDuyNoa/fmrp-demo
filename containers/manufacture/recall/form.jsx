@@ -34,6 +34,8 @@ import { NumericFormat } from "react-number-format";
 import { v4 as uuidv4 } from "uuid";
 import { useRecallItems } from "./hooks/useRecallItems";
 import { optionsQuery } from "@/configs/optionsQuery";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const RecallForm = (props) => {
     const router = useRouter();
 
@@ -89,6 +91,8 @@ const RecallForm = (props) => {
 
     const [errRecallWarehouse, sErrRecallWarehouse] = useState(false);
 
+    const [errRecallProductionOrder, sErrRecallProductionOrder] = useState(false);
+
     const { data: dataBranch = [] } = useBranchList()
 
     const { data: dataItems } = useRecallItems(searchItems, idBranch, idProductionOrder)
@@ -101,6 +105,7 @@ const RecallForm = (props) => {
         router.query && sErrDate(false);
         router.query && sErrBranch(false);
         router.query && sErrRecallWarehouse(false);
+        router.query && sErrRecallProductionOrder(false);
         router.query && sStartDate(new Date());
         router.query && sNote("");
     }, [router.query]);
@@ -268,11 +273,13 @@ const RecallForm = (props) => {
             hasNullQty ||
             isEmpty ||
             idRecalltWarehouse == null ||
+            idProductionOrder == null ||
             (dataMaterialExpiry?.is_enable == "1" && hasNullLot) || (dataMaterialExpiry?.is_enable == "1" && hasNullDate)
         ) {
             idBranch == null && sErrBranch(true);
             hasNullKho && sErrWarehouse(true);
             idRecalltWarehouse == null && sErrRecallWarehouse(true);
+            idProductionOrder == null && sErrRecallProductionOrder(true);
             hasNullQty && sErrQty(true);
             hasNullKho && sErrWarehouse(true);
             hasNullLot && sErrLot(true);
@@ -287,6 +294,7 @@ const RecallForm = (props) => {
             sErrQty(false);
             sErrLot(false);
             sErrDateList(false);
+            sErrRecallProductionOrder(false);
             sOnSending(true);
         }
     };
@@ -302,6 +310,10 @@ const RecallForm = (props) => {
     useEffect(() => {
         sErrRecallWarehouse(false);
     }, [idRecalltWarehouse != null]);
+
+    useEffect(() => {
+        sErrRecallProductionOrder(false);
+    }, [idProductionOrder != null]);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -321,6 +333,7 @@ const RecallForm = (props) => {
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
                 formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
+                formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price ?? "");
                 formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : formatMoment(childItem?.date, FORMAT_MOMENT.DATE_LONG));
                 formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
@@ -354,6 +367,8 @@ const RecallForm = (props) => {
 
     //new
     const _HandleAddChild = (parentId, value) => {
+        console.log("123", value);
+
         sOnLoadingChild(true);
         const newData = listData?.map((e) => {
             if (e?.id === parentId) {
@@ -364,11 +379,11 @@ const RecallForm = (props) => {
                         (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true),
                     location: null,
                     unit: value?.e?.unit_name || value?.e?.unit,
-                    serial: "",
-                    lot: "",
-                    date: null,
+                    serial: value?.e?.serial ? value?.e?.serial : null,
+                    lot: value?.e?.lot ? value?.e?.lot : null,
+                    date: value?.e?.expiration_date ? moment(value?.e?.expiration_date).toDate() : null,
                     recallQuantity: null,
-                    price: null,
+                    price: value?.e?.price ? value?.e?.price : null,
                     note: "",
                     idChildBackEnd: null,
                 };
@@ -387,6 +402,8 @@ const RecallForm = (props) => {
         sOnLoadingChild(true);
         const checkData = listData?.some((e) => e?.item?.value === value?.value);
         if (!checkData) {
+            console.log("value?.e?.expiration_date", value?.e?.expiration_date);
+
             const newData = {
                 id: Date.now(),
                 idParenBackend: null,
@@ -399,11 +416,11 @@ const RecallForm = (props) => {
                             (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
                             (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true),
                         location: null,
-                        serial: "",
-                        lot: "",
-                        date: null,
+                        serial: value?.e?.serial ? value?.e?.serial : null,
+                        lot: value?.e?.lot ? value?.e?.lot : null,
+                        date: value?.e?.expiration_date ? moment(value?.e?.expiration_date).toDate() : null,
                         unit: value?.e?.unit_name,
-                        price: null,
+                        price: value?.e?.price ? value?.e?.price : null,
                         recallQuantity: null,
                         note: "",
                     },
@@ -617,7 +634,7 @@ const RecallForm = (props) => {
                                         {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <SelectCore
+                                    <SelectComponent
                                         options={dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
@@ -628,38 +645,7 @@ const RecallForm = (props) => {
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         className={`${errBranch ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menu: (provided) => ({
-                                                ...provided,
-                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
+                                        type="form"
                                     />
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
@@ -672,7 +658,7 @@ const RecallForm = (props) => {
                                         {dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <SelectCore
+                                    <SelectComponent
                                         options={dataWarehouse}
                                         onChange={_HandleChangeInput.bind(this, "idRecalltWarehouse")}
                                         value={idRecalltWarehouse}
@@ -683,38 +669,7 @@ const RecallForm = (props) => {
                                         placeholder={dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}
                                         className={`${errRecallWarehouse ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menu: (provided) => ({
-                                                ...provided,
-                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
+                                        type="form"
                                     />
                                     {errRecallWarehouse && (
                                         <label className="text-sm text-red-500">{"Vui lòng chọn kho"}</label>
@@ -722,9 +677,10 @@ const RecallForm = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
+                                        {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
-                                    <SelectCore
+                                    <SelectComponent
                                         options={dataProductionOrderItemsByBranch?.data?.items || []}
                                         onChange={_HandleChangeInput.bind(this, "idProductionOrderItem")}
                                         value={idProductionOrder}
@@ -733,41 +689,13 @@ const RecallForm = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
-                                        className={`${"border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errRecallProductionOrder ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menu: (provided) => ({
-                                                ...provided,
-                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
+                                        type="form"
                                     />
+                                    {errRecallWarehouse && (
+                                        <label className="text-sm text-red-500">{"Vui lòng chọn LSX"}</label>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -814,7 +742,7 @@ const RecallForm = (props) => {
                     </div>
                     <div className="grid items-center grid-cols-12 gap-1 py-2">
                         <div className="col-span-3">
-                            <SelectCore
+                            <SelectComponent
                                 options={dataItems}
                                 value={null}
                                 onInputChange={(event) => {
@@ -838,7 +766,7 @@ const RecallForm = (props) => {
                                                 ) : (
                                                     <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                         <img
-                                                            src="/nodata.png"
+                                                            src="/icon/noimagelogo.png"
                                                             alt="Product Image"
                                                             className="w-[30px] h-[30px] object-cover rounded"
                                                         />
@@ -853,7 +781,7 @@ const RecallForm = (props) => {
                                                     <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                         {option.e?.code}
                                                     </h5>
-                                                    <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                    <h5 className="font-medium text-black 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                         {option.e?.product_variation}
                                                     </h5>
                                                 </div>
@@ -864,40 +792,13 @@ const RecallForm = (props) => {
                                         </div>
                                     </div>
                                 )}
-                                style={{
-                                    border: "none",
-                                    boxShadow: "none",
-                                    outline: "none",
-                                }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
+                                type="form"
                                 styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
                                     menuPortal: (base) => ({
                                         ...base,
                                         zIndex: 9999,
                                     }),
-                                    control: (base, state) => ({
-                                        ...base,
-                                        ...(state.isFocused && {
-                                            border: "0 0 0 1px #92BFF7",
-                                            boxShadow: "none",
-                                        }),
-                                    }),
-                                    menu: (provided, state) => ({
-                                        ...provided,
-                                        // width: "130%",
-                                    }),
+
                                 }}
                             />
                         </div>
@@ -965,8 +866,8 @@ const RecallForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
-                        <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2  ">
+                        <div className="h-[100%] w-full">
                             {isFetching ? (
                                 <Loading className="w-full h-10" color="#0f4f9e" />
                             ) : (
@@ -978,7 +879,7 @@ const RecallForm = (props) => {
                                         >
                                             <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mt-5 mr-1">
-                                                    <SelectCore
+                                                    <SelectComponent
                                                         onInputChange={(event) => {
                                                             _HandleSeachApi(event);
                                                         }}
@@ -1000,7 +901,7 @@ const RecallForm = (props) => {
                                                                         ) : (
                                                                             <div className=" object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]">
                                                                                 <img
-                                                                                    src="/nodata.png"
+                                                                                    src="/icon/noimagelogo.png"
                                                                                     alt="Product Image"
                                                                                     className="object-cover rounded "
                                                                                 />
@@ -1015,7 +916,7 @@ const RecallForm = (props) => {
                                                                             <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                                 {option.e?.code}
                                                                             </h5>
-                                                                            <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                            <h5 className="font-medium text-black 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                                 {option.e?.product_variation}
                                                                             </h5>
                                                                         </div>
@@ -1027,45 +928,17 @@ const RecallForm = (props) => {
                                                             </div>
                                                         )}
                                                         classNamePrefix="customDropdow"
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
+                                                        type="form"
                                                         styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
                                                             menuPortal: (base) => ({
                                                                 ...base,
                                                                 zIndex: 9999,
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                ...(state.isFocused && {
-                                                                    border: "0 0 0 1px #92BFF7",
-                                                                    boxShadow: "none",
-                                                                }),
-                                                            }),
-                                                            menu: (provided, state) => ({
-                                                                ...provided,
-                                                                // width: "130%",
                                                             }),
                                                         }}
                                                     />
                                                     <button
                                                         onClick={_HandleAddChild.bind(this, e?.id, e?.item)}
-                                                        className="absolute flex flex-col items-center justify-center w-8 h-8 transition ease-in-out rounded bg-slate-100 -top-4 right-2 hover:rotate-45 hover:bg-slate-200 hover:scale-105 hover:text-red-500"
+                                                        className="absolute z-30 flex flex-col items-center justify-center w-8 h-8 transition ease-in-out rounded bg-slate-100 -top-4 right-2 hover:rotate-45 hover:bg-slate-200 hover:scale-105 hover:text-red-500"
                                                     >
                                                         <Add />
                                                     </button>
@@ -1117,6 +990,7 @@ const RecallForm = (props) => {
                                                                             </div>
                                                                         </div>
                                                                     )}
+                                                                    // type="form"
                                                                     style={{
                                                                         border: "none",
                                                                         boxShadow: "none",
@@ -1147,13 +1021,13 @@ const RecallForm = (props) => {
                                                                         <div className="flex flex-col items-center justify-center h-full p-1 ">
                                                                             <input
                                                                                 value={ce?.lot}
-                                                                                disabled={ce?.disabledDate}
+                                                                                disabled={true}
                                                                                 className={`border ${ce?.disabledDate
                                                                                     ? "bg-gray-50"
                                                                                     : errLot && (ce?.lot == "" || ce?.lot == null)
                                                                                         ? "border-red-500"
                                                                                         : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                                                    } placeholder:text-slate-300 w-full  bg-[#ffffff]  rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                    } placeholder:text-slate-300 w-full disabled:bg-gray-50  bg-[#ffffff]  rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                                 onChange={_HandleChangeChild.bind(
                                                                                     this,
                                                                                     e?.id,
@@ -1171,7 +1045,8 @@ const RecallForm = (props) => {
                                                                                     <DatePicker
                                                                                         selected={ce?.date}
                                                                                         blur
-                                                                                        disabled={ce?.disabledDate}
+                                                                                        // disabled={ce?.disabledDate}
+                                                                                        disabled={true}
                                                                                         placeholderText="DD/MM/YYYY"
                                                                                         dateFormat="dd/MM/yyyy"
                                                                                         onSelect={(date) =>
@@ -1189,7 +1064,7 @@ const RecallForm = (props) => {
                                                                                                 ce?.date == null
                                                                                                 ? "border-red-500"
                                                                                                 : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] disabled:bg-gray-50 rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                                     />
                                                                                     {effectiveDate && (
                                                                                         <>
@@ -1302,7 +1177,7 @@ const RecallForm = (props) => {
                                 </>
                             )}
                         </div>
-                    </div>
+                    </Customscrollbar>
                     <h2 className="font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]">
                         {dataLang?.purchase_total || "purchase_total"}
                     </h2>

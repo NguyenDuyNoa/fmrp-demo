@@ -213,11 +213,11 @@ const Supplier = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.suppliers_supplier_title}
                             </h2>
-                            <div className="flex justify-end items-center gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 {role == true || checkAdd ? (
                                     <Popup_dsncc
                                         listProvince={listProvince}
@@ -227,7 +227,7 @@ const Supplier = (props) => {
                                         onRefreshGroup={refetchGroup.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"suppliers"}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     />
                                 ) : (
                                     <button
@@ -235,7 +235,7 @@ const Supplier = (props) => {
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.branch_popup_create_new}
                                     </button>
@@ -263,7 +263,7 @@ const Supplier = (props) => {
                         </ContainerFilterTab>
 
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -292,7 +292,7 @@ const Supplier = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -310,7 +310,7 @@ const Supplier = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -378,14 +378,14 @@ const Supplier = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={1}
-                                                            className="flex justify-start flex-wrap "
+                                                            className="flex flex-wrap justify-start "
                                                         >
                                                             {e.supplier_group?.map((h) => {
                                                                 return (
                                                                     <span
                                                                         key={h.id}
                                                                         style={{ backgroundColor: "#e2f0fe" }}
-                                                                        className={`text-[#0F4F9E]  mr-2 mb-1 w-fit 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] px-2 rounded-md py-0.5`}
+                                                                        className={`text-[#0F4F9E]  font-[500] mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px]  px-2 rounded-full py-0.5`}
                                                                     >
                                                                         {h.name}
                                                                     </span>
@@ -394,7 +394,7 @@ const Supplier = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={1}
-                                                            className="flex items-center gap-1 flex-wrap"
+                                                            className="flex flex-wrap items-center gap-1"
                                                         >
                                                             {e.branch?.map((i) => (
                                                                 <TagBranch key={i}>{i.name}</TagBranch>
@@ -402,12 +402,12 @@ const Supplier = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={1}
-                                                            className="space-x-2 text-center flex items-center justify-center"
+                                                            className="flex items-center justify-center space-x-2 text-center"
                                                         >
                                                             {role == true || checkEdit ? (
                                                                 <Popup_dsncc
                                                                     onRefresh={refetch.bind(this)}
-                                                                    className="xl:text-base text-xs "
+                                                                    className="text-xs xl:text-base "
                                                                     isState={isState}
                                                                     dataLang={dataLang}
                                                                     listProvince={listProvince}

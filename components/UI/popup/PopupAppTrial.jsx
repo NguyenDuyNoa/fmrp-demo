@@ -149,7 +149,7 @@ const PopupAppTrial = () => {
                                 <button
                                     onClick={handleClickButton}
                                     type="button"
-                                    className="px-4 py-2 text-white bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 duration-300 transition-all ease-in-out rounded-lg focus:outline-none"
+                                    className="px-4 py-2 text-white bg-[#003DA0] hover:bg-[#003DA0]/80 duration-300 transition-all ease-in-out rounded-lg focus:outline-none"
                                 >
                                     Bắt đầu trải nghiệm
                                 </button>

@@ -8,6 +8,7 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
+import AvatarText from "@/components/UI/common/user/AvatarText";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
@@ -18,6 +19,7 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useProvinceList } from "@/hooks/common/useAddress";
 import { useBranchList } from "@/hooks/common/useBranch";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
@@ -36,7 +38,6 @@ import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
 import { useClientGroup } from "./hooks/useClientGroup";
 import { useClientList } from "./hooks/useClientList";
-import { useProvinceList } from "@/hooks/common/useAddress";
 
 const initalState = {
     keySearch: "",
@@ -234,7 +235,7 @@ const Client = (props) => {
                                         onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"client_contact"}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     />
                                 ) : (
                                     <button
@@ -242,7 +243,7 @@ const Client = (props) => {
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.branch_popup_create_new}
                                     </button>
@@ -396,14 +397,20 @@ const Client = (props) => {
                                                                     key={d?.id}
                                                                     theme="dark"
                                                                 >
-                                                                    <ImageErrors
-                                                                        src={d.profile_image}
-                                                                        width={40}
-                                                                        height={40}
-                                                                        defaultSrc="/user-placeholder.jpg"
-                                                                        alt="Image"
-                                                                        className="min-w-8 max-w-8 min-h-8 max-h-8 h-8 w-8 object-cover rounded-[100%] text-left cursor-pointer"
-                                                                    />
+                                                                    {
+                                                                        d?.profile_image
+                                                                            ?
+                                                                            <ImageErrors
+                                                                                src={d.profile_image}
+                                                                                width={40}
+                                                                                height={40}
+                                                                                defaultSrc="/user-placeholder.jpg"
+                                                                                alt="Image"
+                                                                                className="min-w-8 max-w-8 min-h-8 max-h-8 h-8 w-8 object-cover rounded-[100%] text-left cursor-pointer"
+                                                                            />
+                                                                            :
+                                                                            <AvatarText fullName={d?.full_name} />
+                                                                    }
                                                                 </Tooltip>
                                                             );
                                                         })
@@ -427,7 +434,7 @@ const Client = (props) => {
                                                                             : "white"
                                                                             }`,
                                                                     }}
-                                                                    className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}
+                                                                    className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] font-[500] text-[8px] px-2 rounded-full  py-0.5`}
                                                                 >
                                                                     {h.name}
                                                                 </span>

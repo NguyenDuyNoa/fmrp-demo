@@ -75,7 +75,7 @@ const Popup_chitiet = (props) => {
                           {data?.code}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between flex-wrap p-2">
+                      <div className="flex flex-wrap justify-between p-2 mb-4">
                         <span className="text-slate-400 text-sm      w-[30%]">
                           {props.dataLang?.suppliers_supplier_name}:
                         </span>{" "}
@@ -83,7 +83,7 @@ const Popup_chitiet = (props) => {
                           {data?.name}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between items-center p-2">
+                      <div className="flex items-center justify-between p-2 mb-4">
                         <span className="text-slate-400 text-sm   w-[25%]">
                           {props.dataLang?.suppliers_supplier_reper}:
                         </span>{" "}
@@ -91,7 +91,7 @@ const Popup_chitiet = (props) => {
                           {data?.representative}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between  items-center p-2">
+                      <div className="flex items-center justify-between p-2 mb-4">
                         <span className="text-slate-400 text-sm  w-[25%]">
                           {props.dataLang?.suppliers_supplier_email}:
                         </span>{" "}
@@ -99,7 +99,7 @@ const Popup_chitiet = (props) => {
                           {data?.email}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between items-center p-2">
+                      <div className="flex items-center justify-between p-2 mb-4">
                         <span className="text-slate-400 text-sm   w-[25%]">
                           {props.dataLang?.suppliers_supplier_phone}:
                         </span>{" "}
@@ -107,7 +107,7 @@ const Popup_chitiet = (props) => {
                           {data?.phone_number}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between items-center p-2">
+                      <div className="flex items-center justify-between p-2 mb-4">
                         <span className="text-slate-400 text-sm   w-[25%]">
                           {props.dataLang?.suppliers_supplier_taxcode}:
                         </span>{" "}
@@ -115,7 +115,7 @@ const Popup_chitiet = (props) => {
                           {data?.tax_code}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between items-center p-2">
+                      <div className="flex items-center justify-between p-2 mb-4">
                         <span className="text-slate-400 text-sm   w-[25%]">
                           {props.dataLang?.suppliers_supplier_adress}:
                         </span>{" "}
@@ -123,7 +123,7 @@ const Popup_chitiet = (props) => {
                           {data?.address}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between items-center p-2">
+                      <div className="flex items-center justify-between p-2 mb-4">
                         <span className="text-slate-400 text-sm   w-[25%]">
                           {props.dataLang?.suppliers_supplier_note}:{" "}
                         </span>{" "}
@@ -133,8 +133,8 @@ const Popup_chitiet = (props) => {
                       </div>
                     </div>
                     <div className="w-[50%] bg-slate-100/40">
-                      <div className="mb-4 flex justify-between  p-2 items-center flex-wrap">
-                        <span className="text-slate-400 text-sm">
+                      <div className="flex flex-wrap items-center justify-between p-2 mb-4">
+                        <span className="text-sm text-slate-400">
                           {props.dataLang?.client_list_brand}:
                         </span>{" "}
                         <span className="flex flex-wrap justify-between gap-1">
@@ -150,17 +150,17 @@ const Popup_chitiet = (props) => {
                           })}
                         </span>
                       </div>
-                      <div className="mb-4 justify-between  p-2 flex flex-wrap  ">
-                        <span className="text-slate-400 text-sm ">
+                      <div className="flex flex-wrap justify-between p-2 mb-4 ">
+                        <span className="text-sm text-slate-400 ">
                           {"Nhóm nhà cung cấp"}:
                         </span>{" "}
-                        <span className=" flex flex-wrap  justify-start gap-1">
+                        <span className="flex flex-wrap justify-start gap-1 ">
                           {data?.supplier_group?.map((h) => {
                             return (
                               <span
                                 key={h.id}
                                 style={{ backgroundColor: "#e2f0fe" }}
-                                className={`text-[#0F4F9E] mb-1   w-fit xl:text-base text-xs px-2 rounded-md font-[300] py-0.5`}
+                                className={`text-[#0F4F9E] mb-1  w-fit rounded-full  xl:text-base 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] font-[500] text-[8px] px-2 py-0.5`}
                               >
                                 {h.name}
                               </span>
@@ -169,16 +169,16 @@ const Popup_chitiet = (props) => {
                         </span>
                       </div>
 
-                      <div className="mb-4 flex justify-between items-center p-2">
-                        <span className="text-slate-400 text-sm">
+                      <div className="flex items-center justify-between p-2 mb-4">
+                        <span className="text-sm text-slate-400">
                           {props.dataLang?.suppliers_supplier_debt}:
                         </span>{" "}
                         <span className="font-normal capitalize">
                           {formatNumber(data?.debt_begin)}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between items-center p-2">
-                        <span className="text-slate-400 text-sm">
+                      <div className="flex items-center justify-between p-2 mb-4">
+                        <span className="text-sm text-slate-400">
                           {props.dataLang?.client_popup_date}:
                         </span>{" "}
                         <span className="font-normal capitalize">
@@ -190,9 +190,9 @@ const Popup_chitiet = (props) => {
                             : ""}
                         </span>
                       </div>
-                      {/* <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_date}:</span> <span className='font-normal capitalize'>{moment(data?.date_create).format("DD/MM/YYYY")}</span></div> */}
-                      <div className="mb-4 flex justify-between items-center p-2">
-                        <span className="text-slate-400 text-sm">
+                      {/* <div className='flex items-center justify-between p-2 mb-4'><span className='text-sm text-slate-400'>{props.dataLang?.client_popup_date}:</span> <span className='font-normal capitalize'>{moment(data?.date_create).format("DD/MM/YYYY")}</span></div> */}
+                      <div className="flex items-center justify-between p-2 mb-4">
+                        <span className="text-sm text-slate-400">
                           {props.dataLang?.suppliers_supplier_city}:
                         </span>{" "}
                         <span className="font-normal capitalize">
@@ -201,8 +201,8 @@ const Popup_chitiet = (props) => {
                             : ""}
                         </span>
                       </div>
-                      <div className="mb-4 flex justify-between p-2 items-center">
-                        <span className="text-slate-400 text-sm">
+                      <div className="flex items-center justify-between p-2 mb-4">
+                        <span className="text-sm text-slate-400">
                           {props.dataLang?.suppliers_supplier_district}:{" "}
                         </span>
                         <span className="font-normal capitalize">
@@ -211,7 +211,7 @@ const Popup_chitiet = (props) => {
                             : ""}
                         </span>
                         ,
-                        <span className="text-slate-400 text-sm">
+                        <span className="text-sm text-slate-400">
                           {props.dataLang?.suppliers_supplier_wards}:
                         </span>
                         <span className="font-normal capitalize">

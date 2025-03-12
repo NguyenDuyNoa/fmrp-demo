@@ -303,7 +303,7 @@ const Popup_Products = React.memo((props) => {
                         loading={handingCategory.isPending}
                         dataLang={props.dataLang}
                         onClick={_HandleSubmit.bind(this)}
-                        className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#0F4F9E] hover:opacity-90 hover:scale-105 transition"
+                        className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#003DA0] hover:opacity-90 hover:scale-105 transition"
                     />
 
                 </div>

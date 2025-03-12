@@ -4,6 +4,7 @@ import OnResetData from '@/components/UI/btnResetData/btnReset';
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 import { ContainerTotal } from '@/components/UI/common/layout';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
+import { TagColorProduct } from '@/components/UI/common/Tag/TagStatus';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
@@ -16,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import saveAs from 'file-saver';
 import html2canvas from 'html2canvas';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useState } from 'react';
 import ModalImage from 'react-modal-image';
@@ -31,7 +33,7 @@ const initialState = {
     dataDefault: [],
 }
 
-const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => {
+const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab, typePageMoblie }) => {
     const router = useRouter()
 
     const dataSeting = useSetingServer();
@@ -61,7 +63,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
             const newData = data?.boms?.map(e => {
                 return {
                     id: uddid(),
-                    image: e?.images ? e?.images : '/nodata.png',
+                    image: e?.images ? e?.images : '/icon/noimagelogo.png',
                     name: e?.item_name,
                     itemVariation: e?.product_variation,
                     code: e?.item_code,
@@ -210,58 +212,68 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
         },
     ];
 
+    const RenderTab = () => {
+        return (
+            <div className={`flex items-center justify-start ${typePageMoblie ? "gap-1.5" : "gap-4"} my-2`}>
+                <button
+                    type="button"
+                    onClick={() => {
+                        setIsTab('chart')
+                    }}
+                    className={`${isTab === 'chart' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal  ${typePageMoblie ? "w-1/1 min-w-[50%] text-[10px]" : "w-fit min-w-fit text-xs"} rounded-full flex justify-center gap-1 items-center`}>
+                    {dataLang?.productions_orders_details_table_export_chart || 'productions_orders_details_table_export_chart'}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => {
+                        setIsTab('table')
+                    }}
+                    className={`${isTab === 'table' && 'border-[#EE1E1E] border'} bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal  ${typePageMoblie ? "w-1/1 min-w-[50%] text-[10px]" : "w-fit min-w-fit text-xs"} rounded-full flex justify-center gap-1 items-center`}>
+                    {dataLang?.productions_orders_details_table_export_list || 'productions_orders_details_table_export_list'}
+                </button>
+            </div>
+        )
+    }
+
     if (!isMounted) return null
     return (
         <div className='h-full'>
+            {typePageMoblie && <RenderTab />}
             <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-1 my-2'>
-                    {/* <h1 className="w-1/3 my-1 text-sm 3xl:text-basse">{listTab[isStateModal.isTab - 1]?.name}</h1> */}
-                    <div className="flex items-center justify-start gap-4">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsTab('chart')
-                            }}
-                            className={`${isTab === 'chart' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
-                            {dataLang?.productions_orders_details_table_export_chart || 'productions_orders_details_table_export_chart'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsTab('table')
-                            }}
-                            className={`${isTab === 'table' && 'border-[#EE1E1E] border'} bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
-                            {dataLang?.productions_orders_details_table_export_list || 'productions_orders_details_table_export_list'}
-                        </button>
-                    </div>
-                </div>
+                {
+                    !typePageMoblie && <RenderTab />
+                }
                 {
                     isTab == 'table' &&
-                    <div className="flex items-center justify-end gap-1">
+                    <div className={`flex items-center  gap-1 ${typePageMoblie ? 'justify-between w-full' : "justify-end"}`}>
                         <SearchComponent
                             colSpan={1}
                             dataLang={dataLang}
+                            sizeIcon={typePageMoblie ? 16 : 20}
                             placeholder={dataLang?.branch_search}
                             onChange={handleSearch}
-                            classInput={'border'}
+                            classInput={`border ${typePageMoblie ? " !pl-7 !py-1.5" : ""}`}
+                            classNameIcon={`${typePageMoblie ? "!z-[999]" : "!z-[999]"}`}
                         />
-                        <OnResetData onClick={() => refetch()} sOnFetching={() => { }} />
-                        <div>
-                            {isExportSituation.dataDefault?.length > 0 && (
-                                <ExcelFileComponent
-                                    dataLang={dataLang}
-                                    filename={"Danh sách dữ liệu tình hình xuất NVL"}
-                                    multiDataSet={multiDataSet}
-                                    title="DSDLTHXNVL"
-                                />
-                            )}
+                        <div className="flex items-center gap-2">
+                            <OnResetData onClick={() => refetch()} sOnFetching={() => { }} />
+                            <div>
+                                {isExportSituation.dataDefault?.length > 0 && (
+                                    <ExcelFileComponent
+                                        dataLang={dataLang}
+                                        filename={"Danh sách dữ liệu tình hình xuất NVL"}
+                                        multiDataSet={multiDataSet}
+                                        title="DSDLTHXNVL"
+                                    />
+                                )}
+                            </div>
                         </div>
                         {/* <div>
                             <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                         </div> */}
                     </div>
                 }
-            </div>
+            </div >
             <Customscrollbar
                 className={`${isTab === 'chart' && "h-full"
                     ||
@@ -279,56 +291,56 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                             <ColumnTable
                                 colSpan={1}
                                 textAlign={'center'}
-                                className={'normal-case !text-[13px]'}
+                                className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}
                             >
                                 STT
                             </ColumnTable>
                             <ColumnTable
                                 colSpan={3}
                                 textAlign={'center'}
-                                className={'normal-case !text-[13px]'}
+                                className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}
                             >
                                 {dataLang?.productions_orders_details_name_nvl || 'productions_orders_details_name_nvl'}
                             </ColumnTable>
                             <ColumnTable
                                 colSpan={2}
                                 textAlign={'center'}
-                                className={'normal-case !text-[13px]'}
+                                className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}
                             >
                                 {dataLang?.productions_orders_details_type || 'productions_orders_details_type'}
                             </ColumnTable>
                             <ColumnTable
                                 colSpan={1}
                                 textAlign={'center'}
-                                className={'normal-case !text-[13px]'}
+                                className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}
                             >
-                                {dataLang?.productions_orders_details_unit || 'productions_orders_details_unit'}
+                                {typePageMoblie ? "ĐVT" : (dataLang?.productions_orders_details_unit || 'productions_orders_details_unit')}
                             </ColumnTable>
                             <ColumnTable
                                 colSpan={1}
                                 textAlign={'center'}
-                                className={'normal-case !text-[13px]'}
+                                className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}
                             >
                                 {dataLang?.productions_orders_details_table_export_plan || 'productions_orders_details_table_export_plan'}
                             </ColumnTable>
                             <ColumnTable
                                 colSpan={1}
                                 textAlign={'center'}
-                                className={'normal-case !text-[13px]'}
+                                className={`normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}
                             >
                                 {dataLang?.productions_orders_details_table_export_exported || 'productions_orders_details_table_export_exported'}
                             </ColumnTable>
                             <ColumnTable
                                 colSpan={1}
                                 textAlign={'center'}
-                                className={'normal-case !text-[13px]'}
+                                className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}
                             >
                                 {dataLang?.productions_orders_details_table_export_remaining || 'productions_orders_details_table_export_remaining'}
                             </ColumnTable>
                             <ColumnTable
                                 colSpan={1}
                                 textAlign={'center'}
-                                className={'normal-case !text-[13px]'}
+                                className={` normal-case ${typePageMoblie ? "!text-[8px]" : "!text-[13px]"}`}
                             >
                                 {dataLang?.productions_orders_details_table_export_recall || 'productions_orders_details_table_export_recall'}
                             </ColumnTable>
@@ -339,27 +351,27 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                 {isExportSituation.dataTable?.map((e, index) => (
                                     <RowTable gridCols={11} key={e.id.toString()} >
-                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}>
                                             {index + 1}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'} textSize={'!text-xs'}>
-                                            <ModalImage
-                                                small={e.image}
-                                                large={e.image}
+                                        <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2 !px-0'} textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}>
+                                            <Image
+                                                // small={e.image}
+                                                src={e.image}
                                                 width={36}
                                                 height={36}
                                                 alt={e.name}
-                                                className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                                className={`object-cover rounded-md ${typePageMoblie ? 'w-[24px] h-[24px] min-w-[24px] min-h-[24px]' : "min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"}`}
                                             />
                                             <div className='flex flex-col'>
-                                                <span>{e.name}</span>
-                                                <div className='flex items-center gap-1 text-gray-500'>
+                                                <span className={`${typePageMoblie ? "text-[8px] leading-tight" : "text-[13px]"}`}>{e.name}</span>
+                                                <div className={`flex items-center gap-1 ${typePageMoblie ? "text-[6px] leading-tight" : "text-[11px]"} text-gray-500`}>
                                                     <span>{e.code}</span>-<span>{e.itemVariation}</span>
                                                 </div>
                                             </div>
                                         </RowItemTable>
-                                        <RowItemTable colSpan={2} textAlign={'center'} textSize={'!text-xs'}>
-                                            <span
+                                        <RowItemTable className={'!px-0'} colSpan={2} textAlign={'center'} textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}>
+                                            {/* <span
                                                 className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
                                                                      ${(e?.type === "products" && "text-lime-500 border-lime-500") ||
                                                     (e?.type == "semi_products" && "text-orange-500 border-orange-500") ||
@@ -369,21 +381,35 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                                     }`}
                                             >
                                                 {dataLang[e?.type] || e?.type}
-                                            </span>
+                                            </span> */}
+                                            <TagColorProduct
+                                                dataKey={
+                                                    e?.type === "products" ? 0 :
+                                                        e?.type === "semi_products" ? 1 :
+                                                            e?.type === "out_side" ? 2 :
+                                                                e?.type === "materials" ? 3 :
+                                                                    e?.type === "semi_products_outside" ? 4 :
+                                                                        null
+                                                }
+                                                textSize={`${typePageMoblie ? "text-[6px]" : ""}`}
+                                                className={'!px-1'}
+                                                dataLang={dataLang}
+                                                name={e?.type}
+                                            />
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}>
                                             {e.unit}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}>
                                             {e.quantityPlan > 0 ? formatNumber(e.quantityPlan) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}>
                                             {e.quantityExport > 0 ? formatNumber(e.quantityExport) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}>
                                             {e.quantityRemaining > 0 ? formatNumber(e.quantityRemaining) : '-'}
                                         </RowItemTable>
-                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={'!text-xs'}>
+                                        <RowItemTable colSpan={1} textAlign={'center'} textSize={`${typePageMoblie ? "text-[8px]" : "!text-xs"}`}>
                                             {e.quantityImport > 0 ? formatNumber(e.quantityImport) : '-'}
                                         </RowItemTable>
                                     </RowTable>
@@ -421,7 +447,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                     </ColumnTable>
                 </ContainerTotal>
             }
-        </div>
+        </div >
     )
 })
 

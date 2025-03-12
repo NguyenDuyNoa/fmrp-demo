@@ -158,6 +158,7 @@ const FilePDF = ({
                         const pdfGenerator = pdfMake.createPdf(dataPDF[type][props?.type]);
                         pdfGenerator.open((blob) => {
                             const url = URL.createObjectURL(blob);
+
                             setUrl(url);
                         });
                     }

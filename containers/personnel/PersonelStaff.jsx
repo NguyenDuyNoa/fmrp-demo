@@ -40,6 +40,7 @@ import { useSelector } from "react-redux";
 import PopupStaff from "./components/staff/popup";
 import PopupDetail from "./components/staff/popupDetail";
 import { useStaffList } from "./hooks/staff/useStaffList";
+import { getColorByParam, getRandomColors } from "@/utils/helpers/radomcolor";
 
 const initalState = {
     onSending: false,
@@ -294,7 +295,7 @@ const PersonelStaff = (props) => {
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE_ADMIN);
                                         }}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.branch_popup_create_new}
                                     </button>
@@ -418,14 +419,16 @@ const PersonelStaff = (props) => {
                                     ) : data?.rResult?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
-                                                {data?.rResult?.map((e) => (
-                                                    <RowTable gridCols={13} key={e?.id}>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <div className="w-[60px] h-[60px] mx-auto">
-                                                                {e?.profile_image == null ?
+                                                {data?.rResult?.map((e) => {
+                                                    const randomColors = getColorByParam(e?.full_name)
+                                                    return (
+                                                        <RowTable gridCols={13} key={e?.id}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
+                                                                <div className="w-[60px] h-[60px] mx-auto">
+                                                                    {/* {e?.profile_image == null ?
                                                                     <ModalImage
-                                                                        small="/no_image.png"
-                                                                        large="/no_image.png"
+                                                                        small="/icon/noimagelogo.png"
+                                                                        large="/icon/noimagelogo.png"
                                                                         className="object-contain w-full h-full rounded"
                                                                     />
                                                                     :
@@ -434,101 +437,120 @@ const PersonelStaff = (props) => {
                                                                         large={e?.profile_image}
                                                                         className="w-[60px] h-[60px]  rounded-[100%] object-cover"
                                                                     />
-                                                                }
-                                                            </div>
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1}>
-                                                            <PopupDetail
-                                                                dataLang={dataLang}
-                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:textx-blue-600 transition-all ease-linear px-2 text-left"
-                                                                name={e.full_name}
-                                                                id={e?.id}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={"center"}>
-                                                            {e.code}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={"left"}>
-                                                            {e.email}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {e.department?.map((x) => {
-                                                                    return <span key={x.id}>{x.name}</span>;
-                                                                })}
-                                                            </div>
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e.position_name}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={"center"}>
-                                                            {e.last_login != null ? formatMoment(e.last_login, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <label
-                                                                htmlFor={e.id}
-                                                                className="relative inline-flex items-center cursor-pointer"
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    className="sr-only peer"
-                                                                    value={e.active}
-                                                                    id={e.id}
-                                                                    checked={e.active == "0" ? false : true}
-                                                                    onChange={() => {
-                                                                        if (role) {
-                                                                            handleQueryId({
-                                                                                initialKey: e.id,
-                                                                                status: true,
-                                                                            });
-                                                                        } else {
-                                                                            isShow(
-                                                                                "warning",
-                                                                                WARNING_STATUS_ROLE_ADMIN
-                                                                            );
-                                                                        }
-                                                                    }}
+                                                                } */}
+                                                                    {
+                                                                        e?.profile_image
+                                                                            ?
+                                                                            <ModalImage
+                                                                                small={e?.profile_image}
+                                                                                large={e?.profile_image}
+                                                                                className="w-[60px] h-[60px]  rounded-[100%] object-cover"
+                                                                            />
+                                                                            :
+                                                                            <div className="text-[#0F4F9E] ">
+                                                                                <div
+                                                                                    style={{ backgroundImage: `linear-gradient(to left, ${randomColors[1]}, ${randomColors[0]})` }}
+                                                                                    className=" text-lg  rounded-full h-[60px] uppercase  w-[60px] text-[#FFFFFF] flex items-center justify-center"
+                                                                                >
+                                                                                    {e?.full_name[0]}
+                                                                                </div>
+                                                                            </div>
+                                                                    }
+                                                                </div>
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1}>
+                                                                <PopupDetail
+                                                                    dataLang={dataLang}
+                                                                    className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:textx-blue-600 transition-all ease-linear px-2 text-left"
+                                                                    name={e.full_name}
+                                                                    id={e?.id}
                                                                 />
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={2} textAlign={"center"}>
+                                                                {e.code}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={2} textAlign={"left"}>
+                                                                {e.email}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {e.department?.map((x) => {
+                                                                        return <span key={x.id}>{x.name}</span>;
+                                                                    })}
+                                                                </div>
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
+                                                                {e.position_name}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={2} textAlign={"center"}>
+                                                                {e.last_login != null ? formatMoment(e.last_login, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
+                                                                <label
+                                                                    htmlFor={e.id}
+                                                                    className="relative inline-flex items-center cursor-pointer"
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="sr-only peer"
+                                                                        value={e.active}
+                                                                        id={e.id}
+                                                                        checked={e.active == "0" ? false : true}
+                                                                        onChange={() => {
+                                                                            if (role) {
+                                                                                handleQueryId({
+                                                                                    initialKey: e.id,
+                                                                                    status: true,
+                                                                                });
+                                                                            } else {
+                                                                                isShow(
+                                                                                    "warning",
+                                                                                    WARNING_STATUS_ROLE_ADMIN
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    />
 
-                                                                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                                            </label>
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex flex-wrap gap-1">
-                                                            {e.branch?.map((i, indexB) => (
-                                                                <TagBranch key={indexB}>{i.name}</TagBranch>
-                                                            ))}
-                                                        </RowItemTable>
+                                                                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                                                </label>
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} className="flex flex-wrap gap-1">
+                                                                {e.branch?.map((i, indexB) => (
+                                                                    <TagBranch key={indexB}>{i.name}</TagBranch>
+                                                                ))}
+                                                            </RowItemTable>
 
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            className="flex items-center justify-center space-x-2 text-center"
-                                                        >
-                                                            <PopupStaff
-                                                                onRefresh={refetch.bind(this)}
-                                                                className="text-xs xl:text-base "
-                                                                dataLang={dataLang}
-                                                                name={e.name}
-                                                                code={e.code}
-                                                                phone_number={e.phone_number}
-                                                                email={e.email}
-                                                                id={e?.id}
-                                                                listBranch={listBranch}
-                                                                listPosition={listPosition}
-                                                                department={e.department}
-                                                                position_name={e.position_name}
-                                                                last_login={e.last_login}
-                                                                isState={isState}
-                                                            />
-                                                            <BtnAction
-                                                                onRefresh={refetch.bind(this)}
-                                                                onRefreshGroup={() => { }}
-                                                                dataLang={dataLang}
-                                                                id={e?.id}
-                                                                type="personnel_staff"
-                                                            />
-                                                        </RowItemTable>
-                                                    </RowTable>
-                                                ))}
+                                                            <RowItemTable
+                                                                colSpan={1}
+                                                                className="flex items-center justify-center space-x-2 text-center"
+                                                            >
+                                                                <PopupStaff
+                                                                    onRefresh={refetch.bind(this)}
+                                                                    className="text-xs xl:text-base "
+                                                                    dataLang={dataLang}
+                                                                    name={e.name}
+                                                                    code={e.code}
+                                                                    phone_number={e.phone_number}
+                                                                    email={e.email}
+                                                                    id={e?.id}
+                                                                    listBranch={listBranch}
+                                                                    listPosition={listPosition}
+                                                                    department={e.department}
+                                                                    position_name={e.position_name}
+                                                                    last_login={e.last_login}
+                                                                    isState={isState}
+                                                                />
+                                                                <BtnAction
+                                                                    onRefresh={refetch.bind(this)}
+                                                                    onRefreshGroup={() => { }}
+                                                                    dataLang={dataLang}
+                                                                    id={e?.id}
+                                                                    type="personnel_staff"
+                                                                />
+                                                            </RowItemTable>
+                                                        </RowTable>
+                                                    )
+                                                })}
                                             </div>
                                         </>
                                     ) : (

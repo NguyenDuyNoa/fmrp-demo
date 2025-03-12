@@ -197,7 +197,7 @@ const ProductionPlanForm = (props) => {
                 if (!item.stage == "1") {
                     acc.hasMissingStage = true;
                 }
-                if (!item.quantityRemaining || item.quantityRemaining == 0 || (!item.date.startDate && !item.date.endDate)) {
+                if (!item.quantityRemaining || item.quantityRemaining == 0 || (!item.date.startDate || !item.date.endDate)) {
                     acc.hasMissingQuantityDate = true;
                 }
                 return acc;
@@ -205,9 +205,15 @@ const ProductionPlanForm = (props) => {
             { hasMissingBom: false, hasMissingStage: false, hasMissingQuantityDate: false }
         );
 
-        if (hasMissingQuantityDate || !isValue.idBrach || !isValue.date || (!isValue.dateRange.startDate && !isValue.dateRange.endDate)) {
-            showToat("error", "Vui lòng kiểm tra dữ liệu");
-            return;
+        if (hasMissingQuantityDate || !isValue.idBrach || (!isValue.date) || (!isValue.dateRange.startDate || !isValue.dateRange.endDate)) {
+            if (!isValue.idBrach || (!isValue.date)) {
+                showToat("error", "Vui lòng kiểm tra dữ liệu");
+                return
+            }
+            if ((!isValue.dateRange.startDate || !isValue.dateRange.endDate || hasMissingQuantityDate)) {
+                showToat("error", "Timeline sản xuất phải có ngày bắt đầu và ngày kết thúc");
+                return;
+            }
         }
         if (hasMissingBom) {
             showToat("error", `Vui lòng thêm định mức BOM`);

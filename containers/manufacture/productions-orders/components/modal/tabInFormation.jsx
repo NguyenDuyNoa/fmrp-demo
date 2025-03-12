@@ -24,7 +24,7 @@ const initialState = {
     dataInformation: {},
 };
 
-const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab, refetchProductionsOrders }) => {
+const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab, refetchProductionsOrders, typePageMoblie }) => {
     const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
@@ -39,7 +39,7 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
             dataInformation: {
                 ...isInfomation.dataInformation,
                 id: isStateModal.dataDetail?.poi?.poi_id,
-                image: isStateModal.dataDetail?.poi?.images ? isStateModal.dataDetail?.poi?.images : "/nodata.png",
+                image: isStateModal.dataDetail?.poi?.images ? isStateModal.dataDetail?.poi?.images : "/icon/noimagelogo.png",
                 name: isStateModal.dataDetail?.poi?.item_name + " - " + isStateModal.dataDetail?.poi?.item_code,
                 itemVariation: isStateModal.dataDetail?.poi?.product_variation,
                 quantity: isStateModal.dataDetail?.poi?.quantity,
@@ -47,10 +47,12 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                 unit: isStateModal.dataDetail?.poi?.unit_name,
                 type: "products",
                 arrayProducts: isStateModal.dataDetail?.items_semi?.map(e => {
+                    console.log("Eee", e);
+
                     return {
                         ...e,
                         id: e?.id,
-                        image: "/nodata.png",
+                        image: e?.images ? e?.images : "/icon/noimagelogo.png",
                         name: e?.item_name,
                         code: e?.item_code,
                         itemVariation: e?.product_variation,
@@ -165,7 +167,8 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                                 type='products'
                                 checkBorder={''}
                                 dataLang={dataLang}
-                                image={"/nodata.png"}
+                                typePageMoblie={typePageMoblie}
+                                image={isStateModal.dataDetail?.poi?.images ? isStateModal.dataDetail?.poi?.images : "/icon/noimagelogo.png"}
                                 dataDetail={isStateModal.dataDetail}
                                 name={isStateModal.dataDetail?.poi?.item_name}
                                 code={isStateModal.dataDetail?.poi?.item_code}
@@ -197,8 +200,11 @@ const RenderItem = ({
     refetchProductionsOrders,
     quantity_keep,
     quantity_need_manufactures,
-    quantity_error
+    quantity_error,
+    typePageMoblie
 }) => {
+    console.log("typePageMoblie", typePageMoblie);
+
     const isShow = useToast()
 
     const queryClient = useQueryClient()
@@ -244,9 +250,9 @@ const RenderItem = ({
             <div className={`bg-white sticky top-0 z-[1] `}>
                 <div className={`flex items-start py-2 px-4   gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-fit`}>
                     <div className="min-h-[32px] h-8 w-8 min-w-[32px]">
-                        <ModalImage
-                            small={image ?? "/nodata.png"}
-                            large={image ?? "/nodata.png"}
+                        <Image
+                            src={image}
+                            // large={image}
                             width={18}
                             height={18}
                             alt={name}
@@ -254,10 +260,10 @@ const RenderItem = ({
                         />
                     </div>
                     <div className="flex flex-col gap-0.5">
-                        <div className={`text-xs ${type === "semi" ? "font-medium" : "text-[#5599EC] font-semibold"} max-w-[200px]`}>
+                        <div className={`${typePageMoblie ? 'text-[10px] leading-tight' : 'text-sm'} ${type === "semi" ? "font-medium" : "text-[#5599EC] font-semibold"} max-w-[200px]`}>
                             {name}
                         </div>
-                        <div className={`text-[10px] italic text-gray-500 w-fit`}>
+                        <div className={`${typePageMoblie ? "text-[9px] leading-tight" : "text-[12px]"} italic text-gray-500 w-fit`}>
                             {code} - {itemVariation}
                         </div>
                         {
@@ -292,14 +298,14 @@ const RenderItem = ({
                     ?
                     (quantity_need_manufactures > 0)
                         ?
-                        <ProcessBar data={processBar} checkBorder={checkBorder} />
+                        <ProcessBar data={processBar} checkBorder={checkBorder} typePageMoblie={typePageMoblie} />
                         :
                         <p className="text-xs font-normal text-center text-red-500 xl:text-sm">
                             Số lượng sản xuất đã hết, quá trình sản xuất đã kết thúc
                         </p>
                     :
                     // <ProcessFlow data={processBar} />
-                    <ProcessBar data={processBar} checkBorder={checkBorder} />
+                    <ProcessBar data={processBar} checkBorder={checkBorder} typePageMoblie={typePageMoblie} />
             }
             <PopupConfim
                 dataLang={dataLang}
@@ -713,7 +719,7 @@ const RenderItem = ({
 //     //         //     createRoot(itemContainer.node()).render(
 //     //         //         <>
 //     //         //             <Image
-//     //         //                 src={item.image ? item.image : '/nodata.png'}
+//     //         //                 src={item.image ? item.image : '/icon/noimagelogo.png'}
 //     //         //                 alt="Product Image"
 //     //         //                 width={14}
 //     //         //                 height={14}
@@ -745,7 +751,7 @@ const RenderItem = ({
 
 
 
-const ProcessBar = ({ data, checkBorder }) => {
+const ProcessBar = ({ data, checkBorder, typePageMoblie }) => {
 
     const dataSeting = useSetingServer()
 
@@ -762,7 +768,7 @@ const ProcessBar = ({ data, checkBorder }) => {
                     return (
                         <div key={jIndex} className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} ${checkBorder ? "border-r" : ""}`}>
                             <div className="flex min-h-[70px] gap-3">
-                                <div className={` ${(j?.active || j?.begin_production == 1) ? "" : ''} text-[10px] 
+                                <div className={` ${(j?.active || j?.begin_production == 1) ? "" : ''} pt-0.5 text-[10px] 
                                 ${j?.active ? ' text-[#008000]' : j?.begin_production == 1 ? "text-[#FF8F0D] " : "text-black/70"} 
                                 font-medium text-right` }
                                 >
@@ -772,7 +778,7 @@ const ProcessBar = ({ data, checkBorder }) => {
                                     {/* <div className={`${(j?.active || j?.begin_production == 1) ? 'block' : 'hidden'} `}>
                                         {formatMoment((j?.active || j?.begin_production == 1) ? (j?.active ? j?.date_active : j?.date_production ? j?.date_production : new Date()) : new Date(), FORMAT_MOMENT.TIME_SHORT)}
                                     </div> */}
-                                    <div>
+                                    <div className={`${j?.active ? 'opacity-0' : j?.begin_production == 1 ? 'opacity-0' : 'opacity-100'} ${typePageMoblie ? "text-[10px]" : 'text-xs'}`}>
                                         {(j?.active) ? 'Đã hoàn thành' : (j?.begin_production == 1) ? 'Đang sản xuất' : 'Chưa sản xuất'}
                                     </div>
                                 </div>
@@ -809,7 +815,7 @@ const ProcessBar = ({ data, checkBorder }) => {
                                     </div>
                                     <div className="mt-0.5">
                                         <div className="flex items-center gap-2">
-                                            <p className={`-mt-1 text-sm font-semibold ${j?.active ? "text-[#008000]" : j?.begin_production == 1 ? 'text-[#FF8F0D]' : "text-black/60"}`}>
+                                            <p className={`-mt-1 ${typePageMoblie ? "text-[10px]" : 'text-[13px]'}  font-semibold ${j?.active ? "text-[#008000]" : j?.begin_production == 1 ? 'text-[#FF8F0D]' : "text-black/60"}`}>
                                                 {j.stage_name}
                                             </p>
                                             {(+j?.type == 2 || +j?.type == 3)
@@ -821,70 +827,74 @@ const ProcessBar = ({ data, checkBorder }) => {
                                             }
                                         </div>
                                         <div className="flex items-start gap-1 py-2">
-                                            {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} />}
+                                            {j?.purchase_items?.length > 0 && <FiCornerDownRight size={15} className="mt-1" />}
                                             <div className="flex flex-col items-start gap-2">
                                                 {
                                                     j?.purchase_items?.map(e => {
                                                         return (
                                                             <div key={e?.id} className="">
-                                                                <div className="flex items-center justify-start gap-1 px-2 py-px border border-gray-400 rounded-xl">
-                                                                    <div className="h-full">
+                                                                <div className={`flex items-center justify-start gap-1 px-2 ${typePageMoblie ? "py-0" : "py-px"} border border-gray-400 rounded-full`}>
+                                                                    {/* <div className="h-full">
                                                                         <ModalImage
-                                                                            small={e?.image ? e?.image : "/nodata.png"}
-                                                                            large={e?.image ? e?.image : "/nodata.png"}
+                                                                            small={e?.image ? e?.image : "/icon/noimagelogo.png"}
+                                                                            large={e?.image ? e?.image : "/icon/noimagelogo.png"}
                                                                             width={24}
                                                                             height={24}
                                                                             alt={e?.reference_no}
                                                                             className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
                                                                         />
-                                                                    </div>
-                                                                    <div className="flex flex-col items-start">
-                                                                        <div className="flex items-center gap-1">
-                                                                            <span className="text-[#9295A4] text-[11px] font-semibold">
+                                                                    </div> */}
+                                                                    <div className="flex flex-row items-center divide-x">
+                                                                        <div className="flex items-center gap-1 pr-1 text-[#9295A4]">
+                                                                            <span className={`${typePageMoblie ? "text-[8px]" : "text-[11px]"} font-medium`}>
                                                                                 {e?.reference_no}
                                                                             </span>
                                                                             -
-                                                                            <span className="text-[#9295A4] text-[11px] font-semibold">
+                                                                            <span className={`text-[#9295A4] ${typePageMoblie ? "text-[8px]" : "text-[11px]"} font-medium`}>
                                                                                 SL:<span className="pl-0.5">{formatNumber(e?.quantity)}</span>
                                                                             </span>
                                                                             {
-                                                                                e?.quantity_error > 0 && <span className="text-red-500 text-[11px] font-semibold">
+                                                                                e?.quantity_error > 0 && <span className={`text-red-500 ${typePageMoblie ? "text-[8px]" : "text-[11px]"} font-semibold`}>
                                                                                     - SL lỗi:<span className="pl-0.5">{formatNumber(e?.quantity_error)}</span>
                                                                                 </span>
                                                                             }
                                                                         </div>
-                                                                        <div className="flex items-center gap-1">
-                                                                            {dataProductSerial.is_enable === "1" && (
-                                                                                <div className="flex gap-0.5">
-                                                                                    <h6 className="text-[10px]">
-                                                                                        Serial:
-                                                                                    </h6>
-                                                                                    <h6 className="text-[10px] px-2 w-[full] text-left ">
-                                                                                        {e?.serial ? e?.serial : "-"}
-                                                                                    </h6>
+                                                                        {
+                                                                            j?.final_stage == "1" && (
+                                                                                <div className="flex items-center gap-1 pl-1">
+                                                                                    {dataProductSerial.is_enable === "1" && (
+                                                                                        <div className="flex gap-0.5">
+                                                                                            <h6 className={`${typePageMoblie ? "text-[8px]" : "text-[10px]"} text-[#9295A4]`}>
+                                                                                                Serial:
+                                                                                            </h6>
+                                                                                            <h6 className={`${typePageMoblie ? "text-[8px]" : "text-[10px]"} text-[#9295A4] px-2 w-[full] text-left`}>
+                                                                                                {e?.serial ? e?.serial : "-"}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    )}
+                                                                                    {(dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1") && (
+                                                                                        <>
+                                                                                            <div className="flex gap-0.5">
+                                                                                                <h6 className={`${typePageMoblie ? "text-[8px]" : "text-[10px]"} text-[#9295A4]`}>
+                                                                                                    Lot:
+                                                                                                </h6>{" "}
+                                                                                                <h6 className={`${typePageMoblie ? "text-[8px]" : "text-[10px]"} text-[#9295A4] px-2 w-[full] text-left`}>
+                                                                                                    {e?.lot ? e?.lot : "-"}
+                                                                                                </h6>
+                                                                                            </div>
+                                                                                            <div className="flex gap-0.5">
+                                                                                                <h6 className={`${typePageMoblie ? "text-[8px]" : "text-[10px]"} text-[#9295A4]`}>
+                                                                                                    Date:
+                                                                                                </h6>{" "}
+                                                                                                <h6 className={`${typePageMoblie ? "text-[8px]" : "text-[10px]"} text-[#9295A4] px-2 w-[full] text-left`}>
+                                                                                                    {e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                                                </h6>
+                                                                                            </div>
+                                                                                        </>
+                                                                                    )}
                                                                                 </div>
-                                                                            )}
-                                                                            {(dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1") && (
-                                                                                <>
-                                                                                    <div className="flex gap-0.5">
-                                                                                        <h6 className="text-[10px]">
-                                                                                            Lot:
-                                                                                        </h6>{" "}
-                                                                                        <h6 className="text-[10px] px-2 w-[full] text-left ">
-                                                                                            {e?.lot ? e?.lot : "-"}
-                                                                                        </h6>
-                                                                                    </div>
-                                                                                    <div className="flex gap-0.5">
-                                                                                        <h6 className="text-[10px]">
-                                                                                            Date:
-                                                                                        </h6>{" "}
-                                                                                        <h6 className="text-[10px] px-2 w-[full] text-center ">
-                                                                                            {e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
-                                                                                        </h6>
-                                                                                    </div>
-                                                                                </>
-                                                                            )}
-                                                                        </div>
+                                                                            )
+                                                                        }
                                                                     </div>
 
                                                                 </div>

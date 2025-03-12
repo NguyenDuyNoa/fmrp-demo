@@ -125,7 +125,7 @@ const PopupDetail = (props) => {
                                                     on={["hover"]}
                                                     arrow={false}
                                                 >
-                                                    <span className="bg-[#0f4f9e] text-white rounded p-1.5 text-[13px]">
+                                                    <span className="bg-[#003DA0] text-white rounded p-1.5 text-[13px]">
                                                         {data?.adjusted
                                                             ?.split("|||")
                                                             ?.map((item) => item?.split("--")[1])
@@ -198,8 +198,8 @@ const PopupDetail = (props) => {
                                                                         ) : (
                                                                             <div className="w-[40px] h-[50px] object-cover  mx-auto">
                                                                                 <ModalImage
-                                                                                    small="/nodata.png"
-                                                                                    large="/nodata.png"
+                                                                                    small="/icon/noimagelogo.png"
+                                                                                    large="/icon/noimagelogo.png"
                                                                                     className="w-full h-full rounded object-contain p-1"
                                                                                 >
                                                                                     {" "}

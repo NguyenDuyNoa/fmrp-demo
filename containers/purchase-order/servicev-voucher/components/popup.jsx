@@ -998,7 +998,7 @@ const PopupServieVoucher = (props) => {
                                     <button
                                         onClick={_HandleSubmit.bind(this)}
                                         type="submit"
-                                        className="button text-[#FFFFFF]  font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
+                                        className="button text-[#FFFFFF]  font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-4 rounded-[5.5px] bg-[#003DA0]"
                                     >
                                         {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}
                                     </button>

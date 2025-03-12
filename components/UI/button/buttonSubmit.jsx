@@ -9,7 +9,7 @@ const ButtonSubmit = ({ loading, dataLang, onClick, ...rest }) => {
                     onClick={onClick}
                     type={rest?.type || 'submit'}
                     {...rest}
-                    className={`${rest?.className} button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]`}
+                    className={`${rest?.className} button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#003DA0]`}
                 >
                     {/* {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"} */}
                     {title}

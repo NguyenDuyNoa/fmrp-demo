@@ -291,7 +291,7 @@ const CheckQualityForm = (props) => {
                         ) : (
                             <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center rounded">
                                 <img
-                                    src="/nodata.png"
+                                    src="/icon/noimagelogo.png"
                                     alt="Product Image"
                                     className="w-[30px] h-[30px] object-cover rounded"
                                 />

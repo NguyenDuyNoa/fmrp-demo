@@ -644,8 +644,8 @@ const BodyGantt = ({
                                                                         <ModalImage
                                                                             width={36}
                                                                             height={36}
-                                                                            small="/nodata.png"
-                                                                            large="/nodata.png"
+                                                                            small="/icon/noimagelogo.png"
+                                                                            large="/icon/noimagelogo.png"
                                                                             className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                                         ></ModalImage>
                                                                     )}

@@ -42,6 +42,7 @@ import Popup_Products from "./components/product/popupProducts";
 import { useCategoryOptions } from "./hooks/product/useCategoryOptions";
 import { useProductList } from "./hooks/product/useProductList";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 const Products = (props) => {
     const dataLang = props.dataLang;
 
@@ -260,13 +261,13 @@ const Products = (props) => {
                                         setOpen={sOpenDetail}
                                         isOpen={openDetail}
                                         nameModel={"products"}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105" /> :
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     >{dataLang?.branch_popup_create_new}
                                     </button>
                                 }
@@ -444,8 +445,8 @@ const Products = (props) => {
                                                         <RowItemTable colSpan={1} className="flex self-center justify-center">
                                                             {e?.images == null ? (
                                                                 <ModalImage
-                                                                    small="/no_image.png"
-                                                                    large="/no_image.png"
+                                                                    small="/icon/noimagelogo.png"
+                                                                    large="/icon/noimagelogo.png"
                                                                     className="object-cover w-full h-12 rounded"
                                                                 />
                                                             ) : (
@@ -462,6 +463,7 @@ const Products = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'left'}>
                                                             <Popup_Detail
                                                                 id={e?.id}
+                                                                dataProduct={e}
                                                                 dataProductExpiry={dataProductExpiry}
                                                                 dataLang={dataLang}
                                                             >
@@ -473,6 +475,7 @@ const Products = (props) => {
                                                         <RowItemTable colSpan={2} textAlign={'left'} className="flex flex-col items-start justify-start">
                                                             <Popup_Detail
                                                                 id={e?.id}
+                                                                dataProduct={e}
                                                                 dataProductExpiry={dataProductExpiry}
                                                                 dataLang={dataLang}
                                                             >
@@ -481,22 +484,14 @@ const Products = (props) => {
                                                                 </button>
                                                             </Popup_Detail>
                                                             <h6 className="flex items-center gap-1">
-                                                                <span
-                                                                    className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed 2xl:text-[10px] text-[9px]
-                                                                     ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") ||
-                                                                        (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") ||
-                                                                        (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")
-                                                                        }`}
-                                                                >
-                                                                    {dataLang[e?.type_products?.name] || ""}
-                                                                </span>
+                                                                <TagColorProduct dataLang={dataLang} dataKey={e?.type_products?.id} name={e?.type_products?.name} />
                                                             </h6>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'center'}>
                                                             {e?.unit}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'center'}>
-                                                            {formatNumber(e?.variation_count)}
+                                                            {formatNumber(e?.variation_count - 1) == 0 ? "" : e?.variation_count - 1}
                                                         </RowItemTable>
                                                         {/* <RowItemTable colSpan={1} textAlign={'center'}>
                                                             {formatNumber(e?.stock_quantity)}
@@ -539,6 +534,7 @@ const Products = (props) => {
                                                                 id={e.id}
                                                                 name={e.name}
                                                                 code={e.code}
+                                                                dataProduct={e}
                                                                 bom={
                                                                     Number(e?.variation_count) == 0
                                                                         ?

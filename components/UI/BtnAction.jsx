@@ -427,6 +427,7 @@ export const BtnAction = React.memo((props) => {
                                                 name={props?.name}
                                                 code={props?.code}
                                                 type={props?.typeOpen}
+                                                dataProduct={props?.dataProduct}
                                                 onRefresh={props.onRefresh}
                                                 className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
                                             />
@@ -437,6 +438,7 @@ export const BtnAction = React.memo((props) => {
                                                 code={props?.code}
                                                 onRefresh={props.onRefresh}
                                                 type={props?.typeOpen}
+                                                dataProduct={props?.dataProduct}
                                                 bom={props?.bom}
                                                 className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
                                             />
@@ -445,6 +447,7 @@ export const BtnAction = React.memo((props) => {
                                                 dataProductExpiry={props.dataProductExpiry}
                                                 dataLang={props.dataLang}
                                                 id={props?.id}
+                                                dataProduct={props?.dataProduct}
                                                 type={props?.typeOpen}
                                                 className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
                                             />

@@ -10,7 +10,7 @@ import ModalImage from "react-modal-image";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
 import TimelineChartStage from "./components/TimelineChartStage";
 
-const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
+const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang, typePageMoblie }) => {
     const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
@@ -20,24 +20,24 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
     return (
         <>
             <div className="my-4">
-                <div className="grid my-4 grid-cols-13">
-                    <h4 className="col-span-4 px-4 text-[#344054] font-normal text-xs uppercase">
+                <div className={`grid my-4 ${typePageMoblie ? "grid-cols-7" : "grid-cols-13"}`}>
+                    <h4 className={`${typePageMoblie ? "col-span-3" : "col-span-4"} px-4 text-[#344054] font-normal ${typePageMoblie ? "text-[9px]" : "text-xs"} uppercase`}>
                         {dataLang?.materials_planning_order || "materials_planning_order"}
                     </h4>
-                    <h4 className="col-span-1 text-center text-[#344054] font-normal text-xs uppercase">
-                        {dataLang?.category_unit || "category_unit"}
+                    <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-1" : "text-xs col-span-1"} uppercase`}>
+                        {typePageMoblie ? "ĐVT" : (dataLang?.category_unit || "category_unit")}
                     </h4>
-                    <h4 className="col-span-1 text-center text-[#344054] font-normal text-xs uppercase">
+                    <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-1" : "text-xs col-span-1"} uppercase`}>
                         {'SL cần'}
                         {/* {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"} */}
                     </h4>
-                    <h4 className="col-span-1 text-center text-[#344054] font-normal text-xs uppercase">
+                    <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-1" : "text-xs col-span-1"} uppercase`}>
                         {'SL giữ kho'}
                     </h4>
-                    <h4 className="col-span-1 text-center text-[#344054] font-normal text-xs uppercase">
+                    <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-1" : "text-xs col-span-1"} uppercase`}>
                         {'SL sản xuất'}
                     </h4>
-                    <h4 className="col-span-5 text-center text-[#344054] font-normal text-xs uppercase">
+                    <h4 className={`col-span-5 ${typePageMoblie ? "hidden" : "block"} text-center text-[#344054] font-normal text-xs uppercase`}>
                         {"Tiến trình"}
                     </h4>
                 </div>
@@ -60,71 +60,91 @@ const TabSemi = memo(({ handShowItem, isLoadingRight, dataLang }) => {
                                         alt="dow.png"
                                         className={`object-cover ${e.showChild ? "" : "-rotate-90"} transition-all duration-150 ease-linear`}
                                     />
-                                    <h1 className="text-[#52575E] font-semibold 3xl:text-sm text-xs py-2">{e.title}</h1>
+                                    <h1 className={`text-[#52575E] font-semibold ${typePageMoblie ? "text-[10px]" : "3xl:text-sm text-xs"} py-2`}>{e.title}</h1>
                                 </div>
-                                {e.showChild && e.arrListData.map((i, index) => (
+                                {e.showChild && e?.arrListData?.map((i, index) => (
                                     <div
                                         key={i?.id}
-                                        className={`grid grid-cols-13 ${isState.dataModal.id == i?.id ? "bg-gray-100" : ""} ${e.arrListData?.length - 1 == index ? "" : "border-b"} items-center col-span-12 group transition-all duration-150 ease-in-out`}
+                                        className={`grid ${typePageMoblie ? "grid-cols-8" : "grid-cols-13"} ${isState.dataModal.id == i?.id ? "bg-gray-100" : ""} ${e.arrListData?.length - 1 == index ? "" : "border-b"} items-center col-span-12 group transition-all duration-150 ease-in-out`}
                                     >
-                                        <h4 className="col-span-4 text-[#344054] font-normal text-xs flex flex-col py-2 px-4 gap-2">
-                                            <div className="flex items-center gap-1 px-2 py-1 border border-gray-400 w-fit rounded-xl">
-                                                <ModalImage
-                                                    small={i?.childProducts?.image}
-                                                    large={i?.childProducts?.image}
+                                        {
+                                            typePageMoblie && (
+                                                <div className="col-span-8">
+                                                    {
+                                                        i?.quantity_need_manufactures > 0
+                                                            ?
+                                                            <TimelineChartStage data={i?.processBar} typePageMoblie={typePageMoblie} dataLang={dataLang} />
+                                                            :
+                                                            <p className="text-[10px] font-normal text-center text-red-500">
+                                                                Số lượng sản xuất đã hết, quá trình sản xuất đã kết thúc
+                                                            </p>
+                                                    }
+                                                </div>
+                                            )
+                                        }
+                                        <h4 className={`col-span-4 text-[#344054] font-normal text-xs flex flex-col py-2 ${typePageMoblie ? "px-2 gap-1" : "px-4 gap-2"}`}>
+                                            <div className={`flex items-center gap-1 ${typePageMoblie ? "py-0.5 px-2" : "px-2 py-1"} border border-gray-400 rounded-full w-fit`}>
+                                                <Image
+                                                    src={i?.childProducts?.image}
+                                                    // large={i?.childProducts?.image}
                                                     width={18}
                                                     height={18}
                                                     alt={i?.childProducts?.name}
                                                     className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
                                                 />
-                                                <span className="text-[#9295A4] text-[11px]">
+                                                <span className={`text-[#9295A4] ${typePageMoblie ? "text-[7px] leading-tight" : "text-[11px]"}`}>
                                                     {i?.childProducts?.item_name} - SL:{" "}
                                                     {i?.childProducts?.quantity > 0 ? formatNumber(i?.childProducts?.quantity) : "-"}{" "}
                                                 </span>
                                             </div>
                                             <div className="flex items-start gap-2">
                                                 <FiCornerDownRight size={15} />
-                                                <ModalImage
-                                                    small={i?.image}
-                                                    large={i?.image}
+                                                <Image
+                                                    src={i?.image}
+                                                    // small={i?.image}
+                                                    // large={i?.image}
                                                     width={36}
                                                     height={36}
                                                     alt={i?.name}
-                                                    className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                                    className={`object-cover rounded-md ${typePageMoblie ? "w-[24px] h-[24px]" : "min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"}`}
                                                 />
                                                 <div className="flex flex-col gap-0.5">
-                                                    <h1 className={`${isState.dataModal.id == i?.id ? "text-[#0F4F9E]" : "text-[#000000]"}  font-semibold xl:text-sm text-xs`}  >
+                                                    <h1 className={`${isState.dataModal.id == i?.id ? "text-[#0F4F9E]" : "text-[#000000]"}  font-semibold ${typePageMoblie ? "text-[10px] leading-tight" : "xl:text-sm text-xs"}`}  >
                                                         {i?.name}
                                                     </h1>
-                                                    <h1 className="text-[#9295A4] font-normal text-[11px]">
+                                                    <h1 className={`text-[#9295A4] font-normal ${typePageMoblie ? "text-[8px] leading-tight" : "text-[11px]"}`}>
                                                         {i?.code} - {i?.itemVariation}
                                                     </h1>
                                                 </div>
                                             </div>
                                         </h4>
-                                        <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                        <h4 className={`${typePageMoblie ? "col-span-1" : "col-span-1"} text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px]" : "xl:text-sm text-xs"} uppercase`}>
                                             {i?.unit}
                                         </h4>
-                                        <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                        <h4 className={`${typePageMoblie ? "col-span-1" : "col-span-1"} text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px]" : "xl:text-sm text-xs"} uppercase`}>
                                             {i?.quantity > 0 ? formatNumber(i?.quantity) : "-"}
                                         </h4>
-                                        <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                        <h4 className={`${typePageMoblie ? "col-span-1" : "col-span-1"} text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px]" : "xl:text-sm text-xs"} uppercase`}>
                                             {i?.quantity_keep > 0 ? formatNumber(i?.quantity_keep) : "-"}
                                         </h4>
-                                        <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                        <h4 className={`${typePageMoblie ? "col-span-1" : "col-span-1"} text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px]" : "xl:text-sm text-xs"} uppercase`}>
                                             {i?.quantity_need_manufactures > 0 ? formatNumber(i?.quantity_need_manufactures) : "-"}
                                         </h4>
-                                        <div className="col-span-5">
-                                            {
-                                                i?.quantity_need_manufactures > 0
-                                                    ?
-                                                    <TimelineChartStage data={i?.processBar} dataLang={dataLang} />
-                                                    :
-                                                    <p className="text-xs font-normal text-center text-red-500 xl:text-sm">
-                                                        Số lượng sản xuất đã hết, quá trình sản xuất đã kết thúc
-                                                    </p>
-                                            }
-                                        </div>
+                                        {
+                                            !typePageMoblie && (
+                                                <div className="col-span-5">
+                                                    {
+                                                        i?.quantity_need_manufactures > 0
+                                                            ?
+                                                            <TimelineChartStage data={i?.processBar} dataLang={dataLang} />
+                                                            :
+                                                            <p className="text-xs font-normal text-center text-red-500 xl:text-sm">
+                                                                Số lượng sản xuất đã hết, quá trình sản xuất đã kết thúc
+                                                            </p>
+                                                    }
+                                                </div>
+                                            )
+                                        }
                                         {/* <h4 className="flex items-center col-span-5">
                                             {i?.processBar.map((j, JIndex) => {
                                                 return (

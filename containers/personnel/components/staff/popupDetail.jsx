@@ -10,6 +10,7 @@ import { Image as IconImage } from "iconsax-react";
 import Image from "next/image";
 import { useState } from "react";
 import { useStaffDetail } from "../../hooks/staff/useStaffDetail";
+import { getColorByParam, getRandomColors } from "@/utils/helpers/radomcolor";
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -47,6 +48,7 @@ const PopupDetail = (props) => {
         enabled: !!open && !!props?.id
     })
 
+    const colorImages = getRandomColors()
 
     return (
         <PopupCustom
@@ -190,8 +192,8 @@ const PopupDetail = (props) => {
                                                 </span>
                                             </div>
                                             <div className="flex justify-center">
-                                                <div className="relative h-[180px] w-[180px] rounded bg-slate-200">
-                                                    {data?.profile_image && (
+                                                {data?.profile_image && (
+                                                    <div className="relative h-[180px] w-[180px] rounded bg-slate-200">
                                                         <Image
                                                             width={180}
                                                             height={180}
@@ -210,13 +212,21 @@ const PopupDetail = (props) => {
                                                             crossOrigin="anonymous"
                                                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                                         />
-                                                    )}
-                                                    {!data?.profile_image && (
-                                                        <div className="flex flex-col items-center justify-center w-full h-full">
-                                                            <IconImage />
+                                                    </div>
+                                                )}
+                                                {!data?.profile_image && (
+                                                    // <div className="flex flex-col items-center justify-center w-full h-full">
+                                                    //     <IconImage />
+                                                    // </div>
+                                                    <div className="text-[#0F4F9E] ">
+                                                        <div
+                                                            style={{ backgroundImage: `linear-gradient(to left, ${getColorByParam(data?.full_name)[1]}, ${getColorByParam(data?.full_name)[0]})` }}
+                                                            className=" text-3xl  rounded-full h-[140px] w-[140px] uppercase text-[#FFFFFF] flex items-center justify-center"
+                                                        >
+                                                            {data?.full_name[0]}
                                                         </div>
-                                                    )}
-                                                </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </h6>
                                         <h6>

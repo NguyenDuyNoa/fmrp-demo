@@ -9,7 +9,9 @@ import { ProductionsOrdersProvider } from "./context/productionsOrders";
 const ProductionsOrders = (props) => {
     const dataLang = props.dataLang;
 
-    const propsDefault = { dataLang };
+    const propsDefault = { dataLang, typeScreen: props.type };
+
+    const typePageMoblie = props.type == 'mobile'
 
     const statusExprired = useStatusExprired();
     return (
@@ -18,7 +20,7 @@ const ProductionsOrders = (props) => {
                 <title>{dataLang?.productions_orders || 'productions_orders'}</title>
             </Head>
             <Container className={'relative'}>
-                {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}
+                {typePageMoblie ? null : statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}
                 <ProductionsOrdersProvider>
                     <MainTable {...propsDefault} />
                 </ProductionsOrdersProvider>

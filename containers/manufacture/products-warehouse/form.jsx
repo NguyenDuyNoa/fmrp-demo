@@ -33,6 +33,7 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { useProductsWarehouseItems } from "./hooks/useProductsWarehouseItems";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const ProductsWarehouseForm = (props) => {
     const router = useRouter();
@@ -853,7 +854,7 @@ const ProductsWarehouseForm = (props) => {
                                                 ) : (
                                                     <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                         <img
-                                                            src="/nodata.png"
+                                                            src="/icon/noimagelogo.png"
                                                             alt="Product Image"
                                                             className="w-[30px] h-[30px] object-cover rounded"
                                                         />
@@ -1014,8 +1015,8 @@ const ProductsWarehouseForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+                        <div className="h-[100%] w-full">
                             {isFetching ? (
                                 <Loading className="w-full h-10" color="#0f4f9e" />
                             ) : (
@@ -1049,7 +1050,7 @@ const ProductsWarehouseForm = (props) => {
                                                                         ) : (
                                                                             <div className=" object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]">
                                                                                 <img
-                                                                                    src="/nodata.png"
+                                                                                    src="/icon/noimagelogo.png"
                                                                                     alt="Product Image"
                                                                                     className="object-cover rounded "
                                                                                 />
@@ -1393,7 +1394,7 @@ const ProductsWarehouseForm = (props) => {
                                 </>
                             )}
                         </div>
-                    </div>
+                    </Customscrollbar>
                     <h2 className="font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]">
                         {dataLang?.purchase_total || "purchase_total"}
                     </h2>

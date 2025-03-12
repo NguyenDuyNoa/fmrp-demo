@@ -406,7 +406,7 @@ const Inventory = (props) => {
                                                                 on={["hover"]}
                                                                 arrow={false}
                                                             >
-                                                                <span className="bg-[#0f4f9e] text-white rounded p-1.5 ">
+                                                                <span className="bg-[#003DA0] text-white rounded p-1.5 ">
                                                                     {e?.adjusted
                                                                         ?.split("|||")
                                                                         ?.map((item) => item?.split("--")[1])

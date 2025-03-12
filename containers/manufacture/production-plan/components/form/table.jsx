@@ -87,8 +87,8 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                                         <ModalImage
                                             width={36}
                                             height={36}
-                                            small="/nodata.png"
-                                            large="/nodata.png"
+                                            small="/icon/noimagelogo.png"
+                                            large="/icon/noimagelogo.png"
                                             className="object-cover rounded-md min-w-[36px] max-w-[36px] w-[36px] max-h-[36px] min-h-[36px] h-[36px]"
                                         ></ModalImage>
                                     )}
@@ -263,7 +263,7 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
                                             clearButtonClassName="mr-6 hover:scale-150 transition-all duration-150 ease-linear"
                                             placeholderText={dataLang?.production_plan_form_materials_date_to_date || 'production_plan_form_materials_date_to_date'}
                                             className={`py-[8px] px-4  text-[13px] placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
-                                            ${i.date.startDate == null ? "border-red-500" : "border-[#E1E1E1]"}  focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] z-[999]`}
+                                            ${(i.date.startDate == null || i.date.endDate == null) ? "border-red-500" : "border-[#E1E1E1]"}  focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] z-[999]`}
                                         />
 
                                         <Image

@@ -39,7 +39,7 @@ import { useCategoryOptions } from "@/containers/products/hooks/product/useCateg
 import { useBranchList } from "@/hooks/common/useBranch";
 import { useClientComboboxNoSearchToParams } from "@/hooks/common/useClients";
 import { useProductsVariantByBranchSearch } from "@/hooks/common/useProductTypeProducts";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import FilterHeader from "./components/fillter/filterHeader";
 import { ProductionsOrdersProvider } from "../productions-orders/context/productionsOrders";
 import GanttChart from "./components/gantt/ganttFinal";
@@ -71,15 +71,21 @@ const initialValues = {
 };
 
 const ProductionPlan = (props) => {
+    console.log("props", props);
+
     const dataLang = props.dataLang;
 
+
+
     const router = useRouter();
+    console.log("router", router);
 
     const statusExprired = useStatusExprired();
 
     const { paginate } = usePagination();
 
     const { handleTab } = useTab("order");
+
 
     const [isSort, sIsSort] = useState("");
 
@@ -109,7 +115,7 @@ const ProductionPlan = (props) => {
 
     const params = {
         page: router.query?.page || 1,
-        limit: limit,
+        limit: 3,
         sort: isSort,
         status: isValue?.planStatus?.map(e => e?.value),
         date_start: isValue.startDate ? formatMoment(isValue.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
@@ -120,70 +126,104 @@ const ProductionPlan = (props) => {
         product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,
     };
 
-    const _ServerFetching = async () => {
+    useEffect(() => {
+        console.log("router", router);
+
+    }, [router.query?.tab]);
+
+    const _ServerFetching = async (req) => {
         const url = router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true";
         try {
-            const { data } = await apiProductionPlan.apiListOrderPlan(url, { params: params });
+            const { data } = await apiProductionPlan.apiListOrderPlan(url, { params: req });
+            const res = data?.rResult?.map((i) => {
+                return {
+                    ...i,
+                    id: i?.id,
+                    nameOrder: i?.nameOrder,
+                    status: i?.status,
+                    process: i?.process,
+                    processDefault: i?.processDefault,
+                    listProducts: i?.listProducts.map((s) => {
+                        const check = arrIdChecked.includes(s?.id);
+                        return {
+                            ...s,
+                            id: s?.id,
+                            name: s?.name,
+                            images: s?.images,
+                            desription: s?.desription,
+                            status: s?.status,
+                            quantity: +s?.quantity,
+                            quantityRemaining: +s?.quantity_rest,
+                            quantityPlan: +s?.quantity_plan,
+                            actions: s?.actions,
+                            processArr: s?.processArr,
+                            unitName: s?.unit_name,
+                            checked: check,
+                            productVariation: s?.product_variation,
+                        };
+                    }),
+                };
+            })
+            // updateData({
+            //     timeLine: data?.listDate?.map((e) => {
+            //         return {
+            //             id: uuid(),
+            //             title: e?.title,
+            //             month: formatMoment(e?.month_year, FORMAT_MOMENT.MONTH),
+            //             days: e?.days?.map((i) => {
+            //                 return {
+            //                     ...i,
+            //                     id: uuid(),
+            //                     day: `${i?.day_name} ${formatMoment(i?.date, FORMAT_MOMENT.MONTH)}`,
+            //                     date: formatMoment(i?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
+            //                 };
+            //             }),
+            //         };
+            //     }),
+            // });
+            // updateTotalItems({ iTotalDisplayRecords: data?.output?.iTotalDisplayRecords, iTotalRecords: data?.output?.iTotalRecords });
+            return {
+                ...data,
+                rResult: res
+            }
 
-            updateData({
-                listOrder: data?.rResult?.map((i) => {
-                    return {
-                        ...i,
-                        id: i?.id,
-                        nameOrder: i?.nameOrder,
-                        status: i?.status,
-                        process: i?.process,
-                        processDefault: i?.processDefault,
-                        listProducts: i?.listProducts.map((s) => {
-                            const check = arrIdChecked.includes(s?.id);
-                            return {
-                                ...s,
-                                id: s?.id,
-                                name: s?.name,
-                                images: s?.images,
-                                desription: s?.desription,
-                                status: s?.status,
-                                quantity: +s?.quantity,
-                                quantityRemaining: +s?.quantity_rest,
-                                quantityPlan: +s?.quantity_plan,
-                                actions: s?.actions,
-                                processArr: s?.processArr,
-                                unitName: s?.unit_name,
-                                checked: check,
-                                productVariation: s?.product_variation,
-                            };
-                        }),
-                    };
-                }),
-                timeLine: data?.listDate?.map((e) => {
-                    return {
-                        id: uuid(),
-                        title: e?.title,
-                        month: formatMoment(e?.month_year, FORMAT_MOMENT.MONTH),
-                        days: e?.days?.map((i) => {
-                            return {
-                                ...i,
-                                id: uuid(),
-                                day: `${i?.day_name} ${formatMoment(i?.date, FORMAT_MOMENT.MONTH)}`,
-                                date: formatMoment(i?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
-                            };
-                        }),
-                    };
-                }),
-            });
-            updateTotalItems({ iTotalDisplayRecords: data?.output?.iTotalDisplayRecords, iTotalRecords: data?.output?.iTotalRecords });
         } catch (error) {
             throw error
         }
     };
 
-    const { isLoading, isFetching } = useQuery({
-        queryKey: ['api_production_internal_plan', { ...params }, router.query.tab],
-        queryFn: _ServerFetching,
-        placeholderData: keepPreviousData,
+    // const { isLoading, isFetching } = useQuery({
+    //     queryKey: ['api_production_internal_plan', { ...params }, router.query.tab],
+    //     queryFn: _ServerFetching,
+    //     placeholderData: keepPreviousData,
+    //     enabled: router.query.tab == 'order' || router.query.tab == 'plan',
+    //     ...optionsQuery
+    // })
+    const { isLoading, isFetching, data, hasNextPage, fetchNextPage } = useInfiniteQuery({
+        queryKey: ["api_production_internal_plan", { ...params }, router.query.tab],
+        queryFn: async ({ pageParam = 1 }) => {
+            const data = await _ServerFetching({
+                ...params,
+                page: pageParam
+            })
+            console.log("data 11111", data);
+
+            return data;
+        },
+        getNextPageParam: (lastPage, pages) => {
+            return lastPage?.output?.next == 1 ? pages?.length + 1 : null;
+        },
+        retry: 5,
+        retryDelay: 5000,
+        initialPageParam: 1,
         enabled: router.query.tab == 'order' || router.query.tab == 'plan',
-        ...optionsQuery
+        ...optionsQuery,
     })
+
+    const convertData = data ? data?.pages?.map((item) => item?.rResult).flat() : []
+    useEffect(() => {
+        updateData({ listOrder: convertData })
+    }, [data])
 
     const _HandleSeachApi = debounce(async (inputValue) => {
         try {
@@ -264,6 +304,8 @@ const ProductionPlan = (props) => {
         checkedItems,
         router: router.query?.tab,
         page: router.query?.page,
+        typeScreen: props.type,
+        hasNextPage, fetchNextPage
     };
 
     console.log("isData.listOrder", isData);
@@ -274,7 +316,13 @@ const ProductionPlan = (props) => {
                 <title>{dataLang?.production_plan_title || 'production_plan_title'}</title>
             </Head>
             <Container>
-                {statusExprired ? <EmptyExprired /> : <Header {...shareProps} />}
+                {
+                    props.type == 'mobile'
+                        ?
+                        null
+                        :
+                        statusExprired ? <EmptyExprired /> : <Header {...shareProps} />
+                }
                 <FilterHeader {...shareProps} onChangeValue={onChangeValue} />
                 <ProductionsOrdersProvider>
                     {/* <BodyGantt
@@ -295,7 +343,7 @@ const ProductionPlan = (props) => {
                         handleCheked={handleCheked}
                         dataOrder={isData.listOrder} />
                 </ProductionsOrdersProvider>
-                {isData.listOrder?.length > 0 && (
+                {/* {isData.listOrder?.length > 0 && (
                     <ContainerPagination className="flex items-center space-x-5">
                         <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                         <Pagination
@@ -305,7 +353,7 @@ const ProductionPlan = (props) => {
                             currentPage={router.query?.page || 1}
                         />
                     </ContainerPagination>
-                )}
+                )} */}
             </Container>
             <PopupConfim
                 dataLang={dataLang}

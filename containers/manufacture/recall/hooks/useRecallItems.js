@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 
 export const useRecallItems = (search, idBranch, idProductionOrder) => {
     return useQuery({
-        queryKey: ["api_items_recall", search, idBranch, idProductionOrder],
+        queryKey: ["api_items_recall", search, idProductionOrder],
         queryFn: async () => {
             const converArray = (array) => {
                 return array?.map((e) => ({
@@ -19,30 +19,36 @@ export const useRecallItems = (search, idBranch, idProductionOrder) => {
                     e,
                 })) || []
             }
+            const { data } = await apiRecall.apiItemsByProductionOrder({
+                params: {
+                    poi_id: idProductionOrder?.value,
+                    search
+                }
+            });
+            return converArray(data?.result)
+            // if (idProductionOrder) {
+            //     const { data } = await apiRecall.apiItemsByProductionOrder({
+            //         params: {
+            //             poi_id: idProductionOrder?.value,
+            //             search
+            //         }
+            //     });
+            //     return converArray(data?.result)
 
-            if (idProductionOrder) {
-                const { data } = await apiRecall.apiItemsByProductionOrder({
-                    params: {
-                        poi_id: idProductionOrder?.value,
-                        search
-                    }
-                });
-                return converArray(data?.result)
-
-            } else {
-                const { data } = await apiRecall.apiItemsRecall(search ? "POST" : 'GET', {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    },
-                    data: {
-                        term: search,
-                    },
-                });
-                return converArray(data?.result)
-            }
+            // } else {
+            //     const { data } = await apiRecall.apiItemsRecall(search ? "POST" : 'GET', {
+            //         params: {
+            //             "filter[branch_id]": idBranch ? idBranch?.value : null,
+            //         },
+            //         data: {
+            //             term: search,
+            //         },
+            //     });
+            //     return converArray(data?.result)
+            // }
 
         },
-        enabled: !!idBranch,
+        enabled: !!idBranch && !!idProductionOrder,
         ...optionsQuery
     })
 }

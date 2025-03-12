@@ -256,8 +256,8 @@ const PopupEditDetail = (props) => {
                                                             ) : (
                                                                 <div className="w-[50px] h-[60px] object-cover  mx-auto">
                                                                     <ModalImage
-                                                                        small="/nodata.png"
-                                                                        large="/nodata.png"
+                                                                        small="/icon/noimagelogo.png"
+                                                                        large="/icon/noimagelogo.png"
                                                                         className="w-full h-full rounded object-contain p-1"
                                                                     ></ModalImage>
                                                                 </div>
@@ -393,7 +393,7 @@ const PopupEditDetail = (props) => {
                                 <button
                                     onClick={handleSubmit}
                                     type="submit"
-                                    className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
+                                    className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#003DA0] hover:scale-105 transition-all ease-linear"
                                 >
                                     {dataLang?.branch_popup_save || "branch_popup_save"}
                                 </button>

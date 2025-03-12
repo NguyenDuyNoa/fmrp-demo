@@ -35,6 +35,7 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
 import { usePriceQuoteContactByClient } from "./hooks/usePriceQuoteContactByClient";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const PriceQuoteForm = (props) => {
     const router = useRouter();
@@ -950,258 +951,256 @@ const PriceQuoteForm = (props) => {
                         </div>
                     </div>
 
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="pr-2">
-                            <React.Fragment>
-                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                    {sortedArr.map((e, index) => (
-                                        <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
-                                            <div className="z-10 col-span-3 my-auto ">
-                                                <SelectComponent
-                                                    onInputChange={(event) => { _HandleSeachApi(event) }}
-                                                    dangerouslySetInnerHTML={{ __html: option.label }}
-                                                    options={options}
-                                                    onChange={_HandleChangeInputOption.bind(
-                                                        this,
-                                                        e?.id,
-                                                        "item",
-                                                        index
-                                                    )}
-                                                    value={e?.item}
-                                                    formatOptionLabel={(option) => (
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex items-center ">
-                                                                <div>
-                                                                    {option.e?.images !== null ? (
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+                        <React.Fragment>
+                            <div className="h-full divide-y divide-slate-200">
+                                {sortedArr.map((e, index) => (
+                                    <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
+                                        <div className="z-10 col-span-3 my-auto ">
+                                            <SelectComponent
+                                                onInputChange={(event) => { _HandleSeachApi(event) }}
+                                                dangerouslySetInnerHTML={{ __html: option.label }}
+                                                options={options}
+                                                onChange={_HandleChangeInputOption.bind(
+                                                    this,
+                                                    e?.id,
+                                                    "item",
+                                                    index
+                                                )}
+                                                value={e?.item}
+                                                formatOptionLabel={(option) => (
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center ">
+                                                            <div>
+                                                                {option.e?.images !== null ? (
+                                                                    <img
+                                                                        src={option.e?.images}
+                                                                        alt="Product Image"
+                                                                        className="3xl:max-w-[35px] 3xl:h-[35px] 2xl:max-w-[35px] 2xl:h-[25px] xl:max-w-[35px] xl:h-[25px] max-w-[25px] h-[25px] text-[8px] object-cover rounded mr-1"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="3xl:max-w-[35px] 3xl:h-[35px] 2xl:max-w-[35px] 2xl:h-[25px] xl:max-w-[35px] xl:h-[25px] max-w-[25px] h-[25px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
                                                                         <img
-                                                                            src={option.e?.images}
+                                                                            src="/icon/noimagelogo.png"
                                                                             alt="Product Image"
-                                                                            className="3xl:max-w-[35px] 3xl:h-[35px] 2xl:max-w-[35px] 2xl:h-[25px] xl:max-w-[35px] xl:h-[25px] max-w-[25px] h-[25px] text-[8px] object-cover rounded mr-1"
+                                                                            className="3xl:max-w-[35px] 3xl:h-[35px] 2xl:max-w-[35px] 2xl:h-[25px] xl:max-w-[35px] xl:h-[25px] max-w-[25px] h-[25px] object-cover rounded mr-1"
                                                                         />
-                                                                    ) : (
-                                                                        <div className="3xl:max-w-[35px] 3xl:h-[35px] 2xl:max-w-[35px] 2xl:h-[25px] xl:max-w-[35px] xl:h-[25px] max-w-[25px] h-[25px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
-                                                                            <img
-                                                                                src="/nodata.png"
-                                                                                alt="Product Image"
-                                                                                className="3xl:max-w-[35px] 3xl:h-[35px] 2xl:max-w-[35px] 2xl:h-[25px] xl:max-w-[35px] xl:h-[25px] max-w-[25px] h-[25px] object-cover rounded mr-1"
-                                                                            />
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                                <div>
-                                                                    <h3 className="font-bold 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
-                                                                        {option.e?.name}
-                                                                    </h3>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <h3 className="font-bold 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
+                                                                    {option.e?.name}
+                                                                </h3>
 
-                                                                    <div className="flex gap-1 3xl:gap-2 2xl:gap-1 xl:gap-1">
-                                                                        <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
-                                                                            {option.e?.product_variation}
-                                                                        </h5>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2 text-gray-400">
-                                                                        <h5 className="text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {dataLang[option.e?.text_type]}
-                                                                        </h5>
-                                                                        {"-"}
-                                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {dataLang?.purchase_survive || "purchase_survive"}
-                                                                            :
-                                                                        </h5>
-                                                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : "0"}
-                                                                        </h5>
-                                                                    </div>
+                                                                <div className="flex gap-1 3xl:gap-2 2xl:gap-1 xl:gap-1">
+                                                                    <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
+                                                                        {option.e?.product_variation}
+                                                                    </h5>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-gray-400">
+                                                                    <h5 className="text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                        {dataLang[option.e?.text_type]}
+                                                                    </h5>
+                                                                    {"-"}
+                                                                    <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                        {dataLang?.purchase_survive || "purchase_survive"}
+                                                                        :
+                                                                    </h5>
+                                                                    <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                        {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : "0"}
+                                                                    </h5>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    )}
-                                                    placeholder={dataLang?.price_quote_item || "price_quote_item"}
-                                                    hideSelectedOptions={false}
-                                                    className={`cursor-pointer rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2`}
-                                                    isSearchable={true}
-                                                    noOptionsMessage={() => "Không có dữ liệu"}
-                                                    menuPortalTarget={document.body}
-                                                    styles={{
-                                                        placeholder: (base) => ({
-                                                            ...base,
-                                                            color: "#cbd5e1",
+                                                    </div>
+                                                )}
+                                                placeholder={dataLang?.price_quote_item || "price_quote_item"}
+                                                hideSelectedOptions={false}
+                                                className={`cursor-pointer rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2`}
+                                                isSearchable={true}
+                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                menuPortalTarget={document.body}
+                                                styles={{
+                                                    placeholder: (base) => ({
+                                                        ...base,
+                                                        color: "#cbd5e1",
+                                                    }),
+                                                    menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999,
+                                                    }),
+                                                    control: (base, state) => ({
+                                                        ...base,
+                                                        ...(state.isFocused && {
+                                                            border: "0 0 0 1px #92BFF7",
+                                                            boxShadow: "none",
                                                         }),
-                                                        menuPortal: (base) => ({
-                                                            ...base,
-                                                            zIndex: 9999,
-                                                        }),
-                                                        control: (base, state) => ({
-                                                            ...base,
-                                                            ...(state.isFocused && {
-                                                                border: "0 0 0 1px #92BFF7",
-                                                                boxShadow: "none",
-                                                            }),
-                                                        }),
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="flex items-center justify-center col-span-1 text-center">
-                                                <h3
-                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"
-                                                        } 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                                    }),
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-center col-span-1 text-center">
+                                            <h3
+                                                className={`${index === 0 ? "cursor-default" : "cursor-text"
+                                                    } 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                            >
+                                                {e?.unit}
+                                            </h3>
+                                        </div>
+                                        <div className="flex items-center justify-center col-span-1">
+                                            <div className="flex items-center justify-center">
+                                                <button
+                                                    disabled={index === 0}
+                                                    onClick={() => handleDecrease(e?.id)}
+                                                    className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                                 >
-                                                    {e?.unit}
-                                                </h3>
-                                            </div>
-                                            <div className="flex items-center justify-center col-span-1">
-                                                <div className="flex items-center justify-center">
-                                                    <button
-                                                        disabled={index === 0}
-                                                        onClick={() => handleDecrease(e?.id)}
-                                                        className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                    >
-                                                        <Minus size="16" />
-                                                    </button>
-                                                    <InPutNumericFormat
-                                                        value={index == 0 ? 1 : e?.quantity}
-                                                        onValueChange={_HandleChangeInputOption.bind(
-                                                            this,
-                                                            e?.id,
-                                                            "quantity",
-                                                            e
-                                                        )}
-                                                        isAllowed={isAllowedNumber}
-                                                        allowNegative={false}
-                                                        className={`${index === 0 ? "cursor-default" : "cursor-text"} 
-                                                        ${e?.quantity == 0 && 'border-red-500' || e?.quantity == "" && 'border-red-500'} 
-                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`} />
-                                                    <button
-                                                        disabled={index === 0}
-                                                        onClick={() => handleIncrease(e.id)}
-                                                        className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                    >
-                                                        <Add size="16" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center justify-center col-span-1 text-center">
-                                                <InPutMoneyFormat
-                                                    value={index === 0 ? 1 : e?.price}
+                                                    <Minus size="16" />
+                                                </button>
+                                                <InPutNumericFormat
+                                                    value={index == 0 ? 1 : e?.quantity}
                                                     onValueChange={_HandleChangeInputOption.bind(
                                                         this,
                                                         e?.id,
-                                                        "price",
-                                                        index
+                                                        "quantity",
+                                                        e
                                                     )}
                                                     isAllowed={isAllowedNumber}
-                                                    readOnly={index === 0 ? readOnlyFirst : false}
-                                                    className={` ${index === 0 ? "cursor-default" : "cursor-text"} 
-                                                    ${e?.price == 0 && 'border-red-500' || e?.price == "" && 'border-red-500'} 
-                                                    appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                                                />
-                                            </div>
-                                            <div className="flex items-center justify-center col-span-1 text-center">
-                                                <InPutNumericFormat
-                                                    value={index === 0 ? 0 : e?.discount}
-                                                    onValueChange={_HandleChangeInputOption.bind(
-                                                        this,
-                                                        e?.id,
-                                                        "discount",
-                                                        index
-                                                    )}
-                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"} appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200`}
-                                                    readOnly={index === 0 ? readOnlyFirst : false}
-                                                    isAllowed={isAllowedDiscount}
-                                                />
-                                            </div>
-
-                                            <div className="flex items-center justify-end col-span-1 text-right">
-                                                <h3
-                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
-                                                >
-                                                    {formatMoney(e?.priceAffter)}
-                                                </h3>
-                                            </div>
-                                            <div className="flex items-center justify-center col-span-1">
-                                                <SelectComponent
-                                                    options={taxOptions}
-                                                    onChange={_HandleChangeInputOption.bind(this, e?.id, "taxStages", index)}
-                                                    value={
-                                                        e?.taxStages
-                                                            ? {
-                                                                label: taxOptions.find(
-                                                                    (item) => item.value === e?.taxStages?.value
-                                                                )?.label,
-                                                                value: e?.taxStages?.value,
-                                                                tax_rate: e?.taxStages?.tax_rate,
-                                                            }
-                                                            : null
-                                                    }
-                                                    placeholder={"% Thuế"}
-                                                    isDisabled={index === 0 ? true : false}
-                                                    hideSelectedOptions={false}
-                                                    formatOptionLabel={(option) => (
-                                                        <div className="flex items-center justify-start gap-1 ">
-                                                            <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                {option?.label}
-                                                            </h2>
-                                                            <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{`(${option?.tax_rate})`}</h2>
-                                                        </div>
-                                                    )}
-                                                    className={`border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                                    isSearchable={true}
-                                                    noOptionsMessage={() => "Không có dữ liệu"}
-                                                    menuPortalTarget={document.body}
-                                                    closeMenuOnSelect={true}
-                                                    styles={{
-                                                        placeholder: (base) => ({
-                                                            ...base,
-                                                            color: "#cbd5e1",
-                                                        }),
-                                                        menuPortal: (base) => ({
-                                                            ...base,
-                                                            zIndex: 20,
-                                                        }),
-                                                        control: (base, state) => ({
-                                                            ...base,
-                                                            boxShadow: "none",
-                                                            padding: "2.7px",
-                                                            ...(state.isFocused && {
-                                                                border: "0 0 0 1px #92BFF7",
-                                                            }),
-                                                        }),
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="flex items-center justify-end col-span-1 text-right">
-                                                <h3
-                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
-                                                >
-                                                    {formatMoney(e?.totalPrice)}
-                                                </h3>
-                                            </div>
-                                            <div className="flex items-center justify-center col-span-1">
-                                                <input
-                                                    value={e?.note}
-                                                    onChange={_HandleChangeInputOption.bind(this, e?.id, "note", index)}
-                                                    name="optionEmail"
-                                                    placeholder="Ghi chú"
-                                                    disabled={index === 0 ? true : false}
-                                                    type="text"
-                                                    className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                                                />
-                                            </div>
-                                            <div className="flex items-center justify-center col-span-1">
+                                                    allowNegative={false}
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"} 
+                                                        ${e?.quantity == 0 && 'border-red-500' || e?.quantity == "" && 'border-red-500'} 
+                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`} />
                                                 <button
-                                                    onClick={_HandleDelete.bind(this, e?.id)}
-                                                    type="button"
-                                                    title="Xóa"
-                                                    className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
+                                                    disabled={index === 0}
+                                                    onClick={() => handleIncrease(e.id)}
+                                                    className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                                 >
-                                                    <IconDelete />
+                                                    <Add size="16" />
                                                 </button>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </React.Fragment>
-                        </div>
-                    </div>
+                                        <div className="flex items-center justify-center col-span-1 text-center">
+                                            <InPutMoneyFormat
+                                                value={index === 0 ? 1 : e?.price}
+                                                onValueChange={_HandleChangeInputOption.bind(
+                                                    this,
+                                                    e?.id,
+                                                    "price",
+                                                    index
+                                                )}
+                                                isAllowed={isAllowedNumber}
+                                                readOnly={index === 0 ? readOnlyFirst : false}
+                                                className={` ${index === 0 ? "cursor-default" : "cursor-text"} 
+                                                    ${e?.price == 0 && 'border-red-500' || e?.price == "" && 'border-red-500'} 
+                                                    appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-center col-span-1 text-center">
+                                            <InPutNumericFormat
+                                                value={index === 0 ? 0 : e?.discount}
+                                                onValueChange={_HandleChangeInputOption.bind(
+                                                    this,
+                                                    e?.id,
+                                                    "discount",
+                                                    index
+                                                )}
+                                                className={`${index === 0 ? "cursor-default" : "cursor-text"} appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200`}
+                                                readOnly={index === 0 ? readOnlyFirst : false}
+                                                isAllowed={isAllowedDiscount}
+                                            />
+                                        </div>
+
+                                        <div className="flex items-center justify-end col-span-1 text-right">
+                                            <h3
+                                                className={`${index === 0 ? "cursor-default" : "cursor-text"} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                            >
+                                                {formatMoney(e?.priceAffter)}
+                                            </h3>
+                                        </div>
+                                        <div className="flex items-center justify-center col-span-1">
+                                            <SelectComponent
+                                                options={taxOptions}
+                                                onChange={_HandleChangeInputOption.bind(this, e?.id, "taxStages", index)}
+                                                value={
+                                                    e?.taxStages
+                                                        ? {
+                                                            label: taxOptions.find(
+                                                                (item) => item.value === e?.taxStages?.value
+                                                            )?.label,
+                                                            value: e?.taxStages?.value,
+                                                            tax_rate: e?.taxStages?.tax_rate,
+                                                        }
+                                                        : null
+                                                }
+                                                placeholder={"% Thuế"}
+                                                isDisabled={index === 0 ? true : false}
+                                                hideSelectedOptions={false}
+                                                formatOptionLabel={(option) => (
+                                                    <div className="flex items-center justify-start gap-1 ">
+                                                        <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                            {option?.label}
+                                                        </h2>
+                                                        <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{`(${option?.tax_rate})`}</h2>
+                                                    </div>
+                                                )}
+                                                className={`border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                                                isSearchable={true}
+                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                menuPortalTarget={document.body}
+                                                closeMenuOnSelect={true}
+                                                styles={{
+                                                    placeholder: (base) => ({
+                                                        ...base,
+                                                        color: "#cbd5e1",
+                                                    }),
+                                                    menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 20,
+                                                    }),
+                                                    control: (base, state) => ({
+                                                        ...base,
+                                                        boxShadow: "none",
+                                                        padding: "2.7px",
+                                                        ...(state.isFocused && {
+                                                            border: "0 0 0 1px #92BFF7",
+                                                        }),
+                                                    }),
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-end col-span-1 text-right">
+                                            <h3
+                                                className={`${index === 0 ? "cursor-default" : "cursor-text"} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                            >
+                                                {formatMoney(e?.totalPrice)}
+                                            </h3>
+                                        </div>
+                                        <div className="flex items-center justify-center col-span-1">
+                                            <input
+                                                value={e?.note}
+                                                onChange={_HandleChangeInputOption.bind(this, e?.id, "note", index)}
+                                                name="optionEmail"
+                                                placeholder="Ghi chú"
+                                                disabled={index === 0 ? true : false}
+                                                type="text"
+                                                className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-center col-span-1">
+                                            <button
+                                                onClick={_HandleDelete.bind(this, e?.id)}
+                                                type="button"
+                                                title="Xóa"
+                                                className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
+                                            >
+                                                <IconDelete />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </React.Fragment>
+                    </Customscrollbar>
 
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
                         <div className="flex items-center col-span-2 gap-2">

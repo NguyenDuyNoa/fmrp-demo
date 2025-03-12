@@ -17,7 +17,8 @@ import TabRecallMaterials from "./tabRecallMaterials";
 import TabWarehouseHistory from "./tabWarehouseHistory";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 
 const initialState = {
@@ -25,33 +26,13 @@ const initialState = {
     dataDetail: {},
 };
 
-const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
+const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }) => {
 
     const minWidth = 850; // Đặt giá trị chiều rộng tối thiểu
 
     const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
 
-    const dataTotal = [
-        {
-            title: dataLang?.productions_orders_details_material_costs || 'productions_orders_details_material_costs',
-            number: 0,
-            bgColor: "#EBFEF2",
-            bgSmall: "#0BAA2E",
-        },
-        {
-            title: dataLang?.productions_orders_details_other_costs || 'productions_orders_details_other_costs',
-            number: 0,
-            bgColor: "#FEF8EC",
-            bgSmall: "#FF8F0D",
-        },
-        {
-            title: dataLang?.productions_orders_details_total_costs || 'productions_orders_details_total_costs',
-            number: 0,
-            bgColor: "#FFEEF0",
-            bgSmall: "#EE1E1E",
-        },
-    ];
-
+    const dataSeting = useSetingServer();
 
     const router = useRouter();
 
@@ -73,7 +54,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
 
     const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
 
-
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     useEffect(() => {
         // Chờ các refs được gán đầy đủ
@@ -122,12 +103,12 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         if (router.query.tab) {
             router.push({
                 pathname: router.route,
-                query: { tabModal: e, tab: router.query.tab },
+                query: { ...router.query, tabModal: e, tab: router.query.tab },
             });
         } else {
             router.push({
                 pathname: router.route,
-                query: { tabModal: e },
+                query: { ...router.query, tabModal: e },
             });
         }
 
@@ -197,7 +178,29 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         },
     ];
 
-    const shareProps = { queryStateModal, isState, refetchProductionsOrders, isLoading, dataLang, isStateModal, width, listTab };
+    const dataTotal = [
+        {
+            title: dataLang?.productions_orders_details_material_costs || 'productions_orders_details_material_costs',
+            number: formatNumber(data?.dataDetail?.cost?.cost_material ?? 0) ?? 0,
+            bgColor: "#EBFEF2",
+            bgSmall: "#0BAA2E",
+        },
+        {
+            title: dataLang?.productions_orders_details_other_costs || 'productions_orders_details_other_costs',
+            number: formatNumber(data?.dataDetail?.cost?.cost_other ?? 0) ?? 0,
+            bgColor: "#FEF8EC",
+            bgSmall: "#FF8F0D",
+        },
+        {
+            title: dataLang?.productions_orders_details_total_costs || 'productions_orders_details_total_costs',
+            number: formatNumber(data?.dataDetail?.cost?.total_cost ?? 0) ?? 0,
+            bgColor: "#FFEEF0",
+            bgSmall: "#EE1E1E",
+        },
+    ];
+
+
+    const shareProps = { queryStateModal, isState, refetchProductionsOrders, isLoading, dataLang, isStateModal, width, listTab, typePageMoblie };
 
     const components = {
         1: <TabInFormation {...shareProps} />,
@@ -207,17 +210,56 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
         5: <TabRecallMaterials {...shareProps} />,
         6: <TabProcessingCost {...shareProps} />,
     };
+
+    console.log("data?.dataDetail", data?.dataDetail);
+    // const findSt
+
+    const color = {
+        "0": {
+            class: 'text-[#f59e0b] bg-[#fff7ed]',
+            circle: "bg-[#f59e0b]",
+            title: "Chưa sản xuất"
+        },
+        "1": {
+            class: 'text-[#3b82f6] bg-[#eff6ff]',
+            circle: "bg-[#3b82f6]",
+            title: "Đang sản xuất"
+        },
+        "2": {
+            class: 'text-[#22c55e] bg-[#f0fdf4]',
+            circle: "bg-[#22c55e]",
+            title: "Hoàn thành"
+        },
+        "3": {
+            class: 'text-[#ef4444] bg-[#fef2f2]',
+            circle: "bg-[#ef4444]",
+            title: "Chưa hoàn thành & Quá hạn"
+        }
+    }
+
+    const getStatusColor = (status) => color[status] ?? {
+        class: 'text-[#3b82f6] bg-[#eff6ff]',
+        circle: "bg-[#3b82f6]",
+        title: "Chưa hoàn thành"
+    };
+    // const getStatusColor = (status) => color[status] ?? {
+    //     class: 'text-[#3b82f6] bg-[#eff6ff]',
+    //     circle: "bg-[#3b82f6]",
+    //     title: "Chưa hoàn thành"
+    // };
+
+
     if (!isMounted) return null
 
     return (
         <Customscrollbar
             style={{
                 width: width,
-                height: `calc(100vh - ${68}px)`,
+                height: typePageMoblie ? "100vh" : `calc(100vh - ${68}px)`,
                 transform: isState.openModal ? "translateX(0%)" : "translateX(100%)",
                 maxWidth: "100vw",
             }}
-            className={`bg-[#FFFFFF] absolute top-[9.2%] right-0 shadow-md z-[999] transition-all duration-150 ease-linear h-full overflow-y-auto`}
+            className={`bg-[#FFFFFF] absolute ${typePageMoblie ? 'top-0' : "top-[9.2%]"} right-0 shadow-md z-[999] transition-all duration-150 ease-linear h-full overflow-y-auto`}
         >
             <div className="pl-3 pr-4">
                 <div className="flex justify-between py-4 border-b border-gray-300">
@@ -236,54 +278,62 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                             className="text-sm rotate-90 cursor-pointer text-gray-650"
                             onClick={() => setWidth(window.innerWidth)}
                         />
-                        <h1 className="text-[#0F4F9E] font-medium capitalize">
+                        <h1 className={`text-[#0F4F9E] ${typePageMoblie ? 'text-sm' : " text-base"} font-medium capitalize`}>
                             {dataLang?.productions_orders_details || "productions_orders_details"}
                         </h1>
                     </div>
-                    <button
-                        onClick={() => {
-                            queryState({ openModal: !isState.openModal, dataModal: {} });
-                            setWidth(minWidth);
-                        }}
-                        type="button"
-                        className="w-[20px] h-[20px] hover:scale-125 transition-all duration-300 ease-linear"
-                    >
-                        <Image
-                            alt=""
-                            src={"/manufacture/x.png"}
-                            width={20}
-                            height={20}
-                            className="object-cover w-full h-full"
-                        />
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <div className="">
+                            <span className={`${getStatusColor(data?.dataDetail?.poi?.status_item)?.class} ${typePageMoblie ? 'text-xs py-1' : "text-sm py-2"} pl-3 pr-4  rounded-3xl font-medium w-fit h-fit`}>
+                                <span className={`${getStatusColor(data?.dataDetail?.poi?.status_item)?.circle} h-2 w-2 rounded-full inline-block mr-2`} />
+                                {getStatusColor(data?.dataDetail?.poi?.status_item)?.title}
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => {
+                                queryState({ openModal: !isState.openModal, dataModal: {} });
+                                setWidth(minWidth);
+                            }}
+                            type="button"
+                            className="w-[20px] h-[20px] hover:scale-125 transition-all duration-300 ease-linear"
+                        >
+                            <Image
+                                alt=""
+                                src={"/manufacture/x.png"}
+                                width={20}
+                                height={20}
+                                className="object-cover w-full h-full"
+                            />
+                        </button>
+                    </div>
                 </div>
-                <div className={`grid grid-cols-12 w-auto items-center flex-wrap gap-4`}>
+                <div className={`grid grid-cols-12 w-auto items-center flex-wrap ${typePageMoblie ? "gap-2" : "gap-4"}`}>
                     <div className={`grid grid-cols-2 ${width >= 1100 ? "col-span-5" : "col-span-12"} `}>
                         <div className="flex flex-col">
-                            <div className="flex items-center gap-1 my-2">
-                                <h3 className="text-[13px]">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}:</h3>
-                                <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_po ?? ""}</h3>
+                            <div className={`flex items-center ${typePageMoblie ? "gap-px my-1" : "gap-1 my-2"}`}>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"}`}>{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}:</h3>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"} font-medium`}>{isStateModal.dataDetail?.poi?.reference_no_po ?? ""}</h3>
                             </div>
-                            <div className="flex items-center col-span-3 gap-1 my-2">
-                                <h3 className="text-[13px] ">{dataLang?.productions_orders_details_plan || 'productions_orders_details_plan'}:</h3>
-                                <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_pp ?? ""}</h3>
+                            <div className={`flex items-center col-span-3 ${typePageMoblie ? "gap-px my-1" : "gap-1 my-2"}`}>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"}`}>{dataLang?.productions_orders_details_plan || 'productions_orders_details_plan'}:</h3>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"} font-medium`}>{isStateModal.dataDetail?.poi?.reference_no_pp ?? ""}</h3>
                             </div>
-                            <div className="flex items-center gap-1 my-2">
-                                <h3 className="text-[13px]">{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}:</h3>
-                                <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_detail ?? ""}</h3>
+                            <div className={`flex items-center ${typePageMoblie ? "gap-px my-1" : "gap-1 my-2"}`}>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"}`}>{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}:</h3>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"} font-medium`}>{isStateModal.dataDetail?.poi?.reference_no_detail ?? ""}</h3>
                             </div>
                         </div>
                         <div className="flex flex-col">
-                            <div className="flex items-center col-span-3 gap-1 my-2">
-                                <h3 className="text-[13px]">{dataLang?.productions_orders_details_orders || 'productions_orders_details_orders'}:</h3>
-                                <h3 className="text-[13px] font-medium">{isStateModal.dataDetail?.poi?.object?.reference_no}</h3>
+                            <div className={`flex items-center col-span-3 ${typePageMoblie ? "gap-px my-1" : "gap-1 my-2"}`}>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"}`}>{dataLang?.productions_orders_details_orders || 'productions_orders_details_orders'}:</h3>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"} font-medium`}>{isStateModal.dataDetail?.poi?.object?.reference_no}</h3>
                             </div>
-                            <div className="flex items-center col-span-3 gap-1 my-2">
-                                <h3 className="text-[13px]">{dataLang?.productions_orders_details_client || 'productions_orders_details_client'}:</h3>
-                                <h3 className="text-[13px] font-medium">{isStateModal.dataDetail?.poi?.object?.company ?? ""}</h3>
+                            <div className={`flex items-center col-span-3 ${typePageMoblie ? "gap-px my-1" : "gap-1 my-2"}`}>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"}`}>{dataLang?.productions_orders_details_client || 'productions_orders_details_client'}:</h3>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"} font-medium`}>{isStateModal.dataDetail?.poi?.object?.company ?? ""}</h3>
                             </div>
-                            <div className="flex items-center gap-1 my-2">
-                                <h3 className=" text-[13px]">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}:</h3>
+                            <div className={`flex items-center ${typePageMoblie ? "gap-px my-1" : "gap-1 my-2"}`}>
+                                <h3 className={`${typePageMoblie ? "text-[10px] leading-tight" : "text-[13px]"}`}>{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}:</h3>
                                 <TagBranch className="w-fit">{isStateModal.dataDetail?.poi?.branch_name}</TagBranch>
                             </div>
                         </div>
@@ -294,7 +344,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                                 <div
                                     key={i}
                                     style={{ backgroundColor: `${e.bgColor}` }}
-                                    className={`w-full p-4 rounded-md space-y-1.5`}
+                                    className={`w-full ${typePageMoblie ? "p-3" : "p-4"} rounded-md space-y-1.5`}
                                 >
                                     <h4 className={`text-[#3A3E4C] font-normal ${width >= 1100 ? "text-base" : "text-xs"}`}>
                                         {e.title}
@@ -302,9 +352,9 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                                     <div className="flex items-end justify-between">
                                         <h6
                                             style={{ backgroundColor: `${e.bgSmall}` }}
-                                            className={`text-base font-medium text-white px-3 py-1 flex flex-col justify-center items-center rounded-md`}
+                                            className={`${typePageMoblie ? (e?.number > 0 ? "text-xs px-1" : "text-xs px-2") : "text-base px-3"} font-medium text-white  py-1 flex flex-col justify-center items-center rounded-md`}
                                         >
-                                            {e.number}
+                                            {formatNumber(e?.number ?? 0)}
                                         </h6>
                                     </div>
                                 </div>
@@ -313,7 +363,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                     </div>
                 </div>
 
-                <div className="mt-4 border-b">
+                <div className={`${typePageMoblie ? "mt-2" : "mt-4"} border-b`}>
                     <ContainerFilterTab>
                         {
                             listTab.map((e, index) => (
@@ -321,12 +371,12 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang }) => {
                                     key={e.id}
                                     ref={el => tabRefs.current[index] = el}
                                     onClick={() => handleActiveTab(e.id)}
-                                    className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id ? "border-[#0F4F9E] border-b bg-[#F7FBFF]" : 'border-b border-transparent'}
-                                    hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
+                                    className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id ? "border-[#0F4F9E] border-b-2 bg-[#F7FBFF]" : 'border-b-2  border-transparent'}
+                                     group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
                                 >
-                                    <h3 className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} text-[13px] group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
+                                    <h3 className={`relative ${typePageMoblie ? "py-1.5 text-xs" : "py-[10px] text-[13px]"} px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"}  group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
                                         {e.name}
-                                        <span className={`${e?.count > 0 && "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 h-[16px] w-[16px]  text-[11px]  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"} `}>
+                                        <span className={`${e?.count > 0 && `absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 h-[16px] w-[16px]  ${typePageMoblie ? "text-[9px]" : "text-[11px]"}  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center`} `}>
                                             {e?.count > 0 && e?.count}
                                         </span>
                                     </h3>

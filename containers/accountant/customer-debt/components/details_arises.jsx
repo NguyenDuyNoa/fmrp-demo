@@ -13,6 +13,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { useMemo, useState } from "react";
 import { useCustomerDebtDetailArises } from "../hooks/useCustomerDebtDetailArises";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const getRandomColors = () => {
     const colors = [
@@ -179,9 +180,12 @@ const PopupDetailArises = (props) => {
                                                         <ExpandableContent content={e?.note} />
                                                     </h6>
                                                     <h6 className="col-span-2 mx-auto w-fit">
-                                                        <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                        {/* <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
                                                             {e?.branch_name}
-                                                        </div>
+                                                        </div> */}
+                                                        <TagBranch className="w-fit">
+                                                            {e?.branch_name}
+                                                        </TagBranch>
                                                     </h6>
                                                 </div>
                                             ))}
@@ -190,7 +194,7 @@ const PopupDetailArises = (props) => {
                                 ) : <NoData />}
                             </div>
                             <div className="flex items-center justify-between space-x-5">
-                                {data.rResult?.length > 0 ? (
+                                {data?.rResult?.length > 0 ? (
                                     <Pagination
                                         postsPerPage={limit}
                                         totalPosts={Number(data.output?.iTotalDisplayRecords)}

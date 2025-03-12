@@ -1202,7 +1202,7 @@ const PopupStatus = (props) => {
                         <button
                             onClick={_HandleSave.bind(this)}
                             type="submit"
-                            className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
+                            className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#003DA0]"
                         >
                             {"Cập nhật"}
                         </button>

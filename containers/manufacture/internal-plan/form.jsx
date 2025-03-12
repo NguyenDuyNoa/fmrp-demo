@@ -31,6 +31,7 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { useInternalPlanItems } from "./hooks/useInternalPlanItems";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const initsFetching = {
     onLoading: false,
@@ -318,7 +319,7 @@ const InternalPlanForm = (props) => {
                         ) : (
                             <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center rounded">
                                 <img
-                                    src="/nodata.png"
+                                    src="/icon/noimagelogo.png"
                                     alt="Product Image"
                                     className="w-[30px] h-[30px] object-cover rounded"
                                 />
@@ -698,8 +699,8 @@ const InternalPlanForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+                        <div className="h-[100%] w-full">
                             {isFetching ? (
                                 <Loading className="w-full h-10" color="#0f4f9e" />
                             ) : (
@@ -850,7 +851,7 @@ const InternalPlanForm = (props) => {
                                 </>
                             )}
                         </div>
-                    </div>
+                    </Customscrollbar>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
                         <div className="flex items-center col-span-4 gap-2">
                             <h2>{dataLang?.internal_plan_dateFrom || "internal_plan_dateFrom"}</h2>

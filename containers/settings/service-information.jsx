@@ -340,7 +340,7 @@ const PriceItem = React.memo((props) => {
             </div>
             <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]"} w-full h-1 border-t border-dashed mt-5`} />
             <div className="flex justify-center my-6">
-                <button className={`${onHover ? "border-transparent bg-[#0F4F9E] text-white" : "border-[#D0D5DD] bg-white text-[#344054]"} transition duration-200 w-[80%] py-3 border rounded-md`}>Mua ngay</button>
+                <button className={`${onHover ? "border-transparent bg-[#003DA0] text-white" : "border-[#D0D5DD] bg-white text-[#344054]"} transition duration-200 w-[80%] py-3 border rounded-md`}>Mua ngay</button>
             </div>
         </div>
     )

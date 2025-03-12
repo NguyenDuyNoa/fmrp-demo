@@ -13,7 +13,7 @@ import { useItemsVariantSearchCombobox } from "@/hooks/common/useItems";
 import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
 import dynamic from "next/dynamic";
@@ -35,7 +35,7 @@ import PopupRecallRawMaterials from "../popup/PopupRecallRawMaterials";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 
-const MainTable = ({ dataLang }) => {
+const MainTable = ({ dataLang, typeScreen }) => {
     const listTab = [
         {
             id: uddid(),
@@ -48,6 +48,9 @@ const MainTable = ({ dataLang }) => {
             type: "semiProduct",
         },
     ];
+
+    const typePageMoblie = typeScreen == 'mobile'
+
 
     const [isParentId, sIsParentId] = useState(null);
 
@@ -65,7 +68,7 @@ const MainTable = ({ dataLang }) => {
 
     const { data: listPlan = [] } = useInternalPlansSearchCombobox(isState.searchPlan);
 
-    const { data: comboboxProductionOrdersDetail = [] } = useProductionOrdersComboboxDetail()
+    const { data: comboboxProductionOrdersDetail = [] } = useProductionOrdersComboboxDetail(isState.searchPODetail)
 
     const { data: listProducts = [] } = useItemsVariantSearchCombobox(isState.searchItemsVariant);
 
@@ -167,6 +170,37 @@ const MainTable = ({ dataLang }) => {
     };
 
 
+    // const { isLoading, isFetching, isRefetching, refetch: refetchProductionsOrders } = useInfiniteQuery({
+    //     //     queryKey: ["api_production_orders",
+    //     //         isState.page,
+    //     //         isState.search,
+    //     //         isState.date.dateStart,
+    //     //         isState.date.dateEnd,
+    //     //         isState.valueProductionOrders,
+    //     //         isState.valueProductionOrdersDetail,
+    //     //         isState.valueBr,
+    //     //         isState.valueOrders,
+    //     //         isState.valuePlan,
+    //     //         isState.valueProducts],
+    //     queryFn: async ({ pageParam = 1 }) => {
+    //         const { data } = await apiDashboard.apiGetDashboardMaterialsToPurchase({
+    //             params: {
+    //                 page: pageParam,
+    //                 limit: 10,
+    //             }
+    //         }
+    //         );
+
+    //         return data;
+    //     },
+    //     getNextPageParam: (lastPage, pages) => {
+    //         return lastPage?.next == 1 ? pages?.length + 1 : null;
+    //     },
+    //     retry: 5,
+    //     retryDelay: 5000,
+    //     initialPageParam: 1,
+    //     ...optionsQuery,
+    // });
     const { isLoading, isFetching, isRefetching, refetch: refetchProductionsOrders } = useQuery({
         queryKey: ["api_production_orders",
             isState.page,
@@ -259,7 +293,7 @@ const MainTable = ({ dataLang }) => {
                                 return {
                                     ...i,
                                     id: i?.poi_id,
-                                    image: i?.images ? i?.images : "/nodata.png",
+                                    image: i?.images ? i?.images : "/icon/noimagelogo.png",
                                     name: i?.item_name,
                                     itemVariation: i?.product_variation,
                                     code: i?.item_code,
@@ -275,7 +309,12 @@ const MainTable = ({ dataLang }) => {
 
                                         };
                                     }),
-                                    childProducts: i?.semi_products,
+                                    childProducts: i?.semi_products?.map(e => {
+                                        return {
+                                            ...e,
+                                            image: e?.images ? e?.images : "/icon/noimagelogo.png",
+                                        }
+                                    })
                                 };
                             }),
                         };
@@ -290,7 +329,7 @@ const MainTable = ({ dataLang }) => {
                                 return {
                                     ...i,
                                     id: uddid(),
-                                    image: i?.images ? i?.images : "/nodata.png",
+                                    image: i?.images ? i?.images : "/icon/noimagelogo.png",
                                     name: i?.item_name,
                                     itemVariation: i?.product_variation,
                                     code: i?.item_code,
@@ -307,7 +346,7 @@ const MainTable = ({ dataLang }) => {
                                     }),
                                     childProducts: {
                                         ...i?.products_parent,
-                                        image: i?.products_parent?.image ? i?.products_parent?.image : "/nodata.png",
+                                        image: i?.products_parent?.images ? i?.products_parent?.images : "/icon/noimagelogo.png",
                                     },
                                 };
                             }),
@@ -336,6 +375,13 @@ const MainTable = ({ dataLang }) => {
     const fetDataOrder = debounce(async (value) => {
         try {
             queryState({ searchOrders: value });
+        } catch (error) { }
+    }, 500);
+
+
+    const fetDataPoDetail = debounce(async (value) => {
+        try {
+            queryState({ searchPODetail: value });
         } catch (error) { }
     }, 500);
 
@@ -421,6 +467,7 @@ const MainTable = ({ dataLang }) => {
         fetDataOrder,
         fetchDataPlan,
         fetchDataItems,
+        fetDataPoDetail,
         listBr,
         listOrders,
         listPlan,
@@ -428,8 +475,28 @@ const MainTable = ({ dataLang }) => {
         comboboxProductionOrders,
         comboboxProductionOrdersDetail,
         isLoadingRight,
-        refetchProductionsOrders
+        refetchProductionsOrders,
+        typePageMoblie
     };
+
+    const SearchProduction = () => {
+        return (
+            <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
+                <form className="relative flex items-center w-full">
+                    <SearchNormal1
+                        size={20}
+                        className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                    />
+                    <input
+                        onChange={(e) => onChangeSearch(e)}
+                        className={`relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                        type="text"
+                        placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
+                    />
+                </form>
+            </div>
+        )
+    }
 
     if (!isMouted) {
         return null;
@@ -437,28 +504,20 @@ const MainTable = ({ dataLang }) => {
 
     return (
         <React.Fragment>
-            <FilterHeader {...shareProps} />
+            {!typePageMoblie && <FilterHeader {...shareProps} />}
             <div className="!mt-[14px]">
                 <h1 className="text-[#141522] font-medium text-[13px] my-2">
                     {dataLang?.productions_orders_total || "productions_orders_total"}: {isState?.countAll}
                 </h1>
+                {
+                    typePageMoblie && <SearchProduction />
+                }
                 <div className="flex ">
                     <div className="w-[22%] border-r-0 border-[#d8dae5] border">
-                        <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
-                            <form className="relative flex items-center w-full">
-                                <SearchNormal1
-                                    size={20}
-                                    className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
-                                />
-                                <input
-                                    onChange={(e) => onChangeSearch(e)}
-                                    className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]"
-                                    type="text"
-                                    placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
-                                />
-                            </form>
-                        </div>
-                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh] overflow-y-auto">
+                        {
+                            !typePageMoblie && <SearchProduction />
+                        }
+                        <Customscrollbar className={`${typePageMoblie ? "h-[85vh]" : "3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh]"}  overflow-y-auto`}>
                             {(isLoading || isRefetching)
                                 ?
                                 <Loading />
@@ -487,31 +546,49 @@ const MainTable = ({ dataLang }) => {
                                             <div
                                                 key={e.id}
                                                 onClick={() => handleShow(e.id)}
-                                                className={`py-2 pl-2 pr-3 ${e.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                                className={`py-2 ${typePageMoblie ? "px-px" : "pl-2 pr-3"}  ${e.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
                                             >
-                                                <div className="flex justify-between">
-                                                    <div className="flex flex-col gap-1">
-                                                        <h1 className="text-[13px] font-medium text-[#0F4F9E]">
-                                                            {e.title}
-                                                        </h1>
-                                                        <h3 className="text-[#667085] font-medium text-[13px]">
-                                                            {dataLang?.materials_planning_create_on ||
-                                                                "materials_planning_create_on"}{" "}
-                                                            <span className="text-[#141522] font-medium text-[13px]">
-                                                                {e.time}
-                                                            </span>
-                                                        </h3>
-                                                    </div>
+                                                {
+                                                    typePageMoblie
+                                                        ?
+                                                        <div className={`flex flex-col items-center gap-1`}>
+                                                            {isState.listDataRight?.title && (
+                                                                // status_manufacture
+                                                                <span className={`${color[e?.status_manufacture]?.class} text-[8px] px-1 py-px rounded-3xl font-medium w-fit h-fit flex items-center gap-1`}>
+                                                                    <span className={`${color[e?.status_manufacture]?.circle} h-1 w-1 rounded-full inline-block`} />
+                                                                    <p>{color[e?.status_manufacture]?.title}</p>
+                                                                </span>
+                                                            )}
+                                                            <h1 className="text-[8px] font-medium text-[#0F4F9E]">
+                                                                {e.title}
+                                                            </h1>
 
-                                                    {isState.listDataRight?.title && (
-                                                        // status_manufacture
-                                                        <span className={`${color[e?.status_manufacture]?.class} text-xs pl-2 pr-4 py-1.5 rounded-3xl font-medium w-fit h-fit`}>
-                                                            <span className={`${color[e?.status_manufacture]?.circle} h-2 w-2 rounded-full inline-block mr-2`} />
-                                                            {color[e?.status_manufacture]?.title}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {e.id == isState.idDetailProductionOrder && (
+                                                        </div>
+                                                        :
+                                                        <div className={`flex justify-between`}>
+                                                            <div className="flex flex-col gap-1">
+                                                                <h1 className="text-[13px] font-medium text-[#0F4F9E]">
+                                                                    {e.title}
+                                                                </h1>
+                                                                <h3 className="text-[#667085] font-medium text-[13px]">
+                                                                    {dataLang?.materials_planning_create_on ||
+                                                                        "materials_planning_create_on"}{" "}
+                                                                    <span className="text-[#141522] font-medium text-[13px]">
+                                                                        {e.time}
+                                                                    </span>
+                                                                </h3>
+                                                            </div>
+
+                                                            {isState.listDataRight?.title && (
+                                                                // status_manufacture
+                                                                <span className={`${color[e?.status_manufacture]?.class} text-xs pl-2 pr-4 py-1.5 rounded-3xl font-medium w-fit h-fit`}>
+                                                                    <span className={`${color[e?.status_manufacture]?.circle} h-2 w-2 rounded-full inline-block mr-2`} />
+                                                                    {color[e?.status_manufacture]?.title}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                }
+                                                {!typePageMoblie && (e.id == isState.idDetailProductionOrder) && (
                                                     <div className="flex flex-col w-full gap-2 mt-1">
                                                         <div className="flex items-center gap-1">
                                                             <h3 className=" text-[#52575E] font-medium text-[13px]">
@@ -571,7 +648,7 @@ const MainTable = ({ dataLang }) => {
                                 <button
                                     type="button"
                                     onClick={() => queryState({ page: isState.page + 1 })}
-                                    className="block w-full py-1 mx-auto mt-1 text-[13px] transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200"
+                                    className={`block w-full py-1 mx-auto mt-1 ${typePageMoblie ? "text-[10px]" : "text-[13px]"} transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200`}
                                 >
                                     {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
                                 </button>
@@ -583,27 +660,29 @@ const MainTable = ({ dataLang }) => {
                             (!isLoading) && (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0) && (
                                 <div className="flex items-center justify-between px-4 py-1 border-b">
                                     <div className="">
-                                        <h1 className="text-[#52575E] font-normal text-xs capitalize">
+                                        <h1 className={`text-[#52575E] font-normal ${typePageMoblie ? "text-[10px]" : "text-xs"} capitalize`}>
                                             {dataLang?.productions_orders || "productions_orders"}
                                         </h1>
                                         <div className="flex items-center gap-2">
                                             {
                                                 isRefetchingRight
                                                     ?
-                                                    <div className="animate-pulse w-[200px] h-[20px] bg-gray-100 rounded-2xl" />
+                                                    <div className={`animate-pulse ${typePageMoblie ? "w-[80px]" : "w-[200px]"} h-[20px] bg-gray-100 rounded-2xl`} />
                                                     :
-                                                    <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
+                                                    <h1 className={`text-[#3276FA] font-medium ${typePageMoblie ? "text-xs" : "3xl:text-[20px] text-[16px]"} uppercase`}>
                                                         {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
                                                     </h1>
                                             }
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <OnResetData sOnFetching={(e) => { }}
-                                            onClick={() => {
-                                                refetchProductionsOrders();
-                                                refetch()
-                                            }} />
+                                        {!typePageMoblie && (
+                                            <OnResetData sOnFetching={(e) => { }}
+                                                onClick={() => {
+                                                    refetchProductionsOrders();
+                                                    refetch()
+                                                }} />
+                                        )}
                                         <Zoom
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 1.08 }}
@@ -612,6 +691,7 @@ const MainTable = ({ dataLang }) => {
                                             <PopupConfimStage
                                                 dataLang={dataLang}
                                                 dataRight={isState}
+                                                typePageMoblie={typePageMoblie}
                                                 refetch={() => {
                                                     refetchProductionsOrders();
                                                     refetch()
@@ -632,25 +712,29 @@ const MainTable = ({ dataLang }) => {
                                             }}
                                         />
                                     </Zoom> */}
-                                        <Zoom
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 1.08 }}
-                                            className="w-fit"
-                                        >
-                                            <button
-                                                className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                                                onClick={() => {
-                                                    handleQueryId({ status: true, id: isState.idDetailProductionOrder });
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-2 px-3 py-2 ">
-                                                    <RiDeleteBin5Line className="text-base text-red-600" />
-                                                    <h3 className="text-xs font-medium text-red-600 3xl:text-base">
-                                                        {dataLang?.materials_planning_delete || "materials_planning_delete"}
-                                                    </h3>
-                                                </div>
-                                            </button>
-                                        </Zoom>
+                                        {
+                                            !typePageMoblie && (
+                                                <Zoom
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 1.08 }}
+                                                    className="w-fit"
+                                                >
+                                                    <button
+                                                        className="bg-red-100 rounded-lg outline-none focus:outline-none"
+                                                        onClick={() => {
+                                                            handleQueryId({ status: true, id: isState.idDetailProductionOrder });
+                                                        }}
+                                                    >
+                                                        <div className="flex items-center gap-2 px-3 py-2 ">
+                                                            <RiDeleteBin5Line className="text-base text-red-600" />
+                                                            <h3 className="text-xs font-medium text-red-600 3xl:text-base">
+                                                                {dataLang?.materials_planning_delete || "materials_planning_delete"}
+                                                            </h3>
+                                                        </div>
+                                                    </button>
+                                                </Zoom>
+                                            )
+                                        }
                                     </div>
                                     {/* <button
                         className="bg-red-100 rounded-lg outline-none focus:outline-none"
@@ -690,7 +774,7 @@ const MainTable = ({ dataLang }) => {
                                 ?
                                 <>
                                     <div className="mx-4">
-                                        <div className="my-6 border-b ">
+                                        <div className={`${typePageMoblie ? "my-2" : "my-6"} border-b`}>
                                             <div className="flex items-center gap-4 ">
                                                 {listTab.map((e) => (
                                                     <button
@@ -698,7 +782,7 @@ const MainTable = ({ dataLang }) => {
                                                         onClick={() => handleActiveTab(e.type)}
                                                         className={`hover:bg-[#F7FBFF] ${isState.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
                                                     >
-                                                        <h3 className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} 3xl:text-base text-[13px] group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
+                                                        <h3 className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} ${typePageMoblie ? "text-xs" : "3xl:text-base text-[13px]"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
                                                             {e.name}
                                                         </h3>
                                                     </button>

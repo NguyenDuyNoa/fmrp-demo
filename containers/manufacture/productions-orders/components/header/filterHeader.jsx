@@ -17,6 +17,7 @@ const FilterHeader = memo(
         listOrders,
         listPlan,
         listProducts,
+        fetDataPoDetail,
         comboboxProductionOrders,
         comboboxProductionOrdersDetail
     }) => {
@@ -55,6 +56,9 @@ const FilterHeader = memo(
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueProductionOrdersDetail}
+                            onInputChange={(e) => {
+                                fetDataPoDetail(e);
+                            }}
                             onChange={(e) => handleFilter("valueProductionOrdersDetail", e)}
                             options={comboboxProductionOrdersDetail}
                             classNamePrefix={"productionSmoothing"}
@@ -95,7 +99,7 @@ const FilterHeader = memo(
                                                     ) : (
                                                         <div className=" max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover  flex items-center justify-center rounded">
                                                             <img
-                                                                src="/nodata.png"
+                                                                src="/icon/noimagelogo.png"
                                                                 alt="Product Image"
                                                                 className="max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover rounded"
                                                             />

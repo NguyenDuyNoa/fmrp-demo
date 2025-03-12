@@ -200,7 +200,7 @@ const PopupDetail = (props) => {
                                                             {/* <h6 className="text-[13px]   py-0.5 col-span-1 text-center">
                             {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto' />):
                               <div className='w-[50px] h-[60px] object-cover  mx-auto'>
-                                <ModalImage small="/nodata.png" large="/nodata.png" className='object-contain w-full h-full p-1 rounded' > </ModalImage>
+                                <ModalImage small="/icon/noimagelogo.png" large="/icon/noimagelogo.png" className='object-contain w-full h-full p-1 rounded' > </ModalImage>
                               </div>
                             }
                             </h6>     
@@ -218,8 +218,8 @@ const PopupDetail = (props) => {
                                                                         ) : (
                                                                             <div className="w-[40px] h-[50px] object-cover  mx-auto">
                                                                                 <ModalImage
-                                                                                    small="/nodata.png"
-                                                                                    large="/nodata.png"
+                                                                                    small="/icon/noimagelogo.png"
+                                                                                    large="/icon/noimagelogo.png"
                                                                                     className="object-contain w-full h-full p-1 rounded"
                                                                                 >
                                                                                     {" "}

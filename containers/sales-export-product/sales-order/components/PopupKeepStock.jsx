@@ -3,6 +3,7 @@
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading/loading";
 import PopupCustom from "@/components/UI/popup";
@@ -271,7 +272,7 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                             size={20}
                             className="group-hover:text-orange-500 group-hover:scale-110 group-hover:shadow-md "
                         />
-                        <p className="group-hover:text-orange-500 pr-4">
+                        <p className="pr-4 group-hover:text-orange-500">
                             {dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
                         </p>
                     </button>
@@ -279,13 +280,13 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
             >
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
                 <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
-                    <div className=" customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
+                    <div className="flex flex-col pb-1 overflow-auto customsroll scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <h2 className="font-normal bg-[#ECF0F4] 3xl:p-2 p-1 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
                             {dataLang?.detail_general_information || "detail_general_information"}
                         </h2>
                         <div className="grid grid-cols-12 min-h-[100px]">
                             <div className="col-span-4">
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4 ">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 whitespace-nowrap">
                                         {dataLang?.sales_product_date || "sales_product_date"}:
                                     </h3>
@@ -293,7 +294,7 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                         {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                     </h3>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {dataLang?.sales_product_code || "sales_product_code"}:
                                     </h3>
@@ -304,7 +305,7 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                             </div>
 
                             <div className="col-span-4 ">
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {dataLang?.price_quote_customer || "price_quote_customer"}:
                                     </h3>
@@ -312,7 +313,7 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                         {data?.client_name}
                                     </h3>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {dataLang?.price_quote_order_status || "price_quote_order_status"}:
                                     </h3>
@@ -331,7 +332,7 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                 </div>
                             </div>
                             <div className="col-span-4 ">
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}:
                                     </h3>
@@ -340,15 +341,20 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                     </h3>
                                 </div>
 
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {dataLang?.price_quote_branch || "price_quote_branch"}:
                                     </h3>
-                                    <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[10px]  col-span-4 mr-2 px-2 max-w-[250px] w-fit max-h-[100px] text-center text-[#0F4F9E]  font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] ">
+                                    {/* <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[10px]  col-span-4 mr-2 px-2 max-w-[250px] w-fit max-h-[100px] text-center text-[#0F4F9E]  font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] ">
                                         {data?.branch_name}
-                                    </h3>
+                                    </h3> */}
+                                    <div className="col-span-4">
+                                        <TagBranch className='w-fit'>
+                                            {data?.branch_name}
+                                        </TagBranch>
+                                    </div>
                                 </div>
-                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <label className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {dataLang?.salesOrder_warehouse_list || "salesOrder_warehouse_list"}:
                                     </label>
@@ -424,9 +430,9 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                 ) : (
                                                                     <div className="w-[50px] h-[50px] object-cover  mx-auto">
                                                                         <ModalImage
-                                                                            small="/nodata.png"
-                                                                            large="/nodata.png"
-                                                                            className="w-full h-full rounded object-contain p-1"
+                                                                            small="/icon/noimagelogo.png"
+                                                                            large="/icon/noimagelogo.png"
+                                                                            className="object-contain w-full h-full p-1 rounded"
                                                                         ></ModalImage>
                                                                     </div>
                                                                 )}
@@ -485,17 +491,17 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                                             size={15}
                                                                                         />
                                                                                     ) : (
-                                                                                        <div className="h-4 w-4 rounded-full bg-transparent border border-gray-300" />
+                                                                                        <div className="w-4 h-4 bg-transparent border border-gray-300 rounded-full" />
                                                                                     )}
                                                                                 </div>
                                                                                 <div className="flex flex-col items-start jus">
                                                                                     <h3>
                                                                                         {i.location_name} -
-                                                                                        <span className="text-blue-500 pl-1">
+                                                                                        <span className="pl-1 text-blue-500">
                                                                                             {i.quantity}
                                                                                         </span>
                                                                                     </h3>
-                                                                                    <div className="flex items-center font-oblique flex-wrap">
+                                                                                    <div className="flex flex-wrap items-center font-oblique">
                                                                                         {dataProductSerial.is_enable ===
                                                                                             "1" ? (
                                                                                             <div className="flex gap-0.5">
@@ -603,12 +609,12 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                 );
                                                             })
                                                         ) : (
-                                                            <span className="font-normal text-red-500  rounded-2xl py-1 px-3  bg-red-200">
+                                                            <span className="px-3 py-1 font-normal text-red-500 bg-red-200 rounded-2xl">
                                                                 Tồn kho hết
                                                             </span>
                                                         )}
                                                     </h6>
-                                                    <div className="col-span-1 flex items-center justify-center">
+                                                    <div className="flex items-center justify-center col-span-1">
                                                         <button
                                                             onClick={(event) =>
                                                                 handleQueryId({ id: e.id, status: true })
@@ -640,8 +646,8 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                 </div>
                             )}
                         </div>
-                        <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between border-t">
-                            <div className="col-span-7 font-medium grid grid-cols-7 text-left">
+                        <div className="grid flex-col justify-between grid-cols-12 mt-2 text-right border-t">
+                            <div className="grid grid-cols-7 col-span-7 font-medium text-left">
                                 <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] ">
                                     {dataLang?.price_quote_note || "price_quote_note"}
                                 </h3>
@@ -651,7 +657,7 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                             </div>
                             <div className="col-span-3 space-y-2"></div>
                             <div className="col-span-2 space-y-2">
-                                <div className="text-right mt-5 mr-2 space-x-2">
+                                <div className="mt-5 mr-2 space-x-2 text-right">
                                     <button
                                         type="button"
                                         onClick={_ToggleModal.bind(this, false)}
@@ -662,7 +668,7 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                     <button
                                         onClick={handleSubmit}
                                         type="submit"
-                                        className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
+                                        className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#003DA0] hover:scale-105 transition-all ease-linear"
                                     >
                                         {dataLang?.branch_popup_save || "branch_popup_save"}
                                     </button>

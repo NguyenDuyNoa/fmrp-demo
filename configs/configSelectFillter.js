@@ -11,6 +11,7 @@ const configSelectFillter = {
         boxShadow: "none",
         outline: "none",
     },
+
     theme: (theme) => ({
         ...theme,
         colors: {
@@ -34,6 +35,20 @@ const configSelectFillter = {
                 boxShadow: "0 0 0 1.5px #0F4F9E",
             }),
         }),
+        option: (provided, state) => ({
+            // ...[styles?.option ? styles?.option : configSelectFillter.styles?.option],
+            ...provided,
+            backgroundColor: 'transparent',
+            // backgroundColor: state?.isSelected ? 'transparent' : provided?.backgroundColor, // Bỏ nền khi selected
+            color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
+            '&:hover': {
+                backgroundColor: 'transparent',
+                // backgroundColor: state?.isSelected ? 'transparent' : provided['&:hover']?.backgroundColor, // Giữ transparent khi hover
+                color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
+            },
+        }),
+
     },
+
 };
 export default configSelectFillter;

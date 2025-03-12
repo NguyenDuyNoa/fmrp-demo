@@ -39,6 +39,7 @@ import { useSalesOrderQuotaByBranch } from "./hooks/useSalesOrderQuotaByBranch";
 import { useClientComboboxByBranch } from "@/hooks/common/useClients";
 import { useStaffComboboxByBranch } from "@/hooks/common/useStaffs";
 import { useTaxList } from "@/hooks/common/useTaxs";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const SalesOrderForm = (props) => {
     const router = useRouter();
@@ -1151,7 +1152,7 @@ const SalesOrderForm = (props) => {
                         ) : (
                             <div className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
                                 <img
-                                    src="/nodata.png"
+                                    src="/icon/noimagelogo.png"
                                     alt="Product Image"
                                     className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover rounded mr-1"
                                 />
@@ -1572,7 +1573,7 @@ const SalesOrderForm = (props) => {
                                                                 ) : (
                                                                     <div className="w-[50px] h-[60px] object-cover flex items-center justify-center rounded">
                                                                         <img
-                                                                            src="/nodata.png"
+                                                                            src="/icon/noimagelogo.png"
                                                                             alt="Product Image"
                                                                             style={{
                                                                                 width: "40px",
@@ -1682,11 +1683,178 @@ const SalesOrderForm = (props) => {
                         </div>
                     </div>
                     {/* Thông tin mặt hàng Mặt hàng */}
-                    <div className="3xl:h-[330px] h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="pr-2">
-                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                {/* phân chia,m */}
-                                <div className="grid grid-cols-12">
+                    <Customscrollbar className="max-h-[400px] h-[400px] overflow-auto pb-2 ">
+                        <div className="h-full divide-y divide-slate-200">
+                            {/* phân chia,m */}
+                            <div className="grid grid-cols-12">
+                                <div className="col-span-2 ">
+                                    <SelectComponent
+                                        onInputChange={(event) => {
+                                            _HandleSeachApi(event);
+                                        }}
+                                        dangerouslySetInnerHTML={{
+                                            __html: option.label,
+                                        }}
+                                        options={typeOrder === "1" && quote === null ? [] : options}
+                                        onChange={(value) => handleAddParent(value)}
+                                        value={null}
+                                        formatOptionLabel={selectItemsLabel}
+                                        placeholder={dataLang?.sales_product_select_item || "sales_product_select_item"}
+                                        hideSelectedOptions={false}
+                                        className={`cursor-pointer rounded-md bg-white  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        isSearchable={true}
+                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                        menuPortalTarget={document.body}
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                            }),
+                                            menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 9999,
+                                            }),
+                                            control: (base, state) => ({
+                                                ...base,
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                    boxShadow: "none",
+                                                }),
+                                            }),
+                                        }}
+                                    />
+                                </div>
+
+                                <div className="grid items-center grid-cols-10 col-span-10 gap-1 mb-1">
+                                    <div className="flex items-center justify-center col-span-1 text-center">
+                                        <h3
+                                            className={`cursor-default 3xl:text-[16px] 2xl:text-[14px] xl:text-[13px] text-[12px]`}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1">
+                                        <button
+                                            disabled={true}
+                                            className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                                        >
+                                            <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90 " />
+                                        </button>
+                                        <InPutNumericFormat
+                                            className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                            value={1}
+                                            allowNegative={false}
+                                            thousandSeparator=","
+                                        />
+                                        <button
+                                            disabled={true}
+                                            className=" 2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                                        >
+                                            <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                        </button>
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1 text-center">
+                                        <InPutNumericFormat
+                                            value={1}
+                                            allowNegative={false}
+                                            readOnly={true}
+                                            decimalScale={0}
+                                            isNumericString={true}
+                                            className={`cursor-default appearance-none 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                                            thousandSeparator=","
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1 text-center">
+                                        <InPutNumericFormat
+                                            value={0}
+                                            className={`cursor-default appearance-none text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
+                                            thousandSeparator=","
+                                            allowNegative={false}
+                                            readOnly={true}
+                                            isNumericString={true}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-end col-span-1 text-right">
+                                        <h3
+                                            className={`cursor-default px-2 py-2.5 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
+                                        >
+                                            1
+                                        </h3>
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1">
+                                        <SelectComponent
+                                            options={taxOptions}
+                                            value={null}
+                                            placeholder={"% Thuế"}
+                                            isDisabled={true}
+                                            hideSelectedOptions={false}
+                                            formatOptionLabel={taxRateLabel}
+                                            className={`border-transparent placeholder:text-slate-300 3xl:mb-4 2xl:mb-3 mb-3.5 3x:h-4 h-6 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                                            isSearchable={true}
+                                            noOptionsMessage={() => "Không có dữ liệu"}
+                                            menuPortalTarget={document.body}
+                                            closeMenuOnSelect={true}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 20,
+                                                }),
+                                                control: (base, state) => ({
+                                                    ...base,
+                                                    boxShadow: "none",
+                                                    padding: "0.7px",
+                                                }),
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-end col-span-1 text-right">
+                                        <h3
+                                            className={`cursor-default px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
+                                        >
+                                            1
+                                        </h3>
+                                    </div>
+                                    <div className="col-span-1 ">
+                                        <div className="relative flex flex-row custom-date-picker">
+                                            <DatePicker
+                                                selected={null}
+                                                blur
+                                                disabled={true}
+                                                placeholderText="DD/MM/YYYY"
+                                                dateFormat="dd/MM/yyyy"
+                                                className={`bg-gray-100 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[7px] border placeholder:text-slate-300 rounded text-[#52575E] font-normal xl:px-1 px-0.5 outline-none cursor-default `}
+                                            />
+                                            <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%]  text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-default" />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1">
+                                        <input
+                                            value={null}
+                                            name="optionEmail"
+                                            placeholder="Ghi chú"
+                                            disabled={true}
+                                            type="text"
+                                            className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1">
+                                        <button
+                                            onClick={() => _HandleDelete("default", "default")}
+                                            type="button"
+                                            title="Xóa"
+                                            className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
+                                        >
+                                            <IconDelete />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* phân chia  */}
+                            {sortedArr.map((e, index) => (
+                                <div className="grid items-center grid-cols-12 gap-1 py-1" key={e?.id}>
                                     <div className="col-span-2 ">
                                         <SelectComponent
                                             onInputChange={(event) => {
@@ -1695,13 +1863,16 @@ const SalesOrderForm = (props) => {
                                             dangerouslySetInnerHTML={{
                                                 __html: option.label,
                                             }}
-                                            options={typeOrder === "1" && quote === null ? [] : options}
-                                            onChange={(value) => handleAddParent(value)}
-                                            value={null}
+                                            options={options}
+                                            onChange={(value) => _HandleChangeValue(e?.id, value)}
+                                            value={e?.item}
+                                            // components={{ MenuList, MultiValue }}
                                             formatOptionLabel={selectItemsLabel}
-                                            placeholder={dataLang?.sales_product_select_item || "sales_product_select_item"}
+                                            placeholder={
+                                                dataLang?.sales_product_select_item || "sales_product_select_item"
+                                            }
                                             hideSelectedOptions={false}
-                                            className={`cursor-pointer rounded-md bg-white  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            className={`cursor-pointer rounded-md bg-white 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -1717,363 +1888,191 @@ const SalesOrderForm = (props) => {
                                                 control: (base, state) => ({
                                                     ...base,
                                                     ...(state.isFocused && {
-                                                        border: "0 0 0 1px #92BFF7",
                                                         boxShadow: "none",
+                                                        padding: "0",
                                                     }),
                                                 }),
                                             }}
                                         />
                                     </div>
 
-                                    <div className="grid items-center grid-cols-10 col-span-10 gap-1 mb-1">
-                                        <div className="flex items-center justify-center col-span-1 text-center">
-                                            <h3
-                                                className={`cursor-default 3xl:text-[16px] 2xl:text-[14px] xl:text-[13px] text-[12px]`}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1">
+                                    <div className="flex items-center justify-center col-span-1 text-center">
+                                        <h3
+                                            className={`'cursor-text 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
+                                        >
+                                            {e?.unit}
+                                        </h3>
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1">
+                                        <div className="flex items-center justify-center">
                                             <button
-                                                disabled={true}
+                                                onClick={() => handleDecrease(e?.id)}
                                                 className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                             >
-                                                <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90 " />
+                                                <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
                                             </button>
                                             <InPutNumericFormat
-                                                className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                                value={1}
+                                                value={e?.quantity}
+                                                onValueChange={(value) =>
+                                                    handleOnChangeInputOption(e?.id, "quantity", value)
+                                                }
+                                                isAllowed={({ floatValue }) => {
+                                                    if (floatValue == 0) {
+                                                        return true;
+                                                    } else {
+                                                        return true;
+                                                    }
+                                                }}
                                                 allowNegative={false}
-                                                thousandSeparator=","
+                                                className={`${(e?.quantity == 0 && "border-red-500") || (e?.quantity == "" && "border-red-500")
+                                                    } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
                                             <button
-                                                disabled={true}
-                                                className=" 2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                                                onClick={() => handleIncrease(e.id)}
+                                                className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                             >
                                                 <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
                                             </button>
                                         </div>
-                                        <div className="flex items-center justify-center col-span-1 text-center">
-                                            <InPutNumericFormat
-                                                value={1}
-                                                allowNegative={false}
-                                                readOnly={true}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                className={`cursor-default appearance-none 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                                                thousandSeparator=","
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1 text-center">
+                                        <InPutMoneyFormat
+                                            value={e?.price}
+                                            onValueChange={(value) =>
+                                                handleOnChangeInputOption(e?.id, "price", value)
+                                            }
+                                            isAllowed={isAllowedNumber}
+                                            allowNegative={false}
+                                            className={`${(e?.price == 0 && "border-red-500") || (e?.price == "" && "border-red-500")
+                                                } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1 text-center">
+                                        <InPutNumericFormat
+                                            value={e?.discount}
+                                            onValueChange={(value) =>
+                                                handleOnChangeInputOption(e?.id, "discount", value)
+                                            }
+                                            className={`cursor-text appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
+                                            isAllowed={isAllowedDiscount}
+                                            isNumericString={true}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-end col-span-1 text-right">
+                                        <h3
+                                            className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
+                                        >
+                                            {formatNumber(e?.price_after_discount)}
+                                        </h3>
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1 p-0">
+                                        <SelectComponent
+                                            options={taxOptions}
+                                            onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
+                                            value={
+                                                e?.tax
+                                                    ? {
+                                                        label: taxOptions.find(
+                                                            (item) => item.value === e?.tax?.value
+                                                        )?.label,
+                                                        value: e?.tax?.value,
+                                                        tax_rate: e?.tax?.tax_rate,
+                                                    }
+                                                    : null
+                                            }
+                                            placeholder={"% Thuế"}
+                                            hideSelectedOptions={false}
+                                            formatOptionLabel={taxRateLabel}
+                                            className={` border-transparent placeholder:text-slate-300 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                                            isSearchable={true}
+                                            noOptionsMessage={() => "Không có dữ liệu"}
+                                            menuPortalTarget={document.body}
+                                            closeMenuOnSelect={true}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 20,
+                                                }),
+                                                control: (base, state) => ({
+                                                    ...base,
+                                                    boxShadow: "none",
+                                                    padding: "0px",
+                                                    margin: "0px",
+                                                }),
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-end col-span-1 text-right">
+                                        <h3
+                                            className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        >
+                                            {formatMoney(e?.total_amount)}
+                                        </h3>
+                                    </div>
+                                    <div className="col-span-1 ">
+                                        <div className="relative flex flex-row custom-date-picker">
+                                            <DatePicker
+                                                selected={e?.delivery_date ? e?.delivery_date : null}
+                                                blur
+                                                placeholderText="DD/MM/YYYY"
+                                                dateFormat="dd/MM/yyyy"
+                                                onSelect={(date) =>
+                                                    handleOnChangeInputOption(e?.id, "delivery_date", date)
+                                                }
+                                                onChange={(date) =>
+                                                    handleOnChangeInputOption(e?.id, "delivery_date", date)
+                                                }
+                                                className={`${errDeliveryDate && e?.delivery_date === null
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
                                             />
+                                            {e?.delivery_date && (
+                                                <>
+                                                    <MdClear
+                                                        className="absolute right-0 3xl:-translate-x-[320%] 3xl:translate-y-[1%] 2xl:-translate-x-[150%] 2xl:translate-y-[1%] xl:-translate-x-[140%] xl:translate-y-[1%] -translate-x-[90%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-110 xl:scale-90 scale-75 cursor-pointer"
+                                                        onClick={() =>
+                                                            handleOnChangeInputOption(e?.id, "clear_delivery_date")
+                                                        }
+                                                    />
+                                                </>
+                                            )}
+                                            <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%] text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-pointer" />
                                         </div>
-                                        <div className="flex items-center justify-center col-span-1 text-center">
-                                            <InPutNumericFormat
-                                                value={0}
-                                                className={`cursor-default appearance-none text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                                                thousandSeparator=","
-                                                allowNegative={false}
-                                                readOnly={true}
-                                                isNumericString={true}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-end col-span-1 text-right">
-                                            <h3
-                                                className={`cursor-default px-2 py-2.5 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                            >
-                                                1
-                                            </h3>
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1">
-                                            <SelectComponent
-                                                options={taxOptions}
-                                                value={null}
-                                                placeholder={"% Thuế"}
-                                                isDisabled={true}
-                                                hideSelectedOptions={false}
-                                                formatOptionLabel={taxRateLabel}
-                                                className={`border-transparent placeholder:text-slate-300 3xl:mb-4 2xl:mb-3 mb-3.5 3x:h-4 h-6 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                                isSearchable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
-                                                menuPortalTarget={document.body}
-                                                closeMenuOnSelect={true}
-                                                styles={{
-                                                    placeholder: (base) => ({
-                                                        ...base,
-                                                        color: "#cbd5e1",
-                                                    }),
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 20,
-                                                    }),
-                                                    control: (base, state) => ({
-                                                        ...base,
-                                                        boxShadow: "none",
-                                                        padding: "0.7px",
-                                                    }),
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-end col-span-1 text-right">
-                                            <h3
-                                                className={`cursor-default px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                            >
-                                                1
-                                            </h3>
-                                        </div>
-                                        <div className="col-span-1 ">
-                                            <div className="relative flex flex-row custom-date-picker">
-                                                <DatePicker
-                                                    selected={null}
-                                                    blur
-                                                    disabled={true}
-                                                    placeholderText="DD/MM/YYYY"
-                                                    dateFormat="dd/MM/yyyy"
-                                                    className={`bg-gray-100 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[7px] border placeholder:text-slate-300 rounded text-[#52575E] font-normal xl:px-1 px-0.5 outline-none cursor-default `}
-                                                />
-                                                <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%]  text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-default" />
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1">
-                                            <input
-                                                value={null}
-                                                name="optionEmail"
-                                                placeholder="Ghi chú"
-                                                disabled={true}
-                                                type="text"
-                                                className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1">
-                                            <button
-                                                onClick={() => _HandleDelete("default", "default")}
-                                                type="button"
-                                                title="Xóa"
-                                                className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                                            >
-                                                <IconDelete />
-                                            </button>
-                                        </div>
+                                        {errDeliveryDate && e?.delivery_date === null && (
+                                            <label className="text-[12px] max-w-10px text-red-500">
+                                                Vui lòng chọn ngày cần hàng!
+                                            </label>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1">
+                                        <input
+                                            value={e?.note}
+                                            onChange={(value) => handleOnChangeInputOption(e?.id, "note", value)}
+                                            name="optionEmail"
+                                            placeholder="Ghi chú"
+                                            type="text"
+                                            className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-center col-span-1">
+                                        <button
+                                            onClick={_HandleDelete.bind(this, e?.id)}
+                                            type="button"
+                                            title="Xóa"
+                                            className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
+                                        >
+                                            <IconDelete />
+                                        </button>
                                     </div>
                                 </div>
-
-                                {/* phân chia  */}
-                                {sortedArr.map((e, index) => (
-                                    <div className="grid items-center grid-cols-12 gap-1 py-1" key={e?.id}>
-                                        <div className="col-span-2 ">
-                                            <SelectComponent
-                                                onInputChange={(event) => {
-                                                    _HandleSeachApi(event);
-                                                }}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: option.label,
-                                                }}
-                                                options={options}
-                                                onChange={(value) => _HandleChangeValue(e?.id, value)}
-                                                value={e?.item}
-                                                // components={{ MenuList, MultiValue }}
-                                                formatOptionLabel={selectItemsLabel}
-                                                placeholder={
-                                                    dataLang?.sales_product_select_item || "sales_product_select_item"
-                                                }
-                                                hideSelectedOptions={false}
-                                                className={`cursor-pointer rounded-md bg-white 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                                isSearchable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
-                                                menuPortalTarget={document.body}
-                                                styles={{
-                                                    placeholder: (base) => ({
-                                                        ...base,
-                                                        color: "#cbd5e1",
-                                                    }),
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 9999,
-                                                    }),
-                                                    control: (base, state) => ({
-                                                        ...base,
-                                                        ...(state.isFocused && {
-                                                            boxShadow: "none",
-                                                            padding: "0",
-                                                        }),
-                                                    }),
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="flex items-center justify-center col-span-1 text-center">
-                                            <h3
-                                                className={`'cursor-text 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                            >
-                                                {e?.unit}
-                                            </h3>
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1">
-                                            <div className="flex items-center justify-center">
-                                                <button
-                                                    onClick={() => handleDecrease(e?.id)}
-                                                    className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                >
-                                                    <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                                                </button>
-                                                <InPutNumericFormat
-                                                    value={e?.quantity}
-                                                    onValueChange={(value) =>
-                                                        handleOnChangeInputOption(e?.id, "quantity", value)
-                                                    }
-                                                    isAllowed={({ floatValue }) => {
-                                                        if (floatValue == 0) {
-                                                            return true;
-                                                        } else {
-                                                            return true;
-                                                        }
-                                                    }}
-                                                    allowNegative={false}
-                                                    className={`${(e?.quantity == 0 && "border-red-500") || (e?.quantity == "" && "border-red-500")
-                                                        } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                                />
-                                                <button
-                                                    onClick={() => handleIncrease(e.id)}
-                                                    className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                >
-                                                    <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1 text-center">
-                                            <InPutMoneyFormat
-                                                value={e?.price}
-                                                onValueChange={(value) =>
-                                                    handleOnChangeInputOption(e?.id, "price", value)
-                                                }
-                                                isAllowed={isAllowedNumber}
-                                                allowNegative={false}
-                                                className={`${(e?.price == 0 && "border-red-500") || (e?.price == "" && "border-red-500")
-                                                    } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1 text-center">
-                                            <InPutNumericFormat
-                                                value={e?.discount}
-                                                onValueChange={(value) =>
-                                                    handleOnChangeInputOption(e?.id, "discount", value)
-                                                }
-                                                className={`cursor-text appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                                                isAllowed={isAllowedDiscount}
-                                                isNumericString={true}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-end col-span-1 text-right">
-                                            <h3
-                                                className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                            >
-                                                {formatNumber(e?.price_after_discount)}
-                                            </h3>
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1 p-0">
-                                            <SelectComponent
-                                                options={taxOptions}
-                                                onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
-                                                value={
-                                                    e?.tax
-                                                        ? {
-                                                            label: taxOptions.find(
-                                                                (item) => item.value === e?.tax?.value
-                                                            )?.label,
-                                                            value: e?.tax?.value,
-                                                            tax_rate: e?.tax?.tax_rate,
-                                                        }
-                                                        : null
-                                                }
-                                                placeholder={"% Thuế"}
-                                                hideSelectedOptions={false}
-                                                formatOptionLabel={taxRateLabel}
-                                                className={` border-transparent placeholder:text-slate-300 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                                isSearchable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
-                                                menuPortalTarget={document.body}
-                                                closeMenuOnSelect={true}
-                                                styles={{
-                                                    placeholder: (base) => ({
-                                                        ...base,
-                                                        color: "#cbd5e1",
-                                                    }),
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 20,
-                                                    }),
-                                                    control: (base, state) => ({
-                                                        ...base,
-                                                        boxShadow: "none",
-                                                        padding: "0px",
-                                                        margin: "0px",
-                                                    }),
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-end col-span-1 text-right">
-                                            <h3
-                                                className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
-                                            >
-                                                {formatMoney(e?.total_amount)}
-                                            </h3>
-                                        </div>
-                                        <div className="col-span-1 ">
-                                            <div className="relative flex flex-row custom-date-picker">
-                                                <DatePicker
-                                                    selected={e?.delivery_date ? e?.delivery_date : null}
-                                                    blur
-                                                    placeholderText="DD/MM/YYYY"
-                                                    dateFormat="dd/MM/yyyy"
-                                                    onSelect={(date) =>
-                                                        handleOnChangeInputOption(e?.id, "delivery_date", date)
-                                                    }
-                                                    onChange={(date) =>
-                                                        handleOnChangeInputOption(e?.id, "delivery_date", date)
-                                                    }
-                                                    className={`${errDeliveryDate && e?.delivery_date === null
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                        } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
-                                                />
-                                                {e?.delivery_date && (
-                                                    <>
-                                                        <MdClear
-                                                            className="absolute right-0 3xl:-translate-x-[320%] 3xl:translate-y-[1%] 2xl:-translate-x-[150%] 2xl:translate-y-[1%] xl:-translate-x-[140%] xl:translate-y-[1%] -translate-x-[90%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-110 xl:scale-90 scale-75 cursor-pointer"
-                                                            onClick={() =>
-                                                                handleOnChangeInputOption(e?.id, "clear_delivery_date")
-                                                            }
-                                                        />
-                                                    </>
-                                                )}
-                                                <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%] text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-pointer" />
-                                            </div>
-                                            {errDeliveryDate && e?.delivery_date === null && (
-                                                <label className="text-[12px] max-w-10px text-red-500">
-                                                    Vui lòng chọn ngày cần hàng!
-                                                </label>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1">
-                                            <input
-                                                value={e?.note}
-                                                onChange={(value) => handleOnChangeInputOption(e?.id, "note", value)}
-                                                name="optionEmail"
-                                                placeholder="Ghi chú"
-                                                type="text"
-                                                className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-center col-span-1">
-                                            <button
-                                                onClick={_HandleDelete.bind(this, e?.id)}
-                                                type="button"
-                                                title="Xóa"
-                                                className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                                            >
-                                                <IconDelete />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            ))}
                         </div>
-                    </div>
+                    </Customscrollbar>
 
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
                         <div className="flex items-center col-span-3 gap-2">

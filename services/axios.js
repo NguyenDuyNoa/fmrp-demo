@@ -32,21 +32,36 @@ axios.interceptors.request.use(
 const _ServerInstance = async (method, url, dataObject = {}, callback) => {
     const showToat = useToast()
 
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const tokenFMRP = urlParams.get("tokenFMRP");
+    console.log("12222222222 tokenFMRP", tokenFMRP);
+
+
+    const databaseappFMRP = urlParams.get("databaseappFMRP");
+
+    console.log("12222222222 databaseappFMRP", databaseappFMRP);
+
+
     let token = null;
 
     let databaseApp = null;
 
     try {
-        token = Cookies.get("tokenFMRP") ?? ""
+        token = Cookies.get("tokenFMRP") ?? tokenFMRP ?? ""
     } catch (err) {
         token = null;
     }
 
     try {
-        databaseApp = Cookies.get("databaseappFMRP") ?? ""
+        databaseApp = Cookies.get("databaseappFMRP") ?? databaseappFMRP ?? ""
     } catch (err) {
         databaseApp = null;
     }
+
+    console.log("token", token);
+    console.log("databaseApp", databaseApp);
+
 
     const headers = {
         "Content-Type": "application/json",

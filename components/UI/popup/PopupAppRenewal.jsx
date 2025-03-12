@@ -37,12 +37,12 @@ const PopupAppRenewal = () => {
     }, []);
 
     useEffect(() => {
-        if (dataAuthentication.status_active_package.status === 3) {
+        if (dataAuthentication.status_active_package?.status === 3) {
             setOpenModal(true);
         } else {
             setOpenModal(false);
         }
-    }, [dataAuthentication.status_active_package.status]);
+    }, [dataAuthentication.status_active_package?.status]);
 
     const fetchListPackage = () => {
         Axios("GET", `api_web/api_login/get_list_data_pack?csrf_protection=true`, {}, (err, res) => {
@@ -264,7 +264,7 @@ const PopupAppRenewal = () => {
                             <button
                                 // onClick={handleClickButton}
                                 type="button"
-                                className="px-4 py-2 3xl:text-base text-sm text-white bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 duration-300 transition-all ease-in-out rounded-lg focus:outline-none"
+                                className="px-4 py-2 3xl:text-base text-sm text-white bg-[#003DA0] hover:bg-[#003DA0]/80 duration-300 transition-all ease-in-out rounded-lg focus:outline-none"
                             >
                                 Thanh toán
                             </button>

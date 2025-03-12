@@ -16,8 +16,8 @@ const apiProductionsOrders = {
         return response.data
     },
     // bộ lọc lsx chi tiết
-    async apiComboboxProductionOrdersDetail() {
-        const response = await axiosCustom('GET', `/api_web/api_manufactures/searchPODetail`);
+    async apiComboboxProductionOrdersDetail(param) {
+        const response = await axiosCustom('GET', `/api_web/api_manufactures/searchPODetail`, param);
         return response.data
     },
     // api chi tiết lsx
@@ -44,6 +44,11 @@ const apiProductionsOrders = {
     // thu hồi nvl
     async apiGetRecallProduction(data) {
         const response = await axiosCustom('POST', `/api_web/Api_Purchase_Internal/getItems`, data);
+        return response.data
+    },
+    // chi phí nvl
+    async apiGetCostProduction(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/getFactoryProductionCost`, data);
         return response.data
     },
 

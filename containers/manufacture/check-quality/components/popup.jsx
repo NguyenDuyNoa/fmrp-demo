@@ -156,8 +156,8 @@ const PopupCheckQuality = (props) => {
                                                                 className="custom-modal-image object-cover rounded w-[50px] h-[60px]"
                                                             />
                                                             // <Lightbox
-                                                            //     small={e?.images ?? "/nodata.png"}
-                                                            //     large={e?.images ?? "/nodata.png"}
+                                                            //     small={e?.images ?? "/icon/noimagelogo.png"}
+                                                            //     large={e?.images ?? "/icon/noimagelogo.png"}
                                                             //     alt="Hello World!"
                                                             //     onClose={() => {
 
@@ -166,8 +166,8 @@ const PopupCheckQuality = (props) => {
                                                         ) : (
                                                             <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
                                                                 <ModalImage
-                                                                    small="/nodata.png"
-                                                                    large="/nodata.png"
+                                                                    small="/icon/noimagelogo.png"
+                                                                    large="/icon/noimagelogo.png"
                                                                     className="object-contain w-full h-full p-1 rounded"
                                                                 />
                                                             </div>

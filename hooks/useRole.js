@@ -43,7 +43,9 @@ const useActionRole = (auth, type) => {
 
 
     };
-
+    if (!auth) {
+        return { checkDelete: false, checkEdit: false, checkAdd: false, checkExport: false, checkBrowser: false };
+    }
     const convertedAuth = Object.entries(auth)?.map(([key, item]) => {
         const newModel = conversionRules[item?.module] || item?.module;
         return {

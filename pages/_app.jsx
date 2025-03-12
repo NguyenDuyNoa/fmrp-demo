@@ -1,22 +1,21 @@
 import Layout from "@/components/layout";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import LoadingPage from "@/components/UI/loading/loadingPage";
-import LoginPage from "@/components/UI/login/login";
 import { useAuththentication, useLanguage, useSetings } from "@/hooks/useAuth";
 import store from "@/services/redux";
+import { CookieCore } from "@/utils/lib/cookie";
 import { Inter, Lexend_Deca } from "@next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import React, { Suspense, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Provider, useDispatch, useSelector } from "react-redux";
+import 'simplebar-react/dist/simplebar.min.css';
 import "sweetalert2/src/sweetalert2.scss";
 import "../styles/globals.scss";
-import { CookieCore } from "@/utils/lib/cookie";
-import ChatBubbleAI from "@/components/UI/chat/ChatAiBubble";
-import 'simplebar-react/dist/simplebar.min.css';
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { useRouter } from "next/router";
-import { useLayoutEffect } from "react";
+import Login from "./auth/login";
+import Register from "./auth/register";
 
 // const t = Lark
 const deca = Lexend_Deca({
@@ -135,8 +134,36 @@ function MainPage({ Component, pageProps }) {
         return <LoadingPage />;
     }
 
+    if (router.pathname == '/manufacture/productions-orders-mobile' || router.pathname == '/manufacture/production-plan-mobile') {
+
+        return <Customscrollbar className="relative max-h-screen ">
+            <Layout dataLang={data}>
+                <Component dataLang={data} {...pageProps} />
+            </Layout>
+        </Customscrollbar>
+    }
+
     if (!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) {
-        return <LoginPage dataLang={data} />;
+        console.log("tokenFMRP", tokenFMRP);
+        console.log("databaseappFMRP", databaseappFMRP);
+        if (router.pathname == '/auth/register') {
+            console.log("auth");
+            return <Register dataLang={data} />;
+        }
+        if ((!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false) || router.pathname == '/auth/login')) {
+            console.log("auth1");
+
+            return <Login dataLang={data} />;
+        }
+        router.replace("/dashboard");
+        return <LoadingPage />;
+
+
+    }
+    // Nếu đã đăng nhập mà đang ở login hoặc register, chuyển hướng dashboard
+    if (router.pathname.startsWith("/auth")) {
+        router.replace("/dashboard");
+        return <LoadingPage />;
     }
 
     return (

@@ -15,6 +15,8 @@ import ModalDetail from "@/containers/manufacture/productions-orders/components/
 import Loading from "@/components/UI/loading/loading"
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate"
 import { formatMoment } from "@/utils/helpers/formatMoment"
+import { useInView } from "react-intersection-observer"
+import LoadingButton from "@/components/UI/loading/loadingButton"
 
 
 // e74c3c đỏ nhạt
@@ -27,11 +29,34 @@ import { formatMoment } from "@/utils/helpers/formatMoment"
 //     .domain([])
 //     // .range(["#e74c3c", "#3b82f6", "#4CAF50", '#2563eb', '#6b7280'])
 //     .range([])
+// xanh lá hoàn thành, đỏ là chưa hoàn thành & timeline sx vượt quá hnay, còn lại xanh dương
 const colorScale = d3
     .scaleOrdinal()
     .domain(["2", "3"]) // Xác định rõ các giá trị có màu riêng
     .range(["#4CAF50", "#e74c3c"]) // Xanh lá cho "2", đỏ cho "3"
     .unknown("#3b82f6"); // Mặc định xanh dương cho các giá trị khác
+
+
+// "0": {
+//     class: 'text-[#f59e0b] bg-[#fff7ed]',
+//     circle: "bg-[#f59e0b]",
+//     title: "Chưa sản xuất"
+// },
+// "1": {
+//     class: 'text-[#3b82f6] bg-[#eff6ff]',
+//     circle: "bg-[#3b82f6]",
+//     title: "Đang sản xuất"
+// },
+// "2": {
+//     class: 'text-[#22c55e] bg-[#f0fdf4]',
+//     circle: "bg-[#22c55e]",
+//     title: "Hoàn thành"
+// },
+// "3": {
+//     class: 'text-[#ef4444] bg-[#fef2f2]',
+//     circle: "bg-[#ef4444]",
+//     title: "Chưa hoàn thành & Quá hạn"
+// }
 
 
 const GanttChart = ({
@@ -52,11 +77,23 @@ const GanttChart = ({
     dataOrder,
     checkedItems,
     isData,
-    isValue
+    isValue,
+    typeScreen,
+    hasNextPage,
+    fetchNextPage
 }) => {
-    const ROW_HEIGHT = 30
+    const typePageMoblie = typeScreen == 'mobile'
+
+    const ROW_HEIGHT = typePageMoblie ? 65 : 30
+
+
+    const minWidthBox = typePageMoblie ? 440 : 800
+
+    // const ROW_HEIGHT = typePageMoblie ? 65 : 30
 
     const BAR_HEIGHT = 8
+
+    const { ref, inView } = useInView()
 
     const orders = dataOrder
 
@@ -93,7 +130,7 @@ const GanttChart = ({
     //             {
     //                 name: "Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo",
     //                 status: "Hoàn thành",
-    //                 quantity: 800,
+    //                 quantity: minWidthBox,
     //                 processArr: [
     //                     {
     //                         items: [
@@ -134,7 +171,7 @@ const GanttChart = ({
     //             {
     //                 name: "Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo Cổ áo",
     //                 status: "Hoàn thành",
-    //                 quantity: 800,
+    //                 quantity: minWidthBox,
     //                 processArr: [
     //                     {
     //                         items: [
@@ -191,7 +228,7 @@ const GanttChart = ({
     const xScale = d3
         .scaleTime()
         .domain(timeRange)
-        .range([0, Math.max(ganttWidth - 40, 800)])
+        .range([0, Math.max(ganttWidth - 40, minWidthBox)])
 
 
     const calculateTotalHeight = () => {
@@ -205,6 +242,12 @@ const GanttChart = ({
             return acc + height;
         }, 0);
     };
+
+    useEffect(() => {
+        if (inView && hasNextPage) {
+            fetchNextPage()
+        }
+    }, [inView, hasNextPage, fetchNextPage])
 
     useEffect(() => {
         if (orders?.length > 0) {
@@ -280,8 +323,8 @@ const GanttChart = ({
 
     const renderGanttHeader = () => {
         const ticks = xScale.ticks(d3.timeDay);
-        const minWidthPerDay = 80;
-        const totalMinWidth = Math.max(ticks.length * minWidthPerDay, 800);
+        const minWidthPerDay = typePageMoblie ? 38.5 : 80;
+        const totalMinWidth = Math.max(ticks.length * minWidthPerDay, minWidthBox);
 
         // Xác định các tháng duy nhất
         const months = [];
@@ -299,7 +342,7 @@ const GanttChart = ({
         });
 
         return (
-            <div className="overflow-x-auto" style={{ minWidth: totalMinWidth }}>
+            <div className="overflow-x-auto " style={{ minWidth: totalMinWidth }}>
                 <svg width={totalMinWidth} height={60} className="text-gray-600">
                     <g transform="translate(0, 0)">
                         {/* Tháng (Sẽ di chuyển dựa trên cuộn) */}
@@ -325,7 +368,7 @@ const GanttChart = ({
                                             x={x + 10} // Đặt nhãn ở đầu tháng
                                             y="25"
                                             textAnchor="start" // Căn lề trái thay vì giữa
-                                            className="text-sm font-semibold"
+                                            className={`${typePageMoblie ? "text-xs" : "text-sm"} font-semibold`}
                                             fill={"black"}
                                         >
                                             {month.label}
@@ -397,8 +440,10 @@ const GanttChart = ({
 
 
     const renderFullHeightGridLines = () => {
-        const minWidthPerDay = 80;
-        const totalMinWidth = Math.max(ganttWidth, ganttContainerRef.current?.clientWidth || 800);
+        // const minWidthPerDay = 80;
+        const minWidthPerDay = typePageMoblie ? 38.5 : 80;
+
+        const totalMinWidth = Math.max(ganttWidth, ganttContainerRef.current?.clientWidth || minWidthBox);
 
         // ✅ Lấy chiều cao chính xác từ scrollHeight thay vì clientHeight
         const totalHeight = ganttParentContainerRef.current?.scrollHeight || containerHeight;
@@ -439,8 +484,9 @@ const GanttChart = ({
         const ticks = xScale.ticks(d3.timeDay)
 
         // Định nghĩa min-width cho từng ngày
-        const minWidthPerDay = 80 // Đảm bảo mỗi ngày có ít nhất 30px
-        const totalMinWidth = Math.max(ticks.length * minWidthPerDay, 800) // Tổng min-width tối thiểu
+        const minWidthPerDay = typePageMoblie ? 38.5 : 80; // Đảm bảo mỗi ngày có ít nhất 30px
+
+        const totalMinWidth = Math.max(ticks.length * minWidthPerDay, minWidthBox) // Tổng min-width tối thiểu
 
         // Scale mới đảm bảo khoảng cách tối thiểu
         const adjustedXScale = (date) => {
@@ -578,8 +624,9 @@ const GanttChart = ({
     const ticks = xScale.ticks(d3.timeDay)
 
     // Xác định min-width cho từng ngày
-    const minWidthPerDay = 80 // Mỗi ngày có ít nhất 30px
-    const totalMinWidth = Math.max(ticks.length * minWidthPerDay, 800) // Tổng min-width tối thiểu
+    const minWidthPerDay = typePageMoblie ? 38.5 : 80; // Mỗi ngày có ít nhất 30px
+
+    const totalMinWidth = Math.max(ticks.length * minWidthPerDay, minWidthBox) // Tổng min-width tối thiểu
 
     // Chọn giá trị lớn hơn giữa kích thước container và min-width
     const adjustedGanttWidth = Math.max(ganttWidth, totalMinWidth)
@@ -610,10 +657,13 @@ const GanttChart = ({
     };
 
     useEffect(() => {
+        console.log("hasNextPage", hasNextPage);
+
         const tableContainer = tableContainerRef.current;
         const ganttParentContainer = ganttParentContainerRef.current;
 
         if (!tableContainer || !ganttParentContainer) return;
+        console.log("111");
 
         let isSyncingScroll = false;
 
@@ -625,7 +675,17 @@ const GanttChart = ({
             ganttParentContainer.scrollTop = tableContainer.scrollTop;
 
             isSyncingScroll = false;
+
+            const isAtBottom =
+                tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 1;
+            console.log("isAtBottom", isAtBottom);
+
+            if (isAtBottom && hasNextPage) {
+                fetchNextPage();
+            }
         };
+        console.log("!111");
+
 
         const handleParentScroll = () => {
             if (isSyncingScroll) return;
@@ -636,20 +696,27 @@ const GanttChart = ({
 
             // Kiểm tra nếu `ganttParentContainer` đã cuộn đến đáy
             const isAtBottom = parentScrollTop + parentClientHeight >= parentScrollHeight - 1;
+            console.log("isAtBottom", isAtBottom);
+
+            if (hasNextPage && isAtBottom) {
+                fetchNextPage()
+            }
+            // console.log("isAtBottom", isAtBottom);
+
 
             // Cuộn `tableContainer` theo `ganttParentContainer`
             tableContainer.scrollTop = parentScrollTop;
             isSyncingScroll = false;
         };
 
-        tableContainer.addEventListener("scroll", handleTableScroll);
-        ganttParentContainer.addEventListener("scroll", handleParentScroll);
+        tableContainer.addEventListener("scroll", handleTableScroll, { passive: false });
+        ganttParentContainer.addEventListener("scroll", handleParentScroll, { passive: false });
 
         return () => {
-            tableContainer.removeEventListener("scroll", handleTableScroll);
-            ganttParentContainer.removeEventListener("scroll", handleParentScroll);
+            tableContainer.removeEventListener("scroll", handleTableScroll, { passive: false });
+            ganttParentContainer.removeEventListener("scroll", handleParentScroll, { passive: false });
         };
-    }, [orders]);
+    }, [orders, hasNextPage]);
 
     useEffect(() => {
         const tableContainer = tableContainerRef.current;
@@ -665,134 +732,187 @@ const GanttChart = ({
             ganttContainer.scrollLeft = ganttContainer.scrollWidth;
             ganttParentContainer.scrollLeft = ganttParentContainer.scrollWidth;
         }, 100); // Delay một chút để đảm bảo nội dung đã render
-    }, [orders]);
+    }, [orders,]);
 
 
     const shareProps = {
         refetchProductionsOrders: () => { },
-        dataLang
+        dataLang,
+        typePageMoblie
     }
+
+
+
+    const Legend = () => {
+        const legendItems = [
+            { label: "Hoàn thành", color: "#4CAF50" },
+            { label: "Chưa sản xuất", color: "#3b82f6" },
+            { label: "Quá hạn", color: "#e74c3c" },
+        ];
+
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    fontSize: "9px",
+                    marginBottom: "5px"
+                }}
+                className=""
+            >
+                {legendItems.map((item, index) => (
+                    <div key={index} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                        <div style={{
+                            width: "12px",
+                            height: "12px",
+                            backgroundColor: item.color,
+                            borderRadius: "100%"
+                        }} />
+                        <span style={{ color: "#333" }}>{item.label}</span>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
+    const TabProduction = () => {
+        return (
+            <div className="flex items-center gap-2">
+                {[
+                    { name: dataLang?.production_plan_gantt_order || 'production_plan_gantt_order', tab: "order" },
+                    { name: dataLang?.production_plan_gantt_internal || 'production_plan_gantt_internal', tab: "plan" },
+                ].map((e) => (
+                    <Zoom className={`${typePageMoblie ? "w-1/2" : "w-fit"}`}>
+                        <button
+                            key={e.tab}
+                            onClick={() => {
+                                if (arrIdChecked?.length > 0) {
+                                    handleQueryId({ status: true, initialKey: e.tab })
+                                } else {
+                                    handleTab(e.tab)
+                                }
+                                queryState({ openModal: false, });
+                            }}
+                            type="button"
+                            className={`${router == e.tab ? "bg-sky-200 text-sky-600" : "bg-sky-50 text-sky-500"
+                                }  hover:bg-sky-200 ${typePageMoblie ? "w-full" : "w-fit min-w-fit"}  hover:text-sky-600 font-semibold text-[11px] text-sky-400 px-2 py-[5px] rounded-xl transition-all duration-150 ease-linear`}
+                        >
+                            {e.name}
+                        </button>
+                    </Zoom>
+                ))}
+            </div>
+        )
+    }
+
     return (
         <React.Fragment>
-            <div className="flex flex-col  3xl:h-[70vh] xxl:h-[62.5vh] 2xl:h-[64vh] xl:h-[65vh] lg:h-[61vh] h-[60vh] overflow-hidden border">
+            {typePageMoblie && <TabProduction />}
+            <div className={`flex flex-col ${typePageMoblie ? "h-[85vh]" : "3xl:h-[73vh] xxl:h-[68vh] 2xl:h-[68vh] xl:h-[76vh] lg:h-[65vh] h-[65vh]"}   overflow-hidden border`}>
                 <div className="sticky top-0 z-10 flex border-b border-b-[#e5e7eb]">
-                    <div className="w-[40%]  border-r border-[#e5e7eb]">
-                        <div className="flex items-center gap-2 py-0.5 pl-2">
-                            {[
-                                { name: dataLang?.production_plan_gantt_order || 'production_plan_gantt_order', tab: "order" },
-                                { name: dataLang?.production_plan_gantt_internal || 'production_plan_gantt_internal', tab: "plan" },
-                            ].map((e) => (
-                                <Zoom className="w-fit">
-                                    <button
-                                        key={e.tab}
-                                        onClick={() => {
-                                            if (arrIdChecked?.length > 0) {
-                                                handleQueryId({ status: true, initialKey: e.tab })
-                                            } else {
-                                                handleTab(e.tab)
-                                            }
-                                            queryState({ openModal: false, });
-                                        }}
-                                        type="button"
-                                        className={`${router == e.tab ? "bg-sky-200 text-sky-600" : "bg-sky-50 text-sky-500"
-                                            }  hover:bg-sky-200 hover:text-sky-600 font-semibold text-[11px] text-sky-400 px-2 py-[5px] rounded-xl transition-all duration-150 ease-linear`}
-                                    >
-                                        {e.name}
-                                    </button>
-                                </Zoom>
-                            ))}
+                    <div className={`${typePageMoblie ? "w-[23%]" : "w-[40%]"}  border-r border-[#e5e7eb]`}>
+                        <div className={`${typePageMoblie ? "hidden" : 'flex'} items-center justify-between gap-2 py-0.5 px-2`}>
+                            <TabProduction />
+                            {/* {Legend()} */}
                         </div>
-                        {orders?.length > 0 && (
-                            <div className="flex items-center gap-2 px-1">
-                                <div className="w-[30%] flex items-center gap-1">
-                                    <div className="flex items-center gap-1">
-                                        <div className="mr-1">
-                                            <label
-                                                className="relative flex items-center  cursor-pointer rounded-[4px] "
-                                                htmlFor={"checkbox"}
-                                            >
-                                                <input
-                                                    id="checkbox"
-                                                    type="checkbox"
-                                                    checked={checkedItems?.length === orders?.flatMap(order => order?.listProducts)?.length}
-                                                    className="peer relative h-[15px] w-[15px] cursor-pointer appearance-none rounded-[4px] border border-blue-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
-                                                    onChange={() => {
-                                                        handleChekedAll();
-                                                    }}
-                                                />
-                                                <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        className="w-3 h-3"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                        stroke="currentColor"
-                                                        stroke-width="1"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
-                                                </div>
-                                            </label>
-                                        </div>
-                                        <div onClick={() => handleSort()} className="flex flex-col gap-1 cursor-pointer ">
-                                            <Image
-                                                alt={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
-                                                width={7}
-                                                height={4}
-                                                src={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
-                                                className={`${isSort ? "" : "rotate-180"} object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                            />
-                                            <Image
-                                                alt={isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
-                                                width={7}
-                                                height={4}
-                                                src={isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
-                                                className={`${!isSort ? "rotate-180" : ""} object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
-                                        {dataLang?.production_plan_gantt_table_order || 'production_plan_gantt_table_order'}
-                                    </div>
-                                </div>
-                                <div className="w-[70%] grid grid-cols-8 items-center">
-                                    <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                        {dataLang?.production_plan_gantt_table_status || 'production_plan_gantt_table_status'}
-                                    </div>
-                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                        {dataLang?.production_plan_gantt_table_quantity || 'production_plan_gantt_table_quantity'}
-                                    </div>
-                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                        {dataLang?.production_plan_gantt_table_quantity_plan || 'production_plan_gantt_table_quantity_plan'}
-                                    </div>
-                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                        {dataLang?.production_plan_gantt_table_quantity_remaining || 'production_plan_gantt_table_quantity_remaining'}
-                                    </div>
-                                </div>
+                        {typePageMoblie
+                            ?
+                            <div className="flex items-center justify-center w-full h-full p-2 text-xs">
+                                Mặt hàng
                             </div>
-                        )}
+                            :
+                            orders?.length > 0 && (
+                                <div className="flex items-center gap-2 px-1">
+                                    <div className="w-[30%] flex items-center gap-1">
+                                        <div className="flex items-center gap-1">
+                                            <div className="mr-1">
+                                                <label
+                                                    className="relative flex items-center  cursor-pointer rounded-[4px] "
+                                                    htmlFor={"checkbox"}
+                                                >
+                                                    <input
+                                                        id="checkbox"
+                                                        type="checkbox"
+                                                        checked={checkedItems?.length === orders?.flatMap(order => order?.listProducts)?.length}
+                                                        className="peer relative h-[15px] w-[15px] cursor-pointer appearance-none rounded-[4px] border border-blue-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
+                                                        onChange={() => {
+                                                            handleChekedAll();
+                                                        }}
+                                                    />
+                                                    <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="w-3 h-3"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                            stroke="currentColor"
+                                                            stroke-width="1"
+                                                        >
+                                                            <path
+                                                                fill-rule="evenodd"
+                                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                clip-rule="evenodd"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <div onClick={() => handleSort()} className="flex flex-col gap-1 cursor-pointer ">
+                                                <Image
+                                                    alt={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
+                                                    width={7}
+                                                    height={4}
+                                                    src={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
+                                                    className={`${isSort ? "" : "rotate-180"} object-cover hover:scale-110 transition-all ease-linear duration-200`}
+                                                />
+                                                <Image
+                                                    alt={isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
+                                                    width={7}
+                                                    height={4}
+                                                    src={isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
+                                                    className={`${!isSort ? "rotate-180" : ""} object-cover hover:scale-110 transition-all ease-linear duration-200`}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                            {dataLang?.production_plan_gantt_table_order || 'production_plan_gantt_table_order'}
+                                        </div>
+                                    </div>
+                                    <div className="w-[70%] grid grid-cols-8 items-center">
+                                        <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                            {dataLang?.production_plan_gantt_table_status || 'production_plan_gantt_table_status'}
+                                        </div>
+                                        <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                            {dataLang?.production_plan_gantt_table_quantity || 'production_plan_gantt_table_quantity'}
+                                        </div>
+                                        <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                            {dataLang?.production_plan_gantt_table_quantity_plan || 'production_plan_gantt_table_quantity_plan'}
+                                        </div>
+                                        <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                            {dataLang?.production_plan_gantt_table_quantity_remaining || 'production_plan_gantt_table_quantity_remaining'}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                     </div>
-                    <div ref={headerContainerRef} className="w-[60%] overflow-x-hidden">
+                    <div ref={headerContainerRef} className={`${typePageMoblie ? "w-[79%]" : "w-[60%]"} overflow-x-hidden relative`}>
                         {orders?.length > 0 && (renderGanttHeader())}
                     </div>
                 </div>
                 {
                     isFetching
                         ?
-                        <Loading className="3xl:h-[70vh] xxl:h-[62.5vh] 2xl:h-[64vh] xl:h-[65vh] lg:h-[61vh] h-[60vh]" />
+                        <Loading className="3xl:h-[73vh] xxl:h-[68vh] 2xl:h-[68vh] xl:h-[76vh] lg:h-[65vh] h-[65vh]" />
                         :
                         orders?.length > 0
                             ?
-                            <div className="flex h-full overflow-hidden">
+                            <div className={`flex  h-full ${typePageMoblie ? "" : "overflow-hidden"}`}>
                                 <Customscrollbar
                                     ref={tableContainerRef}
                                     hideScrollbar={true}
                                     onFocus={(e) => e.preventDefault()}
-                                    className="w-[40%] h-full overflow-auto border-r border-[#e5e7eb]"
+                                    className={`${typePageMoblie ? "w-[23%] h-[92%]" : "w-[40%] h-full"}  overflow-auto border-r border-[#e5e7eb]`}
                                 >
                                     {/* <div ref={tableContainerRef} className="w-[40%] h-full overflow-auto border-r border-[#e5e7eb]"> */}
                                     {orders.map((order) => {
@@ -801,54 +921,103 @@ const GanttChart = ({
                                         const sussces = ["2"].includes(order?.status); // Hoàn thành 
                                         return (
                                             <React.Fragment key={order?.id}>
-                                                <div
-                                                    className="flex items-center my-0.5 px-1 w-full cursor-pointer group gap-2 bg-[#F3F4F6] rounded"
-                                                    onClick={() => toggleOrder(order?.id)}
-                                                    style={{ height: `${ROW_HEIGHT}px` }}
-                                                >
-                                                    <div className="w-[30%] flex items-center justify-start gap-2 text-xs font-bold group">
-                                                        <div className="">
-                                                            <Image
-                                                                alt="sub"
-                                                                width={7}
-                                                                height={4}
-                                                                src={"/productionPlan/Shapedow.png"}
-                                                                className={`${expandedOrders[order?.id] ? "rotate-0 t" : "-rotate-90 "} object-cover duration-500 col-span-1 mx-auto  transition-all ease-in-out`}
-                                                            />
+                                                {
+                                                    typePageMoblie
+                                                        ?
+                                                        <div
+                                                            className="flex flex-col items-center my-1 px-1 w-full cursor-pointer group gap-1 bg-[#F3F4F6] rounded"
+                                                            onClick={() => toggleOrder(order?.id)}
+                                                            style={{ height: `${ROW_HEIGHT}px` }}
+                                                        >
+                                                            <div className="flex items-center justify-start w-full gap-2 text-xs font-bold group">
+                                                                <div className="">
+                                                                    <Image
+                                                                        alt="sub"
+                                                                        width={7}
+                                                                        height={4}
+                                                                        src={"/productionPlan/Shapedow.png"}
+                                                                        className={`${expandedOrders[order?.id] ? "rotate-0 t" : "-rotate-90 "} object-cover duration-500 col-span-1 mx-auto  transition-all ease-in-out`}
+                                                                    />
+                                                                </div>
+                                                                <h2 className={`text-[#52575E] ${(outDate && "group-hover:text-[#FF8F0D]") ||
+                                                                    (processing && "group-hover:text-blue-500") ||
+                                                                    (sussces && "group-hover:text-green-500")
+                                                                    } line-clamp-1   transition-all ease-in-out text-[10px] font-semibold col-span-3`}
+                                                                >
+                                                                    {order?.nameOrder}
+                                                                </h2>
+                                                            </div>
+                                                            <div className="flex flex-col items-start w-full gap-1">
+                                                                <h2
+                                                                    className={`${(outDate && "text-[#FF8F0D]") ||
+                                                                        (processing && "text-blue-500") ||
+                                                                        (sussces && "text-green-500")
+                                                                        } whitespace-nowrap  text-[10px] font-medium`}
+                                                                >
+                                                                    {(outDate && "Chưa sản xuất") ||
+                                                                        (processing && "Đang sản xuất") ||
+                                                                        (sussces && "Hoàn thành")}
+                                                                </h2>
+                                                                <h3
+                                                                    className={`${(outDate &&
+                                                                        "text-[#FF8F0D] border-[#FF8F0D] bg-[#FFEEF0]") ||
+                                                                        (processing && "text-blue-500 border-blue-500 bg-[#EBF5FF]") ||
+                                                                        (sussces && "text-green-500 border-green-500 bg-[#EBFEF2]")
+                                                                        } text-[10px] font-normal  py-0.5 px-2 rounded-lg border`}
+                                                                >
+                                                                    {order?.process}
+                                                                </h3>
+                                                            </div>
                                                         </div>
-                                                        <h2 className={`text-[#52575E] ${(outDate && "group-hover:text-[#FF8F0D]") ||
-                                                            (processing && "group-hover:text-blue-500") ||
-                                                            (sussces && "group-hover:text-green-500")
-                                                            } line-clamp-1 3xl:text-sm  transition-all ease-in-out xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] font-semibold col-span-3`}
+                                                        :
+                                                        <div
+                                                            className="flex items-center my-0.5 px-1 w-full cursor-pointer group gap-2 bg-[#F3F4F6] rounded"
+                                                            onClick={() => toggleOrder(order?.id)}
+                                                            style={{ height: `${ROW_HEIGHT}px` }}
                                                         >
-                                                            {order?.nameOrder}
-                                                        </h2>
-                                                    </div>
+                                                            <div className="w-[30%] flex items-center justify-start gap-2 text-xs font-bold group">
+                                                                <div className="">
+                                                                    <Image
+                                                                        alt="sub"
+                                                                        width={7}
+                                                                        height={4}
+                                                                        src={"/productionPlan/Shapedow.png"}
+                                                                        className={`${expandedOrders[order?.id] ? "rotate-0 t" : "-rotate-90 "} object-cover duration-500 col-span-1 mx-auto  transition-all ease-in-out`}
+                                                                    />
+                                                                </div>
+                                                                <h2 className={`text-[#52575E] ${(outDate && "group-hover:text-[#FF8F0D]") ||
+                                                                    (processing && "group-hover:text-blue-500") ||
+                                                                    (sussces && "group-hover:text-green-500")
+                                                                    } line-clamp-1 3xl:text-sm  transition-all ease-in-out xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] font-semibold col-span-3`}
+                                                                >
+                                                                    {order?.nameOrder}
+                                                                </h2>
+                                                            </div>
 
-                                                    <div className="flex items-center w-[70%] gap-1 pl-1.5">
-                                                        <h2
-                                                            className={`${(outDate && "text-[#FF8F0D]") ||
-                                                                (processing && "text-blue-500") ||
-                                                                (sussces && "text-green-500")
-                                                                }  3xl:text-[13px] whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] font-medium`}
-                                                        >
-                                                            {(outDate && "Chưa sản xuất") ||
-                                                                (processing && "Đang sản xuất") ||
-                                                                (sussces && "Hoàn thành")}
-                                                        </h2>
-                                                        <h3
-                                                            className={`${(outDate &&
-                                                                "text-[#FF8F0D] border-[#FF8F0D] bg-[#FFEEF0]") ||
-                                                                (processing && "text-blue-500 border-blue-500 bg-[#EBF5FF]") ||
-                                                                (sussces && "text-green-500 border-green-500 bg-[#EBFEF2]")
-                                                                } 3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal  py-0.5 px-2 rounded-lg border`}
-                                                        >
-                                                            {order?.process}
-                                                        </h3>
-                                                    </div>
-                                                    <div className="p-2"></div>
-                                                </div>
-
+                                                            <div className="flex items-center w-[70%] gap-1 pl-1.5">
+                                                                <h2
+                                                                    className={`${(outDate && "text-[#FF8F0D]") ||
+                                                                        (processing && "text-blue-500") ||
+                                                                        (sussces && "text-green-500")
+                                                                        }  3xl:text-[13px] whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] font-medium`}
+                                                                >
+                                                                    {(outDate && "Chưa sản xuất") ||
+                                                                        (processing && "Đang sản xuất") ||
+                                                                        (sussces && "Hoàn thành")}
+                                                                </h2>
+                                                                <h3
+                                                                    className={`${(outDate &&
+                                                                        "text-[#FF8F0D] border-[#FF8F0D] bg-[#FFEEF0]") ||
+                                                                        (processing && "text-blue-500 border-blue-500 bg-[#EBF5FF]") ||
+                                                                        (sussces && "text-green-500 border-green-500 bg-[#EBFEF2]")
+                                                                        } 3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal  py-0.5 px-2 rounded-lg border`}
+                                                                >
+                                                                    {order?.process}
+                                                                </h3>
+                                                            </div>
+                                                            <div className="p-2"></div>
+                                                        </div>
+                                                }
                                                 {expandedOrders[order?.id] &&
                                                     order?.listProducts?.map((product, pIndex) => (
                                                         <label
@@ -859,111 +1028,185 @@ const GanttChart = ({
                                                             data-product-row
                                                             data-product-id={`${order?.id}-${pIndex}`}
                                                         >
-
-                                                            <div className="w-[30%] flex items-center  gap-2">
-                                                                <div className="flex items-center">
-                                                                    {
-                                                                        product?.quantityRemaining == 0
-                                                                            ?
-                                                                            <button
-                                                                                id={product?.id}
-                                                                                onClick={async () => {
-                                                                                    showToast("error", "Mặt hàng này đã được lên kế hoạch sản xuất đủ", 4000)
-                                                                                }}
-                                                                                type="button"
-                                                                            >
-                                                                                <svg
-                                                                                    width="16"
-                                                                                    height="16"
-                                                                                    viewBox="0 0 16 16"
-                                                                                    fill="none"
-                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                            {
+                                                                typePageMoblie
+                                                                    ?
+                                                                    <div className="flex flex-col my-1">
+                                                                        <div className="flex flex-col items-center gap-1">
+                                                                            {product?.images != null ? (
+                                                                                <Image
+                                                                                    src={product?.images}
+                                                                                    // large={product?.images}
+                                                                                    width={36}
+                                                                                    height={36}
+                                                                                    alt={product?.name}
+                                                                                    className="object-cover rounded-sm min-w-[62px] min-h-[62px] w-[62px] h-[62px] max-w-[62px] max-h-[62px]"
+                                                                                />
+                                                                            ) : (
+                                                                                <Image
+                                                                                    width={36}
+                                                                                    height={36}
+                                                                                    // small="/icon/noimagelogo.png"
+                                                                                    // large="/icon/noimagelogo.png"
+                                                                                    src="/icon/noimagelogo.png"
+                                                                                    alt={product?.name}
+                                                                                    className="object-cover rounded-sm min-w-[62px] min-h-[62px] w-[62px] h-[62px] max-w-[62px] max-h-[62px]"
+                                                                                ></Image>
+                                                                            )}
+                                                                            <div className="flex flex-col">
+                                                                                <h1 className="text-[#000000] text-center line-clamp-3 font-semibold text-[12px] leading-[14px]">
+                                                                                    {product?.name}
+                                                                                </h1>
+                                                                                <h1 className="text-[#9295A4] font-normal text-[8px] leading-[12px]">
+                                                                                    {product?.productVariation}
+                                                                                </h1>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex flex-col items-start">
+                                                                            <div className="">
+                                                                                <h3 className={`${(product?.status_item_po == "0" && "text-[#FF8F0D]") ||
+                                                                                    (product?.status_item_po == "1" && "text-blue-500") ||
+                                                                                    (product?.status_item_po == "2" && "text-green-500")
+                                                                                    } font-medium  text-[8px] leading-[8px]`}
                                                                                 >
-                                                                                    <circle cx="8" cy="8" r="8" fill="#4CAF50" />
-                                                                                    <path
-                                                                                        d="M4 8.5L7 11L12 5"
-                                                                                        stroke="white"
-                                                                                        strokeWidth="2"
-                                                                                        strokeLinecap="round"
-                                                                                        strokeLinejoin="round"
-                                                                                    />
-                                                                                </svg>
-                                                                            </button>
-                                                                            :
-                                                                            <button
-                                                                                type="button"
-                                                                                id={product?.id}
-                                                                                onClick={async () => {
-
-                                                                                    await handleCheked(order, product);
-                                                                                }}
-                                                                                className={`min-w-4 w-4 max-w-4 relative min-h-4 max-h-4  h-4 rounded-full cursor-pointer outline-none focus:outline-none   flex justify-center items-center 
-                                                                ${checkedItems.some(item => item?.id === product?.id) ? "bg-blue-500 before:w-2 before:h-2 before:-translate-x-[5%] before:translate-y-[5%] before:rounded-full before:border-gray-300 before:border before:bg-white border border-gray-100"
-                                                                                        : "bg-white border border-gray-300 "
-                                                                                    }`}
-                                                                            ></button>
-                                                                    }
-                                                                </div>
-                                                                <div className="flex items-center gap-1">
-                                                                    {product?.images != null ? (
-                                                                        <ModalImage
-                                                                            small={product?.images}
-                                                                            large={product?.images}
-                                                                            width={36}
-                                                                            height={36}
-                                                                            alt={product?.name}
-                                                                            className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
-                                                                        />
-                                                                    ) : (
-                                                                        <ModalImage
-                                                                            width={36}
-                                                                            height={36}
-                                                                            small="/nodata.png"
-                                                                            large="/nodata.png"
-                                                                            className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
-                                                                        ></ModalImage>
-                                                                    )}
-                                                                    <div className="flex flex-col">
-                                                                        <h1 className="text-[#000000] line-clamp-2 font-semibold 3xl:text-xs  xxl:text-[11px] 2xl:text-[10px] xl:text-[9px] lg:text-[9px] text-[11px]">
-                                                                            {product?.name}
-                                                                        </h1>
-                                                                        <h1 className="text-[#9295A4] font-normal 3xl:text-[10px] xxl:text-[8px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px]">
-                                                                            {/* {product?.productVariation} */}
-                                                                            {/* {product?.desription} -  */}
-                                                                            {product?.productVariation}
-                                                                        </h1>
+                                                                                    {product?.status_item_po == "0" && "Chưa sản xuất"}
+                                                                                    {product?.status_item_po == "1" && 'Đang sản xuất'}
+                                                                                    {product?.status_item_po == "2" && 'Hoàn thành'}
+                                                                                </h3>
+                                                                            </div>
+                                                                            {/* <h3 className="text-[#52575E]  text-center font-medium flex items-center gap-2">
+                                                                                <div className="text-[#52575E] text-center font-normal text-[8px] leading-[8px]">
+                                                                                    {dataLang?.production_plan_gantt_table_quantity || 'production_plan_gantt_table_quantity'}
+                                                                                </div>
+                                                                                <p className="text-[8px]">{product?.quantity > 0 ? formatNumber(product?.quantity) : "-"}</p>
+                                                                            </h3>
+                                                                            <h3 className="text-[#FF8F0D]  text-center  font-medium flex items-center gap-2">
+                                                                                <div className="text-[#52575E] text-center font-normal text-[8px] leading-[8px]">
+                                                                                    {dataLang?.production_plan_gantt_table_quantity_remaining || 'production_plan_gantt_table_quantity_remaining'}
+                                                                                </div>
+                                                                                <p className="text-[8px]"> {product?.quantityRemaining > 0 ? formatNumber(product?.quantityRemaining) : "-"}</p>
+                                                                            </h3>
+                                                                            <h3 className="flex items-start gap-2 font-medium text-blue-600 text-start">
+                                                                                <div className="text-[#52575E] font-normal text-[8px] flex flex-col leading-[8px]">
+                                                                                    <p className="w-full">SL đã</p>
+                                                                                    <p className="w-full">lập KHSX</p>
+                                                                                </div>
+                                                                                <p className="text-[8px]"> {product?.quantityPlan > 0 ? formatNumber(product?.quantityPlan) : "-"}</p>
+                                                                            </h3> */}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="w-[70%] grid grid-cols-8 items-center">
-                                                                <div className="col-span-2">
-                                                                    <h3 className={`${(product?.status_item_po == "0" && "text-[#FF8F0D]") ||
-                                                                        (product?.status_item_po == "1" && "text-blue-500") ||
-                                                                        (product?.status_item_po == "2" && "text-green-500")
-                                                                        } font-medium col-span-2 3xl:text-[13px] whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px]`}
-                                                                    >
-                                                                        {product?.status_item_po == "0" && "Chưa sản xuất"}
-                                                                        {product?.status_item_po == "1" && 'Đang sản xuất'}
-                                                                        {product?.status_item_po == "2" && 'Hoàn thành'}
-                                                                    </h3>
-                                                                </div>
-                                                                <h3 className="text-[#52575E]  col-span-2 text-center font-medium text-[13px]">
-                                                                    {product?.quantity > 0 ? formatNumber(product?.quantity) : "-"}
-                                                                </h3>
-                                                                <h3 className="text-blue-600  col-span-2 text-center font-medium text-[13px]">
-                                                                    {product?.quantityPlan > 0 ? formatNumber(product?.quantityPlan) : "-"}
-                                                                </h3>
-                                                                <h3 className="text-[#FF8F0D]  col-span-2 text-center  font-medium text-[13px] ">
-                                                                    {product?.quantityRemaining > 0 ? formatNumber(product?.quantityRemaining) : "-"}
-                                                                </h3>
-                                                            </div>
+                                                                    :
+                                                                    <>
+                                                                        <div className="w-[30%] flex items-center  gap-2">
+                                                                            <div className="flex items-center">
+                                                                                {
+                                                                                    product?.quantityRemaining == 0
+                                                                                        ?
+                                                                                        <button
+                                                                                            id={product?.id}
+                                                                                            onClick={async () => {
+                                                                                                showToast("error", "Mặt hàng này đã được lên kế hoạch sản xuất đủ", 4000)
+                                                                                            }}
+                                                                                            type="button"
+                                                                                        >
+                                                                                            <svg
+                                                                                                width="16"
+                                                                                                height="16"
+                                                                                                viewBox="0 0 16 16"
+                                                                                                fill="none"
+                                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                            >
+                                                                                                <circle cx="8" cy="8" r="8" fill="#4CAF50" />
+                                                                                                <path
+                                                                                                    d="M4 8.5L7 11L12 5"
+                                                                                                    stroke="white"
+                                                                                                    strokeWidth="2"
+                                                                                                    strokeLinecap="round"
+                                                                                                    strokeLinejoin="round"
+                                                                                                />
+                                                                                            </svg>
+                                                                                        </button>
+                                                                                        :
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            id={product?.id}
+                                                                                            onClick={async () => {
+
+                                                                                                await handleCheked(order, product);
+                                                                                            }}
+                                                                                            className={`min-w-4 w-4 max-w-4 relative min-h-4 max-h-4  h-4 rounded-full cursor-pointer outline-none focus:outline-none   flex justify-center items-center 
+                                                                ${checkedItems.some(item => item?.id === product?.id) ? "bg-blue-500 before:w-2 before:h-2 before:-translate-x-[5%] before:translate-y-[5%] before:rounded-full before:border-gray-300 before:border before:bg-white border border-gray-100"
+                                                                                                    : "bg-white border border-gray-300 "
+                                                                                                }`}
+                                                                                        ></button>
+                                                                                }
+                                                                            </div>
+                                                                            <div className="flex items-center gap-1">
+                                                                                {product?.images != null ? (
+                                                                                    <ModalImage
+                                                                                        small={product?.images}
+                                                                                        large={product?.images}
+                                                                                        width={36}
+                                                                                        height={36}
+                                                                                        alt={product?.name}
+                                                                                        className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                                                                    />
+                                                                                ) : (
+                                                                                    <ModalImage
+                                                                                        width={36}
+                                                                                        height={36}
+                                                                                        small="/icon/noimagelogo.png"
+                                                                                        large="/icon/noimagelogo.png"
+                                                                                        className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
+                                                                                    ></ModalImage>
+                                                                                )}
+                                                                                <div className="flex flex-col">
+                                                                                    <h1 className="text-[#000000] line-clamp-2 font-semibold 3xl:text-xs  xxl:text-[11px] 2xl:text-[10px] xl:text-[9px] lg:text-[9px] text-[11px]">
+                                                                                        {product?.name}
+                                                                                    </h1>
+                                                                                    <h1 className="text-[#9295A4] font-normal 3xl:text-[10px] xxl:text-[8px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px]">
+                                                                                        {/* {product?.productVariation} */}
+                                                                                        {/* {product?.desription} -  */}
+                                                                                        {product?.productVariation}
+                                                                                    </h1>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="w-[70%] grid grid-cols-8 items-center">
+                                                                            <div className="col-span-2">
+                                                                                <h3 className={`${(product?.status_item_po == "0" && "text-[#FF8F0D]") ||
+                                                                                    (product?.status_item_po == "1" && "text-blue-500") ||
+                                                                                    (product?.status_item_po == "2" && "text-green-500")
+                                                                                    } font-medium col-span-2 3xl:text-[13px] whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px]`}
+                                                                                >
+                                                                                    {product?.status_item_po == "0" && "Chưa sản xuất"}
+                                                                                    {product?.status_item_po == "1" && 'Đang sản xuất'}
+                                                                                    {product?.status_item_po == "2" && 'Hoàn thành'}
+                                                                                </h3>
+                                                                            </div>
+                                                                            <h3 className="text-[#52575E]  col-span-2 text-center font-medium text-[13px]">
+                                                                                {product?.quantity > 0 ? formatNumber(product?.quantity) : "-"}
+                                                                            </h3>
+                                                                            <h3 className="text-blue-600  col-span-2 text-center font-medium text-[13px]">
+                                                                                {product?.quantityPlan > 0 ? formatNumber(product?.quantityPlan) : "-"}
+                                                                            </h3>
+                                                                            <h3 className="text-[#FF8F0D]  col-span-2 text-center  font-medium text-[13px] ">
+                                                                                {product?.quantityRemaining > 0 ? formatNumber(product?.quantityRemaining) : "-"}
+                                                                            </h3>
+                                                                        </div>
+                                                                    </>
+                                                            }
+
                                                         </label>
                                                     ))}
                                             </React.Fragment>
                                         )
                                     })}
+                                    <div className="h-[50px]">
+                                        {hasNextPage && <LoadingButton ref={ref} className='w-4 h-4 text-blue-500' />}
+                                    </div>
                                 </Customscrollbar>
-                                <div className="w-[60%] h-full overflow-hidden" >
+                                <div className={`${typePageMoblie ? "w-[79%] h-[92%]" : "w-[60%] h-[100%]"}  overflow-hidden`} >
                                     {
                                         (orders.some((order) => (order?.listProducts?.some((product) => product?.processArr?.length > 0)))) && !isFetching
                                             ?
@@ -987,7 +1230,6 @@ const GanttChart = ({
                                                                         style={{ minHeight: `${product?.processArr?.length * ROW_HEIGHT}px` }}
                                                                         className="relative z-20"
                                                                         data-gantt-id={`${order?.id}-${pIndex}`}
-
                                                                     >
 
                                                                         {renderGanttBars(order, product)}
@@ -996,6 +1238,10 @@ const GanttChart = ({
                                                             })}
                                                         </React.Fragment>
                                                     ))}
+
+                                                </div>
+                                                <div className="h-[50px]">
+                                                    {hasNextPage && <LoadingButton ref={ref} className='w-4 h-4 text-blue-500' />}
                                                 </div>
                                             </Customscrollbar>
                                             :

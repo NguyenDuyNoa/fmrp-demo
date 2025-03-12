@@ -24,6 +24,7 @@ import { useActiveStages } from "../../hooks/useActiveStages";
 import { useHandingFinishedStages } from "../../hooks/useHandingFinishedStages";
 import { useListFinishedStages } from "../../hooks/useListFinishedStages";
 import { useLoadOutOfStock } from "../../hooks/useLoadOutOfStock";
+import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 
 
 const initialState = {
@@ -34,7 +35,7 @@ const initialState = {
     arrayMoveBom: []
 }
 
-const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) => {
+const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, typePageMoblie }) => {
     const tableRef = useRef(null)
 
     const isToast = useToast();
@@ -358,9 +359,9 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
             title={<p>Hoàn thành công đoạn <span className="text-blue-500">(Số lệnh sản xuất: {data?.po?.reference_no})</span></p>}
             button={
 
-                <div className="flex items-center gap-2 px-3 py-2 ">
-                    <FaCheck className="text-base text-white" />
-                    <h3 className="text-xs font-medium text-white 3xl:text-base">
+                <div className={`flex items-center gap-2 ${typePageMoblie ? "py-1 px-2" : "px-3 py-2"}`}>
+                    <FaCheck className={`${typePageMoblie ? "text-xs" : "text-base"} text-white`} />
+                    <h3 className={` font-medium text-white ${typePageMoblie ? "text-[10px]" : "3xl:text-base text-xs"}`}>
                         Hoàn thành công đoạn
                     </h3>
                 </div>
@@ -571,11 +572,11 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
                                                         <td className="p-2 border sticky z-[1] left-[0px] bg-white">
                                                             <div className="flex items-center justify-center">
                                                                 <Image
-                                                                    src={row?.images ? row?.images : "/nodata.png"}
-                                                                    // large={row?.images ? row?.images : "/nodata.png"}
+                                                                    src={row?.images ? row?.images : "/icon/noimagelogo.png"}
+                                                                    // large={row?.images ? row?.images : "/icon/noimagelogo.png"}
                                                                     width={36}
                                                                     height={36}
-                                                                    alt={row?.images ? row?.images : "/nodata.png"}
+                                                                    alt={row?.images ? row?.images : "/icon/noimagelogo.png"}
                                                                     className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
                                                                 />
                                                             </div>
@@ -825,11 +826,11 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
                                                             <td className="p-2 border">
                                                                 <div className="flex items-center justify-center ">
                                                                     <Image
-                                                                        src={row?.images ? row?.images : "/nodata.png"}
-                                                                        // large={row?.images ? row?.images : "/nodata.png"}
+                                                                        src={row?.images ? row?.images : "/icon/noimagelogo.png"}
+                                                                        // large={row?.images ? row?.images : "/icon/noimagelogo.png"}
                                                                         width={36}
                                                                         height={36}
-                                                                        alt={row?.images ? row?.images : "/nodata.png"}
+                                                                        alt={row?.images ? row?.images : "/icon/noimagelogo.png"}
                                                                         className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
                                                                     />
                                                                 </div>
@@ -849,7 +850,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
                                                                     }
                                                                     {/* type_item */}
                                                                     <div className="flex items-center gap-1">
-                                                                        <span className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
+                                                                        {/* <span className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
                                                                      ${(row?.type_products === "products" && "text-lime-500 border-lime-500") ||
                                                                             (row?.type_products == "semi_products" && "text-orange-500 border-orange-500") ||
                                                                             (row?.type_products == "out_side" && "text-sky-500 border-sky-500") ||
@@ -859,12 +860,23 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable }) =>
                                                                             }`}
                                                                         >
                                                                             {dataLang[row?.type_products] ?? row?.type_products}
-                                                                        </span>
+                                                                        </span> */}
+                                                                        <TagColorProduct
+                                                                            dataKey={
+                                                                                row?.type_products === "products" ? 0 :
+                                                                                    row?.type_products === "semi_products" ? 1 :
+                                                                                        row?.type_products === "out_side" ? 2 :
+                                                                                            row?.type_products === "materials" || row?.type_products === "material" ? 3 :
+                                                                                                row?.type_products === "semi_products_outside" ? 4 :
+                                                                                                    null
+                                                                            }
+                                                                            dataLang={dataLang}
+                                                                            name={row?.type_products}
+                                                                        />
+
                                                                         {
                                                                             row?.stage_name && (
-                                                                                <span className="py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-teal-500 border-teal-500 text-xs">
-                                                                                    {row?.stage_name}
-                                                                                </span>
+                                                                                <TagColorProduct name={row?.stage_name} lang={false} dataKey={5} />
                                                                             )
                                                                         }
                                                                     </div>

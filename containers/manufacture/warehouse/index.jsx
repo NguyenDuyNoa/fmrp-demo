@@ -39,6 +39,7 @@ import { useWarehouseDetail } from "./hooks/useWarehouseDetail";
 import { useWarehouseList } from "./hooks/useWarehouseList";
 import { useWarehouseLocation } from "./hooks/useWarehouseLocation";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 
 const initialState = {
     idWarehouse: "",
@@ -281,6 +282,7 @@ const Warehouse = (props) => {
             query: { page: 1 },
         });
     };
+    console.log("data?.rResult", data?.rResult);
 
     return (
         <React.Fragment>
@@ -310,7 +312,7 @@ const Warehouse = (props) => {
                                         W onRefresh={refetch.bind(this)}
                                         onRefreshGroup={refetchWarehouseDetail.bind(this)}
                                         dataLang={dataLang}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     />
                                 ) : (
                                     <button
@@ -318,7 +320,7 @@ const Warehouse = (props) => {
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.branch_popup_create_new}
                                     </button>
@@ -599,8 +601,8 @@ const Warehouse = (props) => {
                                                                     <div className="flex w-full gap-2 px-2 3xl:gap-3">
                                                                         <div className="3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center">
                                                                             <ModalImage
-                                                                                small="/no_image.png"
-                                                                                large="/no_image.png"
+                                                                                small="/icon/noimagelogo.png"
+                                                                                large="/icon/noimagelogo.png"
                                                                                 className="xxl:w-[70px] xxl:min-w-[70px] xxl:h-[70px] xl:w-[50px] xl:min-w-[50px] xl:h-[50px] w-[40px] min-w-[40px] h-[40px] rounded object-contain"
                                                                             />
                                                                         </div>
@@ -618,7 +620,7 @@ const Warehouse = (props) => {
                                                                             </h6>
 
                                                                             <h6 className="text-left w-fit ">
-                                                                                <span
+                                                                                {/* <span
                                                                                     className={`${e.item_type == "product"
                                                                                         ? "text-lime-500  border-lime-500 "
                                                                                         : " text-orange-500 border-orange-500"
@@ -627,7 +629,13 @@ const Warehouse = (props) => {
                                                                                     {e.item_type
                                                                                         ? dataLang[e?.item_type]
                                                                                         : ""}
-                                                                                </span>
+                                                                                </span> */}
+                                                                                <TagColorProduct
+                                                                                    dataKey={e?.item_type === "product" ? 0 : 1}
+                                                                                    dataLang={dataLang}
+                                                                                    name={e?.item_type}
+                                                                                />
+
                                                                             </h6>
                                                                         </div>
                                                                     </div>
@@ -654,7 +662,7 @@ const Warehouse = (props) => {
                                                                             </h6>
 
                                                                             <h6 className="text-left w-fit ">
-                                                                                <span
+                                                                                {/* <span
                                                                                     className={`${e.item_type == "product"
                                                                                         ? "text-lime-500  border-lime-500"
                                                                                         : " text-orange-500 border-orange-500"
@@ -663,7 +671,12 @@ const Warehouse = (props) => {
                                                                                     {e.item_type
                                                                                         ? dataLang[e?.item_type]
                                                                                         : ""}
-                                                                                </span>
+                                                                                </span> */}
+                                                                                <TagColorProduct
+                                                                                    dataKey={e?.item_type === "product" ? 0 : 1}
+                                                                                    dataLang={dataLang}
+                                                                                    name={e?.item_type}
+                                                                                />
                                                                             </h6>
                                                                         </div>
                                                                     </div>
@@ -693,7 +706,7 @@ const Warehouse = (props) => {
                                                                         ? dataMaterialExpiry?.is_enable !=
                                                                             dataProductExpiry?.is_enable
                                                                             ? "grid-cols-8"
-                                                                            : isState.dataMaterialExpiry
+                                                                            : dataMaterialExpiry
                                                                                 .is_enable == "1"
                                                                                 ? "grid-cols-8"
                                                                                 : "grid-cols-6"
@@ -706,84 +719,84 @@ const Warehouse = (props) => {
                                                                                 : " grid-cols-5"
                                                                         }`}
                                                                 >
-                                                                    <RowItemTable colSpan={1} className="py-3 border-b">
-                                                                        {item.location_name == null
-                                                                            ? "-"
-                                                                            : item.location_name}
+                                                                    <RowItemTable textSize={'text-[12px]'} colSpan={1} className="py-3 border-b !font-normal">
+                                                                        {item.location_name == null ? "-" : item.location_name}
                                                                     </RowItemTable>
                                                                     <RowItemTable
                                                                         colSpan={1}
-                                                                        className="py-3 border-b"
+                                                                        textSize={'text-[13px]'}
+                                                                        className="py-3 border-b !font-normal"
                                                                         textAlign={"center"}
                                                                     >
-                                                                        {item.option_name_1 == null
-                                                                            ? "-"
-                                                                            : item.option_name_1}
+                                                                        {item.option_name_1 == null ? "-" : item.option_name_1}
                                                                     </RowItemTable>
                                                                     <RowItemTable
                                                                         colSpan={1}
-                                                                        className="py-3 border-b"
+                                                                        textSize={'text-[13px]'}
+                                                                        className="py-3 border-b !font-normal"
                                                                         textAlign={"center"}
                                                                     >
-                                                                        {item.option_name_2 == null
-                                                                            ? "-"
-                                                                            : item.option_name_2}
+                                                                        {item.option_name_2 == null ? "-" : item.option_name_2}
                                                                     </RowItemTable>
                                                                     {dataProductSerial?.is_enable === "1" ? (
                                                                         <RowItemTable
                                                                             colSpan={1}
-                                                                            className="py-3 border-b"
+                                                                            textSize={'text-[13px]'}
+                                                                            className="py-3 border-b !font-normal"
                                                                             textAlign={"center"}
                                                                         >
-                                                                            {item.serial == null || item.serial == ""
-                                                                                ? "-"
-                                                                                : item.serial}
+                                                                            {item.serial == null || item.serial == "" ? "-" : item.serial}
                                                                         </RowItemTable>
                                                                     ) : (
                                                                         ""
                                                                     )}
-                                                                    {dataMaterialExpiry?.is_enable === "1" ||
-                                                                        dataProductExpiry?.is_enable === "1" ? (
+                                                                    {dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1" ? (
                                                                         <>
                                                                             <RowItemTable
                                                                                 colSpan={1}
-                                                                                className="py-3 border-b"
+                                                                                textSize={'text-[13px]'}
+                                                                                className="py-3 border-b !font-normal"
                                                                                 textAlign={"center"}
                                                                             >
-                                                                                {item.lot == null || item.lot == ""
-                                                                                    ? "-"
-                                                                                    : item.lot}
+                                                                                {item.lot == null || item.lot == "" ? "-" : item.lot}
                                                                             </RowItemTable>
                                                                             <RowItemTable
                                                                                 colSpan={1}
-                                                                                className="py-3 border-b"
+                                                                                textSize={'text-[13px]'}
+                                                                                className="py-3 border-b !font-normal"
                                                                                 textAlign={"center"}
                                                                             >
-                                                                                {item.expiration_date
-                                                                                    ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
-                                                                                    : "-"}
+                                                                                {item.expiration_date ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                             </RowItemTable>
                                                                         </>
                                                                     ) : (
                                                                         ""
                                                                     )}
                                                                     <RowItemTable
-                                                                        textAlign={"right"}
+                                                                        textAlign={"center"}
                                                                         colSpan={1}
-                                                                        className="py-3 border-b "
+                                                                        textSize={'text-[13px]'}
+                                                                        className="py-3 font-semibold border-b"
                                                                     >
-                                                                        {item.quantity
-                                                                            ? formatNumber(+item?.quantity)
-                                                                            : "-"}
+                                                                        {
+                                                                            item?.quantity
+                                                                                ?
+                                                                                <>
+                                                                                    <span className="">{formatNumber(+item?.quantity)}</span>/
+                                                                                    <span className="relative pt-1 pl-0.5 text-xs capitalize top-1">{e?.unit}</span>
+                                                                                </>
+                                                                                :
+                                                                                "-"
+                                                                        }
+
                                                                     </RowItemTable>
                                                                     <RowItemTable
                                                                         textAlign={"right"}
                                                                         colSpan={1}
-                                                                        className="py-3 border-b"
+                                                                        textSize={'text-[13px]'}
+                                                                        className="py-3 border-b !font-normal"
                                                                     >
-                                                                        {item.amount
-                                                                            ? formatNumber(+item?.amount)
-                                                                            : "-"}
+                                                                        {item.amount ? formatNumber(+item?.amount) : "-"}
                                                                     </RowItemTable>
                                                                 </div>
                                                             ))}

@@ -15,6 +15,8 @@ import { ArrowUp, ArrowDown2 as IconDown } from "iconsax-react";
 import { Tooltip } from "react-tippy";
 import "react-tippy/dist/tippy.css";
 import Popup from "reactjs-popup";
+import { getColorByParam } from "@/utils/helpers/radomcolor";
+import AvatarText from "../UI/common/user/AvatarText";
 const Header = () => {
     const router = useRouter();
 
@@ -337,10 +339,42 @@ const Header = () => {
                 },
             ],
         },
+
+        // {
+        //     title: "NVL, thành phẩm",
+        //     sub: [
+        //         {
+        //             title: "Nguyên vật liệu",
+        //             img: "/icon/header/danhmuc/nvl.png",
+        //             items: [
+        //                 {
+        //                     viewOwn: auth?.material_category?.is_view_own,
+        //                     view: auth?.material_category?.is_view,
+        //                     name: "Nhóm nguyên vật liệu",
+        //                     link: "/items/category",
+        //                 },
+        //             ],
+        //         },
+        //         {
+        //             title: "thành phẩm",
+        //             img: "/icon/header/danhmuc/tp.png",
+        //             items: [
+
+        //                 {
+        //                     viewOwn: auth?.products?.is_view_own,
+        //                     view: auth?.products?.is_view,
+        //                     name: "Danh sách thành phẩm",
+        //                     link: "/products",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
         {
-            title: "Sản xuất",
+            title: "Sản xuất & QC",
             sub: [
                 {
+                    title: "Sản xuất",
                     items: [
                         {
                             viewOwn: auth?.internal_plans?.is_view_own,
@@ -385,33 +419,9 @@ const Header = () => {
                         //     view: -1,
                         // },
                     ]
-
-                }
-            ],
-        },
-        // {
-        //     title: "Gia công ngoài",
-        //     sub: [
-        //         {
-        //             items: [
-        //                 {
-        //                     viewOwn: -1,
-        //                     view: -1,
-        //                     name: "Xuất gia công",
-        //                 },
-        //                 {
-        //                     viewOwn: -1,
-        //                     view: -1,
-        //                     name: "Nhập gia công",
-        //                 },
-        //             ],
-        //         },
-        //     ],
-        // },
-        {
-            title: "QC",
-            sub: [
+                },
                 {
+                    title: "QC",
                     items: [
                         {
                             name: "Phiếu kiểm tra chất lượng",
@@ -435,6 +445,53 @@ const Header = () => {
                 }
             ],
         },
+
+        // {
+        //     title: "Gia công ngoài",
+        //     sub: [
+        //         {
+        //             items: [
+        //                 {
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     name: "Xuất gia công",
+        //                 },
+        //                 {
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     name: "Nhập gia công",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
+        // {
+        //     title: "QC",
+        //     sub: [
+        //         {
+        //             items: [
+        //                 {
+        //                     name: "Phiếu kiểm tra chất lượng",
+        //                     viewOwn: -1,
+        //                     view: -1,
+        //                     link: "/manufacture/check-quality",
+        //                 },
+        //                 // {
+        //                 //     name: "Danh mục lỗi",
+        //                 //     link: "/manufacture/category-errors",
+        //                 //     viewOwn: -1,
+        //                 //     view: -1,
+        //                 // },
+        //                 // {
+        //                 //     name: "Chi tiết lỗi",
+        //                 //     link: "/manufacture/category-detail-errors",
+        //                 //     viewOwn: -1,
+        //                 //     view: -1,
+        //                 // },
+        //             ]
+        //         }
+        //     ],
+        // },
     ];
 
     const ListKhac = [
@@ -1043,11 +1100,12 @@ const Header = () => {
     const currentDropdown = dropdowns[currentDropdownIndex];
 
     return (
-        <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
+        <header className="z-40 w-full bg-[#003DA0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
+            {/* <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             <div className="3xl:mx-6 2xl:mx-4 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 3xl:space-x-6 2xl:space-x-4 xl:space-x-4">
-                        <Link href="/">
+                        <Link href="/" className="relative mr-5 2xl:mr-6">
                             <Image
                                 alt=""
                                 src="/LOGO_HEADER.png"
@@ -1060,6 +1118,15 @@ const Header = () => {
                                 placeholder="blur"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
+                            <div
+                                style={{
+                                    background: `radial-gradient(45.83% 94.64% at 93.75% 3.57%, #1FC583 0%, #1F9285 100%)`,
+                                    boxShadow: `1px 1px 2px 0px #00000040`
+                                }}
+                                className="px-1.5 py-0.5 text-[8px] font-semibold text-white rounded-sm w-fit absolute top-0 right-0 translate-x-[110%]"
+                            >
+                                Beta
+                            </div>
                         </Link>
                         {dropdowns.map((dropdown, index) => (
                             <React.Fragment key={index}>
@@ -1222,6 +1289,9 @@ const Header = () => {
 
 const DropdownAvatar = React.memo(() => {
     const auth = useSelector((state) => state.auth);
+    console.log("auth", auth);
+
+    const randomColors = getColorByParam(auth?.user_full_name)
 
     const router = useRouter();
 
@@ -1235,7 +1305,7 @@ const DropdownAvatar = React.memo(() => {
             dispatch({ type: "auth/update", payload: false });
             CookieCore.remove("tokenFMRP");
             CookieCore.remove("databaseappFMRP");
-            router.push("/");
+            router.push("/auth/login");
             sOnSending(false);
         } catch (error) {
 
@@ -1282,18 +1352,23 @@ const DropdownAvatar = React.memo(() => {
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
+
                             ) : (
-                                <Image
-                                    alt=""
-                                    src={"/avatar_null.png"}
-                                    width={40}
-                                    height={40}
-                                    quality={100}
-                                    className="object-cover min-w-[30px] w-[30px] min-h-[30px] h-[30px] rounded-full"
-                                    loading="lazy"
-                                    crossOrigin="anonymous"
-                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                <AvatarText
+                                    fullName={auth?.user_full_name}
+                                    className={'!min-w-[30px] !min-h-[30px] !w-[30px] !h-[30px] !max-w-[30px] !max-h-[30px]'}
                                 />
+                                // <Image
+                                //     alt=""
+                                //     src={"/avatar_null.png"}
+                                //     width={40}
+                                //     height={40}
+                                //     quality={100}
+                                //     className="object-cover min-w-[30px] w-[30px] min-h-[30px] h-[30px] rounded-full"
+                                //     loading="lazy"
+                                //     crossOrigin="anonymous"
+                                //     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                // />
                             )}
                             <Image
                                 alt=""
@@ -1332,17 +1407,22 @@ const DropdownAvatar = React.memo(() => {
                                         blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                     />
                                 ) : (
-                                    <Image
-                                        alt=""
-                                        src={"/avatar_null.png"}
-                                        width={40}
-                                        height={40}
-                                        quality={100}
-                                        className="object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
-                                        loading="lazy"
-                                        crossOrigin="anonymous"
-                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                    // <Image
+                                    //     alt=""
+                                    //     src={"/avatar_null.png"}
+                                    //     width={40}
+                                    //     height={40}
+                                    //     quality={100}
+                                    //     className="object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
+                                    //     loading="lazy"
+                                    //     crossOrigin="anonymous"
+                                    //     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                    // />
+                                    <AvatarText
+                                        fullName={auth?.user_full_name}
+                                        className={'!min-w-[40px] !min-h-[40px] !w-[40px] !h-[40px] !max-w-[40px] !max-h-[40px]'}
                                     />
+
                                 )}
                                 <div className="bg-green-500 w-2.5 h-2.5 rounded-full absolute bottom-0 right-1" />
                             </div>

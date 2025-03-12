@@ -7,7 +7,7 @@ const ImagesItem = ({ data, classNameImage, classNameBoxImage }) => {
     return (
         <div className={`${classNameBoxImage}`}>
             <Image
-                src={data?.images ? data?.images : "/nodata.png"}
+                src={data?.images ? data?.images : "/icon/noimagelogo.png"}
                 width={1280}
                 height={1024}
                 alt={data?.name}

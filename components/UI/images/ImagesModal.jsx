@@ -18,8 +18,8 @@ const ImagesModal = () => {
         <Popup open={statePopupPreviewImage.open} classNameModeltime='!bg-transparent'>
             <div className="relative z-[9999] w-[98vw] h-screen">
                 <Lightbox
-                    medium={images ? images : "/nodata.png"}
-                    large={images ? images : "/nodata.png"}
+                    medium={images ? images : "/icon/noimagelogo.png"}
+                    large={images ? images : "/icon/noimagelogo.png"}
                     alt={nameAlt}
                     onClose={() => dispatch({ type: "statePopupPreviewImage", payload: { open: false } })}
                 />

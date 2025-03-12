@@ -19,7 +19,11 @@ import { useProductDetailStage } from "../../hooks/product/useProductDetailStage
 import Popup_Bom from "./popupBom";
 import Popup_GiaiDoan from "./popupStage";
 import { is } from "date-fns/locale";
+import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
+import useToast from "@/hooks/useToast";
 const Popup_Detail = React.memo((props) => {
+    const isShow = useToast();
+
     const dataSeting = useSetingServer()
 
     const formatNumber = (number) => {
@@ -106,9 +110,16 @@ const Popup_Detail = React.memo((props) => {
         >
             <div className="py-4 xl:w-[1000px] w-[900px] space-y-5">
                 <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
-                    {dataTab.map((item) => (
+                    {dataTab?.map((item) => (
                         <button
-                            onClick={_HandleSelectTab.bind(this, item.id)}
+                            onClick={() => {
+                                if ([2, 3].includes(item.id) && props?.dataProduct?.type_products?.id == 2) {
+                                    isShow("error", `Bán thành phẩm mua ngoài, không có ${item.name.toLowerCase()}`);
+                                } else {
+                                    _HandleSelectTab(item.id)
+                                }
+                            }
+                            }
                             className={`${tab === item.id ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}
                         >
                             {item.name}
@@ -128,7 +139,7 @@ const Popup_Detail = React.memo((props) => {
                                             <h5 className="text-slate-400 text-sm w-[40%]">
                                                 {props.dataLang?.client_list_brand || "client_list_brand"}:
                                             </h5>
-                                            <div className="w-[55%] flex flex-col items-end">
+                                            <div className="w-[55%] flex flex-col gap-1.5 items-end">
                                                 {list?.branch?.map((e) => (
                                                     <TagBranch key={e.id.toString()} className="w-fit">
                                                         {e.name}
@@ -160,7 +171,7 @@ const Popup_Detail = React.memo((props) => {
                                             </h5>
                                             <h6 className="w-[55%] text-right">
                                                 {/* {props.dataLang[list?.type_products?.name]} */}
-                                                <span
+                                                {/* <span
                                                     className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
                                                          ${(list?.type_products?.id === 0 && "text-lime-500 border-lime-500") ||
                                                         (list?.type_products?.id === 1 && "text-orange-500 border-orange-500") ||
@@ -168,7 +179,12 @@ const Popup_Detail = React.memo((props) => {
                                                         }`}
                                                 >
                                                     {props.dataLang[list?.type_products?.name] || list?.type_products?.name}
-                                                </span>
+                                                </span> */}
+                                                <TagColorProduct
+                                                    className='!py-1.5' dataLang={props.dataLang}
+                                                    dataKey={list?.type_products?.id}
+                                                    name={list?.type_products?.name}
+                                                />
                                             </h6>
                                         </div>
                                         <div className="flex justify-between">
@@ -218,7 +234,7 @@ const Popup_Detail = React.memo((props) => {
                                         </h5>
                                         {list?.images == null ? (
                                             <img
-                                                src="/no_image.png"
+                                                src="/icon/noimagelogo.png"
                                                 className="object-contain w-48 h-48 rounded pointer-events-none select-none"
                                             />
                                         ) : (
@@ -288,7 +304,7 @@ const Popup_Detail = React.memo((props) => {
                                                         <div className="flex items-center self-center justify-center">
                                                             {e?.image == null ? (
                                                                 <img
-                                                                    src="/no_image.png"
+                                                                    src="/icon/noimagelogo.png"
                                                                     className="object-contain w-auto h-20 rounded pointer-events-none select-none"
                                                                 />
                                                             ) : (
@@ -394,8 +410,8 @@ const Popup_Detail = React.memo((props) => {
                                                                 {/* <h6 className="px-2 xl:text-[15px] text-xs col-span-2">
                                                                     {e?.str_type_item}
                                                                 </h6> */}
-                                                                <h6 className="flex items-center col-span-3 gap-1">
-                                                                    <span
+                                                                <h6 className="flex items-center justify-center col-span-3 gap-1">
+                                                                    {/* <span
                                                                         className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
                                                                      ${(e?.item_type_current === "products" && "text-lime-500 border-lime-500") ||
                                                                             (e?.item_type_current == "semi_products" && "text-orange-500 border-orange-500") ||
@@ -405,7 +421,19 @@ const Popup_Detail = React.memo((props) => {
                                                                             }`}
                                                                     >
                                                                         {e?.str_type_item ?? ""}
-                                                                    </span>
+                                                                    </span> */}
+                                                                    <TagColorProduct
+                                                                        dataKey={
+                                                                            e?.item_type_current === "products" ? 0 :
+                                                                                e?.item_type_current === "semi_products" ? 1 :
+                                                                                    e?.item_type_current === "out_side" ? 2 :
+                                                                                        e?.item_type_current === "material" ? 3 :
+                                                                                            e?.item_type_current === "semi_products_outside" ? 4 :
+                                                                                                null
+                                                                        }
+                                                                        lang={false}
+                                                                        name={e?.str_type_item}
+                                                                    />
                                                                 </h6>
                                                                 <h6 className="col-span-2 px-2 text-xs 2xl:text-base xl:text-sm">
                                                                     <div className="grid grid-cols-1">

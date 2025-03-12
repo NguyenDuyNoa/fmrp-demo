@@ -113,7 +113,7 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
                                 isClearable
                                 clearButtonClassName="mr-6 hover:scale-150 transition-all duration-150 ease-linear"
                                 placeholderText={dataLang?.production_plan_form_materials_date_to_date || 'production_plan_form_materials_date_to_date'}
-                                className={`${isValue.dateRange.startDate == null && isValue.dateRange.endDate == null
+                                className={`${isValue.dateRange.startDate == null || isValue.dateRange.endDate == null
                                     ? "border-red-500"
                                     : "border-[#E1E1E1]"
                                     } py-[8px] px-4 3xl:placeholder:text-sm  xxl:placeholder:text-xs 2xl:placeholder:text-[11px] xl:placeholder:text-[10px] lg:placeholder:text-[9px] text-sm placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 

@@ -157,18 +157,22 @@ export const Dropdown = (props) => {
                                             <React.Fragment>
                                                 {ce.title && (
                                                     <div className="flex items-center px-3 mb-2 space-x-2">
-                                                        <Image
-                                                            alt={ce.title}
-                                                            src={ce?.img}
-                                                            width={24}
-                                                            height={24}
-                                                            quality={100}
-                                                            className="object-contain"
-                                                            loading="lazy"
-                                                            crossOrigin="anonymous"
-                                                            placeholder="blur"
-                                                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                                        />
+                                                        {
+                                                            ce?.img && (
+                                                                <Image
+                                                                    alt={ce.title}
+                                                                    src={ce?.img}
+                                                                    width={24}
+                                                                    height={24}
+                                                                    quality={100}
+                                                                    className="object-contain"
+                                                                    loading="lazy"
+                                                                    crossOrigin="anonymous"
+                                                                    placeholder="blur"
+                                                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                />
+                                                            )
+                                                        }
                                                         <h5 className="uppercase text-[#141522] 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px]">
                                                             {ce.title}
                                                         </h5>

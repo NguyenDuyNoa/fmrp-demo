@@ -1,8 +1,10 @@
 import apiImport from "@/Api/apiPurchaseOrder/apiImport";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
+import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading/loading";
@@ -36,10 +38,12 @@ import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
-import Select, { components } from "react-select";
+import Select from "react-select";
 import { v4 as uuidv4 } from "uuid";
 import { useImportBySupplier } from "./hooks/useImportBySupplier";
 import { useImportItemByOrder } from "./hooks/useImportItemByOrder";
+import SelectItemComponent, { MenuListClickAll } from "@/components/UI/filterComponents/selectItemComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
 const PurchaseImportForm = (props) => {
     const router = useRouter();
@@ -79,6 +83,8 @@ const PurchaseImportForm = (props) => {
     const [listData, sListData] = useState([]);
 
     const [idSupplier, sIdSupplier] = useState(null);
+
+    const [idSurplusWarehouse, sIdSurplusWarehouse] = useState(null);
 
     const [idTheOrder, sIdTheOrder] = useState(null);
 
@@ -153,6 +159,8 @@ const PurchaseImportForm = (props) => {
                 },
                 child: e?.child.map((ce) => ({
                     id: Number(ce?.id),
+                    id_plan: ce?.id_plan,
+                    reference_no_plan: ce?.reference_no_plan,
                     disabledDate:
                         (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
                         (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
@@ -173,12 +181,19 @@ const PurchaseImportForm = (props) => {
                     tax: {
                         tax_rate: ce?.tax_rate,
                         value: ce?.tax_id,
-                        label: ce?.tax_name,
+                        label: (ce?.tax_id && !ce?.tax_name) ? 'Miễn thuế' : ce?.tax_name,
                     },
                     note: ce?.note,
                 })),
             }))
             );
+            sIdSurplusWarehouse(rResult?.warehouse_id > 0
+                ?
+                {
+                    label: rResult?.location_name,
+                    value: rResult?.warehouse_id,
+                    warehouse_name: rResult?.warehouse_name,
+                } : null)
             sCode(rResult?.code);
             sIdBranch({ label: rResult?.branch_name, value: rResult?.branch_id });
             sIdSupplier({ label: rResult?.supplier_name, value: rResult?.supplier_id, });
@@ -253,7 +268,10 @@ const PurchaseImportForm = (props) => {
                 sIdSupplier(null);
                 sWarehouseAll(null);
             }
-        } else if (type == "itemAll") {
+        } else if (type == "idSurplusWarehouse") {
+            sIdSurplusWarehouse(value);
+        }
+        else if (type == "itemAll") {
             sItemAll(value);
             if (value?.length === 0) {
                 //new
@@ -265,6 +283,8 @@ const PurchaseImportForm = (props) => {
                     item: e,
                     child: [
                         {
+                            id_plan: e?.e?.id_plan,
+                            reference_no_plan: e?.e?.reference_no_plan,
                             warehouse: null,
                             disabledDate:
                                 (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
@@ -331,10 +351,16 @@ const PurchaseImportForm = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const hasNullWarehouse = listData.some((item) => item.child?.some((childItem) => childItem.warehouse === null || (id && (childItem.warehouse?.label === null || childItem.warehouse?.warehouse_name === null))));
+
+
+        const hasNullWarehouse = listData.some((item) => item.child?.some((childItem) => childItem?.id_plan == 0 && (childItem.warehouse === null || (id && (childItem.warehouse?.label === null || childItem.warehouse?.warehouse_name === null)))));
+
         const hasNullSerial = listData.some((item) => item?.item.e?.text_type === "products" && item.child?.some((childItem) => childItem.serial === "" || childItem.serial == null));
+
         const hasNullLot = listData.some((item) => item.child?.some((childItem) => !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null)));
+
         const hasNullDate = listData.some((item) => item.child?.some((childItem) => !childItem.disabledDate && childItem.date === null));
+
         const checkNumber = listData.some((item) => item.child?.some((childItem) => childItem.price == "" || childItem.price == 0 || childItem.amount == "" || childItem.amount == 0));
         if (
             idSupplier == null ||
@@ -396,6 +422,8 @@ const PurchaseImportForm = (props) => {
             item: e,
             child: [
                 {
+                    id_plan: e?.e?.id_plan,
+                    reference_no_plan: e?.e?.reference_no_plan,
                     id: uuidv4(),
                     disabledDate:
                         (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
@@ -428,29 +456,7 @@ const PurchaseImportForm = (props) => {
     };
 
 
-    const MenuList = (props) => {
-        return (
-            <components.MenuList {...props}>
-                {[...options]?.length > 0 && (
-                    <div className="grid grid-cols-2 items-center  cursor-pointer">
-                        <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center "
-                            onClick={_HandleSelectAll.bind(this)}
-                        >
-                            Chọn tất cả
-                        </div>
-                        <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center"
-                            onClick={() => sListData([])}
-                        >
-                            Bỏ chọn tất cả
-                        </div>
-                    </div>
-                )}
-                {props.children}
-            </components.MenuList>
-        );
-    };
+
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -548,6 +554,7 @@ const PurchaseImportForm = (props) => {
         formData.append("branch_id", idBranch.value);
         formData.append("suppliers_id", idSupplier.value);
         formData.append("id_order", idTheOrder.value);
+        formData.append("warehouse_id", idSurplusWarehouse?.value ?? "");
         formData.append("note", note);
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, item?.id);
@@ -555,6 +562,7 @@ const PurchaseImportForm = (props) => {
             formData.append(`items[${index}][purchase_order_item_id]`, item?.item?.e?.purchase_order_item_id);
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
+                formData.append(`items[${index}][child][${childIndex}][id_plan]`, childItem?.id_plan);
                 { id && formData.append(`items[${index}][child][${childIndex}][row_id]`, typeof childItem?.id == "number" ? childItem?.id : 0); }
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
                 formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
@@ -564,7 +572,7 @@ const PurchaseImportForm = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
                 formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
                 formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
-                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.warehouse?.value);
+                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.id_plan == 0 ? childItem?.warehouse?.value : "");
                 formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.discount);
             });
         });
@@ -606,6 +614,8 @@ const PurchaseImportForm = (props) => {
             if (e?.id === parentId) {
                 const newChild = {
                     id: uuidv4(),
+                    id_plan: value?.e?.id_plan,
+                    reference_no_plan: value?.e?.reference_no_plan,
                     disabledDate:
                         (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
                         (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
@@ -643,6 +653,8 @@ const PurchaseImportForm = (props) => {
                 item: value,
                 child: [
                     {
+                        id_plan: value?.e?.id_plan,
+                        reference_no_plan: value?.e?.reference_no_plan,
                         id: uuidv4(),
                         disabledDate:
                             (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
@@ -822,6 +834,9 @@ const PurchaseImportForm = (props) => {
         sSearchOrder(inputValue);
     }, 500)
 
+    console.log("listData", listData);
+
+
     return (
         <React.Fragment>
             <Head>
@@ -841,11 +856,11 @@ const PurchaseImportForm = (props) => {
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                         <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                             {dataLang?.import_title || "import_title"}
                         </h2>
-                        <div className="flex justify-end items-center mr-2">
+                        <div className="flex items-center justify-end mr-2">
                             <ButtonBack
                                 onClick={() => router.push(routerImport.home)}
                                 dataLang={dataLang}
@@ -853,12 +868,12 @@ const PurchaseImportForm = (props) => {
                         </div>
                     </div>
 
-                    <div className=" w-full rounded">
+                    <div className="w-full rounded ">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
                                 {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-10  gap-3 items-center mt-2">
+                            <div className="grid items-center grid-cols-12 gap-3 mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
@@ -872,12 +887,12 @@ const PurchaseImportForm = (props) => {
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
-                                <div className="col-span-2 relative">
+                                <div className="relative col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="custom-date-picker flex flex-row">
+                                    <div className="flex flex-row custom-date-picker">
                                         <DatePicker
                                             blur
                                             fixedHeight
@@ -910,50 +925,17 @@ const PurchaseImportForm = (props) => {
                                         {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <SelectCore
+                                    <SelectComponent
                                         options={dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
+                                        type="form"
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        // components={{ MultiValue }}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menu: (provided) => ({
-                                                ...provided,
-                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
                                     />
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
@@ -966,7 +948,7 @@ const PurchaseImportForm = (props) => {
                                         {dataLang?.import_supplier || "import_supplier"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <SelectCore
+                                    <SelectComponent
                                         options={dataSupplier}
                                         onChange={_HandleChangeInput.bind(this, "supplier")}
                                         value={idSupplier}
@@ -976,41 +958,7 @@ const PurchaseImportForm = (props) => {
                                         className={`${errSupplier ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
-                                        // components={{ MultiValue }}
-                                        menuPortalTarget={document.body}
-                                        closeMenuOnSelect={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 20,
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
+                                        type="form"
                                     />
                                     {errSupplier && (
                                         <label className="text-sm text-red-500">
@@ -1023,7 +971,7 @@ const PurchaseImportForm = (props) => {
                                         {dataLang?.import_the_orders || "import_the_orders"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <SelectCore
+                                    <SelectComponent
                                         onInputChange={(event) => {
                                             _HandleSeachApi(event)
                                         }}
@@ -1037,38 +985,7 @@ const PurchaseImportForm = (props) => {
                                         placeholder={dataLang?.import_the_orders || "import_the_orders"}
                                         className={`${errTheOrder ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menu: (provided) => ({
-                                                ...provided,
-                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
+                                        type="form"
                                     />
                                     {errTheOrder && (
                                         <label className="text-sm text-red-500">
@@ -1076,16 +993,46 @@ const PurchaseImportForm = (props) => {
                                         </label>
                                     )}
                                 </div>
+                                <div className="col-span-2 ">
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {"Chọn kho nhập dư (nếu có)"}
+                                    </label>
+                                    <SelectComponent
+                                        onChange={_HandleChangeInput.bind(this, "idSurplusWarehouse")}
+                                        value={idSurplusWarehouse}
+                                        formatOptionLabel={(option) => (
+                                            <div className="z-20">
+                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                    {dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}
+                                                </h2>
+                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                    {dataLang?.import_Warehouse_location || "import_Warehouse_ocation"}:{" "}
+                                                    {option?.label}
+                                                </h2>
+                                            </div>
+                                        )}
+                                        options={dataWarehouse}
+                                        hideSelectedOptions={false}
+                                        isClearable
+                                        placeholder={"Chọn kho nhập dư"}
+                                        classNamePrefix="surplusWarehouse"
+                                        className={` border-transparent placeholder:text-slate-300 textt-[8px] w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                        type="form"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div className=" bg-[#ECF0F4] p-2 grid  grid-cols-12">
-                        <div className="font-normal col-span-12">
+                        <div className="col-span-12 font-normal">
                             {dataLang?.import_item_information || "import_item_information"}
                         </div>
                     </div>
-                    <div className="grid grid-cols-10 items-end gap-3">
-                        <div div className="col-span-2   my-auto ">
+                    <div className="grid items-end grid-cols-10 gap-3">
+
+                        {/* <div div className="col-span-2 my-auto ">
                             <label className="text-[#344054] font-normal text-sm mb-1 ">
                                 {dataLang?.import_click_items || "import_click_items"}{" "}
                             </label>
@@ -1099,12 +1046,12 @@ const PurchaseImportForm = (props) => {
                                 components={{ MenuList, MultiValue }}
                                 formatOptionLabel={(option) => {
                                     if (option.value === "0") {
-                                        return <div className="text-gray-400 font-medium">{option.label}</div>;
+                                        return <div className="font-medium text-gray-400">{option.label}</div>;
                                     } else if (option.value === null) {
-                                        return <div className="text-gray-400 font-medium">{option.label}</div>;
+                                        return <div className="font-medium text-gray-400">{option.label}</div>;
                                     } else {
                                         return (
-                                            <div className="flex items-center justify-between py-2 z-20">
+                                            <div className="z-20 flex items-center justify-between py-2">
                                                 <div className="flex items-center gap-2">
                                                     <div>
                                                         {option.e?.images != null ? (
@@ -1120,7 +1067,7 @@ const PurchaseImportForm = (props) => {
                                                         ) : (
                                                             <div className="w-[50px] h-[60px] object-cover flex items-center justify-center rounded">
                                                                 <img
-                                                                    src="/nodata.png"
+                                                                    src="/icon/noimagelogo.png"
                                                                     alt="Product Image"
                                                                     style={{
                                                                         width: "40px",
@@ -1152,7 +1099,7 @@ const PurchaseImportForm = (props) => {
                                                     <div className="text-right opacity-0">{"0"}</div>
                                                     <div className="flex gap-2">
                                                         <div className="flex items-center gap-2">
-                                                            <h5 className="text-gray-400 font-normal">
+                                                            <h5 className="font-normal text-gray-400">
                                                                 {dataLang?.purchase_survive || "purchase_survive"}:
                                                             </h5>
                                                             <h5 className="text-[#0F4F9E] font-medium">
@@ -1203,8 +1150,8 @@ const PurchaseImportForm = (props) => {
                                     }),
                                 }}
                             />
-                        </div>
-                        <div className="col-span-2 ">
+                        </div> */}
+                        {/* <div className="col-span-2 ">
                             <label className="text-[#344054] font-normal text-sm mb-1 ">
                                 {dataLang?.import_click_house || "import_click_house"}{" "}
                             </label>
@@ -1266,24 +1213,75 @@ const PurchaseImportForm = (props) => {
                                     }),
                                 }}
                             />
-                        </div>
+                        </div> */}
+
                     </div>
-                    <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-1">
-                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]">
+                    <div className="grid grid-cols-15 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-1">
+                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  text-[#667085] px-px   col-span-2 text-center truncate font-[400]">
                             {dataLang?.import_from_items || "import_from_items"}
+                            <SelectItemComponent
+                                options={[...options]}
+                                closeMenuOnSelect={false}
+                                dataLang={dataLang}
+                                onChange={_HandleChangeInput.bind(this, "itemAll")}
+                                value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.item)}
+                                isMulti
+                                maxShowMuti={0}
+                                components={{
+                                    MenuList: (props) => <MenuListClickAll
+                                        {...props}
+                                        onClickSelectAll={_HandleSelectAll.bind(this)}
+                                        onClickDeleteSelectAll={() => sListData([])}
+                                    />,
+                                    MultiValue
+                                }}
+                                placeholder={dataLang?.import_click_items || "import_click_items"}
+                                // placeholder={dataLang?.purchase_items || "purchase_items"}
+                                className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20"
+                                isSearchable={true}
+                                noOptionsMessage={() => "Không có dữ liệu"}
+                                menuPortalTarget={document.body}
+
+                            />
                         </h4>
-                        <div className="col-span-10">
+                        <div className="col-span-13">
                             <div
                                 className={`${dataProductSerial?.is_enable == "1"
                                     ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                                        ? "grid-cols-13"
-                                        : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" : "grid-cols-11"
+                                        ? "grid-cols-14"
+                                        : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-[repeat(14_minmax(0_1fr))]" : "grid-cols-12"
                                     : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                                        ? "grid-cols-12" : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-12" : "grid-cols-10"
-                                    } grid `}
+                                        ? "grid-cols-13" : dataMaterialExpiry?.is_enable == "1" ? "grid-cols-13" : "grid-cols-11"
+                                    } grid items-center `}
                             >
-                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  text-[#667085] px-px   col-span-2   text-center  truncate font-[400]">
+
                                     {dataLang?.import_from_ware_loca || "import_from_ware_loca"}
+                                    <SelectItemComponent
+                                        onChange={_HandleChangeInput.bind(this, "warehouseAll")}
+                                        value={warehouseAll}
+                                        formatOptionLabel={(option) => (
+                                            <div className="z-20">
+                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                                                    {dataLang?.import_Warehouse || "import_Warehouse"}  : {option?.warehouse_name}
+                                                </h2>
+                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                                                    {dataLang?.import_Warehouse_location || "import_Warehouse_ocation"}:{" "}{option?.label}
+                                                </h2>
+                                            </div>
+                                        )}
+                                        options={dataWarehouse}
+                                        isClearable
+                                        placeholder={'Chọn nhanh kho - Vị trí'}
+                                        // placeholder={dataLang?.import_from_ware_loca || "import_from_ware_loca"}
+                                        styles={{
+                                            menu: {
+                                                width: "100%"
+                                            }
+                                        }}
+                                        hideSelectedOptions={false}
+                                        className={` border-transparent placeholder:text-slate-300 2xl:!text-[10px] xl:!text-[10px] !text-[10px]  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                                    />
                                 </h4>
                                 {dataProductSerial?.is_enable === "1" && (
                                     <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
@@ -1330,9 +1328,9 @@ const PurchaseImportForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-12 items-center gap-1 py-2">
+                    <div className="grid items-center gap-1 py-2 grid-cols-15">
                         <div className="col-span-2">
-                            <SelectCore
+                            <SelectItemComponent
                                 options={options}
                                 value={null}
                                 onChange={_HandleAddParent.bind(this)}
@@ -1340,111 +1338,23 @@ const PurchaseImportForm = (props) => {
                                 placeholder="Mặt hàng"
                                 noOptionsMessage={() => "Không có dữ liệu"}
                                 menuPortalTarget={document.body}
-                                formatOptionLabel={(option) => (
-                                    <div className="flex items-center  justify-between py-2">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-[40px] h-h-[60px]">
-                                                {option.e?.images != null ? (
-                                                    <img
-                                                        src={option.e?.images}
-                                                        alt="Product Image"
-                                                        className="max-w-[30px] h-[40px] text-[8px] object-cover rounded"
-                                                    />
-                                                ) : (
-                                                    <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
-                                                        <img
-                                                            src="/nodata.png"
-                                                            alt="Product Image"
-                                                            className="w-[30px] h-[30px] object-cover rounded"
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                    {option.e?.name}
-                                                </h3>
-                                                <div className="flex gap-2">
-                                                    <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                        {option.e?.code}
-                                                    </h5>
-                                                    <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                        {option.e?.product_variation}
-                                                    </h5>
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                            {dataLang[option.e?.text_type]}
-                                                        </h5>
-                                                        {"-"}
-                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                            {dataLang?.purchase_survive || "purchase_survive"}:
-                                                        </h5>
-                                                        <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                            {formatNumber(option.e?.qty_warehouse ?? 0)}
-                                                        </h5>
-
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                )}
-                                style={{
-                                    border: "none",
-                                    boxShadow: "none",
-                                    outline: "none",
-                                }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                    menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 9999,
-                                    }),
-                                    control: (base, state) => ({
-                                        ...base,
-                                        ...(state.isFocused && {
-                                            border: "0 0 0 1px #92BFF7",
-                                            boxShadow: "none",
-                                        }),
-                                    }),
-                                    menu: (provided, state) => ({
-                                        ...provided,
-                                        width: "130%",
-                                    }),
-                                }}
+                                dataLang={dataLang}
                             />
                         </div>
-                        <div className="col-span-10">
+                        <div className="col-span-13">
                             <div
                                 className={`${dataProductSerial?.is_enable == "1"
                                     ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
+                                        ? "grid-cols-14"
+                                        : dataMaterialExpiry?.is_enable == "1"
+                                            ? "grid-cols-[repeat(14_minmax(0_1fr))]" : "grid-cols-12"
+                                    : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
                                         ? "grid-cols-13"
                                         : dataMaterialExpiry?.is_enable == "1"
-                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]" : "grid-cols-11"
-                                    : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                                        ? "grid-cols-12"
-                                        : dataMaterialExpiry?.is_enable == "1"
-                                            ? "grid-cols-12" : "grid-cols-10"
+                                            ? "grid-cols-13" : "grid-cols-11"
                                     } grid  divide-x border-t border-b border-r border-l`}
                             >
-                                <div className="col-span-1">
-                                    {" "}
+                                <div className="col-span-2">
                                     <SelectCore
                                         classNamePrefix="customDropdowDefault"
                                         placeholder="Kho - vị trí"
@@ -1453,7 +1363,7 @@ const PurchaseImportForm = (props) => {
                                     />
                                 </div>
                                 {dataProductSerial?.is_enable === "1" ? (
-                                    <div className=" col-span-1 flex items-center">
+                                    <div className="flex items-center col-span-1 ">
                                         <div className="flex justify-center   p-0.5 flex-col items-center">
                                             <NumericFormat
                                                 className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  2xl:px-2 xl:px-1 p-0 font-normal  focus:outline-none "
@@ -1470,8 +1380,8 @@ const PurchaseImportForm = (props) => {
                                 )}
                                 {dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1" ? (
                                     <>
-                                        <div className=" col-span-1 flex items-center">
-                                            <div className="flex justify-center flex-col items-center">
+                                        <div className="flex items-center col-span-1 ">
+                                            <div className="flex flex-col items-center justify-center">
                                                 <NumericFormat
                                                     className="py-2 appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none "
                                                     allowNegative={false}
@@ -1482,8 +1392,8 @@ const PurchaseImportForm = (props) => {
                                                 />
                                             </div>
                                         </div>
-                                        <div className=" col-span-1 flex items-center ">
-                                            <div className="custom-date-picker flex flex-row ">
+                                        <div className="flex items-center col-span-1 ">
+                                            <div className="flex flex-row custom-date-picker ">
                                                 <DatePicker
                                                     // selected={effectiveDate}
                                                     // blur
@@ -1506,25 +1416,25 @@ const PurchaseImportForm = (props) => {
                                     ""
                                 )}
                                 <div className="col-span-1"></div>
-                                <div className="col-span-1 flex items-center justify-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     {/* 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px] */}
-                                    {/* <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center3xl:p-0 2xl:p-0 xl:p-0 p-0  bg-slate-200 rounded-full"><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button> */}
+                                    {/* <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center3xl:p-0 2xl:p-0 xl:p-0 p-0  bg-slate-200 rounded-full"><Minus className='scale-50 2xl:scale-100 xl:scale-100' size="16"/></button> */}
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                        <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                     </button>
                                     <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b w-full border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                        <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                     </button>
                                 </div>
-                                <div className="col-span-1 justify-center flex items-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <div className=" 2xl:w-24 xl:w-[75px] w-[70px] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-2 px-2 font-medium text-black">
                                         1
                                     </div>
                                 </div>
-                                <div className="col-span-1 justify-center flex items-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <div className=" 2xl:w-24 xl:w-[75px] w-[70px] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium">
                                         0
                                     </div>
@@ -1532,7 +1442,7 @@ const PurchaseImportForm = (props) => {
                                 <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-end">
                                     0
                                 </div>
-                                <div className="col-span-1 flex items-center w-full">
+                                <div className="flex items-center w-full col-span-1">
                                     <Select
                                         placeholder="% Thuế"
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full"
@@ -1557,8 +1467,8 @@ const PurchaseImportForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="min:h-[400px] h-[100%] max:h-[800px]">
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+                        <div className="h-[100%]">
                             {isFetching ? (
                                 <Loading className="h-60" color="#0f4f9e" />
                             ) : (
@@ -1566,18 +1476,18 @@ const PurchaseImportForm = (props) => {
                                     {listData?.map((e) => (
                                         <div
                                             key={e?.id?.toString()}
-                                            className="grid grid-cols-12 gap-1 my-1 items-start"
+                                            className="grid items-start gap-1 my-1 grid-cols-15"
                                         >
                                             <div className="col-span-2 border border-r p-0.5 pb-1 h-full">
-                                                <div className="relative mr-5 mt-5">
-                                                    <SelectCore
+                                                <div className="relative mt-5 mr-5">
+                                                    <SelectItemComponent
                                                         options={options}
                                                         value={e?.item}
                                                         className=""
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}
                                                         formatOptionLabel={(option) => (
-                                                            <div className="flex items-center  justify-between py-2">
+                                                            <div className="flex items-center justify-between py-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <div className="w-[40px] h-h-[60px]">
                                                                         {option.e?.images != null ? (
@@ -1589,7 +1499,7 @@ const PurchaseImportForm = (props) => {
                                                                         ) : (
                                                                             <div className=" object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]">
                                                                                 <img
-                                                                                    src="/nodata.png"
+                                                                                    src="/icon/noimagelogo.png"
                                                                                     alt="Product Image"
                                                                                     className="object-cover rounded "
                                                                                 />
@@ -1610,11 +1520,12 @@ const PurchaseImportForm = (props) => {
                                                                                 </h5>
                                                                             </div>
                                                                         </div>
-                                                                        <div className="flex gap-2">
+                                                                        <div className="flex flex-col">
                                                                             <div className="flex items-center gap-2">
                                                                                 <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                                     {dataLang[option.e?.text_type]}
                                                                                 </h5>
+
                                                                                 {"-"}
                                                                                 <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                                     {dataLang?.purchase_survive || "purchase_survive"}:
@@ -1624,128 +1535,89 @@ const PurchaseImportForm = (props) => {
                                                                                 </h5>
 
                                                                             </div>
+                                                                            {
+                                                                                option?.e?.id_plan > 0 && <TagColorProduct lang={false} dataKey={1} name={option?.e?.reference_no_plan} />
+                                                                            }
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         )}
                                                         classNamePrefix="customDropdow"
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            menuPortal: (base) => ({
-                                                                ...base,
-                                                                // zIndex: 9999,
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                ...(state.isFocused && {
-                                                                    border: "0 0 0 1px #92BFF7",
-                                                                    boxShadow: "none",
-                                                                }),
-                                                            }),
-                                                            menu: (provided, state) => ({
-                                                                ...provided,
-                                                                width: "130%",
-                                                            }),
-                                                        }}
                                                     />
                                                     <button
                                                         onClick={_HandleAddChild.bind(this, e?.id, e?.item)}
-                                                        className="w-10 h-10 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 -right-4"
+                                                        className="absolute z-30 flex flex-col items-center justify-center w-10 h-10 rounded bg-slate-100 -top-4 -right-4"
                                                     >
                                                         <Add />
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="col-span-10  items-center">
+                                            <div className="items-center col-span-13">
                                                 <div
                                                     className={`${dataProductSerial?.is_enable == "1"
                                                         ? dataMaterialExpiry?.is_enable !=
                                                             dataProductExpiry?.is_enable
-                                                            ? "grid-cols-13"
+                                                            ? "grid-cols-14"
                                                             : dataMaterialExpiry?.is_enable == "1"
-                                                                ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                                                : "grid-cols-11"
+                                                                ? "grid-cols-[repeat(14_minmax(0_1fr))]"
+                                                                : "grid-cols-12"
                                                         : dataMaterialExpiry?.is_enable !=
                                                             dataProductExpiry?.is_enable
-                                                            ? "grid-cols-12"
+                                                            ? "grid-cols-13"
                                                             : dataMaterialExpiry?.is_enable == "1"
-                                                                ? "grid-cols-12"
-                                                                : "grid-cols-10"
-                                                        } grid  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r`}
+                                                                ? "grid-cols-13"
+                                                                : "grid-cols-11"
+                                                        } grid  3xl:text-[12px] 2xl:text-[11px] xl:text-[10px] text-[9px] border-b divide-x divide-y border-r`}
                                                 >
                                                     {e?.child?.map((ce) => (
                                                         <React.Fragment key={ce?.id?.toString()}>
-                                                            <div className="flex justify-center border-t border-l  h-full p-1 flex-col items-center ">
-                                                                <SelectCore
-                                                                    options={dataWarehouse}
-                                                                    value={ce?.warehouse}
-                                                                    onChange={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "warehouse"
-                                                                    )}
-                                                                    className={`${(errWarehouse && ce?.warehouse == null) || (errWarehouse && (ce?.warehouse?.label == null || ce?.warehouse?.warehouse_name == null)) ? "border-red-500 border" : ""}  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                    placeholder={"Kho - vị trí"}
-                                                                    menuPortalTarget={document.body}
-                                                                    formatOptionLabel={(option) => {
-                                                                        return (
-                                                                            (option?.warehouse_name ||
-                                                                                option?.label) && (
-                                                                                <div className="z-[999]">
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                                                                                        {dataLang?.import_Warehouse || "import_Warehouse"}  : {option?.warehouse_name}
-                                                                                    </h2>
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                                                                                        {option?.label}
-                                                                                    </h2>
-                                                                                </div>
-                                                                            )
-                                                                        );
-                                                                    }}
-                                                                    style={{
-                                                                        border: "none",
-                                                                        boxShadow: "none",
-                                                                        outline: "none",
-                                                                    }}
-                                                                    theme={(theme) => ({
-                                                                        ...theme,
-                                                                        colors: {
-                                                                            ...theme.colors,
-                                                                            primary25: "#EBF5FF",
-                                                                            primary50: "#92BFF7",
-                                                                            primary: "#0F4F9E",
-                                                                        },
-                                                                    })}
-                                                                    styles={{
-                                                                        menu: (provided, state) => ({
-                                                                            ...provided,
-                                                                            width: "150%",
-                                                                        }),
-                                                                    }}
-                                                                    classNamePrefix="customDropdow"
-                                                                />
+                                                            <div className={`flex flex-col items-center justify-center h-full col-span-2 p-1  border-t border-l`}>
+                                                                {
+                                                                    (ce?.id_plan > 0 && ce?.reference_no_plan) ?
+                                                                        <TagColorProduct
+                                                                            lang={false}
+                                                                            dataKey={6}
+                                                                            name={`Vị trí theo ${ce?.reference_no_plan}`}
+                                                                            className='3xl:!text-[13px] 2xl:!text-[9px] xl:!text-[8px] !text-[8px]'
+                                                                        />
+                                                                        :
+                                                                        <SelectItemComponent
+                                                                            options={dataWarehouse}
+                                                                            value={ce?.warehouse}
+                                                                            onChange={_HandleChangeChild.bind(
+                                                                                this,
+                                                                                e?.id,
+                                                                                ce?.id,
+                                                                                "warehouse"
+                                                                            )}
+                                                                            className={`${(errWarehouse && ce?.warehouse == null) || (errWarehouse && (ce?.warehouse?.label == null || ce?.warehouse?.warehouse_name == null)) ? "border-red-500 border" : ""}  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                            placeholder={"Kho - vị trí"}
+                                                                            formatOptionLabel={(option) => {
+                                                                                return (
+                                                                                    (option?.warehouse_name ||
+                                                                                        option?.label) && (
+                                                                                        <div className="z-[999]">
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                                                                                                {dataLang?.import_Warehouse || "import_Warehouse"}  : {option?.warehouse_name}
+                                                                                            </h2>
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                                                                                                {option?.label}
+                                                                                            </h2>
+                                                                                        </div>
+                                                                                    )
+                                                                                );
+                                                                            }}
+                                                                            styles={{
+                                                                                menu: {
+                                                                                    width: "100%"
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                }
                                                             </div>
                                                             {dataProductSerial.is_enable === "1" ? (
-                                                                <div className=" col-span-1 ">
+                                                                <div className="col-span-1 ">
                                                                     <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                         <input
                                                                             value={ce?.serial}
@@ -1773,7 +1645,7 @@ const PurchaseImportForm = (props) => {
                                                             )}
                                                             {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                 <>
-                                                                    <div className=" col-span-1  ">
+                                                                    <div className="col-span-1 ">
                                                                         <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                             {/* <input
                                         value={ce?.lot}
@@ -1796,7 +1668,7 @@ const PurchaseImportForm = (props) => {
                                                                             />
                                                                         </div>
                                                                     </div>
-                                                                    <div className=" col-span-1  ">
+                                                                    <div className="col-span-1 ">
                                                                         <div className="custom-date-picker flex justify-center h-full p-0.5 flex-col items-center w-full">
                                                                             {/* <input type='date'
                                         value={ce?.date}
@@ -1804,8 +1676,8 @@ const PurchaseImportForm = (props) => {
                                         className={`${errDateList && ce?.date == "" && !ce?.disabledDate ? "border-red-500 border" : "border-b-2 border-gray-200"} w-[100%] rounded "appearance-none  text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-1 xl:px-1 p-0 font-normal   focus:outline-none "`}
                                         onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "date")}
                                       /> */}
-                                                                            <div className="col-span-4 relative">
-                                                                                <div className="custom-date-picker flex flex-row">
+                                                                            <div className="relative col-span-4">
+                                                                                <div className="flex flex-row custom-date-picker">
                                                                                     <DatePicker
                                                                                         selected={ce?.date}
                                                                                         blur
@@ -1825,7 +1697,7 @@ const PurchaseImportForm = (props) => {
                                                                                             //  && !ce?.disabledDate
                                                                                             //   ? ""
                                                                                             //   : ce?.disabledDate ? "" : ""
-                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                                                                            } placeholder:text-slate-300 placeholder:text-[9px] text-[10px] w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
                                                                                     // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
                                                                                     />
                                                                                     {effectiveDate && (
@@ -1840,7 +1712,7 @@ const PurchaseImportForm = (props) => {
                                                                                             />
                                                                                         </>
                                                                                     )}
-                                                                                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                                                                                    <BsCalendarEvent className="absolute right-0 -translate-x-[55%] top-[50%] -translate-y-[50%] text-[#CCCCCC] scale-110 cursor-pointer" />
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -1858,7 +1730,7 @@ const PurchaseImportForm = (props) => {
                                                                     onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}
                                                                 >
                                                                     <Minus
-                                                                        className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                        className="scale-50 2xl:scale-100 xl:scale-100"
                                                                         size="16"
                                                                     />
                                                                 </button>
@@ -1873,7 +1745,7 @@ const PurchaseImportForm = (props) => {
                                                                     onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}
                                                                 >
                                                                     <Add
-                                                                        className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                        className="scale-50 2xl:scale-100 xl:scale-100"
                                                                         size="16"
                                                                     />
                                                                 </button>
@@ -1901,35 +1773,20 @@ const PurchaseImportForm = (props) => {
                                                                 </h3>
                                                             </div>
                                                             <div className=" flex flex-col items-center p-0.5 h-full justify-center">
-                                                                <SelectCore
+                                                                <SelectItemComponent
                                                                     options={taxOptions}
                                                                     value={ce?.tax}
                                                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "tax")}
                                                                     placeholder={dataLang?.import_from_tax || "import_from_tax"}
                                                                     className={`  3xl:text-[12px] 2xl:text-[10px] p-1 xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                                                    menuPortalTarget={document.body}
-                                                                    style={{
-                                                                        border: "none",
-                                                                        boxShadow: "none",
-                                                                        outline: "none",
-                                                                    }}
                                                                     formatOptionLabel={(option) => (
-                                                                        <div className="flex justify-start items-center gap-1 ">
-                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                        <div className="flex items-center justify-start gap-1 flex-nowrap">
+                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] whitespace-nowrap">
                                                                                 {option?.label}
                                                                             </h2>
                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(${option?.tax_rate})`}</h2>
                                                                         </div>
                                                                     )}
-                                                                    theme={(theme) => ({
-                                                                        ...theme,
-                                                                        colors: {
-                                                                            ...theme.colors,
-                                                                            primary25: "#EBF5FF",
-                                                                            primary50: "#92BFF7",
-                                                                            primary: "#0F4F9E",
-                                                                        },
-                                                                    })}
                                                                 />
                                                             </div>
                                                             {/* <div>{ce?.totalMoney}</div> */}
@@ -1950,7 +1807,7 @@ const PurchaseImportForm = (props) => {
                                                                 <button
                                                                     title="Xóa"
                                                                     onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
-                                                                    className=" text-red-500 flex flex-col justify-center items-center"
+                                                                    className="flex flex-col items-center justify-center text-red-500 "
                                                                 >
                                                                     <IconDelete />
                                                                 </button>
@@ -1964,72 +1821,36 @@ const PurchaseImportForm = (props) => {
                                 </>
                             )}
                         </div>
-                    </div>
+                    </Customscrollbar>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
-                        <div className="col-span-2  flex items-center gap-2">
+                        <div className="flex items-center col-span-2 gap-2">
                             <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
-                            <div className="col-span-1 text-center flex items-center justify-center">
+                            <div className="flex items-center justify-center col-span-1 text-center">
                                 <InPutNumericFormat
                                     value={discount}
                                     isAllowed={isAllowedDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "discount")}
-                                    className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
+                                    className="w-20 px-2 py-1 font-medium text-center bg-transparent border-b-2 border-gray-300 focus:outline-none"
 
                                 />
                             </div>
                         </div>
-                        <div className="col-span-2 flex items-center gap-2 ">
+                        <div className="flex items-center col-span-2 gap-2 ">
                             <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
-                            <SelectCore
+                            <SelectItemComponent
                                 options={taxOptions}
                                 onChange={_HandleChangeInput.bind(this, "tax")}
                                 value={tax}
                                 formatOptionLabel={(option) => (
-                                    <div className="flex justify-start items-center gap-1 ">
+                                    <div className="flex items-center justify-start gap-1 ">
                                         <h2>{option?.label}</h2>
                                         <h2>{`(${option?.tax_rate})`}</h2>
                                     </div>
                                 )}
                                 placeholder={dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}
-                                hideSelectedOptions={false}
                                 className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                                 isSearchable={true}
                                 noOptionsMessage={() => "Không có dữ liệu"}
-                                //  dangerouslySetInnerHTML={{__html: option.label}}
-                                menuPortalTarget={document.body}
-                                closeMenuOnSelect={true}
-                                style={{
-                                    border: "none",
-                                    boxShadow: "none",
-                                    outline: "none",
-                                }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                    menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 20,
-                                    }),
-                                    control: (base, state) => ({
-                                        ...base,
-                                        boxShadow: "none",
-                                        padding: "2.7px",
-                                        ...(state.isFocused && {
-                                            border: "0 0 0 1px #92BFF7",
-                                        }),
-                                    }),
-                                }}
                             />
                         </div>
                     </div>
@@ -2051,7 +1872,7 @@ const PurchaseImportForm = (props) => {
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                         />
                     </div>
-                    <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
+                    <div className="flex-col justify-between col-span-3 mt-5 space-y-4 text-right ">
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal ">
@@ -2191,6 +2012,5 @@ const PurchaseImportForm = (props) => {
         </React.Fragment>
     );
 };
-
 
 export default PurchaseImportForm;

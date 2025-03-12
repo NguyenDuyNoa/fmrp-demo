@@ -247,13 +247,13 @@ const Items = (props) => {
                                         onRefresh={refetch.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"materials"}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105" /> :
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                                     >{dataLang?.branch_popup_create_new}
                                     </button>
                                 }
@@ -380,8 +380,8 @@ const Items = (props) => {
                                                         <div className="w-[48px] h-[48px] mx-auto">
                                                             {e?.images == null ? (
                                                                 <ModalImage
-                                                                    small="/no_image.png"
-                                                                    large="/no_image.png"
+                                                                    small="/icon/noimagelogo.png"
+                                                                    large="/icon/noimagelogo.png"
                                                                     className="object-contain w-full h-full rounded"
                                                                 />
                                                             ) : (
@@ -422,7 +422,7 @@ const Items = (props) => {
                                                         {e?.note}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} textAlign={"center"}>
-                                                        {e?.variation_count ? e?.variation_count : "0"}
+                                                        {formatNumber(e?.variation_count - 1) == 0 ? "" : e?.variation_count - 1}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={2} className="flex flex-wrap gap-1">
                                                         {e.branch?.map((i) => (
@@ -539,10 +539,10 @@ const Popup_Detail = React.memo((props) => {
                                         <h5 className="text-slate-400 text-sm w-[40%]">
                                             {props.dataLang?.client_list_brand || "client_list_brand"}:
                                         </h5>
-                                        <div className="w-[55%] flex items-center gap-1 flex-wrap">
+                                        <div className="w-[55%] flex flex-col items-end gap-1.5 ">
                                             {list?.branch?.map((e) => {
                                                 return (
-                                                    <TagBranch key={e.id.toString()} className="last:ml-0 w-fit">
+                                                    <TagBranch key={e.id.toString()} className="w-fit">
                                                         {e.name}
                                                     </TagBranch>
                                                 );
@@ -632,7 +632,7 @@ const Popup_Detail = React.memo((props) => {
                                         </h5>
                                         {list?.images == null ? (
                                             <img
-                                                src="/no_image.png"
+                                                src="/icon/noimagelogo.png"
                                                 className="object-contain w-48 h-48 rounded pointer-events-none select-none"
                                             />
                                         ) : (
@@ -705,7 +705,7 @@ const Popup_Detail = React.memo((props) => {
                                                         <div className="flex self-center justify-center">
                                                             {e?.image == null ? (
                                                                 <img
-                                                                    src="/no_image.png"
+                                                                    src="/icon/noimagelogo.png"
                                                                     className="object-contain w-auto h-20 rounded pointer-events-none select-none"
                                                                 />
                                                             ) : (

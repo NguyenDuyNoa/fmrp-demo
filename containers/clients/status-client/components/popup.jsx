@@ -214,7 +214,7 @@ const Popup_status = (props) => {
                             </button>
                             <button
                                 type="submit"
-                                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#0F4F9E]"
+                                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#003DA0]"
                             >
                                 {props.dataLang?.branch_popup_save}
                             </button>

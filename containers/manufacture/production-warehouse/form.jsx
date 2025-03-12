@@ -30,6 +30,7 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { useProductionWarehouseItems } from "./hooks/useProductionWarehouseItems";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const ProductionWarehouseForm = (props) => {
     const router = useRouter();
@@ -252,7 +253,7 @@ const ProductionWarehouseForm = (props) => {
         try {
             const { isSuccess, message, item } = await apiProductionWarehouse.apiHangdingProductionWarehouse(id ? id : undefined, formData);
             if (isSuccess) {
-                isShow("success", `${dataLang[message]}` || message);
+                isShow("success", `${dataLang[message] || message}`);
                 sCode("");
                 sStartDate(new Date());
                 sIdBranch(null);
@@ -263,7 +264,7 @@ const ProductionWarehouseForm = (props) => {
                 router.push(routerProductionWarehouse.home);
                 sOnSending(false);
             } else {
-                handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
+                handleCheckError(`${dataLang[message] || message} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
             }
         } catch (error) {
             throw error
@@ -587,7 +588,7 @@ const ProductionWarehouseForm = (props) => {
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid items-center grid-cols-8 gap-3 mt-2">
+                            <div className="grid items-center grid-cols-6 gap-3 mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
@@ -691,7 +692,7 @@ const ProductionWarehouseForm = (props) => {
                                         </label>
                                     )}
                                 </div>
-                                <div className="col-span-2 ">
+                                {/* <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
@@ -739,7 +740,7 @@ const ProductionWarehouseForm = (props) => {
                                             }),
                                         }}
                                     />
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>
@@ -801,7 +802,7 @@ const ProductionWarehouseForm = (props) => {
                                                 ) : (
                                                     <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                         <img
-                                                            src="/nodata.png"
+                                                            src="/icon/noimagelogo.png"
                                                             alt="Product Image"
                                                             className="w-[30px] h-[30px] object-cover rounded"
                                                         />
@@ -935,8 +936,8 @@ const ProductionWarehouseForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2 ">
+                        <div className="h-[100%]  w-full">
                             {isFetching ? (
                                 <Loading className="w-full h-10" color="#0f4f9e" />
                             ) : (
@@ -967,7 +968,7 @@ const ProductionWarehouseForm = (props) => {
                                                                         ) : (
                                                                             <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                                                 <img
-                                                                                    src="/nodata.png"
+                                                                                    src="/icon/noimagelogo.png"
                                                                                     alt="Product Image"
                                                                                     className="w-[30px] h-[30px] object-cover rounded"
                                                                                 />
@@ -1313,7 +1314,7 @@ const ProductionWarehouseForm = (props) => {
                                 </>
                             )}
                         </div>
-                    </div>
+                    </Customscrollbar>
                     <h2 className="font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]">
                         {dataLang?.purchase_total || "purchase_total"}
                     </h2>

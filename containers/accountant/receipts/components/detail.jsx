@@ -39,7 +39,7 @@ const PopupDetail = (props) => {
                 <div className=" space-x-5 w-[530px] h-auto">
                     <div>
                         <div className="w-[530px]">
-                            <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]  pb-1">
+                            <Customscrollbar className="pb-1 max-h-[85vh]">
                                 <GeneralInformation {...props} />
                                 <div className="min-h-[130px] px-2 bg-gray-50 ">
                                     <Customscrollbar className="grid grid-cols-2 space-x-4 3xl:max-h-[400px] xxl:max-h-[300px] 2xl:max-h-[350px] xl:max-h-[300px] lg:max-h-[280px] max-h-[300px]">
@@ -155,7 +155,7 @@ const PopupDetail = (props) => {
                                             <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                 {data?.voucher?.map((e, index) => (
                                                     <div
-                                                        className="grid items-center grid-cols-5 border-b hover:bg-slate-50"
+                                                        className="grid items-center grid-cols-5 border-b"
                                                         key={e.id?.toString()}
                                                     >
                                                         <h6 className="text-[13px] col-span-1 font-medium  py-2  text-center break-words">
@@ -176,7 +176,7 @@ const PopupDetail = (props) => {
                                 <h2 className="font-semibold p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
-                                <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
+                                <div className="grid flex-col justify-between grid-cols-12 mt-2 ">
                                     <div className="col-span-7">
                                         <h3 className="text-[13px] font-semibold">
                                             {props.dataLang?.import_from_note || "import_from_note"}

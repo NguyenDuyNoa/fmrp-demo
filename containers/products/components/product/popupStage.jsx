@@ -311,6 +311,10 @@ const Popup_Stage = React.memo((props) => {
             button={
                 <div
                     onClick={() => {
+                        if (props?.dataProduct?.type_products?.id == 2) {
+                            isShow("error", 'Bán thành phẩm mua ngoài, không thể thiết kế công đoạn');
+                            return
+                        }
                         if (role || checkEdit || checkAdd) {
                             sIsOpen(true);
                         } else {
@@ -378,7 +382,7 @@ const Popup_Stage = React.memo((props) => {
                             </button>
                             <button
                                 onClick={_HandleSubmit.bind(this)}
-                                className="text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
+                                className="text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#003DA0]"
                             >
                                 {props.dataLang?.branch_popup_save}
                             </button>

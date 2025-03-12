@@ -5,8 +5,10 @@ export async function middleware(request, event) {
     const { pathname, origin } = request.nextUrl;
 
     const token = request.cookies.get("tokenFMRP") ?? ""
+    console.log("pathname", pathname);
 
     const databaseappFMRP = request.cookies.get("databaseappFMRP") ?? ""
+
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api_web/Api_Authentication/authentication?csrf_protection=true`, {
             method: "GET",
@@ -20,10 +22,29 @@ export async function middleware(request, event) {
 
         const data = await response.json();
         if (data.isSuccess) {
-            return NextResponse.next();
+            // return NextResponse.next();
+            if ((!token || token == "" || token?.value == "") || (!databaseappFMRP || databaseappFMRP == "" || databaseappFMRP?.value == "")) {
+                if ((pathname.startsWith('/manufacture/productions-orders-mobile')) || pathname.startsWith("/manufacture/production-plan-mobile")) {
+                    return NextResponse.next();
+                }
+                return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL_API_AUTH_LOGIN}`);
+            } else {
+                if ((pathname.startsWith('/manufacture/productions-orders-mobile')) || pathname.startsWith("/manufacture/production-plan-mobile")) {
+                    console.log("12");
+                    return NextResponse.next();
+                }
+                if (pathname.startsWith("/auth")) {
+                    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL_API_DASHBOARD}`);
+                }
+                return NextResponse.next();
+            }
         } else {
+            if ((pathname.startsWith('/manufacture/productions-orders-mobile')) || pathname.startsWith("/manufacture/production-plan-mobile")) {
+                return NextResponse.next();
+            }
             CookieCore.remove("tokenFMRP");
             CookieCore.remove("databaseappFMRP");
+            // return NextResponse.redirect(new URL("/auth/login", request.url))
         }
     } catch (error) {
     }
@@ -31,8 +52,13 @@ export async function middleware(request, event) {
     if (pathname.startsWith("/")) {
         if ((!token || token == "" || token?.value == "") || (!databaseappFMRP || databaseappFMRP == "" || databaseappFMRP?.value == "")) {
             return NextResponse.next();
+        } else {
+            if (pathname.startsWith("/auth")) {
+                return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL_API_DASHBOARD}`);
+            }
+            return NextResponse.next();
         }
-        return NextResponse.next();
+
     }
     return NextResponse.next();
 }

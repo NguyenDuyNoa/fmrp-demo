@@ -1,4 +1,5 @@
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 import Loading from "@/components/UI/loading/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
@@ -273,7 +274,7 @@ const WarehouseSlug = (props) => {
                                     <House2 size="32" color="#0F4F9E" />
                                     <h2 className="text-2xl text-[#52575E]">{data?.name}</h2>
                                 </div>
-                                <div className="flex justify-end items-center">
+                                <div className="flex items-center justify-end">
                                     <button
                                         type="button"
                                         onClick={() => router.back()}
@@ -284,11 +285,11 @@ const WarehouseSlug = (props) => {
                                 </div>
                             </div>
                             <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
-                                <div className="xl:space-y-3 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
-                                        <div className="col-span-4 grid grid-cols-5">
+                                <div className="space-y-2 xl:space-y-3">
+                                    <div className="grid items-center justify-between w-full grid-cols-6 p-2 rounded bg-slate-100 xl:p-3">
+                                        <div className="grid grid-cols-5 col-span-4">
                                             <div className="col-span-1">
-                                                <form className="flex items-center relative">
+                                                <form className="relative flex items-center">
                                                     <IconSearch
                                                         size={20}
                                                         className="absolute 2xl:left-3 z-10  text-[#cccccc] xl:left-[4%] left-[1%]"
@@ -301,7 +302,7 @@ const WarehouseSlug = (props) => {
                                                     />
                                                 </form>
                                             </div>
-                                            <div className="ml-1 col-span-1">
+                                            <div className="col-span-1 ml-1">
                                                 <Select
                                                     options={[
                                                         {
@@ -351,7 +352,7 @@ const WarehouseSlug = (props) => {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="ml-1 col-span-1">
+                                            <div className="col-span-1 ml-1">
                                                 <Select
                                                     options={[
                                                         {
@@ -401,7 +402,7 @@ const WarehouseSlug = (props) => {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="ml-1 col-span-1">
+                                            <div className="col-span-1 ml-1">
                                                 <Select
                                                     options={[
                                                         {
@@ -453,14 +454,14 @@ const WarehouseSlug = (props) => {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="flex space-x-2 items-center justify-end col-span-2">
+                                        <div className="flex items-center justify-end col-span-2 space-x-2">
                                             <button
                                                 onClick={refetch.bind(this)}
                                                 type="button"
-                                                className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
+                                                className="p-2 transition-all ease-in-out rounded-md bg-green-50 hover:bg-green-200 hover:scale-105 group animate-pulse hover:animate-none"
                                             >
                                                 <Refresh2
-                                                    className="group-hover:-rotate-45 transition-all ease-in-out"
+                                                    className="transition-all ease-in-out group-hover:-rotate-45"
                                                     size="22"
                                                     color="green"
                                                 />
@@ -589,8 +590,8 @@ const WarehouseSlug = (props) => {
                                                             <h6 className="xl:text-base text-xs w-[full]  ">
                                                                 {e?.image == null ? (
                                                                     <ModalImage
-                                                                        small="/no_image.png"
-                                                                        large="/no_image.png"
+                                                                        small="/icon/noimagelogo.png"
+                                                                        large="/icon/noimagelogo.png"
                                                                         className="w-[40px] h-[40px] rounded object-contain"
                                                                     />
                                                                 ) : (
@@ -604,24 +605,29 @@ const WarehouseSlug = (props) => {
                                                                 )}
                                                             </h6>
                                                         </div>
-                                                        <div className=" col-span-1 border-r  border-b flex  items-center">
+                                                        <div className="flex items-center col-span-1 border-b border-r ">
                                                             <h6 className=" 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] py-3  w-fit text-left ">
-                                                                <span
+                                                                {/* <span
                                                                     className={`${e.item_type == "product"
                                                                         ? "text-lime-500  border-lime-500 "
                                                                         : " text-orange-500 border-orange-500"
                                                                         } border rounded py-1 px-1.5 w-fit ml-1 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px]`}
                                                                 >
                                                                     {e.item_type ? dataLang[e?.item_type] : ""}
-                                                                </span>
+                                                                </span> */}
+                                                                <TagColorProduct
+                                                                    dataKey={e?.item_type === "product" ? 0 : 1}
+                                                                    dataLang={dataLang}
+                                                                    name={e?.item_type}
+                                                                />
                                                             </h6>
                                                         </div>
-                                                        <div className=" col-span-1 border-r  border-b flex  items-center">
+                                                        <div className="flex items-center col-span-1 border-b border-r ">
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                 {e.item_code == null ? "-" : e.item_code}
                                                             </h6>
                                                         </div>
-                                                        <div className=" col-span-1   border-b flex  items-center">
+                                                        <div className="flex items-center col-span-1 border-b ">
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                 {e.item_name == null ? "-" : e.item_name}
                                                             </h6>
@@ -659,18 +665,18 @@ const WarehouseSlug = (props) => {
                                                                                 : " grid-cols-5"
                                                                         }`}
                                                                 >
-                                                                    <div className="col-span-1 border-r border-b">
+                                                                    <div className="col-span-1 border-b border-r">
                                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                             {" "}
                                                                             {e.location_name == null ? "-" : e.location_name}
                                                                         </h6>
                                                                     </div>
-                                                                    <div className=" col-span-1 border-r border-b">
+                                                                    <div className="col-span-1 border-b border-r ">
                                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
                                                                             {e.option_name_1 == null ? "-" : e.option_name_1}
                                                                         </h6>
                                                                     </div>
-                                                                    <div className=" col-span-1 border-r border-b">
+                                                                    <div className="col-span-1 border-b border-r ">
                                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
                                                                             {e.option_name_2 == null
                                                                                 ? "-"
@@ -678,7 +684,7 @@ const WarehouseSlug = (props) => {
                                                                         </h6>
                                                                     </div>
                                                                     {dataProductSerial.is_enable === "1" ? (
-                                                                        <div className=" col-span-1 border-r border-b">
+                                                                        <div className="col-span-1 border-b border-r ">
                                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                                 {e.serial == null || e.serial == ""
                                                                                     ? "-"
@@ -690,12 +696,12 @@ const WarehouseSlug = (props) => {
                                                                     )}
                                                                     {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                         <>
-                                                                            <div className=" col-span-1 border-r border-b ">
+                                                                            <div className="col-span-1 border-b border-r ">
                                                                                 <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                                     {e.lot == null || e.lot == "" ? "-" : e.lot}
                                                                                 </h6>
                                                                             </div>
-                                                                            <div className=" col-span-1 border-r border-b ">
+                                                                            <div className="col-span-1 border-b border-r ">
                                                                                 <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
                                                                                     {e.expiration_date ? formatMoment(e.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                 </h6>
@@ -704,12 +710,12 @@ const WarehouseSlug = (props) => {
                                                                     ) : (
                                                                         ""
                                                                     )}
-                                                                    <div className=" col-span-1 border-r border-b ">
+                                                                    <div className="col-span-1 border-b border-r ">
                                                                         <h6 className="xl:text-base text-sm  px-2 py-3  w-[full] text-red-500 font-medium text-center ">
                                                                             {e.quantity ? formatNumber(e?.quantity) : "-"}
                                                                         </h6>
                                                                     </div>
-                                                                    <div className=" col-span-1 border-b">
+                                                                    <div className="col-span-1 border-b ">
                                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-right ">
                                                                             {e.amount ? formatNumber(e?.amount) : "-"}
                                                                         </h6>
@@ -726,7 +732,7 @@ const WarehouseSlug = (props) => {
                             </div>
                         </div>
                         {data?.rResult?.length != 0 && (
-                            <div className="flex space-x-5 items-center">
+                            <div className="flex items-center space-x-5">
                                 <h6>
                                     {dataLang?.display} {data?.output?.iTotalDisplayRecords} {dataLang?.among}{" "}
                                     {data?.output?.iTotalRecords} {dataLang?.ingredient}

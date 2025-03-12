@@ -12,6 +12,7 @@ import TableContact from "../table/tableContact";
 import TableDelivery from "../table/tableDelivery";
 import { useClientDetail } from "../../hooks/usseClientDetail";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import AvatarText from "@/components/UI/common/user/AvatarText";
 
 
 const Popup_chitiet = (props) => {
@@ -191,29 +192,34 @@ const Popup_chitiet = (props) => {
                                                 </span>
                                                 <span className="flex flex-wrap">
                                                     {data?.staff_charge
-                                                        ? data?.staff_charge?.map(
-                                                            (e) => {
-                                                                return (
-                                                                    <span className="ml-1 font-normal capitalize">
-                                                                        <Tooltip
-                                                                            title={
-                                                                                e.full_name
-                                                                            }
-                                                                            arrow
-                                                                            theme="dark"
-                                                                        >
-                                                                            <ImageErrors
-                                                                                src={e.profile_image}
-                                                                                width={40}
-                                                                                height={40}
-                                                                                defaultSrc="/user-placeholder.jpg"
-                                                                                alt="Image"
-                                                                                className="object-cover min-w-8 max-w-8 min-h-8 max-h-8 h-8 w-8 rounded-[100%] text-left"
-                                                                            />
-                                                                        </Tooltip>
-                                                                    </span>
-                                                                );
-                                                            }
+                                                        ? data?.staff_charge?.map((e) => {
+                                                            return (
+                                                                <span className="ml-1 font-normal capitalize">
+                                                                    <Tooltip
+                                                                        title={
+                                                                            e?.full_name
+                                                                        }
+                                                                        arrow
+                                                                        theme="dark"
+                                                                    >
+                                                                        {
+                                                                            e?.profile_image
+                                                                                ?
+                                                                                <ImageErrors
+                                                                                    src={e.profile_image}
+                                                                                    width={40}
+                                                                                    height={40}
+                                                                                    defaultSrc="/user-placeholder.jpg"
+                                                                                    alt="Image"
+                                                                                    className="object-cover min-w-8 max-w-8 min-h-8 max-h-8 h-8 w-8 rounded-[100%] text-left"
+                                                                                />
+                                                                                :
+                                                                                <AvatarText fullName={e?.full_name} />
+                                                                        }
+                                                                    </Tooltip>
+                                                                </span>
+                                                            );
+                                                        }
                                                         )
                                                         : ""}
                                                 </span>
@@ -262,7 +268,8 @@ const Popup_chitiet = (props) => {
                                                                             : "#0F4F9E"
                                                                             }`,
                                                                     }}
-                                                                    className="last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2   rounded-[5.5px]"
+
+                                                                    className="last:ml-0 capitalize  w-fit xl:text-base 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] font-[500] text-[8px] px-2  py-0.5  rounded-full"
                                                                 >
                                                                     {e.name}{" "}
                                                                 </span>

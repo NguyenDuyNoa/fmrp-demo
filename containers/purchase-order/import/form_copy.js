@@ -1211,7 +1211,7 @@ const Index = (props) => {
                               <img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
                             ) : (
                               <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
-                                <img src="/nodata.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                                <img src="/icon/noimagelogo.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
                               </div>
                             )}
                           </div>
@@ -1363,7 +1363,7 @@ const Index = (props) => {
                                     <div className='w-[40px] h-h-[60px]'>
                                       {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" className='object-cover rounded' />) :
                                         <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
-                                          <img src="/nodata.png" alt="Product Image" className='object-cover rounded ' />
+                                          <img src="/icon/noimagelogo.png" alt="Product Image" className='object-cover rounded ' />
                                         </div>
                                       }
                                     </div>
@@ -1737,7 +1737,7 @@ const Index = (props) => {
                 className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}</button>
               <button
                 onClick={_HandleSubmit.bind(this)}
-                type="submit" className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}</button>
+                type="submit" className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#003DA0]">{dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}</button>
             </div>
           </div>
         </div>

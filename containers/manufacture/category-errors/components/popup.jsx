@@ -193,7 +193,7 @@ const PopupCategoryErrors = (props) => {
                             loading={handingCategoryErrors.isPending || false}
                             dataLang={props.dataLang}
                             onClick={() => handleSubmit((data) => onSubmit(data))()}
-                            className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#0F4F9E]"
+                            className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#003DA0]"
                         />
                     </div>
                 </div>

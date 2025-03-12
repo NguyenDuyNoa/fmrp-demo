@@ -37,6 +37,7 @@ import { routerReturnSales } from "routers/sellingGoods";
 import { v4 as uuidv4 } from "uuid";
 import { useReturnSalesItems } from "./hooks/useReturnSalesItems";
 import { useTaxList } from "@/hooks/common/useTaxs";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const initsFetching = {
     onFetchingCondition: false,
@@ -513,7 +514,7 @@ const ReturnSalesForm = (props) => {
                         ) : (
                             <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center rounded">
                                 <img
-                                    src="/nodata.png"
+                                    src="/icon/noimagelogo.png"
                                     alt="Product Image"
                                     className="w-[30px] h-[30px] object-cover rounded"
                                 />
@@ -690,11 +691,11 @@ const ReturnSalesForm = (props) => {
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                         <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                             {dataLang?.returnSales_titleLits || "returnSales_titleLits"}
                         </h2>
-                        <div className="flex justify-end items-center mr-2">
+                        <div className="flex items-center justify-end mr-2">
                             <ButtonBack
                                 onClick={() => router.push(routerReturnSales.home)}
                                 dataLang={dataLang}
@@ -702,13 +703,13 @@ const ReturnSalesForm = (props) => {
                         </div>
                     </div>
 
-                    <div className=" w-full rounded">
+                    <div className="w-full rounded ">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-10 gap-3 items-center mt-2">
+                            <div className="grid items-center grid-cols-10 gap-3 mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
@@ -724,11 +725,11 @@ const ReturnSalesForm = (props) => {
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
-                                <div className="col-span-2 relative">
+                                <div className="relative col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </label>
-                                    <div className="custom-date-picker flex flex-row">
+                                    <div className="flex flex-row custom-date-picker">
                                         <DatePicker
                                             blur
                                             fixedHeight
@@ -926,7 +927,7 @@ const ReturnSalesForm = (props) => {
                         </div>
                     </div>
                     <div className=" bg-[#ECF0F4] p-2 grid  grid-cols-12">
-                        <div className="font-normal col-span-12">
+                        <div className="col-span-12 font-normal">
                             {dataLang?.import_item_information || "import_item_information"}
                         </div>
                     </div>
@@ -969,7 +970,7 @@ const ReturnSalesForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-12 items-center gap-1 py-2">
+                    <div className="grid items-center grid-cols-12 gap-1 py-2">
                         <div className="col-span-2">
                             <Select
                                 options={options}
@@ -1018,7 +1019,7 @@ const ReturnSalesForm = (props) => {
                             />
                         </div>
                         <div className="col-span-10">
-                            <div className="grid grid-cols-11  divide-x border-t border-b border-r border-l">
+                            <div className="grid grid-cols-11 border-t border-b border-l border-r divide-x">
                                 <div className="col-span-2">
                                     {" "}
                                     <Select
@@ -1031,23 +1032,23 @@ const ReturnSalesForm = (props) => {
                                     />
                                 </div>
                                 <div className="col-span-1"></div>
-                                <div className="col-span-1 flex  justify-center items-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                        <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                     </button>
                                     <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                        <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                     </button>
                                 </div>
-                                <div className="col-span-1 justify-center flex items-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <div className=" 3xl:text-[12px] w-full 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50 text-black">
                                         1
                                     </div>
                                 </div>
-                                <div className="col-span-1 justify-center flex items-center">
+                                <div className="flex items-center justify-center col-span-1">
                                     <div className=" w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50">
                                         0
                                     </div>
@@ -1055,7 +1056,7 @@ const ReturnSalesForm = (props) => {
                                 <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-end">
                                     0
                                 </div>
-                                <div className="col-span-1 flex items-center w-full">
+                                <div className="flex items-center w-full col-span-1">
                                     <Select
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={dataLang?.returns_tax || "returns_tax"}
@@ -1081,18 +1082,18 @@ const ReturnSalesForm = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+                        <div className="h-[100%]  w-full">
                             {isFetching ? (
-                                <Loading className="h-10 w-full" color="#0f4f9e" />
+                                <Loading className="w-full h-10" color="#0f4f9e" />
                             ) : (
                                 <>
                                     {listData?.map((e) => (
                                         <div
                                             key={e?.id?.toString()}
-                                            className="grid grid-cols-12 gap-2 my-1 items-start"
+                                            className="grid items-start grid-cols-12 gap-2 my-1"
                                         >
-                                            <div className="col-span-2 border border-r p-2 pb-1 h-full">
+                                            <div className="h-full col-span-2 p-2 pb-1 border border-r">
                                                 <div className="relative mt-5">
                                                     <Select
                                                         options={options}
@@ -1140,7 +1141,7 @@ const ReturnSalesForm = (props) => {
                                                     />
                                                     <button
                                                         onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
-                                                        className="w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
+                                                        className="absolute flex flex-col items-center justify-center w-8 h-8 transition ease-in-out rounded bg-slate-100 -top-4 right-5 hover:rotate-45 hover:bg-slate-200 hover:scale-105 hover:text-red-500"
                                                     >
                                                         <Add className="" />
                                                     </button>
@@ -1158,14 +1159,14 @@ const ReturnSalesForm = (props) => {
                                                     </button>
                                                 )}
                                             </div>
-                                            <div className="col-span-10  items-center">
+                                            <div className="items-center col-span-10">
                                                 <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                                                     {fetChingData.load ? (
                                                         <Loading className="h-2 col-span-11" color="#0f4f9e" />
                                                     ) : (
                                                         e?.child?.map((ce) => (
                                                             <React.Fragment key={ce?.id?.toString()}>
-                                                                <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
+                                                                <div className="flex flex-col justify-center h-full col-span-2 p-1 border-t border-l">
                                                                     <Select
                                                                         options={dataWarehouse}
                                                                         value={ce?.warehouse}
@@ -1265,7 +1266,7 @@ const ReturnSalesForm = (props) => {
                                                                             )}
                                                                         >
                                                                             <Minus
-                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                                className="scale-50 2xl:scale-100 xl:scale-100"
                                                                                 size="16"
                                                                             />
                                                                         </button>
@@ -1316,7 +1317,7 @@ const ReturnSalesForm = (props) => {
                                                                             )}
                                                                         >
                                                                             <Add
-                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                                className="scale-50 2xl:scale-100 xl:scale-100"
                                                                                 size="16"
                                                                             />
                                                                         </button>
@@ -1332,8 +1333,8 @@ const ReturnSalesForm = (props) => {
                                                                                         className="font-medium"
                                                                                     />
                                                                                     <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
-                                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-indigo-500">
-                                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75 absolute"></span>
+                                                                                        <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
+                                                                                            <span className="absolute inline-flex w-full h-full bg-indigo-400 rounded-full opacity-75 animate-ping"></span>
                                                                                         </span>
                                                                                     </span>
                                                                                 </div>
@@ -1342,17 +1343,17 @@ const ReturnSalesForm = (props) => {
                                                                             on={["hover", "focus"]}
                                                                         >
                                                                             <div className="flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm">
-                                                                                <span className="font-medium text-xs">
+                                                                                <span className="text-xs font-medium">
                                                                                     Sl đã giao:{" "}
                                                                                     {formatNumber(
                                                                                         +ce?.quantityDelivered
                                                                                     )}
                                                                                 </span>
-                                                                                <span className="font-medium text-xs">
+                                                                                <span className="text-xs font-medium">
                                                                                     Sl đã trả:{" "}
                                                                                     {formatNumber(ce?.quantityPay)}
                                                                                 </span>
-                                                                                <span className="font-medium text-xs">
+                                                                                <span className="text-xs font-medium">
                                                                                     Sl còn lại:{" "}
                                                                                     {formatNumber(ce?.quantityLeft)}
                                                                                 </span>
@@ -1408,7 +1409,7 @@ const ReturnSalesForm = (props) => {
                                                                         )}
                                                                     </h3>
                                                                 </div>
-                                                                <div className=" flex flex-col items-center p-1 h-full justify-center">
+                                                                <div className="flex flex-col items-center justify-center h-full p-1 ">
                                                                     <Select
                                                                         options={taxOptions}
                                                                         value={ce?.tax}
@@ -1430,7 +1431,7 @@ const ReturnSalesForm = (props) => {
                                                                             outline: "none",
                                                                         }}
                                                                         formatOptionLabel={(option) => (
-                                                                            <div className="flex justify-start items-center gap-1 ">
+                                                                            <div className="flex items-center justify-start gap-1 ">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                                     {option?.label}
                                                                                 </h2>
@@ -1482,7 +1483,7 @@ const ReturnSalesForm = (props) => {
                                                                             e?.id,
                                                                             ce?.id
                                                                         )}
-                                                                        className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
+                                                                        className="flex flex-col items-center justify-center p-2 text-red-500 transition-all ease-linear rounded-md  hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
                                                                     >
                                                                         <IconDelete />
                                                                     </button>
@@ -1497,28 +1498,28 @@ const ReturnSalesForm = (props) => {
                                 </>
                             )}
                         </div>
-                    </div>
+                    </Customscrollbar>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
-                        <div className="col-span-2  flex items-center gap-2">
+                        <div className="flex items-center col-span-2 gap-2">
                             <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
-                            <div className="col-span-1 text-center flex items-center justify-center">
+                            <div className="flex items-center justify-center col-span-1 text-center">
                                 <InPutNumericFormat
                                     isAllowed={isAllowedDiscount}
                                     value={generalDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "generalDiscount")}
-                                    className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
+                                    className="w-20 px-2 py-1 font-medium text-center bg-transparent border-b-2 border-gray-300  focus:outline-none"
 
                                 />
                             </div>
                         </div>
-                        <div className="col-span-2 flex items-center gap-2 ">
+                        <div className="flex items-center col-span-2 gap-2 ">
                             <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
                             <Select
                                 options={taxOptions}
                                 onChange={_HandleChangeInput.bind(this, "generalTax")}
                                 value={generalTax}
                                 formatOptionLabel={(option) => (
-                                    <div className="flex justify-start items-center gap-1 ">
+                                    <div className="flex items-center justify-start gap-1 ">
                                         <h2>{option?.label}</h2>
                                         <h2>{`(${option?.tax_rate})`}</h2>
                                     </div>
@@ -1584,7 +1585,7 @@ const ReturnSalesForm = (props) => {
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                         />
                     </div>
-                    <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
+                    <div className="flex-col justify-between col-span-3 mt-5 space-y-4 text-right ">
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal ">

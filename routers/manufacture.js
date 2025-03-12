@@ -1,6 +1,7 @@
 //Kho && sản xuất
 const url = "/manufacture";
 
+
 // Kế hoạch sản xuất
 const routerPproductionPlan = {
     home: `${url}/production-plan`,

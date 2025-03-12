@@ -150,7 +150,8 @@ const ExportToOther = (props) => {
                 id: isKeyState?.id,
                 checkedpost: isKeyState?.checkedUn,
             };
-            sCheckedWare(dataChecked);
+            _ServerSending(dataChecked)
+            // sCheckedWare(dataChecked);
         }
         handleQueryId({ status: false });
     };
@@ -166,7 +167,7 @@ const ExportToOther = (props) => {
             }
         });
     };
-    const _ServerSending = async () => {
+    const _ServerSending = async (checkedWare) => {
         let data = new FormData();
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
         data.append("id", checkedWare?.id);
@@ -190,17 +191,17 @@ const ExportToOther = (props) => {
         queryState({ onSending: false });
     };
 
-    useEffect(() => {
-        isState.onSending && _ServerSending();
-    }, [isState.onSending]);
+    // useEffect(() => {
+    //     isState.onSending && _ServerSending();
+    // }, [isState.onSending]);
 
-    useEffect(() => {
-        checkedWare.id != null && queryState({ onSending: true });
-    }, [checkedWare]);
+    // useEffect(() => {
+    //     checkedWare.id != null && queryState({ onSending: true });
+    // }, [checkedWare]);
 
-    useEffect(() => {
-        checkedWare.id != null && queryState({ onSending: true });
-    }, [checkedWare.id != null]);
+    // useEffect(() => {
+    //     checkedWare.id != null && queryState({ onSending: true });
+    // }, [checkedWare.id != null]);
 
     const multiDataSet = [
         {
@@ -338,7 +339,7 @@ const ExportToOther = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.exportToOthe_list || "exportToOthe_list"}
                             </h2>
@@ -371,7 +372,7 @@ const ExportToOther = (props) => {
                             })}
                         </ContainerFilterTab>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-6 gap-2">
@@ -457,7 +458,7 @@ const ExportToOther = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -475,7 +476,7 @@ const ExportToOther = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}

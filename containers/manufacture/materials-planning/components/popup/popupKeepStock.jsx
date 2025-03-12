@@ -464,7 +464,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                             <div className="flex items-center gap-2">
                                                                 <div className="w-[50px] h-[60px]">
                                                                     <img
-                                                                        src={option.images ? option.images : '/nodata.png'}
+                                                                        src={option.images ? option.images : '/icon/noimagelogo.png'}
                                                                         alt="Product Image"
                                                                         className="object-cover w-full h-full rounded"
                                                                     />
@@ -598,8 +598,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                     :
                                                                     <div className="w-[50px] h-[50px] object-cover  mx-auto">
                                                                         <ModalImage
-                                                                            small="/nodata.png"
-                                                                            large="/nodata.png"
+                                                                            small="/icon/noimagelogo.png"
+                                                                            large="/icon/noimagelogo.png"
                                                                             className="object-contain w-full h-full p-1 rounded"
                                                                         ></ModalImage>
                                                                     </div>

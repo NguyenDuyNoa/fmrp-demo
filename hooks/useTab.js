@@ -7,7 +7,7 @@ const useTab = (initialTab = "all") => {
     const handleTab = useCallback((e) => {
         router.push({
             pathname: router.route,
-            query: { tab: e },
+            query: { ...router.query, tab: e },
         });
     },
         [router.query?.tab]
@@ -17,7 +17,7 @@ const useTab = (initialTab = "all") => {
         const defaultTab = router.query?.tab || initialTab;
         router.push({
             pathname: router.route,
-            query: { tab: defaultTab },
+            query: { ...router.query, tab: defaultTab },
         });
     }, [router.query?.tab]);
 

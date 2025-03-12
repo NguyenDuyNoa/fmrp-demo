@@ -128,7 +128,7 @@ const Prefixes = (props) => {
                         <div className="flex py-5 ml-1 space-x-5">
                             <button
                                 onClick={_HandleSubmit.bind(this)}
-                                className="px-8 py-2.5 rounded transition hover:scale-105 bg-[#0F4F9E] text-white"
+                                className="px-8 py-2.5 rounded transition hover:scale-105 bg-[#003DA0] text-white"
                             >
                                 Lưu
                             </button>

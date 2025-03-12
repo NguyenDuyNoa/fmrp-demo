@@ -88,7 +88,7 @@ const PopupAdd = ({ data, listStaff }) => {
             button={
                 <button
                     type="button"
-                    className="bg-[#0F4F9E] rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
+                    className="bg-[#003DA0] rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
                 >
                     <Image src={"/productionSmoothing/Icon.png"} width={16} height={16} className="object-cover" />
                     <h3 className="text-sm font-medium text-white transition-all duration-200 ease-linear">
@@ -369,7 +369,7 @@ const PopupAdd = ({ data, listStaff }) => {
                     </button>
                     <button
                         type="submit"
-                        className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
+                        className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#003DA0] hover:scale-105 transition-all ease-linear"
                     >
                         {"Thực hiện"}
                     </button>

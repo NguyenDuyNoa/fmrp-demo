@@ -3,11 +3,14 @@ import { SelectCore } from "@/utils/lib/Select";
 import { FaCheck } from "react-icons/fa";
 import { components } from "react-select";
 import { Customscrollbar } from "../common/Customscrollbar";
+import { MenuListClickAll } from "./selectItemComponent";
+
+
 
 
 export const CustomOption = (props) => {
     return (
-        <components.Option {...props}>
+        <components.Option   {...props}>
             <div className={`flex items-center justify-between w-full ${props.isDisabled ? "cursor-default" : "cursor-pointer"}`}>
                 <div>{props.children}</div>
                 {props.isSelected && <FaCheck className="w-2.5 h-2.5 ml-2 text-primary" />}
@@ -22,6 +25,8 @@ export const CustomMenuList = (props) => {
         </Customscrollbar>
     )
 }
+
+
 
 const SelectComponent = ({
     options,
@@ -46,7 +51,8 @@ const SelectComponent = ({
     classParent,
     onMenuOpen,
     maxShowMuti,
-    id
+    id,
+    type = 'header'
 }) => {
     // const styles = {
     //     menuList: (base) => ({
@@ -67,10 +73,63 @@ const SelectComponent = ({
     //         }
     //     })
     // }
+
+    const styleType = type == "header" ?
+        styles ?
+            {
+                ...styles,
+                option: (provided, state) => ({
+                    ...styles?.option,
+                    ...provided,
+                    backgroundColor: 'transparent',
+                    // backgroundColor: state?.isSelected ? 'transparent' : provided?.backgroundColor, // Bỏ nền khi selected
+                    color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
+                    '&:hover': {
+                        backgroundColor: 'transparent',
+                        // backgroundColor: state?.isSelected ? 'transparent' : provided['&:hover']?.backgroundColor, // Giữ transparent khi hover
+                        color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
+                    },
+                }),
+            }
+            : configSelectFillter.styles
+
+        : {
+            ...styles,
+            option: (provided, state) => ({
+                ...styles?.option,
+                ...provided,
+                backgroundColor: 'transparent',
+                // backgroundColor: state?.isSelected ? 'transparent' : provided?.backgroundColor, // Bỏ nền khi selected
+                color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
+                '&:hover': {
+                    backgroundColor: 'transparent',
+                    // backgroundColor: state?.isSelected ? 'transparent' : provided['&:hover']?.backgroundColor, // Giữ transparent khi hover
+                    color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
+                },
+            }),
+            placeholder: (base) => ({
+                ...base,
+                color: "#cbd5e1",
+            }),
+            menu: (provided) => ({
+                ...provided,
+                zIndex: 9999, // Giá trị z-index tùy chỉnh
+            }),
+            control: (base, state) => ({
+                ...base,
+                boxShadow: "none",
+                padding: "2.7px",
+                ...(state.isFocused && {
+                    border: "0 0 0 1px #92BFF7",
+                }),
+            }),
+        }
+
     return (
         <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
             <SelectCore
                 id={id ?? "parentSelect"}
+
                 options={options}
                 value={value}
                 onInputChange={onInputChange ? onInputChange : ""}
@@ -95,7 +154,23 @@ const SelectComponent = ({
                 isClearable={isClearable}
                 menuPortalTarget={menuPortalTarget}
                 menuShouldBlockScroll={menuShouldBlockScroll}
-                styles={styles ? styles : configSelectFillter.styles}
+                // styles={{
+                //     ...[styles ? styles : configSelectFillter.styles],
+                // option: (provided, state) => ({
+                //     ...[styles?.option ? styles?.option : configSelectFillter.styles?.option],
+                //     ...provided,
+                //     backgroundColor: 'transparent',
+                //     // backgroundColor: state?.isSelected ? 'transparent' : provided?.backgroundColor, // Bỏ nền khi selected
+                //     color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
+                //     '&:hover': {
+                //         backgroundColor: 'transparent',
+                //         // backgroundColor: state?.isSelected ? 'transparent' : provided['&:hover']?.backgroundColor, // Giữ transparent khi hover
+                //         color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
+                //     },
+                // }),
+                // }}
+                // bỏ nền dùm anh nha chỉ để tích màu xanh và chữ màu xanh thui
+                styles={styleType}
 
             />
         </div>

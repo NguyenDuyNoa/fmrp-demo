@@ -31,7 +31,7 @@ const Dashboard = (props) => {
                 <title>Tổng quan</title>
             </Head>
 
-            <Customscrollbar className="h-screen px-10 py-8 pt-24 space-y-5 overflow-x-auto overflow-y-auto text">
+            <Customscrollbar className="px-10 py-8 pt-24 space-y-5 overflow-x-auto overflow-y-auto text">
                 {dataPstWH && (
                     <div
                         style={{
@@ -61,16 +61,18 @@ const Dashboard = (props) => {
                         </span>
                     </button>
                 </div> */}
-                <ListTask {...props} />
-                <div className="grid grid-cols-2 gap-5">
-                    <PieChart {...props} />
-                    <ProductionProgressTracker {...props} />
-                    <LineChart {...props} />
-                    <ColumnChart {...props} />
-                    <TableChart {...props} />
-                    {/* <ManufacturingStatusMonitor {...props} /> */}
-                    {/* <AreaChart {...props} /> */}
-                    <BarChart {...props} />
+                <div className="flex flex-col gap-3">
+                    <ListTask {...props} />
+                    <div className="grid grid-cols-2 gap-5">
+                        <PieChart {...props} />
+                        <ProductionProgressTracker {...props} />
+                        <LineChart {...props} />
+                        <ColumnChart {...props} />
+                        <TableChart {...props} />
+                        {/* <ManufacturingStatusMonitor {...props} /> */}
+                        {/* <AreaChart {...props} /> */}
+                        <BarChart {...props} />
+                    </div>
                 </div>
             </Customscrollbar>
         </React.Fragment>

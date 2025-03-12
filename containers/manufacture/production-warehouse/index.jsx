@@ -41,7 +41,7 @@ import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
@@ -132,7 +132,10 @@ const ProductionWarehouse = (props) => {
     }, 500);
 
     const handleSaveStatus = () => {
+        console.log("1");
+
         if (isKeyState?.type === "browser") {
+            console.log("2");
             const checked = isKeyState.value.target.checked;
             const warehousemanId = isKeyState.value.target.value;
             const dataChecked = {
@@ -141,7 +144,8 @@ const ProductionWarehouse = (props) => {
                 id: isKeyState?.id,
                 checkedpost: isKeyState?.checkedUn,
             };
-            sCheckedWare(dataChecked);
+            // sCheckedWare(dataChecked);
+            _ServerSending(dataChecked)
         }
         handleQueryId({ status: false });
     };
@@ -152,10 +156,11 @@ const ProductionWarehouse = (props) => {
             initialKey: { id, checkedUn, type, value },
         });
     };
-    const _ServerSending = async () => {
+
+    const _ServerSending = async (dataChecked) => {
         let data = new FormData();
-        data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
-        data.append("id", checkedWare?.id);
+        data.append("warehouseman_id", dataChecked?.checkedpost != "0" ? dataChecked?.checkedpost : "");
+        data.append("id", dataChecked?.id);
         try {
             const { isSuccess, message } = await apiProductionWarehouse.apiHangdingStatusWarehouse({ data: data });
 
@@ -173,17 +178,17 @@ const ProductionWarehouse = (props) => {
         }
     };
 
-    useEffect(() => {
-        isState.onSending && _ServerSending();
-    }, [isState.onSending]);
+    // useEffect(() => {
+    //     isState.onSending && _ServerSending();
+    // }, [isState.onSending]);
 
-    useEffect(() => {
-        checkedWare.id != null && queryState({ onSending: true });
-    }, [checkedWare]);
+    // useEffect(() => {
+    //     checkedWare.id != null && queryState({ onSending: true });
+    // }, [checkedWare]);
 
-    useEffect(() => {
-        checkedWare.id != null && queryState({ onSending: true });
-    }, [checkedWare.id != null]);
+    // useEffect(() => {
+    //     checkedWare.id != null && queryState({ onSending: true });
+    // }, [checkedWare.id != null]);
 
     const multiDataSet = [
         {

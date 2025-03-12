@@ -11,6 +11,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import React, { useState } from "react";
 import { usePaymentDetail } from "../hooks/usePaymentDetail";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 
 const PopupDetail = (props) => {
@@ -37,7 +38,7 @@ const PopupDetail = (props) => {
                 <div>
                     <div className="w-[530px]">
                         {/* <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
-                        <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]">
+                        <Customscrollbar className="max-h-[85vh]">
                             <h2 className="font-semibold bg-[#ECF0F4] p-2 text-[13px]">
                                 {props.dataLang?.import_detail_info || "import_detail_info"}
                             </h2>
@@ -186,7 +187,7 @@ const PopupDetail = (props) => {
                                 {props.dataLang?.payment_costInfo || "payment_costInfo"}
                             </h2>
                             <div className=" w-[100%] lx:w-[110%] ">
-                                <div className={`grid-cols-5 grid sticky top-0  bg-white shadow-lg  z-10 rounded`}>
+                                {/* <div className={`grid-cols-5 grid sticky top-0  bg-white shadow-lg  z-10 rounded`}>
                                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
                                         #
                                     </h4>
@@ -196,7 +197,18 @@ const PopupDetail = (props) => {
                                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center">
                                         {props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
                                     </h4>
-                                </div>
+                                </div> */}
+                                <HeaderTablePopup gridCols={5} className={'!rounded-none'}>
+                                    <ColumnTablePopup>
+                                        #
+                                    </ColumnTablePopup>
+                                    <ColumnTablePopup colSpan={2}>
+                                        {props.dataLang?.payment_costs || "payment_costs"}
+                                    </ColumnTablePopup>
+                                    <ColumnTablePopup>
+                                        {props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
+                                    </ColumnTablePopup>
+                                </HeaderTablePopup>
                                 {isLoading ? (
                                     <Loading className="max-h-28" color="#0f4f9e" />
                                 ) : data?.detail?.length > 0 ? (
@@ -204,7 +216,7 @@ const PopupDetail = (props) => {
                                         <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                             {data?.detail?.map((e, index) => (
                                                 <div
-                                                    className="grid items-center grid-cols-5 border-b hover:bg-slate-50"
+                                                    className="grid items-center grid-cols-5 border-b "
                                                     key={e.id?.toString()}
                                                 >
                                                     <h6 className="text-[13px] col-span-1 font-medium  py-2  text-center break-words">
@@ -225,7 +237,7 @@ const PopupDetail = (props) => {
                             <h2 className="font-semibold p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                 {props.dataLang?.purchase_total || "purchase_total"}
                             </h2>
-                            <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
+                            <div className="grid flex-col justify-between grid-cols-12 mt-2 ">
                                 <div className="col-span-7">
                                     <h3 className="text-[13px] font-semibold">
                                         {props.dataLang?.import_from_note || "import_from_note"}

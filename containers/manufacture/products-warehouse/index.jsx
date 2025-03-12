@@ -144,6 +144,7 @@ const ProductsWarehouse = (props) => {
                 checkedpost: isKeyState?.checkedUn,
             };
             sCheckedWare(dataChecked);
+            _ServerSending(dataChecked)
         }
         handleQueryId({ status: false });
     };
@@ -154,7 +155,7 @@ const ProductsWarehouse = (props) => {
             initialKey: { id, checkedUn, type, value },
         });
     };
-    const _ServerSending = async () => {
+    const _ServerSending = async (checkedWare) => {
         let data = new FormData();
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
         data.append("id", checkedWare?.id);
@@ -182,17 +183,17 @@ const ProductsWarehouse = (props) => {
         }
     };
 
-    useEffect(() => {
-        isState.onSending && _ServerSending();
-    }, [isState.onSending]);
+    // useEffect(() => {
+    //     isState.onSending && _ServerSending();
+    // }, [isState.onSending]);
 
-    useEffect(() => {
-        checkedWare.id != null && queryState({ onSending: true });
-    }, [checkedWare]);
+    // useEffect(() => {
+    //     checkedWare.id != null && queryState({ onSending: true });
+    // }, [checkedWare]);
 
-    useEffect(() => {
-        checkedWare.id != null && queryState({ onSending: true });
-    }, [checkedWare.id != null]);
+    // useEffect(() => {
+    //     checkedWare.id != null && queryState({ onSending: true });
+    // }, [checkedWare.id != null]);
 
     const multiDataSet = [
         {

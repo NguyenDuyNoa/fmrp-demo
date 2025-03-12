@@ -30,6 +30,8 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import Select from "react-select";
 import { usePurchasesItems } from "./hooks/usePurchasesItems";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
 const PurchasesForm = (props) => {
     const router = useRouter();
@@ -378,24 +380,24 @@ const PurchasesForm = (props) => {
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                         <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                             {id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}
                         </h2>
-                        <div className="flex justify-end items-center">
+                        <div className="flex items-center justify-end">
                             <ButtonBack
                                 onClick={() => router.push(routerPurchases.home)}
                                 dataLang={dataLang}
                             />
                         </div>
                     </div>
-                    <div className=" w-full rounded">
+                    <div className="w-full rounded ">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2 ">
                                 {dataLang?.purchase_general || "purchase_general"}
                             </h2>
 
-                            <div className="flex flex-wrap justify-between items-center mt-2">
+                            <div className="flex flex-wrap items-center justify-between mt-2">
                                 <div className="w-[24.5%]">
                                     <label className="text-[#344054] font-normal text-sm mb-1  2xl:text-[12px] xl:text-[13px] text-[13px]">
                                         {dataLang?.purchase_code || "purchase_code"}{" "}
@@ -414,7 +416,7 @@ const PurchasesForm = (props) => {
                                         {dataLang?.purchase_day || "purchase_day"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="custom-date-picker flex flex-row">
+                                    <div className="flex flex-row custom-date-picker">
                                         <DatePicker
                                             blur
                                             fixedHeight
@@ -468,7 +470,8 @@ const PurchasesForm = (props) => {
                                         {dataLang?.purchase_branch || "purchase_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectComponent
+                                        type="form"
                                         options={listBr}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
@@ -551,16 +554,16 @@ const PurchasesForm = (props) => {
                             </h4>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                    <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
                         {/* <div className='h-[400px] '> */}
                         {/* <div className=''> */}
-                        <div className="pr-2">
+                        <div className="w-full h-full">
                             <React.Fragment>
-                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                <div className="h-full divide-y divide-slate-200">
                                     {/* <ScrollArea className=" h-[400px] overflow-hidden" speed={1}  smoothScrolling={true}> */}
                                     {sortedArr.map((e, index) => (
                                         <div className="grid grid-cols-12 gap-1 py-1 " key={e.id}>
-                                            <div className="col-span-1 flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1">
                                                 <h3 className="text-[#344054] font-normal text-center text-sm mb-1 ml-2 ">
                                                     {index + 1}
                                                 </h3>
@@ -582,7 +585,7 @@ const PurchasesForm = (props) => {
                                                     )}
                                                     value={e?.items}
                                                     formatOptionLabel={(option) => (
-                                                        <div className="flex items-center  justify-between py-2">
+                                                        <div className="flex items-center justify-between py-2">
                                                             <div className="flex items-center gap-2">
                                                                 <div>
                                                                     {option.e?.images != null ? (
@@ -598,7 +601,7 @@ const PurchasesForm = (props) => {
                                                                     ) : (
                                                                         <div className="w-[40px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                                             <img
-                                                                                src="/nodata.png"
+                                                                                src="/icon/noimagelogo.png"
                                                                                 alt="Product Image"
                                                                                 style={{
                                                                                     width: "40px",
@@ -678,12 +681,12 @@ const PurchasesForm = (props) => {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="col-span-1 text-center flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1 text-center">
                                                 <h3 className="2xl:text-[12px] xl:text-[13px] text-[13px]">
                                                     {e.unit}
                                                 </h3>
                                             </div>
-                                            <div className="col-span-2 flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-2">
                                                 <div className="flex items-center justify-center">
                                                     <button
                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
@@ -713,7 +716,7 @@ const PurchasesForm = (props) => {
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="col-span-3 flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-3">
                                                 <input
                                                     value={e.note}
                                                     onChange={_HandleChangeInputOption.bind(
@@ -728,7 +731,7 @@ const PurchasesForm = (props) => {
                                                     className="focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                                                 />
                                             </div>
-                                            <div className="col-span-1 flex items-center justify-center">
+                                            <div className="flex items-center justify-center col-span-1">
                                                 <button
                                                     onClick={_HandleDelete.bind(this, e.id)}
                                                     type="button"
@@ -744,7 +747,7 @@ const PurchasesForm = (props) => {
                                 {/* </ScrollArea> */}
                             </React.Fragment>
                         </div>
-                    </div>
+                    </Customscrollbar>
                     <h2 className="font-normal bg-[white] shadow-xl p-2 border-b border-b-[#a9b5c5] 2xl:text-[14px] xl:text-[13px] text-[13px]  border-t border-t-[#a9b5c5]">
                         {dataLang?.purchase_total || "purchase_total"}{" "}
                     </h2>
@@ -763,7 +766,7 @@ const PurchasesForm = (props) => {
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[120px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                         />
                     </div>
-                    <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
+                    <div className="flex-col justify-between col-span-3 mt-5 space-y-4 text-right ">
                         <div className="flex justify-between ">
                             <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]">
                                 <h3>{dataLang?.purchase_totalCount || "purchase_totalCount"}</h3>

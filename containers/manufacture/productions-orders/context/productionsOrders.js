@@ -26,6 +26,7 @@ const initialState = {
     valueBr: null,
     searchProductionOrders: "",
     searchOrders: "",
+    searchPODetail: "",
     searchPlan: "",
     searchItemsVariant: "",
     date: { dateStart: null, dateEnd: null },

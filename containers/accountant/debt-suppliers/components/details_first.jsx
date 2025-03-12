@@ -13,6 +13,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { useState } from "react";
 import { useSupplierDetailFirst } from "../hooks/useSupplierDetailFirst";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 // Popup_chitietDauki
 const PopupDetailFirst = (props) => {
     const dataLang = props?.dataLang;
@@ -172,9 +173,12 @@ const PopupDetailFirst = (props) => {
                                                                     <ExpandableContent content={e?.note} />
                                                                 </h6>
                                                                 <h6 className="col-span-2 mx-auto w-fit">
-                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                    {/* <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
                                                                         {e?.branch_name}
-                                                                    </div>
+                                                                    </div> */}
+                                                                    <TagBranch className="w-fit">
+                                                                        {e?.branch_name}
+                                                                    </TagBranch>
                                                                 </h6>
                                                             </div>
                                                         ))}

@@ -734,6 +734,11 @@ const Popup_Bom = React.memo((props) => {
             button={
                 <div
                     onClick={() => {
+                        if (props?.dataProduct?.type_products?.id == 2) {
+                            isShow("error", 'Bán thành phẩm mua ngoài, không thể thiết kế BOM');
+                            return
+                        }
+
                         if (props.bom) {
                             isShow("error", props.dataLang?.bom_had || "bom_had");
                             return;
@@ -1170,7 +1175,7 @@ const Popup_Bom = React.memo((props) => {
                         <button
                             type="submit"
                             onClick={_HandleSubmit.bind(this)}
-                            className="button text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
+                            className="button text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#003DA0]"
                         >
                             {props.dataLang?.branch_popup_save}
                         </button>

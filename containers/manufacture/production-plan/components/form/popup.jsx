@@ -191,7 +191,7 @@ const PopupEditer = ({ }) => {
                     </button>
                     <button
                         type="submit"
-                        className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
+                        className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#003DA0] hover:scale-105 transition-all ease-linear"
                     >
                         {"Lưu"}
                     </button>
