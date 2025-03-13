@@ -1203,16 +1203,30 @@ const Header = () => {
                         >
                             <Image
                                 alt=""
-                                src="/icon/header/extent.png"
+                                src="/icon/header/right/seting.png"
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain w-[16px] h-[16px] min-w-[16px] min-h-[16px] transition"
+                                className="object-contain w-[18px] h-[18px] min-w-[18px] min-h-[18px] transition"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
                         </button>
+
+                        <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"} >
+                            <Image
+                                alt=""
+                                src="/icon/header/right/quytrinh.png"
+                                width={18}
+                                height={18}
+                                quality={100}
+                                className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </Dropdown>
                         <button
                             title="Góp ý"
                             onClick={() => {
@@ -1227,11 +1241,11 @@ const Header = () => {
                         >
                             <Image
                                 alt=""
-                                src="/icon/header/message-text.svg"
+                                src="/icon/header/right/gopy.png"
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain w-[16px] h-[16px] min-w-[16px] min-h-[16px] transition"
+                                className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1249,11 +1263,11 @@ const Header = () => {
                             >
                                 <Image
                                     alt=""
-                                    src="/icon/header/tb2.png"
+                                    src="/icon/header/right/thongbao.png"
                                     width={18}
                                     height={18}
                                     quality={100}
-                                    className="object-contain w-[16px] h-[16px] min-w-[16px] min-h-[16px] transition"
+                                    className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1263,19 +1277,25 @@ const Header = () => {
                                 </div> */}
                             </DropdownThongBao>
                         </Link>
-                        <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"} >
+                        <Link
+                            href="https://help.fmrp.vn"
+                            target="_blank"
+                            className=""
+                            title="Hướng dẫn phần mềm"
+                        >
                             <Image
                                 alt=""
-                                src="/icon/header/question.png"
+                                src="/icon/header/right/question.png"
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain w-[21px] h-[21px] min-w-[21px] min-h-[21px] transition"
+                                className="object-contain w-[19px] h-[19px] min-w-[19px] min-h-[19px] transition"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
-                        </Dropdown>
+                        </Link>
+
                         <DropdownAvatar />
                     </div>
                 </div>

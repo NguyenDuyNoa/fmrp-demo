@@ -43,7 +43,7 @@ import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 
 const initialState = {
     idWarehouse: "",
-    limitItemWarehouseDetail: 10,
+    limitItemWarehouseDetail: 15,
     keySearchItem: "",
     idBranch: null,
     idLocationWarehouse: null,
@@ -445,14 +445,20 @@ const Warehouse = (props) => {
                                             </button>
                                         )}
                                         <div>
-                                            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                            <DropdowLimit
+                                                sLimit={(e) => {
+                                                    queryKeyIsState({ limitItemWarehouseDetail: e });
+                                                }}
+                                                limit={isState.limitItemWarehouseDetail}
+                                                dataLang={dataLang}
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className="grid grid-cols-10">
-                            <Customscrollbar className="col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto">
+                            <Customscrollbar className="col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[460px] 2xl:h-[460px] xxl:max-h-[400px] xxl:h-[400px] xl:max-h-[395px] xl:h-[395px] max-h-[460px] h-[460px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto">
                                 {dataWarehouse?.rResult && dataWarehouse?.rResult?.map((item, index) => (
                                     <PopupParent
                                         key={item.id}
@@ -530,7 +536,7 @@ const Warehouse = (props) => {
                                     </PopupParent>
                                 ))}
                             </Customscrollbar>
-                            <Customscrollbar className="col-span-8 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] overflow-auto pb-2">
+                            <Customscrollbar className="col-span-8 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[460px] 2xl:h-[460px] xxl:max-h-[400px] xxl:h-[400px] xl:max-h-[395px] xl:h-[395px] max-h-[460px] h-[460px] overflow-auto pb-2">
                                 <div className={`2xl:w-[100%] pr-2`}>
                                     {/* header table */}
                                     <HeaderTable

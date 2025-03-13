@@ -358,24 +358,23 @@ const SalesOrder = (props) => {
                             </div>
                         </div>
                         <ContainerFilterTab>
-                            {dataFilterBar &&
-                                dataFilterBar?.map((e) => {
-                                    return (
-                                        <TabFilter
-                                            style={{
-                                                backgroundColor: "#e2f0fe",
-                                            }}
-                                            dataLang={dataLang}
-                                            key={e?.id}
-                                            onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                            total={e?.count}
-                                            active={e?.id}
-                                            className={"text-[#0F4F9E]"}
-                                        >
-                                            {dataLang[e?.name]}
-                                        </TabFilter>
-                                    );
-                                })}
+                            {dataFilterBar && dataFilterBar?.map((e) => {
+                                return (
+                                    <TabFilter
+                                        style={{
+                                            backgroundColor: "#e2f0fe",
+                                        }}
+                                        dataLang={dataLang}
+                                        key={e?.id}
+                                        onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                        total={e?.count}
+                                        active={e?.id}
+                                        className={"text-[#0F4F9E]"}
+                                    >
+                                        {dataLang[e?.name]}
+                                    </TabFilter>
+                                );
+                            })}
                         </ContainerFilterTab>
                         {/* table */}
                         <ContainerTable>
@@ -496,7 +495,7 @@ const SalesOrder = (props) => {
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.sales_product_code || "sales_product_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"left"}>
+                                        <ColumnTable colSpan={2} textAlign={"left"}>
                                             {dataLang?.customer || "customer"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
@@ -514,7 +513,7 @@ const SalesOrder = (props) => {
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.branch || "branch"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={4} textAlign={"center"}>
+                                        <ColumnTable colSpan={3} textAlign={"center"}>
                                             {dataLang?.sales_product_order_process || "sales_product_order_process"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
@@ -541,7 +540,7 @@ const SalesOrder = (props) => {
                                                                     id={e?.id}
                                                                 />
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign="left">
+                                                            <RowItemTable colSpan={2} textAlign="left">
                                                                 {e?.client_name}
                                                             </RowItemTable>
                                                             {/* fix */}
@@ -624,8 +623,8 @@ const SalesOrder = (props) => {
                                                                 <TagBranch>{e?.branch_name}</TagBranch>
                                                             </RowItemTable>
 
-                                                            <RowItemTable colSpan={4}>
-                                                                <div className="flex items-start py-2 ml-3">
+                                                            <RowItemTable colSpan={3}>
+                                                                <div className="flex items-start p-2 ">
                                                                     {e?.process.map((item, i) => {
                                                                         const isValue = [
                                                                             "production_plan",
@@ -637,68 +636,78 @@ const SalesOrder = (props) => {
                                                                         const isValueDelivery = ["delivery"].includes(item?.code);
 
                                                                         return (
-                                                                            <>
-                                                                                <div
-                                                                                    className="relative"
-                                                                                    key={`process-${i}`}
-                                                                                >
-                                                                                    {!["keep_stock", "import_outsourcing",].includes(item?.code) && (
-                                                                                        <>
-                                                                                            <div className="flex items-center">
+                                                                            <div
+                                                                                className="relative"
+                                                                                key={`process-${i}`}
+                                                                            >
+                                                                                {!["keep_stock", "import_outsourcing",].includes(item?.code) && (
+                                                                                    <>
+                                                                                        <div className="flex items-center">
+                                                                                            <div
+                                                                                                className={`${item?.active ? `h-2 w-2 rounded-full bg-green-500` : `h-2 w-2 rounded-full bg-gray-400`} `}
+                                                                                            />
+                                                                                            {!isValueDelivery && (
                                                                                                 <div
-                                                                                                    className={`${item?.active ? `h-2 w-2 rounded-full bg-green-500` : `h-2 w-2 rounded-full bg-gray-400`} `}
+                                                                                                    className={`${item?.active ? `w-full bg-green-500 h-0.5 ` : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`}`}
                                                                                                 />
-                                                                                                {!isValueDelivery && (
-                                                                                                    <div
-                                                                                                        className={`${item?.active ? `w-full bg-green-500 h-0.5 ` : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`}`}
-                                                                                                    />
-                                                                                                )}
-                                                                                            </div>
-                                                                                            <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
-                                                                                                <div
-                                                                                                    className={`${item?.active
-                                                                                                        ? "text-green-500"
-                                                                                                        : "text-slate-500"
-                                                                                                        } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                >
-                                                                                                    <div className="flex items-center justify-center w-full gap-1">
-                                                                                                        <h6>
-                                                                                                            {
-                                                                                                                dataLang[item?.name]
-                                                                                                            }
-                                                                                                        </h6>
-                                                                                                        {isValueDelivery && (
-                                                                                                            <h6
-                                                                                                                className={`${item?.active &&
-                                                                                                                    isValueDelivery
-                                                                                                                    ? "text-green-500"
-                                                                                                                    : "text-orange-500"
-                                                                                                                    } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
-                                                                                                            >{`(${dataLang[item?.status] || item?.status})`}</h6>
-                                                                                                        )}
-                                                                                                    </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
+                                                                                            <div
+                                                                                                className={`${item?.active ? "text-green-500" : "text-slate-500"
+                                                                                                    } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                                                                            >
+                                                                                                <div className="flex items-center justify-center w-full gap-1">
+                                                                                                    <h6>
+                                                                                                        {
+                                                                                                            dataLang[item?.name]
+                                                                                                        }
+                                                                                                    </h6>
+                                                                                                    {isValueDelivery && (
+                                                                                                        <h6
+                                                                                                            className={`${item?.active &&
+                                                                                                                isValueDelivery
+                                                                                                                ? "text-green-500"
+                                                                                                                : "text-orange-500"
+                                                                                                                } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                                                                        >{`(${dataLang[item?.status] || item?.status})`}</h6>
+                                                                                                    )}
                                                                                                 </div>
                                                                                             </div>
-                                                                                        </>
+                                                                                        </div>
+                                                                                    </>
+                                                                                )}
+                                                                                <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
+                                                                                    {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
+
+                                                                                    {item?.reference && item?.reference.slice(0, isExpanded ? item?.reference?.length : 2).map((ci, index) => (
+                                                                                        <div
+                                                                                            className="flex flex-col"
+                                                                                            key={index}
+                                                                                        >
+                                                                                            {ci?.reference_no}
+                                                                                        </div>
+                                                                                    ))}
+                                                                                    {item?.reference && item?.reference?.length > 2 && (
+                                                                                        <button onClick={toggleShowAll}>
+                                                                                            {isExpanded ? "Rút gọn" : "Xem thêm"}
+                                                                                        </button>
                                                                                     )}
-                                                                                    <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
-                                                                                        {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
-                                                                                        {isValue && item?.reference && item?.reference.slice(0, isExpanded ? item?.reference?.length : 2).map((ci, index) => (
-                                                                                            <div
-                                                                                                className="flex flex-col"
-                                                                                                key={index}
-                                                                                            >
-                                                                                                {ci?.code}
-                                                                                            </div>
-                                                                                        ))}
-                                                                                        {item?.reference && item?.reference?.length > 2 && (
-                                                                                            <button onClick={toggleShowAll}>
-                                                                                                {isExpanded ? "Rút gọn" : "Xem thêm"}
-                                                                                            </button>
-                                                                                        )}
-                                                                                    </p>
-                                                                                </div>
-                                                                            </>
+                                                                                    {/* {isValue && item?.reference && item?.reference.slice(0, isExpanded ? item?.reference?.length : 2).map((ci, index) => (
+                                                                                        <div
+                                                                                            className="flex flex-col"
+                                                                                            key={index}
+                                                                                        >
+                                                                                            {ci?.code}
+                                                                                        </div>
+                                                                                    ))}
+                                                                                    {item?.reference && item?.reference?.length > 2 && (
+                                                                                        <button onClick={toggleShowAll}>
+                                                                                            {isExpanded ? "Rút gọn" : "Xem thêm"}
+                                                                                        </button>
+                                                                                    )} */}
+                                                                                </p>
+                                                                            </div>
                                                                         );
                                                                     })}
                                                                 </div>

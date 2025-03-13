@@ -487,6 +487,15 @@ const SalesOrderForm = (props) => {
                         if (check) {
                             return check;
                         }
+                        console.log("eeeeeeeeeeee", e);
+
+                        let money = 0
+                        if (e.e?.tax?.tax_rate == undefined) {
+                            money = Number(1) * (1 + Number(0) / 100) * Number(e?.e?.quantity);
+                        } else {
+                            money = Number(e?.e?.affterDiscount) * (1 + Number(e?.e?.tax?.tax_rate) / 100) * Number(e?.e?.quantity);
+                        }
+
                         return {
                             id: uuidv4(),
                             item: {
@@ -497,12 +506,12 @@ const SalesOrderForm = (props) => {
                             unit: e?.e?.unit_name,
                             quantity: 1,
                             sortIndex: index,
-                            price: 1,
+                            price: e?.e?.price_sell,
                             discount: 0,
                             price_after_discount: 1,
                             tax: 0,
                             price_after_tax: 1,
-                            total_amount: 1,
+                            total_amount: Number(money.toFixed(2)),
                             note: "",
                             delivery_date: null,
                         };
@@ -510,6 +519,7 @@ const SalesOrderForm = (props) => {
                     setOption([...newData]);
                 }
                 if (typeOrder === "1" && quote !== null) {
+
                     const newData = value
                         ?.map((e, index) => {
                             return {
@@ -522,16 +532,16 @@ const SalesOrderForm = (props) => {
                                 unit: e?.e?.unit_name,
                                 quantity: e?.e?.quantity,
                                 sortIndex: index,
-                                price: e?.e?.price,
+                                price: e?.e?.price_sell,
                                 discount: e?.e?.discount_percent,
-                                price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
+                                price_after_discount: +e?.e?.price_sell * (1 - +e?.e?.discount_percent / 100),
                                 tax: {
                                     label: e?.e?.tax_name,
                                     value: e?.e?.tax_id,
                                     tax_rate: e?.e?.tax_rate,
                                 },
-                                price_after_tax: +e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
-                                total_amount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
+                                price_after_tax: +e?.e?.price_sell * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
+                                total_amount: +e?.e?.price_sell * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
                                 note: e?.e?.note_item,
                                 delivery_date: null,
                             };
@@ -549,18 +559,25 @@ const SalesOrderForm = (props) => {
     const handleAddParent = (value) => {
         const checkData = option?.some((e) => e?.item?.value === value?.value);
         if (!checkData) {
+
+            let money = 0
+            if (value.e?.tax?.tax_rate == undefined) {
+                money = Number(1) * (1 + Number(0) / 100) * Number(value?.e?.quantity);
+            } else {
+                money = Number(value?.e?.affterDiscount) * (1 + Number(value?.e?.tax?.tax_rate) / 100) * Number(value?.e?.quantity);
+            }
             if (typeOrder === "0") {
                 const newData = {
                     id: uuidv4(),
                     item: value,
                     unit: value?.e?.unit_name,
                     quantity: 1,
-                    price: 1,
+                    price: value?.e?.price_sell,
                     discount: totalDiscount ? totalDiscount : 0,
                     price_after_discount: 1,
                     tax: null,
                     price_after_tax: 1,
-                    total_amount: 1,
+                    total_amount: Number(money.toFixed(2)),
                     note: "",
                     delivery_date: null,
                 };
@@ -576,21 +593,21 @@ const SalesOrderForm = (props) => {
                     },
                     unit: value?.e?.unit_name,
                     quantity: value?.e?.quantity,
-                    price: value?.e?.price,
+                    price: value?.e?.price_sell,
                     discount: value?.e?.discount_percent,
-                    price_after_discount: +value?.e?.price * (1 - +value?.e?.discount_percent / 100),
+                    price_after_discount: +value?.e?.price_sell * (1 - +value?.e?.discount_percent / 100),
                     tax: {
                         label: value?.e?.tax_name,
                         value: value?.e?.tax_id,
                         tax_rate: value?.e?.tax_rate,
                     },
                     price_after_tax:
-                        +value?.e?.price *
+                        +value?.e?.price_sell *
                         value?.e?.quantity *
                         (1 - +value?.e?.discount_percent / 100) *
                         (1 + value?.e?.tax_rate / 100),
                     total_amount:
-                        +value?.e?.price *
+                        +value?.e?.price_sell *
                         (1 - +value?.e?.discount_percent / 100) *
                         (1 + +value?.e?.tax_rate / 100) *
                         +value?.e?.quantity,

@@ -613,11 +613,13 @@ const PriceQuote = (props) => {
                                                                     )) ||
                                                                     (e?.status === "ordered" && (
                                                                         <div
-                                                                            className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-6 relative text-white border border-orange-400 bg-orange-500 hover:bg-orange-600  transition-all duration-300 ease-in-out rounded-md bg-orange-500 hover:bg-orange-600 text-left 3xl:px-3 3xl:py-5 3xl:pr-5 2xl:px-1 2xl:py-4 2xl:pr-5 xl:px-1 xl:py-3.5 xl:pr-4 lg:px-1 lg:py-2 lg:pr-3 font-normal flex justify-center items-center"
+                                                                            className={`cursor-pointer 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 
+                                                                            3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px]  lg:h-5 border-orange-400 text-white bg-orange-500 hover:bg-orange-600
+                                                                            transition-all relative duration-300 ease-in-out  hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1`}
                                                                             onClick={() => handleToggleOrdered(e?.id)}
                                                                         >
-                                                                            Đã Tạo Đơn Đặt Hàng
-                                                                            <TickCircle className=" absolute 3xl:top-[30%] 3lx:-right-[-5%] 2xl:top-[25%] 2lx:-right-[-5%] xl:top-[25%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4 xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 text-white border-orange-400" />
+                                                                            Đã tạo đơn
+                                                                            <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
                                                                         </div>
                                                                     ))}
                                                             </h6>

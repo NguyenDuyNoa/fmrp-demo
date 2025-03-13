@@ -41,7 +41,7 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel,
             {isLoadingRight ? (
                 <Loading className="h-80" color="#0f4f9e" />
             ) : (
-                <Customscrollbar className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[36vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto">
+                <Customscrollbar className="3xl:h-[52vh] xxl:h-[40vh] 2xl:h-[43vh] xl:h-[40vh] lg:h-[38vh] h-[38vh] overflow-y-auto">
                     {isState?.listDataRight?.dataPPItems?.length > 0 ? (
                         isState?.listDataRight?.dataPPItems?.map((e) => (
                             <div key={e.id} className="grid items-center h-auto grid-cols-12">
@@ -154,7 +154,7 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel,
 
                                         {
                                             !typePageMoblie && (
-                                                <div className={`col-span-4`}>
+                                                <div className={`col-span-5`}>
                                                     <TimelineChartStage data={i?.processBar} dataLang={dataLang} typePageMoblie={typePageMoblie} />
 
                                                     {/* {i.processBar.map((j, JIndex) => {

@@ -1,5 +1,6 @@
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import moment from "moment";
 export const useActiveStages = () => {
     const convertData = (data) => {
         return {
@@ -11,10 +12,16 @@ export const useActiveStages = () => {
                         ...e,
                         quantityError: 0,
                         quantityEnterClient: e?.quantity_enter,
-                        serial: [],
+                        serial: [...Array(e?.quantity_enter)].map((_, index) => {
+                            const serialNumber = (e?.max_serial_number + index + 1).toString().padStart(2, '0'); // 🔹 Format thành "01", "02", ...
+                            return {
+                                value: `${e?.ref}-${serialNumber}`,
+                                isDuplicate: false,
+                            }
+                        }),
                         serialError: [],
-                        lot: null,
-                        date: null
+                        lot: e?.lot,
+                        date: e?.date_use ? moment(e?.date_use).toDate() : null
                     }
                 }),
 

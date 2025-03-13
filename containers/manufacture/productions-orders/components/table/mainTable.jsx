@@ -17,7 +17,7 @@ import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-qu
 import { SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
 import dynamic from "next/dynamic";
-import React, { useContext, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import { v4 as uddid } from "uuid";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
 import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
@@ -443,6 +443,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
             },
         });
     };
+    console.log("searchsearchsearchsearch", isState.search);
 
     const onChangeSearch = debounce((e) => {
         queryState({ search: e.target.value, page: 1, openModal: false });
@@ -479,7 +480,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
         typePageMoblie
     };
 
-    const SearchProduction = () => {
+    const SearchProduction = memo(() => {
         return (
             <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
                 <form className="relative flex items-center w-full">
@@ -491,12 +492,13 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         onChange={(e) => onChangeSearch(e)}
                         className={`relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
                         type="text"
+                        // value={isState.search}
                         placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
                     />
                 </form>
             </div>
         )
-    }
+    })
 
     if (!isMouted) {
         return null;
@@ -510,12 +512,44 @@ const MainTable = ({ dataLang, typeScreen }) => {
                     {dataLang?.productions_orders_total || "productions_orders_total"}: {isState?.countAll}
                 </h1>
                 {
-                    typePageMoblie && <SearchProduction />
+                    typePageMoblie && (
+                        <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
+                            <form className="relative flex items-center w-full">
+                                <SearchNormal1
+                                    size={20}
+                                    className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                                />
+                                <input
+                                    onChange={(e) => onChangeSearch(e)}
+                                    className={`relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                                    type="text"
+                                    // value={isState.search}
+                                    placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
+                                />
+                            </form>
+                        </div>
+                    )
                 }
                 <div className="flex ">
                     <div className="w-[22%] border-r-0 border-[#d8dae5] border">
                         {
-                            !typePageMoblie && <SearchProduction />
+                            !typePageMoblie && (
+                                <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
+                                    <form className="relative flex items-center w-full">
+                                        <SearchNormal1
+                                            size={20}
+                                            className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                                        />
+                                        <input
+                                            onChange={(e) => onChangeSearch(e)}
+                                            className={`relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                                            type="text"
+                                            // value={isState.search}
+                                            placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
+                                        />
+                                    </form>
+                                </div>
+                            )
                         }
                         <Customscrollbar className={`${typePageMoblie ? "h-[85vh]" : "3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh]"}  overflow-y-auto`}>
                             {(isLoading || isRefetching)

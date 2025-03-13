@@ -154,227 +154,255 @@ const TimelineChartStage = ({ data, dataLang, typePageMoblie }) => {
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     const getColor = (item) => {
-        if (item?.active) return "#008000"; // Xanh khi active
-        if (item?.begin_production == "1") return "#FF8F0D"; // Cam khi bắt đầu sản xuất
-        return "gray"; // Xám mặc định
+        if (item?.active) return "#008000";
+        if (item?.begin_production == "1") return "#FF8F0D";
+        return "gray";
     };
 
     const svgRef = useRef();
     const containerRef = useRef();
 
-    const [width, setWidth] = useState(0);
-
-    const [height, setHeight] = useState(0); // Chiều cao tự động
+    const [svgWidth, setSvgWidth] = useState(0);
+    const [svgHeight, setSvgHeight] = useState(150); // Giữ chiều cao đủ để căn giữa
 
     useEffect(() => {
         if (!data || data.length === 0) return;
 
         const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 0;
-        setWidth(containerWidth);
-
         const svg = d3.select(svgRef.current);
-        svg.selectAll("*").remove(); // Xóa nội dung cũ nếu có
+        svg.selectAll("*").remove();
 
-        // const dynamicHeight = Math.max(data.length * (20) - 30, 50);
-        const additionalHeight = data.length * 25; // Mỗi mục cách nhau 25px
-        const dynamicHeight = additionalHeight; // Loại bỏ baseHeight, chỉ dựa vào số lượng dữ liệu
-        setHeight(dynamicHeight); // Cập nhật chiều cao động
+        const margin = { left: 50, right: 50 }; // 🌟 Thêm khoảng cách 2 bên
+        const minSpacing = 80;
+        const maxSpacing = 150;
+        const titleLengths = data.map(d => d.title.length);
+        const dynamicSpacing = titleLengths.map(len => Math.min(maxSpacing, minSpacing + len * 3));
 
-        const circleRadius = 4;
-        const margin = { left: 20, right: 20 };
+        const xPositions = dynamicSpacing.reduce((acc, space, index) => {
+            if (index === 0) acc.push(margin.left);
+            else acc.push(acc[index - 1] + space);
+            return acc;
+        }, []);
 
-        if (containerWidth === 0) return;
+        const totalWidth = xPositions[xPositions.length - 1] + margin.right;
+        setSvgWidth(Math.max(totalWidth, containerWidth));
 
-        // Tạo thang đo X
-        const xScale = d3.scalePoint()
+        const xScale = d3.scaleOrdinal()
             .domain(data.map(d => d.title))
-            .range([margin.left, containerWidth - margin.right])
-            .padding(0.5);
+            .range(xPositions);
 
-        // Vẽ các đường nối
-        svg.selectAll(".timeline-line")
+        // 🌟 Dịch toàn bộ biểu đồ xuống giữa
+        const chartGroup = svg.append("g").attr("transform", `translate(0, ${svgHeight / 2})`);
+
+        chartGroup.selectAll(".timeline-line")
             .data(data.slice(0, -1))
             .enter()
             .append("line")
-            .attr("x1", d => xScale(d.title) + circleRadius)
-            .attr("y1", dynamicHeight / 2)
-            .attr("x2", (d, i) => xScale(data[i + 1].title) - circleRadius)
-            .attr("y2", dynamicHeight / 2)
+            .attr("x1", (d, i) => xScale(d.title) + 4)
+            .attr("y1", 0)
+            .attr("x2", (d, i) => xScale(data[i + 1].title) - 4)
+            .attr("y2", 0)
             .attr("stroke", d => getColor(d))
             .attr("stroke-width", 1.5);
 
-        // Vẽ các điểm tròn
-        svg.selectAll(".circle")
+        chartGroup.selectAll(".circle")
             .data(data)
             .enter()
             .append("circle")
             .attr("cx", d => xScale(d.title))
-            .attr("cy", dynamicHeight / 2)
-            .attr("r", circleRadius)
+            .attr("cy", 0)
+            .attr("r", 5)
             .attr("fill", d => getColor(d));
 
-        // Thêm ngày
-        svg.selectAll(".date-label")
-            .data(data)
-            .enter()
-            .append("text")
-            .attr("x", d => xScale(d.title))
-            .attr("y", dynamicHeight / 2 - (typePageMoblie ? 10 : 15))
-            .attr("text-anchor", "middle")
-            .style("font-weight", "600")
-            .attr("fill", d => getColor(d))
-            .attr("font-size", typePageMoblie ? "7px" : "10px")
-            .text(d => d?.date ? formatMoment(d?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "");
+        // chartGroup.selectAll(".date-label")
+        //     .data(data)
+        //     .enter()
+        //     .append("text")
+        //     .attr("x", d => xScale(d.title))
+        //     .attr("y", -20)
+        //     .attr("text-anchor", "middle")
+        //     .style("font-weight", "600")
+        //     .attr("fill", d => getColor(d))
+        //     .attr("font-size", typePageMoblie ? "7px" : "10px") // ✅ Giữ đúng font-size của bạn
+        //     .text(d => d?.date ? formatMoment(d?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "");
 
-        // Thêm tên
-        svg.selectAll(".title-label")
+        chartGroup.selectAll(".title-label")
             .data(data)
             .enter()
             .append("text")
             .attr("x", d => xScale(d.title))
-            .attr("y", dynamicHeight / 2 + (typePageMoblie ? 15 : 20))
+            .attr("y", 25)
             .attr("text-anchor", "middle")
             .style("font-weight", "600")
             .attr("fill", d => getColor(d))
-            .attr("font-size", typePageMoblie ? "7px" : "11px")
+            .attr("font-size", typePageMoblie ? "7px" : "11px") // ✅ Giữ đúng font-size
             .text(d => d.title);
 
-        // Thêm số lượng
-        svg.selectAll(".quantity-label")
+        chartGroup.selectAll(".quantity-label")
             .data(data)
             .enter()
             .append("text")
             .attr("x", d => xScale(d.title))
-            .attr("y", dynamicHeight / 2 + (typePageMoblie ? 23 : 35))
+            .attr("y", 45)
             .attr("text-anchor", "middle")
             .style("font-weight", "600")
             .attr("fill", d => getColor(d))
-            .attr("font-size", typePageMoblie ? "7px" : "10px")
+            .attr("font-size", typePageMoblie ? "7px" : "10px") // ✅ Giữ đúng font-size
             .text(d => d.dtPurchaseProduct?.quantity > 0 ? `SL: ${formatNumber(d.dtPurchaseProduct?.quantity)}` : "");
 
-        // Thêm số lỗi
-        svg.selectAll(".salary-label")
+        chartGroup.selectAll(".salary-label")
             .data(data)
             .enter()
             .append("text")
             .attr("x", d => xScale(d.title))
-            .attr("y", dynamicHeight / 2 + (typePageMoblie ? 45 : 50))
+            .attr("y", 65)
             .attr("text-anchor", "middle")
             .style("font-weight", "600")
             .attr("fill", '#ff0000')
-            .attr("font-size", typePageMoblie ? "7px" : "10px")
+            .attr("font-size", typePageMoblie ? "7px" : "10px") // ✅ Giữ đúng font-size
             .text(d => d.dtPurchaseProduct?.quantity_error > 0 ? `SL lỗi: ${formatNumber(d.dtPurchaseProduct?.quantity_error)}` : ``);
-    }, [data, width, dataLang]);
-
-    // useEffect(() => {
-    //     if (!data || data.length === 0) return;
-
-    //     const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 0;
-    //     setWidth(containerWidth);
-
-    //     const svg = d3.select(svgRef.current);
-    //     svg.selectAll("*").remove(); // Xóa nội dung cũ nếu có
-
-    //     const baseHeight = 90; // Chiều cao tối thiểu
-    //     const additionalHeight = data.length * 25; // Mỗi mục cách nhau 25px
-    //     const dynamicHeight = Math.max(baseHeight, additionalHeight);
-    //     setHeight(dynamicHeight); // Cập nhật chiều cao động
-
-    //     const circleRadius = 4;
-    //     const margin = { left: 20, right: 20 };
-
-    //     if (containerWidth === 0) return;
-
-    //     // Tạo thang đo X
-    //     const xScale = d3.scalePoint()
-    //         .domain(data.map(d => d.title))
-    //         .range([margin.left, containerWidth - margin.right])
-    //         .padding(0.5);
-
-    //     // Vẽ các đường nối
-    //     svg.selectAll(".timeline-line")
-    //         .data(data.slice(0, -1))
-    //         .enter()
-    //         .append("line")
-    //         .attr("x1", d => xScale(d.title) + circleRadius)
-    //         .attr("y1", dynamicHeight / 2)
-    //         .attr("x2", (d, i) => xScale(data[i + 1].title) - circleRadius)
-    //         .attr("y2", dynamicHeight / 2)
-    //         .attr("stroke", d => getColor(d))
-    //         .attr("stroke-width", 1.5);
-
-    //     // Vẽ các điểm tròn
-    //     svg.selectAll(".circle")
-    //         .data(data)
-    //         .enter()
-    //         .append("circle")
-    //         .attr("cx", d => xScale(d.title))
-    //         .attr("cy", dynamicHeight / 2)
-    //         .attr("r", circleRadius)
-    //         .attr("fill", d => getColor(d));
-
-    //     // Thêm ngày
-    //     svg.selectAll(".date-label")
-    //         .data(data)
-    //         .enter()
-    //         .append("text")
-    //         .attr("x", d => xScale(d.title))
-    //         .attr("y", dynamicHeight / 2 - 15)
-    //         .attr("text-anchor", "middle")
-    //         .style("font-weight", "600")
-    //         .attr("fill", d => getColor(d))
-    //         .attr("font-size", "10px")
-    //         .text(d => d?.date ? formatMoment(d?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "");
-
-    //     // Thêm tên
-    //     svg.selectAll(".title-label")
-    //         .data(data)
-    //         .enter()
-    //         .append("text")
-    //         .attr("x", d => xScale(d.title))
-    //         .attr("y", dynamicHeight / 2 + 20)
-    //         .attr("text-anchor", "middle")
-    //         .style("font-weight", "600")
-    //         .attr("fill", d => getColor(d))
-    //         .attr("font-size", "11px")
-    //         .text(d => d.title);
-
-    //     // Thêm số lượng
-    //     svg.selectAll(".quantity-label")
-    //         .data(data)
-    //         .enter()
-    //         .append("text")
-    //         .attr("x", d => xScale(d.title))
-    //         .attr("y", dynamicHeight / 2 + 35)
-    //         .attr("text-anchor", "middle")
-    //         .style("font-weight", "600")
-    //         .attr("fill", d => getColor(d))
-    //         .attr("font-size", "10px")
-    //         .text(d => d.dtPurchaseProduct?.quantity > 0 ? `SL: ${formatNumber(d.dtPurchaseProduct?.quantity)}` : "");
-
-    //     // Thêm số lỗi
-    //     svg.selectAll(".salary-label")
-    //         .data(data)
-    //         .enter()
-    //         .append("text")
-    //         .attr("x", d => xScale(d.title))
-    //         .attr("y", dynamicHeight / 2 + 50)
-    //         .attr("text-anchor", "middle")
-    //         .style("font-weight", "600")
-    //         .attr("fill", '#ff0000')
-    //         .attr("font-size", "10px")
-    //         .text(d => d.dtPurchaseProduct?.quantity_error > 0 ? `SL lỗi: ${formatNumber(d.dtPurchaseProduct?.quantity_error)}` : '');
-
-    // }, [data, width, dataLang]);
+    }, [data, dataLang]);
 
     return (
-        <div ref={containerRef} className="w-full">
-            <svg ref={svgRef} width="100%" height={typePageMoblie ? (height) : height}></svg>
+        <div ref={containerRef} className="w-full overflow-x-auto">
+            <svg ref={svgRef} width={svgWidth} height={svgHeight}></svg>
         </div>
     );
 };
 
 export default TimelineChartStage;
+
+// import { useEffect, useRef, useState } from "react";
+// import * as d3 from "d3";
+// import { formatMoment } from "@/utils/helpers/formatMoment";
+// import formatNumberConfig from "@/utils/helpers/formatnumber";
+// import useSetingServer from "@/hooks/useConfigNumber";
+// import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+
+// const TimelineChartStage = ({ data, dataLang, typePageMoblie }) => {
+//     const dataSeting = useSetingServer();
+//     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
+//     const getColor = (item) => {
+//         if (item?.active) return "#008000"; // Xanh khi active
+//         if (item?.begin_production == "1") return "#FF8F0D"; // Cam khi bắt đầu sản xuất
+//         return "gray"; // Xám mặc định
+//     };
+
+//     const svgRef = useRef();
+//     const containerRef = useRef();
+
+//     const [width, setWidth] = useState(0);
+
+//     const [height, setHeight] = useState(0); // Chiều cao tự động
+
+//     useEffect(() => {
+//         if (!data || data.length === 0) return;
+
+//         const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 0;
+//         setWidth(containerWidth);
+
+//         const svg = d3.select(svgRef.current);
+//         svg.selectAll("*").remove(); // Xóa nội dung cũ nếu có
+
+//         // const dynamicHeight = Math.max(data.length * (20) - 30, 50);
+//         const additionalHeight = data.length * 25; // Mỗi mục cách nhau 25px
+//         const dynamicHeight = additionalHeight; // Loại bỏ baseHeight, chỉ dựa vào số lượng dữ liệu
+//         setHeight(dynamicHeight); // Cập nhật chiều cao động
+
+//         const circleRadius = 4;
+//         const margin = { left: 20, right: 20 };
+
+//         if (containerWidth === 0) return;
+
+//         // Tạo thang đo X
+//         const xScale = d3.scalePoint()
+//             .domain(data.map(d => d.title))
+//             .range([margin.left, containerWidth - margin.right])
+//             .padding(0.5);
+
+//         // Vẽ các đường nối
+//         svg.selectAll(".timeline-line")
+//             .data(data.slice(0, -1))
+//             .enter()
+//             .append("line")
+//             .attr("x1", d => xScale(d.title) + circleRadius)
+//             .attr("y1", dynamicHeight / 2)
+//             .attr("x2", (d, i) => xScale(data[i + 1].title) - circleRadius)
+//             .attr("y2", dynamicHeight / 2)
+//             .attr("stroke", d => getColor(d))
+//             .attr("stroke-width", 1.5);
+
+//         // Vẽ các điểm tròn
+//         svg.selectAll(".circle")
+//             .data(data)
+//             .enter()
+//             .append("circle")
+//             .attr("cx", d => xScale(d.title))
+//             .attr("cy", dynamicHeight / 2)
+//             .attr("r", circleRadius)
+//             .attr("fill", d => getColor(d));
+
+//         // Thêm ngày
+//         svg.selectAll(".date-label")
+//             .data(data)
+//             .enter()
+//             .append("text")
+//             .attr("x", d => xScale(d.title))
+//             .attr("y", dynamicHeight / 2 - (typePageMoblie ? 10 : 15))
+//             .attr("text-anchor", "middle")
+//             .style("font-weight", "600")
+//             .attr("fill", d => getColor(d))
+//             .attr("font-size", typePageMoblie ? "7px" : "10px")
+//             .text(d => d?.date ? formatMoment(d?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "");
+
+//         // Thêm tên
+//         svg.selectAll(".title-label")
+//             .data(data)
+//             .enter()
+//             .append("text")
+//             .attr("x", d => xScale(d.title))
+//             .attr("y", dynamicHeight / 2 + (typePageMoblie ? 15 : 20))
+//             .attr("text-anchor", "middle")
+//             .style("font-weight", "600")
+//             .attr("fill", d => getColor(d))
+//             .attr("font-size", typePageMoblie ? "7px" : "11px")
+//             .text(d => d.title);
+
+//         // Thêm số lượng
+//         svg.selectAll(".quantity-label")
+//             .data(data)
+//             .enter()
+//             .append("text")
+//             .attr("x", d => xScale(d.title))
+//             .attr("y", dynamicHeight / 2 + (typePageMoblie ? 23 : 35))
+//             .attr("text-anchor", "middle")
+//             .style("font-weight", "600")
+//             .attr("fill", d => getColor(d))
+//             .attr("font-size", typePageMoblie ? "7px" : "10px")
+//             .text(d => d.dtPurchaseProduct?.quantity > 0 ? `SL: ${formatNumber(d.dtPurchaseProduct?.quantity)}` : "");
+
+//         // Thêm số lỗi
+//         svg.selectAll(".salary-label")
+//             .data(data)
+//             .enter()
+//             .append("text")
+//             .attr("x", d => xScale(d.title))
+//             .attr("y", dynamicHeight / 2 + (typePageMoblie ? 45 : 50))
+//             .attr("text-anchor", "middle")
+//             .style("font-weight", "600")
+//             .attr("fill", '#ff0000')
+//             .attr("font-size", typePageMoblie ? "7px" : "10px")
+//             .text(d => d.dtPurchaseProduct?.quantity_error > 0 ? `SL lỗi: ${formatNumber(d.dtPurchaseProduct?.quantity_error)}` : ``);
+//     }, [data, width, dataLang]);
+//     return (
+//         <div ref={containerRef} className="w-full">
+//             <svg ref={svgRef} width="100%" height={typePageMoblie ? (height) : height}></svg>
+//         </div>
+//     );
+// };
+
+// export default TimelineChartStage;
 
 
 // import { useEffect, useRef, useState } from "react";

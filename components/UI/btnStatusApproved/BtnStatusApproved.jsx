@@ -1,8 +1,8 @@
 import { TickCircle } from "iconsax-react"
 
 const BtnStatusApproved = ({ onClick, title, type, className }) => {
-    const STATUS_APPROVED = "Đã Duyệt"
-    const STATUS_UNAPPROVED = "Chưa Duyệt"
+    const STATUS_APPROVED = "Đã duyệt"
+    const STATUS_UNAPPROVED = "Chưa duyệt"
     return <div
         className={`${className} cursor-pointer 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 
         3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] 
@@ -10,7 +10,7 @@ const BtnStatusApproved = ({ onClick, title, type, className }) => {
         ${type == "0" && "border-red-500 text-red-500 hover:bg-red-500"}
         ${type == "1" && "border-[#00aa59] text-[#00aa59] hover:bg-[#00aa59]"}
         ${type == "2" && "border-sky-500 text-sky-500 hover:bg-sky-500"}
-        ${type == "3" && " border-orange-400 text-white bg-orange-500 hover:bg-orange-600 !h-10"}
+        ${type == "3" && " border-orange-400 text-white bg-orange-500 hover:bg-orange-600 "}
         transition-all duration-300 ease-in-out  hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1`}
         onClick={onClick}
     >
@@ -22,9 +22,9 @@ const BtnStatusApproved = ({ onClick, title, type, className }) => {
 }
 
 const BtnStatusApprovedCustom = ({ onClick, title, type, className }) => {
-    const STATUS_APPROVED = "Đã Duyệt"
-    const STATUS_UNAPPROVED = "Chưa Duyệt"
-    const STATUS_UNAPPROVED_CUSTOM = "Không Duyệt"
+    const STATUS_APPROVED = "Đã duyệt"
+    const STATUS_UNAPPROVED = "Chưa duyệt"
+    const STATUS_UNAPPROVED_CUSTOM = "Không duyệt"
 
     const stringMap = {
         0: STATUS_UNAPPROVED,
@@ -39,7 +39,7 @@ const BtnStatusApprovedCustom = ({ onClick, title, type, className }) => {
         ${type == "0" && "border-red-500 text-red-500 hover:bg-red-500"}
         ${type == "1" && "border-[#00aa59] text-[#00aa59] hover:bg-[#00aa59]"}
         ${type == "2" && "border-sky-500 text-sky-500 hover:bg-sky-500"}
-        ${type == "3" && " border-orange-400 text-white bg-orange-500 hover:bg-orange-600 !h-10"}
+        ${type == "3" && " border-orange-400 text-white bg-orange-500 hover:bg-orange-600"}
         transition-all duration-300 ease-in-out  hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1`}
         onClick={onClick}
     >

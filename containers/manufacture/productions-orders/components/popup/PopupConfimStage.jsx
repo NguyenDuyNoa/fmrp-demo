@@ -79,6 +79,9 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
         const r = await onGetData(payload)
 
+        console.log("r", r);
+
+
         queryState({ dataTableProducts: r, arrayMoveBom: [] });
 
         onGetBom({
@@ -168,18 +171,103 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         return { ...item, [type]: newQuantity, [serialType]: updatedSerials };
     };
 
+    const updateSerialsGeneric = (item, value, type) => {
+        let existingSerials = [...(item[type] || [])]; // Giữ serial cũ
+        const quantity = value?.floatValue ?? value;
+
+        // Lấy số lớn nhất từ cả hai danh sách serial và serialError
+        const getMaxSerial = (list) => list.length > 0
+            ? Math.max(...list.map(s => parseInt(s.value.split('-').pop(), 10)).filter(n => !isNaN(n)))
+            : 0;
+
+        const maxSerialFromSerial = getMaxSerial(item.serial || []);
+        const maxSerialFromError = getMaxSerial(item.serialError || []);
+        const globalMaxSerial = Math.max(maxSerialFromSerial, maxSerialFromError, item?.max_serial_number ?? 0);
+
+        if (quantity > existingSerials.length) {
+            const startSerial = globalMaxSerial + 1; // Bắt đầu từ số lớn nhất tìm được
+
+            const additionalSerials = [...Array(quantity - existingSerials.length)].map((_, i) => ({
+                value: `${item?.ref}-${(startSerial + i).toString().padStart(2, '0')}`,
+                isDuplicate: false
+            }));
+
+            existingSerials = [...existingSerials, ...additionalSerials]; // Giữ nguyên serial cũ + thêm mới
+        }
+        // Nếu số lượng giảm, chỉ cắt bớt serial mới, giữ nguyên serial cũ
+        else if (quantity < existingSerials.length) {
+            existingSerials = existingSerials.slice(0, quantity).map(s => ({ ...s, isDuplicate: false }));
+        }
+
+        // Kiểm tra và cập nhật trạng thái trùng lặp
+        const valuesList = existingSerials.map(s => s?.value).filter(Boolean);
+        existingSerials = existingSerials.map(s => ({
+            ...s,
+            isDuplicate: valuesList.indexOf(s?.value) !== valuesList.lastIndexOf(s?.value)
+        }));
+
+        return {
+            ...item,
+            [type === 'serialError' ? 'quantityError' : 'quantityEnterClient']: quantity,
+            [type]: existingSerials
+        };
+    };
+
+
+    // const updateSerialsGeneric = (item, value, type) => {
+
+    //     let existingSerials = [...(item[type] || [])]; // Giữ serial cũ
+
+    //     const quantity = value?.floatValue ?? value;
+
+    //     if (quantity > existingSerials.length) {
+    //         //  Xác định số bắt đầu: `quantityEnterClient` dùng serial cuối, `quantityError` bắt đầu từ 1
+    //         const startSerial = existingSerials.length > 0
+    //             ? parseInt(existingSerials[existingSerials.length - 1].value.split('-').pop(), 10) + 1
+    //             : (type === 'serial' ? item?.max_serial_number + 1 : 1);
+
+    //         const additionalSerials = [...Array(quantity - existingSerials.length)].map((_, i) => ({
+    //             value: `${item?.ref}-${(startSerial + i).toString().padStart(2, '0')}`,
+    //             isDuplicate: false
+    //         }));
+
+    //         existingSerials = [...existingSerials, ...additionalSerials]; // Giữ nguyên serial cũ + thêm mới
+    //     }
+    //     //  Nếu số lượng giảm, chỉ cắt bớt serial mới, giữ nguyên serial cũ
+    //     else if (quantity < existingSerials.length) {
+    //         // existingSerials = existingSerials.slice(0, quantity);
+    //         existingSerials = existingSerials.slice(0, quantity).map(s => ({ ...s, isDuplicate: false }));
+
+    //     }
+    //     const valuesList = existingSerials.map(s => s?.value).filter(Boolean);
+    //     existingSerials = existingSerials.map(s => ({
+    //         ...s,
+    //         isDuplicate: valuesList.indexOf(s?.value) !== valuesList.lastIndexOf(s?.value)
+    //     }));
+    //     return {
+    //         ...item,
+    //         [type === 'serialError' ? 'quantityError' : 'quantityEnterClient']: quantity,
+    //         [type]: existingSerials
+    //     };
+    // };
+
 
     const handleChange = ({ table, type, value, row, index }) => {
 
         if (table == 'product') {
-            const checkType = ['quantityEnterClient', 'quantityError'].includes(type)
+            const quantityEnterClient = "quantityEnterClient"
+            const quantityError = "quantityError"
+            const checkType = [quantityEnterClient, quantityError].includes(type)
 
             const newData = isState.dataTableProducts?.data?.items?.map((item) => {
                 if (item?.poi_id === row?.poi_id) {
+                    if (checkType) {
+                        return updateSerialsGeneric(item, value, type == quantityEnterClient ? 'serial' : "serialError")
+                    }
+
                     if (type === 'serial' || type === 'serialError') {
                         let updatedArray = Array.isArray(item[type]) ? [...item[type]] : [];
 
-                        // Cập nhật giá trị mới trong mảng
                         updatedArray[index] = { value, isDuplicate: false };
 
                         // Kiểm tra trùng lặp trong cùng một hàng
@@ -196,9 +284,10 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
                         return { ...item, [type]: updatedArray };
                     }
-                    if (checkType) {
-                        return updateQuantityAndSerial(item, type, value, type === 'quantityEnterClient' ? 'serial' : 'serialError');
-                    }
+                    // if (checkType) {
+                    //     return updateQuantityAndSerial(item, type, value, type === 'quantityEnterClient' ? 'serial' : 'serialError');
+                    // }
+
                     return { ...item, [type]: checkType ? value?.floatValue : value }
                 }
                 return item
@@ -466,49 +555,20 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between">
                                 <div className="text-lg font-normal">Nhập thành phẩm</div>
-                                <SelectCore
-                                    options={data?.warehouses || []}
-                                    onChange={(e) => queryState({ objectWareHouse: e })}
-                                    value={isState.objectWareHouse}
-                                    isClearable={true}
-                                    closeMenuOnSelect={true}
-                                    hideSelectedOptions={false}
-                                    placeholder={'Kho thành phẩm'}
-                                    className={`${!isState.objectWareHouse ? 'border-red-500' : 'border-transparent'} placeholder:text-slate-300 w-1/3 z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                    isSearchable={true}
-                                    style={{
-                                        border: "none",
-                                        boxShadow: "none",
-                                        outline: "none",
-                                    }}
-                                    theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: "#EBF5FF",
-                                            primary50: "#92BFF7",
-                                            primary: "#0F4F9E",
-                                        },
-                                    })}
-                                    styles={{
-                                        placeholder: (base) => ({
-                                            ...base,
-                                            color: "#cbd5e1",
-                                        }),
-                                        menu: (provided) => ({
-                                            ...provided,
-                                            // zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                        }),
-                                        // control: (base, state) => ({
-                                        //     ...base,
-                                        //     boxShadow: "none",
-                                        //     padding: "2.7px",
-                                        //     ...(state.isFocused && {
-                                        //         // border: "0 0 0 1px #92BFF7",
-                                        //     }),
-                                        // }),
-                                    }}
-                                />
+                                <div className="w-1/3">
+                                    <SelectComponent
+                                        options={data?.warehouses || []}
+                                        onChange={(e) => queryState({ objectWareHouse: e })}
+                                        value={isState.objectWareHouse}
+                                        isClearable={true}
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={'Kho thành phẩm'}
+                                        className={`${!isState.objectWareHouse ? 'border-red-500' : 'border-transparent'} placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        type="form"
+                                    />
+                                </div>
                             </div>
                             <div className="">
                                 <Customscrollbar
@@ -621,7 +681,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                                                                             });
                                                                                         }}
                                                                                         className={`
-                                                                                            border text-center py-1 px-1 font-medium w-full focus:outline-none 
+                                                                                            border text-center py-1 px-1 font-medium w-full focus:outline-none  text-xs
                                                                                             ${row.serial?.[sIndex]?.isDuplicate ? "border-red-500" : "border-gray-200 border-b-2"}
                                                                                         `}
                                                                                     />
@@ -670,7 +730,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                                                                             });
                                                                                         }}
                                                                                         className={`
-                                                                                            border text-center py-1 px-1 font-medium w-full focus:outline-none 
+                                                                                            border text-center py-1 px-1 font-medium w-full focus:outline-none  text-xs
                                                                                             ${row.serialError?.[sIndex]?.isDuplicate ? "border-red-500" : "border-gray-200 border-b-2"}
                                                                                         `}
                                                                                     />
@@ -699,7 +759,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                                                                 row,
                                                                             });
                                                                         }}
-                                                                        className={`border text-center py-1 px-1 font-medium w-full focus:outline-none border-gray-200 border-b-2} `}
+                                                                        className={`border text-center text-xs py-1 px-1 font-medium w-full focus:outline-none border-gray-200 border-b-2} `}
                                                                     />
                                                                 </td>
                                                                 <td className="p-2 text-sm border w-[150px]">

@@ -366,7 +366,7 @@ export const BtnAction = React.memo((props) => {
                     :
                     <Popup
                         trigger={
-                            <button className={` flex space-x-1 items-center bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-sm xl:!text-xs text-[9px] ` + props.className}>
+                            <button className={` flex space-x-1 items-center bg-slate-100 2xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-sm xxl:!text-[11px] xl:text-[9px] text-[9px] ` + props.className}>
                                 <span>{props.dataLang?.btn_action || "btn_action"}</span>
                                 <ArrowDown2 size={12} />
                             </button>

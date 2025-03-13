@@ -115,7 +115,7 @@ const ProductionPlan = (props) => {
 
     const params = {
         page: router.query?.page || 1,
-        limit: 3,
+        limit: 15,
         sort: isSort,
         status: isValue?.planStatus?.map(e => e?.value),
         date_start: isValue.startDate ? formatMoment(isValue.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
