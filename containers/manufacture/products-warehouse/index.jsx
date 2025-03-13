@@ -51,6 +51,7 @@ import PopupDetail from "./components/pupup";
 import { useProductsWarehouseCombobox } from "./hooks/useProductsWarehouseCombobox";
 import { useProductsWarehouseFillterbar } from "./hooks/useProductsWarehouseFillterbar";
 import { useProductsWarehouseList } from "./hooks/useProductsWarehouseList";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 
 const initalState = {
     keySearch: "",
@@ -508,6 +509,7 @@ const ProductsWarehouse = (props) => {
                                                             {e?.reference_no_detail}
                                                         </RowItemTable>
                                                         <LinkWarehouse
+                                                            disbleClick={true}
                                                             colSpan={1}
                                                             warehouse_id={e?.warehouse_id}
                                                             warehouse_name={e?.warehouse_name}
@@ -527,7 +529,12 @@ const ProductsWarehouse = (props) => {
                                                             colSpan={1}
                                                             className={"flex items-center justify-start gap-2"}
                                                         >
-                                                            <div className="relative">
+                                                            <CustomAvatar
+                                                                data={e}
+                                                                fullName={e?.staff_create?.full_name}
+                                                                profileImage={e?.staff_create?.profile_image}
+                                                            />
+                                                            {/* <div className="relative">
                                                                 <ModalImage
                                                                     small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
                                                                     large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
@@ -550,7 +557,7 @@ const ProductsWarehouse = (props) => {
                                                                     </span>
                                                                 </span>
                                                             </div>
-                                                            <h6 className="capitalize">{e?.staff_create?.full_name}</h6>
+                                                            <h6 className="capitalize">{e?.staff_create?.full_name}</h6> */}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>
                                                             <ButtonWarehouse

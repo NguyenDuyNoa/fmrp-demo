@@ -44,6 +44,10 @@ const apiDeliveryReceipt = {
         const response = await axiosCustom('POST', `/api_web/api_delivery/GetShippingClient?csrf_protection=true`, data);
         return response.data
     },
+    async apiPostShippingClient(data) {
+        const response = await axiosCustom('POST', `/api_web/api_delivery/AddShippingClient?csrf_protection=true`, data);
+        return response.data
+    },
     async apiHangdingDeliveryReceipt(id, data) {
         const response = await axiosCustom('POST', id ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true` : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true", data);
         return response.data

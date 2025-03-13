@@ -52,6 +52,7 @@ import PopupDetailWarehouseTransfer from "./components/pupup";
 import { useWarehouseTransferCombobox } from "./hooks/useWarehouseTransferCombobox";
 import { useWarehouseTransferFilterbar } from "./hooks/useWarehouseTransferFilterbar";
 import { useWarehouseTransferList } from "./hooks/useWarehouseTransferList";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 
 const initialState = {
     onSending: false,
@@ -548,10 +549,12 @@ const WarehouseTransfer = (props) => {
 
                                                         <LinkWarehouse
                                                             colSpan={1}
+                                                            disbleClick={true}
                                                             warehouse_id={e?.warehouses_id}
                                                             warehouse_name={e?.warehouses_id_name}
                                                         />
                                                         <LinkWarehouse
+                                                            disbleClick={true}
                                                             colSpan={1}
                                                             warehouse_id={e?.warehouses_to}
                                                             warehouse_name={e?.warehouses_to_name}
@@ -579,7 +582,11 @@ const WarehouseTransfer = (props) => {
                                                             {e?.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className={"flex items-center gap-2"}>
-                                                            <div className="relative">
+                                                            <CustomAvatar
+                                                                fullName={e?.staff_create?.full_name}
+                                                                profileImage={e?.staff_create?.profile_image}
+                                                            />
+                                                            {/* <div className="relative">
                                                                 <ModalImage
                                                                     small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
                                                                     large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
@@ -602,7 +609,7 @@ const WarehouseTransfer = (props) => {
                                                                     </span>
                                                                 </span>
                                                             </div>
-                                                            <h6 className="capitalize">{e?.staff_create?.full_name}</h6>
+                                                            <h6 className="capitalize">{e?.staff_create?.full_name}</h6> */}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>
                                                             <ButtonWarehouse

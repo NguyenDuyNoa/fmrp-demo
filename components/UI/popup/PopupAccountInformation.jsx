@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import TagBranch from "../common/Tag/TagBranch";
 import useToast from "@/hooks/useToast";
 import Loading from "../loading/loading";
+import AvatarText from "../common/user/AvatarText";
 
 const PopupAccountInformation = (props) => {
     const { dataLang } = props
@@ -25,7 +26,8 @@ const PopupAccountInformation = (props) => {
 
     const { onSubmit, isLoading } = useUpdateAvatar()
 
-    const [image, setImage] = useState('/user-placeholder.jpg');
+    const [image, setImage] = useState("");
+    // const [image, setImage] = useState('/user-placeholder.jpg');
 
     const handleImageChange = async (event) => {
         const file = event.target.files[0];
@@ -76,15 +78,21 @@ const PopupAccountInformation = (props) => {
                         <>
                             <div className="flex items-center gap-4">
                                 <label className="relative cursor-pointer">
-                                    <div className="w-16 h-16 overflow-hidden border border-gray-300 rounded-full">
-                                        <Image
-                                            width={1280}
-                                            height={1024}
-                                            src={image}
-                                            alt="Profile"
-                                            className="object-cover w-full h-full"
-                                        />
-                                    </div>
+                                    {
+                                        image
+                                            ?
+                                            <div className="w-16 h-16 overflow-hidden border border-gray-300 rounded-full">
+                                                <Image
+                                                    width={1280}
+                                                    height={1024}
+                                                    src={image}
+                                                    alt="Profile"
+                                                    className="object-cover w-full h-full"
+                                                />
+                                            </div>
+                                            :
+                                            <AvatarText fullName={data?.data?.staff?.full_name} className={'!h-[64px] !w-[64px] !min-w-[64px] !min-h-[64px]'} />
+                                    }
                                     <label className="absolute bottom-0 right-0 p-1 bg-gray-200 border border-gray-300 rounded-full cursor-pointer">
                                         <Camera size={16} className="text-gray-600" />
                                         <input

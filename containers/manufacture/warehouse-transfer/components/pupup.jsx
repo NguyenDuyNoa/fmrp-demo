@@ -20,6 +20,7 @@ import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useWarehouseTransferDetail } from "../hooks/useWarehouseTransferDetail";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 
 const PopupDetailWarehouseTransfer = (props) => {
     const [open, sOpen] = useState(false);
@@ -75,22 +76,11 @@ const PopupDetailWarehouseTransfer = (props) => {
                                                 {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
-                                                <div className="relative">
-                                                    <ImageErrors
-                                                        src={data?.staff_create?.profile_image}
-                                                        width={25}
-                                                        height={25}
-                                                        defaultSrc="/user-placeholder.jpg"
-                                                        alt="Image"
-                                                        className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6 rounded-[100%] text-left cursor-pointer"
-                                                    />
-                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                        <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
-                                                            <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                                <h6 className="capitalize">{data?.staff_create?.full_name}</h6>
+                                                <CustomAvatar
+                                                    data={data}
+                                                    fullName={data?.staff_create?.full_name}
+                                                    profileImage={data?.staff_create?.profile_image}
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -114,6 +104,7 @@ const PopupDetailWarehouseTransfer = (props) => {
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 <LinkWarehouse
+                                                    disbleClick={true}
                                                     open={open}
                                                     warehouse_id={data?.warehouses_id}
                                                     warehouse_name={data?.warehouses_id_name}
@@ -143,6 +134,7 @@ const PopupDetailWarehouseTransfer = (props) => {
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 <LinkWarehouse
                                                     open={open}
+                                                    disbleClick={true}
                                                     warehouse_id={data?.warehouses_to}
                                                     color="text-green-600"
                                                     warehouse_name={data?.warehouses_to_name}

@@ -35,7 +35,7 @@ const PopupAddress = (props) => {
 
     const handingAddress = useMutation({
         mutationFn: (data) => {
-            return apiDeliveryReceipt.apiHandingWarehouse(data);
+            return apiDeliveryReceipt.apiPostShippingClient(data);
         }
     })
 
@@ -93,7 +93,7 @@ const PopupAddress = (props) => {
                     <div className="space-y-1">
                         <label className="text-[#344054] font-normal text-base">
                             {props.dataLang?.delivery_receipt_name_person_address || "delivery_receipt_name_person_address"}
-                            <span className="text-red-500 ml-1">*</span>
+                            <span className="ml-1 text-red-500">*</span>
                         </label>
                         <input
                             value={namePerson}
@@ -112,7 +112,7 @@ const PopupAddress = (props) => {
                     <div className="space-y-1">
                         <label className="text-[#344054] font-normal">
                             {props.dataLang?.delivery_receipt_address || "delivery_receipt_address"}
-                            <span className="text-red-500 ml-1">*</span>
+                            <span className="ml-1 text-red-500">*</span>
                         </label>
                         <input
                             value={address}
@@ -131,7 +131,7 @@ const PopupAddress = (props) => {
                     <div className="space-y-1">
                         <label className="text-[#344054] font-normal">
                             {props.dataLang?.delivery_receipt_phone || "delivery_receipt_phone"}
-                            <span className="text-red-500 ml-1">*</span>
+                            <span className="ml-1 text-red-500">*</span>
                         </label>
                         <PhoneInput
                             country={"vn"}
@@ -157,7 +157,7 @@ const PopupAddress = (props) => {
                             </label>
                         )}
                     </div>
-                    <div className="mt-5 space-x-2 flex flex-row justify-end">
+                    <div className="flex flex-row justify-end mt-5 space-x-2">
                         <button
                             type="button"
                             onClick={handleClosePopup}

@@ -18,6 +18,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useReturnSalesDetail } from "../hooks/useReturnSalesDetail";
 import PopupCustom from "/components/UI/popup";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 registerLocale("vi", vi);
 
 const PopupDetail = (props) => {
@@ -67,7 +68,7 @@ const PopupDetail = (props) => {
                                                 {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="grid grid-cols-2 font-medium">
-                                                <div className="flex items-center gap-2">
+                                                {/* <div className="flex items-center gap-2">
                                                     <div className="relative">
                                                         <ImageErrors
                                                             src={data?.staff_create?.profile_image}
@@ -84,7 +85,12 @@ const PopupDetail = (props) => {
                                                         </span>
                                                     </div>
                                                     <h6 className="capitalize">{data?.staff_create?.full_name}</h6>
-                                                </div>
+                                                </div> */}
+                                                <CustomAvatar
+                                                    data={data}
+                                                    fullName={data?.staff_create?.full_name}
+                                                    profileImage={data?.staff_create?.profile_image}
+                                                />
                                             </div>{" "}
                                         </div>
                                         <div className="grid grid-cols-2 my-2 font-medium">

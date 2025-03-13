@@ -49,6 +49,7 @@ import PopupDetail from "./components/popup";
 import { useProductionWarehouseCombobox } from "./hooks/useProductionWarehouseCombobox";
 import { useProductionWarehouseFillterbar } from "./hooks/useProductionWarehouseFillterbar";
 import { useProductionWarehouseList } from "./hooks/useProductionWarehouseList";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 
 const initialState = {
     onSending: false,
@@ -515,7 +516,11 @@ const ProductionWarehouse = (props) => {
                                                         colSpan={1}
                                                         className="flex items-center justify-start gap-2"
                                                     >
-                                                        <div className="relative">
+                                                        <CustomAvatar
+                                                            fullName={e?.staff_create?.full_name}
+                                                            profileImage={e?.staff_create?.profile_image}
+                                                        />
+                                                        {/* <div className="relative">
                                                             <ModalImage
                                                                 small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
                                                                 large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
@@ -538,7 +543,7 @@ const ProductionWarehouse = (props) => {
                                                                 </span>
                                                             </span>
                                                         </div>
-                                                        <h6 className="capitalize">{e?.staff_create?.full_name}</h6>
+                                                        <h6 className="capitalize">{e?.staff_create?.full_name}</h6> */}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1}>
                                                         <ButtonWarehouse

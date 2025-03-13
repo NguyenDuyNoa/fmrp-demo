@@ -16,6 +16,7 @@ import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useSalesOrderDetail } from "../hooks/useSalesOrderDetail";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 registerLocale("vi", vi);
 
 const PopupDetailProduct = (props) => {
@@ -151,6 +152,7 @@ const PopupDetailProduct = (props) => {
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-normal col-span-2">
                                         {data?.staff_name}
                                     </h3>
+
                                 </div>
 
                                 <div className="grid grid-cols-6 my-3 font-medium xl:my-4">

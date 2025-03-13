@@ -569,6 +569,7 @@ const ExportToOther = (props) => {
                                                             className=""
                                                         ></RowItemTable>
                                                         <LinkWarehouse
+                                                            disbleClick={true}
                                                             colSpan={1}
                                                             warehouse_id={e?.warehouse_id}
                                                             warehouse_name={e?.warehouse_name}

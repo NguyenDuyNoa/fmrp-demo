@@ -14,6 +14,7 @@ import { default as formatMoneyConfig, default as formatNumberConfig } from "@/u
 import { useState } from "react";
 import ModalImage from "react-modal-image";
 import { useOrderDetail } from "../hooks/useOrderDetail";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -134,7 +135,7 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
-                                                <div className="relative">
+                                                {/* <div className="relative">
                                                     <ImageErrors
                                                         src={data?.staff_create?.profile_image}
                                                         width={25}
@@ -153,7 +154,12 @@ const PopupDetail = (props) => {
                                                     {
                                                         data?.staff_create?.full_name
                                                     }
-                                                </h6>
+                                                </h6> */}
+                                                <CustomAvatar
+                                                    data={data}
+                                                    fullName={data?.staff_create?.full_name}
+                                                    profileImage={data?.staff_create?.profile_image}
+                                                />
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-2 my-4 font-semibold">

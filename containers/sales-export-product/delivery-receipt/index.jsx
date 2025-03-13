@@ -50,6 +50,7 @@ import { useDeliveryReceipCombobox } from "./hooks/useDeliveryReceipCombobox";
 import { useDeliveryReceiptFilterbar } from "./hooks/useDeliveryReceiptFilterbar";
 import { useDeliveryReceiptList } from "./hooks/useDeliveryReceiptList";
 import { useClientCombobox } from "@/hooks/common/useClients";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 
 const initialState = {
     keySearch: "",
@@ -536,7 +537,7 @@ const DeliveryReceipt = (props) => {
                                                             textAlign={"left"}
                                                             className="flex items-center space-x-1"
                                                         >
-                                                            <div className="relative">
+                                                            {/* <div className="relative">
                                                                 <ModalImage
                                                                     small={e?.created_by_profile_image ? e?.created_by_profile_image : "/user-placeholder.jpg"}
                                                                     large={e?.created_by_profile_image ? e?.created_by_profile_image : "/user-placeholder.jpg"}
@@ -559,7 +560,12 @@ const DeliveryReceipt = (props) => {
                                                                     </span>
                                                                 </span>
                                                             </div>
-                                                            <h6 className="capitalize">{e?.created_by_full_name}</h6>
+                                                            <h6 className="capitalize">{e?.created_by_full_name}</h6> */}
+                                                            <CustomAvatar
+                                                                data={e}
+                                                                fullName={e?.created_by_full_name}
+                                                                profileImage={e?.created_by_profile_image}
+                                                            />
                                                         </RowItemTable>
 
                                                         <RowItemTable colSpan={1}>
@@ -573,7 +579,7 @@ const DeliveryReceipt = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {e?.note}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="mx-auto  w-fit">
+                                                        <RowItemTable colSpan={1} className="mx-auto w-fit">
                                                             <TagBranch>{e?.name_branch}</TagBranch>
                                                         </RowItemTable>
                                                         <RowItemTable

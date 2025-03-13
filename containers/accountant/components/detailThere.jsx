@@ -17,6 +17,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 const PopupDetailThere = (props) => {
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
@@ -162,7 +163,12 @@ const PopupDetailThere = (props) => {
                                                 {props.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
-                                                <div className="relative">
+                                                <CustomAvatar
+                                                    data={data}
+                                                    fullName={data?.staff_create?.full_name}
+                                                    profileImage={data?.staff_create?.profile_image}
+                                                />
+                                                {/* <div className="relative">
                                                     <ImageErrors
                                                         src={data?.staff_create?.profile_image}
                                                         width={25}
@@ -179,7 +185,7 @@ const PopupDetailThere = (props) => {
                                                 </div>
                                                 <h6 className="capitalize">
                                                     {data?.staff_create?.full_name}
-                                                </h6>
+                                                </h6> */}
                                             </div>{" "}
                                         </div>
                                         <div className="grid grid-cols-2 my-4 font-medium">
@@ -443,7 +449,7 @@ const PopupDetailThere = (props) => {
                                                     {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                                 </h3>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="relative">
+                                                    {/* <div className="relative">
                                                         <ImageErrors
                                                             src={data?.staff_create?.profile_image}
                                                             width={25}
@@ -460,7 +466,12 @@ const PopupDetailThere = (props) => {
                                                     </div>
                                                     <h6 className="capitalize">
                                                         {data?.staff_create?.full_name}
-                                                    </h6>
+                                                    </h6> */}
+                                                    <CustomAvatar
+                                                        data={data}
+                                                        fullName={data?.staff_create?.full_name}
+                                                        profileImage={data?.staff_create?.profile_image}
+                                                    />
                                                 </div>
                                             </div>{" "}
                                             <div className="grid grid-cols-2 my-4 font-semibold">
@@ -739,7 +750,7 @@ const PopupDetailThere = (props) => {
                                                     {props.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                                 </h3>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="relative">
+                                                    {/* <div className="relative">
                                                         <ImageErrors
                                                             src={data?.staff_create?.profile_image}
                                                             width={25}
@@ -756,7 +767,12 @@ const PopupDetailThere = (props) => {
                                                     </div>
                                                     <h6 className="capitalize">
                                                         {data?.staff_create?.full_name}
-                                                    </h6>
+                                                    </h6> */}
+                                                    <CustomAvatar
+                                                        data={data}
+                                                        fullName={data?.staff_create?.full_name}
+                                                        profileImage={data?.staff_create?.profile_image}
+                                                    />
                                                 </div>{" "}
                                             </div>
                                             <div className="grid grid-cols-2 my-4 font-semibold">
@@ -1018,7 +1034,7 @@ const PopupDetailThere = (props) => {
                                                     {props.dataLang?.purchase_propnent || "purchase_propnent"}
                                                 </h3>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="relative">
+                                                    {/* <div className="relative">
                                                         <ImageErrors
                                                             src={
                                                                 data?.profile_image
@@ -1037,7 +1053,12 @@ const PopupDetailThere = (props) => {
                                                     </div>
                                                     <h6 className="capitalize">
                                                         {data?.user_create_name}
-                                                    </h6>
+                                                    </h6> */}
+                                                    <CustomAvatar
+                                                        data={data}
+                                                        fullName={data?.staff_create?.full_name}
+                                                        profileImage={data?.staff_create?.profile_image}
+                                                    />
                                                 </div>{" "}
                                             </div>
                                             <div className="grid grid-cols-2 my-4 font-semibold">
@@ -1270,7 +1291,7 @@ const PopupDetailThere = (props) => {
                                                 </h3>
                                                 <div className="grid grid-cols-2 my-2 font-medium">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="relative">
+                                                        {/* <div className="relative">
                                                             <ImageErrors
                                                                 src={data?.staff_create?.profile_image}
                                                                 width={25}
@@ -1287,7 +1308,12 @@ const PopupDetailThere = (props) => {
                                                         </div>
                                                         <h6 className="capitalize">
                                                             {data?.staff_create?.full_name}
-                                                        </h6>
+                                                        </h6> */}
+                                                        <CustomAvatar
+                                                            data={data}
+                                                            fullName={data?.staff_create?.full_name}
+                                                            profileImage={data?.staff_create?.profile_image}
+                                                        />
                                                     </div>
                                                 </div>{" "}
                                             </div>

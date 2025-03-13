@@ -508,6 +508,7 @@ const Recall = (props) => {
                                                         </RowItemTable>
                                                         <LinkWarehouse
                                                             colSpan={1}
+                                                            disbleClick={true}
                                                             warehouse_id={e?.warehouse_id}
                                                             warehouse_name={e?.warehouse_name}
                                                         />

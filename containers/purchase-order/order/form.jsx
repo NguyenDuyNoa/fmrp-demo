@@ -342,6 +342,7 @@ const OrderForm = (props) => {
             sSelectedDate(formatMoment(value.target.value, FORMAT_MOMENT.DATE_TIME_LONG));
         } else if (type === "supplier") {
             sIdSupplier(value);
+            sOnFetchingItemsAll(true);
         } else if (type === "staff") {
             sIdStaff(value);
         } else if (type === "delivery_dateNew") {
@@ -510,7 +511,7 @@ const OrderForm = (props) => {
     })
 
     useQuery({
-        queryKey: ["api_dataItems_variantAll", onFetchingItemsAll],
+        queryKey: ["api_dataItems_variantAll", onFetchingItemsAll, idSupplier],
         queryFn: async () => {
             _ServerFetching_ItemsAll();
         },

@@ -56,7 +56,7 @@ const PopupDetail = (props) => {
                                 <GeneralInformation {...props} />
                                 <div className="grid grid-cols-9  min-h-[100px] px-2 items-center bg-zinc-50">
                                     <div className="col-span-3">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
@@ -64,7 +64,7 @@ const PopupDetail = (props) => {
                                                 {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h3>
@@ -72,7 +72,7 @@ const PopupDetail = (props) => {
                                                 {data?.code}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.exportToOthe_object || "exportToOthe_object"}
                                             </h3>
@@ -82,26 +82,27 @@ const PopupDetail = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props?.dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_from_browse || "import_from_browse"}
                                             </h3>
-                                            <div className="flex flex-wrap  gap-2 items-center ">
+                                            <div className="flex flex-wrap items-center gap-2 ">
                                                 <TagWarehouse data={data} />
                                             </div>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props?.dataLang?.exportToOthe_warehouse || "exportToOthe_warehouse"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 <LinkWarehouse
                                                     open={open}
+                                                    disbleClick={true}
                                                     warehouse_id={data?.warehouse_id}
                                                     warehouse_name={data?.warehouse_name}
                                                 />
@@ -109,7 +110,7 @@ const PopupDetail = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props?.dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                             </h3>
@@ -117,7 +118,7 @@ const PopupDetail = (props) => {
                                                 {formatMoney(data?.amount)}
                                             </h3>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className=" text-[13px] ">
                                                 {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
@@ -129,7 +130,7 @@ const PopupDetail = (props) => {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
+                                        <div className="grid grid-cols-2 my-2 font-medium">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
@@ -163,7 +164,7 @@ const PopupDetail = (props) => {
                                             <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                 {data?.items?.map((e) => (
                                                     <div
-                                                        className="grid grid-cols-9 hover:bg-slate-50 items-center border-b"
+                                                        className="grid items-center grid-cols-9 border-b hover:bg-slate-50"
                                                         key={e.id?.toString()}
                                                     >
                                                         <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
@@ -181,7 +182,7 @@ const PopupDetail = (props) => {
                                                                             <ModalImage
                                                                                 small="/icon/noimagelogo.png"
                                                                                 large="/icon/noimagelogo.png"
-                                                                                className="w-full h-full rounded object-contain p-1"
+                                                                                className="object-contain w-full h-full p-1 rounded"
                                                                             >
                                                                                 {" "}
                                                                             </ModalImage>
@@ -195,7 +196,7 @@ const PopupDetail = (props) => {
                                                                     <h6 className="text-[13px] text-left font-medium capitalize">
                                                                         {e?.item?.product_variation}
                                                                     </h6>
-                                                                    <div className="flex items-center font-oblique flex-wrap">
+                                                                    <div className="flex flex-wrap items-center font-oblique">
                                                                         {dataProductSerial.is_enable === "1" ? (
                                                                             <div className="flex gap-0.5">
                                                                                 <h6 className="text-[12px]">
@@ -266,7 +267,7 @@ const PopupDetail = (props) => {
                                 <h2 className="font-medium p-2 text-[13px]  border-[#E7EAEE] border-opacity-70 border-y-[1px]  z-10">
                                     {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
-                                <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                                <div className="sticky bottom-0 z-10 grid flex-col justify-between grid-cols-12 mt-2 ">
                                     <div className="col-span-7">
                                         <h3 className="text-[13px] p-1">
                                             {props.dataLang?.returns_reason || "returns_reason"}

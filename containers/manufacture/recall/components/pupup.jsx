@@ -91,6 +91,7 @@ const PopupDetail = (props) => {
                                                 {/* {data?.warehouse_name} */}
                                                 <LinkWarehouse
                                                     open={open}
+                                                    disbleClick={true}
                                                     warehouse_id={data?.warehouse_id}
                                                     warehouse_name={data?.warehouse_name}
                                                 />
