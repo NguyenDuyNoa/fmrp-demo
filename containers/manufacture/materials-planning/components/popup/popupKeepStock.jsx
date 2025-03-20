@@ -18,6 +18,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { Add, Trash as IconDelete, ArrowDown2 as IconDown, TickCircle } from "iconsax-react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { Controller, useForm } from "react-hook-form";
@@ -589,19 +590,27 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                             {
                                                                 e?.item?.image != null
                                                                     ?
-                                                                    <ModalImage
-                                                                        small={e?.item?.image}
-                                                                        large={e?.item?.image}
+                                                                    <Image
+                                                                        src={e?.item?.image}
+                                                                        width={1280}
+                                                                        height={1024}
                                                                         alt="Product Image"
                                                                         className="custom-modal-image z-10 object-cover rounded w-[50px] h-[50px] mx-auto"
                                                                     />
+                                                                    // <ModalImage
+                                                                    //     small={e?.item?.image}
+                                                                    //     large={e?.item?.image}
+                                                                    //     alt="Product Image"
+                                                                    //     className="custom-modal-image z-10 object-cover rounded w-[50px] h-[50px] mx-auto"
+                                                                    // />
                                                                     :
                                                                     <div className="w-[50px] h-[50px] object-cover  mx-auto">
-                                                                        <ModalImage
-                                                                            small="/icon/noimagelogo.png"
-                                                                            large="/icon/noimagelogo.png"
+                                                                        <Image
+                                                                            src="/icon/noimagelogo.png"
+                                                                            width={1280}
+                                                                            height={1024}
                                                                             className="object-contain w-full h-full p-1 rounded"
-                                                                        ></ModalImage>
+                                                                        />
                                                                     </div>
                                                             }
                                                         </div>

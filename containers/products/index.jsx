@@ -483,9 +483,9 @@ const Products = (props) => {
                                                                     {e?.name}
                                                                 </button>
                                                             </Popup_Detail>
-                                                            <h6 className="flex items-center gap-1">
-                                                                <TagColorProduct dataLang={dataLang} dataKey={e?.type_products?.id} name={e?.type_products?.name} />
-                                                            </h6>
+                                                            {/* <h6 className="flex items-center gap-1"> */}
+                                                            <TagColorProduct dataLang={dataLang} dataKey={e?.type_products?.id} name={e?.type_products?.name} />
+                                                            {/* </h6> */}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'center'}>
                                                             {e?.unit}

@@ -173,7 +173,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
     const updateSerialsGeneric = (item, value, type) => {
         let existingSerials = [...(item[type] || [])]; // Giữ serial cũ
-        const quantity = value?.floatValue ?? value;
+        const quantity = value?.floatValue ? value?.floatValue : value?.value;
 
         // Lấy số lớn nhất từ cả hai danh sách serial và serialError
         const getMaxSerial = (list) => list.length > 0

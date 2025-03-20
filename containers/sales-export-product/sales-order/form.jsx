@@ -183,8 +183,8 @@ const SalesOrderForm = (props) => {
 
             if (rResult?.quote_id !== "0" && rResult?.quote_code !== null) {
                 setTypeOrder("1");
-                setHidden(true);
-                setQuote({ label: rResult?.quote_code, value: rResult?.quote_id, });
+                // setHidden(true);
+                // setQuote({ label: rResult?.quote_code, value: rResult?.quote_id, });
             }
             return rResult
         },
@@ -395,7 +395,7 @@ const SalesOrderForm = (props) => {
         if (status == "customer") {
             setCustomer(isId);
             setContactPerson(null);
-            setQuote(null);
+            // setQuote(null);
             setOption([]);
 
             setOnFetchingItem(true);
@@ -406,12 +406,12 @@ const SalesOrderForm = (props) => {
             setCustomer(null);
             setContactPerson(null);
             setStaff(null);
-            setQuote(null);
+            // setQuote(null);
         }
         if (status == "typeOrder") {
             setTypeOrder(isId);
-            setHidden(isId === "1");
-            setQuote(isId === "0" ? null : quote);
+            // setHidden(isId === "1");
+            // setQuote(isId === "0" ? null : quote);
             isId == 1 && refetchQuote()
             setOnFetchingItem(isId === "0" && true);
             setOnFetchingItemsAll(isId === "1" && true);
@@ -422,7 +422,7 @@ const SalesOrderForm = (props) => {
             setOption([]);
         }
         if (status == "quote") {
-            setQuote(isId);
+            // setQuote(isId);
             setOption([]);
             setOnFetchingItemsAll(true);
             setOnFetchingItem(true);
@@ -440,7 +440,7 @@ const SalesOrderForm = (props) => {
             } else {
                 setCustomer(value);
                 setContactPerson(null);
-                setQuote(null);
+                // setQuote(null);
             }
         } else if (type === "branch") {
             if (option?.length >= 1) {
@@ -450,7 +450,7 @@ const SalesOrderForm = (props) => {
                 setCustomer(null);
                 setContactPerson(null);
                 setStaff(null);
-                setQuote(null);
+                // setQuote(null);
                 setOption([]);
             }
         } else if (type === "contactPerson") {
@@ -463,7 +463,7 @@ const SalesOrderForm = (props) => {
             if (option?.length >= 1) {
                 handleQueryId({ status: true, idChild: type, id: value });
             } else {
-                setQuote(value);
+                // setQuote(value);
                 setOnFetchingItem(true);
             }
         } else if (type === "note") {
@@ -1456,7 +1456,7 @@ const SalesOrderForm = (props) => {
                                     )}
                                 </div>
 
-                                <div className="col-span-3 h-[68px] space-y-3">
+                                {/* <div className="col-span-3 h-[68px] space-y-3">
                                     <label className="text-[#344054] font-norma 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.sales_product_order_type || "sales_product_order_type"}
                                     </label>
@@ -1496,8 +1496,8 @@ const SalesOrderForm = (props) => {
                                             </label>
                                         </div>
                                     </div>
-                                </div>
-                                {hidden && (
+                                </div> */}
+                                {/* {hidden && (
                                     <div className="col-span-3">
                                         <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
                                             {dataLang?.sales_product_quotation || "sales_product_quotation"}{" "}
@@ -1537,7 +1537,7 @@ const SalesOrderForm = (props) => {
                                             </label>
                                         )}
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         </div>
                     </div>

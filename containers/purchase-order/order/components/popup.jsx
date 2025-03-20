@@ -35,7 +35,8 @@ const PopupDetail = (props) => {
     return (
         <>
             <PopupCustom
-                title={props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title"}
+                title={"Chi tiết phiếu đơn hàng mua (PO)"}
+                // title={props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -79,11 +80,14 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                             </h3>
                                             <h3 className=" text-[13px] font-medium flex items-center">
-                                                {data?.order_type == "0" ? (
-                                                    <TagColorRed className={'!py-0.5'} name={'Tạo mới'} />
-                                                ) : (
-                                                    <TagColorOrange className={'!py-0.5'} name='YCMH' />
-                                                )}
+                                                {data?.status_plan == "1"
+                                                    ?
+                                                    <TagColorOrange className={'!py-0.5'} name='KHSX' /> : data?.order_type == "0"
+                                                        ? (
+                                                            <TagColorRed className={'!py-0.5'} name={'Tạo mới'} />
+                                                        ) : (
+                                                            <TagColorOrange className={'!py-0.5'} name='KHSX' />
+                                                        )}
                                             </h3>
                                         </div>
                                     </div>
@@ -104,11 +108,12 @@ const PopupDetail = (props) => {
                                                 ))}
                                         </div>
                                         <div className="my-4 font-medium text-[13px]">
-                                            {props.dataLang
-                                                ?.purchase_order_table_number || "purchase_order_table_number"}
+                                            Số kế hoạch
+                                            {/* {props.dataLang
+                                                ?.purchase_order_table_number || "purchase_order_table_number"} */}
                                         </div>
                                         <div className="flex flex-wrap  gap-2 items-center justify-start text-[13px]">
-                                            {data?.purchases
+                                            {/* {data?.purchases
                                                 ?.reduce(
                                                     (acc, cur) =>
                                                         acc +
@@ -118,7 +123,19 @@ const PopupDetail = (props) => {
                                                 )
                                                 .split("")
                                                 .join("")
+                                                .replace(/^,/, "")} */}
+                                            {data?.list_production_plan
+                                                ?.reduce(
+                                                    (acc, cur) =>
+                                                        acc +
+                                                        (acc ? ", " : "") +
+                                                        cur?.reference_no,
+                                                    ""
+                                                )
+                                                .split("")
+                                                .join("")
                                                 .replace(/^,/, "")}
+
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">

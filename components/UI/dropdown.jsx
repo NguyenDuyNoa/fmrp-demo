@@ -17,6 +17,8 @@ const deca = Lexend_Deca({
 const inter = Inter({ subsets: ["latin"] });
 
 export const Dropdown = (props) => {
+    const [open, sOpen] = useState(false);
+
     const { is_admin } = useSelector((state) => state.auth);
 
     const showToat = useToast();
@@ -28,12 +30,32 @@ export const Dropdown = (props) => {
                     <button
                         className={`text-slate-200 3xl:text-[18px] 2xl:text-base xxl:text-base xl:text-sm text-xs  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center`}
                     >
-                        {props.children}
+                        {
+                            props?.type == 'procedure' ?
+                                (open
+                                    ?
+                                    props.children
+                                    :
+                                    <Tooltip
+                                        title={"Quy trình"}
+                                        arrow
+                                        className="cursor-pointer"
+                                        theme="dark"
+
+                                    >
+                                        {props.children}
+                                    </Tooltip>)
+                                :
+                                props.children
+                        }
                     </button>
                 }
                 closeOnDocumentClick
                 arrow={props.position}
-                on={["hover"]}
+                on={props?.type == 'procedure' ? ["click"] : ["hover"]}
+                open={open}
+                onClose={() => sOpen(false)}
+                onOpen={() => sOpen(true)}
                 position={props.position}
                 className={`popover-edit -translate-y-10 ` + props.className}
             >
@@ -45,7 +67,7 @@ export const Dropdown = (props) => {
                                 className={`${e.title ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5" : "px-1"} space-y-1 min-w-[200px]`}
                             >
                                 {e.title && (
-                                    <h3 className="px-3 text-base font-medium">
+                                    <h3 className="px-3 text-[14.5px] uppercase">
                                         {e.title}
                                     </h3>
                                 )}
@@ -242,6 +264,7 @@ export const DropdownThongBao = (props) => {
     const [tab, sTab] = useState(0);
     const [onFetching, sOnFetching] = useState(false);
     const [checkStt, sCheckStt] = useState(false);
+    const [open, sOpen] = useState(false);
     const _HandleSelectTab = (e) => {
         sTab(e);
         !e && sOnFetching(true);
@@ -261,18 +284,35 @@ export const DropdownThongBao = (props) => {
             sOnFetching(false);
         }, 500);
     }, []);
+    console.log("open", open);
 
     return (
         <div className="">
             <Popup
                 trigger={
                     <button className={`flex items-center justify-center text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] `} >
-                        {props.children}
+                        {
+                            open
+                                ?
+                                props.children
+                                :
+                                <Tooltip
+                                    title={"Thông báo"}
+                                    arrow
+                                    theme="dark"
+                                    className="cursor-pointer"
+                                >
+                                    {props.children}
+                                </Tooltip>
+                        }
                     </button>
                 }
                 closeOnDocumentClick
                 arrow={props.position}
-                on={["hover"]}
+                on={["click"]}
+                open={open}
+                onOpen={() => sOpen(true)}
+                onClose={() => sOpen(false)}
                 // open={true}
                 position={props.position}
                 className={`popover-edit -translate-y-10 ${props.className}`}

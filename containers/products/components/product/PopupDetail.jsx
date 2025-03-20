@@ -169,7 +169,7 @@ const Popup_Detail = React.memo((props) => {
                                             <h5 className="text-slate-400 text-sm w-[40%]">
                                                 {props.dataLang?.type_finishedProduct}:
                                             </h5>
-                                            <h6 className="w-[55%] text-right">
+                                            <div className="w-[55%] text-right">
                                                 {/* {props.dataLang[list?.type_products?.name]} */}
                                                 {/* <span
                                                     className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
@@ -185,7 +185,7 @@ const Popup_Detail = React.memo((props) => {
                                                     dataKey={list?.type_products?.id}
                                                     name={list?.type_products?.name}
                                                 />
-                                            </h6>
+                                            </div>
                                         </div>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">{props.dataLang?.unit}:</h5>
@@ -410,7 +410,7 @@ const Popup_Detail = React.memo((props) => {
                                                                 {/* <h6 className="px-2 xl:text-[15px] text-xs col-span-2">
                                                                     {e?.str_type_item}
                                                                 </h6> */}
-                                                                <h6 className="flex items-center justify-center col-span-3 gap-1">
+                                                                <div className="flex items-center justify-center col-span-3 gap-1">
                                                                     {/* <span
                                                                         className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
                                                                      ${(e?.item_type_current === "products" && "text-lime-500 border-lime-500") ||
@@ -434,7 +434,7 @@ const Popup_Detail = React.memo((props) => {
                                                                         lang={false}
                                                                         name={e?.str_type_item}
                                                                     />
-                                                                </h6>
+                                                                </div>
                                                                 <h6 className="col-span-2 px-2 text-xs 2xl:text-base xl:text-sm">
                                                                     <div className="grid grid-cols-1">
                                                                         <h5>{e?.item_name}</h5>

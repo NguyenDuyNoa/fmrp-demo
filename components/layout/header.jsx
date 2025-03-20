@@ -34,26 +34,26 @@ const Header = () => {
 
     const ListDanhMuc = [
         {
-            title: "Khách hàng",
+            // title: "Khách hàng & Nhà cung cấp",
             sub: [
                 {
-                    // title: "Khách hàng",
-                    // img: "/icon/header/danhmuc/kh.png",
+                    title: "Khách hàng",
                     items: [
                         {
-                            viewOwn: auth?.customers?.is_view_own,
-                            view: auth?.customers?.is_view,
-                            name: "Danh sách khách hàng",
-                            link: "/clients/clients?tab=0",
+                            viewOwn: auth?.client_group?.is_view_own,
+                            view: auth?.client_group?.is_view,
+                            name: "Nhóm khách hàng",
+                            link: "/clients/groups",
                         },
-                        {
-                            name: "Danh sách liên hệ",
-                            link: "/clients/contact",
-                            // viewOwn: auth?.client_contact?.is_view_own,
-                            // view: auth?.client_contact?.is_view,
-                            viewOwn: auth?.customers?.is_view_own,
-                            view: auth?.customers?.is_view,
-                        },
+
+                        // {
+                        //     name: "Danh sách liên hệ",
+                        //     link: "/clients/contact",
+                        //     // viewOwn: auth?.client_contact?.is_view_own,
+                        //     // view: auth?.client_contact?.is_view,
+                        //     viewOwn: auth?.customers?.is_view_own,
+                        //     view: auth?.customers?.is_view,
+                        // },
                         {
                             viewOwn: auth?.client_status?.is_view_own,
                             view: auth?.client_status?.is_view,
@@ -61,36 +61,25 @@ const Header = () => {
                             link: "/clients/status-client",
                         },
                         {
-                            viewOwn: auth?.client_group?.is_view_own,
-                            view: auth?.client_group?.is_view,
-                            name: "Nhóm khách hàng",
-                            link: "/clients/groups",
+                            viewOwn: auth?.customers?.is_view_own,
+                            view: auth?.customers?.is_view,
+                            name: "Danh sách khách hàng",
+                            link: "/clients/clients?tab=0",
                         },
-                    ],
+                    ]
                 },
-            ],
-        },
-        {
-            title: "Nhà cung cấp",
-            sub: [
                 {
-                    // title: "Nhà cung cấp",
-                    // img: "/icon/header/danhmuc/ncc.png",
+                    title: "Nhà cung cấp",
                     items: [
-                        {
-                            viewOwn: auth?.suppliers?.is_view_own,
-                            view: auth?.suppliers?.is_view,
-                            name: "Danh sách NCC",
-                            link: "/suppliers/supplier",
-                        },
-                        {
-                            // viewOwn: auth?.contacts_suppliers?.is_view_own,
-                            // view: auth?.contacts_suppliers?.is_view,
-                            viewOwn: auth?.suppliers?.is_view_own,
-                            view: auth?.suppliers?.is_view,
-                            name: "Danh sách liên hệ NCC",
-                            link: "/suppliers/contacts",
-                        },
+
+                        // {
+                        //     // viewOwn: auth?.contacts_suppliers?.is_view_own,
+                        //     // view: auth?.contacts_suppliers?.is_view,
+                        //     viewOwn: auth?.suppliers?.is_view_own,
+                        //     view: auth?.suppliers?.is_view,
+                        //     name: "Danh sách liên hệ NCC",
+                        //     link: "/suppliers/contacts",
+                        // },
                         // {
                         //     viewOwn: 0,
                         //     view: 0,
@@ -102,16 +91,88 @@ const Header = () => {
                             name: "Nhóm nhà cung cấp",
                             link: "/suppliers/groups",
                         },
-                    ],
-                },
+                        {
+                            viewOwn: auth?.suppliers?.is_view_own,
+                            view: auth?.suppliers?.is_view,
+                            name: "Danh sách nhà cung cấp",
+                            link: "/suppliers/supplier",
+                        },
+                    ]
+                }
+                // title: "Khách hàng",
+                // img: "/icon/header/danhmuc/kh.png",
+                // items: [
+                //     {
+                //         viewOwn: auth?.customers?.is_view_own,
+                //         view: auth?.customers?.is_view,
+                //         name: "Danh sách khách hàng",
+                //         link: "/clients/clients?tab=0",
+                //     },
+                //     // {
+                //     //     name: "Danh sách liên hệ",
+                //     //     link: "/clients/contact",
+                //     //     // viewOwn: auth?.client_contact?.is_view_own,
+                //     //     // view: auth?.client_contact?.is_view,
+                //     //     viewOwn: auth?.customers?.is_view_own,
+                //     //     view: auth?.customers?.is_view,
+                //     // },
+                //     {
+                //         viewOwn: auth?.client_status?.is_view_own,
+                //         view: auth?.client_status?.is_view,
+                //         name: "Trạng thái khách hàng",
+                //         link: "/clients/status-client",
+                //     },
+                //     {
+                //         viewOwn: auth?.client_group?.is_view_own,
+                //         view: auth?.client_group?.is_view,
+                //         name: "Nhóm khách hàng",
+                //         link: "/clients/groups",
+                //     },
+                // ],
             ],
         },
+        // {
+        //     title: "Nhà cung cấp",
+        //     sub: [
+        //         {
+        //             // title: "Nhà cung cấp",
+        //             // img: "/icon/header/danhmuc/ncc.png",
+        //             items: [
+        //                 {
+        //                     viewOwn: auth?.suppliers?.is_view_own,
+        //                     view: auth?.suppliers?.is_view,
+        //                     name: "Danh sách NCC",
+        //                     link: "/suppliers/supplier",
+        //                 },
+        //                 // {
+        //                 //     // viewOwn: auth?.contacts_suppliers?.is_view_own,
+        //                 //     // view: auth?.contacts_suppliers?.is_view,
+        //                 //     viewOwn: auth?.suppliers?.is_view_own,
+        //                 //     view: auth?.suppliers?.is_view,
+        //                 //     name: "Danh sách liên hệ NCC",
+        //                 //     link: "/suppliers/contacts",
+        //                 // },
+        //                 // {
+        //                 //     viewOwn: 0,
+        //                 //     view: 0,
+        //                 //     name: "Mặt hàng chủ đạo theo NCC"
+        //                 // },
+        //                 {
+        //                     viewOwn: auth?.suppliers_groups?.is_view_own,
+        //                     view: auth?.suppliers_groups?.is_view,
+        //                     name: "Nhóm nhà cung cấp",
+        //                     link: "/suppliers/groups",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
         {
-            title: "NVL, thành phẩm",
+            // title: "NVL, thành phẩm",
             sub: [
                 {
                     title: "Nguyên vật liệu",
-                    img: "/icon/header/danhmuc/nvl.png",
+                    // img: "/icon/header/danhmuc/nvl.png",
                     items: [
                         {
                             viewOwn: auth?.material_category?.is_view_own,
@@ -129,7 +190,7 @@ const Header = () => {
                 },
                 {
                     title: "thành phẩm",
-                    img: "/icon/header/danhmuc/tp.png",
+                    // img: "/icon/header/danhmuc/tp.png",
                     items: [
                         {
                             viewOwn: auth?.category_products?.is_view_own,
@@ -148,10 +209,10 @@ const Header = () => {
             ],
         },
         {
-            title: "Nhân sự",
+            // title: "Nhân sự",
             sub: [
                 {
-                    // title: "Phòng ban",
+                    title: "Nhân sự",
                     // img: "/icon/header/danhmuc/nv.png",
                     items: [
                         {
@@ -180,34 +241,17 @@ const Header = () => {
 
     const ListBanXuatHang = [
         {
-            title: "Bán hàng",
+            // title: "Bán & Xuất hàng",
             sub: [
                 {
-                    // title: "Báo giá",
+                    title: "Bán & Xuất hàng",
                     items: [
-                        {
-                            viewOwn: auth?.quotes?.is_view_own,
-                            view: auth?.quotes?.is_view,
-                            name: "Báo giá",
-                            link: "/sales-export-product/price-quote",
-                        },
                         {
                             viewOwn: auth?.orders?.is_view_own,
                             view: auth?.orders?.is_view,
                             name: "Đơn hàng bán",
                             link: "/sales-export-product/sales-order",
                         },
-                    ],
-                },
-            ],
-        },
-        {
-            title: "Giao hàng & Trả hàng",
-            sub: [
-                {
-                    // title: "Phiếu giao hàng",
-                    // link: "#"
-                    items: [
                         {
                             viewOwn: auth?.deliveries?.is_view_own,
                             view: auth?.deliveries?.is_view,
@@ -224,45 +268,81 @@ const Header = () => {
                 },
             ],
         },
+
+        // {
+        //     title: "Bán hàng",
+        //     sub: [
+        //         {
+        //             // title: "Báo giá",
+        //             items: [
+        //                 {
+        //                     viewOwn: auth?.quotes?.is_view_own,
+        //                     view: auth?.quotes?.is_view,
+        //                     name: "Báo giá",
+        //                     link: "/sales-export-product/price-quote",
+        //                 },
+        //                 {
+        //                     viewOwn: auth?.orders?.is_view_own,
+        //                     view: auth?.orders?.is_view,
+        //                     name: "Đơn hàng bán",
+        //                     link: "/sales-export-product/sales-order",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
+        // {
+        //     title: "Giao hàng & Trả hàng",
+        //     sub: [
+        //         {
+        //             // title: "Phiếu giao hàng",
+        //             // link: "#"
+        //             items: [
+        //                 {
+        //                     viewOwn: auth?.deliveries?.is_view_own,
+        //                     view: auth?.deliveries?.is_view,
+        //                     name: "Phiếu giao hàng",
+        //                     link: "/sales-export-product/delivery-receipt",
+        //                 },
+        //                 {
+        //                     viewOwn: auth?.returned_goods?.is_view_own,
+        //                     view: auth?.returned_goods?.is_view,
+        //                     name: "Trả lại hàng bán",
+        //                     link: "/sales-export-product/return-sales",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
     ];
 
     const ListMuaNhapHang = [
         {
-            title: "Mua hàng",
+            // title: "Mua & Nhập hàng",
             sub: [
                 {
+                    title: "Mua & Nhập hàng",
                     // title: "Mua hàng",
                     // img: "/icon/header/muanhap/mua.png",
                     items: [
-                        {
-                            viewOwn: auth?.purchases?.is_view_own,
-                            view: auth?.purchases?.is_view,
-                            name: "Yêu cầu mua hàng",
-                            link: "/purchase-order/purchases",
-                        },
+                        // {
+                        //     viewOwn: auth?.purchases?.is_view_own,
+                        //     view: auth?.purchases?.is_view,
+                        //     name: "Yêu cầu mua hàng",
+                        //     link: "/purchase-order/purchases",
+                        // },
                         {
                             viewOwn: auth?.purchase_order?.is_view_own,
                             view: auth?.purchase_order?.is_view,
-                            name: "Đơn đặt hàng",
+                            name: "Đơn hàng mua",
                             link: "/purchase-order/order",
                         },
-                        {
-                            viewOwn: auth?.services?.is_view_own,
-                            view: auth?.services?.is_view,
-                            name: "Phiếu dịch vụ",
-                            link: "/purchase-order/servicev-voucher",
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            title: "Nhập hàng & trả hàng",
-            sub: [
-                {
-                    // title: "Nhập hàng & trả hàng",
-                    // img: "/icon/header/kho/Vector-9.png",
-                    items: [
+                        // {
+                        //     viewOwn: auth?.services?.is_view_own,
+                        //     view: auth?.services?.is_view,
+                        //     name: "Phiếu dịch vụ",
+                        //     link: "/purchase-order/servicev-voucher",
+                        // },
                         {
                             viewOwn: auth?.import?.is_view_own,
                             view: auth?.import?.is_view,
@@ -279,13 +359,37 @@ const Header = () => {
                 },
             ],
         },
+        // {
+        //     title: "Nhập hàng & Trả hàng",
+        //     sub: [
+        //         {
+        //             // title: "Nhập hàng & trả hàng",
+        //             // img: "/icon/header/kho/Vector-9.png",
+        //             items: [
+        //                 {
+        //                     viewOwn: auth?.import?.is_view_own,
+        //                     view: auth?.import?.is_view,
+        //                     name: "Nhập hàng",
+        //                     link: "/purchase-order/import",
+        //                 },
+        //                 {
+        //                     viewOwn: auth?.return_suppliers?.is_view_own,
+        //                     view: auth?.return_suppliers?.is_view,
+        //                     name: "Trả hàng",
+        //                     link: "/purchase-order/returns",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
     ];
 
     const ListKhoSanXuat = [
         {
-            title: "Kho hàng",
+            // title: "Kho hàng",
             sub: [
                 {
+                    title: "Kho hàng",
                     items: [
                         {
                             viewOwn: auth?.warehouse?.is_view_own,
@@ -371,7 +475,7 @@ const Header = () => {
         //     ],
         // },
         {
-            title: "Sản xuất & QC",
+            // title: "Sản xuất & QC",
             sub: [
                 {
                     title: "Sản xuất",
@@ -496,10 +600,10 @@ const Header = () => {
 
     const ListKhac = [
         {
-            title: "Tiện ích",
+            // title: "Tiện ích",
             sub: [
                 {
-                    // title: "Tiện ích",
+                    title: "Tiện ích",
                     // img: "/icon/header/khac/ti.png",
                     items: [
                         // {
@@ -587,12 +691,24 @@ const Header = () => {
 
     const ListBaoCao = [
         {
-            title: "Báo cáo",
+            // title: "Báo cáo",
             sub: [
                 {
-                    // title: "Báo cáo",
+                    title: "Báo cáo",
                     // img: "/icon/header/khac/bc.png",
                     items: [
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Quản lý sản xuất",
+                            link: "/report-statistical/production-manager/quota-materials",
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tồn kho",
+                            link: "/report-statistical/warehouse-report/card",
+                        },
                         // {
                         //     viewOwn: -1,
                         //     view: -1,
@@ -610,41 +726,31 @@ const Header = () => {
                             name: "Báo cáo mua hàng",
                             link: "/report-statistical/purchase-report/purchases",
                         },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Công nợ phải thu",
-                            link: "/report-statistical/receivables-debt/aggregate-debt",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Công nợ phải trả",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Tồn quỹ",
-                            link: "/report-statistical/fund-balance/autumn-diary",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Tồn kho",
-                            link: "/report-statistical/warehouse-report/card",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Quản lý sản xuất",
-                            link: "/report-statistical/production-manager/quota-materials",
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Báo cáo lợi nhuận",
-                            link: "/report-statistical/profit-report",
-                        },
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     name: "Công nợ phải thu",
+                        //     link: "/report-statistical/receivables-debt/aggregate-debt",
+                        // },
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     name: "Công nợ phải trả",
+                        // },
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     name: "Tồn quỹ",
+                        //     link: "/report-statistical/fund-balance/autumn-diary",
+                        // },
+
+
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     name: "Báo cáo lợi nhuận",
+                        //     link: "/report-statistical/profit-report",
+                        // },
                     ],
                 },
             ],
@@ -684,10 +790,10 @@ const Header = () => {
 
     const ListQuyTrinh = [
         {
-            title: "Quy trình",
+            // title: "Quy trình",
             sub: [
                 {
-                    // title: "Quy trình",
+                    title: "Quy trình",
                     // img: "/icon/header/quytrinh/process.svg",
                     items: [
                         {
@@ -959,10 +1065,10 @@ const Header = () => {
 
     const ListKeToan = [
         {
-            title: "Công nợ bán",
+            // title: "Công nợ bán",
             sub: [
                 {
-                    // title: "Công nợ bán",
+                    title: "Công nợ bán",
                     // img: "/icon/header/banxuat/cnb.png",
                     items: [
                         {
@@ -982,10 +1088,10 @@ const Header = () => {
             ],
         },
         {
-            title: "Công nợ mua",
+            // title: "Công nợ mua",
             sub: [
                 {
-                    // title: "Công nợ mua",
+                    title: "Công nợ mua",
                     // img: "/icon/header/muanhap/cnm.png",
                     items: [
                         {
@@ -1024,7 +1130,9 @@ const Header = () => {
         {
             data: ListMuaNhapHang,
             position: "bottom left",
-            className: "popover-bottom-left-muanhaphang arrow-muanhaphang",
+            className: "popover-bottom-left arrow-banxuathang",
+
+            // className: "popover-bottom-left-muanhaphang arrow-muanhaphang",
             title: "Mua & Nhập hàng",
             text: "Quản lý các model mua, nhập, trả hàng",
         },
@@ -1190,19 +1298,22 @@ const Header = () => {
                                 placeholder="Tìm kiếm"
                             />
                         </form>
-                        <button
-                            title="Cài đặt"
-                            onClick={() => {
-                                if (role) {
-                                    router.push("/settings");
-                                } else {
-                                    isShow("warning", WARNING_STATUS_ROLE_ADMIN);
-                                }
-                            }}
-                            className=""
+                        <Tooltip
+                            title={"Cài đặt"}
+                            arrow
+                            className="cursor-pointer"
+                            theme="dark"
+
                         >
                             <Image
                                 alt=""
+                                onClick={() => {
+                                    if (role) {
+                                        router.push("/settings");
+                                    } else {
+                                        isShow("warning", WARNING_STATUS_ROLE_ADMIN);
+                                    }
+                                }}
                                 src="/icon/header/right/seting.png"
                                 width={18}
                                 height={18}
@@ -1212,9 +1323,10 @@ const Header = () => {
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
-                        </button>
+                        </Tooltip>
 
-                        <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"} >
+
+                        <Dropdown data={ListQuyTrinh} type='procedure' className="popover-quytrinh" position={"bottom right"} >
                             <Image
                                 alt=""
                                 src="/icon/header/right/quytrinh.png"
@@ -1227,20 +1339,23 @@ const Header = () => {
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
                         </Dropdown>
-                        <button
-                            title="Góp ý"
-                            onClick={() => {
-                                dispatch({
-                                    type: "statePopupRecommendation",
-                                    payload: {
-                                        open: true
-                                    }
-                                })
-                            }}
-                            className=""
+                        <Tooltip
+                            title={"Góp ý"}
+                            arrow
+                            theme="dark"
+                            className="cursor-pointer"
+
                         >
                             <Image
                                 alt=""
+                                onClick={() => {
+                                    dispatch({
+                                        type: "statePopupRecommendation",
+                                        payload: {
+                                            open: true
+                                        }
+                                    })
+                                }}
                                 src="/icon/header/right/gopy.png"
                                 width={18}
                                 height={18}
@@ -1250,17 +1365,22 @@ const Header = () => {
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
-                        </button>
+                        </Tooltip>
+
+
+
                         <Link
                             href="#"
-                            title="Thông báo"
                             className=""
                         >
                             <DropdownThongBao
                                 data={[] || ListThongBao}
                                 className="popover-thongbao"
                                 position={"bottom right"}
+
+
                             >
+
                                 <Image
                                     alt=""
                                     src="/icon/header/right/thongbao.png"
@@ -1277,24 +1397,32 @@ const Header = () => {
                                 </div> */}
                             </DropdownThongBao>
                         </Link>
-                        <Link
-                            href="https://help.fmrp.vn"
-                            target="_blank"
-                            className=""
-                            title="Hướng dẫn phần mềm"
+
+                        <Tooltip
+                            title={"Hướng dẫn phần mềm"}
+                            className="cursor-pointer"
+                            arrow
+                            theme="dark"
                         >
-                            <Image
-                                alt=""
-                                src="/icon/header/right/question.png"
-                                width={18}
-                                height={18}
-                                quality={100}
-                                className="object-contain w-[19px] h-[19px] min-w-[19px] min-h-[19px] transition"
-                                loading="lazy"
-                                crossOrigin="anonymous"
-                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                            />
-                        </Link>
+                            <Link
+                                href="https://help.fmrp.vn"
+                                target="_blank"
+                                className=""
+                            >
+                                <Image
+                                    alt=""
+                                    src="/icon/header/right/question.png"
+                                    width={18}
+                                    height={18}
+                                    quality={100}
+                                    className="object-contain w-[19px] h-[19px] min-w-[19px] min-h-[19px] transition"
+                                    loading="lazy"
+                                    crossOrigin="anonymous"
+                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                />
+                            </Link>
+                        </Tooltip>
+
 
                         <DropdownAvatar />
                     </div>
@@ -1303,7 +1431,7 @@ const Header = () => {
             {/* <div className="px-10 py-0 pt-1 overflow-x-auto">
                 <Expirred />
             </div> */}
-        </header>
+        </header >
     );
 };
 

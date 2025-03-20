@@ -32,6 +32,7 @@ import { optionsQuery } from "@/configs/optionsQuery";
 import { TagColorOrange } from "@/components/UI/common/Tag/TagStatus";
 import { ProductionsOrdersContext } from "@/containers/manufacture/productions-orders/context/productionsOrders";
 import dynamic from "next/dynamic";
+import PopupPurchaseBeta from "../popup/popupPurchaseBeta";
 // import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
 const ModalDetail = dynamic(() => import("@/containers/manufacture/productions-orders/components/modal/modalDetail"), { ssr: false });
 
@@ -71,6 +72,23 @@ const initialValue = {
 
 const MainTable = ({ dataLang }) => {
     const arrButton = [
+        // {
+        //     id: 1,
+        //     name: dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock",
+        //     icon: <MdAdd className="text-base text-blue-600" />,
+        // },
+        // {
+        //     id: 2,
+        //     name: dataLang?.materials_planning_add_purchase || "materials_planning_add_purchase",
+        //     icon: <MdAdd className="text-base text-blue-600" />,
+        //     // icon: "/materials_planning/add.png",
+        // },
+        // {
+        //     id: 3,
+        //     name: dataLang?.materials_planning_delete || "materials_planning_delete",
+        //     icon: <RiDeleteBin5Line className="text-base text-red-600" />,
+        //     // icon: "/materials_planning/delete.png",
+        // },
         {
             id: 1,
             name: dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock",
@@ -78,7 +96,7 @@ const MainTable = ({ dataLang }) => {
         },
         {
             id: 2,
-            name: dataLang?.materials_planning_add_purchase || "materials_planning_add_purchase",
+            name: "Thêm mua hàng",
             icon: <MdAdd className="text-base text-blue-600" />,
             // icon: "/materials_planning/add.png",
         },
@@ -103,7 +121,8 @@ const MainTable = ({ dataLang }) => {
         },
         {
             id: uddid(),
-            name: dataLang?.materials_planning_keep_stock || "materials_planning_keep_stock",
+            name: "Giữ kho & Mua hàng",
+            // name: dataLang?.materials_planning_keep_stock || "materials_planning_keep_stock",
             type: "keepStock",
         },
     ];
@@ -354,7 +373,8 @@ const MainTable = ({ dataLang }) => {
                                 }),
                             };
                         }),
-                        dataPurchases: data?.purchases?.map((e) => {
+                        dataPurchases: data?.purchase_order?.map((e) => {
+                            // dataPurchases: data?.purchases?.map((e) => {
                             return {
                                 ...e,
                                 id: e?.id,
@@ -368,6 +388,7 @@ const MainTable = ({ dataLang }) => {
                                         image: i?.images ? i?.images : "/icon/noimagelogo.png",
                                         name: i?.item_name,
                                         quantity: i?.quantity_net,
+                                        quantityImport: i?.quantity_import,
                                         unit: i?.unit_name,
                                         lot: i?.lot,
                                         expiration_date: i?.expiration_date,
@@ -652,7 +673,7 @@ const MainTable = ({ dataLang }) => {
                                                 />
                                             )) ||
                                             (e.id == 2 && (
-                                                <PopupPurchase
+                                                <PopupPurchaseBeta
                                                     id={e.id}
                                                     queryValue={queryValue}
                                                     fetchDataTable={fetchDataTable}

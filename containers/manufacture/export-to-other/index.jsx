@@ -452,7 +452,7 @@ const ExportToOther = (props) => {
                                             />
                                             <DateToDateComponent
                                                 value={isState.valueDate}
-                                                onChange={() => queryState({ valueDate: e })}
+                                                onChange={(e) => queryState({ valueDate: e })}
                                                 colSpan={1}
                                             />
                                         </div>

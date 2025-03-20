@@ -148,6 +148,7 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const TimelineChartStage = ({ data, dataLang, typePageMoblie }) => {
     const dataSeting = useSetingServer();
@@ -264,9 +265,9 @@ const TimelineChartStage = ({ data, dataLang, typePageMoblie }) => {
     }, [data, dataLang]);
 
     return (
-        <div ref={containerRef} className="w-full overflow-x-auto">
+        <Customscrollbar ref={containerRef} className="overflow-x-auto">
             <svg ref={svgRef} width={svgWidth} height={svgHeight}></svg>
-        </div>
+        </Customscrollbar>
     );
 };
 

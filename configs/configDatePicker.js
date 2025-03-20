@@ -17,8 +17,18 @@ const styleDatePicker = {
         },
     },
     className:
-        "react-datepicker__input-container  placeholder:text-[#cbd5e1] 2xl:placeholder:text-xs xl:placeholder:text-xs lg:placeholder:text-[8px] placeholder:text-[8px]",
+        `react-datepicker__input-container  placeholder:text-[#cbd5e1] 
+        2xl:placeholder:text-[10px] 
+        xl:placeholder:text-[10px] 
+        lg:placeholder:text-[8px] 
+        placeholder:text-[8px] `,
     inputClassName:
-        "rounded-md w-full 2xl:p-2 placeholder:text-[#cbd5e1] xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-[9px] lg:placeholder:text-[8px] placeholder:text-[8px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent",
+        `rounded w-full  placeholder:text-[#cbd5e1] px-1.5 2xl:py-1.5 py-2.5 rounded 2xl:text-base text-xs  bg-white focus:outline-[#0F4F9E] 
+         2xl:placeholder:text-[9px]
+         xl:placeholder:text-[7.5px]
+          lg:placeholder:text-[7px]
+           placeholder:text-[7px] border-none 
+         2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent
+        `,
 };
 export default styleDatePicker;
