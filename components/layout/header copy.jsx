@@ -621,7 +621,6 @@ const Header = () => {
                             viewOwn: -1,
                             view: -1,
                             name: "Công nợ phải trả",
-                            link: "/report-statistical/receivables-debt/#",
                         },
                         {
                             viewOwn: -1,
@@ -1015,7 +1014,6 @@ const Header = () => {
             className: "popover-bottom-left arrow-danhmuc",
             title: "Danh mục",
             text: "Quản lý các model Khách hàng, nhà cung cấp, NVL, thành phẩm, nhân sự",
-            link: ["/clients", "/supplier", "/items", "/products", "/personnel"],
         },
         {
             data: ListBanXuatHang,
@@ -1023,32 +1021,28 @@ const Header = () => {
             className: "popover-bottom-left arrow-banxuathang",
             text: "Quản lý các model bán hàng, giao hàng",
             title: "Bán & Xuất hàng",
-            link: ["/sales-export-product"],
         },
         {
             data: ListMuaNhapHang,
             position: "bottom left",
-            className: "",
+            className: "popover-bottom-left-muanhaphang arrow-muanhaphang",
             title: "Mua & Nhập hàng",
             text: "Quản lý các model mua, nhập, trả hàng",
-            link: ["/purchase-order"],
         },
 
         {
             data: ListKhoSanXuat,
-            position: "bottom left",
+            // position: "",
             className: "popover-khosanxuat",
             title: "Kho & Sản xuất",
             text: "Quản lý các model kho, sản xuất, gia công, QC",
-            link: ["/warehouses", "/manufacture"],
         },
         {
             data: ListKeToan,
             position: "bottom left",
-            className: "",
+            className: "popover-bottom-left-muanhaphang arrow-muanhaphang",
             title: "Kế toán",
             text: "Quản lý các model công nợ",
-            link: ["/accountant"],
         },
         {
             data: ListBaoCao,
@@ -1056,14 +1050,12 @@ const Header = () => {
             className: "",
             title: "Báo cáo & Thống kê",
             text: "Quản lý các báo cáo, thống kê",
-            link: ["/report-statistical"],
         },
         {
             data: ListKhac,
             className: "popover-khac",
             text: "Quản lý các tiện ích, công việc",
             title: "Tiện ích",
-            link: ["/convenience"],
         },
         // {
         //     data: ListAdd,
@@ -1108,48 +1100,42 @@ const Header = () => {
     const currentDropdown = dropdowns[currentDropdownIndex];
 
     return (
-        <header className="fixed z-40 w-full bg-[#003DA0] top-0 h-[72px] flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 1536py-4">
+        <header className="z-40 w-full bg-[#003DA0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
             {/* <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
-            <div className="flex items-center space-x-2">
-                <Link
-                    href="/"
-                    className="relative mr-8"
-                >
-                    <Image
-                        alt=""
-                        src="/LOGO_HEADER.png"
-                        width={100}
-                        height={45}
-                        quality={100}
-                        className="3xl:w-[110px] w-[100px] h-auto object-contain"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        placeholder="blur"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
-                    <div
-                        style={{
-                            background: `radial-gradient(45.83% 94.64% at 93.75% 3.57%, #1FC583 0%, #1F9285 100%)`,
-                            boxShadow: `1px 1px 2px 0px #00000040`
-                        }}
-                        className="px-1.5 py-0.5 text-[8px] font-semibold text-white rounded-sm w-fit absolute top-0 right-0 translate-x-[110%]"
-                    >
-                        Beta
-                    </div>
-                </Link>
+            <div className="flex items-center justify-between 3xl:mx-6 2xl:mx-4 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">
+                <div className="flex items-center space-x-2 3xl:space-x-6 2xl:space-x-4 xl:space-x-4">
+                    <Link href="/" className="relative mr-5 2xl:mr-6">
+                        <Image
+                            alt=""
+                            src="/LOGO_HEADER.png"
+                            width={100}
+                            height={45}
+                            quality={100}
+                            className="3xl:w-[110px] 2xl:w-[100px] xl:w-[90px] w-[70px] h-auto object-contain"
+                            loading="lazy"
+                            crossOrigin="anonymous"
+                            placeholder="blur"
+                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                        />
+                        <div
+                            style={{
+                                background: `radial-gradient(45.83% 94.64% at 93.75% 3.57%, #1FC583 0%, #1F9285 100%)`,
+                                boxShadow: `1px 1px 2px 0px #00000040`
+                            }}
+                            className="px-1.5 py-0.5 text-[8px] font-semibold text-white rounded-sm w-fit absolute top-0 right-0 translate-x-[110%]"
+                        >
+                            Beta
+                        </div>
+                    </Link>
 
-                <div className='flex flex-row items-center gap-2'>
                     {
-                        dropdowns.map((dropdown, index) => {
-                            console.log('dropdown', dropdown);
-
-
-                            return (
-                                <React.Fragment key={index}>
-                                    <Tooltip
-                                        titleClassName="custom-title-class"
-                                        trigger="manual"
-                                        html={
+                        dropdowns.map((dropdown, index) => (
+                            <React.Fragment key={index}>
+                                <Tooltip
+                                    titleClassName="custom-title-class"
+                                    trigger="manual"
+                                    html={
+                                        <React.Fragment>
                                             <div className="w-auto h-auto rounded-lg ">
                                                 <div className="flex items-center justify-center rounded-lg">
                                                     <ArrowUp
@@ -1162,131 +1148,80 @@ const Header = () => {
                                                     </h2>
                                                 </div>
                                             </div>
-                                        }
-                                        title={dropdown.text}
-                                        open={dataPstWH && index === currentDropdownIndex}
-                                        position="bottom"
-                                        animation="perspective"
-                                        size="regular"
-                                        theme="light"
-                                        arrow={true}
+                                        </React.Fragment>
+                                    }
+                                    title={dropdown.text}
+                                    open={dataPstWH && index === currentDropdownIndex}
+                                    position="bottom"
+                                    animation="perspective"
+                                    size="regular"
+                                    theme="light"
+                                    arrow={true}
+                                >
+                                    <Dropdown
+                                        data={dropdown.data}
+                                        position={dropdown.position}
+                                        className={dropdown.className}
+                                        style={dataPstWH}
                                     >
-                                        <Dropdown
-                                            data={dropdown.data}
-                                            position={dropdown.position}
-                                            className={dropdown.className}
-                                            link={dropdown.link}
-                                            style={dataPstWH}
-                                        >
-                                            {dropdown.title}
-                                        </Dropdown>
-                                    </Tooltip>
-                                </React.Fragment>
-
-                            )
-                        })
+                                        {dropdown.title}
+                                    </Dropdown>
+                                </Tooltip>
+                            </React.Fragment>
+                        ))
                     }
                 </div>
-            </div>
 
-            <div className="flex items-center 3xl:gap-4 gap-2">
-                <form className="relative flex items-center">
-                    <div className="w-[16px] h-[16px] min-w-[16px] min-h-[16px] absolute left-3">
+                <div className="flex items-center gap-4">
+                    <form className="relative flex items-center">
+                        <div className="w-[16px] h-[16px] min-w-[16px] min-h-[16px] absolute left-3">
+                            <Image
+                                alt=""
+                                src="/icon/header/timkiem.png"
+                                width={24}
+                                height={18}
+                                quality={100}
+                                className="object-contain w-full h-full"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </div>
+                        <input
+                            className="3xl:w-64 2xl:w-44 xxl:w-40 xl:w-32 lg:w-28 3xl:h-10 2xl:h-9 xl:h-8 lg:h-7 3xl:placeholder:text-base 2xl:placeholder:text-[14px] xl:placeholder:text-[12px] lg:placeholder:text-[10px] placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none pl-10 pr-5 py-2 rounded-md"
+                            type="text"
+                            placeholder="Tìm kiếm"
+                        />
+                    </form>
+
+                    <button
+                        title="Cài đặt"
+                        onClick={() => {
+                            if (role) {
+                                router.push("/settings");
+                            } else {
+                                isShow("warning", WARNING_STATUS_ROLE_ADMIN);
+                            }
+                        }}
+                        className=""
+                    >
                         <Image
                             alt=""
-                            src="/icon/header/timkiem.png"
-                            width={24}
+                            src="/icon/header/right/seting.png"
+                            width={18}
                             height={18}
                             quality={100}
-                            className="object-contain w-full h-full"
+                            className="object-contain w-[18px] h-[18px] min-w-[18px] min-h-[18px] transition"
                             loading="lazy"
                             crossOrigin="anonymous"
                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                         />
-                    </div>
-                    <input
-                        className="3xl:w-64 2xl:w-48 xxl:w-40 xl:w-32 lg:w-28 3xl:h-10 2xl:h-9 xl:h-8 lg:h-7 3xl:placeholder:text-base 2xl:placeholder:text-[14px] xl:placeholder:text-[12px] lg:placeholder:text-[10px] placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none pl-10 pr-5 py-2 rounded-md"
-                        type="text"
-                        placeholder="Tìm kiếm"
-                    />
-                </form>
+                    </button>
 
-                <button
-                    title="Cài đặt"
-                    onClick={() => {
-                        if (role) {
-                            router.push("/settings");
-                        } else {
-                            isShow("warning", WARNING_STATUS_ROLE_ADMIN);
-                        }
-                    }}
-                    className=""
-                >
-                    <Image
-                        alt=""
-                        src="/icon/header/right/seting.png"
-                        width={18}
-                        height={18}
-                        quality={100}
-                        className="object-contain size-full transition"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
-                </button>
-
-                <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"} >
-                    <Image
-                        alt=""
-                        src="/icon/header/right/quytrinh.png"
-                        width={18}
-                        height={18}
-                        quality={100}
-                        className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
-                </Dropdown>
-
-                <button
-                    title="Góp ý"
-                    onClick={() => {
-                        dispatch({
-                            type: "statePopupRecommendation",
-                            payload: {
-                                open: true
-                            }
-                        })
-                    }}
-                    className=""
-                >
-                    <Image
-                        alt=""
-                        src="/icon/header/right/gopy.png"
-                        width={18}
-                        height={18}
-                        quality={100}
-                        className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
-                </button>
-
-                <Link
-                    href="#"
-                    title="Thông báo"
-                    className=""
-                >
-                    <DropdownThongBao
-                        data={[] || ListThongBao}
-                        className="popover-thongbao"
-                        position={"bottom right"}
-                    >
+                    <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"} >
                         <Image
                             alt=""
-                            src="/icon/header/right/thongbao.png"
+                            src="/icon/header/right/quytrinh.png"
                             width={18}
                             height={18}
                             quality={100}
@@ -1295,32 +1230,81 @@ const Header = () => {
                             crossOrigin="anonymous"
                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                         />
-                        {/* <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
+                    </Dropdown>
+
+                    <button
+                        title="Góp ý"
+                        onClick={() => {
+                            dispatch({
+                                type: "statePopupRecommendation",
+                                payload: {
+                                    open: true
+                                }
+                            })
+                        }}
+                        className=""
+                    >
+                        <Image
+                            alt=""
+                            src="/icon/header/right/gopy.png"
+                            width={18}
+                            height={18}
+                            quality={100}
+                            className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
+                            loading="lazy"
+                            crossOrigin="anonymous"
+                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                        />
+                    </button>
+
+                    <Link
+                        href="#"
+                        title="Thông báo"
+                        className=""
+                    >
+                        <DropdownThongBao
+                            data={[] || ListThongBao}
+                            className="popover-thongbao"
+                            position={"bottom right"}
+                        >
+                            <Image
+                                alt=""
+                                src="/icon/header/right/thongbao.png"
+                                width={18}
+                                height={18}
+                                quality={100}
+                                className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                            {/* <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
                                     2
                                 </div> */}
-                    </DropdownThongBao>
-                </Link>
+                        </DropdownThongBao>
+                    </Link>
 
-                <Link
-                    href="https://help.fmrp.vn"
-                    target="_blank"
-                    className=""
-                    title="Hướng dẫn phần mềm"
-                >
-                    <Image
-                        alt=""
-                        src="/icon/header/right/question.png"
-                        width={18}
-                        height={18}
-                        quality={100}
-                        className="object-contain w-[19px] h-[19px] min-w-[19px] min-h-[19px] transition"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
-                </Link>
+                    <Link
+                        href="https://help.fmrp.vn"
+                        target="_blank"
+                        className=""
+                        title="Hướng dẫn phần mềm"
+                    >
+                        <Image
+                            alt=""
+                            src="/icon/header/right/question.png"
+                            width={18}
+                            height={18}
+                            quality={100}
+                            className="object-contain w-[19px] h-[19px] min-w-[19px] min-h-[19px] transition"
+                            loading="lazy"
+                            crossOrigin="anonymous"
+                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                        />
+                    </Link>
 
-                <DropdownAvatar />
+                    <DropdownAvatar />
+                </div>
             </div>
             {/* <div className="px-10 py-0 pt-1 overflow-x-auto">
                 <Expirred />
