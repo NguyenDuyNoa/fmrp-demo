@@ -10,6 +10,7 @@ const TagColorProduct = ({ dataLang, dataKey, name, className, lang = true, text
         4: "text-green-500 bg-green-100",
         5: "text-teal-500 bg-teal-100",
         6: "text-red-500 bg-red-100",
+        7: "text-gray-500 bg-gray-100",
     }
     return (
         <span

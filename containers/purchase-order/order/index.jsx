@@ -116,6 +116,19 @@ const Order = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     };
 
+    const statusMap = {
+        "0": "Chưa nhập",
+        "1": "Nhập 1 phần",
+        "2": "Đã nhập đủ",
+    };
+
+    const getStatusText = (e) => {
+        console.log("e", e);
+
+        return e?.status_pay ? statusMap[e.status_pay] || "" : "";
+    };
+    console.log("data?.rResult", data?.rResult);
+
     const multiDataSet = [
         {
             columns: [
@@ -160,7 +173,8 @@ const Order = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.purchase_order_table_number || "purchase_order_table_number"}`,
+                    title: `Số kế hoạch`,
+                    // title: `${dataLang?.purchase_order_table_number || "purchase_order_table_number"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -219,19 +233,25 @@ const Order = (props) => {
             ],
             data: data?.rResult?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
-                { value: `${e?.date ? e?.date : ""}` },
+                { value: `${(e?.date && e?.date != "0000-00-00") ? formatMoment(e?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.supplier_name ? e?.supplier_name : ""}` },
                 {
-                    value: `${e?.order_type ? (e?.order_type == "0" ? "Tạo mới" : "Theo YCHM") : ""}`,
+                    value: `${e?.status_plan == "1" ? "KHSX" : e?.order_type ? (e?.order_type == "0" ? "Tạo mới" : "Theo YCHM") : ""}`,
                 },
                 {
-                    value: `${e?.purchases
-                        ? e?.purchases?.map((e) => {
-                            return e?.code;
+                    value: `${e?.list_production_plan
+                        ? e?.list_production_plan?.map((e) => {
+                            return e?.reference_no;
                         })
                         : ""
                         }`,
+                    // value: `${e?.purchases
+                    //     ? e?.purchases?.map((e) => {
+                    //         return e?.code;
+                    //     })
+                    //     : ""
+                    //     }`,
                 },
                 {
                     value: `${e?.total_price ? formatMoney(e?.total_price) : ""}`,
@@ -244,12 +264,13 @@ const Order = (props) => {
                 },
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
-                    value: `${e?.status_pay
-                        ? (e?.status_pay === "0" && "Chưa nhập") ||
-                        (e?.status_pay === "1" && "Nhập 1 phần") ||
-                        (e?.status_pay === "2" && "Đã nhập đủ đủ")
-                        : ""
-                        }`,
+                    value: `${dataLang[e?.import_status] || e?.import_status || ""}`,
+                    // value: `${e?.status_pay
+                    //     ? (e?.status_pay == "0" && "Chưa nhập") ||
+                    //     (e?.status_pay == "1" && "Nhập 1 phần") ||
+                    //     (e?.status_pay == "2" && "Đã nhập đủ")
+                    //     : ""
+                    //     }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -260,7 +281,8 @@ const Order = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.purchase_order || "purchase_order"} </title>
+                <title>Đơn hàng mua (PO) </title>
+                {/* <title>{dataLang?.purchase_order || "purchase_order"} </title> */}
             </Head>
             <Container>
                 {statusExprired ? (
@@ -269,14 +291,19 @@ const Order = (props) => {
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">{dataLang?.purchase_purchase || "purchase_purchase"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.purchase_order || "purchase_order"}</h6>
+                        <h6>
+                            Đơn hàng mua (PO)
+                            {/* {dataLang?.purchase_order || "purchase_order"} */}
+
+                        </h6>
                     </div>
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
                         <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.purchase_order || "purchase_order"}
+                                {/* {dataLang?.purchase_order || "purchase_order"} */}
+                                Đơn hàng mua (PO)
                             </h2>
                             <button
                                 onClick={() => {
@@ -296,22 +323,21 @@ const Order = (props) => {
                         </div>
 
                         <ContainerFilterTab>
-                            {dataFilterbar &&
-                                dataFilterbar?.map((e) => {
-                                    return (
-                                        <TabFilter
-                                            style={{ backgroundColor: "#e2f0fe" }}
-                                            dataLang={dataLang}
-                                            key={e.id}
-                                            onClick={_HandleSelectTab.bind(this, `${e.id}`)}
-                                            total={e.count}
-                                            active={e.id}
-                                            className={"text-[#0F4F9E]"}
-                                        >
-                                            {dataLang[e?.name] || e?.name}
-                                        </TabFilter>
-                                    );
-                                })}
+                            {dataFilterbar && dataFilterbar?.map((e) => {
+                                return (
+                                    <TabFilter
+                                        style={{ backgroundColor: "#e2f0fe" }}
+                                        dataLang={dataLang}
+                                        key={e.id}
+                                        onClick={_HandleSelectTab.bind(this, `${e.id}`)}
+                                        total={e.count}
+                                        active={e.id}
+                                        className={"text-[#0F4F9E]"}
+                                    >
+                                        {dataLang[e?.name] || e?.name}
+                                    </TabFilter>
+                                );
+                            })}
                         </ContainerFilterTab>
                         <ContainerTable>
                             <div className="space-y-2 xl:space-y-3">
@@ -405,8 +431,8 @@ const Order = (props) => {
                                                     {data?.rResult?.length > 0 && (
                                                         <ExcelFileComponent
                                                             dataLang={dataLang}
-                                                            filename="Danh sách yêu cầu mua hàng"
-                                                            title="DSYCMH"
+                                                            filename="Danh sách đơn hàng mua (PO)"
+                                                            title="DSDHM (PO)"
                                                             multiDataSet={multiDataSet}
                                                         />
                                                     )}
@@ -443,7 +469,8 @@ const Order = (props) => {
                                             {dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_number || "purchase_order_table_number"}
+                                            Số Kế hoạch
+                                            {/* {dataLang?.purchase_order_table_number || "purchase_order_table_number"} */}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_total || "purchase_order_table_total"}
@@ -474,7 +501,7 @@ const Order = (props) => {
                                             {data?.rResult?.map((e) => (
                                                 <RowTable key={e?.id} gridCols={12}>
                                                     <RowItemTable colSpan={1} textAlign="center">
-                                                        {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                                        {(e?.date != null && e?.date != "0000-00-00") ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1}>
                                                         <PopupDetail
@@ -491,17 +518,44 @@ const Order = (props) => {
                                                         colSpan={1}
                                                         className={"flex justify-center text-center"}
                                                     >
-                                                        {e?.order_type == "0" ? (
+
+                                                        {e?.status_plan == "1"
+                                                            ?
+                                                            <TagColorOrange name={"KHSX"} />
+                                                            :
+                                                            e?.order_type == "0"
+                                                                ? (
+                                                                    <TagColorRed name={"Tạo mới"} />
+                                                                ) : (
+                                                                    <TagColorOrange name={"YCMH"} />
+                                                                )}
+                                                        {/* {e?.order_type == "0" ? (
                                                             <TagColorRed name={"Tạo mới"} />
                                                         ) : (
                                                             <TagColorOrange name={"YCMH"} />
-                                                        )}
+                                                        )} */}
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
                                                         className={"flex-col items-center justify-center"}
                                                     >
-                                                        {e?.purchases?.map((purchase, index) => (
+                                                        {e?.list_production_plan?.map((purchase, index) => (
+                                                            // id_plan
+                                                            // : 
+                                                            // "3"
+                                                            // id_purchase_order
+                                                            // : 
+                                                            // "92"
+                                                            // reference_no
+                                                            // : 
+                                                            // "KHSX-22052437"
+                                                            <React.Fragment key={purchase?.id_plan}>
+                                                                <div className="text-[10px] px-1 col-span-1 text-center items-center justify-center flex flex-wrap text-[#0F4F9E]  transition-all ease-in-out">
+                                                                    {purchase?.reference_no}
+                                                                </div>
+                                                            </React.Fragment>
+                                                        ))}
+                                                        {/* {e?.purchases?.map((purchase, index) => (
                                                             <React.Fragment key={purchase.id}>
                                                                 <PopupDetailThere
                                                                     dataLang={dataLang}
@@ -511,7 +565,7 @@ const Order = (props) => {
                                                                     name={purchase.code}
                                                                 />
                                                             </React.Fragment>
-                                                        ))}
+                                                        ))} */}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} textAlign={"right"}>
                                                         {formatMoney(e.total_price)}

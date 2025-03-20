@@ -12,9 +12,25 @@ html {
     scroll-behavior: smooth;
     height: 100vh;
     overflow: hidden;
+    font-size: 105%;
 }
 body {
     background-color: white;
+}
+
+.tippy-tooltip {
+    border-radius: 6px;
+    background-color: #555f6d;
+}
+.tippy-tooltip-content {
+    font-size: 12px;
+    font-weight: 500;
+}
+.tippy-popper[x-placement^="bottom"] [x-arrow] {
+    border-bottom: 7px solid #555f6d !important;
+}
+.tippy-popper[x-placement^="top"] [x-arrow] {
+    border-top: 7px solid #555f6d !important;
 }
 
 .react-datepicker {

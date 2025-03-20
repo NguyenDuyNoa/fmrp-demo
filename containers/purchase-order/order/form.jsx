@@ -187,26 +187,30 @@ const OrderForm = (props) => {
 
             const itemlast = [{ items: null }];
 
-            const itemsConver = rResult?.item?.map((e) => ({
-                purchases_order_item_id: e?.purchases_order_item_id,
-                id: e.purchases_order_item_id,
-                items: {
-                    e: e?.item,
-                    label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
-                    value: e.item?.id,
-                },
-                quantity: Number(e?.quantity),
-                price: Number(e?.price),
-                discount: Number(e?.discount_percent),
-                tax: { tax_rate: e?.tax_rate, value: e?.tax_id },
-                unit: e.item?.unit_name,
-                affterDiscount: Number(e?.price_after_discount),
-                note: e?.note,
-                total:
-                    Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
-            }))
+            const itemsConver = rResult?.item?.map((e) => {
+
+                return {
+                    purchases_order_item_id: e?.purchases_order_item_id,
+                    id: e.purchases_order_item_id,
+                    items: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
+                        value: e.item?.id,
+                    },
+                    quantity: Number(e?.quantity),
+                    price: Number(e?.price),
+                    id_plan: e?.id_plan,
+                    discount: Number(e?.discount_percent),
+                    tax: { tax_rate: e?.tax_rate, value: e?.tax_id },
+                    unit: e.item?.unit_name,
+                    affterDiscount: Number(e?.price_after_discount),
+                    note: e?.note,
+                    total: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
+                }
+            })
             const item = itemlast?.concat(itemsConver);
+            console.log("itemsConver", itemsConver);
 
             sOption(item);
             setSortedArr(itemsConver);
@@ -228,9 +232,9 @@ const OrderForm = (props) => {
                 value: rResult?.supplier_id,
             });
 
-            sStartDate(moment(rResult?.date).toDate());
+            sStartDate((rResult?.date || !rResult?.date == "0000-00-00") ? moment(rResult?.date).toDate() : null);
 
-            sDelivery_dateNew(moment(rResult?.delivery_date).toDate());
+            sDelivery_dateNew((rResult?.delivery_date || !rResult?.delivery_date == "0000-00-00") ? moment(rResult?.delivery_date).toDate() : null);
 
             sOptionType(rResult?.order_type);
 
@@ -241,7 +245,7 @@ const OrderForm = (props) => {
                 }))
             );
 
-            sHidden(rResult?.order_type === "1" ? true : false);
+            // sHidden(rResult?.order_type === "1" ? true : false);
 
             sOnFetchingItemsAll(rResult?.order_type === "0" ? true : false);
 
@@ -255,12 +259,13 @@ const OrderForm = (props) => {
 
         }
     };
+    console.log("sortedArr", sortedArr);
 
     const resetValue = () => {
         if (isKeyState?.type === "optionType") {
             sOptionType(isKeyState?.value.target.value);
 
-            sHidden(isKeyState?.value.target.value === "1");
+            // sHidden(isKeyState?.value.target.value === "1");
 
             sIdPurchases(isKeyState?.value.target.value === "0" ? [] : idPurchases);
 
@@ -595,6 +600,7 @@ const OrderForm = (props) => {
             purchases_item_id: e?.items?.e?.purchases_item_id,
             note: e?.note,
             id: e?.id,
+            id_plan: e?.id_plan,
             purchases_order_item_id: e?.purchases_order_item_id,
         };
     });
@@ -616,11 +622,11 @@ const OrderForm = (props) => {
                 sOnSending(true);
             }
         } else {
-            if (idSupplier == null || idStaff == null || idBranch == null || idPurchases?.length == 0 || check) {
+            if (idSupplier == null || idStaff == null || idBranch == null || check) {
                 idSupplier == null && sErrSupplier(true);
                 idStaff == null && sErrStaff(true);
                 idBranch == null && sErrBranch(true);
-                idPurchases?.length == 0 && sErrPurchase(true);
+                // idPurchases?.length == 0 && sErrPurchase(true);
                 isShow("error", `${dataLang?.required_field_null}`);
             } else {
                 sOnSending(true);
@@ -891,6 +897,7 @@ const OrderForm = (props) => {
                 `items[${index}][purchases_order_item_id]`,
                 item?.purchases_order_item_id != undefined ? item?.purchases_order_item_id : ""
             );
+            formData.append(`items[${index}][id_plan]`, item?.id_plan ? item?.id_plan : "0");
             formData.append(`items[${index}][item]`, item?.item);
             formData.append(`items[${index}][id]`, router.query?.id ? item?.id : "");
             formData.append(`items[${index}][quantity]`, item?.quantity.toString());
@@ -1032,15 +1039,22 @@ const OrderForm = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.purchase_order || "purchase_order"}</h6>
+                        <h6 className="text-[#141522]/40">
+                            {/* {dataLang?.purchase_order || "purchase_order"} */}
+                            Đơn hàng mua (PO)
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.purchase_order_information || "purchase_order_information"}</h6>
+                        <h6>
+                            {/* {dataLang?.purchase_order_information || "purchase_order_information"} */}
+                            Thông tin đơn hàng mua (PO)
+                        </h6>
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
                         <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                            {dataLang?.purchase_order_information || "purchase_order_information"}
+                            Thông tin đơn hàng mua (PO)
+                            {/* {dataLang?.purchase_order_information || "purchase_order_information"} */}
                         </h2>
                         <div className="flex items-center justify-end mr-2">
                             <ButtonBack onClick={() => router.push(routerOrder.home)} dataLang={dataLang} />
@@ -1204,7 +1218,7 @@ const OrderForm = (props) => {
                                         <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
                                     </div>
                                 </div>
-                                <div className="col-span-3">
+                                {/* <div className="col-span-3">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}{" "}
                                     </label>
@@ -1244,8 +1258,8 @@ const OrderForm = (props) => {
                                             </label>
                                         </div>
                                     </div>
-                                </div>
-                                {hidden && (
+                                </div> */}
+                                {/* {hidden && (
                                     <div className="col-span-3">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
                                             {dataLang?.purchase_order_purchase_requisition_form || "purchase_order_purchase_requisition_form"}{" "}
@@ -1272,7 +1286,7 @@ const OrderForm = (props) => {
                                             </label>
                                         )}
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         </div>
                     </div>

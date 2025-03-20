@@ -22,6 +22,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
         <>
             <div className="flex items-center justify-start gap-8">
                 <h1 className=" text-[#11315B] font-normal 3xl:text-lg text-base">
+                    {/* Giữ kho & Mua hàng */}
                     {dataLang?.materials_planning_plan_status || "materials_planning_plan_status"}
                 </h1>
                 <div className="flex items-center gap-4">
@@ -42,7 +43,8 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                         className={`${isTab === "dataPurchases" && "border-[#EE1E1E] border"
                             } bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal text-xs w-fit rounded-md  flex gap-1 items-center`}
                     >
-                        {dataLang?.materials_planning_ycmh || "materials_planning_ycmh"}
+                        {'Đơn mua'}
+                        {/* {dataLang?.materials_planning_ycmh || "materials_planning_ycmh"} */}
                         <span className="bg-[#EE1E1E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">
                             {dataTable?.listDataRight?.dataPurchases?.length ?? 0}
                         </span>
@@ -97,7 +99,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                             <span className="capitalize">{e.user}</span>
                                         </h5>
                                         {isTab === "dataKeepStock" && <TagWarehouse data={{ warehouseman_id: e?.warehousemanId }} />}
-                                        {isTab === "dataPurchases" &&
+                                        {/* {isTab === "dataPurchases" &&
                                             ((e?.status == 0 && (
                                                 <div
                                                     className={` font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 w-fit  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]`}
@@ -118,7 +120,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                             {dataLang?.purchase_approved || "purchase_approved"}
                                                         </span>
                                                     </div>
-                                                )))}
+                                                )))} */}
                                     </div>
                                     {isTab === "dataKeepStock" && (
                                         <div className="flex items-center gap-5 my-2">
@@ -139,8 +141,8 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                 </div>
                                 {e.showChild && (
                                     <>
-                                        <div className="grid grid-cols-12 py-2 bg-[#EEF4FD] rounded">
-                                            <h4 className="col-span-4 px-4 text-[#344054] font-normal text-xs ">
+                                        <div className={`grid ${isTab === "dataPurchases" ? "grid-cols-10" : "grid-cols-12"} py-2 bg-[#EEF4FD] rounded`}>
+                                            <h4 className={`col-span-4 px-4 text-[#344054] font-normal text-xs`}>
                                                 {dataLang?.inventory_items || "inventory_items"}
                                             </h4>
                                             <h4 className="col-span-2 px-4 text-center text-[#344054] font-normal text-xs ">
@@ -148,11 +150,13 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                             </h4>
                                             <h4 className="col-span-2 flex items-center gap-2 justify-center text-[#344054] font-normal text-xs ">
                                                 {isTab === "dataKeepStock" && (dataLang?.materials_planning_quantity_kept || "materials_planning_quantity_kept")}
-                                                {isTab === "dataPurchases" && (dataLang?.price_quote_quantity || "price_quote_quantity")}
+                                                {isTab === "dataPurchases" && 'Số lượng đã mua'}
+                                                {/* {isTab === "dataPurchases" && (dataLang?.price_quote_quantity || "price_quote_quantity")} */}
                                             </h4>
-                                            <h4 className={`${isTab === "dataKeepStock" ? "col-span-2 text-center px-4" : "col-span-4 text-left px-0"}   text-[#344054] font-normal text-xs`}>
+                                            <h4 className={`${isTab === "dataKeepStock" ? "col-span-2 text-center px-4" : "col-span-2 text-center px-0"}   text-[#344054] font-normal text-xs`}>
                                                 {isTab === "dataKeepStock" && (dataLang?.warehouseTransfer_rransferPosition || "warehouseTransfer_rransferPosition")}
-                                                {isTab === "dataPurchases" && (dataLang?.purchase_status || "purchase_status")}
+                                                {isTab === "dataPurchases" && 'Số lượng đã nhập'}
+                                                {/* {isTab === "dataPurchases" && (dataLang?.purchase_status || "purchase_status")} */}
                                             </h4>
                                             {isTab === "dataKeepStock" && (
                                                 <h4 className={`col-span-2 px-4 text-center text-[#344054] font-normal text-xs`} >
@@ -164,7 +168,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                             {e.arrListData.map((i, index) => (
                                                 <div
                                                     key={i.id}
-                                                    className={`grid grid-cols-12 items-center ${e.arrListData?.length - 1 == index ? "" : "border-b"} `}
+                                                    className={`grid ${isTab === "dataPurchases" ? "grid-cols-10" : "grid-cols-12"}  items-center ${e.arrListData?.length - 1 == index ? "" : "border-b"} `}
                                                 >
                                                     <h4 className="flex items-center col-span-4 gap-2 px-4 py-2">
                                                         <ModalImage
@@ -226,7 +230,12 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                             </h4>
                                                         </>
                                                     )}
-                                                    {isTab === "dataPurchases" && (
+                                                    {
+                                                        isTab === "dataPurchases" && (
+                                                            <div className="col-span-2 text-center">{i?.quantityImport > 0 ? formatNumber(i?.quantityImport) : "-"}</div>
+                                                        )
+                                                    }
+                                                    {/* {isTab === "dataPurchases" && (
                                                         <div className="col-span-4 flex items-center w-[70%]">
                                                             {i.processBar.map((j, index) => (
                                                                 <div className="flex flex-col w-full my-2" key={j.id}>
@@ -262,7 +271,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                 </div>
                                                             ))}
                                                         </div>
-                                                    )}
+                                                    )} */}
                                                 </div>
                                             ))}
                                         </div>

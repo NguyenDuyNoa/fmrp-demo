@@ -734,7 +734,7 @@ const SalesOrder = (props) => {
                         </ContainerTable>
                     </div>
                     <ContainerTotal className={"grid-cols-13"}>
-                        <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
+                        <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
                             {dataLang?.total_outside || "total_outside"}
                         </ColumnTable>
                         <ColumnTable colSpan={1} textAlign={"right"} className="">

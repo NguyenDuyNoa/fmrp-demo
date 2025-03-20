@@ -103,7 +103,7 @@ const Warehouse = (props) => {
 
     useEffect(() => {
         if (dataWarehouse?.rResult?.length > 0) {
-            queryKeyIsState({ idWarehouse: dataWarehouse?.rResult[0].id });
+            queryKeyIsState({ idWarehouse: isState?.idWarehouse ? isState?.idWarehouse : dataWarehouse?.rResult[0].id });
         }
     }, [dataWarehouse?.rResult])
 
@@ -282,7 +282,6 @@ const Warehouse = (props) => {
             query: { page: 1 },
         });
     };
-    console.log("data?.rResult", data?.rResult);
 
     return (
         <React.Fragment>
@@ -625,8 +624,7 @@ const Warehouse = (props) => {
                                                                                     : e.item_code}
                                                                             </h6>
 
-                                                                            <h6 className="text-left w-fit ">
-                                                                                {/* <span
+                                                                            {/* <span
                                                                                     className={`${e.item_type == "product"
                                                                                         ? "text-lime-500  border-lime-500 "
                                                                                         : " text-orange-500 border-orange-500"
@@ -636,13 +634,46 @@ const Warehouse = (props) => {
                                                                                         ? dataLang[e?.item_type]
                                                                                         : ""}
                                                                                 </span> */}
+                                                                            {
+                                                                                e?.stage_id > 0 && e?.type_products == "products" && (
+                                                                                    <TagColorProduct
+                                                                                        dataKey={7}
+                                                                                        lang={false}
+                                                                                        dataLang={dataLang}
+                                                                                        name={dataLang?.product_dd}
+                                                                                    />
+                                                                                )
+                                                                                ||
+                                                                                e?.stage_id > 0 && e?.type_products == "semi_products" && (
+                                                                                    <TagColorProduct
+                                                                                        dataKey={7}
+                                                                                        lang={false}
+                                                                                        dataLang={dataLang}
+                                                                                        name={dataLang?.semi_products_dd}
+                                                                                    />
+                                                                                )
+                                                                                ||
+                                                                                e?.stage_id > 0 && e?.type_products == "semi_products_outside" && (
+                                                                                    <TagColorProduct
+                                                                                        dataKey={7}
+                                                                                        lang={false}
+                                                                                        dataLang={dataLang}
+                                                                                        name={dataLang?.semi_products_outside_dd}
+                                                                                    />
+                                                                                )
+                                                                                ||
                                                                                 <TagColorProduct
                                                                                     dataKey={e?.item_type === "product" ? 0 : 1}
                                                                                     dataLang={dataLang}
                                                                                     name={e?.item_type}
                                                                                 />
+                                                                            }
+                                                                            {/* <TagColorProduct
+                                                                                    dataKey={e?.item_type === "product" ? 0 : 1}
+                                                                                    dataLang={dataLang}
+                                                                                    name={e?.item_type}
+                                                                                /> */}
 
-                                                                            </h6>
                                                                         </div>
                                                                     </div>
                                                                 ) : (
@@ -667,8 +698,7 @@ const Warehouse = (props) => {
                                                                                     : e.item_code}
                                                                             </h6>
 
-                                                                            <h6 className="text-left w-fit ">
-                                                                                {/* <span
+                                                                            {/* <span
                                                                                     className={`${e.item_type == "product"
                                                                                         ? "text-lime-500  border-lime-500"
                                                                                         : " text-orange-500 border-orange-500"
@@ -678,12 +708,46 @@ const Warehouse = (props) => {
                                                                                         ? dataLang[e?.item_type]
                                                                                         : ""}
                                                                                 </span> */}
+                                                                            {
+                                                                                e?.stage_id > 0 && e?.type_products == "products" && (
+                                                                                    <TagColorProduct
+                                                                                        dataKey={7}
+                                                                                        lang={false}
+                                                                                        dataLang={dataLang}
+                                                                                        name={dataLang?.product_dd}
+                                                                                    />
+                                                                                )
+                                                                                ||
+                                                                                e?.stage_id > 0 && e?.type_products == "semi_products" && (
+                                                                                    <TagColorProduct
+                                                                                        dataKey={7}
+                                                                                        lang={false}
+                                                                                        dataLang={dataLang}
+                                                                                        name={dataLang?.semi_products_dd}
+                                                                                    />
+                                                                                )
+                                                                                ||
+                                                                                e?.stage_id > 0 && e?.type_products == "semi_products_outside" && (
+                                                                                    <TagColorProduct
+                                                                                        dataKey={7}
+                                                                                        lang={false}
+                                                                                        dataLang={dataLang}
+                                                                                        name={dataLang?.semi_products_outside_dd}
+                                                                                    />
+                                                                                )
+                                                                                ||
                                                                                 <TagColorProduct
                                                                                     dataKey={e?.item_type === "product" ? 0 : 1}
                                                                                     dataLang={dataLang}
                                                                                     name={e?.item_type}
                                                                                 />
-                                                                            </h6>
+                                                                            }
+
+                                                                            {/* <TagColorProduct
+                                                                                    dataKey={e?.item_type === "product" ? 0 : 1}
+                                                                                    dataLang={dataLang}
+                                                                                    name={e?.item_type}
+                                                                                /> */}
                                                                         </div>
                                                                     </div>
                                                                 )}

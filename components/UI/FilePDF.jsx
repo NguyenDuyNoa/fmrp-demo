@@ -2505,7 +2505,8 @@ const FilePDF = ({
         ///Đơn đặt hàng po
         const docDefinitionOrder = {
             info: {
-                title: `${`${props.dataLang?.purchase_order || "purchase_order"} - ${data?.code}`}`,
+                title: `${`Đơn hàng mua (PO) - ${data?.code}`}`,
+                // title: `${`${props.dataLang?.purchase_order || "purchase_order"} - ${data?.code}`}`,
                 author: "Foso",
                 subject: "Quotation",
                 keywords: "PDF",
@@ -2519,7 +2520,8 @@ const FilePDF = ({
                 {
                     stack: [
                         {
-                            text: uppercaseText(`${props.dataLang?.purchase_order || "purchase_order"}`, "contentTitle"),
+                            text: uppercaseText(`Đơn hàng mua (PO)`, "contentTitle"),
+                            // text: uppercaseText(`${props.dataLang?.purchase_order || "purchase_order"}`, "contentTitle"),
                         },
                     ],
                     margin: marginContent,
@@ -2608,12 +2610,14 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text: props?.type === "order" ? `${props.dataLang?.purchase_order_table_number + ": " || "purchase_order_table_number"}` : "",
+                            text: props?.type === "order" ? `Số kế hoạch: ` : "",
+                            // text: props?.type === "order" ? `${props.dataLang?.purchase_order_table_number + ": " || "purchase_order_table_number"}` : "",
                             inline: true,
                             fontSize: 10,
                         },
                         {
-                            text: props?.type === "order" ? `${data?.purchases?.map((e) => e.code).join(", ")}` : "",
+                            text: props?.type === "order" ? `${data?.list_production_plan?.length > 0 ? data?.list_production_plan?.map((e) => e?.reference_no).join(", ") : ""}` : "",
+                            // text: props?.type === "order" ? `${data?.purchases?.map((e) => e.code).join(", ")}` : "",
                             bold: true,
                             fontSize: 10,
                         },

@@ -22,6 +22,7 @@ import "sweetalert2/src/sweetalert2.scss";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import LoadingButton from "@/components/UI/loading/loadingButton";
 import Cookies from "js-cookie";
+import Link from "next/link";
 
 const Login = React.memo((props) => {
     const initialState = {
@@ -326,9 +327,18 @@ const Login = React.memo((props) => {
                                         Đăng ký ngay
                                     </button>
                                 </div>
-                                <h4 className="text-center text-[#667085] text-sm font-light">
-                                    FOSOSOFT © {formatMoment(new Date(), FORMAT_MOMENT.YY)}
-                                </h4>
+                                <div className="text-center text-[#667085] text-sm font-light flex items-center gap-1 w-full justify-center">
+                                    <p>Power by</p>
+                                    <Link href="https://fososoft.vn" target="_blank" className="w-[45px] h-auto">
+                                        <Image
+                                            src={'/icon/logo-green.png'}
+                                            width={1280}
+                                            height={1024}
+                                            alt="@logo"
+                                            className="object-contain w-full h-full"
+                                        />
+                                    </Link>
+                                </div>
                             </form>
                             {/* <div className="flex items-center justify-center space-x-6">
                                                 <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">

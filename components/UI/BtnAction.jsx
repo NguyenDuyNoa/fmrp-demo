@@ -250,9 +250,10 @@ export const BtnAction = React.memo((props) => {
         ///Đơn đặt hàng PO
         if (!!props?.id && props?.type === "order") {
             if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
-                isShow("error", `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
+                isShow("error", `${(props?.status_pay != "not_spent" && ("Đơn hàng mua đã có phiếu Nhập. Không thể sửa"))
+                    // isShow("error", `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
                     ||
-                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")}`
+                    (props?.status != "not_stocked" && "Đơn hàng mua đã có phiếu Nhập. Không thể sửa")}`
                 );
                 return
             }

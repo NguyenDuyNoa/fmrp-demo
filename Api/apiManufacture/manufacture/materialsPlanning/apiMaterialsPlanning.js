@@ -52,6 +52,11 @@ const apiMaterialsPlanning = {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/handlingPurchaseProductionPlan`, data);
         return response.data
     },
+    // thêm PO beta
+    async apiHandlingOrderProductionPlan(data) {
+        const response = await axiosCustom('POST', `/api_web/api_manufactures/handlingPurchaseOrderProductionPlan`, data);
+        return response.data
+    },
 
 }
 export default apiMaterialsPlanning
