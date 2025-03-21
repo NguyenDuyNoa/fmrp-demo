@@ -25,8 +25,6 @@ export const useHandingFinishedStages = () => {
             formData.append("warehouse_import_id", data?.objectData?.objectWareHouse?.id)
 
             const { objectData: { dataTableProducts, dataTableBom } } = data
-            console.log("dataTableBom", dataTableBom);
-            console.log("dataTableProducts", dataTableProducts);
 
             // if (!dataTableProducts || !dataTableBom || dataTableProducts?.data?.items?.length == 0 || dataTableBom?.data?.boms?.length == 0) {
             //     isToast('error', 'Vui lòng kiểm tra dữ liệu')
@@ -60,7 +58,6 @@ export const useHandingFinishedStages = () => {
                 formData.append(`items[${index}][number]`, element?.number ?? "")
                 formData.append(`items[${index}][final_stage]`, element?.final_stage ?? "")
                 formData.append(`items[${index}][item_variation_id]`, element?.item_variation_id ?? "")
-                console.log("dataProductExpiry", dataProductExpiry, dataMaterialExpiry);
 
                 // công đoạn cuối
                 if (element?.final_stage == 1) {

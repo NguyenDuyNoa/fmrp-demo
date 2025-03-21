@@ -1315,7 +1315,6 @@ const Header = () => {
 
 const DropdownAvatar = React.memo(() => {
     const auth = useSelector((state) => state.auth);
-    console.log("auth", auth);
 
     const randomColors = getColorByParam(auth?.user_full_name)
 

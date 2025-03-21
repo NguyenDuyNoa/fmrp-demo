@@ -14,7 +14,6 @@ const ProductionProgressTracker = React.memo((props) => {
 
     const { data: dataProduction, isLoading } = useGetProductionProgressByGroup();
 
-    console.log("dataProduction", dataProduction);
 
     const data = [
         {

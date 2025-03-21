@@ -58,7 +58,10 @@ const adminState = {
     statePopupPreviewImage: {
         open: false,
         data: {}
-    }
+    },
+    stateFilterDropdown: {
+        open: false,
+    },
 };
 
 function adminReducer(state = adminState, action) {
@@ -109,6 +112,8 @@ function adminReducer(state = adminState, action) {
             return { ...state, statePopupParent: action.payload };
         case "statePopupPreviewImage":
             return { ...state, statePopupPreviewImage: action.payload };
+        case "stateFilterDropdown":
+            return { ...state, stateFilterDropdown: action.payload };
         default:
             return state;
     }

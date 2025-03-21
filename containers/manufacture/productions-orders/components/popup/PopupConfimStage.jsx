@@ -79,9 +79,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
         const r = await onGetData(payload)
 
-        console.log("r", r);
-
-
         queryState({ dataTableProducts: r, arrayMoveBom: [] });
 
         onGetBom({
@@ -125,7 +122,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         if (!tableRef?.current || !tableRefTotal?.current) return;
         const handleScroll = () => {
             if (tableRef.current && tableRefTotal.current) {
-                console.log("tableRefTotal", tableRefTotal);
 
                 tableRefTotal.current.scrollLeft = tableRef.current.scrollLeft;
             }

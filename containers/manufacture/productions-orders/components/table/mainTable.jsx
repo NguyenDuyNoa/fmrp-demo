@@ -14,7 +14,7 @@ import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { SearchNormal1 } from "iconsax-react";
+import { ArrowDown2, SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
 import dynamic from "next/dynamic";
 import React, { memo, useContext, useEffect, useState } from "react";
@@ -32,6 +32,13 @@ import useToast from "@/hooks/useToast";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import PopupRecallRawMaterials from "../popup/PopupRecallRawMaterials";
+import { useSelector } from "react-redux";
+import FunnelIcon from "@/components/icons/common/FunnelIcon";
+import CaretDownIcon from "@/components/icons/common/CaretDownIcon";
+import ButtonAnimationNew from "@/components/UI/button/ButtonAnimationNew";
+import FilterDropdown from "@/pages/dropdown/FilterDropdown";
+
+import DatePicker from "react-datepicker";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 
@@ -75,6 +82,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
     const { data: comboboxProductionOrders = [] } = useProductionOrdersCombobox(isState.searchProductionOrders)
 
     const handleFilter = (type, value) => queryState({ [type]: value, page: 1 });
+
+    const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
 
     useEffect(() => {
         setIsMouted(true);
@@ -443,7 +452,6 @@ const MainTable = ({ dataLang, typeScreen }) => {
             },
         });
     };
-    console.log("searchsearchsearchsearch", isState.search);
 
     const onChangeSearch = debounce((e) => {
         queryState({ search: e.target.value, page: 1, openModal: false });
@@ -500,13 +508,85 @@ const MainTable = ({ dataLang, typeScreen }) => {
         )
     })
 
+    // trigger của bộ lọc
+    const triggerFilter = (
+        <button className={`${stateFilterDropdown?.open ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg py-2 px-3 group custom-transition`}>
+            <span className="w-5 h-5 shrink-0">
+                <FunnelIcon className='w-full h-full ' />
+            </span>
+            <span className={`${stateFilterDropdown?.open ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} text-nowrap 3xl:text-base text-sm custom-transition`}>Bộ lọc</span>
+            {/* <span className="rounded-full bg-[#0F4F9E] text-white text-xs w-5 h-5 flex items-center justify-center">
+                6
+            </span> */}
+            <span className="w-4 h-4 shrink-0">
+                <CaretDownIcon className={`${stateFilterDropdown?.open ? "rotate-180" : "rotate-0"} w-full h-full custom-transition`} />
+            </span>
+        </button>
+    );
+
+
     if (!isMouted) {
         return null;
     }
 
     return (
         <React.Fragment>
+            <div className="flex justify-between items-center">
+                <h2 className="3xl:text-2xl xl:text-xl text-base text-[#52575E] capitalize font-medium">
+                    {dataLang?.productions_orders || 'productions_orders'}
+                </h2>
+
+                <div className="flex items-center gap-2">
+                    <ButtonAnimationNew
+                        icon={
+                            <div>
+                                search
+                            </div>
+                        }
+                        hideTitle={true}
+                        className=""
+                        onClick={() => console.log("helloo")}
+                    />
+
+                    <div className="relative w-full col-span-2">
+                        <DatePicker
+                            id="start"
+                            portalId="menu-time"
+                            calendarClassName="rasta-stripes"
+                            clearButtonClassName="text"
+                            selected={isState.date.dateStart}
+                            startDate={isState.date.dateStart}
+                            endDate={isState.date.dateEnd}
+                            selectsRange
+                            onChange={(date) => {
+                                const [start, end] = date;
+                                queryState({
+                                    date: {
+                                        dateStart: start,
+                                        dateEnd: end,
+                                    },
+                                });
+                            }}
+                            isClearable
+                            placeholderText={dataLang?.productions_orders_day_to_day || 'productions_orders_day_to_day'}
+                            className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
+                        />
+                        <ArrowDown2
+                            size="11"
+                            color="#6b7280"
+                            className="absolute right-0 -translate-x-1/2 translate-y-1/2 top-1/2"
+                        />
+                    </div>
+
+                    <FilterDropdown trigger={triggerFilter}>
+                        Hello
+                    </FilterDropdown>
+                </div>
+            </div>
+
+
             {!typePageMoblie && <FilterHeader {...shareProps} />}
+
             <div className="!mt-[14px]">
                 <h1 className="text-[#141522] font-medium text-[13px] my-2">
                     {dataLang?.productions_orders_total || "productions_orders_total"}: {isState?.countAll}

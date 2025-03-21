@@ -75,8 +75,6 @@ const PopupPurchaseBeta = ({ dataLang, icon, title, dataTable, className, queryV
 
     const dataSupplier = form.watch("idBranch") ? listSuppiler?.rResult?.map((e) => ({ label: e.name, value: e.id })) : []
 
-    console.log("dataSupplier", dataSupplier);
-
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: "arrayItem",

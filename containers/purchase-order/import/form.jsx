@@ -834,9 +834,6 @@ const PurchaseImportForm = (props) => {
         sSearchOrder(inputValue);
     }, 500)
 
-    console.log("listData", listData);
-
-
     return (
         <React.Fragment>
             <Head>

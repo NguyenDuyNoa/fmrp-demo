@@ -1215,12 +1215,12 @@ const Header = () => {
     const currentDropdown = dropdowns[currentDropdownIndex];
 
     return (
-        <header className="fixed z-40 w-full bg-[#003DA0] top-0 h-[72px] flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 1536py-4">
+        <header className="fixed z-40 w-full bg-[#003DA0] top-0 xl:h-[72px] h-14 flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 py-4">
             {/* <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             <div className="flex items-center space-x-2">
                 <Link
                     href="/"
-                    className="relative mr-8"
+                    className="relative xl:mr-8 mr-7"
                 >
                     <Image
                         alt=""
@@ -1228,12 +1228,13 @@ const Header = () => {
                         width={100}
                         height={45}
                         quality={100}
-                        className="3xl:w-[110px] w-[100px] h-auto object-contain"
+                        className="3xl:w-[110px] 2xl:w-[100px] xl:w-[90px] w-[60px] h-auto object-contain"
                         loading="lazy"
                         crossOrigin="anonymous"
                         placeholder="blur"
                         blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                     />
+
                     <div
                         style={{
                             background: `radial-gradient(45.83% 94.64% at 93.75% 3.57%, #1FC583 0%, #1F9285 100%)`,
@@ -1245,11 +1246,9 @@ const Header = () => {
                     </div>
                 </Link>
 
-                <div className='flex flex-row items-center gap-2'>
+                <div className='flex flex-row items-center xl:gap-1 gap-0.5'>
                     {
                         dropdowns.map((dropdown, index) => {
-                            console.log('dropdown', dropdown);
-
 
                             return (
                                 <React.Fragment key={index}>
@@ -1296,9 +1295,9 @@ const Header = () => {
                 </div>
             </div>
 
-            <div className="flex items-center 3xl:gap-4 gap-2">
+            <div className="flex items-center 3xl:gap-4 xl:gap-3 gap-2">
                 <form className="relative flex items-center">
-                    <div className="w-[16px] h-[16px] min-w-[16px] min-h-[16px] absolute left-3">
+                    <div className="2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 absolute xl:left-3 left-1.5">
                         <Image
                             alt=""
                             src="/icon/header/timkiem.png"
@@ -1312,120 +1311,141 @@ const Header = () => {
                         />
                     </div>
                     <input
-                        className="3xl:w-64 2xl:w-48 xxl:w-40 xl:w-32 lg:w-28 3xl:h-10 2xl:h-9 xl:h-8 lg:h-7 3xl:placeholder:text-base 2xl:placeholder:text-[14px] xl:placeholder:text-[12px] lg:placeholder:text-[10px] placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none pl-10 pr-5 py-2 rounded-md"
+                        className="3xl:w-64 2xl:w-44 xxl:w-40 xl:w-32 lg:w-24 3xl:h-10 xl:h-9 h-8 3xl:text-base xxl:text-sm text-xs 3xl:placeholder:text-base xxl:placeholder:text-[14px] placeholder:text-xs placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none xxl:pl-10 xl:pl-8 lg:pl-6 pr-2 py-2 rounded-md"
                         type="text"
                         placeholder="Tìm kiếm"
                     />
                 </form>
 
-                <button
-                    title="Cài đặt"
-                    onClick={() => {
-                        if (role) {
-                            router.push("/settings");
-                        } else {
-                            isShow("warning", WARNING_STATUS_ROLE_ADMIN);
-                        }
-                    }}
-                    className=""
-                >
-                    <Image
-                        alt=""
-                        src="/icon/header/right/seting.png"
-                        width={18}
-                        height={18}
-                        quality={100}
-                        className="object-contain size-full transition"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
-                </button>
+                <Tooltip
+                    title={"Cài đặt"}
+                    arrow
+                    className="cursor-pointer"
+                    theme="dark"
 
-                <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"} >
-                    <Image
-                        alt=""
-                        src="/icon/header/right/quytrinh.png"
-                        width={18}
-                        height={18}
-                        quality={100}
-                        className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
+                >
+                    <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
+                        <Image
+                            alt=""
+                            onClick={() => {
+                                if (role) {
+                                    router.push("/settings");
+                                } else {
+                                    isShow("warning", WARNING_STATUS_ROLE_ADMIN);
+                                }
+                            }}
+                            src="/icon/header/right/seting.png"
+                            width={20}
+                            height={20}
+                            quality={100}
+                            className="object-contain w-full h-full transition"
+                            loading="lazy"
+                            crossOrigin="anonymous"
+                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                        />
+                    </div>
+                </Tooltip>
+
+                <Dropdown
+                    data={ListQuyTrinh}
+                    type='procedure'
+                    className="popover-quytrinh"
+                    position={"bottom right"}
+                    classNameTrigger={"2xl:!p-0 !p-0"}
+                >
+                    <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
+                        <Image
+                            alt=""
+                            src="/icon/header/right/quytrinh.png"
+                            width={18}
+                            height={18}
+                            quality={100}
+                            className="object-contain w-full h-full transition"
+                            loading="lazy"
+                            crossOrigin="anonymous"
+                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                        />
+                    </div>
                 </Dropdown>
 
-                <button
-                    title="Góp ý"
-                    onClick={() => {
-                        dispatch({
-                            type: "statePopupRecommendation",
-                            payload: {
-                                open: true
-                            }
-                        })
-                    }}
-                    className=""
+                <Tooltip
+                    title={"Góp ý"}
+                    arrow
+                    theme="dark"
+                    className="cursor-pointer"
                 >
-                    <Image
-                        alt=""
-                        src="/icon/header/right/gopy.png"
-                        width={18}
-                        height={18}
-                        quality={100}
-                        className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
-                </button>
+                    <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
+                        <Image
+                            alt=""
+                            onClick={() => {
+                                dispatch({
+                                    type: "statePopupRecommendation",
+                                    payload: {
+                                        open: true
+                                    }
+                                })
+                            }}
+                            src="/icon/header/right/gopy.png"
+                            width={18}
+                            height={18}
+                            quality={100}
+                            className="object-contain w-full h-full transition"
+                            loading="lazy"
+                            crossOrigin="anonymous"
+                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                        />
+                    </div>
+                </Tooltip>
 
-                <Link
-                    href="#"
-                    title="Thông báo"
-                    className=""
+                <DropdownThongBao
+                    data={[] || ListThongBao}
+                    className="popover-thongbao"
+                    position={"bottom right"}
                 >
-                    <DropdownThongBao
-                        data={[] || ListThongBao}
-                        className="popover-thongbao"
-                        position={"bottom right"}
-                    >
+                    <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
                         <Image
                             alt=""
                             src="/icon/header/right/thongbao.png"
                             width={18}
                             height={18}
                             quality={100}
-                            className="object-contain w-[17px] h-[17px] min-w-[17px] min-h-[17px] transition"
+                            className="object-contain w-full h-full transition"
                             loading="lazy"
                             crossOrigin="anonymous"
                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                         />
-                        {/* <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
+                    </div>
+                    {/* <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
                                     2
                                 </div> */}
-                    </DropdownThongBao>
-                </Link>
+                </DropdownThongBao>
 
-                <Link
-                    href="https://help.fmrp.vn"
-                    target="_blank"
-                    className=""
-                    title="Hướng dẫn phần mềm"
+                <Tooltip
+                    title={"Hướng dẫn phần mềm"}
+                    className="cursor-pointer"
+                    arrow
+                    theme="dark"
                 >
-                    <Image
-                        alt=""
-                        src="/icon/header/right/question.png"
-                        width={18}
-                        height={18}
-                        quality={100}
-                        className="object-contain w-[19px] h-[19px] min-w-[19px] min-h-[19px] transition"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                    />
-                </Link>
+                    <Link
+                        href="https://help.fmrp.vn"
+                        target="_blank"
+                        className=""
+                    >
+                        <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
+                            <Image
+                                alt=""
+                                src="/icon/header/right/question.png"
+                                width={18}
+                                height={18}
+                                quality={100}
+                                className="object-contain w-full h-full transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </div>
+                    </Link>
+                </Tooltip>
 
                 <DropdownAvatar />
             </div>
@@ -1438,7 +1458,6 @@ const Header = () => {
 
 const DropdownAvatar = React.memo(() => {
     const auth = useSelector((state) => state.auth);
-    console.log("auth", auth);
 
     const randomColors = getColorByParam(auth?.user_full_name)
 

@@ -22,7 +22,6 @@ const ChatAi = (props) => {
 
     const { data: dataNumberOfWords, isLoading: isLoadingNumberOfWords } = useGetNumberOfWordsList()
 
-    console.log("stateBoxChatAi", stateBoxChatAi);
 
     const titleHeaderAi = {
         "bom": {
@@ -33,14 +32,12 @@ const ChatAi = (props) => {
         }
     }
 
-    console.log("dataParent", dataParent);
     const handleSubmitGenerateText = async () => {
         const res = await titleHeaderAi[type].onSubmit({
             content: stateBoxChatAi.chat?.content
         })
         if (res?.data) {
             if (type == 'bom') {
-                console.log("res?.data?.item", res?.data?.items);
                 const newData = dataParent?.dataSelectedVariant?.map((e) => ({
                     ...e,
                     child: res?.data?.items?.map((ce) => ({
@@ -71,8 +68,6 @@ const ChatAi = (props) => {
                         } : null,
                     })),
                 }));
-                console.log("newData", newData);
-
 
                 dispatch({
                     type: "stateBoxChatAi",
@@ -114,9 +109,6 @@ const ChatAi = (props) => {
             })
         }
     }, [dataNumberOfWords, stateBoxChatAi.open])
-
-    console.log("12222", stateBoxChatAi?.generateContentClient);
-
 
     return (
         <PopupCustom

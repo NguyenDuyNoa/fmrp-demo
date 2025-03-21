@@ -11,7 +11,7 @@ input::-ms-clear {
 html {
     scroll-behavior: smooth;
     height: 100vh;
-    overflow: hidden;
+    // overflow: hidden;
     font-size: 105%;
 }
 body {
@@ -151,6 +151,10 @@ body {
     }
 }
 
+.custom-transition {
+    @apply duration-300 ease-in-out transition-all;
+}
+
 .popover-edit-content {
     margin: 24px 0px 0px 0px !important;
     width: inherit !important;
@@ -224,7 +228,7 @@ body {
 
 .popover-quytrinh-arrow {
     position: relative !important;
-    left: -23px;
+    left: -20px;
 }
 .popover-thongbao-arrow {
     position: relative !important;

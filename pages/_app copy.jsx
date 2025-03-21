@@ -145,7 +145,6 @@ function MainPage({ Component, pageProps }) {
 
     if (!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) {
         if (router.pathname == '/auth/register') {
-          
             return <Register dataLang={data} />;
         }
         if ((!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false) || router.pathname == '/auth/login')) {
@@ -164,7 +163,10 @@ function MainPage({ Component, pageProps }) {
     }
 
     return (
-        <Customscrollbar className="relative h-screen">
+        <Customscrollbar
+            className="relative h-[calc(100vh_-_72px)] "
+        // className={`${['/dashboard'].includes(router.pathname) ? "max-h-screen" : "!overflow-y-hidden !overflow-x-hidden"}`}
+        >
             <Layout dataLang={data}>
                 <Component dataLang={data} {...pageProps} />
             </Layout>

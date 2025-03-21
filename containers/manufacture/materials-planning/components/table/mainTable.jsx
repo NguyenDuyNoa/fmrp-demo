@@ -280,7 +280,6 @@ const MainTable = ({ dataLang }) => {
     const fetchDataTableRight = async (id) => {
         try {
             const { data, isSuccess } = await apiMaterialsPlanning.apiDetailProductionPlans(id);
-            console.log("data?.productionPlan", data?.productionPlan);
 
             if (isSuccess == 1) {
                 queryState({

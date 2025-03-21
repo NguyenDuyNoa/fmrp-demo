@@ -6,7 +6,6 @@ import { Lightbox } from "react-modal-image";
 
 const CustomAvatar = ({ profileImage, fullName, data, classNameAvatar }) => {
     const randomColors = getColorByParam(fullName)
-    console.log("fullName", fullName);
 
     return (
         <div className="flex items-center justify-start w-full gap-2">

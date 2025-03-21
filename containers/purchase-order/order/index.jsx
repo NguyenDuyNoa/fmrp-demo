@@ -123,11 +123,8 @@ const Order = (props) => {
     };
 
     const getStatusText = (e) => {
-        console.log("e", e);
-
         return e?.status_pay ? statusMap[e.status_pay] || "" : "";
     };
-    console.log("data?.rResult", data?.rResult);
 
     const multiDataSet = [
         {

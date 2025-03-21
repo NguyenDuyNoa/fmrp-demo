@@ -123,7 +123,6 @@ const ProductionPlan = (props) => {
         const url = router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true";
         try {
             const { data } = await apiProductionPlan.apiListOrderPlan(url, { params: params });
-            console.log("data 12222", data);
 
             updateData({
                 dataBackend: data,
@@ -354,8 +353,6 @@ const ProductionPlan = (props) => {
         router: router.query?.tab,
         page: router.query?.page,
     };
-
-    console.log("isData.listOrder", isData);
 
     return (
         <>

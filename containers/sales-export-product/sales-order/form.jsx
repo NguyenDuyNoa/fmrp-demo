@@ -487,7 +487,6 @@ const SalesOrderForm = (props) => {
                         if (check) {
                             return check;
                         }
-                        console.log("eeeeeeeeeeee", e);
 
                         let money = 0
                         if (e.e?.tax?.tax_rate == undefined) {

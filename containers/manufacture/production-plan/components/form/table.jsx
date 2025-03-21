@@ -17,7 +17,6 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
     const showToast = useToast();
     const { getItem } = FnlocalStorage();
     const getLocalStorageTab = getItem("tab");
-    console.log("dataLang", dataLang);
 
     return (
         <>

@@ -71,14 +71,9 @@ const initialValues = {
 };
 
 const ProductionPlan = (props) => {
-    console.log("props", props);
-
     const dataLang = props.dataLang;
 
-
-
     const router = useRouter();
-    console.log("router", router);
 
     const statusExprired = useStatusExprired();
 
@@ -125,11 +120,6 @@ const ProductionPlan = (props) => {
         branch_id: isValue.valueBr?.value ? isValue.valueBr?.value : "",
         product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,
     };
-
-    useEffect(() => {
-        console.log("router", router);
-
-    }, [router.query?.tab]);
 
     const _ServerFetching = async (req) => {
         const url = router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true";
@@ -206,7 +196,6 @@ const ProductionPlan = (props) => {
                 ...params,
                 page: pageParam
             })
-            console.log("data 11111", data);
 
             return data;
         },
@@ -307,8 +296,6 @@ const ProductionPlan = (props) => {
         typeScreen: props.type,
         hasNextPage, fetchNextPage
     };
-
-    console.log("isData.listOrder", isData);
 
     return (
         <>

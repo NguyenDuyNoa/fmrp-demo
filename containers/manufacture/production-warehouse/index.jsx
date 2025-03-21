@@ -133,10 +133,8 @@ const ProductionWarehouse = (props) => {
     }, 500);
 
     const handleSaveStatus = () => {
-        console.log("1");
 
         if (isKeyState?.type === "browser") {
-            console.log("2");
             const checked = isKeyState.value.target.checked;
             const warehousemanId = isKeyState.value.target.value;
             const dataChecked = {
