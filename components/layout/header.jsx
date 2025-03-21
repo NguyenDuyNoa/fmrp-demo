@@ -18,6 +18,8 @@ import Popup from "reactjs-popup";
 import { getColorByParam } from "@/utils/helpers/radomcolor";
 import AvatarText from "../UI/common/user/AvatarText";
 
+import { motion } from 'framer-motion'
+
 const Header = () => {
     const router = useRouter();
 
@@ -55,12 +57,12 @@ const Header = () => {
                         //     viewOwn: auth?.customers?.is_view_own,
                         //     view: auth?.customers?.is_view,
                         // },
-                        {
-                            viewOwn: auth?.client_status?.is_view_own,
-                            view: auth?.client_status?.is_view,
-                            name: "Trạng thái khách hàng",
-                            link: "/clients/status-client",
-                        },
+                        // {
+                        //     viewOwn: auth?.client_status?.is_view_own,
+                        //     view: auth?.client_status?.is_view,
+                        //     name: "Trạng thái khách hàng",
+                        //     link: "/clients/status-client",
+                        // },
                         {
                             viewOwn: auth?.customers?.is_view_own,
                             view: auth?.customers?.is_view,
@@ -1426,25 +1428,30 @@ const Header = () => {
                     arrow
                     theme="dark"
                 >
-                    <Link
-                        href="https://help.fmrp.vn"
-                        target="_blank"
-                        className=""
+                    <motion.div
+                        className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0 cursor-pointer'
+                        onClick={() => window.open("https://help.fmrp.vn")}
+                        initial={{ rotate: 0 }}
+                        animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
+                        transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            repeatDelay: 2,
+                            ease: "easeInOut"
+                        }}
                     >
-                        <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
-                            <Image
-                                alt=""
-                                src="/icon/header/right/question.png"
-                                width={18}
-                                height={18}
-                                quality={100}
-                                className="object-contain w-full h-full transition"
-                                loading="lazy"
-                                crossOrigin="anonymous"
-                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                            />
-                        </div>
-                    </Link>
+                        <Image
+                            alt=""
+                            src="/icon/header/right/question.png"
+                            width={18}
+                            height={18}
+                            quality={100}
+                            className="object-contain w-full h-full transition"
+                            loading="lazy"
+                            crossOrigin="anonymous"
+                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                        />
+                    </motion.div>
                 </Tooltip>
 
                 <DropdownAvatar />

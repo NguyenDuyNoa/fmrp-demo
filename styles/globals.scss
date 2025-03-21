@@ -615,10 +615,16 @@ body {
     gap: 4px;
 }
 
-// .__react_modal_image__modal_content {
-//     z-index: 999 !important;
-// }
-// .__react_modal_image__modal_container {
-//     width: 100vw !important;
-//     height: 100vh !important;
-// }
+/* custom-datepicker.css */
+.react-datepicker__input-container {
+    @apply relative;
+
+    .react-datepicker__close-icon::after {
+        background-color: transparent !important;
+        color: transparent !important;
+        content: url("/icon/new/X.svg") !important;
+
+        // vertical-align: middle;
+        @apply size-4 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer;
+    }
+}

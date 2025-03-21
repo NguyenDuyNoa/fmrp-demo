@@ -3,6 +3,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 
+// /icon/new/CaretDown
+
 const CaretDownIcon = ({
     size = 32,
     color = "currentColor",

@@ -35,14 +35,18 @@ import PopupRecallRawMaterials from "../popup/PopupRecallRawMaterials";
 import { useSelector } from "react-redux";
 import FunnelIcon from "@/components/icons/common/FunnelIcon";
 import CaretDownIcon from "@/components/icons/common/CaretDownIcon";
-import ButtonAnimationNew from "@/components/UI/button/ButtonAnimationNew";
-import FilterDropdown from "@/pages/dropdown/FilterDropdown";
+import ButtonAnimationNew from "@/components/common/button/ButtonAnimationNew";
+import FilterDropdown from "@/components/common/dropdown/FilterDropdown";
 
 import DatePicker from "react-datepicker";
+import MagnifyingGlassIcon from "@/components/icons/common/MagnifyingGlassIcon";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/router";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 
 const MainTable = ({ dataLang, typeScreen }) => {
+    const router = useRouter()
     const listTab = [
         {
             id: uddid(),
@@ -66,6 +70,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
     const { data: listBr = [] } = useBranchList()
 
     const [isMouted, setIsMouted] = useState(false);
+    const [isOpenSearch, setIsOpenSearch] = useState(false);
 
     const { isOpen, handleQueryId, isIdChild, isId } = useToggle();
 
@@ -415,6 +420,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
             openModal: false,
             dataModal: {},
         });
+        router.push("/manufacture/productions-orders?tabModal=1")
     };
 
     const handleActiveTab = (e) => {
@@ -525,35 +531,78 @@ const MainTable = ({ dataLang, typeScreen }) => {
     );
 
 
+    const toggleSearch = () => {
+        setIsOpenSearch(!isOpenSearch);
+    };
+
+
     if (!isMouted) {
         return null;
     }
 
     return (
         <React.Fragment>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center w-full">
                 <h2 className="3xl:text-2xl xl:text-xl text-base text-[#52575E] capitalize font-medium">
                     {dataLang?.productions_orders || 'productions_orders'}
                 </h2>
 
-                <div className="flex items-center gap-2">
-                    <ButtonAnimationNew
-                        icon={
-                            <div>
-                                search
-                            </div>
-                        }
-                        hideTitle={true}
-                        className=""
-                        onClick={() => console.log("helloo")}
-                    />
+                <div className="flex items-center gap-2 max-w-[50%]">
 
-                    <div className="relative w-full col-span-2">
+
+                    <div className="relative flex items-center justify-end">
+
+
+                        {/* Animated Search Input */}
+                        <AnimatePresence>
+                            {isOpenSearch && (
+                                <motion.div
+                                    initial={{ width: 0, opacity: 0 }}
+                                    animate={{ width: "100%", opacity: 1 }}
+                                    exit={{ width: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    className="overflow-hidden"
+                                >
+                                    <form className="relative flex items-center w-full">
+                                        <SearchNormal1
+                                            size={20}
+                                            className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                                        />
+                                        <input
+                                            onChange={(e) => onChangeSearch(e)}
+                                            className={`${typePageMoblie ? "pl-7" : "pl-10"}
+                                               ${isOpenSearch ? "rounded-l-lg" : "rounded-lg"}
+                                                relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E]  p-0 h-10 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                                            type="text"
+                                            // value={isState.search}
+                                            placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
+                                        />
+                                    </form>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }}>
+                            <ButtonAnimationNew
+                                icon={
+                                    <div className='size-6 text-[#9295A4]'>
+                                        <MagnifyingGlassIcon className='size-full' />
+                                    </div>
+                                }
+                                hideTitle={true}
+                                className={`${isOpenSearch ? "rounded-r-lg" : "rounded-lg"} flex items-center justify-center w-12 h-10 shrink-0 border border-[#D0D5DD] bg-white`}
+                                onClick={toggleSearch}
+                            />
+                        </motion.div>
+                    </div>
+
+                    <div className="relative">
+
                         <DatePicker
                             id="start"
                             portalId="menu-time"
                             calendarClassName="rasta-stripes"
-                            clearButtonClassName="text"
+                            clearButtonClassName=""
                             selected={isState.date.dateStart}
                             startDate={isState.date.dateStart}
                             endDate={isState.date.dateEnd}
@@ -568,14 +617,15 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 });
                             }}
                             isClearable
-                            placeholderText={dataLang?.productions_orders_day_to_day || 'productions_orders_day_to_day'}
-                            className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
+                            placeholderText={`${dataLang?.productions_orders_day_to_day}...` || 'productions_orders_day_to_day...'}
+                            className="p-2 h-10 placeholder:text-sm placeholder:text-[#6b7280] text-sm w-[250px] outline-none focus:outline-none border-[#d8dae5] focus:border-[#3276FA] focus:bg-[#EBF5FF] border rounded-md"
                         />
-                        <ArrowDown2
-                            size="11"
-                            color="#6b7280"
-                            className="absolute right-0 -translate-x-1/2 translate-y-1/2 top-1/2"
-                        />
+                        {
+                            !isState.date.dateStart &&
+                            <span className="absolute top-1/2 -translate-y-1/2 right-2 w-4 h-4 shrink-0 text-[#9295A4]">
+                                <CaretDownIcon className={`w-full h-full custom-transition`} />
+                            </span>
+                        }
                     </div>
 
                     <FilterDropdown trigger={triggerFilter}>

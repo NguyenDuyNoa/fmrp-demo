@@ -3,6 +3,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 
+// /icon/new/Funnel
+
 const FunnelIcon = ({
     size = 32,
     color = "currentColor",
