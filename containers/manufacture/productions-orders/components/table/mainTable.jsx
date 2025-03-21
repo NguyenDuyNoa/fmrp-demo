@@ -32,6 +32,7 @@ import useToast from "@/hooks/useToast";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import PopupRecallRawMaterials from "../popup/PopupRecallRawMaterials";
+import { useRouter } from "next/router";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 
@@ -48,6 +49,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
             type: "semiProduct",
         },
     ];
+
+    const router = useRouter()
 
     const typePageMoblie = typeScreen == 'mobile'
 
@@ -406,6 +409,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
             openModal: false,
             dataModal: {},
         });
+        // router.push("/manufacture/productions-orders?tabModal=1")
     };
 
     const handleActiveTab = (e) => {
@@ -442,6 +446,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                 }),
             },
         });
+        router.push("/manufacture/productions-orders?tabModal=1")
     };
     console.log("searchsearchsearchsearch", isState.search);
 

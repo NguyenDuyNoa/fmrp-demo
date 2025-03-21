@@ -114,9 +114,13 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
 
         queryStateModal({ isTab: e });
     };
+    useEffect(() => {
+        handleActiveTab(1)
+        queryStateModal({ isTab: 1 })
+    }, [isState?.openModal])
 
     const { data, isLoading } = useQuery({
-        queryKey: ["api_item_orders_detail", isState.openModal, isState?.dataModal?.id],
+        queryKey: ["api_item_orders_detail", isState.openModal, isState?.dataModal?.id, router.query?.tabModal, router.query.tab],
         queryFn: async () => {
             const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
 
@@ -202,6 +206,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
             bgSmall: "#EE1E1E",
         },
     ];
+
 
 
     const shareProps = { queryStateModal, isState, refetchProductionsOrders, isLoading, dataLang, isStateModal, width, listTab, typePageMoblie };
