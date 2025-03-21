@@ -10,25 +10,33 @@ import Popup from "reactjs-popup";
 import Loading from "./loading/loading";
 import Zoom from "./zoomElement/zoomElement";
 import NoData from "./noData/nodata";
+import { useRouter } from "next/router";
+import HoverEffectButton from "../animations/button/HoverEffectButton";
+
 const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
 });
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const Dropdown = (props) => {
+    const router = useRouter()
     const [open, sOpen] = useState(false);
 
     const { is_admin } = useSelector((state) => state.auth);
 
     const showToat = useToast();
 
+    console.log('router?.pathname', router?.pathname);
+    console.log('props', props);
+
     return (
         <div className="">
             <Popup
                 trigger={
                     <button
-                        className={`text-slate-200 3xl:text-[18px] 2xl:text-base xxl:text-base xl:text-sm text-xs  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center`}
+                        className={`${props?.link?.some(link => router.pathname.startsWith(link)) ? "bg-[#E2F0FE] text-[#11315B] font-semibold" : "bg-transparent text-[#F3F4F6] font-normal hover:text-white"} rounded-xl xl:text-sm text-xs px-2 py-1 hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center ease-in-out duration-300 transition-all`}
                     >
                         {
                             props?.type == 'procedure' ?
@@ -49,6 +57,15 @@ export const Dropdown = (props) => {
                                 props.children
                         }
                     </button>
+                    // <div className='overflow-hidden cursor-pointer'>
+                    //     <HoverEffectButton
+                    //         title={props.children}
+                    //         hoverTitle={props.children}
+                    //         reverse={false}
+                    //         className={`${props?.link?.some(link => router.pathname.startsWith(link)) ? "bg-[#E2F0FE] text-[#11315B] font-semibold" : "bg-transparent text-[#F3F4F6] font-normal hover:text-[#11315B] hover:font-semibold"} rounded-xl xl:text-sm text-xs px-2 py-1 hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center overflow-hidden`}
+                    //         colorHover="#E2F0FE"
+                    //     />
+                    // </div>
                 }
                 closeOnDocumentClick
                 arrow={props.position}
@@ -57,7 +74,7 @@ export const Dropdown = (props) => {
                 onClose={() => sOpen(false)}
                 onOpen={() => sOpen(true)}
                 position={props.position}
-                className={`popover-edit -translate-y-10 ` + props.className}
+                className={`popover-edit -translate-y-10` + props.className}
             >
                 <div className={`w-auto ${inter.className} `}>
                     <div className="bg-white 2xl:py-2 lg:py-0.5 px-0.5 rounded-lg justify-between flex divide-x divide-[#DDDDE2]">
@@ -278,6 +295,7 @@ export const DropdownThongBao = (props) => {
             sOnFetching(false);
         }, 500);
     }, [tab]);
+
     useEffect(() => {
         sOnFetching(true);
         setTimeout(() => {
@@ -317,9 +335,10 @@ export const DropdownThongBao = (props) => {
                 position={props.position}
                 className={`popover-edit -translate-y-10 ${props.className}`}
             >
-                <div className={`w-auto ${inter.className} bg-white mb-1  overflow-auto scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 3xl:max-h-[700px] xxl:max-h-[500px] 2xl:max-h-[500px] xl:max-h-[400px] lg:max-h-[370px] max-h-[500px]  px-0.5 rounded-lg justify-between  `}>
-                    <div className="flex items-center sticky top-0  bg-white  rounded z-[999]  p-0 pt-2">
-                        {props?.data?.tab &&
+                <div className={`w-auto ${inter.className} bg-white mb-1  overflow-auto scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 3xl:max-h-[700px] xxl:max-h-[500px] 2xl:max-h-[500px] xl:max-h-[400px] lg:max-h-[370px] max-h-[500px] px-0.5 rounded-lg justify-between`}>
+                    <div className="flex items-center sticky top-0 bg-white rounded z-[999] p-0 pt-2">
+                        {
+                            props?.data?.tab &&
                             props?.data?.tab.map((e, index, array) => {
                                 return (
                                     <div key={index}>
@@ -337,31 +356,38 @@ export const DropdownThongBao = (props) => {
                                         </TabFilters>
                                     </div>
                                 );
-                            })}
+                            })
+                        }
                     </div>
-                    <div className="">
-                        <div className={`3xl:px-2 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}>
-                            <div className="space-y-0.5">
-                                {onFetching ? (
-                                    <Loading />
-                                ) : (
-                                    <>
-                                        <TabContent
-                                            subItems={props.data?.tab?.find((e) => e?.id === tab)?.sub || []}
-                                            checkStt={checkStt}
-                                        />
-                                        {props.data?.tab?.find((e) => e?.id === tab)?.sub?.length > 0 && (
-                                            <Link href={`${props.data?.tab[tab]?.link}`}>
-                                                <Zoom className="items-center text-center ">
-                                                    <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
-                                                        {props.data?.tab[tab]?.more}
-                                                    </h5>
-                                                </Zoom>
-                                            </Link>
-                                        )}
-                                    </>
-                                )}
-                            </div>
+
+                    <div className={`3xl:px-2 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}>
+                        <div className="space-y-0.5">
+                            {
+                                onFetching ?
+                                    (
+                                        <Loading />
+                                    )
+                                    :
+                                    (
+                                        <>
+                                            <TabContent
+                                                subItems={props.data?.tab?.find((e) => e?.id === tab)?.sub || []}
+                                                checkStt={checkStt}
+                                            />
+                                            {
+                                                props.data?.tab?.find((e) => e?.id === tab)?.sub?.length > 0 && (
+                                                    <Link href={`${props.data?.tab[tab]?.link}`}>
+                                                        <Zoom className="items-center text-center ">
+                                                            <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
+                                                                {props.data?.tab[tab]?.more}
+                                                            </h5>
+                                                        </Zoom>
+                                                    </Link>
+                                                )
+                                            }
+                                        </>
+                                    )
+                            }
                         </div>
                     </div>
                 </div>
@@ -369,6 +395,7 @@ export const DropdownThongBao = (props) => {
         </div>
     );
 };
+
 const TabContent = ({ subItems, checkStt }) => {
     const [checkStatus, setCheckStatus] = useState({}); // Sử dụng một đối tượng để theo dõi trạng thái của từng phần tử
 
