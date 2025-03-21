@@ -114,9 +114,13 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
 
         queryStateModal({ isTab: e });
     };
+    useEffect(() => {
+        handleActiveTab(1)
+        queryStateModal({ isTab: 1 })
+    }, [isState?.openModal])
 
     const { data, isLoading } = useQuery({
-        queryKey: ["api_item_orders_detail", isState.openModal, isState?.dataModal?.id],
+        queryKey: ["api_item_orders_detail", isState.openModal, isState?.dataModal?.id, router.query?.tabModal, router.query.tab],
         queryFn: async () => {
             const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
 
@@ -143,6 +147,8 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
         placeholderData: keepPreviousData,
         ...optionsQuery,
     })
+
+    console.log("data?.dataDetail", data?.dataDetail);
 
     const listTab = [
         {
@@ -178,26 +184,29 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
         },
     ];
 
+    console.log("data?.dataDetail?.cost?.cost_material", data?.dataDetail?.cost?.cost_material);
+
     const dataTotal = [
         {
             title: dataLang?.productions_orders_details_material_costs || 'productions_orders_details_material_costs',
-            number: formatNumber(data?.dataDetail?.cost?.cost_material ?? 0) ?? 0,
+            number: data?.dataDetail?.cost?.cost_material ? formatNumber(data?.dataDetail?.cost?.cost_material) : 0,
             bgColor: "#EBFEF2",
             bgSmall: "#0BAA2E",
         },
         {
             title: dataLang?.productions_orders_details_other_costs || 'productions_orders_details_other_costs',
-            number: formatNumber(data?.dataDetail?.cost?.cost_other ?? 0) ?? 0,
+            number: data?.dataDetail?.cost?.cost_other ? formatNumber(data?.dataDetail?.cost?.cost_other) : 0,
             bgColor: "#FEF8EC",
             bgSmall: "#FF8F0D",
         },
         {
             title: dataLang?.productions_orders_details_total_costs || 'productions_orders_details_total_costs',
-            number: formatNumber(data?.dataDetail?.cost?.total_cost ?? 0) ?? 0,
+            number: data?.dataDetail?.cost?.total_cost ? formatNumber(data?.dataDetail?.cost?.total_cost) : 0,
             bgColor: "#FFEEF0",
             bgSmall: "#EE1E1E",
         },
     ];
+
 
 
     const shareProps = { queryStateModal, isState, refetchProductionsOrders, isLoading, dataLang, isStateModal, width, listTab, typePageMoblie };
@@ -352,7 +361,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
                                             style={{ backgroundColor: `${e.bgSmall}` }}
                                             className={`${typePageMoblie ? (e?.number > 0 ? "text-xs px-1" : "text-xs px-2") : "text-base px-3"} font-medium text-white  py-1 flex flex-col justify-center items-center rounded-md`}
                                         >
-                                            {formatNumber(e?.number ?? 0)}
+                                            {e?.number}
                                         </h6>
                                     </div>
                                 </div>

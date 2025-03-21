@@ -457,6 +457,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                 }),
             },
         });
+        router.push("/manufacture/productions-orders?tabModal=1")
     };
 
     const onChangeSearch = debounce((e) => {
