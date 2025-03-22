@@ -23,7 +23,7 @@ const configSelectFillter = {
     styles: {
         singleValue: (base, state) => ({ // Thêm vào đây để đổi màu chữ
             ...base,
-            color: state.isDisabled ? "#a1a1aa" : "#141522", // màu bạn muốn đổi
+            color: state.isDisabled ? "#a1a1aa" : "#52575E", // màu bạn muốn đổi
             fontWeight: 500   // thêm font weight tùy ý (400, 500, 600, 700...)
         }),
         placeholder: (base, state) => ({
@@ -37,12 +37,13 @@ const configSelectFillter = {
             opacity: state.isDisabled ? 0.7 : 1,
         }),
         option: (provided, state) => ({
+            // ...[styles?.option ? styles?.option : configSelectFillter.styles?.option],
             ...provided,
-            backgroundColor: state.isSelected ? "#EBF5FF" : state.isFocused ? "#F0F9FF" : "transparent",
-            color: state.isSelected ? '#2563eb' : state.isFocused ? '#2563eb' : '#141522', // ← đổi màu chữ tại đây
+            backgroundColor: 'transparent',
+            color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
             '&:hover': {
-                backgroundColor: "#F0F9FF",
-                color: '#2563eb' // luôn giữ màu chữ xanh khi hover
+                backgroundColor: 'transparent',
+                color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
             },
         }),
 

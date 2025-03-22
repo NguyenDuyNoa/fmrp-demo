@@ -164,7 +164,7 @@ function MainPage({ Component, pageProps }) {
     }
 
     return (
-        <Customscrollbar className="relative h-screen">
+        <Customscrollbar className="relative h-screen custom-size-text">
             <Layout dataLang={data}>
                 <Component dataLang={data} {...pageProps} />
             </Layout>

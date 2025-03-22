@@ -20,7 +20,9 @@ export const CustomOption = (props) => {
 
 // Custom Dropdown Indicator
 const DropdownIndicator = (props) => (
-    <components.DropdownIndicator {...props}>
+    <components.DropdownIndicator
+        {...props}
+    >
         <CaretDropdownThinIcon className="w-4 h-4 text-[#9295A4]" />
     </components.DropdownIndicator>
 );
@@ -34,15 +36,13 @@ const ClearIndicator = (props) => (
 
 export const CustomMenuList = (props) => {
     return (
-        <Customscrollbar className='max-h-[300px]'>
+        <Customscrollbar className='max-h-[300px] z-[999]'>
             {props.children}
         </Customscrollbar>
     )
 }
 
-
-
-const SelectComponent = ({
+const SelectComponentNew = ({
     options,
     value,
     onChange,
@@ -66,28 +66,9 @@ const SelectComponent = ({
     onMenuOpen,
     maxShowMuti,
     id,
-    type = 'header'
+    type = 'header',
+    isDisabled = false
 }) => {
-    // const styles = {
-    //     menuList: (base) => ({
-    //         ...base,
-    //         height: "100px",
-
-    //         "::-webkit-scrollbar": {
-    //             width: "9px"
-    //         },
-    //         "::-webkit-scrollbar-track": {
-    //             background: "red"
-    //         },
-    //         "::-webkit-scrollbar-thumb": {
-    //             background: "#888"
-    //         },
-    //         "::-webkit-scrollbar-thumb:hover": {
-    //             background: "#555"
-    //         }
-    //     })
-    // }
-
     const styleType = type == "header" ?
         (
             styles ?
@@ -115,7 +96,7 @@ const SelectComponent = ({
                 ...provided,
                 backgroundColor: 'transparent',
                 // backgroundColor: state?.isSelected ? 'transparent' : provided?.backgroundColor, // Bỏ nền khi selected
-                color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
+                color: state?.isSelected ? '#2563eb' : "#2563eb", // Giữ màu chữ
                 '&:hover': {
                     backgroundColor: 'transparent',
                     // backgroundColor: state?.isSelected ? 'transparent' : provided['&:hover']?.backgroundColor, // Giữ transparent khi hover
@@ -126,6 +107,7 @@ const SelectComponent = ({
                 ...base,
                 color: "#cbd5e1",
             }),
+           
             menu: (provided) => ({
                 ...provided,
                 zIndex: 9999, // Giá trị z-index tùy chỉnh
@@ -133,11 +115,13 @@ const SelectComponent = ({
 
         }
 
+    console.log('isDisabled', isDisabled);
+
+
     return (
         <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
             <SelectCore
                 id={id ?? "parentSelect"}
-
                 options={options}
                 value={value}
                 onInputChange={onInputChange ? onInputChange : ""}
@@ -163,26 +147,10 @@ const SelectComponent = ({
                 isClearable={isClearable}
                 menuPortalTarget={menuPortalTarget}
                 menuShouldBlockScroll={menuShouldBlockScroll}
-                // styles={{
-                //     ...[styles ? styles : configSelectFillter.styles],
-                // option: (provided, state) => ({
-                //     ...[styles?.option ? styles?.option : configSelectFillter.styles?.option],
-                //     ...provided,
-                //     backgroundColor: 'transparent',
-                //     // backgroundColor: state?.isSelected ? 'transparent' : provided?.backgroundColor, // Bỏ nền khi selected
-                //     color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
-                //     '&:hover': {
-                //         backgroundColor: 'transparent',
-                //         // backgroundColor: state?.isSelected ? 'transparent' : provided['&:hover']?.backgroundColor, // Giữ transparent khi hover
-                //         color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
-                //     },
-                // }),
-                // }}
-                // bỏ nền dùm anh nha chỉ để tích màu xanh và chữ màu xanh thui
                 styles={styleType}
-
+                isDisabled={isDisabled}
             />
         </div>
     );
 };
-export default SelectComponent;
+export default SelectComponentNew;

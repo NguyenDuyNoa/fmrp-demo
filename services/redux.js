@@ -60,7 +60,7 @@ const adminState = {
         data: {}
     },
     stateFilterDropdown: {
-        open: false,
+        openDropdownId: null, // ← thêm vào đây thay vì open
     },
 };
 
@@ -113,7 +113,12 @@ function adminReducer(state = adminState, action) {
         case "statePopupPreviewImage":
             return { ...state, statePopupPreviewImage: action.payload };
         case "stateFilterDropdown":
-            return { ...state, stateFilterDropdown: action.payload };
+            return {
+                ...state,
+                stateFilterDropdown: {
+                    openDropdownId: action.payload.openDropdownId
+                }
+            };
         default:
             return state;
     }

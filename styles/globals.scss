@@ -11,8 +11,8 @@ input::-ms-clear {
 html {
     scroll-behavior: smooth;
     height: 100vh;
-    // overflow: hidden;
-    font-size: 105%;
+    overflow: hidden;
+    // font-size: 105%;
 }
 body {
     background-color: white;
@@ -148,6 +148,12 @@ body {
         transform: scale(1) translateY(0px);
         opacity: 1;
         box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+    }
+}
+
+.custom-size-text {
+    .text-default {
+        @apply 3xl:text-base xl:text-sm lg:text-sm text-base 3xl:placeholder:text-base placeholder:text-sm tracking-[1%];
     }
 }
 
@@ -517,9 +523,9 @@ body {
     width: 15px !important;
     height: 15px !important;
 }
+
 .productionSmoothing__placeholder {
-    font-size: 12px !important;
-    color: #6b7280 !important;
+    @apply text-sm   font-light;
 }
 /// select trong model  Điều độ sản xuất productionSmoothing popup
 

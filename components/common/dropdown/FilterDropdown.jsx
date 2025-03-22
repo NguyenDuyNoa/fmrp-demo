@@ -2,39 +2,42 @@ import { useState, useRef, useEffect, cloneElement, isValidElement } from 'react
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 
-const FilterDropdown = ({ children, trigger }) => {
-    const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
-    const dispatch = useDispatch();
-
-    const [isOpen, setIsOpen] = useState(false);
+const FilterDropdown = ({ children, trigger, className, dropdownId, ...props }) => {
     const dropdownRef = useRef(null);
     const triggerRef = useRef(null);
 
-    const toggleDropdown = () => {
-        dispatch({ type: "stateFilterDropdown", payload: { open: !isOpen } });
+    const dispatch = useDispatch();
+    const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
 
-        setIsOpen(!isOpen)
+    const isOpen = stateFilterDropdown?.openDropdownId === dropdownId;
+
+    const toggleDropdown = () => {
+        // dispatch({ type: "stateFilterDropdown", payload: { open: !stateFilterDropdown?.open } });
+        dispatch({
+            type: "stateFilterDropdown",
+            payload: { openDropdownId: isOpen ? null : dropdownId }
+        });
     }
 
     const handleClickOutside = (event) => {
-        if (
-            dropdownRef.current &&
-            !dropdownRef.current.contains(event.target) &&
-            triggerRef.current &&
-            !triggerRef.current.contains(event.target)
-        ) {
-            dispatch({ type: "stateFilterDropdown", payload: { open: false } });
+        const dropdownElement = dropdownRef.current;
+        const triggerElement = triggerRef.current;
 
-            setIsOpen(false);
+        // Kiểm tra click ngoài Dropdown và Trigger chính
+        const clickedOutsideDropdown = dropdownElement && !dropdownElement.contains(event.target);
+        const clickedOutsideTrigger = triggerElement && !triggerElement.contains(event.target);
+
+        // kiểm tra click vào menu combobox hoặc indicator hoặc vùng multi-select (cả label và nút remove)
+        const clickedInsideSelect = event.target.closest('.productionSmoothing__menu, .productionSmoothing__indicator, .productionSmoothing__multi-value, .productionSmoothing__multi-value__remove');
+
+        if (clickedOutsideDropdown && clickedOutsideTrigger && !clickedInsideSelect) {
+            dispatch({ type: "stateFilterDropdown", payload: { openDropdownId: null } });
         }
     };
 
-    console.log('stateFilterDropdown', stateFilterDropdown);
-
-
     useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
     }, []);
 
     return (
@@ -47,11 +50,17 @@ const FilterDropdown = ({ children, trigger }) => {
                 : null
             }
 
-            {stateFilterDropdown.open && (
-                <div ref={dropdownRef} className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg border z-50 min-w-[600px] p-4">
-                    {children}
-                </div>
-            )}
+            {
+                isOpen && (
+                    <div
+                        ref={dropdownRef}
+                        className={`${className} absolute right-0 mt-2 bg-white shadow-lg rounded-lg border z-50 min-w-[600px] p-4`}
+                        {...props}
+                    >
+                        {children}
+                    </div>
+                )
+            }
         </div>
     );
 };

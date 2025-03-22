@@ -44,6 +44,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import RadioDropdown from "@/components/common/dropdown/RadioDropdown";
+import SelectComponentNew from "@/components/UI/filterComponents/SelectComponentNew";
 
 const MainTable = ({ dataLang, typeScreen }) => {
     const router = useRouter()
@@ -505,7 +508,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                     />
                     <input
                         onChange={(e) => onChangeSearch(e)}
-                        className={`relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                        className={`relative border border-[#D0D5DD] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
                         type="text"
                         // value={isState.search}
                         placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
@@ -517,11 +520,13 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // trigger của bộ lọc
     const triggerFilter = (
-        <button className={`${stateFilterDropdown?.open ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg py-2 px-3 group custom-transition`}>
+        <button className={`${stateFilterDropdown?.open ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg h-10 px-3 group custom-transition`}>
             <span className="w-5 h-5 shrink-0">
                 <FunnelIcon className='w-full h-full ' />
             </span>
-            <span className={`${stateFilterDropdown?.open ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} text-nowrap 3xl:text-base text-sm custom-transition`}>Bộ lọc</span>
+            <span className={`${stateFilterDropdown?.open ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} text-nowrap 3xl:text-base text-sm custom-transition`}>
+                {dataLang?.productions_orders_filter || "productions_orders_filter"}
+            </span>
             {/* <span className="rounded-full bg-[#0F4F9E] text-white text-xs w-5 h-5 flex items-center justify-center">
                 6
             </span> */}
@@ -536,6 +541,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
         setIsOpenSearch(!isOpenSearch);
     };
 
+    console.log('isState', isState);
 
     if (!isMouted) {
         return null;
@@ -565,15 +571,11 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     className="overflow-hidden"
                                 >
                                     <form className="relative flex items-center w-full">
-                                        <SearchNormal1
-                                            size={20}
-                                            className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
-                                        />
                                         <input
                                             onChange={(e) => onChangeSearch(e)}
-                                            className={`${typePageMoblie ? "pl-7" : "pl-10"}
-                                               ${isOpenSearch ? "rounded-l-lg" : "rounded-lg"}
-                                                relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E]  p-0 h-10 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                                            className={`
+                                               ${isOpenSearch ? "rounded-l-lg border-r-0 border-[#D0D5DD] focus:border-[#3276FA]" : "rounded-lg border-[#D0D5DD]"}
+                                                relative border  bg-white pl-2 h-10 text-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
                                             type="text"
                                             // value={isState.search}
                                             placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
@@ -586,19 +588,18 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }}>
                             <ButtonAnimationNew
                                 icon={
-                                    <div className='size-6 text-[#9295A4]'>
+                                    <div className='size-6 '>
                                         <MagnifyingGlassIcon className='size-full' />
                                     </div>
                                 }
                                 hideTitle={true}
-                                className={`${isOpenSearch ? "rounded-r-lg" : "rounded-lg"} flex items-center justify-center w-12 h-10 shrink-0 border border-[#D0D5DD] bg-white`}
+                                className={`${isOpenSearch ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]" : "rounded-lg text-[#9295A4] border-[#D0D5DD]"} flex items-center justify-center w-12 h-10 shrink-0 border`}
                                 onClick={toggleSearch}
                             />
                         </motion.div>
                     </div>
 
                     <div className="relative">
-
                         <DatePicker
                             id="start"
                             portalId="menu-time"
@@ -619,7 +620,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             }}
                             isClearable
                             placeholderText={`${dataLang?.productions_orders_day_to_day}...` || 'productions_orders_day_to_day...'}
-                            className="p-2 h-10 placeholder:text-sm placeholder:text-[#6b7280] text-sm w-[250px] outline-none focus:outline-none border-[#d8dae5] focus:border-[#3276FA] focus:bg-[#EBF5FF] border rounded-md"
+                            className="p-2 h-10 text-default w-[250px] outline-none focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
                         />
                         {
                             !isState.date.dateStart &&
@@ -629,14 +630,404 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         }
                     </div>
 
-                    <FilterDropdown trigger={triggerFilter}>
-                        Hello
+                    <FilterDropdown
+                        trigger={triggerFilter}
+                        style={{
+                            boxShadow: "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040"
+                        }}
+                        className="flex flex-col gap-4 border-[#D8DAE5] rounded-lg 3xl:!min-w-[1820px] 2xl:min-w-[1500px] xxl:min-w-[1400px] xl:min-w-[1250px] min-w-[1000px]"
+                        dropdownId="dropdownFilterMain"
+                    >
+                        <div className="3xl:text-xl text-lg text-[#344054] font-medium ">
+                            {dataLang?.productions_orders_filter || "productions_orders_filter"}
+                        </div>
+
+                        <div className='grid 3xl:grid-cols-7 grid-cols-4 w-full gap-3'>
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueBr}
+                                    onChange={(e) => handleFilter("valueBr", e)}
+                                    options={listBr}
+                                    classParent="ml-0 focus:ring-none focus:outline-none focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_all || 'productions_orders_details_all'}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">
+                                    {dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}/{dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
+                                </h3>
+
+                                <RadioDropdown />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueOrders}
+                                    options={listOrders}
+                                    onInputChange={(e) => {
+                                        fetDataOrder(e);
+                                    }}
+                                    classParent="ml-0"
+                                    onChange={(e) => handleFilter("valueOrders", e)}
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}
+                                    isDisabled={isState?.seletedRadioFilter?.id !== 1}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valuePlan}
+                                    options={listPlan}
+                                    onInputChange={(e) => {
+                                        fetchDataPlan(e);
+                                    }}
+                                    classParent="ml-0"
+                                    onChange={(e) => handleFilter("valuePlan", e)}
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
+                                    isDisabled={isState?.seletedRadioFilter?.id !== 2}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProductionOrders}
+                                    onInputChange={(e) => {
+                                        fetchComboboxProductionOrders(e);
+                                    }}
+                                    onChange={(e) => handleFilter("valueProductionOrders", e)}
+                                    options={comboboxProductionOrders}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_number || 'productions_orders_details_number'}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProductionOrdersDetail}
+                                    onInputChange={(e) => {
+                                        fetDataPoDetail(e);
+                                    }}
+                                    onChange={(e) => handleFilter("valueProductionOrdersDetail", e)}
+                                    options={comboboxProductionOrdersDetail}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}
+                                />
+                            </div>
+
+                            <div className="3xl:col-span-2 col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_item || 'productions_orders_item'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProducts}
+                                    options={[{ label: "Mặt hàng", value: "", isDisabled: true }, ...listProducts]}
+                                    onChange={(e) => handleFilter("valueProducts", e)}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_item || 'productions_orders_item'}
+                                    onInputChange={(e) => {
+                                        fetchDataItems(e);
+                                    }}
+                                    isMulti={true}
+                                    components={{ MultiValue }}
+                                    maxShowMuti={1}
+                                    formatOptionLabel={(option) => {
+
+                                        return (
+                                            <div className="">
+                                                {
+                                                    option?.isDisabled ?
+                                                        (
+                                                            <div className="custom-text">
+                                                                <h3 className="text-base font-medium bg-transparent">{option.label}</h3>
+                                                            </div>
+                                                        )
+                                                        :
+                                                        (
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="custom-none max-w-[30px] w-[30px] h-[30px] max-h-[30px]">
+                                                                    {
+                                                                        option.e?.images != null ?
+                                                                            (
+                                                                                <img
+                                                                                    src={option.e?.images}
+                                                                                    alt="Product Image"
+                                                                                    className="max-max-w-[30px] w-[30px] h-[30px] max-h-[30px] text-[8px] object-cover rounded"
+                                                                                />
+                                                                            )
+                                                                            :
+                                                                            (
+                                                                                <div className=" max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover  flex items-center justify-center rounded">
+                                                                                    <img
+                                                                                        src="/icon/noimagelogo.png"
+                                                                                        alt="Product Image"
+                                                                                        className="max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover rounded"
+                                                                                    />
+                                                                                </div>
+                                                                            )
+                                                                    }
+                                                                </div>
+                                                                <div className="custom-text w-full">
+                                                                    <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                        {option.e?.item_name}
+                                                                    </h3>
+                                                                    <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
+                                                                        {option.e?.product_variation}
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                }
+                                            </div>
+                                        );
+                                    }}
+                                    menuPlacement="auto"
+                                    menuPosition="fixed"
+                                    styles={{
+                                        multiValueLabel: (provided) => ({
+                                            ...provided,
+                                            "& .custom-none": {
+                                                display: "none",
+                                            },
+                                            "& .custom-text": {
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "5px",
+                                                maxWidth: "50px",
+                                            },
+                                            "& .custom-text h5": {
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                whiteSpace: "nowrap",
+                                            },
+                                        }),
+
+                                        menu: (provided) => ({
+                                            ...provided,
+                                            width: "200%",
+                                            left: "auto",
+                                            right: 0, // luôn mở rộng về phía trái từ góc phải của select
+                                        }),
+                                    }}
+                                />
+                            </div>
+                        </div>
                     </FilterDropdown>
+
+                    {/* <FilterDropdown
+                        trigger={triggerFilter}
+                        style={{
+                            boxShadow: "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040"
+                        }}
+                        className="flex flex-col gap-4 border-[#D8DAE5] rounded-lg !min-w-[1700px]"
+                        dropdownId="dropdownFilterMain2"
+                    >
+                        <div className="3xl:text-xl text-lg text-[#344054] font-medium ">
+                            {dataLang?.productions_orders_filter || "productions_orders_filter"}
+                        </div>
+
+                        <div className='grid grid-cols-7 w-full gap-3'>
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueBr}
+                                    onChange={(e) => handleFilter("valueBr", e)}
+                                    options={listBr}
+                                    classParent="ml-0 focus:ring-none focus:outline-none focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_all || 'productions_orders_details_all'}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">
+                                    {dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}/{dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
+                                </h3>
+
+                                <RadioDropdown />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueOrders}
+                                    options={listOrders}
+                                    onInputChange={(e) => {
+                                        fetDataOrder(e);
+                                    }}
+                                    classParent="ml-0"
+                                    onChange={(e) => handleFilter("valueOrders", e)}
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}
+                                    isDisabled={isState?.seletedRadioFilter?.id !== 1}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valuePlan}
+                                    options={listPlan}
+                                    onInputChange={(e) => {
+                                        fetchDataPlan(e);
+                                    }}
+                                    classParent="ml-0"
+                                    onChange={(e) => handleFilter("valuePlan", e)}
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
+                                    isDisabled={isState?.seletedRadioFilter?.id !== 2}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_item || 'productions_orders_item'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProducts}
+                                    options={[{ label: "Mặt hàng", value: "", isDisabled: true }, ...listProducts]}
+                                    onChange={(e) => handleFilter("valueProducts", e)}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_item || 'productions_orders_item'}
+                                    onInputChange={(e) => {
+                                        fetchDataItems(e);
+                                    }}
+                                    isMulti={true}
+                                    components={{ MultiValue }}
+                                    maxShowMuti={1}
+                                    formatOptionLabel={(option) => {
+
+                                        return (
+                                            <div className="">
+                                                {
+                                                    option?.isDisabled ?
+                                                        (
+                                                            <div className="custom-text">
+                                                                <h3 className="text-base font-medium bg-transparent">{option.label}</h3>
+                                                            </div>
+                                                        )
+                                                        :
+                                                        (
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="custom-none max-w-[30px] w-[30px] h-[30px] max-h-[30px]">
+                                                                    {
+                                                                        option.e?.images != null ?
+                                                                            (
+                                                                                <img
+                                                                                    src={option.e?.images}
+                                                                                    alt="Product Image"
+                                                                                    className="max-max-w-[30px] w-[30px] h-[30px] max-h-[30px] text-[8px] object-cover rounded"
+                                                                                />
+                                                                            )
+                                                                            :
+                                                                            (
+                                                                                <div className=" max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover  flex items-center justify-center rounded">
+                                                                                    <img
+                                                                                        src="/icon/noimagelogo.png"
+                                                                                        alt="Product Image"
+                                                                                        className="max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover rounded"
+                                                                                    />
+                                                                                </div>
+                                                                            )
+                                                                    }
+                                                                </div>
+                                                                <div className="custom-text w-full">
+                                                                    <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                        {option.e?.item_name}
+                                                                    </h3>
+                                                                    <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
+                                                                        {option.e?.product_variation}
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                }
+                                            </div>
+                                        );
+                                    }}
+                                    styles={{
+                                        multiValueLabel: (provided) => ({
+                                            ...provided,
+                                            "& .custom-none": {
+                                                display: "none",
+                                            },
+                                            "& .custom-text": {
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "5px",
+                                                maxWidth: "50px",
+                                            },
+                                            "& .custom-text h5": {
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                whiteSpace: "nowrap",
+                                            },
+                                        }),
+
+                                        menu: (provided) => ({
+                                            ...provided,
+                                            width: "200%",
+                                        }),
+                                    }}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProductionOrders}
+                                    onInputChange={(e) => {
+                                        fetchComboboxProductionOrders(e);
+                                    }}
+                                    onChange={(e) => handleFilter("valueProductionOrders", e)}
+                                    options={comboboxProductionOrders}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_number || 'productions_orders_details_number'}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProductionOrdersDetail}
+                                    onInputChange={(e) => {
+                                        fetDataPoDetail(e);
+                                    }}
+                                    onChange={(e) => handleFilter("valueProductionOrdersDetail", e)}
+                                    options={comboboxProductionOrdersDetail}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}
+                                />
+                            </div>
+                        </div>
+                    </FilterDropdown> */}
                 </div>
             </div>
 
 
-            {!typePageMoblie && <FilterHeader {...shareProps} />}
+            {/* {!typePageMoblie && <FilterHeader {...shareProps} />} */}
 
             <div className="!mt-[14px]">
                 <h1 className="text-[#141522] font-medium text-[13px] my-2">
@@ -652,7 +1043,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 />
                                 <input
                                     onChange={(e) => onChangeSearch(e)}
-                                    className={`relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                                    className={`relative border border-[#D0D5DD] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
                                     type="text"
                                     // value={isState.search}
                                     placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
@@ -662,8 +1053,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
                     )
                 }
                 <div className="flex ">
-                    <div className="w-[22%] border-r-0 border-[#d8dae5] border">
-                        {
+                    <div className="w-[22%] border-r-0 border-[#D0D5DD] border">
+                        {/* {
                             !typePageMoblie && (
                                 <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
                                     <form className="relative flex items-center w-full">
@@ -673,7 +1064,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                         />
                                         <input
                                             onChange={(e) => onChangeSearch(e)}
-                                            className={`relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                                            className={`relative border border-[#D0D5DD] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
                                             type="text"
                                             // value={isState.search}
                                             placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
@@ -681,7 +1072,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     </form>
                                 </div>
                             )
-                        }
+                        } */}
                         <Customscrollbar className={`${typePageMoblie ? "h-[85vh]" : "3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh]"}  overflow-y-auto`}>
                             {(isLoading || isRefetching)
                                 ?
@@ -820,7 +1211,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             )}
                         </Customscrollbar>
                     </div>
-                    <div className="w-[78%] border border-[#d8dae5] ">
+                    <div className="w-[78%] border border-[#D0D5DD] ">
                         {
                             (!isLoading) && (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0) && (
                                 <div className="flex items-center justify-between px-4 py-1 border-b">

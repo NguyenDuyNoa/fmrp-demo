@@ -24,6 +24,10 @@ const initialState = {
     valueProductionOrders: null,
     valueProducts: [],
     valueBr: null,
+    seletedRadioFilter: {
+        id: 1,
+        label: "Đơn hàng bán"
+    },
     searchProductionOrders: "",
     searchOrders: "",
     searchPODetail: "",
