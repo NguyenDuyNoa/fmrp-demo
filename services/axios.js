@@ -12,7 +12,6 @@ axios.interceptors.response.use(
         return response;
     },
     function (error) {
-        console.log("error response", error);
         return Promise.reject(error);
     }
 );
@@ -23,7 +22,6 @@ axios.interceptors.request.use(
         return config;
     },
     (error) => {
-        console.log("error request", error);
         return Promise.reject(error);
     }
 );
@@ -35,13 +33,8 @@ const _ServerInstance = async (method, url, dataObject = {}, callback) => {
     const urlParams = new URLSearchParams(window.location.search);
 
     const tokenFMRP = urlParams.get("tokenFMRP");
-    console.log("12222222222 tokenFMRP", tokenFMRP);
-
 
     const databaseappFMRP = urlParams.get("databaseappFMRP");
-
-    console.log("12222222222 databaseappFMRP", databaseappFMRP);
-
 
     let token = null;
 
@@ -58,10 +51,6 @@ const _ServerInstance = async (method, url, dataObject = {}, callback) => {
     } catch (err) {
         databaseApp = null;
     }
-
-    console.log("token", token);
-    console.log("databaseApp", databaseApp);
-
 
     const headers = {
         "Content-Type": "application/json",

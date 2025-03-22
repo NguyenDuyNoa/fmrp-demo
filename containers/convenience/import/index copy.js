@@ -381,7 +381,6 @@ const Index = (props) => {
                 raw: false,
                 dateNF: "yyyy-mm-dd",
             });
-            console.log("sheetData", sheetData);
 
             const startRowIndex = parseInt(startRows) - 1;
             const endRowIndex = parseInt(endRows) - 1;
@@ -411,7 +410,6 @@ const Index = (props) => {
                     rowData["rowIndex"] = rowIndex;
                 }
                 jsonData.push(rowData);
-                console.log("rowData", rowData);
             }
             setTimeout(() => {
                 sDataImport(jsonData);

@@ -4,9 +4,8 @@ import { FaCheck } from "react-icons/fa";
 import { components } from "react-select";
 import { Customscrollbar } from "../common/Customscrollbar";
 import { MenuListClickAll } from "./selectItemComponent";
-
-
-
+import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
+import CloseXIcon from "@/components/icons/common/CloseXIcon";
 
 export const CustomOption = (props) => {
     return (
@@ -18,6 +17,21 @@ export const CustomOption = (props) => {
         </components.Option>
     )
 }
+
+// Custom Dropdown Indicator
+const DropdownIndicator = (props) => (
+    <components.DropdownIndicator {...props}>
+        <CaretDropdownThinIcon className="w-4 h-4 text-[#9295A4]" />
+    </components.DropdownIndicator>
+);
+
+// Custom Clear Indicator
+const ClearIndicator = (props) => (
+    <components.ClearIndicatorndicator {...props}>
+        <CloseXIcon className="w-4 h-4 text-[#9295A4]" />
+    </components.ClearIndicatorndicator>
+);
+
 export const CustomMenuList = (props) => {
     return (
         <Customscrollbar className='max-h-[300px]'>
@@ -75,25 +89,26 @@ const SelectComponent = ({
     // }
 
     const styleType = type == "header" ?
-        styles ?
-            {
-                ...styles,
-                option: (provided, state) => ({
-                    ...styles?.option,
-                    ...provided,
-                    backgroundColor: 'transparent',
-                    // backgroundColor: state?.isSelected ? 'transparent' : provided?.backgroundColor, // Bỏ nền khi selected
-                    color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
-                    '&:hover': {
+        (
+            styles ?
+                {
+                    ...styles,
+                    option: (provided, state) => ({
+                        ...styles?.option,
+                        ...provided,
                         backgroundColor: 'transparent',
-                        // backgroundColor: state?.isSelected ? 'transparent' : provided['&:hover']?.backgroundColor, // Giữ transparent khi hover
-                        color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
-                    },
-                }),
-            }
-            : configSelectFillter.styles
-
-        : {
+                        color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
+                        '&:hover': {
+                            backgroundColor: 'transparent',
+                            color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
+                        },
+                    }),
+                }
+                :
+                configSelectFillter.styles
+        )
+        :
+        {
             ...styles,
             option: (provided, state) => ({
                 ...styles?.option,
@@ -115,14 +130,7 @@ const SelectComponent = ({
                 ...provided,
                 zIndex: 9999, // Giá trị z-index tùy chỉnh
             }),
-            control: (base, state) => ({
-                ...base,
-                boxShadow: "none",
-                padding: "2.7px",
-                ...(state.isFocused && {
-                    border: "0 0 0 1px #92BFF7",
-                }),
-            }),
+
         }
 
     return (
@@ -143,7 +151,8 @@ const SelectComponent = ({
                 components={{
                     ...components,
                     Option: CustomOption,
-                    MenuList: CustomMenuList
+                    MenuList: CustomMenuList,
+                    DropdownIndicator, // ← Custom arrow indicator
                 }}
                 maxShowMuti={maxShowMuti}
                 noOptionsMessage={noOptionsMessage ? noOptionsMessage : configSelectFillter.noOptionsMessage}

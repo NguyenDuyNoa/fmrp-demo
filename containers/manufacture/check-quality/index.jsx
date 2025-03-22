@@ -84,8 +84,6 @@ const CheckQuality = (props) => {
     };
 
     const { data, isFetching, isLoading, refetch } = useCheckQualityList(params)
-    console.log("data11", data);
-
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });

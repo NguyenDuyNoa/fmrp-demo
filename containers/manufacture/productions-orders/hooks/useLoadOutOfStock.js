@@ -20,7 +20,6 @@ export const useLoadOutOfStock = () => {
         formData.append("pp_id", data?.items[0]?.pp_id ?? "");
 
         // }
-        console.log("data?.items", data?.object);
         const arrayMoveBom = data?.object?.arrayMoveBom || []
         if (arrayMoveBom.length > 0) {
             for (let index = 0; index < arrayMoveBom?.length; index++) {

@@ -771,7 +771,6 @@ const BodyGantt = ({
                                                                                             <div
                                                                                                 onClick={() => {
                                                                                                     if (ci?.reference_no_detail) {
-                                                                                                        console.log("ci", ci);
 
                                                                                                         handleShowModel(ci)
                                                                                                     }

@@ -55,9 +55,6 @@ const PopupDetailFirst = (props) => {
         return formatMoneyConfig(+number, dataSeting)
     };
 
-    console.log("limit", limit);
-
-
     const params = {
         limit: limit,
         page: isState.currentPage,

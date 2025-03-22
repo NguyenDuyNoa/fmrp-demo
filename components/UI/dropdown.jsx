@@ -28,16 +28,11 @@ export const Dropdown = (props) => {
 
     const showToat = useToast();
 
-    console.log('router?.pathname', router?.pathname);
-    console.log('props', props);
-
     return (
         <div className="">
             <Popup
                 trigger={
-                    <button
-                        className={`${props?.link?.some(link => router.pathname.startsWith(link)) ? "bg-[#E2F0FE] text-[#11315B] font-semibold" : "bg-transparent text-[#F3F4F6] font-normal hover:text-white"} rounded-xl xl:text-sm text-xs px-2 py-1 hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center ease-in-out duration-300 transition-all`}
-                    >
+                    <button className={`${props?.classNameTrigger} ${props?.link?.some(link => router.pathname.startsWith(link)) ? "bg-[#E2F0FE] text-[#11315B] font-semibold" : "bg-transparent text-[#F3F4F6] font-normal hover:text-white"} rounded-xl xxl:text-sm xl:text-xs text-[10px] 2xl:px-3 px-2 py-1 hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center ease-in-out duration-300 transition-all`}>
                         {
                             props?.type == 'procedure' ?
                                 (open
@@ -74,7 +69,7 @@ export const Dropdown = (props) => {
                 onClose={() => sOpen(false)}
                 onOpen={() => sOpen(true)}
                 position={props.position}
-                className={`popover-edit -translate-y-10` + props.className}
+                className={`popover-edit -translate-y-10 ` + props.className}
             >
                 <div className={`w-auto ${inter.className} `}>
                     <div className="bg-white 2xl:py-2 lg:py-0.5 px-0.5 rounded-lg justify-between flex divide-x divide-[#DDDDE2]">
@@ -302,7 +297,6 @@ export const DropdownThongBao = (props) => {
             sOnFetching(false);
         }, 500);
     }, []);
-    console.log("open", open);
 
     return (
         <div className="">

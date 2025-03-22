@@ -65,7 +65,6 @@ const Information = (props) => {
     };
 
     const _HandleChangeValue = (type, value) => {
-        console.log(type);
         if (type == "name") {
             sData({ ...data, company_name: value.target?.value });
         } else if (type == "phone") {

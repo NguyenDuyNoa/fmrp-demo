@@ -80,9 +80,7 @@ const Popup_phongban = (props) => {
                     sValueBr([]);
                     props.onRefresh && props.onRefresh();
                     sOpen(false);
-                    console.log("res ss", res);
                 } else {
-                    console.log("res err", res);
                     isShow("error", props.dataLang[message] || message);
                 }
             },

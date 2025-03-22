@@ -36,8 +36,6 @@ const PopupCheckQuality = (props) => {
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
-    console.log("data", data);
-
     return (
         <PopupCustom
             title={"Chi tiết kiểm tra chất lượng"}

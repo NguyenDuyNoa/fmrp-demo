@@ -20,7 +20,7 @@ import Register from "./auth/register";
 // const t = Lark
 const deca = Lexend_Deca({
     subsets: ["latin"],
-    weight: ["300", "400", "500", "600", "700"],
+    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 const inter = Inter({ subsets: ["latin"] });
@@ -45,8 +45,8 @@ const Index = (props) => {
                 <Suspense fallback={<LoadingPage />}>
                     <Provider store={store}>
                         {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
-                        {/* <main className={deca.className}> */}
-                        <main className={inter.className}>
+                        <main className={deca.className}>
+                            {/* <main className={deca.className}> */}
                             <MainPage {...props} />
                         </main>
                     </Provider>
@@ -144,14 +144,11 @@ function MainPage({ Component, pageProps }) {
     }
 
     if (!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) {
-        console.log("tokenFMRP", tokenFMRP);
-        console.log("databaseappFMRP", databaseappFMRP);
         if (router.pathname == '/auth/register') {
-            console.log("auth");
+          
             return <Register dataLang={data} />;
         }
         if ((!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false) || router.pathname == '/auth/login')) {
-            console.log("auth1");
 
             return <Login dataLang={data} />;
         }
@@ -167,10 +164,7 @@ function MainPage({ Component, pageProps }) {
     }
 
     return (
-        <Customscrollbar
-            className="relative max-h-screen "
-        // className={`${['/dashboard'].includes(router.pathname) ? "max-h-screen" : "!overflow-y-hidden !overflow-x-hidden"}`}
-        >
+        <Customscrollbar className="relative h-screen custom-size-text">
             <Layout dataLang={data}>
                 <Component dataLang={data} {...pageProps} />
             </Layout>

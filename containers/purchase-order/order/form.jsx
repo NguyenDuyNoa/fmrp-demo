@@ -210,7 +210,6 @@ const OrderForm = (props) => {
                 }
             })
             const item = itemlast?.concat(itemsConver);
-            console.log("itemsConver", itemsConver);
 
             sOption(item);
             setSortedArr(itemsConver);
@@ -259,7 +258,6 @@ const OrderForm = (props) => {
 
         }
     };
-    console.log("sortedArr", sortedArr);
 
     const resetValue = () => {
         if (isKeyState?.type === "optionType") {
@@ -394,7 +392,6 @@ const OrderForm = (props) => {
             sDiscount(value?.value);
         } else if (type == "itemAll") {
             sItemAll(value);
-            console.log("value", value);
             if (value?.length == 0) {
                 setSortedArr([]);
             } else {
@@ -559,9 +556,6 @@ const OrderForm = (props) => {
         value: e.id,
         e,
     }));
-
-    console.log("dataItems", dataItems);
-
 
     useEffect(() => {
         const check = () => {
@@ -818,9 +812,6 @@ const OrderForm = (props) => {
         }
     };
     const _HandleDelete = (id) => {
-        console.log("id", id);
-        console.log("sortedArr", sortedArr);
-
         const newOption = sortedArr.filter((x) => x.id !== id);
         setSortedArr(newOption);
     };
@@ -872,8 +863,6 @@ const OrderForm = (props) => {
     }, [sortedArr]);
 
     const _ServerSending = async () => {
-        console.log("sortedArr", sortedArr);
-
         let formData = new FormData();
         formData.append("code", code);
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
@@ -952,8 +941,6 @@ const OrderForm = (props) => {
     }, [onSending]);
 
     const _HandleSelectAll = () => {
-        console.log("dataItems", dataItems);
-
         const newData = dataItems.map((item, index) => {
             let money = 0
             if (item.tax?.tax_rate == undefined) {
@@ -986,7 +973,6 @@ const OrderForm = (props) => {
     }
 
     const changeItem = (e) => {
-        console.log("e", e);
         // const price = Number(e?.e?.price);
         // sortedArr[index].affterDiscount = +price * (1 - (discount ? discount : 0) / 100);
         // sortedArr[index].affterDiscount = +(Math.round(sortedArr[index].affterDiscount + "e+2") + "e-2");

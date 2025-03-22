@@ -12,7 +12,7 @@ html {
     scroll-behavior: smooth;
     height: 100vh;
     overflow: hidden;
-    font-size: 105%;
+    // font-size: 105%;
 }
 body {
     background-color: white;
@@ -151,6 +151,16 @@ body {
     }
 }
 
+.custom-size-text {
+    .text-default {
+        @apply 3xl:text-base xl:text-sm lg:text-sm text-base 3xl:placeholder:text-base placeholder:text-sm tracking-[1%];
+    }
+}
+
+.custom-transition {
+    @apply duration-300 ease-in-out transition-all;
+}
+
 .popover-edit-content {
     margin: 24px 0px 0px 0px !important;
     width: inherit !important;
@@ -224,7 +234,7 @@ body {
 
 .popover-quytrinh-arrow {
     position: relative !important;
-    left: -23px;
+    left: -20px;
 }
 .popover-thongbao-arrow {
     position: relative !important;
@@ -513,9 +523,9 @@ body {
     width: 15px !important;
     height: 15px !important;
 }
+
 .productionSmoothing__placeholder {
-    font-size: 12px !important;
-    color: #6b7280 !important;
+    @apply text-sm   font-light;
 }
 /// select trong model  Điều độ sản xuất productionSmoothing popup
 
@@ -611,10 +621,16 @@ body {
     gap: 4px;
 }
 
-// .__react_modal_image__modal_content {
-//     z-index: 999 !important;
-// }
-// .__react_modal_image__modal_container {
-//     width: 100vw !important;
-//     height: 100vh !important;
-// }
+/* custom-datepicker.css */
+.react-datepicker__input-container {
+    @apply relative;
+
+    .react-datepicker__close-icon::after {
+        background-color: transparent !important;
+        color: transparent !important;
+        content: url("/icon/new/X.svg") !important;
+
+        // vertical-align: middle;
+        @apply size-4 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer;
+    }
+}

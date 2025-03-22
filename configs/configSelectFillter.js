@@ -1,8 +1,7 @@
 const configSelectFillter = {
     hideSelectedOptions: false,
     isClearable: true,
-    className:
-        "3xl:text-[16px] parentSelect 2xl:text-[14px] xl:text-[13px] lg:text-[9px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20",
+    className: " xl:text-sm text-sm 2xl:placeholder:text-base xl:placeholder:text-sm placeholder:text-sm w-full h-full lg:w-[160px] rounded-lg bg-white z-20",
     isSearchable: true,
     noOptionsMessage: () => "Không có dữ liệu",
     closeMenuOnSelect: true,
@@ -18,33 +17,32 @@ const configSelectFillter = {
             ...theme.colors,
             primary25: "#EBF5FF",
             primary50: "#92BFF7",
-            primary: "#0F4F9E",
+            primary: "#3276FA",
         },
     }),
     styles: {
-        placeholder: (base) => ({
+        singleValue: (base, state) => ({ // Thêm vào đây để đổi màu chữ
             ...base,
-            color: "#cbd5e1",
+            color: state.isDisabled ? "#a1a1aa" : "#141522", // màu bạn muốn đổi
+            fontWeight: 500   // thêm font weight tùy ý (400, 500, 600, 700...)
+        }),
+        placeholder: (base, state) => ({
+            ...base,
+            color: state.isDisabled ? "#a1a1aa" : "#52575E",
         }),
         control: (base, state) => ({
             ...base,
-            border: "none",
-            outline: "none",
-            boxShadow: "none",
-            ...(state.isFocused && {
-                boxShadow: "0 0 0 1.5px #0F4F9E",
-            }),
+            backgroundColor: state.isDisabled ? "#f9fafb" : base.backgroundColor,
+            cursor: state.isDisabled ? "not-allowed" : "pointer",
+            opacity: state.isDisabled ? 0.7 : 1,
         }),
         option: (provided, state) => ({
-            // ...[styles?.option ? styles?.option : configSelectFillter.styles?.option],
             ...provided,
-            backgroundColor: 'transparent',
-            // backgroundColor: state?.isSelected ? 'transparent' : provided?.backgroundColor, // Bỏ nền khi selected
-            color: state?.isSelected ? '#2563eb' : provided?.color, // Giữ màu chữ
+            backgroundColor: state.isSelected ? "#EBF5FF" : state.isFocused ? "#F0F9FF" : "transparent",
+            color: state.isSelected ? '#2563eb' : state.isFocused ? '#2563eb' : '#141522', // ← đổi màu chữ tại đây
             '&:hover': {
-                backgroundColor: 'transparent',
-                // backgroundColor: state?.isSelected ? 'transparent' : provided['&:hover']?.backgroundColor, // Giữ transparent khi hover
-                color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
+                backgroundColor: "#F0F9FF",
+                color: '#2563eb' // luôn giữ màu chữ xanh khi hover
             },
         }),
 

@@ -16,7 +16,7 @@ import PopupModelTime from "components/UI/modelTime";
 import { useRouterCustom } from "@/hooks/useRouterCustom";
 const Header = () => {
     const auth = useSelector((state) => state.auth?.permissions_current);
-    console.log(auth);
+
     const ListDanhMuc = [
         {
             title: "Khách hàng",

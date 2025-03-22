@@ -193,10 +193,6 @@ export default function ChatBubbleAI(props) {
 
             }
         })
-
-        console.log("res", res);
-
-
     };
 
     useEffect(() => {

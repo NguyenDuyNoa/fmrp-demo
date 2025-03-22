@@ -44,7 +44,6 @@ const SelectItemComponent = (props) => {
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
-    console.log("props?.styles", props?.styles);
 
     return (
         <SelectCore

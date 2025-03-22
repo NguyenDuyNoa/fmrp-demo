@@ -13,7 +13,7 @@ const MoreSelectedBadge = ({ items }) => {
     const label = `+ ${length}`;
 
     return (
-        <div style={style} title={title}>
+        <div style={style} title={title} className="ml-auto bg-[#d4eefa] rounded-md 3xl:text-sm !text-[10px] px-2 py-0.5 absolute top-1/2 -translate-y-1/2 right-0 z-[999]">
             {label}
         </div>
     );

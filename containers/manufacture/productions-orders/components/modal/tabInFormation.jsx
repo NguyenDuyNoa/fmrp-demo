@@ -47,7 +47,6 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
                 unit: isStateModal.dataDetail?.poi?.unit_name,
                 type: "products",
                 arrayProducts: isStateModal.dataDetail?.items_semi?.map(e => {
-                    console.log("Eee", e);
 
                     return {
                         ...e,
@@ -69,7 +68,6 @@ const TabInFormation = memo(({ isStateModal, isLoading, width, dataLang, listTab
             },
         });
     }, [isStateModal.dataDetail]);
-    console.log("isStateModal.dataDetail?.poi?.stasges", isStateModal.dataDetail?.poi);
 
     return (
         <div>
@@ -203,8 +201,6 @@ const RenderItem = ({
     quantity_error,
     typePageMoblie
 }) => {
-    console.log("typePageMoblie", typePageMoblie);
-
     const isShow = useToast()
 
     const queryClient = useQueryClient()

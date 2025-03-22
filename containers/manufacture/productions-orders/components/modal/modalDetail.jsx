@@ -219,8 +219,6 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
         5: <TabRecallMaterials {...shareProps} />,
         6: <TabProcessingCost {...shareProps} />,
     };
-
-    console.log("data?.dataDetail", data?.dataDetail);
     // const findSt
 
     const color = {

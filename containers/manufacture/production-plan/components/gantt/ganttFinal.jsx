@@ -657,13 +657,10 @@ const GanttChart = ({
     };
 
     useEffect(() => {
-        console.log("hasNextPage", hasNextPage);
-
         const tableContainer = tableContainerRef.current;
         const ganttParentContainer = ganttParentContainerRef.current;
 
         if (!tableContainer || !ganttParentContainer) return;
-        console.log("111");
 
         let isSyncingScroll = false;
 
@@ -678,13 +675,11 @@ const GanttChart = ({
 
             const isAtBottom =
                 tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 1;
-            console.log("isAtBottom", isAtBottom);
 
             if (isAtBottom && hasNextPage) {
                 fetchNextPage();
             }
         };
-        console.log("!111");
 
 
         const handleParentScroll = () => {
@@ -696,7 +691,6 @@ const GanttChart = ({
 
             // Kiểm tra nếu `ganttParentContainer` đã cuộn đến đáy
             const isAtBottom = parentScrollTop + parentClientHeight >= parentScrollHeight - 1;
-            console.log("isAtBottom", isAtBottom);
 
             if (hasNextPage && isAtBottom) {
                 fetchNextPage()

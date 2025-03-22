@@ -12,6 +12,7 @@ import PopupRecommendation from '../UI/popup/PopupRecommendation';
 import PopupUpdateVersion from '../UI/popup/PopupUpdateVersion';
 import ImagesModal from '../UI/images/ImagesModal';
 import { useRouter } from 'next/router';
+import React from 'react';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -29,6 +30,11 @@ const Index = ({ children, ...props }) => {
 
     const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
 
+    const statePopupAccountInformation = useSelector((state) => state.statePopupAccountInformation);
+    const statePopupChangePassword = useSelector((state) => state.statePopupChangePassword);
+    const statePopupRecommendation = useSelector((state) => state.statePopupRecommendation);
+    const statePopupUpdateVersion = useSelector((state) => state.statePopupUpdateVersion);
+
     return (
         <QueryClientProvider client={queryClient}>
             {
@@ -36,7 +42,7 @@ const Index = ({ children, ...props }) => {
                     ?
                     children
                     :
-                    <>
+                    <React.Fragment>
                         <Header />
                         {children}
                         {
@@ -50,11 +56,23 @@ const Index = ({ children, ...props }) => {
 
                         <PopupAppTrial {...props} />
                         <PopupAppRenewal {...props} />
-                        <PopupUpdateVersion {...props} />
-                        <PopupAccountInformation {...props} />
-                        <PopupChangePassword {...props} />
-                        <PopupRecommendation {...props} />
-                    </>
+                        {
+                            statePopupUpdateVersion?.open &&
+                            <PopupUpdateVersion {...props} />
+                        }
+                        {
+                            statePopupAccountInformation?.open &&
+                            <PopupAccountInformation {...props} />
+                        }
+                        {
+                            statePopupChangePassword?.open &&
+                            <PopupChangePassword {...props} />
+                        }
+                        {
+                            statePopupRecommendation?.open &&
+                            <PopupRecommendation {...props} />
+                        }
+                    </React.Fragment>
             }
 
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}

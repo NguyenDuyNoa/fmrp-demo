@@ -12,8 +12,6 @@ const PopupRecallRawMaterials = ({ dataLang, dataRight, refetch: refetchMainTabl
 
     const queryState = (data) => setState((prev) => ({ ...prev, ...data }));
 
-    console.log("dataRight", dataRight);
-
 
     return (
         <PopupCustom

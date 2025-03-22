@@ -174,36 +174,7 @@ const FilterHeader = memo(
                             placeholder={dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
                         />
                     </div>
-                    <div className="relative w-full col-span-2">
-                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_day_to_day || 'productions_orders_day_to_day'}</h3>
-                        <DatePicker
-                            id="start"
-                            portalId="menu-time"
-                            calendarClassName="rasta-stripes"
-                            clearButtonClassName="text"
-                            selected={isState.date.dateStart}
-                            startDate={isState.date.dateStart}
-                            endDate={isState.date.dateEnd}
-                            selectsRange
-                            onChange={(date) => {
-                                const [start, end] = date;
-                                queryState({
-                                    date: {
-                                        dateStart: start,
-                                        dateEnd: end,
-                                    },
-                                });
-                            }}
-                            isClearable
-                            placeholderText={dataLang?.productions_orders_day_to_day || 'productions_orders_day_to_day'}
-                            className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
-                        />
-                        <ArrowDown2
-                            size="11"
-                            color="#6b7280"
-                            className="absolute right-0 -translate-x-1/2 translate-y-1/2 top-1/2"
-                        />
-                    </div>
+                 
                 </div>
             </>
         );

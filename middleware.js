@@ -5,7 +5,6 @@ export async function middleware(request, event) {
     const { pathname, origin } = request.nextUrl;
 
     const token = request.cookies.get("tokenFMRP") ?? ""
-    console.log("pathname", pathname);
 
     const databaseappFMRP = request.cookies.get("databaseappFMRP") ?? ""
 
@@ -30,7 +29,6 @@ export async function middleware(request, event) {
                 return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL_API_AUTH_LOGIN}`);
             } else {
                 if ((pathname.startsWith('/manufacture/productions-orders-mobile')) || pathname.startsWith("/manufacture/production-plan-mobile")) {
-                    console.log("12");
                     return NextResponse.next();
                 }
                 if (pathname.startsWith("/auth")) {

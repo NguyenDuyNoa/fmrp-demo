@@ -12,9 +12,6 @@ export const useProductTypeProducts = (dataLang) => {
 
             const data = await apiProducts.apiProductTypeProducts();
 
-            console.log("datadatadatadata", data);
-
-
             dispatch({
                 type: "type_finishedProduct/update",
                 payload: data?.map((e) => ({

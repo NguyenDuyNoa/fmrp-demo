@@ -181,7 +181,6 @@ const Popup_Bom = React.memo((props) => {
             sDataCd(data.stages.map((e) => ({ label: e?.name, value: e?.id })));
 
             const { rResult } = await apiProducts.apiProductVariationOption(props.id)
-            console.log("rResult", rResult);
 
             const newData = rResult[0]?.product_variation?.includes("NONE")
                 ? [
@@ -206,8 +205,6 @@ const Popup_Bom = React.memo((props) => {
                 }
                 return e;
             });
-            console.log("convertArr", convertArr);
-
 
             sDataVariant(convertArr);
 
@@ -653,7 +650,6 @@ const Popup_Bom = React.memo((props) => {
 
                 // Chỉ cập nhật state nếu dữ liệu thực sự thay đổi
                 if (hasChange) {
-                    console.log("Updating state...");
                     sDataSelectedVariant([...dataSelectedVariant]); // Tạo lại tham chiếu để React nhận diện thay đổi
                 } else {
                     console.log("No changes detected, skipping update");
@@ -675,8 +671,6 @@ const Popup_Bom = React.memo((props) => {
             sTab(dataSelectedVariant[0]?.value);
         }
     }, [dataSelectedVariant]);
-    console.log("dataSelectedVariant", dataSelectedVariant);
-
 
     const _ServerSending = async () => {
         let formData = new FormData();

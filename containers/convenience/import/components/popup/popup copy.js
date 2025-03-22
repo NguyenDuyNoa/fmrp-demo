@@ -129,7 +129,6 @@ const Popup_status = (props) => {
         width: { wpx: 150 },
         style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
       }));
-      console.log("columns", columns);
 
       const values = mappedData.map((i) =>
         allFields.map((header) => {
@@ -159,8 +158,6 @@ const Popup_status = (props) => {
           };
         })
       );
-
-      console.log("values", values);
 
       return { values, columns };
     } else {

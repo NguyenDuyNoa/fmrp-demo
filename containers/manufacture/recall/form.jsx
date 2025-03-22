@@ -367,8 +367,6 @@ const RecallForm = (props) => {
 
     //new
     const _HandleAddChild = (parentId, value) => {
-        console.log("123", value);
-
         sOnLoadingChild(true);
         const newData = listData?.map((e) => {
             if (e?.id === parentId) {
@@ -402,8 +400,6 @@ const RecallForm = (props) => {
         sOnLoadingChild(true);
         const checkData = listData?.some((e) => e?.item?.value === value?.value);
         if (!checkData) {
-            console.log("value?.e?.expiration_date", value?.e?.expiration_date);
-
             const newData = {
                 id: Date.now(),
                 idParenBackend: null,
