@@ -35,17 +35,26 @@ const configSelectFillter = {
             backgroundColor: state.isDisabled ? "#f9fafb" : base.backgroundColor,
             cursor: state.isDisabled ? "not-allowed" : "pointer",
             opacity: state.isDisabled ? 0.7 : 1,
+            zIndex: 1, // thấp hơn dropdown khác
+
         }),
         option: (provided, state) => ({
             ...provided,
-            backgroundColor: state.isSelected ? "#EBF5FF" : state.isFocused ? "#F0F9FF" : "transparent",
+            backgroundColor: state.isSelected ? "transparent" : state.isFocused ? "#F0F9FF" : "transparent",
             color: state.isSelected ? '#2563eb' : state.isFocused ? '#2563eb' : '#141522', // ← đổi màu chữ tại đây
             '&:hover': {
                 backgroundColor: "#F0F9FF",
                 color: '#2563eb' // luôn giữ màu chữ xanh khi hover
             },
         }),
-
+         menu: (provided) => ({
+                ...provided,
+                zIndex: 999999999999999, // Giá trị z-index tùy chỉnh
+            }),
+        menuPortal: base => ({
+            ...base,
+            zIndex: 999999999999999 // hoặc cao hơn nếu cần, miễn cao hơn tất cả các thành phần khác
+        })
     },
 
 };

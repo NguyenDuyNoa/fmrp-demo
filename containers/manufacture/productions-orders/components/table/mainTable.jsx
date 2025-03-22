@@ -46,7 +46,7 @@ import { useRouter } from "next/router";
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import RadioDropdown from "@/components/common/dropdown/RadioDropdown";
-import SelectComponentNew from "@/components/UI/filterComponents/SelectComponentNew";
+import SelectComponentNew from "@/components/common/select/SelectComponentNew";
 
 const MainTable = ({ dataLang, typeScreen }) => {
     const router = useRouter()
@@ -520,7 +520,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // trigger của bộ lọc
     const triggerFilter = (
-        <button className={`${stateFilterDropdown?.open ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg h-10 px-3 group custom-transition`}>
+        <button className={`${stateFilterDropdown?.open ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg xl:h-10 h-9 px-3 group custom-transition`}>
             <span className="w-5 h-5 shrink-0">
                 <FunnelIcon className='w-full h-full ' />
             </span>
@@ -553,10 +553,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
                 <h2 className="3xl:text-2xl xl:text-xl text-base text-[#52575E] capitalize font-medium">
                     {dataLang?.productions_orders || 'productions_orders'}
                 </h2>
-
-                <div className="flex items-center gap-2 max-w-[50%]">
-
-
+                
+                <div className="flex items-center gap-2 xl:max-w-[70%]">
                     <div className="relative flex items-center justify-end">
 
 
@@ -575,7 +573,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                             onChange={(e) => onChangeSearch(e)}
                                             className={`
                                                ${isOpenSearch ? "rounded-l-lg border-r-0 border-[#D0D5DD] focus:border-[#3276FA]" : "rounded-lg border-[#D0D5DD]"}
-                                                relative border  bg-white pl-2 h-10 text-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
+                                                relative border  bg-white pl-2 xl:h-10 h-9 text-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
                                             type="text"
                                             // value={isState.search}
                                             placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
@@ -593,7 +591,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     </div>
                                 }
                                 hideTitle={true}
-                                className={`${isOpenSearch ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]" : "rounded-lg text-[#9295A4] border-[#D0D5DD]"} flex items-center justify-center w-12 h-10 shrink-0 border`}
+                                className={`${isOpenSearch ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]" : "rounded-lg text-[#9295A4] border-[#D0D5DD]"} flex items-center justify-center w-12 xl:h-10 h-9 shrink-0 border`}
                                 onClick={toggleSearch}
                             />
                         </motion.div>
@@ -620,7 +618,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             }}
                             isClearable
                             placeholderText={`${dataLang?.productions_orders_day_to_day}...` || 'productions_orders_day_to_day...'}
-                            className="p-2 h-10 text-default w-[250px] outline-none focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
+                            className="p-2 xl:h-10 h-9 text-default w-[250px] outline-none focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
                         />
                         {
                             !isState.date.dateStart &&
@@ -635,7 +633,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         style={{
                             boxShadow: "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040"
                         }}
-                        className="flex flex-col gap-4 border-[#D8DAE5] rounded-lg 3xl:!min-w-[1820px] 2xl:min-w-[1500px] xxl:min-w-[1400px] xl:min-w-[1250px] min-w-[1000px]"
+                        className="flex flex-col gap-4 border-[#D8DAE5] rounded-lg 3xl:!min-w-[1820px] 2xl:min-w-[1500px] xxl:min-w-[1400px] xl:min-w-[1250px] lg:min-w-[1000px]"
                         dropdownId="dropdownFilterMain"
                     >
                         <div className="3xl:text-xl text-lg text-[#344054] font-medium ">
@@ -650,7 +648,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     value={isState.valueBr}
                                     onChange={(e) => handleFilter("valueBr", e)}
                                     options={listBr}
-                                    classParent="ml-0 focus:ring-none focus:outline-none focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
+                                    classParent="ml-0 !font-semibold focus:ring-none focus:outline-none focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_details_all || 'productions_orders_details_all'}
                                 />
@@ -730,7 +728,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 />
                             </div>
 
-                            <div className="3xl:col-span-2 col-span-1 space-y-1">
+                            <div className="3xl:col-span-1 col-span-2 space-y-1">
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_item || 'productions_orders_item'}</h3>
                                 <SelectComponentNew
                                     isClearable={true}
@@ -819,7 +817,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
                                         menu: (provided) => ({
                                             ...provided,
-                                            width: "200%",
+                                            width: "125%",
                                             left: "auto",
                                             right: 0, // luôn mở rộng về phía trái từ góc phải của select
                                         }),
