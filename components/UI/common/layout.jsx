@@ -25,7 +25,7 @@ export const Container = ({ children, className }) => {
 
 export const ContainerBody = ({ children }) => {
     return (
-        <div className=" gap-1 h-[100%] overflow-hidden col-span-7 flex-col justify-between">
+        <div className=" gap-1 h-[95%] overflow-hidden col-span-7 flex-col justify-between">
             <div className="h-[100%] flex flex-col justify-between overflow-hidden">
                 {/* <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden"> */}
                 {children}
