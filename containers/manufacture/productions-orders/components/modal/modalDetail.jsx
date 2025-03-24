@@ -148,7 +148,6 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
         ...optionsQuery,
     })
 
-    console.log("data?.dataDetail", data?.dataDetail);
 
     const listTab = [
         {
@@ -184,8 +183,6 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
         },
     ];
 
-    console.log("data?.dataDetail?.cost?.cost_material", data?.dataDetail?.cost?.cost_material);
-
     const dataTotal = [
         {
             title: dataLang?.productions_orders_details_material_costs || 'productions_orders_details_material_costs',
@@ -206,8 +203,6 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
             bgSmall: "#EE1E1E",
         },
     ];
-
-
 
     const shareProps = { queryStateModal, isState, refetchProductionsOrders, isLoading, dataLang, isStateModal, width, listTab, typePageMoblie };
 

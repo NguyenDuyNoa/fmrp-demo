@@ -1,5 +1,6 @@
 import CaretDropdownThinIcon from '@/components/icons/common/CaretDropdownThinIcon';
 import { ProductionsOrdersContext } from '@/containers/manufacture/productions-orders/context/productionsOrders';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState, useRef, useEffect, useContext } from 'react';
 
 const options = [
@@ -19,15 +20,6 @@ const RadioDropdown = () => {
             setOpen(false);
         }
     };
-
-    // useEffect(() => {
-    //     if (options) {
-    //         queryState({
-    //             seletedRadioFilter: options[0]
-    //         })
-    //     }
-    // }, [options]);
-
 
     useEffect(() => {
         document.addEventListener("mousedown", handleClickOutside);
@@ -54,42 +46,53 @@ const RadioDropdown = () => {
                 <CaretDropdownThinIcon className={`${open ? 'rotate-180' : ''} w-4 h-4 text-[#9295A4]`} />
             </button>
 
-            {
-                open && (
-                    <div className="absolute mt-1 p-1 w-full bg-white border border-[#D8DAE5] rounded-lg shadow-lg z-[9999999]">
-                        {
-                            options.map(option => (
-                                <label
-                                    key={option.id}
-                                    className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-50"
-                                >
-                                    <input
-                                        type="radio"
-                                        checked={isStateProvider?.seletedRadioFilter?.id === option.id}
-                                        onChange={() => {
-                                            if (option.id == 1) {
-                                                queryState({
-                                                    seletedRadioFilter: option,
-                                                    valuePlan: null,
-                                                })
+            <AnimatePresence>
+                {
+                    open && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="absolute mt-1 p-1 w-full bg-white border border-[#D8DAE5] rounded-lg shadow-lg z-[9999999]"
+                        >
+                            {
+                                options.map(option => (
+                                    <label
+                                        key={option.id}
+                                        className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-50"
+                                    >
+                                        <input
+                                            type="radio"
+                                            checked={isStateProvider?.seletedRadioFilter?.id === option.id}
+                                            onChange={() => {
+                                                if (option.id == 1) {
+                                                    queryState({
+                                                        seletedRadioFilter: option,
+                                                        valuePlan: null,
+                                                    })
 
-                                            } else if (option.id == 2) {
-                                                queryState({
-                                                    seletedRadioFilter: option,
-                                                    valueOrders: null,
-                                                })
-                                            }
-
-                                        }}
-                                        className="form-radio text-sm text-[#0F4F9E]"
-                                    />
-                                    <span className='text-sm text-[#141522] font-normal'>{option.label}</span>
-                                </label>
-                            ))
-                        }
-                    </div>
-                )
-            }
+                                                } else if (option.id == 2) {
+                                                    queryState({
+                                                        seletedRadioFilter: option,
+                                                        valueOrders: null,
+                                                    })
+                                                }
+                                                // ✅ Delay đóng dropdown để tránh xung đột với FilterDropdown
+                                                setTimeout(() => {
+                                                    setOpen(false);
+                                                }, 50);
+                                            }}
+                                            className="form-radio text-sm text-[#0F4F9E]"
+                                        />
+                                        <span className='text-sm text-[#141522] font-normal'>{option.label}</span>
+                                    </label>
+                                ))
+                            }
+                        </motion.div>
+                    )
+                }
+            </AnimatePresence>
         </div>
     );
 };

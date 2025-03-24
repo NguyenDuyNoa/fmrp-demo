@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect, cloneElement, isValidElement } from 'react';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { AnimatePresence, motion } from 'framer-motion'
 
-const FilterDropdown = ({ children, trigger, className, dropdownId, ...props }) => {
+const FilterDropdown = ({ children, trigger, className, dropdownId, placement = "bottom-right", ...props }) => {
     const dropdownRef = useRef(null);
     const triggerRef = useRef(null);
 
     const dispatch = useDispatch();
     const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
-
     const isOpen = stateFilterDropdown?.openDropdownId === dropdownId;
+
+    const [triggerWidth, setTriggerWidth] = useState(0);
 
     const toggleDropdown = () => {
         // dispatch({ type: "stateFilterDropdown", payload: { open: !stateFilterDropdown?.open } });
@@ -26,7 +27,6 @@ const FilterDropdown = ({ children, trigger, className, dropdownId, ...props }) 
         // Kiểm tra click ngoài Dropdown và Trigger chính
         const clickedOutsideDropdown = dropdownElement && !dropdownElement.contains(event.target);
         const clickedOutsideTrigger = triggerElement && !triggerElement.contains(event.target);
-
         // kiểm tra click vào menu combobox hoặc indicator hoặc vùng multi-select (cả label và nút remove)
         const clickedInsideSelect = event.target.closest('.productionSmoothing__menu, .productionSmoothing__indicator, .productionSmoothing__multi-value, .productionSmoothing__multi-value__remove');
 
@@ -40,8 +40,29 @@ const FilterDropdown = ({ children, trigger, className, dropdownId, ...props }) 
         return () => document.removeEventListener("click", handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        if (isOpen && triggerRef.current) {
+            const width = triggerRef.current.offsetWidth;
+            setTriggerWidth(width);
+        }
+    }, [isOpen]);
+
+
+    // 👇 Map placement thành class tailwind
+    const getPlacementClass = () => {
+        switch (placement) {
+            case 'bottom-left': return 'left-0 top-full mt-2';
+            case 'bottom-right': return 'right-0 top-full mt-2';
+            case 'top-left': return 'left-0 bottom-full mb-2';
+            case 'top-right': return 'right-0 bottom-full mb-2';
+            case 'bottom-center': return 'left-1/2 -translate-x-1/2 top-full mt-2';
+            case 'top-center': return 'left-1/2 -translate-x-1/2 bottom-full mb-2';
+            default: return 'right-0 top-full mt-2';
+        }
+    };
+
     return (
-        <div className="relative inline-block">
+        <div className="relative w-full">
             {isValidElement(trigger)
                 ? cloneElement(trigger, {
                     ref: triggerRef,
@@ -50,17 +71,32 @@ const FilterDropdown = ({ children, trigger, className, dropdownId, ...props }) 
                 : null
             }
 
-            {
-                isOpen && (
-                    <div
-                        ref={dropdownRef}
-                        className={`${className} absolute right-0 mt-2 bg-white shadow-lg rounded-lg border z-50 min-w-[600px] p-4`}
-                        {...props}
-                    >
-                        {children}
-                    </div>
-                )
-            }
+            <AnimatePresence>
+                {
+                    isOpen && (
+                        // <div
+                        //     ref={dropdownRef}
+                        //     style={{ minWidth: `${triggerWidth}px` }}
+                        //     className={`${className}
+                        //     ${getPlacementClass()}
+                        //     absolute bg-white shadow-lg rounded-lg border z-50 p-4`}
+                        //     {...props}
+                        // >
+                        <motion.div
+                            ref={dropdownRef}
+                            style={{ minWidth: `${triggerWidth}px` }}
+                            className={`${className} ${getPlacementClass()} absolute bg-white shadow-lg rounded-lg border z-50 p-4`}
+                            initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            {...props}
+                        >
+                            {children}
+                        </motion.div>
+                    )
+                }
+            </AnimatePresence>
         </div>
     );
 };
