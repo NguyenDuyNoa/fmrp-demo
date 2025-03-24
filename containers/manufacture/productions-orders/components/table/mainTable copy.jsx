@@ -17,7 +17,7 @@ import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-qu
 import { ArrowDown2, SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
 import dynamic from "next/dynamic";
-import React, { memo, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { memo, useContext, useEffect, useRef, useState } from "react";
 import { v4 as uddid } from "uuid";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
 import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
@@ -48,92 +48,50 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import RadioDropdown from "@/components/common/dropdown/RadioDropdown";
 import SelectComponentNew from "@/components/common/select/SelectComponentNew";
 import { ContainerFilterTab } from "@/components/UI/common/layout";
-import { useAutoActiveTabWithUnderline } from "@/hooks/custom/tab/useAutoActiveTabWithUnderline";
-import TabSwitcherWithUnderline from "@/components/common/tab/TabSwitcherWithUnderline";
-import CalendarBlankIcon from "@/components/icons/common/CalendarBlankIcon";
-import ChartDonutIcon from "@/components/icons/common/ChartDonutIcon";
-import CheckIcon from "@/components/icons/common/CheckIcon";
-import StatusCheckboxGroup from "@/components/common/checkbox/StatusCheckboxGroup";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-import BreadcrumbCustom from "@/components/UI/breadcrumb/BreadcrumbCustom";
+const listTab = [
+    {
+        id: uddid(),
+        name: dataLang?.import_finished_product || "import_finished_product",
+        type: "products",
+    },
+    {
+        id: uddid(),
+        name: dataLang?.materials_planning_semi || "materials_planning_semi",
+        type: "semiProduct",
+    },
+];
 
+const listLsxTab = [
+    {
+        id: "2323",
+        name: "Thông tin",
+        count: null,
+        type: "products",
+    },
+    {
+        id: "43434",
+        name: "Kế hoạch BTP & NVL",
+        count: 0,
+        type: "semiProduct",
+    },
+];
 
 const MainTable = ({ dataLang, typeScreen }) => {
-    const statusExprired = useStatusExprired();
-
-    const breadcrumbItems = [
-        {
-            label: `${dataLang?.materials_planning_manufacture || "materials_planning_manufacture"}`,
-            href: "/"
-        },
-        {
-            label: `${dataLang?.productions_orders || 'productions_orders'}`,
-        }
-    ];
-
-    const listTab = [
-        {
-            id: uddid(),
-            name: dataLang?.import_finished_product || "import_finished_product",
-            type: "products",
-        },
-        {
-            id: uddid(),
-            name: dataLang?.materials_planning_semi || "materials_planning_semi",
-            type: "semiProduct",
-        },
-    ];
-
-    const listLsxTab = [
-        {
-            id: "2323",
-            name: "Thông tin",
-            count: null,
-            type: "products",
-        },
-        {
-            id: "43434",
-            name: "Kế hoạch BTP & NVL",
-            count: 0,
-            type: "semiProduct",
-        },
-    ];
-
-    const listLsxStatus = [
-        {
-            label: "Chưa sản xuất",
-            value: "not_started",
-            color: "bg-[#FF811A]/15 text-[#C25705]"
-        },
-        {
-            label: "Đang sản xuất",
-            value: "in_progress",
-            color: "bg-[#3ECeF7]/20 text-[#076A94]"
-        },
-        {
-            label: "Hoàn thành",
-            value: "completed",
-            color: "bg-[#35BD4B]/20 text-[#1A7526]"
-        },
-    ]
-
     const router = useRouter()
 
-    // const tabListRefs = useRef([]);
+    const tabListRefs = useRef([]);
+    const underlineRef = useRef(null)
 
-    // const [underlineProps, setUnderlineProps] = useState({ left: 0, width: 0 })
+    const [underlineProps, setUnderlineProps] = useState({ left: 0, width: 0 })
 
     const typePageMoblie = typeScreen == 'mobile'
+
+    const [isParentId, sIsParentId] = useState(null);
 
     const isShow = useToast()
 
     const { data: listBr = [] } = useBranchList()
-
-    const breadcrumbRef = useRef(null);
-    const titleRef = useRef(null);
-    const filterRef = useRef(null);
-    const [contentHeight, setContentHeight] = useState(0);
 
     const [isMouted, setIsMouted] = useState(false);
     const [isOpenSearch, setIsOpenSearch] = useState(false);
@@ -159,6 +117,19 @@ const MainTable = ({ dataLang, typeScreen }) => {
     useEffect(() => {
         setIsMouted(true);
     }, []);
+
+
+    useEffect(() => {
+        const activeIndex = listLsxTab.findIndex(e => e.id === isState?.isTabList)
+        console.log('activeIndex', activeIndex);
+
+        const activeTab = tabListRefs.current[activeIndex]
+        console.log('activeTab', activeTab);
+        if (activeTab) {
+            const { offsetLeft, offsetWidth } = activeTab
+            setUnderlineProps({ left: offsetLeft, width: offsetWidth })
+        }
+    }, [])
 
     const convertArrData = (arr) => {
         const newData = arr?.map((e) => {
@@ -200,6 +171,10 @@ const MainTable = ({ dataLang, typeScreen }) => {
         date_start: isState.date.dateStart ? formatMoment(isState.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
         item_variation_id: isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
     };
+
+    useEffect(() => {
+        sIsParentId(null)
+    }, [isState.search])
 
     const fetchState = async (type) => {
         try {
@@ -296,6 +271,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
 
     const fetchisStateSeeMore = async () => {
+
         try {
             const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, { params: params });
             const item = convertArrData(data?.productionOrders);
@@ -339,24 +315,6 @@ const MainTable = ({ dataLang, typeScreen }) => {
         }
     }, [isState.page]);
 
-    useLayoutEffect(() => {
-        const updateHeight = () => {
-            const breadcrumb = breadcrumbRef.current?.offsetHeight || 0;
-            const header = titleRef.current?.offsetHeight || 0;
-            const filter = filterRef.current?.offsetHeight || 0;
-            console.log('header', header);
-            console.log('filter', filter);
-
-            const availableHeight = window.innerHeight - header - filter - breadcrumb - 92;
-            console.log('availableHeight', availableHeight);
-            setContentHeight(availableHeight);
-        };
-
-        updateHeight();
-        window.addEventListener("resize", updateHeight);
-        return () => window.removeEventListener("resize", updateHeight);
-    }, []);
-
     const { isLoading: isLoadingRight, refetch, isRefetching: isRefetchingRight } = useQuery({
         queryKey: ['api_detail_production_orders', isState.idDetailProductionOrder],
         queryFn: () => fetchisStateRight(),
@@ -368,11 +326,9 @@ const MainTable = ({ dataLang, typeScreen }) => {
     const fetchisStateRight = async () => {
         try {
             const { data, isSuccess } = await apiProductionsOrders.apiDetailProductionOrders(isState.idDetailProductionOrder);
-
             if (!isSuccess == 1) {
                 return;
             }
-
             queryState({
                 listDataRight: {
                     title: data?.productionOrder?.reference_no,
@@ -449,7 +405,6 @@ const MainTable = ({ dataLang, typeScreen }) => {
                     }),
                 },
             });
-
             return data
         } catch (error) {
             throw new Error(error);
@@ -580,73 +535,46 @@ const MainTable = ({ dataLang, typeScreen }) => {
         typePageMoblie
     };
 
-    // bộ lọc đang active
-    const activeFilterCount = [
-        isState.valueBr,
-        isState.valueOrders,
-        isState.valuePlan,
-        isState.valueProductionOrders,
-        isState.valueProductionOrdersDetail,
-        ...(isState.valueProducts || []),
-    ].filter(item => {
-        if (Array.isArray(item)) return item.length > 0;
-        return item !== null && item !== undefined;
-    }).length;
+    const SearchProduction = memo(() => {
+        return (
+            <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
+                <form className="relative flex items-center w-full">
+                    <SearchNormal1
+                        size={20}
+                        className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                    />
+                    <input
+                        onChange={(e) => onChangeSearch(e)}
+                        className={`relative border border-[#D0D5DD] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                        type="text"
+                        // value={isState.search}
+                        placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
+                    />
+                </form>
+            </div>
+        )
+    })
 
-    console.log('activeFilterCount', activeFilterCount);
-
-    // trigger của bộ lọc tổng của tất cả
-    const triggerFilterAll = (
-        <button className={`${(stateFilterDropdown?.open || activeFilterCount > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg xl:h-10 h-9 px-3 group custom-transition`}>
+    // trigger của bộ lọc
+    const triggerFilter = (
+        <button className={`${stateFilterDropdown?.open ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg xl:h-10 h-9 px-3 group custom-transition`}>
             <span className="w-5 h-5 shrink-0">
                 <FunnelIcon className='w-full h-full ' />
             </span>
-            <span className={`${(stateFilterDropdown?.open || activeFilterCount > 0) ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} text-nowrap 3xl:text-base text-sm custom-transition`}>
+            <span className={`${stateFilterDropdown?.open ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} text-nowrap 3xl:text-base text-sm custom-transition`}>
                 {dataLang?.productions_orders_filter || "productions_orders_filter"}
             </span>
-            {
-                activeFilterCount > 0 &&
-                <span className="rounded-full bg-[#0F4F9E] text-white text-xs xl:size-5 size-4 flex items-center justify-center">
-                    {activeFilterCount}
-                </span>
-                // :
-                // <span className='xl:size-5 size-4' />
-            }
+            {/* <span className="rounded-full bg-[#0F4F9E] text-white text-xs w-5 h-5 flex items-center justify-center">
+                6
+            </span> */}
             <span className="w-4 h-4 shrink-0">
-                <CaretDownIcon className={`${(stateFilterDropdown?.open || activeFilterCount > 0) ? "rotate-180" : "rotate-0"} w-full h-full custom-transition`} />
+                <CaretDownIcon className={`${stateFilterDropdown?.open ? "rotate-180" : "rotate-0"} w-full h-full custom-transition`} />
             </span>
         </button>
     );
 
-    // trigger của bộ lọc trạng thái
-    const triggerFilterStatus = (
-        <button className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} relative flex items-center justify-between space-x-2 border rounded-lg xl:h-10 h-9 px-3 group custom-transition w-full`}>
-            <ChartDonutIcon className='absolute top-1/2 -translate-y-1/2 xl:size-5 size-4' />
-
-            <span className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}>
-                {dataLang?.purchase_status || "purchase_status"}
-            </span>
-
-            <span className="size-4 shrink-0">
-                <CaretDownIcon className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "rotate-180" : "rotate-0"} w-full h-full custom-transition`} />
-            </span>
-        </button>
-    );
-
-    // toggle click vào ra ô search
     const toggleSearch = () => {
         setIsOpenSearch(!isOpenSearch);
-    };
-
-    // toggle chọn trạng thái lọc lệnh sản xuất
-    const toggleStatus = (value) => {
-        const currentSelected = isState.selectStatusFilter || [];
-
-        const updatedSelected = currentSelected.includes(value)
-            ? currentSelected.filter((v) => v !== value)
-            : [...currentSelected, value];
-
-        queryState({ selectStatusFilter: updatedSelected });
     };
 
     if (!isMouted) {
@@ -655,19 +583,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     return (
         <React.Fragment>
-            <div ref={breadcrumbRef}>
-                {
-                    statusExprired
-                        ?
-                        <EmptyExprired />
-                        :
-                        <React.Fragment>
-                            <BreadcrumbCustom items={breadcrumbItems} className="3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]" />
-                        </React.Fragment>
-                }
-            </div>
-
-            <div ref={titleRef} className="flex justify-between items-center w-full">
+            <div className="flex justify-between items-center w-full">
                 <h2 className="3xl:text-2xl xl:text-xl text-base text-[#52575E] capitalize font-medium">
                     {dataLang?.productions_orders || 'productions_orders'}
                 </h2>
@@ -714,10 +630,6 @@ const MainTable = ({ dataLang, typeScreen }) => {
                     </div>
 
                     <div className="relative">
-                        <div className='size-5 absolute top-1/2 -translate-y-1/2 left-2 z-[2] pointer-events-none'>
-                            <CalendarBlankIcon className='size-full text-[#9295A4]' />
-                        </div>
-
                         <DatePicker
                             id="start"
                             portalId="menu-time"
@@ -737,21 +649,19 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 });
                             }}
                             isClearable
-                            placeholderText={`${dataLang?.productions_orders_select_day}` || 'productions_orders_select_day'}
-                            className="pl-8 pr-2 xl:h-10 h-9 text-default w-[250px] outline-none cursor-pointer focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
-                            onKeyDown={(e) => e.preventDefault()} // 👈 chặn gõ bàn phím
+                            placeholderText={`${dataLang?.productions_orders_day_to_day}...` || 'productions_orders_day_to_day...'}
+                            className="p-2 xl:h-10 h-9 text-default w-[250px] outline-none focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
                         />
-
                         {
                             !isState.date.dateStart &&
-                            <span className="absolute top-1/2 -translate-y-1/2 right-2 w-4 h-4 shrink-0 text-[#9295A4] pointer-events-none">
+                            <span className="absolute top-1/2 -translate-y-1/2 right-2 w-4 h-4 shrink-0 text-[#9295A4]">
                                 <CaretDownIcon className={`w-full h-full custom-transition`} />
                             </span>
                         }
                     </div>
 
                     <FilterDropdown
-                        trigger={triggerFilterAll}
+                        trigger={triggerFilter}
                         style={{
                             boxShadow: "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040"
                         }}
@@ -770,7 +680,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     value={isState.valueBr}
                                     onChange={(e) => handleFilter("valueBr", e)}
                                     options={listBr}
-                                    classParent="ml-0 !font-semibold focus:ring-none focus:outline-none text-sm focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
+                                    classParent="ml-0 !font-semibold focus:ring-none focus:outline-none focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_details_all || 'productions_orders_details_all'}
                                 />
@@ -793,7 +703,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     onInputChange={(e) => {
                                         fetDataOrder(e);
                                     }}
-                                    classParent="ml-0 text-sm"
+                                    classParent="ml-0"
                                     onChange={(e) => handleFilter("valueOrders", e)}
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}
@@ -810,7 +720,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     onInputChange={(e) => {
                                         fetchDataPlan(e);
                                     }}
-                                    classParent="ml-0 text-sm"
+                                    classParent="ml-0"
                                     onChange={(e) => handleFilter("valuePlan", e)}
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
@@ -828,7 +738,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     }}
                                     onChange={(e) => handleFilter("valueProductionOrders", e)}
                                     options={comboboxProductionOrders}
-                                    classParent="ml-0 text-sm"
+                                    classParent="ml-0"
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_details_number || 'productions_orders_details_number'}
                                 />
@@ -844,7 +754,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     }}
                                     onChange={(e) => handleFilter("valueProductionOrdersDetail", e)}
                                     options={comboboxProductionOrdersDetail}
-                                    classParent="ml-0 text-sm"
+                                    classParent="ml-0"
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}
                                 />
@@ -948,147 +858,393 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             </div>
                         </div>
                     </FilterDropdown>
-                </div>
-            </div>
 
-            <div ref={filterRef} className='flex items-center 3xl:gap-6 gap-4 w-full'>
-                <div className='w-full xl:max-w-[15%] max-w-[22%] shrink-0'>
-                    <FilterDropdown
-                        trigger={triggerFilterStatus}
+                    {/* <FilterDropdown
+                        trigger={triggerFilter}
                         style={{
                             boxShadow: "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040"
                         }}
-                        className="flex flex-col gap-4 !p-0 border-[#D8DAE5] rounded-lg w-full shrink-0"
-                        dropdownId="dropdownFilterStatus"
-                        placement="bottom-left"
+                        className="flex flex-col gap-4 border-[#D8DAE5] rounded-lg !min-w-[1700px]"
+                        dropdownId="dropdownFilterMain2"
                     >
-                        <StatusCheckboxGroup
-                            list={listLsxStatus}
-                            selected={isState.selectStatusFilter}
-                            onChange={(value) => toggleStatus(value)}
-                        />
-                    </FilterDropdown>
-                </div>
+                        <div className="3xl:text-xl text-lg text-[#344054] font-medium ">
+                            {dataLang?.productions_orders_filter || "productions_orders_filter"}
+                        </div>
 
-                {/* tab */}
-                <TabSwitcherWithUnderline
-                    tabs={listLsxTab}
-                    activeTab={isState?.isTabList}
-                    onChange={(tab) => handleActiveTab(tab, "list")}
-                    renderLabel={(tab, activeTab) => (
-                        <h3 className={`${isState?.isTabList?.id === tab.id ? "text-[#0375F3] scale-[1.02]" : "text-[#9295A4] scale-[1]"} font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}>
-                            <span>
-                                {tab.name}
-                            </span>
-                            {
-                                tab.count > 0 && (
-                                    <span className="absolute top-0 right-0 translate-x-1/2 h-[16px] w-[16px] text-[11px] bg-[#9295A4] text-white rounded-full flex items-center justify-center">
-                                        {tab.count}
-                                    </span>
-                                )
-                            }
-                        </h3>
-                    )}
-                />
+                        <div className='grid grid-cols-7 w-full gap-3'>
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueBr}
+                                    onChange={(e) => handleFilter("valueBr", e)}
+                                    options={listBr}
+                                    classParent="ml-0 focus:ring-none focus:outline-none focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_all || 'productions_orders_details_all'}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">
+                                    {dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}/{dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
+                                </h3>
+
+                                <RadioDropdown />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueOrders}
+                                    options={listOrders}
+                                    onInputChange={(e) => {
+                                        fetDataOrder(e);
+                                    }}
+                                    classParent="ml-0"
+                                    onChange={(e) => handleFilter("valueOrders", e)}
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}
+                                    isDisabled={isState?.seletedRadioFilter?.id !== 1}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valuePlan}
+                                    options={listPlan}
+                                    onInputChange={(e) => {
+                                        fetchDataPlan(e);
+                                    }}
+                                    classParent="ml-0"
+                                    onChange={(e) => handleFilter("valuePlan", e)}
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
+                                    isDisabled={isState?.seletedRadioFilter?.id !== 2}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_item || 'productions_orders_item'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProducts}
+                                    options={[{ label: "Mặt hàng", value: "", isDisabled: true }, ...listProducts]}
+                                    onChange={(e) => handleFilter("valueProducts", e)}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_item || 'productions_orders_item'}
+                                    onInputChange={(e) => {
+                                        fetchDataItems(e);
+                                    }}
+                                    isMulti={true}
+                                    components={{ MultiValue }}
+                                    maxShowMuti={1}
+                                    formatOptionLabel={(option) => {
+
+                                        return (
+                                            <div className="">
+                                                {
+                                                    option?.isDisabled ?
+                                                        (
+                                                            <div className="custom-text">
+                                                                <h3 className="text-base font-medium bg-transparent">{option.label}</h3>
+                                                            </div>
+                                                        )
+                                                        :
+                                                        (
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="custom-none max-w-[30px] w-[30px] h-[30px] max-h-[30px]">
+                                                                    {
+                                                                        option.e?.images != null ?
+                                                                            (
+                                                                                <img
+                                                                                    src={option.e?.images}
+                                                                                    alt="Product Image"
+                                                                                    className="max-max-w-[30px] w-[30px] h-[30px] max-h-[30px] text-[8px] object-cover rounded"
+                                                                                />
+                                                                            )
+                                                                            :
+                                                                            (
+                                                                                <div className=" max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover  flex items-center justify-center rounded">
+                                                                                    <img
+                                                                                        src="/icon/noimagelogo.png"
+                                                                                        alt="Product Image"
+                                                                                        className="max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover rounded"
+                                                                                    />
+                                                                                </div>
+                                                                            )
+                                                                    }
+                                                                </div>
+                                                                <div className="custom-text w-full">
+                                                                    <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                        {option.e?.item_name}
+                                                                    </h3>
+                                                                    <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
+                                                                        {option.e?.product_variation}
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                }
+                                            </div>
+                                        );
+                                    }}
+                                    styles={{
+                                        multiValueLabel: (provided) => ({
+                                            ...provided,
+                                            "& .custom-none": {
+                                                display: "none",
+                                            },
+                                            "& .custom-text": {
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "5px",
+                                                maxWidth: "50px",
+                                            },
+                                            "& .custom-text h5": {
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                whiteSpace: "nowrap",
+                                            },
+                                        }),
+
+                                        menu: (provided) => ({
+                                            ...provided,
+                                            width: "200%",
+                                        }),
+                                    }}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProductionOrders}
+                                    onInputChange={(e) => {
+                                        fetchComboboxProductionOrders(e);
+                                    }}
+                                    onChange={(e) => handleFilter("valueProductionOrders", e)}
+                                    options={comboboxProductionOrders}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_number || 'productions_orders_details_number'}
+                                />
+                            </div>
+
+                            <div className="col-span-1 space-y-1">
+                                <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}</h3>
+                                <SelectComponentNew
+                                    isClearable={true}
+                                    value={isState.valueProductionOrdersDetail}
+                                    onInputChange={(e) => {
+                                        fetDataPoDetail(e);
+                                    }}
+                                    onChange={(e) => handleFilter("valueProductionOrdersDetail", e)}
+                                    options={comboboxProductionOrdersDetail}
+                                    classParent="ml-0"
+                                    classNamePrefix={"productionSmoothing"}
+                                    placeholder={dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}
+                                />
+                            </div>
+                        </div>
+                    </FilterDropdown> */}
+                </div>
             </div>
 
-            <div style={{ maxHeight: contentHeight }} className="flex items-start 3xl:gap-6 gap-4 h-full w-full overflow-y-auto">
-                {/* <div className="xl:max-w-[15%] max-w-[22%] w-full border-r-0 border-[#D0D5DD] border"> */}
-                <Customscrollbar className={`xl:max-w-[15%] max-w-[22%] w-full h-full border-r-0 border-[#D0D5DD] border overflow-y-auto`}>
-                    {/* <Customscrollbar className={`${typePageMoblie ? "h-[85vh]" : "3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh]"}  overflow-y-auto`}> */}
+
+            <div className='flex items-center 3xl:gap-6 gap-4 w-full'>
+                <div className='w-full max-w-[15%] bg-red-500 shrink-0'>
+                    Filter
+                </div>
+
+                <ContainerFilterTab className="border-b w-full max-w-full relative">
                     {
-                        (isLoading || isRefetching)
-                            ?
-                            (
-                                <Loading />
+                        listLsxTab && listLsxTab.map((e, index) => (
+                            <button
+                                key={e.id}
+                                ref={el => tabListRefs.current[index] = el}
+                                onClick={() => handleActiveTab(e.id, "list")}
+                                className="group relative px-4 py-2 text-sm font-medium outline-none focus:outline-none min-w-fit"
+                                style={{
+                                    WebkitTapHighlightColor: "transparent",
+                                }}
+                            >
+                                {/* <h3 className={`relative py-[10px] text-sm px-2  font-normal ${isState?.isTabList == e.id ? "text-[#0375F3]" : "text-[#667085]"}  group-hover:text-[#0375F3] transition-all duration-200 ease-linear`} >
+                                    {e.name}
+                                    <span className={`${e?.count > 0 && `absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 h-[16px] w-[16px] text-[11px] bg-[#ff6f00] text-white rounded-full text-center items-center flex justify-center`} `}>
+                                        {e?.count > 0 && e?.count}
+                                    </span>
+                                </h3> */}
+
+                                <h3 className={`transition-all duration-200 ease-linear ${isState.isTabList === e.id ? "text-[#0375F3]" : "text-[#667085]"} group-hover:text-[#0375F3]`}>
+                                    {e.name}
+                                    {e.count > 0 && (
+                                        <span className="absolute top-0 right-0 translate-x-1/2 h-[16px] w-[16px] text-[11px] bg-[#ff6f00] text-white rounded-full flex items-center justify-center">
+                                            {e.count}
+                                        </span>
+                                    )}
+                                </h3>
+                            </button>
+                        ))
+                    }
+
+                    {/* underline */}
+                    <motion.div
+                        layout
+                        ref={underlineRef}
+                        className="absolute bottom-0 h-[2px] w-full bg-[#0375F3]"
+                        animate={{ left: underlineProps.left, width: underlineProps.width }}
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                </ContainerFilterTab>
+            </div>
+
+            {/* {!typePageMoblie && <FilterHeader {...shareProps} />} */}
+
+            <div className="!mt-[14px]">
+                <h1 className="text-[#141522] font-medium text-[13px] my-2">
+                    {dataLang?.productions_orders_total || "productions_orders_total"}: {isState?.countAll}
+                </h1>
+                {
+                    typePageMoblie && (
+                        <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
+                            <form className="relative flex items-center w-full">
+                                <SearchNormal1
+                                    size={20}
+                                    className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                                />
+                                <input
+                                    onChange={(e) => onChangeSearch(e)}
+                                    className={`relative border border-[#D0D5DD] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                                    type="text"
+                                    // value={isState.search}
+                                    placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
+                                />
+                            </form>
+                        </div>
+                    )
+                }
+
+                <div className="flex ">
+                    <div className="w-[22%] border-r-0 border-[#D0D5DD] border">
+                        {/* {
+                            !typePageMoblie && (
+                                <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
+                                    <form className="relative flex items-center w-full">
+                                        <SearchNormal1
+                                            size={20}
+                                            className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                                        />
+                                        <input
+                                            onChange={(e) => onChangeSearch(e)}
+                                            className={`relative border border-[#D0D5DD] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] ${typePageMoblie ? "pl-7" : "pl-10"} p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs text-start 2xl:w-full xl:w-full w-[100%]`}
+                                            type="text"
+                                            // value={isState.search}
+                                            placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
+                                        />
+                                    </form>
+                                </div>
                             )
-                            :
-                            (
-                                isState.listDataLeft?.length > 0 ?
+                        } */}
+                        <Customscrollbar className={`${typePageMoblie ? "h-[85vh]" : "3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh]"}  overflow-y-auto`}>
+                            {
+                                (isLoading || isRefetching)
+                                    ?
                                     (
-                                        isState.listDataLeft.map((e, eIndex) => {
-                                            const color = {
-                                                "0": {
-                                                    class: 'text-[#FF8F0D] bg-[#FEF8EC]',
-                                                    circle: "bg-[#FF8F0D]",
-                                                    title: dataLang?.productions_orders_produced ?? "productions_orders_produced"
-                                                },
-                                                "1": {
-                                                    class: 'text-blue-500 bg-blue-100',
-                                                    circle: "bg-blue-500",
-                                                    title: dataLang?.productions_orders_in_progress ?? "productions_orders_in_progress"
-                                                },
-                                                "2": {
-                                                    class: 'text-green-500 bg-green-50 ',
-                                                    circle: "bg-green-500",
-                                                    title: dataLang?.productions_orders_completed ?? "productions_orders_completed"
-                                                }
-                                            }
-
-                                            return (
-                                                <div
-                                                    key={e.id}
-                                                    onClick={() => handleShow(e.id)}
-                                                    className={`py-2 ${typePageMoblie ? "px-px" : "pl-2 pr-3"}  ${e.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
-                                                >
-                                                    {
-                                                        typePageMoblie
-                                                            ?
-                                                            <div className={`flex flex-col items-center gap-1`}>
-                                                                {isState.listDataRight?.title && (
-                                                                    // status_manufacture
-                                                                    <span className={`${color[e?.status_manufacture]?.class} text-[8px] px-1 py-px rounded-3xl font-medium w-fit h-fit flex items-center gap-1`}>
-                                                                        <span className={`${color[e?.status_manufacture]?.circle} h-1 w-1 rounded-full inline-block`} />
-                                                                        <p>{color[e?.status_manufacture]?.title}</p>
-                                                                    </span>
-                                                                )}
-                                                                <h1 className="text-[8px] font-medium text-[#0F4F9E]">
-                                                                    {e.title}
-                                                                </h1>
-
-                                                            </div>
-                                                            :
-                                                            <div className={`flex justify-between`}>
-                                                                <div className="flex flex-col gap-1">
-                                                                    <h1 className="text-[13px] font-medium text-[#0F4F9E]">
-                                                                        {e.title}
-                                                                    </h1>
-                                                                    <h3 className="text-[#667085] font-medium text-[13px]">
-                                                                        {dataLang?.materials_planning_create_on ||
-                                                                            "materials_planning_create_on"}{" "}
-                                                                        <span className="text-[#141522] font-medium text-[13px]">
-                                                                            {e.time}
-                                                                        </span>
-                                                                    </h3>
-                                                                </div>
-
-                                                                {isState.listDataRight?.title && (
-                                                                    // status_manufacture
-                                                                    <span className={`${color[e?.status_manufacture]?.class} text-xs pl-2 pr-4 py-1.5 rounded-3xl font-medium w-fit h-fit`}>
-                                                                        <span className={`${color[e?.status_manufacture]?.circle} h-2 w-2 rounded-full inline-block mr-2`} />
-                                                                        {color[e?.status_manufacture]?.title}
-                                                                    </span>
-                                                                )}
-                                                            </div>
+                                        <Loading />
+                                    )
+                                    :
+                                    (
+                                        isState.listDataLeft?.length > 0 ?
+                                            (
+                                                isState.listDataLeft.map((e, eIndex) => {
+                                                    const color = {
+                                                        "0": {
+                                                            class: 'text-[#FF8F0D] bg-[#FEF8EC]',
+                                                            circle: "bg-[#FF8F0D]",
+                                                            title: dataLang?.productions_orders_produced ?? "productions_orders_produced"
+                                                        },
+                                                        "1": {
+                                                            class: 'text-blue-500 bg-blue-100',
+                                                            circle: "bg-blue-500",
+                                                            title: dataLang?.productions_orders_in_progress ?? "productions_orders_in_progress"
+                                                        },
+                                                        "2": {
+                                                            class: 'text-green-500 bg-green-50 ',
+                                                            circle: "bg-green-500",
+                                                            title: dataLang?.productions_orders_completed ?? "productions_orders_completed"
+                                                        }
                                                     }
-                                                    {!typePageMoblie && (e.id == isState.idDetailProductionOrder) && (
-                                                        <div className="flex flex-col w-full gap-2 mt-1">
-                                                            <div className="flex items-center gap-1">
-                                                                <h3 className=" text-[#52575E] font-medium text-[13px]">
-                                                                    {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
-                                                                </h3>
-                                                                <div className="flex items-center gap-1">
-                                                                    {e.followUp.map((i, index) => (
-                                                                        <div key={index}>
-                                                                            <h2 className="text-[#191D23] font-medium text-[13px]">
-                                                                                {i.nameFollow}
-                                                                            </h2>
+
+                                                    return (
+                                                        <div
+                                                            key={e.id}
+                                                            onClick={() => handleShow(e.id)}
+                                                            className={`py-2 ${typePageMoblie ? "px-px" : "pl-2 pr-3"}  ${e.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                                        >
+                                                            {
+                                                                typePageMoblie
+                                                                    ?
+                                                                    <div className={`flex flex-col items-center gap-1`}>
+                                                                        {isState.listDataRight?.title && (
+                                                                            // status_manufacture
+                                                                            <span className={`${color[e?.status_manufacture]?.class} text-[8px] px-1 py-px rounded-3xl font-medium w-fit h-fit flex items-center gap-1`}>
+                                                                                <span className={`${color[e?.status_manufacture]?.circle} h-1 w-1 rounded-full inline-block`} />
+                                                                                <p>{color[e?.status_manufacture]?.title}</p>
+                                                                            </span>
+                                                                        )}
+                                                                        <h1 className="text-[8px] font-medium text-[#0F4F9E]">
+                                                                            {e.title}
+                                                                        </h1>
+
+                                                                    </div>
+                                                                    :
+                                                                    <div className={`flex justify-between`}>
+                                                                        <div className="flex flex-col gap-1">
+                                                                            <h1 className="text-[13px] font-medium text-[#0F4F9E]">
+                                                                                {e.title}
+                                                                            </h1>
+                                                                            <h3 className="text-[#667085] font-medium text-[13px]">
+                                                                                {dataLang?.materials_planning_create_on ||
+                                                                                    "materials_planning_create_on"}{" "}
+                                                                                <span className="text-[#141522] font-medium text-[13px]">
+                                                                                    {e.time}
+                                                                                </span>
+                                                                            </h3>
                                                                         </div>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                            <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
-                                                            {/* <div className="flex items-center w-full">
+
+                                                                        {isState.listDataRight?.title && (
+                                                                            // status_manufacture
+                                                                            <span className={`${color[e?.status_manufacture]?.class} text-xs pl-2 pr-4 py-1.5 rounded-3xl font-medium w-fit h-fit`}>
+                                                                                <span className={`${color[e?.status_manufacture]?.circle} h-2 w-2 rounded-full inline-block mr-2`} />
+                                                                                {color[e?.status_manufacture]?.title}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                            }
+                                                            {!typePageMoblie && (e.id == isState.idDetailProductionOrder) && (
+                                                                <div className="flex flex-col w-full gap-2 mt-1">
+                                                                    <div className="flex items-center gap-1">
+                                                                        <h3 className=" text-[#52575E] font-medium text-[13px]">
+                                                                            {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
+                                                                        </h3>
+                                                                        <div className="flex items-center gap-1">
+                                                                            {e.followUp.map((i, index) => (
+                                                                                <div key={index}>
+                                                                                    <h2 className="text-[#191D23] font-medium text-[13px]">
+                                                                                        {i.nameFollow}
+                                                                                    </h2>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                    <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
+                                                                    {/* <div className="flex items-center w-full">
                                                 {e.processBar.map((j, JIndex) => {
                                                     return (
                                                         <div key={j.id} className="flex flex-col items-start w-full">
@@ -1119,77 +1275,76 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                                     )
                                                 })}
                                             </div> */}
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </div>
+                                                    )
+                                                })
                                             )
-                                        })
+                                            :
+                                            (
+                                                <NoData />
+                                            )
                                     )
-                                    :
-                                    (
-                                        <NoData />
-                                    )
-                            )
-                    }
+                            }
 
-                    {
-                        isState.next && (
-                            <button
-                                type="button"
-                                onClick={() => queryState({ page: isState.page + 1 })}
-                                className={`block w-full py-1 mx-auto mt-1 ${typePageMoblie ? "text-[10px]" : "text-[13px]"} transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200`}
-                            >
-                                {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
-                            </button>
-                        )
-                    }
-                </Customscrollbar>
-                {/* </div> */}
-
-                <div className="xl:max-w-[85%] max-w-[78%] w-full border border-[#D0D5DD] ">
-                    {
-                        (!isLoading) && (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0) && (
-                            <div className="flex items-center justify-between px-4 py-1 border-b">
-                                <div className="">
-                                    <h1 className={`text-[#52575E] font-normal ${typePageMoblie ? "text-[10px]" : "text-xs"} capitalize`}>
-                                        {dataLang?.productions_orders || "productions_orders"}
-                                    </h1>
-                                    <div className="flex items-center gap-2">
-                                        {
-                                            isRefetchingRight
-                                                ?
-                                                <div className={`animate-pulse ${typePageMoblie ? "w-[80px]" : "w-[200px]"} h-[20px] bg-gray-100 rounded-2xl`} />
-                                                :
-                                                <h1 className={`text-[#3276FA] font-medium ${typePageMoblie ? "text-xs" : "3xl:text-[20px] text-[16px]"} uppercase`}>
-                                                    {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
-                                                </h1>
-                                        }
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {!typePageMoblie && (
-                                        <OnResetData sOnFetching={(e) => { }}
-                                            onClick={() => {
-                                                refetchProductionsOrders();
-                                                refetch()
-                                            }} />
-                                    )}
-                                    <Zoom
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 1.08 }}
-                                        className="w-fit"
+                            {
+                                isState.next && (
+                                    <button
+                                        type="button"
+                                        onClick={() => queryState({ page: isState.page + 1 })}
+                                        className={`block w-full py-1 mx-auto mt-1 ${typePageMoblie ? "text-[10px]" : "text-[13px]"} transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200`}
                                     >
-                                        <PopupConfimStage
-                                            dataLang={dataLang}
-                                            dataRight={isState}
-                                            typePageMoblie={typePageMoblie}
-                                            refetch={() => {
-                                                refetchProductionsOrders();
-                                                refetch()
-                                            }} />
-                                    </Zoom>
+                                        {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
+                                    </button>
+                                )
+                            }
+                        </Customscrollbar>
+                    </div>
+                    <div className="w-[78%] border border-[#D0D5DD] ">
+                        {
+                            (!isLoading) && (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0) && (
+                                <div className="flex items-center justify-between px-4 py-1 border-b">
+                                    <div className="">
+                                        <h1 className={`text-[#52575E] font-normal ${typePageMoblie ? "text-[10px]" : "text-xs"} capitalize`}>
+                                            {dataLang?.productions_orders || "productions_orders"}
+                                        </h1>
+                                        <div className="flex items-center gap-2">
+                                            {
+                                                isRefetchingRight
+                                                    ?
+                                                    <div className={`animate-pulse ${typePageMoblie ? "w-[80px]" : "w-[200px]"} h-[20px] bg-gray-100 rounded-2xl`} />
+                                                    :
+                                                    <h1 className={`text-[#3276FA] font-medium ${typePageMoblie ? "text-xs" : "3xl:text-[20px] text-[16px]"} uppercase`}>
+                                                        {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
+                                                    </h1>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {!typePageMoblie && (
+                                            <OnResetData sOnFetching={(e) => { }}
+                                                onClick={() => {
+                                                    refetchProductionsOrders();
+                                                    refetch()
+                                                }} />
+                                        )}
+                                        <Zoom
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 1.08 }}
+                                            className="w-fit"
+                                        >
+                                            <PopupConfimStage
+                                                dataLang={dataLang}
+                                                dataRight={isState}
+                                                typePageMoblie={typePageMoblie}
+                                                refetch={() => {
+                                                    refetchProductionsOrders();
+                                                    refetch()
+                                                }} />
+                                        </Zoom>
 
-                                    {/* <Zoom
+                                        {/* <Zoom
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 1.08 }}
                                         className="w-fit"
@@ -1203,31 +1358,31 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                             }}
                                         />
                                     </Zoom> */}
-                                    {
-                                        !typePageMoblie && (
-                                            <Zoom
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 1.08 }}
-                                                className="w-fit"
-                                            >
-                                                <button
-                                                    className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                                                    onClick={() => {
-                                                        handleQueryId({ status: true, id: isState.idDetailProductionOrder });
-                                                    }}
+                                        {
+                                            !typePageMoblie && (
+                                                <Zoom
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 1.08 }}
+                                                    className="w-fit"
                                                 >
-                                                    <div className="flex items-center gap-2 px-3 py-2 ">
-                                                        <RiDeleteBin5Line className="text-base text-red-600" />
-                                                        <h3 className="text-xs font-medium text-red-600 3xl:text-base">
-                                                            {dataLang?.materials_planning_delete || "materials_planning_delete"}
-                                                        </h3>
-                                                    </div>
-                                                </button>
-                                            </Zoom>
-                                        )
-                                    }
-                                </div>
-                                {/* <button
+                                                    <button
+                                                        className="bg-red-100 rounded-lg outline-none focus:outline-none"
+                                                        onClick={() => {
+                                                            handleQueryId({ status: true, id: isState.idDetailProductionOrder });
+                                                        }}
+                                                    >
+                                                        <div className="flex items-center gap-2 px-3 py-2 ">
+                                                            <RiDeleteBin5Line className="text-base text-red-600" />
+                                                            <h3 className="text-xs font-medium text-red-600 3xl:text-base">
+                                                                {dataLang?.materials_planning_delete || "materials_planning_delete"}
+                                                            </h3>
+                                                        </div>
+                                                    </button>
+                                                </Zoom>
+                                            )
+                                        }
+                                    </div>
+                                    {/* <button
                         className="bg-red-100 rounded-lg outline-none focus:outline-none"
                         onClick={() => {
                             if (+isState?.countAll == 0) {
@@ -1254,30 +1409,46 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             </h3>
                         </div>
                     </button> */}
-                            </div>
-                        )
-                    }
-                    {(isLoading || (isRefetchingRight))
-                        ?
-                        <Loading />
-                        :
-                        (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0)
-                            ?
-                            <>
-                                <div className="mx-4">
-                                    <div>
-                                        {isState.isTab == "products" && <TabItem {...shareProps} />}
-                                        {/* {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
-                                    </div>
                                 </div>
-                            </>
+                            )
+                        }
+                        {(isLoading || (isRefetchingRight))
+                            ?
+                            <Loading />
                             :
-                            <NoData />
-                    }
+                            (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0)
+                                ?
+                                <>
+                                    <div className="mx-4">
+                                        <div className={`${typePageMoblie ? "my-2" : "my-6"} border-b`}>
+                                            <div className="flex items-center gap-4 ">
+                                                {listTab.map((e) => (
+                                                    <button
+                                                        key={e.id}
+                                                        onClick={() => handleActiveTab(e.type, "detail")}
+                                                        className={`hover:bg-[#F7FBFF] ${isState.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
+                                                    >
+                                                        <h3 className={`py-[10px] px-2  font-normal ${isState.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} ${typePageMoblie ? "text-xs" : "3xl:text-base text-[13px]"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`} >
+                                                            {e.name}
+                                                        </h3>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {isState.isTab == "products" && <TabItem {...shareProps} />}
+                                            {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />}
+                                        </div>
+                                    </div>
+                                </>
+                                :
+                                <NoData />
+                        }
+                    </div>
                 </div>
-            </div>
 
-            <ModalDetail {...shareProps} />
+                <ModalDetail {...shareProps} />
+            </div>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

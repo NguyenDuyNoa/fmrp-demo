@@ -1,12 +1,12 @@
 import { forwardRef } from "react"
 import { Customscrollbar } from "./Customscrollbar"
 
-export const ContainerFilterTab = forwardRef(({ children }, ref) => {
+export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
     return (
         <Customscrollbar
             forceVisible='x'
             ref={ref}
-            className="overflow-x-auto h-fit demo4 simplebar-scrollable-x"
+            className={`${className} overflow-x-auto h-fit demo4 simplebar-scrollable-x`}
             scrollableNodePropsClassName="[&>div]:flex [&>div]:items-center [&>div]:justify-start [&>div]:space-x-3 h-fit"
         // className="flex items-center justify-start overflow-hidden overflow-y-hidden 2xl:space-x-3 lg:space-x-3 h-fit scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
         >
