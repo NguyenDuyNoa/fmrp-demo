@@ -32,7 +32,7 @@ export const Dropdown = (props) => {
         <div className="">
             <Popup
                 trigger={
-                    <button className={`${props?.classNameTrigger} ${props?.link?.some(link => router.pathname.startsWith(link)) ? "bg-[#E2F0FE] text-[#11315B] font-semibold" : "bg-transparent text-[#F3F4F6] font-normal hover:text-white"} rounded-xl xxl:text-sm xl:text-xs text-[10px] 2xl:px-3 px-2 py-1 hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center ease-in-out duration-300 transition-all`}>
+                    <button className={`${props?.classNameTrigger} ${props?.link?.some(link => router.pathname.startsWith(link)) ? "bg-[#E2F0FE] text-[#11315B] font-semibold" : "bg-transparent text-[#F3F4F6] font-normal hover:text-white"} rounded-xl 3xl:text-base xxl:text-sm xl:text-xs text-[10px] 2xl:px-3 px-2 py-1 hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center ease-in-out duration-300 transition-all`}>
                         {
                             props?.type == 'procedure' ?
                                 (open
