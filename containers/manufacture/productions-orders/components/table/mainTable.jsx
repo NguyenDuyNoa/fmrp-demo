@@ -17,7 +17,7 @@ import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-qu
 import { ArrowDown2, SearchNormal1 } from "iconsax-react";
 import { debounce } from "lodash";
 import dynamic from "next/dynamic";
-import React, { memo, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { memo, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { v4 as uddid } from "uuid";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
 import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
@@ -57,6 +57,21 @@ import StatusCheckboxGroup from "@/components/common/checkbox/StatusCheckboxGrou
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import BreadcrumbCustom from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import { useProductionOrdersList } from "../../hooks/useProductionOrdersList";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import LimitListDropdown from "@/components/common/dropdown/LimitListDropdown";
+import LoadingComponent from "@/components/common/loading/loading/LoadingComponent";
+import { useInView } from "react-intersection-observer";
+import { useProductionOrderDetail, useProductionsOrderDetail } from "../../hooks/useProductionOrderDetail";
+import PrinterIcon from "@/components/icons/common/PrinterIcon";
+import StickerIcon from "@/components/icons/common/StickerIcon";
+import ArrowCounterClockwiseIcon from "@/components/icons/common/ArrowCounterClockwiseIcon";
+import TrashIcon from "@/components/icons/common/TrashIcon";
+import { FaCheck } from "react-icons/fa";
+import ListChecksIcon from "@/components/icons/common/ListChecksIcon";
+import KanbanIcon from "@/components/icons/common/KanbanIcon";
+import Image from "next/image";
+import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
 
 
 const MainTable = ({ dataLang, typeScreen }) => {
@@ -118,7 +133,26 @@ const MainTable = ({ dataLang, typeScreen }) => {
         },
     ]
 
+    const listDropdownCompleteStage = [
+        {
+            id: 1,
+            label: "Tổng toàn lệnh",
+            icon: <ListChecksIcon className='size-full' />, // bạn thay bằng icon tương ứng
+            isPremium: false,
+            type: "normal"
+        },
+        {
+            id: 2,
+            label: "Chi tiết công đoạn",
+            icon: <KanbanIcon className='size-full' />,
+            isPremium: true,
+            type: "complete_stage"
+        },
+    ];
+
+
     const router = useRouter()
+    const { ref: refInviewListLsx, inView: inViewListLsx } = useInView()
 
     // const tabListRefs = useRef([]);
 
@@ -133,7 +167,9 @@ const MainTable = ({ dataLang, typeScreen }) => {
     const breadcrumbRef = useRef(null);
     const titleRef = useRef(null);
     const filterRef = useRef(null);
-    const [contentHeight, setContentHeight] = useState(0);
+    const paginationRef = useRef(null);
+    const groupButtonRef = useRef(null);
+    // const [contentHeight, setContentHeight] = useState(0);
 
     const [isMouted, setIsMouted] = useState(false);
     const [isOpenSearch, setIsOpenSearch] = useState(false);
@@ -160,35 +196,6 @@ const MainTable = ({ dataLang, typeScreen }) => {
         setIsMouted(true);
     }, []);
 
-    const convertArrData = (arr) => {
-        const newData = arr?.map((e) => {
-            return {
-                ...e,
-                id: e?.id,
-                title: e?.reference_no,
-                time: formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
-                name: e?.created_by_full_name,
-                nameBranch: e?.name_branch,
-                productionOrder: [],
-                followUp: e?.listObject?.map((i) => {
-                    return {
-                        id: i?.pp_id,
-                        nameFollow: i?.reference_no,
-                        typeFollow: "",
-                    };
-                }),
-                // processBar: [
-                //     { id: uddid(), active: true, date: new Date(), title: 'Bồi', status: "Đã điều độ", quantity: 100 },
-                //     { id: uddid(), active: true, date: new Date(), title: 'Bế', status: "Đã điều độ", quantity: 150 },
-                //     { id: uddid(), active: true, date: new Date(), title: 'Dán TP', status: "Đã điều độ", quantity: 200 },
-                //     { id: uddid(), active: false, date: new Date(), title: 'Đóng gói', status: "Đã điều độ", quantity: 0 },
-                // ],
-                note: "",
-            };
-        });
-        return newData;
-    };
-
     const params = {
         branch_id: isState.valueBr?.value || "",
         _po_id: isState.valueProductionOrders?.value || "",
@@ -201,184 +208,59 @@ const MainTable = ({ dataLang, typeScreen }) => {
         item_variation_id: isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
     };
 
-    const fetchState = async (type) => {
-        try {
-            const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, { params: params });
-            const arrayItem = convertArrData(data?.productionOrders);
-            queryState({
-                countAll: data?.countAll,
-                listDataLeft: arrayItem.map((e, index) => {
-                    return {
-                        ...e,
-                        // showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
-                    };
-                }),
-                next: data?.next == 1,
-            });
+    const {
+        data: dataProductionOrders,
+        isLoading: isLoadingProductionOrderList,
+        isFetching: isFetchingProductionOrderList,
+        fetchNextPage: fetchNextPageProductionOrderList,
+        hasNextPage: hasNextPageProductionOrderList,
+        refetch: refetchProductionOrderList
+    } = useProductionOrdersList(params);
 
-            if (type == 'delete') {
-                queryState({ idDetailProductionOrder: arrayItem[0]?.id ?? null });
-                await fetchisStateRight()
-            }
-            // if (isState.search == "" && arrayItem[0]?.id) {
-            //     queryState({ idDetailProductionOrder: arrayItem[0]?.id });
-            // }
-            if (isState.search == "") {
-                queryState({ idDetailProductionOrder: type == 'delete' ? arrayItem[0]?.id : isState.idDetailProductionOrder ? isState.idDetailProductionOrder : arrayItem[0]?.id });
-            } else {
-                queryState({ idDetailProductionOrder: arrayItem[0]?.id });
-            }
-            if (data?.productionOrders?.length == 0) {
-                queryState({
-                    listDataRight: {
-                        ...isState.listDataRight,
-                        title: null,
-                        statusManufacture: null,
-                        dataPPItems: [],
-                        dataSemiItems: [],
-                    },
-                });
-            }
-            return data;
-        } catch (error) {
-            throw new Error(error);
+    const flagProductionOrders = useMemo(() =>
+        dataProductionOrders ? dataProductionOrders?.pages?.flatMap(page => page?.productionOrders) : [],
+        [dataProductionOrders]
+    );
+
+    // const { isLoading, isFetching, isRefetching, refetch: refetchProductionOrderList } = useQuery({
+    //     queryKey: ["api_production_orders",
+    //         isState.page,
+    //         isState.search,
+    //         isState.date.dateStart,
+    //         isState.date.dateEnd,
+    //         isState.valueProductionOrders,
+    //         isState.valueProductionOrdersDetail,
+    //         isState.valueBr,
+    //         isState.valueOrders,
+    //         isState.valuePlan,
+    //         isState.valueProducts],
+    //     queryFn: () => fetchState(),
+    //     // enabled: isState.openModal == false,
+    //     ...optionsQuery
+    // })
+
+    const {
+        data: dataProductionOrderDetail,
+        isLoading: isLoadingProductionOrderDetail,
+        refetch: refetchProductionOrderDetail,
+        isRefetching: isRefetchingProductionOrderDetail
+    } = useProductionOrderDetail({ id: isState.idDetailProductionOrder, enabled: !!isState.idDetailProductionOrder })
+
+    // loadmore list LSX
+    useEffect(() => {
+        if (inViewListLsx && hasNextPageProductionOrderList) {
+            fetchNextPageProductionOrderList()
         }
-    };
-
-
-    // const { isLoading, isFetching, isRefetching, refetch: refetchProductionsOrders } = useInfiniteQuery({
-    //     //     queryKey: ["api_production_orders",
-    //     //         isState.page,
-    //     //         isState.search,
-    //     //         isState.date.dateStart,
-    //     //         isState.date.dateEnd,
-    //     //         isState.valueProductionOrders,
-    //     //         isState.valueProductionOrdersDetail,
-    //     //         isState.valueBr,
-    //     //         isState.valueOrders,
-    //     //         isState.valuePlan,
-    //     //         isState.valueProducts],
-    //     queryFn: async ({ pageParam = 1 }) => {
-    //         const { data } = await apiDashboard.apiGetDashboardMaterialsToPurchase({
-    //             params: {
-    //                 page: pageParam,
-    //                 limit: 10,
-    //             }
-    //         }
-    //         );
-
-    //         return data;
-    //     },
-    //     getNextPageParam: (lastPage, pages) => {
-    //         return lastPage?.next == 1 ? pages?.length + 1 : null;
-    //     },
-    //     retry: 5,
-    //     retryDelay: 5000,
-    //     initialPageParam: 1,
-    //     ...optionsQuery,
-    // });
-    const { isLoading, isFetching, isRefetching, refetch: refetchProductionsOrders } = useQuery({
-        queryKey: ["api_production_orders",
-            isState.page,
-            isState.search,
-            isState.date.dateStart,
-            isState.date.dateEnd,
-            isState.valueProductionOrders,
-            isState.valueProductionOrdersDetail,
-            isState.valueBr,
-            isState.valueOrders,
-            isState.valuePlan,
-            isState.valueProducts],
-        queryFn: () => fetchState(),
-        // enabled: isState.openModal == false,
-        ...optionsQuery
-    })
-
-
-    const fetchisStateSeeMore = async () => {
-        try {
-            const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, { params: params });
-            const item = convertArrData(data?.productionOrders);
-            let arrayItem = [...isState.listDataLeft, ...item];
-            queryState({
-                countAll: data?.countAll,
-                listDataLeft: arrayItem.map((e, index) => {
-                    return {
-                        ...e,
-                        // showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
-                    };
-                }),
-                next: data?.next == 1,
-
-            });
-            if (isState.search == "") {
-                queryState({ idDetailProductionOrder: isState.idDetailProductionOrder ? isState.idDetailProductionOrder : arrayItem[0]?.id });
-            } else {
-                queryState({ idDetailProductionOrder: arrayItem[0]?.id });
-            }
-            if (data?.productionOrders?.length == 0) {
-                queryState({
-                    listDataRight: {
-                        ...isState.listDataRight,
-                        title: null,
-                        statusManufacture: null,
-                        dataPPItems: [],
-                        dataSemiItems: [],
-                    },
-                });
-            }
-            return data
-        } catch (error) {
-            throw error
-        }
-    };
+    }, [inViewListLsx, fetchNextPageProductionOrderList])
 
     useEffect(() => {
-        if (isState.page != 1) {
-            fetchisStateSeeMore();
-        }
-    }, [isState.page]);
-
-    useLayoutEffect(() => {
-        const updateHeight = () => {
-            const breadcrumb = breadcrumbRef.current?.offsetHeight || 0;
-            const header = titleRef.current?.offsetHeight || 0;
-            const filter = filterRef.current?.offsetHeight || 0;
-            console.log('header', header);
-            console.log('filter', filter);
-
-            const availableHeight = window.innerHeight - header - filter - breadcrumb - 92;
-            console.log('availableHeight', availableHeight);
-            setContentHeight(availableHeight);
-        };
-
-        updateHeight();
-        window.addEventListener("resize", updateHeight);
-        return () => window.removeEventListener("resize", updateHeight);
-    }, []);
-
-    const { isLoading: isLoadingRight, refetch, isRefetching: isRefetchingRight } = useQuery({
-        queryKey: ['api_detail_production_orders', isState.idDetailProductionOrder],
-        queryFn: () => fetchisStateRight(),
-        enabled: !!isState.idDetailProductionOrder,
-        placeholderData: keepPreviousData,
-        ...optionsQuery
-    })
-
-    const fetchisStateRight = async () => {
-        try {
-            const { data, isSuccess } = await apiProductionsOrders.apiDetailProductionOrders(isState.idDetailProductionOrder);
-
-            if (!isSuccess == 1) {
-                return;
-            }
-
+        if (dataProductionOrderDetail) {
             queryState({
                 listDataRight: {
-                    title: data?.productionOrder?.reference_no,
-                    idCommand: data?.productionOrder?.id,
-                    statusManufacture: data?.productionOrder?.status_manufacture,
-                    dataPPItems: data?.listPOItems?.map((e) => {
+                    title: dataProductionOrderDetail?.productionOrder?.reference_no,
+                    idCommand: dataProductionOrderDetail?.productionOrder?.id,
+                    statusManufacture: dataProductionOrderDetail?.productionOrder?.status_manufacture,
+                    dataPPItems: dataProductionOrderDetail?.listPOItems?.map((e) => {
                         return {
                             ...e,
                             id: e?.object_id,
@@ -414,7 +296,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             }),
                         };
                     }),
-                    dataSemiItems: data?.listSemiItems?.map((e) => {
+                    dataSemiItems: dataProductionOrderDetail?.listSemiItems?.map((e) => {
                         return {
                             ...e,
                             id: e?.object_id,
@@ -449,12 +331,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
                     }),
                 },
             });
-
-            return data
-        } catch (error) {
-            throw new Error(error);
         }
-    };
+    }, [dataProductionOrderDetail]);
 
     const fetchComboboxProductionOrders = debounce(async (value) => {
         try {
@@ -488,18 +366,20 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     const handleShow = (id) => {
         queryState({ idDetailProductionOrder: id })
-        queryState({
-            listDataLeft: isState.listDataLeft.map((e) => {
-                const showParent = e.id == id;
-                // showParent && queryState({ idDetailProductionOrder: id })
-                return {
-                    ...e,
-                    showParent: showParent,
-                };
-            }),
-            openModal: false,
-            dataModal: {},
-        });
+
+        // queryState({
+        //     productionOrdersList: isState.productionOrdersList.map((e) => {
+        //         const showParent = e.id == id;
+        //         // showParent && queryState({ idDetailProductionOrder: id })
+        //         return {
+        //             ...e,
+        //             showParent: showParent,
+        //         };
+        //     }),
+        //     openModal: false,
+        //     dataModal: {},
+        // });
+
         router.push("/manufacture/productions-orders?tabModal=1")
     };
 
@@ -575,8 +455,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
         listProducts,
         comboboxProductionOrders,
         comboboxProductionOrdersDetail,
-        isLoadingRight,
-        refetchProductionsOrders,
+        isLoadingProductionOrderDetail,
+        refetchProductionOrderList,
         typePageMoblie
     };
 
@@ -587,13 +467,11 @@ const MainTable = ({ dataLang, typeScreen }) => {
         isState.valuePlan,
         isState.valueProductionOrders,
         isState.valueProductionOrdersDetail,
-        ...(isState.valueProducts || []),
+        isState.valueProducts || [],
     ].filter(item => {
         if (Array.isArray(item)) return item.length > 0;
         return item !== null && item !== undefined;
     }).length;
-
-    console.log('activeFilterCount', activeFilterCount);
 
     // trigger của bộ lọc tổng của tất cả
     const triggerFilterAll = (
@@ -633,6 +511,23 @@ const MainTable = ({ dataLang, typeScreen }) => {
         </button>
     );
 
+    // trigger button hoàn thành công đoạn
+    const triggerCompleteStage = (
+        <div className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-white border border-[#0375F3] bg-[#0375F3] hover:bg-[#0375F3] cursor-pointer hover:shadow-hover-button rounded-lg custom-transition">
+            <span className='size-5'>
+                <CheckIcon className={`size-full`} />
+            </span>
+
+            <span>
+                Hoàn thành sản xuất
+            </span>
+
+            <span className='size-4'>
+                <CaretDropdownThinIcon className={`size-full`} />
+            </span>
+        </div>
+    );
+
     // toggle click vào ra ô search
     const toggleSearch = () => {
         setIsOpenSearch(!isOpenSearch);
@@ -648,6 +543,30 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
         queryState({ selectStatusFilter: updatedSelected });
     };
+
+    // hàm tính chiều cao responsive
+    const calcAvailableHeight = (type) => {
+        if (type === "main") {
+            const breadcrumb = breadcrumbRef.current?.offsetHeight || 0;
+            const titleInfo = titleRef.current?.offsetHeight || 0;
+            const filter = filterRef.current?.offsetHeight || 0;
+            const pagination = paginationRef.current?.offsetHeight || 0;
+
+            return window.innerHeight - breadcrumb - titleInfo - filter - pagination - 84 - 60;
+        } else if (type = "submain") {
+            const breadcrumb = breadcrumbRef.current?.offsetHeight || 0;
+            const titleInfo = titleRef.current?.offsetHeight || 0;
+            const filter = filterRef.current?.offsetHeight || 0;
+            const pagination = paginationRef.current?.offsetHeight || 0;
+            const groupButton = groupButtonRef.current?.offsetHeight || 0;
+
+            return window.innerHeight - breadcrumb - titleInfo - filter - pagination - groupButton - 84 - 60;
+        }
+    };
+
+    console.log('dataProductionOrderDetail', dataProductionOrderDetail);
+    console.log('isState', isState);
+    console.log('calcAvailableHeight("submain")', calcAvailableHeight("submain"));
 
     if (!isMouted) {
         return null;
@@ -992,289 +911,319 @@ const MainTable = ({ dataLang, typeScreen }) => {
                 />
             </div>
 
-            <div style={{ maxHeight: contentHeight }} className="flex items-start 3xl:gap-6 gap-4 h-full w-full overflow-y-auto">
-                {/* <div className="xl:max-w-[15%] max-w-[22%] w-full border-r-0 border-[#D0D5DD] border"> */}
-                <Customscrollbar className={`xl:max-w-[15%] max-w-[22%] w-full h-full border-r-0 border-[#D0D5DD] border overflow-y-auto`}>
-                    {/* <Customscrollbar className={`${typePageMoblie ? "h-[85vh]" : "3xl:h-[65vh] xxl:h-[57vh] 2xl:h-[58.5vh] xl:h-[57.6vh] lg:h-[57vh] h-[35vh]"}  overflow-y-auto`}> */}
+            <div
+                style={{
+                    height: calcAvailableHeight("main"),
+                    maxHeight: calcAvailableHeight("main")
+                }}
+                className=" flex items-start 3xl:gap-6 gap-4 w-full overflow-y-auto"
+            >
+                <Customscrollbar className='xl:max-w-[15%] max-w-[22%] pr-3 w-full h-full border-none border-[#D0D5DD] border' >
                     {
-                        (isLoading || isRefetching)
+                        (isLoadingProductionOrderList)
+                            // (isLoadingProductionOrderList || isRefetching)
                             ?
                             (
-                                <Loading />
+                                <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
                             )
                             :
                             (
-                                isState.listDataLeft?.length > 0 ?
+                                flagProductionOrders?.length > 0 ?
                                     (
-                                        isState.listDataLeft.map((e, eIndex) => {
+                                        flagProductionOrders?.map((item, eIndex) => {
                                             const color = {
                                                 "0": {
-                                                    class: 'text-[#FF8F0D] bg-[#FEF8EC]',
-                                                    circle: "bg-[#FF8F0D]",
+                                                    color: 'bg-[#FF811A]/15 text-[#C25705]',
                                                     title: dataLang?.productions_orders_produced ?? "productions_orders_produced"
                                                 },
                                                 "1": {
-                                                    class: 'text-blue-500 bg-blue-100',
-                                                    circle: "bg-blue-500",
+                                                    color: 'bg-[#3ECeF7]/20 text-[#076A94]',
                                                     title: dataLang?.productions_orders_in_progress ?? "productions_orders_in_progress"
                                                 },
                                                 "2": {
-                                                    class: 'text-green-500 bg-green-50 ',
-                                                    circle: "bg-green-500",
+                                                    color: 'bg-[#35BD4B]/20 text-[#1A7526]',
                                                     title: dataLang?.productions_orders_completed ?? "productions_orders_completed"
                                                 }
                                             }
 
                                             return (
                                                 <div
-                                                    key={e.id}
-                                                    onClick={() => handleShow(e.id)}
-                                                    className={`py-2 ${typePageMoblie ? "px-px" : "pl-2 pr-3"}  ${e.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${isState.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                                    key={item.id}
+                                                    onClick={() => handleShow(item.id)}
+                                                    className={`
+                                                        ${typePageMoblie ? "px-px" : "pl-1 pr-3"}
+                                                        ${item.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"}
+                                                        ${flagProductionOrders?.length - 1 == eIndex ? "border-b-none" : "border-b"}
+                                                        py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
+                                                    style={{
+                                                        background: item.id === isState.idDetailProductionOrder ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)" : ""
+                                                    }}
                                                 >
-                                                    {
-                                                        typePageMoblie
-                                                            ?
-                                                            <div className={`flex flex-col items-center gap-1`}>
-                                                                {isState.listDataRight?.title && (
-                                                                    // status_manufacture
-                                                                    <span className={`${color[e?.status_manufacture]?.class} text-[8px] px-1 py-px rounded-3xl font-medium w-fit h-fit flex items-center gap-1`}>
-                                                                        <span className={`${color[e?.status_manufacture]?.circle} h-1 w-1 rounded-full inline-block`} />
-                                                                        <p>{color[e?.status_manufacture]?.title}</p>
-                                                                    </span>
-                                                                )}
-                                                                <h1 className="text-[8px] font-medium text-[#0F4F9E]">
-                                                                    {e.title}
-                                                                </h1>
+                                                    {/* Gạch xanh bên trái */}
+                                                    <div className='relative pl-5 space-y-2'>
+                                                        {
+                                                            item.id === isState.idDetailProductionOrder && (
+                                                                <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
+                                                            )
+                                                        }
 
-                                                            </div>
-                                                            :
-                                                            <div className={`flex justify-between`}>
-                                                                <div className="flex flex-col gap-1">
-                                                                    <h1 className="text-[13px] font-medium text-[#0F4F9E]">
-                                                                        {e.title}
-                                                                    </h1>
-                                                                    <h3 className="text-[#667085] font-medium text-[13px]">
-                                                                        {dataLang?.materials_planning_create_on ||
-                                                                            "materials_planning_create_on"}{" "}
-                                                                        <span className="text-[#141522] font-medium text-[13px]">
-                                                                            {e.time}
+                                                        {
+                                                            isState.listDataRight?.title && (
+                                                                <span className={`${color[item?.status_manufacture]?.color} text-sm px-2 py-1 rounded font-normal w-fit h-fit`}>
+                                                                    {color[item?.status_manufacture]?.title}
+                                                                </span>
+                                                            )
+                                                        }
+                                                        <h1 className="3xl:text-2xl text-xl font-semibold text-[#003DA0]">
+                                                            {item.reference_no}
+                                                        </h1>
+
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <h3 className="text-[#667085] font-normal 3xl:text-base text-sm">
+                                                                <span>{dataLang?.materials_planning_create_on || "materials_planning_create_on"}{": "}</span>
+                                                                <span>{formatMoment(item?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}</span>
+                                                            </h3>
+
+                                                            <div className="flex flex-wrap items-start gap-x-1">
+                                                                <span className="text-[#667085] whitespace-nowrap font-normal 3xl:text-base text-sm">
+                                                                    {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"}:
+                                                                </span>
+                                                                {
+                                                                    item?.listObject?.map((i, index) => (
+                                                                        <span
+                                                                            key={index}
+                                                                            className="text-[#667085] font-normal 3xl:text-base text-sm"
+                                                                        >
+                                                                            {i.reference_no}
+                                                                            {index < item.listObject.length - 1 && <span>,</span>}
                                                                         </span>
-                                                                    </h3>
-                                                                </div>
+                                                                    ))
+                                                                }
+                                                            </div>
 
-                                                                {isState.listDataRight?.title && (
-                                                                    // status_manufacture
-                                                                    <span className={`${color[e?.status_manufacture]?.class} text-xs pl-2 pr-4 py-1.5 rounded-3xl font-medium w-fit h-fit`}>
-                                                                        <span className={`${color[e?.status_manufacture]?.circle} h-2 w-2 rounded-full inline-block mr-2`} />
-                                                                        {color[e?.status_manufacture]?.title}
-                                                                    </span>
+                                                            <AnimatePresence initial={false}>
+                                                                {item.id === isState.idDetailProductionOrder && (
+                                                                    <motion.div
+                                                                        key="extra-info"
+                                                                        layout
+                                                                        initial={{ height: 0, opacity: 0 }}
+                                                                        animate={{ height: "auto", opacity: 1 }}
+                                                                        exit={{ height: 0, opacity: 0 }}
+                                                                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                        className="flex flex-col w-full overflow-hidden gap-0.5"
+                                                                    >
+                                                                        <h3 className="text-[#667085] font-normal 3xl:text-base text-sm">
+                                                                            <span>{dataLang?.client_list_brand || "client_list_brand"}: </span>
+                                                                            <span>{item?.name_branch}</span>
+                                                                        </h3>
+                                                                    </motion.div>
                                                                 )}
-                                                            </div>
-                                                    }
-                                                    {!typePageMoblie && (e.id == isState.idDetailProductionOrder) && (
-                                                        <div className="flex flex-col w-full gap-2 mt-1">
-                                                            <div className="flex items-center gap-1">
-                                                                <h3 className=" text-[#52575E] font-medium text-[13px]">
-                                                                    {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
-                                                                </h3>
-                                                                <div className="flex items-center gap-1">
-                                                                    {e.followUp.map((i, index) => (
-                                                                        <div key={index}>
-                                                                            <h2 className="text-[#191D23] font-medium text-[13px]">
-                                                                                {i.nameFollow}
-                                                                            </h2>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                            <TagBranch className="w-fit h-fit">{e?.nameBranch}</TagBranch>
-                                                            {/* <div className="flex items-center w-full">
-                                                {e.processBar.map((j, JIndex) => {
-                                                    return (
-                                                        <div key={j.id} className="flex flex-col items-start w-full">
-                                                            <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
-                                                                <span>{j.status}</span>
-                                                                <span>({moment(j.date).format('DD/MM/YYYY')})</span>
-                                                            </p>
-
-                                                            <li className={`${JIndex == e.processBar.length - 1 ? 'flex w-full relative text-gray-900 '
-                                                                :
-                                                                `flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active ? 'after:bg-[#00C170]' : 'after:bg-gray-500'}   after:inline-block after:absolute after:top-1 after:left-[25px]`}`}
-                                                            >
-                                                                <div className="z-10 block whitespace-nowrap">
-                                                                    <span className={`w-[10px] h-[10px]  border-2  ${j.active ? 'bg-[#00C170] border-[#00C170]' : 'bg-gray-500 border-gray-500'} rounded-full flex justify-center items-center mx-auto mb-1 text-[13px]`}></span>
-                                                                    <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[11px] text-[10px]`}>
-                                                                        {j.title}
-                                                                    </p>
-
-                                                                    <p className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"} text-[#0BAA2E] font-normal text-[10px]`}>
-                                                                        SL:
-                                                                        <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
-                                                                            {j.quantity > 0 ? formatNumber(j.quantity) : "-"}
-                                                                        </span>
-                                                                    </p>
-                                                                </div>
-                                                            </li >
+                                                            </AnimatePresence>
                                                         </div>
-                                                    )
-                                                })}
-                                            </div> */}
-                                                        </div>
-                                                    )}
+                                                    </div>
                                                 </div>
                                             )
                                         })
                                     )
                                     :
                                     (
-                                        <NoData />
+                                        <NoData className="mt-0" />
                                     )
                             )
                     }
 
                     {
-                        isState.next && (
-                            <button
-                                type="button"
-                                onClick={() => queryState({ page: isState.page + 1 })}
-                                className={`block w-full py-1 mx-auto mt-1 ${typePageMoblie ? "text-[10px]" : "text-[13px]"} transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200`}
-                            >
-                                {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
-                            </button>
-                        )
+                        (hasNextPageProductionOrderList) && <LoadingComponent ref={refInviewListLsx} />
                     }
                 </Customscrollbar>
-                {/* </div> */}
 
-                <div className="xl:max-w-[85%] max-w-[78%] w-full border border-[#D0D5DD] ">
+                <div className="xl:max-w-[85%] max-w-[78%] w-full h-full border-none border-[#D0D5DD] border overflow-y-hidden">
                     {
-                        (!isLoading) && (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0) && (
-                            <div className="flex items-center justify-between px-4 py-1 border-b">
-                                <div className="">
-                                    <h1 className={`text-[#52575E] font-normal ${typePageMoblie ? "text-[10px]" : "text-xs"} capitalize`}>
-                                        {dataLang?.productions_orders || "productions_orders"}
-                                    </h1>
-                                    <div className="flex items-center gap-2">
-                                        {
-                                            isRefetchingRight
-                                                ?
-                                                <div className={`animate-pulse ${typePageMoblie ? "w-[80px]" : "w-[200px]"} h-[20px] bg-gray-100 rounded-2xl`} />
-                                                :
-                                                <h1 className={`text-[#3276FA] font-medium ${typePageMoblie ? "text-xs" : "3xl:text-[20px] text-[16px]"} uppercase`}>
-                                                    {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || "productions_orders_no_orders")}
-                                                </h1>
-                                        }
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {!typePageMoblie && (
-                                        <OnResetData sOnFetching={(e) => { }}
-                                            onClick={() => {
-                                                refetchProductionsOrders();
-                                                refetch()
-                                            }} />
-                                    )}
-                                    <Zoom
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 1.08 }}
-                                        className="w-fit"
-                                    >
-                                        <PopupConfimStage
-                                            dataLang={dataLang}
-                                            dataRight={isState}
-                                            typePageMoblie={typePageMoblie}
-                                            refetch={() => {
-                                                refetchProductionsOrders();
-                                                refetch()
-                                            }} />
-                                    </Zoom>
+                        (!isLoadingProductionOrderDetail) && (dataProductionOrderDetail?.listPOItems?.length > 0) && (
+                            <div ref={groupButtonRef} className="flex items-center justify-end gap-2 p-0.5 mb-2">
+                                {/* <PopupConfimStage
+                                    dataLang={dataLang}
+                                    dataRight={isState}
+                                    typePageMoblie={typePageMoblie}
+                                    refetch={() => {
+                                        refetchProductionOrderList();
+                                        refetch()
+                                    }} 
+                                    /> */}
 
-                                    {/* <Zoom
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 1.08 }}
-                                        className="w-fit"
-                                    >
-                                        <PopupRecallRawMaterials
-                                            dataLang={dataLang}
-                                            dataRight={isState}
-                                            refetch={() => {
-                                                refetchProductionsOrders();
-                                                refetch()
-                                            }}
-                                        />
-                                    </Zoom> */}
+                                <FilterDropdown
+                                    trigger={triggerCompleteStage}
+                                    style={{
+                                        // boxShadow: "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040"
+                                        boxShadow: "0px 5px 35px 0px #00000012"
+                                    }}
+                                    className="flex flex-col !p-0 border-[#D8DAE5] rounded-lg shrink-0 w-[150%]"
+                                    classNameContainer="!w-fit"
+                                    dropdownId="dropdownCompleteStage"
+                                    placement="bottom-right"
+                                >
                                     {
-                                        !typePageMoblie && (
-                                            <Zoom
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 1.08 }}
-                                                className="w-fit"
-                                            >
-                                                <button
-                                                    className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                                                    onClick={() => {
-                                                        handleQueryId({ status: true, id: isState.idDetailProductionOrder });
-                                                    }}
+                                        listDropdownCompleteStage && listDropdownCompleteStage?.map((tab, index) => {
+                                            // const isChecked = selected.includes(item.value);
+                                            const isFirst = index === 0;
+                                            const isLast = index === listDropdownCompleteStage.length - 1;
+
+                                            const borderClass = isLast
+                                                ? "border-transparent rounded-b-lg border-t-transparent"
+                                                : isFirst
+                                                    ? "rounded-t-lg border-t-transparent"
+                                                    : "border-t-transparent";
+
+                                            return (
+                                                <div
+                                                    key={tab.id}
+                                                    className={`hover:bg-[#F3F4F6] border-b border-[#F7F8F9] border-t flex items-center gap-3 cursor-pointer px-4 py-3 custom-transition ${borderClass}`}
+                                                    onClick={() => { tab.type === "complete_stage" }}
                                                 >
-                                                    <div className="flex items-center gap-2 px-3 py-2 ">
-                                                        <RiDeleteBin5Line className="text-base text-red-600" />
-                                                        <h3 className="text-xs font-medium text-red-600 3xl:text-base">
-                                                            {dataLang?.materials_planning_delete || "materials_planning_delete"}
-                                                        </h3>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className='3xl:size-5 size-4 text-[#0375F3] shrink-0'>
+                                                            {tab.icon}
+                                                        </span>
+                                                        <span className="3xl:text-base text-sm font-normal text-[#101828]">
+                                                            {tab.label}
+                                                        </span>
                                                     </div>
-                                                </button>
-                                            </Zoom>
-                                        )
+
+                                                    {tab.isPremium && (
+                                                        <span className="text-xs font-normal bg-[#1F2329]/10 text-[#646A73] rounded-[4px] px-3 py-1.5">
+                                                            Premium
+                                                        </span>
+                                                    )}
+
+                                                    {/* {list.map((item, index) => {
+
+
+                                                        const borderClass = isLast
+                                                            ? "border-transparent rounded-b-lg border-t-transparent"
+                                                            : isFirst
+                                                                ? "rounded-t-lg border-t-transparent"
+                                                                : "border-t-transparent";
+
+                                                        return (
+                                                            <label
+                                                                key={item.value}
+                                                                className={`hover:bg-[#F3F4F6] border-b border-[#F7F8F9] border-t flex items-center gap-3 cursor-pointer px-4 py-3 custom-transition ${borderClass}`}
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={isChecked}
+                                                                    onChange={() => onChange(item.value)}
+                                                                    className="peer hidden"
+                                                                />
+                                                                <div className="w-4 h-4 rounded border border-[#D0D5DD] flex items-center justify-center peer-checked:text-white peer-checked:bg-[#1760B9] peer-checked:border-[#1760B9]">
+                                                                    <motion.span
+                                                                        className={`${isChecked ? "text-white" : "text-transparent"} size-3 `}
+                                                                        initial={{ scale: 0, opacity: 0 }}
+                                                                        animate={{ scale: 1, opacity: 1 }}
+                                                                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                                                                    >
+                                                                        <CheckIcon className="size-full" />
+                                                                    </motion.span>
+                                                                </div>
+                                                                <span className={`3xl:text-sm text-xs font-normal px-2 py-1 rounded ${item.color}`}>
+                                                                    {item.label}
+                                                                </span>
+                                                            </label>
+                                                        );
+                                                    })} */}
+                                                </div>
+
+
+                                            )
+                                        })
                                     }
-                                </div>
-                                {/* <button
-                        className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                        onClick={() => {
-                            if (+isState?.countAll == 0) {
-                                return isShow(
-                                    "error",
-                                    dataLang?.materials_planning_please_add || "materials_planning_please_add"
-                                );
-                            }
-                            if (!isState.listDataRight?.title) {
-                                return isShow(
-                                    "error",
-                                    dataLang?.productions_orders_please_select ||
-                                        "productions_orders_please_select"
-                                );
-                            }
-                            queryState({ page: 1 });
-                            handleQueryId({ status: true, id: isState.listDataRight?.idCommand });
-                        }}
-                    >
-                        <div className="flex items-center gap-2 px-3 py-2 ">
-                            <RiDeleteBin5Line className="text-base text-red-600" />
-                            <h3 className="text-xs font-medium text-red-600 3xl:text-base">
-                                {dataLang?.materials_planning_delete || "materials_planning_delete"}
-                            </h3>
-                        </div>
-                    </button> */}
+                                </FilterDropdown>
+
+                                <ButtonAnimationNew
+                                    icon={
+                                        <div className='size-4'>
+                                            <PrinterIcon className='size-full' />
+                                        </div>
+                                    }
+                                    title="In lệnh sản xuất"
+                                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
+                                />
+
+                                <ButtonAnimationNew
+                                    icon={
+                                        <div className='size-4'>
+                                            <StickerIcon className='size-full' />
+                                        </div>
+                                    }
+                                    title="In tem thành phẩm"
+                                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
+                                />
+
+                                <ButtonAnimationNew
+                                    icon={
+                                        <div className='size-5'>
+                                            <ArrowCounterClockwiseIcon className='size-full' />
+                                        </div>
+                                    }
+                                    onClick={() => {
+                                        refetchProductionOrderDetail()
+                                    }}
+                                    title="Tải lại"
+                                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-normal text-[#0BAA2E] border border-[#0BAA2E] hover:bg-[#EBFEF2] hover:shadow-hover-button rounded-lg"
+                                />
+
+                                <ButtonAnimationNew
+                                    icon={
+                                        <div className='size-5'>
+                                            <TrashIcon className='size-full' />
+                                        </div>
+                                    }
+                                    onClick={() => {
+                                        handleQueryId({ status: true, id: isState.idDetailProductionOrder });
+                                    }}
+                                    title="Xoá"
+                                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-normal text-[#EE1E1E] border border-[#EE1E1E] hover:bg-[#FFEEF0] hover:shadow-hover-button rounded-lg"
+                                />
                             </div>
                         )
                     }
-                    {(isLoading || (isRefetchingRight))
-                        ?
-                        <Loading />
-                        :
-                        (isState.listDataRight?.dataPPItems?.length > 0 || isState.listDataRight?.dataSemiItems?.length > 0)
+
+                    <Customscrollbar
+                        className='h-full pr-3'
+                        style={{
+                            height: calcAvailableHeight("submain"),
+                            maxHeight: calcAvailableHeight("submain")
+                        }}
+                    >
+                        {(isLoadingProductionOrderDetail || isRefetchingProductionOrderDetail)
+                            // {(isLoadingProductionOrderDetail || (isRefetchingProductionOrderDetail))
                             ?
-                            <>
-                                <div className="mx-4">
-                                    <div>
-                                        {isState.isTab == "products" && <TabItem {...shareProps} />}
-                                        {/* {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
-                                    </div>
-                                </div>
-                            </>
+                            <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
                             :
-                            <NoData />
-                    }
+                            (dataProductionOrderDetail?.listPOItems?.length > 0)
+                                // (dataProductionOrderDetail?.dataPPItems?.length > 0 || dataProductionOrderDetail?.dataSemiItems?.length > 0)
+                                ?
+                                <React.Fragment>
+                                    {isState.isTab == "products" && <TabItem {...shareProps} />}
+                                    {/* {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
+                                </React.Fragment>
+                                :
+                                <NoData />
+                        }
+                    </Customscrollbar>
                 </div>
+            </div>
+
+            <div
+                ref={paginationRef}
+                className='flex items-center'
+            >
+                <LimitListDropdown
+                    limit={isState.limit}
+                    sLimit={(value) => queryState({ limit: value, page: 1 })}
+                    dataLang={dataLang}
+                    total={isState?.countAll}
+                />
             </div>
 
             <ModalDetail {...shareProps} />

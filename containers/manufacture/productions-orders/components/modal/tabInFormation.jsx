@@ -251,7 +251,7 @@ const RenderItem = ({
                             // large={image}
                             width={18}
                             height={18}
-                            alt={name}
+                            alt={name || "img"}
                             className="object-cover w-full h-full rounded-md"
                         />
                     </div>

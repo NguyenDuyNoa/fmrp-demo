@@ -39,7 +39,7 @@ const ModalDetail = dynamic(() => import("@/containers/manufacture/productions-o
 const initialState = {
     isTab: "item",
     countAll: 0,
-    listDataLeft: [],
+    productionOrdersList: [],
     listDataRight: {
         title: "",
         poId: null,
@@ -199,7 +199,7 @@ const MainTable = ({ dataLang }) => {
 
             queryState({
                 countAll: data?.countAll,
-                listDataLeft: arrayItem,
+                productionOrdersList: arrayItem,
                 next: data?.next == 1,
             });
 
@@ -243,10 +243,10 @@ const MainTable = ({ dataLang }) => {
         try {
             const { data } = await apiMaterialsPlanning.apiProductionPlans(isValue.page, isValue.limit, { params: params });
             const item = convertArrData(data?.productionPlans);
-            let arrayItem = [...dataTable.listDataLeft, ...item];
+            let arrayItem = [...dataTable.productionOrdersList, ...item];
             queryState({
                 countAll: data?.countAll,
-                listDataLeft: arrayItem,
+                productionOrdersList: arrayItem,
                 next: data?.next == 1,
             });
 
@@ -542,7 +542,7 @@ const MainTable = ({ dataLang }) => {
                             </form>
                         </div>
                         <Customscrollbar className="3xl:h-[65vh] xxl:h-[54.5vh] 2xl:h-[56vh] xl:h-[56vh] lg:h-[55vh] h-[35vh] overflow-y-auto">
-                            {dataTable.listDataLeft.map((e, eIndex) => (
+                            {dataTable.productionOrdersList.map((e, eIndex) => (
                                 <div
                                     key={e.id}
                                     onClick={() => {

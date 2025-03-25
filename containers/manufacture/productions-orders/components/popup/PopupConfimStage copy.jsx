@@ -151,6 +151,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         return result || { totalQuantity: 0, totalQuantityError: 0, totalQuantityEntered: 0, totalQuantityEnter: 0 };
     }, [isState.dataTableProducts]);
 
+
     const updateQuantityAndSerial = (item, type, value, serialType) => {
         const newQuantity = value?.floatValue || 0;
         const currentSerials = Array.isArray(item[serialType]) ? [...item[serialType]] : [];
@@ -456,7 +457,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                         </div>
                     }
                     title="Hoàn thành công đoạn"
-                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-white border border-[#0375D3] bg-[#0375D3] hover:shadow-hover-button rounded-lg"
+                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-white border border-[#0375D3] bg-[#0375D3] hover:bg-[#0375D3]/80 hover:shadow-hover-button rounded-lg"
                 />
             }
             onClickOpen={() => {
@@ -469,7 +470,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
             lockScroll={true}
             open={isState.open}
             onClose={() => { queryState({ open: false }); }}
-            // classNameBtn={`${dataRight?.listDataRight?.statusManufacture == "2" ? "bg-gray-400" : "bg-blue-500"} rounded-lg`}
+            classNameBtn={`${dataRight?.listDataRight?.statusManufacture == "2" ? "bg-gray-400" : "bg-blue-500"} rounded-lg`}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
             <div className={`w-[85vw] xl:h-[80vh] h-[575px] overflow-hidden `}>

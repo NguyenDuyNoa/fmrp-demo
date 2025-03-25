@@ -16,7 +16,7 @@ const ProductionsOrders = (props) => {
             <Head>
                 <title>{dataLang?.productions_orders || 'productions_orders'}</title>
             </Head>
-            <Container className={'relative'}>
+            <Container className={'relative 3xl:!space-y-3 !space-y-2'}>
                 <ProductionsOrdersProvider>
                     <MainTable {...propsDefault} />
                 </ProductionsOrdersProvider>

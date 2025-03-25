@@ -6,7 +6,7 @@ const initialState = {
     isTab: "products",
     isTabList: undefined, // new
     countAll: 0,
-    listDataLeft: [],
+    productionOrdersList: [],
     listDataRight: {
         title: "",
         statusManufacture: null,
@@ -16,7 +16,7 @@ const initialState = {
     openModal: false,
     next: null,
     page: 1,
-    limit: 15,
+    limit: 10,
     search: "",
     dataModal: {},
     valueOrders: null,
