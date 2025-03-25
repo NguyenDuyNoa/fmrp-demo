@@ -182,7 +182,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
             const arrayItem = convertArrData(data?.productionOrders);
             queryState({
                 countAll: data?.countAll,
-                listDataLeft: arrayItem.map((e, index) => {
+                productionOrdersList: arrayItem.map((e, index) => {
                     return {
                         ...e,
                         // showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
@@ -275,10 +275,10 @@ const MainTable = ({ dataLang, typeScreen }) => {
         try {
             const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, { params: params });
             const item = convertArrData(data?.productionOrders);
-            let arrayItem = [...isState.listDataLeft, ...item];
+            let arrayItem = [...isState.productionOrdersList, ...item];
             queryState({
                 countAll: data?.countAll,
-                listDataLeft: arrayItem.map((e, index) => {
+                productionOrdersList: arrayItem.map((e, index) => {
                     return {
                         ...e,
                         // showParent: isState?.search ? index == 0 : e?.id == isState.idDetailProductionOrder ? true : !isState.idDetailProductionOrder ? index == 0 : false,
@@ -444,7 +444,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
     const handleShow = (id) => {
         queryState({ idDetailProductionOrder: id })
         queryState({
-            listDataLeft: isState.listDataLeft.map((e) => {
+            productionOrdersList: isState.productionOrdersList.map((e) => {
                 const showParent = e.id == id;
                 // showParent && queryState({ idDetailProductionOrder: id })
                 return {
@@ -1160,9 +1160,9 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     )
                                     :
                                     (
-                                        isState.listDataLeft?.length > 0 ?
+                                        isState.productionOrdersList?.length > 0 ?
                                             (
-                                                isState.listDataLeft.map((e, eIndex) => {
+                                                isState.productionOrdersList.map((e, eIndex) => {
                                                     const color = {
                                                         "0": {
                                                             class: 'text-[#FF8F0D] bg-[#FEF8EC]',

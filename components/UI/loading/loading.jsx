@@ -1,6 +1,5 @@
+import Image from "next/image";
 import React from "react";
-
-import ReactLoading from "react-loading";
 
 export default function Loading(props) {
     return (
@@ -10,10 +9,14 @@ export default function Loading(props) {
                 props.className
             }
         >
-            {/* <p className="absolute -mt-24">Đang tải dữ liệu ...</p> */}
-            {/* <ReactLoading type="cylon" color={props.color}  height={'50%'} width={'10%'} /> */}
-            <img src="/loading-test.gif" className="3xl:h-44 h-36" />
-            {/* <img src="/loadingLogo.gif.jpg" className="h-16 3xl:h-20" /> */}
+            <Image
+                alt="loading"
+                width={400}
+                height={400}
+                src="/loading-test.gif"
+                className="3xl:h-44 h-36 w-auto aspect-1"
+                priority
+            />
         </div>
     );
 }

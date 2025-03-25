@@ -53,6 +53,10 @@ body {
 //     background: #93c5fd;
 // }
 
+.simplebar-content {
+    height: 100%;
+}
+
 /* Ngăn focus trên toàn bộ SimpleBar */
 .simplebar-scrollbar:focus,
 .simplebar-track:focus,
@@ -515,7 +519,7 @@ body {
 .productionSmoothing__menu {
     z-index: 9999 !important;
     position: absolute !important;
-  }
+}
 .productionSmoothing__control {
     position: relative !important;
     z-index: 0 !important;

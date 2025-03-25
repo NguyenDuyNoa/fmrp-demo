@@ -4,13 +4,11 @@ import NoData from "@/components/UI/noData/nodata";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Image from "next/image";
-import React, { memo, useContext } from "react";
+import { memo, useContext } from "react";
 import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
 import { ProductionsOrdersContext } from "../../context/productionsOrders";
 import TimelineChartStage from "./components/TimelineChartStage";
-import NoteIcon from "@/components/icons/common/NoteIcon";
-import CaretDownIcon from "@/components/icons/common/CaretDownIcon";
 
 const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel, typePageMoblie }) => {
     const dataSeting = useSetingServer();
@@ -21,7 +19,22 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel,
 
     return (
         <>
-
+            <div className="my-4">
+                <div className={`grid grid-cols-12 my-4`}>
+                    <h4 className={` px-4 text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-8" : "text-xs col-span-4"} uppercase`}>
+                        {dataLang?.materials_planning_order || "materials_planning_order"}
+                    </h4>
+                    <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-2" : "text-xs col-span-1"} uppercase`}>
+                        {typePageMoblie ? "ĐVT" : (dataLang?.category_unit || "category_unit")}
+                    </h4>
+                    <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-2" : "text-xs col-span-2"} uppercase`}>
+                        {typePageMoblie ? "SL" : (dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity")}
+                    </h4>
+                    <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "hidden" : "block text-xs col-span-5"} uppercase`}>
+                        {"Tiến trình"}
+                    </h4>
+                </div>
+            </div>
 
             {
                 isLoadingRight ?
@@ -30,58 +43,25 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel,
                     )
                     :
                     (
-                        <div className='flex flex-col gap-4 h-full'>
-
+                        <Customscrollbar className="3xl:h-[52vh] xxl:h-[40vh] 2xl:h-[43vh] xl:h-[40vh] lg:h-[38vh] h-[38vh] overflow-y-auto">
                             {
                                 isState?.listDataRight?.dataPPItems?.length > 0 ?
                                     (
                                         isState?.listDataRight?.dataPPItems?.map((e) => (
-                                            <div
-                                                key={`colap-${e.id}`}
-                                                className="grid items-center h-auto grid-cols-12 select-none"
-                                            >
+                                            <div key={e.id} className="grid items-center h-auto grid-cols-12">
                                                 <div
                                                     onClick={() => handShowItem(e.id, "dataPPItems")}
-                                                    className={`select-none ${e.showChild ? "border-[#3276FA] bg-[#EBF5FF] text-[#0F4F9E]" : "border-[#D0D5DD] bg-white text-[#3A3E4C] hover:border-[#3276FA] hover:bg-[#EBF5FF] hover:text-[#0F4F9E]"} col-span-12 border flex items-center justify-between px-3 rounded-lg cursor-pointer custom-transition group`}
+                                                    className="col-span-12 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded cursor-pointer"
                                                 >
-                                                    <div className='flex items-center gap-2'>
-                                                        <div className={`${e.showChild ? "text-[#0F4F9E]" : "text-[#9295A4] group-hover:text-[#0F4F9E]"} 3xl:size-5 size-4 custom-transition`}>
-                                                            <NoteIcon className={`size-full`} />
-                                                        </div>
-
-                                                        <h1 className={`font-normal 3xl:text-base text-sm py-2 space-x-1`}>
-                                                            <span>
-                                                                Đơn hàng:
-                                                            </span>
-                                                            <span>
-                                                                {e.title}
-                                                            </span>
-                                                        </h1>
-                                                    </div>
-
-                                                    <div className={`${e.showChild ? "rotate-180 text-[#0F4F9E]" : "text-[#9295A4] group-hover:text-[#0F4F9E]"} size-4 custom-transition`}>
-                                                        <CaretDownIcon className='size-full' />
-                                                    </div>
+                                                    <Image
+                                                        src={"/materials_planning/dow.png"}
+                                                        width={14}
+                                                        height={17}
+                                                        alt="dow.png"
+                                                        className={`object-cover ${e.showChild ? "" : "-rotate-90"} transition-all duration-150 ease-linear`}
+                                                    />
+                                                    <h1 className={`text-[#52575E] font-semibold ${typePageMoblie ? "text-[10px]" : "3xl:text-sm text-xs"} py-2`}>{e.title}</h1>
                                                 </div>
-
-                                                {
-                                                    e.showChild &&
-                                                    <div className={`col-span-12 grid grid-cols-12 my-4`}>
-                                                        <h4 className={` px-4 text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-8" : "text-xs col-span-4"} uppercase`}>
-                                                            {dataLang?.materials_planning_order || "materials_planning_order"}
-                                                        </h4>
-                                                        <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-2" : "text-xs col-span-1"} uppercase`}>
-                                                            {typePageMoblie ? "ĐVT" : (dataLang?.category_unit || "category_unit")}
-                                                        </h4>
-                                                        <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "text-[9px] col-span-2" : "text-xs col-span-2"} uppercase`}>
-                                                            {typePageMoblie ? "SL" : (dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity")}
-                                                        </h4>
-                                                        <h4 className={` text-center text-[#344054] font-normal ${typePageMoblie ? "hidden" : "block text-xs col-span-5"} uppercase`}>
-                                                            {"Tiến trình"}
-                                                        </h4>
-                                                    </div>
-                                                }
-
                                                 {
                                                     e.showChild && e.arrListData.map((i, index) => (
                                                         <div
@@ -242,7 +222,7 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel,
                                         <NoData />
                                     )
                             }
-                        </div>
+                        </Customscrollbar>
                     )
             }
         </>

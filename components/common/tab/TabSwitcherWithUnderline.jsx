@@ -12,7 +12,7 @@ const TabSwitcherWithUnderline = ({ tabs = [], activeTab, onChange, renderLabel 
 
     return (
         <ContainerFilterTab className='relative w-full'>
-            <div className="relative flex border-b-2 w-full ">
+            <div className="relative flex border-b border-[#D0D5DD] w-full ">
                 {
                     tabs.map((tab, index) => (
                         <button

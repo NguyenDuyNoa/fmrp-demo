@@ -32,14 +32,17 @@ const Popup = (props) => {
                 // repositionOnResiz={props.repositionOnResiz}
                 className={`${props.className} popup-edit`}
             >
-                <div className={`${inter.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl w-full`}>
-                    <div className={`${props.classNameTittle ? props.classNameTittle : "items-center"} flex justify-between`}>
-                        <h1 className="text-[#101828] font-medium !text-base !capitalize">
-                            {props.title}
-                        </h1>
-                        
-                        {
-                            (props?.type || !props.onClose)
+                {/* <Customscrollbar scrollableNodePropsClassName='[&>div]:w-auto [&>div]:min-w-fit' className='max-h-[99vh]'> */}
+                <div className="">
+                    {/* <div className="3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 "> */}
+                    <div
+                        className={`${inter.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl w-full`}>
+                        <div className={`${props.classNameTittle ? props.classNameTittle : "items-center"} flex justify-between`}>
+                            <h1 className="text-[#101828] font-medium !text-base !capitalize">
+                                {/* <h1 className="text-[#101828] font-medium 3xl:text-[22px] 2xl:text-[18px] text-lg"> */}
+                                {props.title}
+                            </h1>
+                            {(props?.type || !props.onClose)
                                 ?
                                 ""
                                 :
@@ -49,12 +52,14 @@ const Popup = (props) => {
                                 >
                                     <IconClose className="rotate-45" />
                                 </button>
-                        }
+                            }
+                        </div>
+
+                        {props.children}
+
                     </div>
-
-                    {props.children}
-
                 </div>
+                {/* </Customscrollbar> */}
             </PopupParent>
         </React.Fragment>
     );

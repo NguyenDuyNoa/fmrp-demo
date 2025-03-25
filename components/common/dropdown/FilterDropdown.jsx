@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, cloneElement, isValidElement } from 'react
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion'
 
-const FilterDropdown = ({ children, trigger, className, dropdownId, placement = "bottom-right", ...props }) => {
+const FilterDropdown = ({ children, trigger, className, classNameContainer, dropdownId, placement = "bottom-right", ...props }) => {
     const dropdownRef = useRef(null);
     const triggerRef = useRef(null);
 
@@ -35,9 +35,19 @@ const FilterDropdown = ({ children, trigger, className, dropdownId, placement = 
         }
     };
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Escape') {
+            dispatch({ type: "stateFilterDropdown", payload: { openDropdownId: null } });
+        }
+    };
+
     useEffect(() => {
         document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+            document.removeEventListener("keydown", handleKeyDown);
+        }
     }, []);
 
     useEffect(() => {
@@ -62,7 +72,7 @@ const FilterDropdown = ({ children, trigger, className, dropdownId, placement = 
     };
 
     return (
-        <div className="relative w-full">
+        <div className={`${classNameContainer} relative w-full`}>
             {isValidElement(trigger)
                 ? cloneElement(trigger, {
                     ref: triggerRef,

@@ -12,6 +12,9 @@ module.exports = {
     ],
     theme: {
         extend: {
+            boxShadow: {
+                'hover-button': '0px 1px 2px 0px #1018280D',
+            },
             screens: {
                 "3xl": "1600px",
                 xxl: "1400px",
