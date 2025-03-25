@@ -2,7 +2,7 @@ import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
 import React, { forwardRef, useEffect, useRef } from "react";
 
-const SimpleBarCustom = forwardRef(({ children, ...props }, ref) => {
+const SimpleBarCustom = forwardRef(({ children, scrollableNodePropsClassName, hideScrollbar, ...props }, ref) => {
     const innerRef = useRef(null);
 
     useEffect(() => {
@@ -10,8 +10,6 @@ const SimpleBarCustom = forwardRef(({ children, ...props }, ref) => {
             ref.current = innerRef.current;
         }
     }, [innerRef, ref]);
-
-
 
     return (
         <SimpleBar
@@ -22,7 +20,7 @@ const SimpleBarCustom = forwardRef(({ children, ...props }, ref) => {
 
             scrollableNodeProps={{
                 ref: innerRef,
-                className: props?.scrollableNodePropsClassName,
+                className: scrollableNodePropsClassName,
                 onScroll: (e) => {
                     if (props.onScroll) {
                         props.onScroll(e)
@@ -36,7 +34,7 @@ const SimpleBarCustom = forwardRef(({ children, ...props }, ref) => {
                 tabIndex: -1
             }} // Gắn ref vào inner scrollable element
             style={props.style || {}}
-            className={`${props.className} ${props.hideScrollbar ? "hide-scrollbar" : ""} `}
+            className={`${props.className} ${hideScrollbar ? "hide-scrollbar" : ""} `}
             forceVisible={props.forceVisible ? props.forceVisible : 'y'}
         >
             {children}

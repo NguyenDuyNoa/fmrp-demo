@@ -4,8 +4,9 @@ export const ProductionsOrdersContext = createContext();
 
 const initialState = {
     isTab: "products",
+    isTabList: undefined, // new
     countAll: 0,
-    listDataLeft: [],
+    productionOrdersList: [],
     listDataRight: {
         title: "",
         statusManufacture: null,
@@ -15,7 +16,7 @@ const initialState = {
     openModal: false,
     next: null,
     page: 1,
-    limit: 15,
+    limit: 10,
     search: "",
     dataModal: {},
     valueOrders: null,
@@ -24,10 +25,11 @@ const initialState = {
     valueProductionOrders: null,
     valueProducts: [],
     valueBr: null,
+    selectStatusFilter:[], // selected trạng thái sản xuất
     seletedRadioFilter: {
         id: 1,
         label: "Đơn hàng bán"
-    },
+    }, // selected radio filter (đơn hàng bán/kh nội bộ)
     searchProductionOrders: "",
     searchOrders: "",
     searchPODetail: "",

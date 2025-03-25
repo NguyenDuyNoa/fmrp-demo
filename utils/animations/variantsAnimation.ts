@@ -35,7 +35,7 @@ const variantButtonBasic = {
 const variantButtonPressZoom = {
     rest: { scale: 1 },
     press: { scale: 0.95, transition: { duration: 0.4 } },
-    hover: { scale: 1, transition: { duration: 0.4 } },
+    hover: { scale: 1.02, transition: { duration: 0.4 } },
 };
 
 const variantButtonScaleZoom = {
