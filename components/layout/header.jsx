@@ -1217,7 +1217,7 @@ const Header = () => {
     const currentDropdown = dropdowns[currentDropdownIndex];
 
     return (
-        <header className="fixed z-40 w-full bg-[#003DA0] top-0 xl:h-[72px] h-14 flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 py-4">
+        <header className="fixed z-40 w-full bg-[#003DA0] top-0 xl:h-[72px] h-[62px] flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 py-4">
             {/* <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             <div className="flex items-center space-x-2">
                 <Link
@@ -1230,7 +1230,7 @@ const Header = () => {
                         width={100}
                         height={45}
                         quality={100}
-                        className="3xl:w-[110px] 2xl:w-[100px] xl:w-[90px] w-[60px] h-auto object-contain"
+                        className="3xl:w-[110px] 2xl:w-[100px] xl:w-[90px] w-[90px] h-auto object-contain"
                         loading="lazy"
                         crossOrigin="anonymous"
                         placeholder="blur"
@@ -1299,7 +1299,7 @@ const Header = () => {
 
             <div className="flex items-center 3xl:gap-4 xl:gap-3 gap-2">
                 <form className="relative flex items-center">
-                    <div className="2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 absolute xl:left-3 left-1.5">
+                    <div className="2xl:size-5 xl:size-4 size-3 absolute xl:left-3 left-1.5">
                         <Image
                             alt=""
                             src="/icon/header/timkiem.png"
@@ -1326,7 +1326,7 @@ const Header = () => {
                     theme="dark"
 
                 >
-                    <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
+                    <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
                         <Image
                             alt=""
                             onClick={() => {
@@ -1355,7 +1355,7 @@ const Header = () => {
                     position={"bottom right"}
                     classNameTrigger={"2xl:!p-0 !p-0"}
                 >
-                    <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
+                    <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
                         <Image
                             alt=""
                             src="/icon/header/right/quytrinh.png"
@@ -1376,7 +1376,7 @@ const Header = () => {
                     theme="dark"
                     className="cursor-pointer"
                 >
-                    <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
+                    <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
                         <Image
                             alt=""
                             onClick={() => {
@@ -1404,7 +1404,7 @@ const Header = () => {
                     className="popover-thongbao"
                     position={"bottom right"}
                 >
-                    <div className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0'>
+                    <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
                         <Image
                             alt=""
                             src="/icon/header/right/thongbao.png"
@@ -1429,7 +1429,7 @@ const Header = () => {
                     theme="dark"
                 >
                     <motion.div
-                        className='2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 w-3.5 h-3.5 shink-0 cursor-pointer'
+                        className='2xl:size-5 xl:size-4 size-3 shink-0 cursor-pointer'
                         onClick={() => window.open("https://help.fmrp.vn")}
                         initial={{ rotate: 0 }}
                         animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
@@ -1522,7 +1522,7 @@ const DropdownAvatar = React.memo(() => {
                                     width={40}
                                     height={40}
                                     quality={100}
-                                    className="object-cover min-w-[30px] w-[30px] min-h-[30px] h-[30px] rounded-full"
+                                    className="object-cover xl:min-w-[30px] xl:w-[30px] xl:min-h-[30px] xl:h-[30px] size-7 rounded-full shrink-0"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1531,7 +1531,7 @@ const DropdownAvatar = React.memo(() => {
                             ) : (
                                 <AvatarText
                                     fullName={auth?.user_full_name}
-                                    className={'!min-w-[30px] !min-h-[30px] !w-[30px] !h-[30px] !max-w-[30px] !max-h-[30px]'}
+                                    className={'xl:!min-w-[30px] xl:!min-h-[30px] xl:!w-[30px] xl:!h-[30px] xl:!max-w-[30px] xl:!max-h-[30px] size-7 shrink-0'}
                                 />
                                 // <Image
                                 //     alt=""

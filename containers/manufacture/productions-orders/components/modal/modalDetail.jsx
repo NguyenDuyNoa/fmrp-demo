@@ -27,7 +27,6 @@ const initialState = {
 };
 
 const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }) => {
-
     const minWidth = 850; // Đặt giá trị chiều rộng tối thiểu
 
     const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
@@ -39,15 +38,10 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
     const tabRefs = useRef([]);
 
     const [width, setWidth] = useState(minWidth);
-
     const [isResizing, setIsResizing] = useState(false);
-
     const [initialX, setInitialX] = useState(null);
-
     const [initialWidth, setInitialWidth] = useState(null);
-
     const [isMounted, setIsMounted] = useState(false);
-
     const [isStateModal, setIsStateModal] = useState(initialState);
 
     const queryStateModal = (key) => setIsStateModal((x) => ({ ...x, ...key }));
@@ -147,7 +141,6 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
         placeholderData: keepPreviousData,
         ...optionsQuery,
     })
-
 
     const listTab = [
         {

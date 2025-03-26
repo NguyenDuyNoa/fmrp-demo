@@ -72,6 +72,7 @@ import ListChecksIcon from "@/components/icons/common/ListChecksIcon";
 import KanbanIcon from "@/components/icons/common/KanbanIcon";
 import Image from "next/image";
 import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
+import CheckThinIcon from "@/components/icons/common/CheckThinIcon";
 
 
 const MainTable = ({ dataLang, typeScreen }) => {
@@ -171,7 +172,6 @@ const MainTable = ({ dataLang, typeScreen }) => {
     const groupButtonRef = useRef(null);
     // const [contentHeight, setContentHeight] = useState(0);
 
-    const [isMouted, setIsMouted] = useState(false);
     const [isOpenSearch, setIsOpenSearch] = useState(false);
 
     const { isOpen, handleQueryId, isIdChild, isId } = useToggle();
@@ -192,10 +192,11 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
 
-    useEffect(() => {
-        setIsMouted(true);
+    useLayoutEffect(() => {
+        if (typeof window !== "undefined" && performance?.mark) {
+            performance.mark("beforeRender");
+        }
     }, []);
-
     const params = {
         branch_id: isState.valueBr?.value || "",
         _po_id: isState.valueProductionOrders?.value || "",
@@ -256,16 +257,17 @@ const MainTable = ({ dataLang, typeScreen }) => {
     useEffect(() => {
         if (dataProductionOrderDetail) {
             queryState({
-                listDataRight: {
+                dataProductionOrderDetail: {
+                    ...dataProductionOrderDetail,
                     title: dataProductionOrderDetail?.productionOrder?.reference_no,
-                    idCommand: dataProductionOrderDetail?.productionOrder?.id,
+                    idCommand: dataProductionOrderDetail?.productionOrder?.branch_id,
                     statusManufacture: dataProductionOrderDetail?.productionOrder?.status_manufacture,
-                    dataPPItems: dataProductionOrderDetail?.listPOItems?.map((e) => {
+                    listPOItems: dataProductionOrderDetail?.listPOItems?.map((e, index) => {
                         return {
                             ...e,
                             id: e?.object_id,
                             title: e?.reference_no,
-                            showChild: true,
+                            showChild: dataProductionOrderDetail?.listPOItems?.length > 0 && index == 0 ? true : false,
                             arrListData: e?.items_products?.map((i) => {
                                 return {
                                     ...i,
@@ -296,12 +298,12 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             }),
                         };
                     }),
-                    dataSemiItems: dataProductionOrderDetail?.listSemiItems?.map((e) => {
+                    listSemiItems: dataProductionOrderDetail?.listSemiItems?.map((e, index) => {
                         return {
                             ...e,
                             id: e?.object_id,
                             title: e?.reference_no,
-                            showChild: true,
+                            showChild: dataProductionOrderDetail?.listSemiItems?.length > 0 && index == 0 ? true : false,
                             arrListData: e?.semi_products?.map((i) => {
                                 return {
                                     ...i,
@@ -409,9 +411,9 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     const handShowItem = (id, type) => {
         queryState({
-            listDataRight: {
-                ...isState.listDataRight,
-                [type]: isState.listDataRight?.[type]?.map((e) => {
+            dataProductionOrderDetail: {
+                ...isState.dataProductionOrderDetail,
+                [type]: isState.dataProductionOrderDetail?.[type]?.map((e) => {
                     if (e.id == id) {
                         return {
                             ...e,
@@ -457,7 +459,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
         comboboxProductionOrdersDetail,
         isLoadingProductionOrderDetail,
         refetchProductionOrderList,
-        typePageMoblie
+        typePageMoblie,
     };
 
     // bộ lọc đang active
@@ -475,8 +477,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // trigger của bộ lọc tổng của tất cả
     const triggerFilterAll = (
-        <button className={`${(stateFilterDropdown?.open || activeFilterCount > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg xl:h-10 h-9 px-3 group custom-transition`}>
-            <span className="w-5 h-5 shrink-0">
+        <button className={`${(stateFilterDropdown?.open || activeFilterCount > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} flex items-center space-x-2 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition`}>
+            <span className="3xl:size-5 size-4 shrink-0">
                 <FunnelIcon className='w-full h-full ' />
             </span>
             <span className={`${(stateFilterDropdown?.open || activeFilterCount > 0) ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} text-nowrap 3xl:text-base text-sm custom-transition`}>
@@ -490,7 +492,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                 // :
                 // <span className='xl:size-5 size-4' />
             }
-            <span className="w-4 h-4 shrink-0">
+            <span className="3xl:size-4 size-3.5 shrink-0">
                 <CaretDownIcon className={`${(stateFilterDropdown?.open || activeFilterCount > 0) ? "rotate-180" : "rotate-0"} w-full h-full custom-transition`} />
             </span>
         </button>
@@ -498,14 +500,14 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // trigger của bộ lọc trạng thái
     const triggerFilterStatus = (
-        <button className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} relative flex items-center justify-between space-x-2 border rounded-lg xl:h-10 h-9 px-3 group custom-transition w-full`}>
-            <ChartDonutIcon className='absolute top-1/2 -translate-y-1/2 xl:size-5 size-4' />
+        <button className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}>
+            <ChartDonutIcon className='absolute top-1/2 -translate-y-1/2 3xl:size-5 size-4' />
 
             <span className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}>
                 {dataLang?.purchase_status || "purchase_status"}
             </span>
 
-            <span className="size-4 shrink-0">
+            <span className="3xl:size-4 size-3.5 shrink-0">
                 <CaretDownIcon className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "rotate-180" : "rotate-0"} w-full h-full custom-transition`} />
             </span>
         </button>
@@ -513,16 +515,18 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // trigger button hoàn thành công đoạn
     const triggerCompleteStage = (
-        <div className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-white border border-[#0375F3] bg-[#0375F3] hover:bg-[#0375F3] cursor-pointer hover:shadow-hover-button rounded-lg custom-transition">
-            <span className='size-5'>
-                <CheckIcon className={`size-full`} />
+        <div className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center xl:gap-4 gap-2 xl:text-sm text-xs font-medium text-white border border-[#0375F3] bg-[#0375F3] hover:bg-[#0375F3] cursor-pointer hover:shadow-hover-button rounded-lg custom-transition">
+            <span className='flex items-center xl:gap-2 gap-1'>
+                <span className='xl:size-4 size-3.5 shrink-0'>
+                    <CheckThinIcon className={`size-full`} />
+                </span>
+
+                <span>
+                    Hoàn thành sản xuất
+                </span>
             </span>
 
-            <span>
-                Hoàn thành sản xuất
-            </span>
-
-            <span className='size-4'>
+            <span className='xl:size-4 size-3.5 shrink-0'>
                 <CaretDropdownThinIcon className={`size-full`} />
             </span>
         </div>
@@ -544,33 +548,55 @@ const MainTable = ({ dataLang, typeScreen }) => {
         queryState({ selectStatusFilter: updatedSelected });
     };
 
-    // hàm tính chiều cao responsive
+    const getElementHeightWithMargin = (el) => {
+        if (!el) return 0;
+        const style = window.getComputedStyle(el);
+        const marginTop = parseFloat(style.marginTop) || 0;
+        const marginBottom = parseFloat(style.marginBottom) || 0;
+        const height = el.getBoundingClientRect().height || 0;
+        return height + marginTop + marginBottom;
+    };
+
     const calcAvailableHeight = (type) => {
+        const breadcrumb = getElementHeightWithMargin(breadcrumbRef.current);
+        const titleInfo = getElementHeightWithMargin(titleRef.current);
+        const filter = getElementHeightWithMargin(filterRef.current);
+        const pagination = getElementHeightWithMargin(paginationRef.current);
+        const groupButton = getElementHeightWithMargin(groupButtonRef.current);
+
         if (type === "main") {
-            const breadcrumb = breadcrumbRef.current?.offsetHeight || 0;
-            const titleInfo = titleRef.current?.offsetHeight || 0;
-            const filter = filterRef.current?.offsetHeight || 0;
-            const pagination = paginationRef.current?.offsetHeight || 0;
-
-            return window.innerHeight - breadcrumb - titleInfo - filter - pagination - 84 - 60;
-        } else if (type = "submain") {
-            const breadcrumb = breadcrumbRef.current?.offsetHeight || 0;
-            const titleInfo = titleRef.current?.offsetHeight || 0;
-            const filter = filterRef.current?.offsetHeight || 0;
-            const pagination = paginationRef.current?.offsetHeight || 0;
-            const groupButton = groupButtonRef.current?.offsetHeight || 0;
-
-            return window.innerHeight - breadcrumb - titleInfo - filter - pagination - groupButton - 84 - 60;
+            return window.innerHeight - breadcrumb - titleInfo - filter - pagination - 84 - 24;
+        } else if (type === "submain") {
+            return window.innerHeight - breadcrumb - titleInfo - filter - groupButton - 84 - 34;
         }
     };
+
+    // hàm tính chiều cao responsive
+    // const calcAvailableHeight = (type) => {
+    //     const breadcrumb = breadcrumbRef.current?.offsetHeight || 0;
+    //     const titleInfo = titleRef.current?.offsetHeight || 0;
+    //     const filter = filterRef.current?.offsetHeight || 0;
+    //     const pagination = paginationRef.current?.offsetHeight || 0;
+    //     const groupButton = groupButtonRef.current?.offsetHeight || 0;
+
+    //     console.log('breadcrumb', breadcrumb);
+    //     console.log('titleInfo', titleInfo);
+    //     console.log('filter', filter);
+    //     console.log('pagination', pagination);
+    //     console.log('groupButton', groupButton);
+
+    //     if (type === "main") {
+
+    //         return window.innerHeight - breadcrumb - titleInfo - filter - pagination - 84 - 60;
+    //     } else if (type = "submain") {
+
+    //         return window.innerHeight - breadcrumb - titleInfo - filter - groupButton - 84 - 60;
+    //     }
+    // };
 
     console.log('dataProductionOrderDetail', dataProductionOrderDetail);
     console.log('isState', isState);
     console.log('calcAvailableHeight("submain")', calcAvailableHeight("submain"));
-
-    if (!isMouted) {
-        return null;
-    }
 
     return (
         <React.Fragment>
@@ -581,13 +607,13 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         <EmptyExprired />
                         :
                         <React.Fragment>
-                            <BreadcrumbCustom items={breadcrumbItems} className="3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]" />
+                            <BreadcrumbCustom items={breadcrumbItems} className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]" />
                         </React.Fragment>
                 }
             </div>
 
             <div ref={titleRef} className="flex justify-between items-center w-full">
-                <h2 className="3xl:text-2xl xl:text-xl text-base text-[#52575E] capitalize font-medium">
+                <h2 className="3xl:text-2xl xl:text-[22px] text-xl text-[#52575E] capitalize font-medium">
                     {dataLang?.productions_orders || 'productions_orders'}
                 </h2>
 
@@ -595,45 +621,47 @@ const MainTable = ({ dataLang, typeScreen }) => {
                     <div className="relative flex items-center justify-end">
                         {/* Animated Search Input */}
                         <AnimatePresence>
-                            {isOpenSearch && (
-                                <motion.div
-                                    initial={{ width: 0, opacity: 0 }}
-                                    animate={{ width: "100%", opacity: 1 }}
-                                    exit={{ width: 0, opacity: 0 }}
-                                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                                    className="overflow-hidden"
-                                >
-                                    <form className="relative flex items-center w-full">
-                                        <input
-                                            onChange={(e) => onChangeSearch(e)}
-                                            className={`
+                            {
+                                isOpenSearch && (
+                                    <motion.div
+                                        initial={{ width: 0, opacity: 0 }}
+                                        animate={{ width: "100%", opacity: 1 }}
+                                        exit={{ width: 0, opacity: 0 }}
+                                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                                        className="overflow-hidden"
+                                    >
+                                        <form className="relative flex items-center w-full">
+                                            <input
+                                                onChange={(e) => onChangeSearch(e)}
+                                                className={`
                                                ${isOpenSearch ? "rounded-l-lg border-r-0 border-[#D0D5DD] focus:border-[#3276FA]" : "rounded-lg border-[#D0D5DD]"}
-                                                relative border  bg-white pl-2 xl:h-10 h-9 text-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
-                                            type="text"
-                                            // value={isState.search}
-                                            placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
-                                        />
-                                    </form>
-                                </motion.div>
-                            )}
+                                                relative border  bg-white pl-2 3xl:h-10 h-9 text-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
+                                                type="text"
+                                                // value={isState.search}
+                                                placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
+                                            />
+                                        </form>
+                                    </motion.div>
+                                )
+                            }
                         </AnimatePresence>
 
                         <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }}>
                             <ButtonAnimationNew
                                 icon={
-                                    <div className='size-6 '>
+                                    <div className='3xl:size-6 size-5'>
                                         <MagnifyingGlassIcon className='size-full' />
                                     </div>
                                 }
                                 hideTitle={true}
-                                className={`${isOpenSearch ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]" : "rounded-lg text-[#9295A4] border-[#D0D5DD]"} flex items-center justify-center w-12 xl:h-10 h-9 shrink-0 border`}
+                                className={`${isOpenSearch ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]" : "rounded-lg text-[#9295A4] border-[#D0D5DD]"} flex items-center justify-center 3xl:w-12 w-10 3xl:h-10 h-9 shrink-0 border`}
                                 onClick={toggleSearch}
                             />
                         </motion.div>
                     </div>
 
                     <div className="relative">
-                        <div className='size-5 absolute top-1/2 -translate-y-1/2 left-2 z-[2] pointer-events-none'>
+                        <div className='3xl:size-5 size-4 absolute top-1/2 -translate-y-1/2 left-2 z-[2] pointer-events-none'>
                             <CalendarBlankIcon className='size-full text-[#9295A4]' />
                         </div>
 
@@ -657,13 +685,13 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             }}
                             isClearable
                             placeholderText={`${dataLang?.productions_orders_select_day}` || 'productions_orders_select_day'}
-                            className="pl-8 pr-2 xl:h-10 h-9 text-default w-[250px] outline-none cursor-pointer focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
+                            className="pl-8 pr-2 3xl:h-10 h-9 text-default w-[250px] outline-none cursor-pointer focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
                             onKeyDown={(e) => e.preventDefault()} // 👈 chặn gõ bàn phím
                         />
 
                         {
                             !isState.date.dateStart &&
-                            <span className="absolute top-1/2 -translate-y-1/2 right-2 w-4 h-4 shrink-0 text-[#9295A4] pointer-events-none">
+                            <span className="absolute top-1/2 -translate-y-1/2 right-2 3xl:size-4 size-3.5 shrink-0 text-[#9295A4] pointer-events-none">
                                 <CaretDownIcon className={`w-full h-full custom-transition`} />
                             </span>
                         }
@@ -911,133 +939,147 @@ const MainTable = ({ dataLang, typeScreen }) => {
                 />
             </div>
 
-            <div
-                style={{
-                    height: calcAvailableHeight("main"),
-                    maxHeight: calcAvailableHeight("main")
-                }}
-                className=" flex items-start 3xl:gap-6 gap-4 w-full overflow-y-auto"
-            >
-                <Customscrollbar className='xl:max-w-[15%] max-w-[22%] pr-3 w-full h-full border-none border-[#D0D5DD] border' >
-                    {
-                        (isLoadingProductionOrderList)
-                            // (isLoadingProductionOrderList || isRefetching)
-                            ?
-                            (
-                                <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
-                            )
-                            :
-                            (
-                                flagProductionOrders?.length > 0 ?
-                                    (
-                                        flagProductionOrders?.map((item, eIndex) => {
-                                            const color = {
-                                                "0": {
-                                                    color: 'bg-[#FF811A]/15 text-[#C25705]',
-                                                    title: dataLang?.productions_orders_produced ?? "productions_orders_produced"
-                                                },
-                                                "1": {
-                                                    color: 'bg-[#3ECeF7]/20 text-[#076A94]',
-                                                    title: dataLang?.productions_orders_in_progress ?? "productions_orders_in_progress"
-                                                },
-                                                "2": {
-                                                    color: 'bg-[#35BD4B]/20 text-[#1A7526]',
-                                                    title: dataLang?.productions_orders_completed ?? "productions_orders_completed"
+            <div className=" flex items-start 3xl:gap-6 gap-4 w-full overflow-y-hidden">
+                <div className="2xl:max-w-[15%] xl:max-w-[18%] max-w-[22%] size-full space-y-4 border-none border-[#D0D5DD] border">
+                    <Customscrollbar
+                        className='h-full'
+                        style={{
+                            height: calcAvailableHeight("main"),
+                            maxHeight: calcAvailableHeight("main")
+                        }}
+                    >
+                        {
+                            (isLoadingProductionOrderList)
+                                // (isLoadingProductionOrderList || isRefetching)
+                                ?
+                                (
+                                    <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
+                                )
+                                :
+                                (
+                                    flagProductionOrders?.length > 0 ?
+                                        (
+                                            flagProductionOrders?.map((item, eIndex) => {
+                                                const color = {
+                                                    "0": {
+                                                        color: 'bg-[#FF811A]/15 text-[#C25705]',
+                                                        title: dataLang?.productions_orders_produced ?? "productions_orders_produced"
+                                                    },
+                                                    "1": {
+                                                        color: 'bg-[#3ECeF7]/20 text-[#076A94]',
+                                                        title: dataLang?.productions_orders_in_progress ?? "productions_orders_in_progress"
+                                                    },
+                                                    "2": {
+                                                        color: 'bg-[#35BD4B]/20 text-[#1A7526]',
+                                                        title: dataLang?.productions_orders_completed ?? "productions_orders_completed"
+                                                    }
                                                 }
-                                            }
 
-                                            return (
-                                                <div
-                                                    key={item.id}
-                                                    onClick={() => handleShow(item.id)}
-                                                    className={`
+                                                return (
+                                                    <div
+                                                        key={item.id}
+                                                        onClick={() => handleShow(item.id)}
+                                                        className={`
                                                         ${typePageMoblie ? "px-px" : "pl-1 pr-3"}
                                                         ${item.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"}
                                                         ${flagProductionOrders?.length - 1 == eIndex ? "border-b-none" : "border-b"}
                                                         py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
-                                                    style={{
-                                                        background: item.id === isState.idDetailProductionOrder ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)" : ""
-                                                    }}
-                                                >
-                                                    {/* Gạch xanh bên trái */}
-                                                    <div className='relative pl-5 space-y-2'>
-                                                        {
-                                                            item.id === isState.idDetailProductionOrder && (
-                                                                <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
-                                                            )
-                                                        }
+                                                        style={{
+                                                            background: item.id === isState.idDetailProductionOrder ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)" : ""
+                                                        }}
+                                                    >
+                                                        {/* Gạch xanh bên trái */}
+                                                        <div className='relative pl-5 xl:space-y-2 space-y-1.5'>
+                                                            {
+                                                                item.id === isState.idDetailProductionOrder && (
+                                                                    <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
+                                                                )
+                                                            }
 
-                                                        {
-                                                            isState.listDataRight?.title && (
-                                                                <span className={`${color[item?.status_manufacture]?.color} text-sm px-2 py-1 rounded font-normal w-fit h-fit`}>
-                                                                    {color[item?.status_manufacture]?.title}
-                                                                </span>
-                                                            )
-                                                        }
-                                                        <h1 className="3xl:text-2xl text-xl font-semibold text-[#003DA0]">
-                                                            {item.reference_no}
-                                                        </h1>
+                                                            {
+                                                                isState.dataProductionOrderDetail?.title && (
+                                                                    <span className={`${color[item?.status_manufacture]?.color} xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}>
+                                                                        {color[item?.status_manufacture]?.title}
+                                                                    </span>
+                                                                )
+                                                            }
+                                                            <h1 className="3xl:text-2xl xl:text-xl text-lg font-semibold text-[#003DA0]">
+                                                                {item.reference_no}
+                                                            </h1>
 
-                                                        <div className="flex flex-col gap-0.5">
-                                                            <h3 className="text-[#667085] font-normal 3xl:text-base text-sm">
-                                                                <span>{dataLang?.materials_planning_create_on || "materials_planning_create_on"}{": "}</span>
-                                                                <span>{formatMoment(item?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}</span>
-                                                            </h3>
+                                                            <div className="flex flex-col gap-0.5">
+                                                                <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
+                                                                    <span>{dataLang?.materials_planning_create_on || "materials_planning_create_on"}{": "}</span>
+                                                                    <span>{formatMoment(item?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}</span>
+                                                                </h3>
 
-                                                            <div className="flex flex-wrap items-start gap-x-1">
-                                                                <span className="text-[#667085] whitespace-nowrap font-normal 3xl:text-base text-sm">
-                                                                    {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"}:
-                                                                </span>
-                                                                {
-                                                                    item?.listObject?.map((i, index) => (
-                                                                        <span
-                                                                            key={index}
-                                                                            className="text-[#667085] font-normal 3xl:text-base text-sm"
+                                                                <div className="flex flex-wrap items-start gap-x-1">
+                                                                    <span className="text-[#667085] whitespace-nowrap font-normal 3xl:text-base xl:text-sm text-xs">
+                                                                        {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"}:
+                                                                    </span>
+                                                                    {
+                                                                        item?.listObject?.map((i, index) => (
+                                                                            <span
+                                                                                key={index}
+                                                                                className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs"
+                                                                            >
+                                                                                {i.reference_no}
+                                                                                {index < item.listObject.length - 1 && <span>,</span>}
+                                                                            </span>
+                                                                        ))
+                                                                    }
+                                                                </div>
+
+                                                                <AnimatePresence initial={false}>
+                                                                    {item.id === isState.idDetailProductionOrder && (
+                                                                        <motion.div
+                                                                            key="extra-info"
+                                                                            layout
+                                                                            initial={{ height: 0, opacity: 0 }}
+                                                                            animate={{ height: "auto", opacity: 1 }}
+                                                                            exit={{ height: 0, opacity: 0 }}
+                                                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                            className="flex flex-col w-full overflow-hidden gap-0.5"
                                                                         >
-                                                                            {i.reference_no}
-                                                                            {index < item.listObject.length - 1 && <span>,</span>}
-                                                                        </span>
-                                                                    ))
-                                                                }
+                                                                            <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
+                                                                                <span>{dataLang?.client_list_brand || "client_list_brand"}: </span>
+                                                                                <span>{item?.name_branch}</span>
+                                                                            </h3>
+                                                                        </motion.div>
+                                                                    )}
+                                                                </AnimatePresence>
                                                             </div>
-
-                                                            <AnimatePresence initial={false}>
-                                                                {item.id === isState.idDetailProductionOrder && (
-                                                                    <motion.div
-                                                                        key="extra-info"
-                                                                        layout
-                                                                        initial={{ height: 0, opacity: 0 }}
-                                                                        animate={{ height: "auto", opacity: 1 }}
-                                                                        exit={{ height: 0, opacity: 0 }}
-                                                                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                                        className="flex flex-col w-full overflow-hidden gap-0.5"
-                                                                    >
-                                                                        <h3 className="text-[#667085] font-normal 3xl:text-base text-sm">
-                                                                            <span>{dataLang?.client_list_brand || "client_list_brand"}: </span>
-                                                                            <span>{item?.name_branch}</span>
-                                                                        </h3>
-                                                                    </motion.div>
-                                                                )}
-                                                            </AnimatePresence>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            )
-                                        })
-                                    )
-                                    :
-                                    (
-                                        <NoData className="mt-0" />
-                                    )
-                            )
-                    }
+                                                )
+                                            })
+                                        )
+                                        :
+                                        (
+                                            <NoData className="mt-0" />
+                                        )
+                                )
+                        }
 
-                    {
-                        (hasNextPageProductionOrderList) && <LoadingComponent ref={refInviewListLsx} />
-                    }
-                </Customscrollbar>
+                        {
+                            (hasNextPageProductionOrderList) && <LoadingComponent ref={refInviewListLsx} />
+                        }
+                    </Customscrollbar>
 
-                <div className="xl:max-w-[85%] max-w-[78%] w-full h-full border-none border-[#D0D5DD] border overflow-y-hidden">
+                    <div
+                        ref={paginationRef}
+                        className='flex items-center'
+                    >
+                        <LimitListDropdown
+                            limit={isState.limit}
+                            sLimit={(value) => queryState({ limit: value, page: 1 })}
+                            dataLang={dataLang}
+                            total={isState?.countAll}
+                        />
+                    </div>
+                </div>
+
+                <div className="2xl:max-w-[85%] xl:max-w-[82%] max-w-[78%] size-full space-y-4 border-none border-[#D0D5DD] border overflow-y-hidden">
                     {
                         (!isLoadingProductionOrderDetail) && (dataProductionOrderDetail?.listPOItems?.length > 0) && (
                             <div ref={groupButtonRef} className="flex items-center justify-end gap-2 p-0.5 mb-2">
@@ -1057,7 +1099,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                         // boxShadow: "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040"
                                         boxShadow: "0px 5px 35px 0px #00000012"
                                     }}
-                                    className="flex flex-col !p-0 border-[#D8DAE5] rounded-lg shrink-0 w-[150%]"
+                                    className="flex flex-col !p-0 border-[#D8DAE5] rounded-lg shrink-0 3xl:w-[120%] w-[110%]"
                                     classNameContainer="!w-fit"
                                     dropdownId="dropdownCompleteStage"
                                     placement="bottom-right"
@@ -1090,7 +1132,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                                     </div>
 
                                                     {tab.isPremium && (
-                                                        <span className="text-xs font-normal bg-[#1F2329]/10 text-[#646A73] rounded-[4px] px-3 py-1.5">
+                                                        <span className="text-[10px] font-normal bg-[#1F2329]/10 text-[#646A73] rounded-[4px] px-2.5 py-1">
                                                             Premium
                                                         </span>
                                                     )}
@@ -1146,7 +1188,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                         </div>
                                     }
                                     title="In lệnh sản xuất"
-                                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
+                                    className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
                                 />
 
                                 <ButtonAnimationNew
@@ -1156,12 +1198,12 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                         </div>
                                     }
                                     title="In tem thành phẩm"
-                                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
+                                    className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
                                 />
 
                                 <ButtonAnimationNew
                                     icon={
-                                        <div className='size-5'>
+                                        <div className='3xl:size-5 size-4'>
                                             <ArrowCounterClockwiseIcon className='size-full' />
                                         </div>
                                     }
@@ -1169,12 +1211,12 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                         refetchProductionOrderDetail()
                                     }}
                                     title="Tải lại"
-                                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-normal text-[#0BAA2E] border border-[#0BAA2E] hover:bg-[#EBFEF2] hover:shadow-hover-button rounded-lg"
+                                    className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-normal text-[#0BAA2E] border border-[#0BAA2E] hover:bg-[#EBFEF2] hover:shadow-hover-button rounded-lg"
                                 />
 
                                 <ButtonAnimationNew
                                     icon={
-                                        <div className='size-5'>
+                                        <div className='3xl:size-5 size-4'>
                                             <TrashIcon className='size-full' />
                                         </div>
                                     }
@@ -1182,7 +1224,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                         handleQueryId({ status: true, id: isState.idDetailProductionOrder });
                                     }}
                                     title="Xoá"
-                                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-normal text-[#EE1E1E] border border-[#EE1E1E] hover:bg-[#FFEEF0] hover:shadow-hover-button rounded-lg"
+                                    className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-normal text-[#EE1E1E] border border-[#EE1E1E] hover:bg-[#FFEEF0] hover:shadow-hover-button rounded-lg"
                                 />
                             </div>
                         )
@@ -1201,10 +1243,11 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
                             :
                             (dataProductionOrderDetail?.listPOItems?.length > 0)
-                                // (dataProductionOrderDetail?.dataPPItems?.length > 0 || dataProductionOrderDetail?.dataSemiItems?.length > 0)
+                                // (dataProductionOrderDetail?.listPOItems?.length > 0 || dataProductionOrderDetail?.listSemiItems?.length > 0)
                                 ?
                                 <React.Fragment>
-                                    {isState.isTab == "products" && <TabItem {...shareProps} />}
+                                    {isState.isTabList?.type == "products" && <TabItem {...shareProps} />}
+                                    {isState.isTabList?.type == "semiProduct" && <>Hello</>}
                                     {/* {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
                                 </React.Fragment>
                                 :
@@ -1212,18 +1255,6 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         }
                     </Customscrollbar>
                 </div>
-            </div>
-
-            <div
-                ref={paginationRef}
-                className='flex items-center'
-            >
-                <LimitListDropdown
-                    limit={isState.limit}
-                    sLimit={(value) => queryState({ limit: value, page: 1 })}
-                    dataLang={dataLang}
-                    total={isState?.countAll}
-                />
             </div>
 
             <ModalDetail {...shareProps} />
