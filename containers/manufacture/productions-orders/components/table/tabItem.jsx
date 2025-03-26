@@ -33,9 +33,6 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel 
         };
         const color = colorMap[product?.status_item];
 
-        console.log('totalLength', totalLength);
-
-
         return (
             <div
                 key={`product-${index}`}

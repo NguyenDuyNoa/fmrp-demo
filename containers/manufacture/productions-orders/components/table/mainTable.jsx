@@ -119,17 +119,17 @@ const MainTable = ({ dataLang, typeScreen }) => {
     const listLsxStatus = [
         {
             label: "Chưa sản xuất",
-            value: "not_started",
+            value: "0",
             color: "bg-[#FF811A]/15 text-[#C25705]"
         },
         {
             label: "Đang sản xuất",
-            value: "in_progress",
+            value: "1",
             color: "bg-[#3ECeF7]/20 text-[#076A94]"
         },
         {
             label: "Hoàn thành",
-            value: "completed",
+            value: "2",
             color: "bg-[#35BD4B]/20 text-[#1A7526]"
         },
     ]
@@ -197,6 +197,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
             performance.mark("beforeRender");
         }
     }, []);
+
     const params = {
         branch_id: isState.valueBr?.value || "",
         _po_id: isState.valueProductionOrders?.value || "",
@@ -207,8 +208,11 @@ const MainTable = ({ dataLang, typeScreen }) => {
         internal_plans_id: [isState.valuePlan?.value]?.length > 0 ? [isState.valuePlan?.value].map((e) => e) : "",
         date_start: isState.date.dateStart ? formatMoment(isState.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
         item_variation_id: isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
+        // status: isState?.selectStatusFilter?.length > 0 ? isState?.selectStatusFilter : null
+        ...(isState?.selectStatusFilter?.length > 0 && { status: isState.selectStatusFilter })
     };
 
+    // call api list production
     const {
         data: dataProductionOrders,
         isLoading: isLoadingProductionOrderList,
@@ -218,34 +222,19 @@ const MainTable = ({ dataLang, typeScreen }) => {
         refetch: refetchProductionOrderList
     } = useProductionOrdersList(params);
 
-    const flagProductionOrders = useMemo(() =>
-        dataProductionOrders ? dataProductionOrders?.pages?.flatMap(page => page?.productionOrders) : [],
-        [dataProductionOrders]
-    );
-
-    // const { isLoading, isFetching, isRefetching, refetch: refetchProductionOrderList } = useQuery({
-    //     queryKey: ["api_production_orders",
-    //         isState.page,
-    //         isState.search,
-    //         isState.date.dateStart,
-    //         isState.date.dateEnd,
-    //         isState.valueProductionOrders,
-    //         isState.valueProductionOrdersDetail,
-    //         isState.valueBr,
-    //         isState.valueOrders,
-    //         isState.valuePlan,
-    //         isState.valueProducts],
-    //     queryFn: () => fetchState(),
-    //     // enabled: isState.openModal == false,
-    //     ...optionsQuery
-    // })
-
+    // call api detail production
     const {
         data: dataProductionOrderDetail,
         isLoading: isLoadingProductionOrderDetail,
         refetch: refetchProductionOrderDetail,
         isRefetching: isRefetchingProductionOrderDetail
-    } = useProductionOrderDetail({ id: isState.idDetailProductionOrder, enabled: !!isState.idDetailProductionOrder })
+    } = useProductionOrderDetail({ id: isState.idDetailProductionOrder, enabled: true })
+
+    // flag của list production
+    const flagProductionOrders = useMemo(() =>
+        dataProductionOrders ? dataProductionOrders?.pages?.flatMap(page => page?.productionOrders) : [],
+        [dataProductionOrders]
+    );
 
     // loadmore list LSX
     useEffect(() => {
@@ -254,6 +243,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
         }
     }, [inViewListLsx, fetchNextPageProductionOrderList])
 
+    // set data vào state detail
     useEffect(() => {
         if (dataProductionOrderDetail) {
             queryState({
@@ -548,6 +538,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
         queryState({ selectStatusFilter: updatedSelected });
     };
 
+    // tính toán chiều cao của các element
     const getElementHeightWithMargin = (el) => {
         if (!el) return 0;
         const style = window.getComputedStyle(el);
@@ -571,32 +562,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
         }
     };
 
-    // hàm tính chiều cao responsive
-    // const calcAvailableHeight = (type) => {
-    //     const breadcrumb = breadcrumbRef.current?.offsetHeight || 0;
-    //     const titleInfo = titleRef.current?.offsetHeight || 0;
-    //     const filter = filterRef.current?.offsetHeight || 0;
-    //     const pagination = paginationRef.current?.offsetHeight || 0;
-    //     const groupButton = groupButtonRef.current?.offsetHeight || 0;
-
-    //     console.log('breadcrumb', breadcrumb);
-    //     console.log('titleInfo', titleInfo);
-    //     console.log('filter', filter);
-    //     console.log('pagination', pagination);
-    //     console.log('groupButton', groupButton);
-
-    //     if (type === "main") {
-
-    //         return window.innerHeight - breadcrumb - titleInfo - filter - pagination - 84 - 60;
-    //     } else if (type = "submain") {
-
-    //         return window.innerHeight - breadcrumb - titleInfo - filter - groupButton - 84 - 60;
-    //     }
-    // };
-
     console.log('dataProductionOrderDetail', dataProductionOrderDetail);
     console.log('isState', isState);
-    console.log('calcAvailableHeight("submain")', calcAvailableHeight("submain"));
 
     return (
         <React.Fragment>
@@ -705,7 +672,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         className="flex flex-col gap-4 border-[#D8DAE5] rounded-lg 3xl:!min-w-[1820px] 2xl:min-w-[1500px] xxl:min-w-[1400px] xl:min-w-[1250px] lg:min-w-[1000px]"
                         dropdownId="dropdownFilterMain"
                     >
-                        <div className="3xl:text-xl text-lg text-[#344054] font-medium ">
+                        <div className="3xl:text-xl text-lg text-[#344054] font-medium">
                             {dataLang?.productions_orders_filter || "productions_orders_filter"}
                         </div>
 

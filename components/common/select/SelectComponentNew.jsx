@@ -3,10 +3,7 @@ import { SelectCore } from "@/utils/lib/Select";
 import { FaCheck } from "react-icons/fa";
 import { components } from "react-select";
 import { Customscrollbar } from "../../UI/common/Customscrollbar";
-import { MenuListClickAll } from "../../UI/filterComponents/selectItemComponent";
 import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
-import CloseXIcon from "@/components/icons/common/CloseXIcon";
-import { AnimatePresence, motion } from "framer-motion";
 
 export const CustomOption = (props) => {
     console.log('custom option props: ', props);
