@@ -1,8 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { useContext } from "react";
-import { formatMoment } from "@/utils/helpers/formatMoment";
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { ProductionsOrdersContext } from "../context/productionsOrders";
 
 export const useProductionOrdersList = (params) => {
@@ -10,9 +8,6 @@ export const useProductionOrdersList = (params) => {
 
     const fetchProductionOrdersList = async ({ pageParam = 1 }) => {
         const { data } = await apiProductionsOrders.apiProductionOrders(pageParam, isState.limit, { params });
-
-        console.log('data', data);
-
 
         // const arrayItem = convertArrData(data?.productionOrders);
         // console.log('arrayItem arrayItem', arrayItem);
@@ -34,7 +29,6 @@ export const useProductionOrdersList = (params) => {
         }
 
         return {
-
             ...data,
             nextPage: data?.next == 1 ? pageParam + 1 : undefined,
         };
@@ -52,7 +46,8 @@ export const useProductionOrdersList = (params) => {
             isState.valueBr,
             isState.valueOrders,
             isState.valuePlan,
-            isState.valueProducts
+            isState.valueProducts,
+            isState.selectStatusFilter
         ],
         queryFn: fetchProductionOrdersList,
         initialPageParam: 1,

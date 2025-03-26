@@ -32,7 +32,7 @@ export const Dropdown = (props) => {
         <div className="">
             <Popup
                 trigger={
-                    <button className={`${props?.classNameTrigger} ${props?.link?.some(link => router.pathname.startsWith(link)) ? "bg-[#E2F0FE] text-[#11315B] font-semibold" : "bg-transparent text-[#F3F4F6] font-normal hover:text-white"} rounded-xl xxl:text-sm xl:text-xs text-[10px] 2xl:px-3 px-2 py-1 hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center ease-in-out duration-300 transition-all`}>
+                    <button className={`${props?.classNameTrigger} ${props?.link?.some(link => router.pathname.startsWith(link)) ? "bg-[#E2F0FE] text-[#11315B] font-semibold" : "bg-transparent text-[#F3F4F6] font-normal hover:text-white"} rounded-xl 3xl:text-base xxl:text-sm xl:text-xs text-[11px] text-nowrap 2xl:px-3 px-2 py-1 hover:drop-shadow-[0_0_5px_#eabd7a99] flex flex-col justify-center items-center ease-in-out duration-300 transition-all`}>
                         {
                             props?.type == 'procedure' ?
                                 (open
@@ -73,198 +73,204 @@ export const Dropdown = (props) => {
             >
                 <div className={`w-auto ${inter.className} `}>
                     <div className="bg-white 2xl:py-2 lg:py-0.5 px-0.5 rounded-lg justify-between flex divide-x divide-[#DDDDE2]">
-                        {props.data?.map((e, i) => (
-                            <div
-                                key={i}
-                                className={`${e.title ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5" : "px-1"} space-y-1 min-w-[200px]`}
-                            >
-                                {e.title && (
-                                    <h3 className="px-3 text-[14.5px] uppercase">
-                                        {e.title}
-                                    </h3>
-                                )}
-                                {e.sub?.map((ce, ci) => (
-                                    <div className="space-y-0.5" key={ci}>
-                                        {ce.link ? (
-                                            <>
-                                                {is_admin ? (
-                                                    <Zoom>
-                                                        <Link
-                                                            title={ce.title}
-                                                            href={`${ce.link}`}
-                                                            className="flex  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]"
-                                                        >
-                                                            {ce?.img ? (
-                                                                <React.Fragment>
-                                                                    <Image
-                                                                        alt={ce.title}
-                                                                        src={ce?.img}
-                                                                        width={24}
-                                                                        height={24}
-                                                                        quality={100}
-                                                                        className={`object-contain"`}
-                                                                        loading="lazy"
-                                                                        crossOrigin="anonymous"
-                                                                        placeholder="blur"
-                                                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                                                    />
-                                                                    <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
-                                                                        {ce.title}
-                                                                    </h5>
-                                                                </React.Fragment>
-                                                            ) : (
-                                                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
-                                                                    {ce.title}
-                                                                </li>
-                                                            )}
-                                                        </Link>
-                                                    </Zoom>
-                                                ) : ce?.viewOwn == "1" || ce?.view == "1" ? (
-                                                    <Zoom>
-                                                        <Link
-                                                            title={ce.title}
-                                                            href={`${ce.link}`}
-                                                            className="flex  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]"
-                                                        >
-                                                            {ce?.img ? (
-                                                                <React.Fragment>
-                                                                    <Image
-                                                                        alt={ce.title}
-                                                                        src={ce?.img}
-                                                                        width={24}
-                                                                        height={24}
-                                                                        quality={100}
-                                                                        className={`object-contain"`}
-                                                                        loading="lazy"
-                                                                        crossOrigin="anonymous"
-                                                                        placeholder="blur"
-                                                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                                                    />
-                                                                    <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
-                                                                        {ce.title}
-                                                                    </h5>
-                                                                </React.Fragment>
-                                                            ) : (
-                                                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
-                                                                    {ce.title}
-                                                                </li>
-                                                            )}
-                                                        </Link>
-                                                    </Zoom>
+                        {
+                            props.data?.map((e, i) => (
+                                <div
+                                    key={i}
+                                    className={`${e.title ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5" : "px-1"} space-y-1 min-w-[200px]`}
+                                >
+                                    {
+                                        e.title && (
+                                            <h3 className="px-3 text-[14.5px] uppercase">
+                                                {e.title}
+                                            </h3>
+                                        )
+                                    }
+                                    {
+                                        e.sub?.map((ce, ci) => (
+                                            <div className="space-y-0.5" key={ci}>
+                                                {ce.link ? (
+                                                    <>
+                                                        {is_admin ? (
+                                                            <Zoom>
+                                                                <Link
+                                                                    title={ce.title}
+                                                                    href={`${ce.link}`}
+                                                                    className="flex  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]"
+                                                                >
+                                                                    {ce?.img ? (
+                                                                        <React.Fragment>
+                                                                            <Image
+                                                                                alt={ce.title}
+                                                                                src={ce?.img}
+                                                                                width={24}
+                                                                                height={24}
+                                                                                quality={100}
+                                                                                className={`object-contain"`}
+                                                                                loading="lazy"
+                                                                                crossOrigin="anonymous"
+                                                                                placeholder="blur"
+                                                                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                            />
+                                                                            <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
+                                                                                {ce.title}
+                                                                            </h5>
+                                                                        </React.Fragment>
+                                                                    ) : (
+                                                                        <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
+                                                                            {ce.title}
+                                                                        </li>
+                                                                    )}
+                                                                </Link>
+                                                            </Zoom>
+                                                        ) : ce?.viewOwn == "1" || ce?.view == "1" ? (
+                                                            <Zoom>
+                                                                <Link
+                                                                    title={ce.title}
+                                                                    href={`${ce.link}`}
+                                                                    className="flex  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]"
+                                                                >
+                                                                    {ce?.img ? (
+                                                                        <React.Fragment>
+                                                                            <Image
+                                                                                alt={ce.title}
+                                                                                src={ce?.img}
+                                                                                width={24}
+                                                                                height={24}
+                                                                                quality={100}
+                                                                                className={`object-contain"`}
+                                                                                loading="lazy"
+                                                                                crossOrigin="anonymous"
+                                                                                placeholder="blur"
+                                                                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                            />
+                                                                            <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
+                                                                                {ce.title}
+                                                                            </h5>
+                                                                        </React.Fragment>
+                                                                    ) : (
+                                                                        <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
+                                                                            {ce.title}
+                                                                        </li>
+                                                                    )}
+                                                                </Link>
+                                                            </Zoom>
+                                                        ) : (
+                                                            <Zoom>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        showToat("warning", "Bạn không có quyền truy cập")
+                                                                    }
+                                                                    className="flex text-left text-gray-400 w-full opacity-60 cursor-not-allowed  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1  xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87]"
+                                                                >
+                                                                    {ce?.img ? (
+                                                                        <React.Fragment>
+                                                                            <Image
+                                                                                alt={ce.title}
+                                                                                src={ce?.img}
+                                                                                width={24}
+                                                                                height={24}
+                                                                                quality={100}
+                                                                                className={`object-contain"`}
+                                                                                loading="lazy"
+                                                                                crossOrigin="anonymous"
+                                                                                placeholder="blur"
+                                                                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                            />
+                                                                            <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
+                                                                                {ce.title}
+                                                                            </h5>
+                                                                        </React.Fragment>
+                                                                    ) : (
+                                                                        <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
+                                                                            {ce.title}
+                                                                        </li>
+                                                                    )}
+                                                                </button>
+                                                            </Zoom>
+                                                        )}
+                                                    </>
                                                 ) : (
-                                                    <Zoom>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                showToat("warning", "Bạn không có quyền truy cập")
-                                                            }
-                                                            className="flex text-left text-gray-400 w-full opacity-60 cursor-not-allowed  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1  xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87]"
-                                                        >
-                                                            {ce?.img ? (
-                                                                <React.Fragment>
-                                                                    <Image
-                                                                        alt={ce.title}
-                                                                        src={ce?.img}
-                                                                        width={24}
-                                                                        height={24}
-                                                                        quality={100}
-                                                                        className={`object-contain"`}
-                                                                        loading="lazy"
-                                                                        crossOrigin="anonymous"
-                                                                        placeholder="blur"
-                                                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                                                    />
-                                                                    <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
-                                                                        {ce.title}
-                                                                    </h5>
-                                                                </React.Fragment>
-                                                            ) : (
-                                                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
+                                                    <React.Fragment>
+                                                        {ce.title && (
+                                                            <div className="flex items-center px-3 mb-2 space-x-2">
+                                                                {
+                                                                    ce?.img && (
+                                                                        <Image
+                                                                            alt={ce.title}
+                                                                            src={ce?.img}
+                                                                            width={24}
+                                                                            height={24}
+                                                                            quality={100}
+                                                                            className="object-contain"
+                                                                            loading="lazy"
+                                                                            crossOrigin="anonymous"
+                                                                            placeholder="blur"
+                                                                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                        />
+                                                                    )
+                                                                }
+                                                                <h5 className="uppercase text-[#141522] 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px]">
                                                                     {ce.title}
-                                                                </li>
+                                                                </h5>
+                                                            </div>
+                                                        )}
+                                                    </React.Fragment>
+                                                )}
+                                                {ce.items?.map((e, i) => {
+                                                    return (
+                                                        <div key={i}>
+                                                            {is_admin ? (
+                                                                <Link
+                                                                    href={e.link ? e.link : "#"}
+                                                                    title={e.name}
+                                                                    className="outline-none"
+                                                                    key={i}
+                                                                >
+                                                                    <Zoom>
+                                                                        <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+                                                                            {e?.name}
+                                                                        </li>
+                                                                    </Zoom>
+                                                                </Link>
+                                                            ) : e?.viewOwn == "1" || e?.view == "1" ? (
+                                                                <Link
+                                                                    href={e.link ? e.link : "#"}
+                                                                    title={e.name}
+                                                                    className="outline-none"
+                                                                    key={i}
+                                                                >
+                                                                    <Zoom>
+                                                                        <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+                                                                            {e?.name}
+                                                                        </li>
+                                                                    </Zoom>
+                                                                </Link>
+                                                            ) : (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        showToat("warning", "Bạn không có quyền truy cập")
+                                                                    }
+                                                                    className="w-full text-left text-gray-100 outline-none cursor-not-allowed opacity-60"
+                                                                >
+                                                                    <Zoom>
+                                                                        <li className="cursor-not-allowed text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+                                                                            {e?.name}
+                                                                        </li>
+                                                                    </Zoom>
+                                                                </button>
                                                             )}
-                                                        </button>
-                                                    </Zoom>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <React.Fragment>
-                                                {ce.title && (
-                                                    <div className="flex items-center px-3 mb-2 space-x-2">
-                                                        {
-                                                            ce?.img && (
-                                                                <Image
-                                                                    alt={ce.title}
-                                                                    src={ce?.img}
-                                                                    width={24}
-                                                                    height={24}
-                                                                    quality={100}
-                                                                    className="object-contain"
-                                                                    loading="lazy"
-                                                                    crossOrigin="anonymous"
-                                                                    placeholder="blur"
-                                                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                                                />
-                                                            )
-                                                        }
-                                                        <h5 className="uppercase text-[#141522] 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px]">
-                                                            {ce.title}
-                                                        </h5>
-                                                    </div>
-                                                )}
-                                            </React.Fragment>
-                                        )}
-                                        {ce.items?.map((e, i) => {
-                                            return (
-                                                <div key={i}>
-                                                    {is_admin ? (
-                                                        <Link
-                                                            href={e.link ? e.link : "#"}
-                                                            title={e.name}
-                                                            className="outline-none"
-                                                            key={i}
-                                                        >
-                                                            <Zoom>
-                                                                <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
-                                                                    {e?.name}
-                                                                </li>
-                                                            </Zoom>
-                                                        </Link>
-                                                    ) : e?.viewOwn == "1" || e?.view == "1" ? (
-                                                        <Link
-                                                            href={e.link ? e.link : "#"}
-                                                            title={e.name}
-                                                            className="outline-none"
-                                                            key={i}
-                                                        >
-                                                            <Zoom>
-                                                                <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
-                                                                    {e?.name}
-                                                                </li>
-                                                            </Zoom>
-                                                        </Link>
-                                                    ) : (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                showToat("warning", "Bạn không có quyền truy cập")
-                                                            }
-                                                            className="w-full text-left text-gray-100 outline-none cursor-not-allowed opacity-60"
-                                                        >
-                                                            <Zoom>
-                                                                <li className="cursor-not-allowed text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
-                                                                    {e?.name}
-                                                                </li>
-                                                            </Zoom>
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                ))}
-                            </div>
-                        ))}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            ))
+                        }
                     </div>
                 </div>
             </Popup>

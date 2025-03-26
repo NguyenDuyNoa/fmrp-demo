@@ -2,7 +2,7 @@ import { _ServerInstance as axiosCustom } from "@/services/axios";
 const apiProductionsOrders = {
     async apiProductionOrders(page, limit, param) {
         // Danh sách LSX tổng
-        const response = await axiosCustom('GET', `api_web/api_manufactures/getProductionOrders?page=${page}&limit=${limit}`, param);
+        const response = await axiosCustom('GET', `/api_web/api_manufactures/getProductionOrders?page=${page}&limit=${limit}`, param);
         return response.data
     },
     async apiDetailProductionOrders(id) {
