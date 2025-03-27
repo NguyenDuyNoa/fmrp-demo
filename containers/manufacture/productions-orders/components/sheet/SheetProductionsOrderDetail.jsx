@@ -27,6 +27,7 @@ import TabExportHistory from "../modal/tabExportHistory";
 import TabWarehouseHistory from "../modal/tabWarehouseHistory";
 import TabRecallMaterials from "../modal/tabRecallMaterials";
 import TabProcessingCost from "../modal/tabProcessingCost";
+import { variantButtonScaleZoom } from "@/utils/animations/variantsAnimation";
 
 const initialState = {
     isTab: 1,
@@ -367,10 +368,10 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
                 // onChange={(e) => setComment(e.target.value)}
                 />
                 <div className="flex items-center gap-3 text-[#3A3E4C]">
-                    <PiSmiley className='size-5 shrink-0' />
-                    <PiTextAa className='size-5 shrink-0' />
-                    <PiPaperclip className='size-5 shrink-0' />
-                    <PiImage className='size-5 shrink-0' />
+                    <PiSmiley className='size-5 shrink-0 cursor-pointer' />
+                    <PiTextAa className='size-5 shrink-0 cursor-pointer' />
+                    <PiPaperclip className='size-5 shrink-0 cursor-pointer' />
+                    <PiImage className='size-5 shrink-0 cursor-pointer' />
                 </div>
 
                 <div className='w-[1px] h-4 bg-[#1F2329]/15' />
@@ -380,8 +381,9 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
                         <PiPaperPlaneRightFill className='size-5 shrink-0' />
                     }
                     hideTitle={true}
-                    disabled={true}
-                    className='text-[#0375F3] hover:text-[#0056b3] disabled:!text-[#667085] disabled:bg-transparent'
+                    disabled={false}
+                    variant={variantButtonScaleZoom}
+                    className='text-[#0375F3] hover:text-[#0375F3]/90 disabled:!text-[#667085] disabled:bg-transparent'
                 />
             </div>
         </div >
