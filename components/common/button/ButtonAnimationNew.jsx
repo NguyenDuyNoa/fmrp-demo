@@ -63,7 +63,7 @@ const ButtonAnimationNew = (({
                 <span className={`${classLoading} inline-block size-4 shink animate-spin rounded-full border-[3px] border-solid border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`} />
             )}
 
-            {!reverse && icon && <span className={`${hideTitle ? "max-w-full" : "shink"}`}>{icon}</span>}
+            {!reverse && icon && <span className={`${hideTitle ? "max-w-full" : "shink-0"}`}>{icon}</span>}
 
             {!hideTitle && (
                 <span className='flex items-center w-full text-center'>
@@ -71,7 +71,7 @@ const ButtonAnimationNew = (({
                 </span>
             )}
 
-            {reverse && icon && <span className={`${hideTitle ? "max-w-full" : "shink"}`}>{icon}</span>}
+            {reverse && icon && <span className={`${hideTitle ? "max-w-full" : "shink-0"}`}>{icon}</span>}
         </motion.button>
     );
 });

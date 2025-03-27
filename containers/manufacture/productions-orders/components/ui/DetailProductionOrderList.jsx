@@ -9,11 +9,12 @@ import NoteIcon from "@/components/icons/common/NoteIcon";
 import CaretDownIcon from "@/components/icons/common/CaretDownIcon";
 import ProgressStageBar from "@/components/common/progress/ProgressStageBar";
 import { AnimatePresence, motion } from "framer-motion";
+import { StateContext } from "@/context/_state/productions-orders/StateContext";
 
-const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel }) => {
+const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel }) => {
     const dataSeting = useSetingServer();
     const formatNumber = useCallback((num) => formatNumberConfig(+num, dataSeting), [dataSeting]);
-    const { isStateProvider: isState } = useContext(ProductionsOrdersContext);
+    const { isStateProvider } = useContext(StateContext);
     const [visibleProducts, setVisibleProducts] = useState({});
 
     const handleShowMoreProducts = useCallback((itemId, total) => {
@@ -51,7 +52,7 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel 
                     </div>
 
                     <div className="flex flex-col 3xl:gap-1 gap-0.5">
-                        <p className={`font-semibold 3xl:text-base xl:text-sm text-xs ${isState.dataModal.id === product.id ? "text-[#0F4F9E]" : "text-[#141522] group-hover:text-[#0F4F9E]"}`}>
+                        <p className={`font-semibold 3xl:text-base xl:text-sm text-xs ${isStateProvider?.productionsOrders.dataModal.id === product.id ? "text-[#0F4F9E]" : "text-[#141522] group-hover:text-[#0F4F9E]"}`}>
                             {product.item_name}
                         </p>
                         <div className="space-y-0.5">
@@ -95,10 +96,10 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel 
                 </h4>
             </div>
         );
-    }, [formatNumber, handleShowModel, isState.dataModal.id, dataLang]);
+    }, [formatNumber, handleShowModel, isStateProvider?.productionsOrders.dataModal.id, dataLang]);
 
     if (isLoadingRight) return <Loading className="h-80" color="#0f4f9e" />;
-    const list = isState?.dataProductionOrderDetail?.listPOItems || [];
+    const list = isStateProvider?.productionsOrders?.dataProductionOrderDetail?.listPOItems || [];
     if (!list.length) return <NoData />;
 
     return (
@@ -187,4 +188,4 @@ const TabItem = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel 
     );
 });
 
-export default TabItem;
+export default DetailProductionOrderList;

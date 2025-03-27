@@ -24,7 +24,7 @@ import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersComb
 import { useProductionOrdersComboboxDetail } from "../../hooks/useProductionOrdersComboboxDetail";
 import FilterHeader from "../header/filterHeader";
 import ModalDetail from "../modal/modalDetail";
-import TabItem from "./tabItem";
+import TabItem from "../ui/DetailProductionOrderList";
 import TabSemi from "./tabSemi";
 import PopupConfimStage from "../popup/PopupConfimStage";
 import { RiDeleteBin5Line } from "react-icons/ri";

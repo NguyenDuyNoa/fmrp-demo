@@ -114,9 +114,9 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
     }, [isState?.openModal])
 
     const { data, isLoading } = useQuery({
-        queryKey: ["api_item_orders_detail", isState.openModal, isState?.dataModal?.id, router.query?.tabModal, router.query.tab],
+        queryKey: ["api_item_orders_detail", isState.openModal, isState?.dataModal?.poi_id, router.query?.tabModal, router.query.tab],
         queryFn: async () => {
-            const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
+            const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.poi_id);
 
             const newData = {
                 dataDetail: {
@@ -137,7 +137,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
             return newData
 
         },
-        enabled: !!isState.openModal && !!isState?.dataModal?.id,
+        enabled: !!isState.openModal && !!isState?.dataModal?.poi_id,
         placeholderData: keepPreviousData,
         ...optionsQuery,
     })
@@ -250,7 +250,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
         <Customscrollbar
             style={{
                 width: width,
-                height: typePageMoblie ? "100vh" : `calc(100vh - ${68}px)`,
+                height: typePageMoblie ? "100vh" : `calc(100vh - ${72}px)`,
                 transform: isState.openModal ? "translateX(0%)" : "translateX(100%)",
                 maxWidth: "100vw",
             }}
@@ -333,6 +333,7 @@ const ModalDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }
                             </div>
                         </div>
                     </div>
+                    
                     <div className={`grid grid-cols-3 ${width >= 1100 ? "col-span-7" : "col-span-12"}  gap-5`}>
                         {
                             dataTotal.map((e, i) => (

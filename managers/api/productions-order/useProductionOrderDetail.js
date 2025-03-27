@@ -10,7 +10,7 @@ export const useProductionOrderDetail = ({ id, enabled }) => {
             if (!isSuccess == 1) {
                 return;
             }
-            
+
             return data
         } catch (error) {
             throw new Error(error);
