@@ -155,12 +155,6 @@ body {
     }
 }
 
-.custom-size-text {
-    .text-default {
-        @apply 3xl:text-base xl:text-sm lg:text-sm text-base 3xl:placeholder:text-base placeholder:text-sm tracking-[1%];
-    }
-}
-
 .custom-transition {
     @apply duration-300 ease-in-out transition-all;
 }
@@ -642,5 +636,26 @@ body {
 
         // vertical-align: middle;
         @apply size-4 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer;
+    }
+}
+
+.text-customize {
+    .text-title-section {
+        @apply 3xl:text-[28px] xl:text-2xl text-xl;
+    }
+
+    .text-title-default {
+        @apply 3xl:text-2xl xl:text-xl text-xl;
+    }
+
+    .text-title-small {
+        @apply 3xl:text-xl xl:text-lg text-lg;
+    }
+
+    .text-default {
+        @apply 3xl:text-base xl:text-sm lg:text-sm text-base 3xl:placeholder:text-base placeholder:text-sm tracking-[1%];
+    }
+    .text-sm-default {
+        @apply 3xl:text-sm xl:text-xs lg:text-xs text-xs 3xl:placeholder:text-sm placeholder:text-xs tracking-[1%];
     }
 }

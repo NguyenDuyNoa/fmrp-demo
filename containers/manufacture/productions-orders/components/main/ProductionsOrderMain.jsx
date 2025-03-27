@@ -24,8 +24,6 @@ import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersComb
 import { useProductionOrdersComboboxDetail } from "../../hooks/useProductionOrdersComboboxDetail";
 import FilterHeader from "../header/filterHeader";
 import ModalDetail from "../modal/modalDetail";
-import TabItem from "./tabItem";
-import TabSemi from "./tabSemi";
 import PopupConfimStage from "../popup/PopupConfimStage";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import useToast from "@/hooks/useToast";
@@ -57,12 +55,12 @@ import StatusCheckboxGroup from "@/components/common/checkbox/StatusCheckboxGrou
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import BreadcrumbCustom from "@/components/UI/breadcrumb/BreadcrumbCustom";
-import { useProductionOrdersList } from "../../hooks/useProductionOrdersList";
+import { useProductionOrdersList } from "@/managers/api/productions-order/useProductionOrdersList";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import LimitListDropdown from "@/components/common/dropdown/LimitListDropdown";
 import LoadingComponent from "@/components/common/loading/loading/LoadingComponent";
 import { useInView } from "react-intersection-observer";
-import { useProductionOrderDetail, useProductionsOrderDetail } from "../../hooks/useProductionOrderDetail";
+import { useProductionOrderDetail } from "@/managers/api/productions-order/useProductionOrderDetail";
 import PrinterIcon from "@/components/icons/common/PrinterIcon";
 import StickerIcon from "@/components/icons/common/StickerIcon";
 import ArrowCounterClockwiseIcon from "@/components/icons/common/ArrowCounterClockwiseIcon";
@@ -73,9 +71,13 @@ import KanbanIcon from "@/components/icons/common/KanbanIcon";
 import Image from "next/image";
 import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
 import CheckThinIcon from "@/components/icons/common/CheckThinIcon";
+import { useSheet } from "@/context/ui/SheetContext";
+import SheetProductionsOrderDetail from "../sheet/SheetProductionsOrderDetail";
+import DetailProductionOrderList from "../ui/DetailProductionOrderList";
+import { StateContext } from "@/context/_state/productions-orders/StateContext";
 
 
-const MainTable = ({ dataLang, typeScreen }) => {
+const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const statusExprired = useStatusExprired();
 
     const breadcrumbItems = [
@@ -174,42 +176,56 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     const [isOpenSearch, setIsOpenSearch] = useState(false);
 
+    const { isOpen: isOpenSheet, openSheet, closeSheet, sheetData } = useSheet()
     const { isOpen, handleQueryId, isIdChild, isId } = useToggle();
 
-    const { isStateProvider: isState, queryState } = useContext(ProductionsOrdersContext);
+    // const { isStateProvider: isStateProvider?.productionsOrders, queryStateProvider } = useContext(ProductionsOrdersContext);
+    const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
-    const { data: listOrders = [] } = useOrdersSearchCombobox(isState.searchOrders);
+    const { data: listOrders = [] } = useOrdersSearchCombobox(isStateProvider?.productionsOrders.searchOrders);
 
-    const { data: listPlan = [] } = useInternalPlansSearchCombobox(isState.searchPlan);
+    const { data: listPlan = [] } = useInternalPlansSearchCombobox(isStateProvider?.productionsOrders.searchPlan);
 
-    const { data: comboboxProductionOrdersDetail = [] } = useProductionOrdersComboboxDetail(isState.searchPODetail)
+    const { data: comboboxProductionOrdersDetail = [] } = useProductionOrdersComboboxDetail(isStateProvider?.productionsOrders.searchPODetail)
 
-    const { data: listProducts = [] } = useItemsVariantSearchCombobox(isState.searchItemsVariant);
+    const { data: listProducts = [] } = useItemsVariantSearchCombobox(isStateProvider?.productionsOrders.searchItemsVariant);
 
-    const { data: comboboxProductionOrders = [] } = useProductionOrdersCombobox(isState.searchProductionOrders)
+    const { data: comboboxProductionOrders = [] } = useProductionOrdersCombobox(isStateProvider?.productionsOrders.searchProductionOrders)
 
-    const handleFilter = (type, value) => queryState({ [type]: value, page: 1 });
+    const poiId = useMemo(() => router.query.poi_id, [router.query])
+
+    const handleFilter = (type, value) => queryStateProvider({
+        productionsOrders: {
+            ...isStateProvider?.productionsOrders,
+            [type]: value, page: 1
+        }
+    });
 
     const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
 
-    useLayoutEffect(() => {
-        if (typeof window !== "undefined" && performance?.mark) {
-            performance.mark("beforeRender");
+    // active tab info & tab kế hoạch
+    useEffect(() => {
+        if (listLsxTab?.length > 0 && !isStateProvider?.productionsOrders?.isTabList) {
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    isTabList: listLsxTab[0],
+                },
+            });
         }
-    }, []);
+    }, [listLsxTab]);
 
     const params = {
-        branch_id: isState.valueBr?.value || "",
-        _po_id: isState.valueProductionOrders?.value || "",
-        search: isState.search == "" ? "" : isState.search,
-        _pod_id: isState.valueProductionOrdersDetail?.value || "",
-        orders_id: [isState.valueOrders?.value]?.length > 0 ? [isState.valueOrders?.value].map((e) => e) : "",
-        date_end: isState.date.dateEnd ? formatMoment(isState.date.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
-        internal_plans_id: [isState.valuePlan?.value]?.length > 0 ? [isState.valuePlan?.value].map((e) => e) : "",
-        date_start: isState.date.dateStart ? formatMoment(isState.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
-        item_variation_id: isState.valueProducts?.length > 0 ? isState.valueProducts.map((e) => e?.e?.item_variation_id) : null,
-        // status: isState?.selectStatusFilter?.length > 0 ? isState?.selectStatusFilter : null
-        ...(isState?.selectStatusFilter?.length > 0 && { status: isState.selectStatusFilter })
+        branch_id: isStateProvider?.productionsOrders.valueBr?.value || "",
+        _po_id: isStateProvider?.productionsOrders.valueProductionOrders?.value || "",
+        search: isStateProvider?.productionsOrders.search == "" ? "" : isStateProvider?.productionsOrders.search,
+        _pod_id: isStateProvider?.productionsOrders.valueProductionOrdersDetail?.value || "",
+        orders_id: [isStateProvider?.productionsOrders.valueOrders?.value]?.length > 0 ? [isStateProvider?.productionsOrders.valueOrders?.value].map((e) => e) : "",
+        date_end: isStateProvider?.productionsOrders.date.dateEnd ? formatMoment(isStateProvider?.productionsOrders.date.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        internal_plans_id: [isStateProvider?.productionsOrders.valuePlan?.value]?.length > 0 ? [isStateProvider?.productionsOrders.valuePlan?.value].map((e) => e) : "",
+        date_start: isStateProvider?.productionsOrders.date.dateStart ? formatMoment(isStateProvider?.productionsOrders.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        item_variation_id: isStateProvider?.productionsOrders.valueProducts?.length > 0 ? isStateProvider?.productionsOrders.valueProducts.map((e) => e?.e?.item_variation_id) : null,
+        ...(isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0 && { status: isStateProvider?.productionsOrders.selectStatusFilter })
     };
 
     // call api list production
@@ -219,7 +235,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
         isFetching: isFetchingProductionOrderList,
         fetchNextPage: fetchNextPageProductionOrderList,
         hasNextPage: hasNextPageProductionOrderList,
-        refetch: refetchProductionOrderList
+        refetch: refetchProductionOrderList,
+        isRefetching: isRefetchingProductionOrderList
     } = useProductionOrdersList(params);
 
     // call api detail production
@@ -228,13 +245,29 @@ const MainTable = ({ dataLang, typeScreen }) => {
         isLoading: isLoadingProductionOrderDetail,
         refetch: refetchProductionOrderDetail,
         isRefetching: isRefetchingProductionOrderDetail
-    } = useProductionOrderDetail({ id: isState.idDetailProductionOrder, enabled: true })
+    } = useProductionOrderDetail({ id: isStateProvider?.productionsOrders?.idDetailProductionOrder, enabled: !!isStateProvider?.productionsOrders?.idDetailProductionOrder })
 
     // flag của list production
     const flagProductionOrders = useMemo(() =>
         dataProductionOrders ? dataProductionOrders?.pages?.flatMap(page => page?.productionOrders) : [],
         [dataProductionOrders]
     );
+
+    useEffect(() => {
+        if (!poiId) {
+            closeSheet(false);
+            return;
+        }
+
+        // Chờ có data thì mới mở sheet
+        if (dataProductionOrderDetail) {
+            openSheet({
+                content: <SheetProductionsOrderDetail {...shareProps} />,
+                className: 'w-[90vw] md:w-[700px] xl:w-[65%]',
+            });
+        }
+    }, [poiId, dataProductionOrderDetail]);
+
 
     // loadmore list LSX
     useEffect(() => {
@@ -245,124 +278,166 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // set data vào state detail
     useEffect(() => {
-        if (dataProductionOrderDetail) {
-            queryState({
-                dataProductionOrderDetail: {
-                    ...dataProductionOrderDetail,
-                    title: dataProductionOrderDetail?.productionOrder?.reference_no,
-                    idCommand: dataProductionOrderDetail?.productionOrder?.branch_id,
-                    statusManufacture: dataProductionOrderDetail?.productionOrder?.status_manufacture,
-                    listPOItems: dataProductionOrderDetail?.listPOItems?.map((e, index) => {
-                        return {
-                            ...e,
-                            id: e?.object_id,
-                            title: e?.reference_no,
-                            showChild: dataProductionOrderDetail?.listPOItems?.length > 0 && index == 0 ? true : false,
-                            arrListData: e?.items_products?.map((i) => {
-                                return {
-                                    ...i,
-                                    id: i?.poi_id,
-                                    image: i?.images ? i?.images : "/icon/noimagelogo.png",
-                                    name: i?.item_name,
-                                    itemVariation: i?.product_variation,
-                                    code: i?.item_code,
-                                    quantity: +i?.quantity,
-                                    unit: i?.unit_name,
-                                    processBar: i?.list_stages?.map((j) => {
-                                        return {
-                                            ...j,
-                                            id: uddid(),
-                                            active: j?.active == "1",
-                                            date: j?.date_active,
-                                            title: j?.name_stage,
+        if (isStateProvider?.productionsOrders?.idDetailProductionOrder && dataProductionOrderDetail) {
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    dataProductionOrderDetail: {
+                        ...dataProductionOrderDetail,
+                        title: dataProductionOrderDetail?.productionOrder?.reference_no,
+                        idCommand: dataProductionOrderDetail?.productionOrder?.branch_id,
+                        statusManufacture: dataProductionOrderDetail?.productionOrder?.status_manufacture,
+                        listPOItems: dataProductionOrderDetail?.listPOItems?.map((e, index) => {
+                            return {
+                                ...e,
+                                id: e?.object_id,
+                                title: e?.reference_no,
+                                showChild: dataProductionOrderDetail?.listPOItems?.length > 0 && index == 0 ? true : false,
+                                arrListData: e?.items_products?.map((i) => {
+                                    return {
+                                        ...i,
+                                        id: i?.poi_id,
+                                        image: i?.images ? i?.images : "/icon/noimagelogo.png",
+                                        name: i?.item_name,
+                                        itemVariation: i?.product_variation,
+                                        code: i?.item_code,
+                                        quantity: +i?.quantity,
+                                        unit: i?.unit_name,
+                                        processBar: i?.list_stages?.map((j) => {
+                                            return {
+                                                ...j,
+                                                id: uddid(),
+                                                active: j?.active == "1",
+                                                date: j?.date_active,
+                                                title: j?.name_stage,
 
-                                        };
-                                    }),
-                                    childProducts: i?.semi_products?.map(e => {
-                                        return {
-                                            ...e,
-                                            image: e?.images ? e?.images : "/icon/noimagelogo.png",
-                                        }
-                                    })
-                                };
-                            }),
-                        };
-                    }),
-                    listSemiItems: dataProductionOrderDetail?.listSemiItems?.map((e, index) => {
-                        return {
-                            ...e,
-                            id: e?.object_id,
-                            title: e?.reference_no,
-                            showChild: dataProductionOrderDetail?.listSemiItems?.length > 0 && index == 0 ? true : false,
-                            arrListData: e?.semi_products?.map((i) => {
-                                return {
-                                    ...i,
-                                    id: uddid(),
-                                    image: i?.images ? i?.images : "/icon/noimagelogo.png",
-                                    name: i?.item_name,
-                                    itemVariation: i?.product_variation,
-                                    code: i?.item_code,
-                                    quantity: +i?.quantity,
-                                    unit: i?.unit_name,
-                                    processBar: i?.list_stages?.map((j) => {
-                                        return {
-                                            ...j,
-                                            id: uddid(),
-                                            active: j?.active == "1",
-                                            date: j?.date_active,
-                                            title: j?.name_stage,
-                                        };
-                                    }),
-                                    childProducts: {
-                                        ...i?.products_parent,
-                                        image: i?.products_parent?.images ? i?.products_parent?.images : "/icon/noimagelogo.png",
-                                    },
-                                };
-                            }),
-                        };
-                    }),
-                },
+                                            };
+                                        }),
+                                        childProducts: i?.semi_products?.map(e => {
+                                            return {
+                                                ...e,
+                                                image: e?.images ? e?.images : "/icon/noimagelogo.png",
+                                            }
+                                        })
+                                    };
+                                }),
+                            };
+                        }),
+                        listSemiItems: dataProductionOrderDetail?.listSemiItems?.map((e, index) => {
+                            return {
+                                ...e,
+                                id: e?.object_id,
+                                title: e?.reference_no,
+                                showChild: dataProductionOrderDetail?.listSemiItems?.length > 0 && index == 0 ? true : false,
+                                arrListData: e?.semi_products?.map((i) => {
+                                    return {
+                                        ...i,
+                                        id: uddid(),
+                                        image: i?.images ? i?.images : "/icon/noimagelogo.png",
+                                        name: i?.item_name,
+                                        itemVariation: i?.product_variation,
+                                        code: i?.item_code,
+                                        quantity: +i?.quantity,
+                                        unit: i?.unit_name,
+                                        processBar: i?.list_stages?.map((j) => {
+                                            return {
+                                                ...j,
+                                                id: uddid(),
+                                                active: j?.active == "1",
+                                                date: j?.date_active,
+                                                title: j?.name_stage,
+                                            };
+                                        }),
+                                        childProducts: {
+                                            ...i?.products_parent,
+                                            image: i?.products_parent?.images ? i?.products_parent?.images : "/icon/noimagelogo.png",
+                                        },
+                                    };
+                                }),
+                            };
+                        }),
+                    },
+                }
             });
+
+        } else {
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    dataProductionOrderDetail: undefined,
+                }
+            });
+
         }
-    }, [dataProductionOrderDetail]);
+    }, [isStateProvider?.productionsOrders?.idDetailProductionOrder, dataProductionOrderDetail]);
 
     const fetchComboboxProductionOrders = debounce(async (value) => {
         try {
-            queryState({ searchProductionOrders: value });
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    searchProductionOrders: value
+                }
+            });
         } catch (error) { }
     }, 500);
 
     const fetchDataItems = debounce(async (value) => {
         try {
-            queryState({ searchItemsVariant: value });
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    searchItemsVariant: value
+                }
+            });
         } catch (error) { }
     }, 500);
 
     const fetDataOrder = debounce(async (value) => {
         try {
-            queryState({ searchOrders: value });
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    searchOrders: value
+                }
+            });
         } catch (error) { }
     }, 500);
 
     const fetDataPoDetail = debounce(async (value) => {
         try {
-            queryState({ searchPODetail: value });
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    searchPODetail: value
+                }
+            });
         } catch (error) { }
     }, 500);
 
     const fetchDataPlan = debounce(async (value) => {
         try {
-            queryState({ searchPlan: value });
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    searchPlan: value
+                }
+            });
         } catch (error) { }
     }, 500);
 
     const handleShow = (id) => {
-        queryState({ idDetailProductionOrder: id })
+        queryStateProvider({
+            productionsOrders: {
+                ...isStateProvider?.productionsOrders,
+                idDetailProductionOrder: id
+            }
+        })
 
-        // queryState({
-        //     productionOrdersList: isState.productionOrdersList.map((e) => {
+        // queryStateProvider({
+        //     productionOrdersList: isStateProvider?.productionsOrders.productionOrdersList.map((e) => {
         //         const showParent = e.id == id;
-        //         // showParent && queryState({ idDetailProductionOrder: id })
+        //         // showParent && queryStateProvider({ idDetailProductionOrder: id })
         //         return {
         //             ...e,
         //             showParent: showParent,
@@ -377,10 +452,20 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     const handleActiveTab = (e, type) => {
         if (type === "detail") {
-            queryState({ isTab: e });
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    isTab: e
+                }
+            });
 
         } else if (type === "list") {
-            queryState({ isTabList: e });
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    isTabList: e
+                }
+            });
         }
     };
 
@@ -400,34 +485,69 @@ const MainTable = ({ dataLang, typeScreen }) => {
     };
 
     const handShowItem = (id, type) => {
-        queryState({
-            dataProductionOrderDetail: {
-                ...isState.dataProductionOrderDetail,
-                [type]: isState.dataProductionOrderDetail?.[type]?.map((e) => {
-                    if (e.id == id) {
-                        return {
-                            ...e,
-                            showChild: !e.showChild,
-                        };
-                    }
-                    return e;
-                }),
-            },
+        queryStateProvider({
+            productionsOrders: {
+                ...isStateProvider?.productionsOrders,
+                dataProductionOrderDetail: {
+                    ...isStateProvider?.productionsOrders.dataProductionOrderDetail,
+                    [type]: isStateProvider?.productionsOrders.dataProductionOrderDetail?.[type]?.map((e) => {
+                        if (e.id == id) {
+                            return {
+                                ...e,
+                                showChild: !e.showChild,
+                            };
+                        }
+                        return e;
+                    }),
+                },
+            }
         });
         router.push("/manufacture/productions-orders?tabModal=1")
     };
 
     const onChangeSearch = debounce((e) => {
-        queryState({ search: e.target.value, page: 1, openModal: false });
+        queryStateProvider({
+            productionsOrders: {
+                ...isStateProvider?.productionsOrders,
+                search: e.target.value, page: 1,
+            }
+        });
     }, 500);
 
     const handDeleteItem = (id, type) => {
-        queryState({ page: 1 });
+        queryStateProvider({
+            productionsOrders: {
+                ...isStateProvider?.productionsOrders,
+                page: 1
+            }
+        });
         handleQueryId({ status: true, id: id, idChild: type });
     };
 
     const handleShowModel = (item) => {
-        queryState({ openModal: true, dataModal: item });
+        console.log('item item: ', item);
+
+        queryStateProvider({
+            productionsOrders: {
+                ...isStateProvider?.productionsOrders,
+                itemDetailPoi: item
+            }
+        });
+
+        openSheet({
+            content: (
+                <SheetProductionsOrderDetail {...shareProps} />
+            ),
+            className: 'w-[90vw] md:w-[700px] xl:w-[65%]',
+        })
+
+        console.log('router', router);
+
+        router.push({
+            pathname: router.route,
+            query: { ...router.query, tabModal: router.query.tabModal, poi_id: item.poi_id },
+        });
+        // router.push(`/manufacture/productions-orders?tabModal=1&poi_id=${item.poi_id}`)
     };
 
     const shareProps = {
@@ -454,12 +574,12 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // bộ lọc đang active
     const activeFilterCount = [
-        isState.valueBr,
-        isState.valueOrders,
-        isState.valuePlan,
-        isState.valueProductionOrders,
-        isState.valueProductionOrdersDetail,
-        isState.valueProducts || [],
+        isStateProvider?.productionsOrders.valueBr,
+        isStateProvider?.productionsOrders.valueOrders,
+        isStateProvider?.productionsOrders.valuePlan,
+        isStateProvider?.productionsOrders.valueProductionOrders,
+        isStateProvider?.productionsOrders.valueProductionOrdersDetail,
+        isStateProvider?.productionsOrders.valueProducts || [],
     ].filter(item => {
         if (Array.isArray(item)) return item.length > 0;
         return item !== null && item !== undefined;
@@ -490,15 +610,15 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // trigger của bộ lọc trạng thái
     const triggerFilterStatus = (
-        <button className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}>
+        <button className={`${(stateFilterDropdown?.open || isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}>
             <ChartDonutIcon className='absolute top-1/2 -translate-y-1/2 3xl:size-5 size-4' />
 
-            <span className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}>
+            <span className={`${(stateFilterDropdown?.open || isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}>
                 {dataLang?.purchase_status || "purchase_status"}
             </span>
 
             <span className="3xl:size-4 size-3.5 shrink-0">
-                <CaretDownIcon className={`${(stateFilterDropdown?.open || isState?.selectStatusFilter?.length > 0) ? "rotate-180" : "rotate-0"} w-full h-full custom-transition`} />
+                <CaretDownIcon className={`${(stateFilterDropdown?.open || isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0) ? "rotate-180" : "rotate-0"} w-full h-full custom-transition`} />
             </span>
         </button>
     );
@@ -529,13 +649,18 @@ const MainTable = ({ dataLang, typeScreen }) => {
 
     // toggle chọn trạng thái lọc lệnh sản xuất
     const toggleStatus = (value) => {
-        const currentSelected = isState.selectStatusFilter || [];
+        const currentSelected = isStateProvider?.productionsOrders.selectStatusFilter || [];
 
         const updatedSelected = currentSelected.includes(value)
             ? currentSelected.filter((v) => v !== value)
             : [...currentSelected, value];
 
-        queryState({ selectStatusFilter: updatedSelected });
+        queryStateProvider({
+            productionsOrders: {
+                ...isStateProvider?.productionsOrders,
+                selectStatusFilter: updatedSelected
+            }
+        });
     };
 
     // tính toán chiều cao của các element
@@ -563,7 +688,8 @@ const MainTable = ({ dataLang, typeScreen }) => {
     };
 
     console.log('dataProductionOrderDetail', dataProductionOrderDetail);
-    console.log('isState', isState);
+    console.log('isStateProvider', isStateProvider);
+    console.log('router', router);
 
     return (
         <React.Fragment>
@@ -580,7 +706,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
             </div>
 
             <div ref={titleRef} className="flex justify-between items-center w-full">
-                <h2 className="3xl:text-2xl xl:text-[22px] text-xl text-[#52575E] capitalize font-medium">
+                <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                     {dataLang?.productions_orders || 'productions_orders'}
                 </h2>
 
@@ -604,7 +730,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                                ${isOpenSearch ? "rounded-l-lg border-r-0 border-[#D0D5DD] focus:border-[#3276FA]" : "rounded-lg border-[#D0D5DD]"}
                                                 relative border  bg-white pl-2 3xl:h-10 h-9 text-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
                                                 type="text"
-                                                // value={isState.search}
+                                                // value={isStateProvider?.productionsOrders.search}
                                                 placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
                                             />
                                         </form>
@@ -637,17 +763,20 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             portalId="menu-time"
                             calendarClassName="rasta-stripes"
                             clearButtonClassName=""
-                            selected={isState.date.dateStart}
-                            startDate={isState.date.dateStart}
-                            endDate={isState.date.dateEnd}
+                            selected={isStateProvider?.productionsOrders.date.dateStart}
+                            startDate={isStateProvider?.productionsOrders.date.dateStart}
+                            endDate={isStateProvider?.productionsOrders.date.dateEnd}
                             selectsRange
                             onChange={(date) => {
                                 const [start, end] = date;
-                                queryState({
-                                    date: {
-                                        dateStart: start,
-                                        dateEnd: end,
-                                    },
+                                queryStateProvider({
+                                    productionsOrders: {
+                                        ...isStateProvider?.productionsOrders,
+                                        date: {
+                                            dateStart: start,
+                                            dateEnd: end,
+                                        },
+                                    }
                                 });
                             }}
                             isClearable
@@ -657,7 +786,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         />
 
                         {
-                            !isState.date.dateStart &&
+                            !isStateProvider?.productionsOrders.date.dateStart &&
                             <span className="absolute top-1/2 -translate-y-1/2 right-2 3xl:size-4 size-3.5 shrink-0 text-[#9295A4] pointer-events-none">
                                 <CaretDownIcon className={`w-full h-full custom-transition`} />
                             </span>
@@ -681,7 +810,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}</h3>
                                 <SelectComponentNew
                                     isClearable={true}
-                                    value={isState.valueBr}
+                                    value={isStateProvider?.productionsOrders.valueBr}
                                     onChange={(e) => handleFilter("valueBr", e)}
                                     options={listBr}
                                     classParent="ml-0 !font-semibold focus:ring-none focus:outline-none text-sm focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
@@ -702,7 +831,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}</h3>
                                 <SelectComponentNew
                                     isClearable={true}
-                                    value={isState.valueOrders}
+                                    value={isStateProvider?.productionsOrders.valueOrders}
                                     options={listOrders}
                                     onInputChange={(e) => {
                                         fetDataOrder(e);
@@ -711,7 +840,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     onChange={(e) => handleFilter("valueOrders", e)}
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}
-                                    isDisabled={isState?.seletedRadioFilter?.id !== 1}
+                                    isDisabled={isStateProvider?.productionsOrders?.seletedRadioFilter?.id !== 1}
                                 />
                             </div>
 
@@ -719,7 +848,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}</h3>
                                 <SelectComponentNew
                                     isClearable={true}
-                                    value={isState.valuePlan}
+                                    value={isStateProvider?.productionsOrders.valuePlan}
                                     options={listPlan}
                                     onInputChange={(e) => {
                                         fetchDataPlan(e);
@@ -728,7 +857,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                     onChange={(e) => handleFilter("valuePlan", e)}
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
-                                    isDisabled={isState?.seletedRadioFilter?.id !== 2}
+                                    isDisabled={isStateProvider?.productionsOrders?.seletedRadioFilter?.id !== 2}
                                 />
                             </div>
 
@@ -736,7 +865,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}</h3>
                                 <SelectComponentNew
                                     isClearable={true}
-                                    value={isState.valueProductionOrders}
+                                    value={isStateProvider?.productionsOrders.valueProductionOrders}
                                     onInputChange={(e) => {
                                         fetchComboboxProductionOrders(e);
                                     }}
@@ -752,7 +881,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}</h3>
                                 <SelectComponentNew
                                     isClearable={true}
-                                    value={isState.valueProductionOrdersDetail}
+                                    value={isStateProvider?.productionsOrders.valueProductionOrdersDetail}
                                     onInputChange={(e) => {
                                         fetDataPoDetail(e);
                                     }}
@@ -768,7 +897,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_item || 'productions_orders_item'}</h3>
                                 <SelectComponentNew
                                     isClearable={true}
-                                    value={isState.valueProducts}
+                                    value={isStateProvider?.productionsOrders.valueProducts}
                                     options={[{ label: "Mặt hàng", value: "", isDisabled: true }, ...listProducts]}
                                     onChange={(e) => handleFilter("valueProducts", e)}
                                     classParent="ml-0"
@@ -878,7 +1007,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                     >
                         <StatusCheckboxGroup
                             list={listLsxStatus}
-                            selected={isState.selectStatusFilter}
+                            selected={isStateProvider?.productionsOrders.selectStatusFilter}
                             onChange={(value) => toggleStatus(value)}
                         />
                     </FilterDropdown>
@@ -887,10 +1016,10 @@ const MainTable = ({ dataLang, typeScreen }) => {
                 {/* tab */}
                 <TabSwitcherWithUnderline
                     tabs={listLsxTab}
-                    activeTab={isState?.isTabList}
+                    activeTab={isStateProvider?.productionsOrders?.isTabList}
                     onChange={(tab) => handleActiveTab(tab, "list")}
                     renderLabel={(tab, activeTab) => (
-                        <h3 className={`${isState?.isTabList?.id === tab.id ? "text-[#0375F3] scale-[1.02]" : "text-[#9295A4] scale-[1]"} font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}>
+                        <h3 className={`${isStateProvider?.productionsOrders?.isTabList?.id === tab.id ? "text-[#0375F3] scale-[1.02]" : "text-[#9295A4] scale-[1]"} font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}>
                             <span>
                                 {tab.name}
                             </span>
@@ -948,23 +1077,23 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                                         onClick={() => handleShow(item.id)}
                                                         className={`
                                                         ${typePageMoblie ? "px-px" : "pl-1 pr-3"}
-                                                        ${item.id == isState.idDetailProductionOrder && "bg-[#F0F7FF]"}
+                                                        ${item.id == isStateProvider?.productionsOrders.idDetailProductionOrder && "bg-[#F0F7FF]"}
                                                         ${flagProductionOrders?.length - 1 == eIndex ? "border-b-none" : "border-b"}
                                                         py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
                                                         style={{
-                                                            background: item.id === isState.idDetailProductionOrder ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)" : ""
+                                                            background: item.id === isStateProvider?.productionsOrders.idDetailProductionOrder ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)" : ""
                                                         }}
                                                     >
                                                         {/* Gạch xanh bên trái */}
                                                         <div className='relative pl-5 xl:space-y-2 space-y-1.5'>
                                                             {
-                                                                item.id === isState.idDetailProductionOrder && (
+                                                                item.id === isStateProvider?.productionsOrders.idDetailProductionOrder && (
                                                                     <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
                                                                 )
                                                             }
 
                                                             {
-                                                                isState.dataProductionOrderDetail?.title && (
+                                                                isStateProvider?.productionsOrders.dataProductionOrderDetail?.title && (
                                                                     <span className={`${color[item?.status_manufacture]?.color} xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}>
                                                                         {color[item?.status_manufacture]?.title}
                                                                     </span>
@@ -998,7 +1127,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                                                 </div>
 
                                                                 <AnimatePresence initial={false}>
-                                                                    {item.id === isState.idDetailProductionOrder && (
+                                                                    {item.id === isStateProvider?.productionsOrders.idDetailProductionOrder && (
                                                                         <motion.div
                                                                             key="extra-info"
                                                                             layout
@@ -1038,10 +1167,16 @@ const MainTable = ({ dataLang, typeScreen }) => {
                         className='flex items-center'
                     >
                         <LimitListDropdown
-                            limit={isState.limit}
-                            sLimit={(value) => queryState({ limit: value, page: 1 })}
+                            limit={isStateProvider?.productionsOrders.limit}
+                            sLimit={(value) => queryStateProvider({
+                                productionsOrders: {
+                                    ...isStateProvider?.productionsOrders,
+                                    limit: value,
+                                    page: 1
+                                }
+                            })}
                             dataLang={dataLang}
-                            total={isState?.countAll}
+                            total={isStateProvider?.productionsOrders?.countAll}
                         />
                     </div>
                 </div>
@@ -1052,7 +1187,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             <div ref={groupButtonRef} className="flex items-center justify-end gap-2 p-0.5 mb-2">
                                 {/* <PopupConfimStage
                                     dataLang={dataLang}
-                                    dataRight={isState}
+                                    dataRight={isStateProvider?.productionsOrders}
                                     typePageMoblie={typePageMoblie}
                                     refetch={() => {
                                         refetchProductionOrderList();
@@ -1103,46 +1238,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                                             Premium
                                                         </span>
                                                     )}
-
-                                                    {/* {list.map((item, index) => {
-
-
-                                                        const borderClass = isLast
-                                                            ? "border-transparent rounded-b-lg border-t-transparent"
-                                                            : isFirst
-                                                                ? "rounded-t-lg border-t-transparent"
-                                                                : "border-t-transparent";
-
-                                                        return (
-                                                            <label
-                                                                key={item.value}
-                                                                className={`hover:bg-[#F3F4F6] border-b border-[#F7F8F9] border-t flex items-center gap-3 cursor-pointer px-4 py-3 custom-transition ${borderClass}`}
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={isChecked}
-                                                                    onChange={() => onChange(item.value)}
-                                                                    className="peer hidden"
-                                                                />
-                                                                <div className="w-4 h-4 rounded border border-[#D0D5DD] flex items-center justify-center peer-checked:text-white peer-checked:bg-[#1760B9] peer-checked:border-[#1760B9]">
-                                                                    <motion.span
-                                                                        className={`${isChecked ? "text-white" : "text-transparent"} size-3 `}
-                                                                        initial={{ scale: 0, opacity: 0 }}
-                                                                        animate={{ scale: 1, opacity: 1 }}
-                                                                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                                                                    >
-                                                                        <CheckIcon className="size-full" />
-                                                                    </motion.span>
-                                                                </div>
-                                                                <span className={`3xl:text-sm text-xs font-normal px-2 py-1 rounded ${item.color}`}>
-                                                                    {item.label}
-                                                                </span>
-                                                            </label>
-                                                        );
-                                                    })} */}
                                                 </div>
-
-
                                             )
                                         })
                                     }
@@ -1188,7 +1284,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                         </div>
                                     }
                                     onClick={() => {
-                                        handleQueryId({ status: true, id: isState.idDetailProductionOrder });
+                                        handleQueryId({ status: true, id: isStateProvider?.productionsOrders.idDetailProductionOrder });
                                     }}
                                     title="Xoá"
                                     className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-normal text-[#EE1E1E] border border-[#EE1E1E] hover:bg-[#FFEEF0] hover:shadow-hover-button rounded-lg"
@@ -1204,27 +1300,26 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             maxHeight: calcAvailableHeight("submain")
                         }}
                     >
-                        {(isLoadingProductionOrderDetail || isRefetchingProductionOrderDetail)
-                            // {(isLoadingProductionOrderDetail || (isRefetchingProductionOrderDetail))
+                        {(isLoadingProductionOrderDetail || isRefetchingProductionOrderDetail || isRefetchingProductionOrderList || isLoadingProductionOrderList)
                             ?
                             <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
                             :
                             (dataProductionOrderDetail?.listPOItems?.length > 0)
-                                // (dataProductionOrderDetail?.listPOItems?.length > 0 || dataProductionOrderDetail?.listSemiItems?.length > 0)
                                 ?
                                 <React.Fragment>
-                                    {isState.isTabList?.type == "products" && <TabItem {...shareProps} />}
-                                    {isState.isTabList?.type == "semiProduct" && <>Hello</>}
-                                    {/* {isState.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
+                                    {isStateProvider?.productionsOrders.isTabList?.type == "products" && <DetailProductionOrderList {...shareProps} />}
+                                    {isStateProvider?.productionsOrders.isTabList?.type == "semiProduct" && <>Hello</>}
+                                    {/* {isStateProvider?.productionsOrders.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
                                 </React.Fragment>
                                 :
-                                <NoData />
+                                <NoData className="mt-0" />
                         }
                     </Customscrollbar>
                 </div>
             </div>
 
             <ModalDetail {...shareProps} />
+            {/* <SheetProductionsOrderDetail {...shareProps} /> */}
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
@@ -1239,4 +1334,4 @@ const MainTable = ({ dataLang, typeScreen }) => {
         </React.Fragment>
     );
 };
-export default MainTable;
+export default ProductionsOrderMain;

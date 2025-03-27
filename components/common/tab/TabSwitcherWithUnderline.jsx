@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { useAutoActiveTabWithUnderline } from "@/hooks/custom/tab/useAutoActiveTabWithUnderline"
 import { ContainerFilterTab } from "@/components/UI/common/layout"
 
-const TabSwitcherWithUnderline = ({ tabs = [], activeTab, onChange, renderLabel }) => {
+const TabSwitcherWithUnderline = ({ className, tabs = [], activeTab, onChange, renderLabel }) => {
     const { underlineProps, tabListRefs } = useAutoActiveTabWithUnderline({
         tabs,
         activeTab,
@@ -11,8 +11,8 @@ const TabSwitcherWithUnderline = ({ tabs = [], activeTab, onChange, renderLabel 
     })
 
     return (
-        <ContainerFilterTab className='relative w-full'>
-            <div className="relative flex border-b border-[#D0D5DD] w-full ">
+        <ContainerFilterTab className='relative w-full pb-2'>
+            <div className={`${className} relative flex border-b border-[#D0D5DD] w-full`}>
                 {
                     tabs.map((tab, index) => (
                         <button
