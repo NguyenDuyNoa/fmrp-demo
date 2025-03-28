@@ -17,7 +17,7 @@ import { createContext, useContext, useState, ReactNode } from 'react'
 
 const SheetContext = createContext(undefined)
 
-export const SheetProvider = ({ children }) => {
+export const SheetProvider = ({ children, props }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [sheetData, setSheetData] = useState(null)
 
@@ -32,7 +32,7 @@ export const SheetProvider = ({ children }) => {
     }
 
     return (
-        <SheetContext.Provider value={{ openSheet, closeSheet, isOpen, sheetData }}>
+        <SheetContext.Provider value={{ openSheet, closeSheet, isOpen, sheetData, props }}>
             {children}
         </SheetContext.Provider>
     )

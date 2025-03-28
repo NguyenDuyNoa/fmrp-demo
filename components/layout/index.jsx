@@ -25,7 +25,6 @@ const queryClient = new QueryClient({
 const Index = ({ children, ...props }) => {
     const router = useRouter()
 
-
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
     const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
