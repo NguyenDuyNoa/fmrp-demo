@@ -157,10 +157,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const router = useRouter()
     const { ref: refInviewListLsx, inView: inViewListLsx } = useInView()
 
-    // const tabListRefs = useRef([]);
-
-    // const [underlineProps, setUnderlineProps] = useState({ left: 0, width: 0 })
-
     const typePageMoblie = typeScreen == 'mobile'
 
     const isShow = useToast()
@@ -172,7 +168,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const filterRef = useRef(null);
     const paginationRef = useRef(null);
     const groupButtonRef = useRef(null);
-    // const [contentHeight, setContentHeight] = useState(0);
 
     const [isOpenSearch, setIsOpenSearch] = useState(false);
 
@@ -182,15 +177,43 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     // const { isStateProvider: isStateProvider?.productionsOrders, queryStateProvider } = useContext(ProductionsOrdersContext);
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
+    const params = {
+        branch_id: isStateProvider?.productionsOrders.valueBr?.value || "",
+        _po_id: isStateProvider?.productionsOrders.valueProductionOrders?.value || "",
+        search: isStateProvider?.productionsOrders.search == "" ? "" : isStateProvider?.productionsOrders.search,
+        _pod_id: isStateProvider?.productionsOrders.valueProductionOrdersDetail?.value || "",
+        orders_id: [isStateProvider?.productionsOrders.valueOrders?.value]?.length > 0 ? [isStateProvider?.productionsOrders.valueOrders?.value].map((e) => e) : "",
+        date_end: isStateProvider?.productionsOrders.date.dateEnd ? formatMoment(isStateProvider?.productionsOrders.date.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        internal_plans_id: [isStateProvider?.productionsOrders.valuePlan?.value]?.length > 0 ? [isStateProvider?.productionsOrders.valuePlan?.value].map((e) => e) : "",
+        date_start: isStateProvider?.productionsOrders.date.dateStart ? formatMoment(isStateProvider?.productionsOrders.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        item_variation_id: isStateProvider?.productionsOrders.valueProducts?.length > 0 ? isStateProvider?.productionsOrders.valueProducts.map((e) => e?.e?.item_variation_id) : null,
+        ...(isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0 && { status: isStateProvider?.productionsOrders.selectStatusFilter })
+    };
+
     const { data: listOrders = [] } = useOrdersSearchCombobox(isStateProvider?.productionsOrders.searchOrders);
-
     const { data: listPlan = [] } = useInternalPlansSearchCombobox(isStateProvider?.productionsOrders.searchPlan);
-
     const { data: comboboxProductionOrdersDetail = [] } = useProductionOrdersComboboxDetail(isStateProvider?.productionsOrders.searchPODetail)
-
-    const { data: listProducts = [] } = useItemsVariantSearchCombobox(isStateProvider?.productionsOrders.searchItemsVariant);
-
+    const { data: listProducts = [] } = useItemsVariantSearchCombobox(isStateProvider?.productionsOrders.searchItemsVariant)
     const { data: comboboxProductionOrders = [] } = useProductionOrdersCombobox(isStateProvider?.productionsOrders.searchProductionOrders)
+
+    // call api list production
+    const {
+        data: dataProductionOrders,
+        isLoading: isLoadingProductionOrderList,
+        isFetching: isFetchingProductionOrderList,
+        fetchNextPage: fetchNextPageProductionOrderList,
+        hasNextPage: hasNextPageProductionOrderList,
+        refetch: refetchProductionOrderList,
+        isRefetching: isRefetchingProductionOrderList
+    } = useProductionOrdersList(params);
+
+    // call api detail production
+    const {
+        data: dataProductionOrderDetail,
+        isLoading: isLoadingProductionOrderDetail,
+        refetch: refetchProductionOrderDetail,
+        isRefetching: isRefetchingProductionOrderDetail
+    } = useProductionOrderDetail({ id: isStateProvider?.productionsOrders?.idDetailProductionOrder, enabled: !!isStateProvider?.productionsOrders?.idDetailProductionOrder })
 
     const poiId = useMemo(() => router.query.poi_id, [router.query])
 
@@ -214,38 +237,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             });
         }
     }, [listLsxTab]);
-
-    const params = {
-        branch_id: isStateProvider?.productionsOrders.valueBr?.value || "",
-        _po_id: isStateProvider?.productionsOrders.valueProductionOrders?.value || "",
-        search: isStateProvider?.productionsOrders.search == "" ? "" : isStateProvider?.productionsOrders.search,
-        _pod_id: isStateProvider?.productionsOrders.valueProductionOrdersDetail?.value || "",
-        orders_id: [isStateProvider?.productionsOrders.valueOrders?.value]?.length > 0 ? [isStateProvider?.productionsOrders.valueOrders?.value].map((e) => e) : "",
-        date_end: isStateProvider?.productionsOrders.date.dateEnd ? formatMoment(isStateProvider?.productionsOrders.date.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
-        internal_plans_id: [isStateProvider?.productionsOrders.valuePlan?.value]?.length > 0 ? [isStateProvider?.productionsOrders.valuePlan?.value].map((e) => e) : "",
-        date_start: isStateProvider?.productionsOrders.date.dateStart ? formatMoment(isStateProvider?.productionsOrders.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
-        item_variation_id: isStateProvider?.productionsOrders.valueProducts?.length > 0 ? isStateProvider?.productionsOrders.valueProducts.map((e) => e?.e?.item_variation_id) : null,
-        ...(isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0 && { status: isStateProvider?.productionsOrders.selectStatusFilter })
-    };
-
-    // call api list production
-    const {
-        data: dataProductionOrders,
-        isLoading: isLoadingProductionOrderList,
-        isFetching: isFetchingProductionOrderList,
-        fetchNextPage: fetchNextPageProductionOrderList,
-        hasNextPage: hasNextPageProductionOrderList,
-        refetch: refetchProductionOrderList,
-        isRefetching: isRefetchingProductionOrderList
-    } = useProductionOrdersList(params);
-
-    // call api detail production
-    const {
-        data: dataProductionOrderDetail,
-        isLoading: isLoadingProductionOrderDetail,
-        refetch: refetchProductionOrderDetail,
-        isRefetching: isRefetchingProductionOrderDetail
-    } = useProductionOrderDetail({ id: isStateProvider?.productionsOrders?.idDetailProductionOrder, enabled: !!isStateProvider?.productionsOrders?.idDetailProductionOrder })
 
     // flag của list production
     const flagProductionOrders = useMemo(() =>
@@ -545,7 +536,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
         router.push({
             pathname: router.route,
-            query: { ...router.query, tabModal: router.query.tabModal, poi_id: item.poi_id },
+            query: {
+                ...router.query,
+                tabModal: router.query.tabModal,
+                poi_id: item.poi_id
+            },
         });
         // router.push(`/manufacture/productions-orders?tabModal=1&poi_id=${item.poi_id}`)
     };

@@ -3,6 +3,8 @@ export const FORMAT_MOMENT = {
     MONTH: "MM",
     YY: "YYYY",
     MM_YYYY: "MM/YYYY",
+    DD_MM: "DD/MM",
+    DD_MM_HH_mm: "DD/MM HH:mm",
     YYYY_MM_DD_SLASH: "YYYY/MM/DD",
     DATE_SLASH_LONG: "DD/MM/YYYY",
     DATE_SLASH_SHORT: "DD/MM/YY",

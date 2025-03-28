@@ -60,13 +60,13 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
                                 {product.product_variation}
 
                             </p>
+
                             <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
                                 {product.item_code}
-
                             </p>
+
                             <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
                                 {product.reference_no_detail}
-
                             </p>
                         </div>
                     </div>
@@ -99,7 +99,9 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
     }, [formatNumber, handleShowModel, isStateProvider?.productionsOrders.dataModal.id, dataLang]);
 
     if (isLoadingRight) return <Loading className="h-80" color="#0f4f9e" />;
+
     const list = isStateProvider?.productionsOrders?.dataProductionOrderDetail?.listPOItems || [];
+
     if (!list.length) return <NoData />;
 
     return (
@@ -128,6 +130,7 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
                                 <CaretDownIcon className="size-full" />
                             </div>
                         </div>
+                        
                         <AnimatePresence initial={false}>
                             {
                                 item.showChild && (

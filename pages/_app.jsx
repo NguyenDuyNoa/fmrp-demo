@@ -37,6 +37,9 @@ const queryClient = new QueryClient({
 });
 
 const Index = (props) => {
+    console.log('props props', props);
+
+
 
     return (
         <React.Fragment>
@@ -50,7 +53,7 @@ const Index = (props) => {
                         {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
                         <main className={deca.className}>
                             <StateProvider>
-                                <SheetProvider>
+                                <SheetProvider {...props}>
                                     {/* <main className={deca.className}> */}
                                     <MainPage {...props} />
                                 </SheetProvider>
@@ -176,7 +179,7 @@ function MainPage({ Component, pageProps }) {
             <Layout dataLang={data}>
                 <Component dataLang={data} {...pageProps} />
 
-                <ReusableSheet />
+                <ReusableSheet dataLang={data}/>
             </Layout>
         </Customscrollbar>
     );

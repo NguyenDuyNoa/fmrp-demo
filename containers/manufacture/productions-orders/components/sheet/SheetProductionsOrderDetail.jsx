@@ -21,13 +21,8 @@ import TabSwitcherWithUnderline from "@/components/common/tab/TabSwitcherWithUnd
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { PiImage, PiPaperclip, PiPaperPlaneRightFill, PiSmiley, PiTextAa } from "react-icons/pi";
-import TabInFormation from "../modal/tabInFormation";
-import TabExportSituation from "../modal/tabExportSituation";
-import TabExportHistory from "../modal/tabExportHistory";
-import TabWarehouseHistory from "../modal/tabWarehouseHistory";
-import TabRecallMaterials from "../modal/tabRecallMaterials";
-import TabProcessingCost from "../modal/tabProcessingCost";
 import { variantButtonScaleZoom } from "@/utils/animations/variantsAnimation";
+import TabInformation from "../tab/TabInformation";
 
 const initialState = {
     isTab: 1,
@@ -37,8 +32,10 @@ const initialState = {
 const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }) => {
     const router = useRouter()
 
-    const poiId = useMemo(() => router.query.poi_id, [router.query])
+    const poiId = useMemo(() => router.query.poi_id, [router.query.poi_id])
     const tabModal = useMemo(() => router.query.tabModal, [router.query])
+
+    console.log('tabModal', tabModal);
 
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
@@ -46,39 +43,10 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
 
     const titleSheetRef = useRef(null);
     const commentSheetRef = useRef(null);
-    const { isOpen: isOpenSheet, closeSheet, sheetData } = useSheet()
+    const { isOpen: isOpenSheet, closeSheet } = useSheet()
 
     const { heightMapRef, calcHeights } = useMultiAvailableHeightRef();
     const { data: dataItemOrderDetail, isLoading: isLoadingItemOrderDetail } = useItemOrderDetail({ poi_id: poiId, enabled: isOpenSheet && !!poiId })
-
-    // const { data, isLoading } = useQuery({
-    //     queryKey: ["apiItemOrdersDetail", isOpenSheet, poiId, tabModal],
-    //     queryFn: async () => {
-    //         const { data } = await apiProductionsOrders.apiItemOrdersDetail(poiId);
-
-    //         const newData = {
-    //             dataDetail: {
-    //                 ...data,
-    //                 poi: {
-    //                     ...data?.poi,
-    //                     stages: data?.poi.stages?.map(e => {
-    //                         return {
-    //                             ...e,
-    //                             active: e?.active == "1",
-    //                             // quantity: 100,
-    //                         }
-    //                     })
-    //                 }
-    //             }
-    //         }
-    //         queryStateModal({ ...newData });
-    //         return newData
-
-    //     },
-    //     enabled: !!isOpenSheet && !!poiId,
-    //     placeholderData: keepPreviousData,
-    //     ...optionsQuery,
-    // })
 
     const listTab = [
         {
@@ -115,6 +83,13 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
     ];
 
     useEffect(() => {
+        if (router.pathname !== "/manufacture/productions-orders") {
+            closeSheet()
+        }
+    }, [router])
+
+
+    useEffect(() => {
         const handleResize = () => {
             calcHeights({
                 main: {
@@ -133,20 +108,30 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
         return () => window.removeEventListener('resize', handleResize);
     }, [isOpenSheet, calcHeights]);
 
-    // const components = {
-    //     1: <TabInFormation {...shareProps} />,
-    //     2: <TabExportSituation {...shareProps} />,
-    //     3: <TabExportHistory {...shareProps} />,
-    //     4: <TabWarehouseHistory {...shareProps} />,
-    //     5: <TabRecallMaterials {...shareProps} />,
-    //     6: <TabProcessingCost {...shareProps} />,
-    // };
+    const components = {
+        1: <TabInformation />,
+        2: <>Hello</>,
+        3: <TabInformation />,
+        4: <TabInformation />,
+        5: <TabInformation />,
+        6: <TabInformation />,
+        // 2: <TabExportSituation {...shareProps} />,
+        // 3: <TabExportHistory {...shareProps} />,
+        // 4: <TabWarehouseHistory {...shareProps} />,
+        // 5: <TabRecallMaterials {...shareProps} />,
+        // 6: <TabProcessingCost {...shareProps} />,
+    };
 
     // console.log('isStateProvider', isStateProvider);
     // console.log('titleSheetRef', titleSheetRef);
 
     console.log('dataItemOrderDetail', dataItemOrderDetail);
     console.log('isLoadingItemOrderDetail', isLoadingItemOrderDetail);
+
+    // useEffect(() => {
+    //   if(router.)
+    // }, [third])
+
 
     const formatMoney = (number) => {
         if (typeof number == "string") {
@@ -163,12 +148,24 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
         router.push("/manufacture/productions-orders?tabModal=1")
     }
 
-    const handleActiveTab = (e, type) => {
+    const handleActiveTab = (value, type) => {
         if (type === "detail_sheet") {
+            if (router.query.tab) {
+                router.push({
+                    pathname: router.route,
+                    query: { ...router.query, tabModal: value.id, tab: router.query.tab },
+                });
+            } else {
+                router.push({
+                    pathname: router.route,
+                    query: { ...router.query, tabModal: value.id },
+                });
+            }
+
             queryStateProvider({
                 productionsOrders: {
                     ...isStateProvider?.productionsOrders,
-                    isTabSheet: e
+                    isTabSheet: value
                 }
             });
 
@@ -354,9 +351,8 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
                         />
 
                         {/* content tab */}
-                        {/* <div className="w-full my-2">{components[isStateProvider?.productionsOrders?.isTabSheet]}</div> */}
+                        <div className="w-full my-2">{components[isStateProvider?.productionsOrders?.isTabSheet?.id]}</div>
                     </div>
-
                 </div>
             </Customscrollbar >
 
