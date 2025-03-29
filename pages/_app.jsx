@@ -16,6 +16,9 @@ import "sweetalert2/src/sweetalert2.scss";
 import "../styles/globals.scss";
 import Login from "./auth/login";
 import Register from "./auth/register";
+import { SheetProvider, useSheet } from "@/context/ui/SheetContext";
+import ReusableSheet from "@/components/common/sheet/ReusableSheet";
+import { StateContext, StateProvider } from "@/context/_state/productions-orders/StateContext";
 
 // const t = Lark
 const deca = Lexend_Deca({
@@ -34,6 +37,9 @@ const queryClient = new QueryClient({
 });
 
 const Index = (props) => {
+    console.log('props props', props);
+
+
 
     return (
         <React.Fragment>
@@ -46,8 +52,12 @@ const Index = (props) => {
                     <Provider store={store}>
                         {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
                         <main className={deca.className}>
-                            {/* <main className={deca.className}> */}
-                            <MainPage {...props} />
+                            <StateProvider>
+                                <SheetProvider {...props}>
+                                    {/* <main className={deca.className}> */}
+                                    <MainPage {...props} />
+                                </SheetProvider>
+                            </StateProvider>
                         </main>
                     </Provider>
                 </Suspense>
@@ -59,6 +69,7 @@ const Index = (props) => {
 function MainPage({ Component, pageProps }) {
     const dispatch = useDispatch();
 
+    const { isOpen: isOpenSheet, closeSheet: closeSheet } = useSheet()
     const router = useRouter()
 
     const tokenFMRP = CookieCore.get('tokenFMRP')
@@ -145,7 +156,7 @@ function MainPage({ Component, pageProps }) {
 
     if (!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) {
         if (router.pathname == '/auth/register') {
-          
+
             return <Register dataLang={data} />;
         }
         if ((!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false) || router.pathname == '/auth/login')) {
@@ -164,9 +175,11 @@ function MainPage({ Component, pageProps }) {
     }
 
     return (
-        <Customscrollbar className="relative h-screen custom-size-text">
+        <Customscrollbar className="relative h-screen text-customize">
             <Layout dataLang={data}>
                 <Component dataLang={data} {...pageProps} />
+
+                <ReusableSheet dataLang={data}/>
             </Layout>
         </Customscrollbar>
     );

@@ -51,7 +51,7 @@ const LimitListDropdown = ({ sLimit, limit, dataLang, total }) => {
     }, []);
 
     return (
-        <div className="flex items-center gap-2 text-[#9295A4] text-sm" ref={dropdownRef}>
+        <div className="flex items-center gap-2 text-[#9295A4] 3xl:text-sm text-[13px]" ref={dropdownRef}>
             <span>{dataLang?.display || "Hiển thị"}</span>
 
             <div className="relative">
@@ -59,7 +59,7 @@ const LimitListDropdown = ({ sLimit, limit, dataLang, total }) => {
                     ref={buttonRef}
                     type="button"
                     onClick={handleToggleDropdown}
-                    className="outline-none cursor-pointer border border-[#D0D5DD] text-[#3A3E4C] font-normal bg-white hover:bg-[#D0D5DD]/50 rounded-lg p-2 flex items-center gap-1 custom-transition"
+                    className="outline-none cursor-pointer border border-[#D0D5DD] text-[#3A3E4C] font-normal bg-white hover:bg-[#D0D5DD]/50 rounded-lg 3xl:p-2 p-1 flex items-center gap-1 custom-transition"
                 >
                     {limit === -1 ? "Tất cả" : limit}
 

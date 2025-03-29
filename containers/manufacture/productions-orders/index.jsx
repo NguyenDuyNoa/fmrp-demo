@@ -2,9 +2,9 @@ import React from "react";
 
 import { Container } from "@/components/UI/common/layout";
 import Head from "next/head";
-import MainTable from "./components/table/mainTable";
 
 import { ProductionsOrdersProvider } from "./context/productionsOrders";
+import ProductionsOrderMain from "./components/main/ProductionsOrderMain";
 
 const ProductionsOrders = (props) => {
     const dataLang = props.dataLang;
@@ -18,7 +18,7 @@ const ProductionsOrders = (props) => {
             </Head>
             <Container className={'relative 3xl:!space-y-3 !space-y-2'}>
                 <ProductionsOrdersProvider>
-                    <MainTable {...propsDefault} />
+                    <ProductionsOrderMain {...propsDefault} />
                 </ProductionsOrdersProvider>
             </Container>
         </React.Fragment>
