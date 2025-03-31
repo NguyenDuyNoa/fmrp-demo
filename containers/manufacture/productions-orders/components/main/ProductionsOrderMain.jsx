@@ -606,7 +606,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     // trigger của bộ lọc trạng thái
     const triggerFilterStatus = (
         <button className={`${(stateFilterDropdown?.open || isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]" : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"} relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}>
-            <ChartDonutIcon className='absolute -translate-y-1/2 top-1/2 3xl:size-5 size-4' />
+            <ChartDonutIcon className='absolute top-1/2 -translate-y-1/2 3xl:size-5 size-4' />
 
             <span className={`${(stateFilterDropdown?.open || isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0) ? "text-[#0F4F9E]" : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"} xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}>
                 {dataLang?.purchase_status || "purchase_status"}
@@ -621,7 +621,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     // trigger button hoàn thành công đoạn
     const triggerCompleteStage = (
         <div className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center xl:gap-4 gap-2 xl:text-sm text-xs font-medium text-white border border-[#0375F3] bg-[#0375F3] hover:bg-[#0375F3] cursor-pointer hover:shadow-hover-button rounded-lg custom-transition">
-            <span className='flex items-center gap-1 xl:gap-2'>
+            <span className='flex items-center xl:gap-2 gap-1'>
                 <span className='xl:size-4 size-3.5 shrink-0'>
                     <CheckThinIcon className={`size-full`} />
                 </span>
@@ -700,10 +700,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 }
             </div>
 
-            <div ref={titleRef} className="flex items-center justify-between w-full">
+            <div ref={titleRef} className="flex justify-between items-center w-full">
                 <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                     {dataLang?.productions_orders || 'productions_orders'}
                 </h2>
+
                 <div className="flex items-center gap-2 xl:max-w-[70%]">
                     <div className="relative flex items-center justify-end">
                         {/* Animated Search Input */}
@@ -799,7 +800,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             {dataLang?.productions_orders_filter || "productions_orders_filter"}
                         </div>
 
-                        <div className='grid w-full grid-cols-4 gap-3 3xl:grid-cols-7'>
+                        <div className='grid 3xl:grid-cols-7 grid-cols-4 w-full gap-3'>
                             <div className="col-span-1 space-y-1">
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}</h3>
                                 <SelectComponentNew
@@ -887,7 +888,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                 />
                             </div>
 
-                            <div className="col-span-2 space-y-1 3xl:col-span-1">
+                            <div className="3xl:col-span-1 col-span-2 space-y-1">
                                 <h3 className="text-xs text-[#051B44] font-normal">{dataLang?.productions_orders_item || 'productions_orders_item'}</h3>
                                 <SelectComponentNew
                                     isClearable={true}
@@ -939,7 +940,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                                                             )
                                                                     }
                                                                 </div>
-                                                                <div className="w-full custom-text">
+                                                                <div className="custom-text w-full">
                                                                     <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                         {option.e?.item_name}
                                                                     </h3>
@@ -988,7 +989,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 </div>
             </div>
 
-            <div ref={filterRef} className='flex items-center w-full gap-4 3xl:gap-6'>
+            <div ref={filterRef} className='flex items-center 3xl:gap-6 gap-4 w-full'>
                 <div className='w-full xl:max-w-[15%] max-w-[22%] shrink-0'>
                     <FilterDropdown
                         trigger={triggerFilterStatus}
@@ -1029,7 +1030,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 />
             </div>
 
-            <div className="flex items-start w-full gap-4 overflow-y-hidden 3xl:gap-6">
+            <div className=" flex items-start 3xl:gap-6 gap-4 w-full overflow-y-hidden">
                 <div className="2xl:max-w-[15%] xl:max-w-[18%] max-w-[22%] size-full space-y-4 border-none border-[#D0D5DD] border">
                     <Customscrollbar
                         className='h-full'
@@ -1043,7 +1044,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                 // (isLoadingProductionOrderList || isRefetching)
                                 ?
                                 (
-                                    <Loading className='h-full 3xl:h-full 2xl:h-full xl:h-full' />
+                                    <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
                                 )
                                 :
                                 (
@@ -1296,7 +1297,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                     >
                         {(isLoadingProductionOrderDetail || isRefetchingProductionOrderDetail || isRefetchingProductionOrderList || isLoadingProductionOrderList)
                             ?
-                            <Loading className='h-full 3xl:h-full 2xl:h-full xl:h-full' />
+                            <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
                             :
                             (dataProductionOrderDetail?.listPOItems?.length > 0)
                                 ?
