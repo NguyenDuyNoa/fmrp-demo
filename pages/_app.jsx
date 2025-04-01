@@ -37,10 +37,6 @@ const queryClient = new QueryClient({
 });
 
 const Index = (props) => {
-    console.log('props props', props);
-
-
-
     return (
         <React.Fragment>
             <QueryClientProvider client={queryClient}>

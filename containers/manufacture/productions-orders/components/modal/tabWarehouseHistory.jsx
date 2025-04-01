@@ -84,7 +84,6 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab, type
         ...optionsQuery
     })
 
-
     const multiDataSet = [
         {
             columns: [

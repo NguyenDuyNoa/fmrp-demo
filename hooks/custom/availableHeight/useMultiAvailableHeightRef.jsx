@@ -16,6 +16,8 @@ export const useMultiAvailableHeightRef = () => {
         (config = {}) => {
             const newHeights = {};
             for (const key in config) {
+                if (!config[key]) continue; // 💥 bỏ qua key không có giá trị
+
                 const { refs = [], subtract = 0 } = config[key];
                 const total = refs.reduce((sum, ref) => sum + getElementHeightWithMargin(ref?.current), 0);
                 newHeights[key] = window.innerHeight - total - subtract;

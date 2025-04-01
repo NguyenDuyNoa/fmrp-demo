@@ -8,7 +8,7 @@ const CostCard = ({ className, title, amount, color, percent, isUp }) => {
     return (
         <div className={`${className} border-[0.5px] border-[#D0D5DD] rounded-lg px-4 py-3 w-full space-y-2`}>
             <div className="flex justify-between items-center text-sm text-[#667085]">
-                <span className='text-default text-[#667085] font-normal'>
+                <span className='text-base-default text-[#667085] font-normal'>
                     {title}
                 </span>
                 <span className={`flex items-center gap-1 text-white xl:text-sm text-xs px-1 py-1 rounded ${percentColor}`}>

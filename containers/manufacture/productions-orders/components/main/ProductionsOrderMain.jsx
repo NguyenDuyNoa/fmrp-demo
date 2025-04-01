@@ -215,8 +215,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         isRefetching: isRefetchingProductionOrderDetail
     } = useProductionOrderDetail({ id: isStateProvider?.productionsOrders?.idDetailProductionOrder, enabled: !!isStateProvider?.productionsOrders?.idDetailProductionOrder })
 
-    const poiId = useMemo(() => router.query.poi_id, [router.query])
-
     const handleFilter = (type, value) => queryStateProvider({
         productionsOrders: {
             ...isStateProvider?.productionsOrders,
@@ -225,6 +223,37 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     });
 
     const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
+
+    const poiId = router.query.poi_id
+
+    useEffect(() => {
+        if (!router.isReady) return;
+
+        const isOnProductionOrdersPage = router.pathname === "/manufacture/productions-orders";
+
+        // Đóng Sheet nếu không còn ở đúng trang
+        if (!isOnProductionOrdersPage) {
+            closeSheet();
+        }
+
+        // Nếu có poi_id → set vào state
+        if (poiId && isOnProductionOrdersPage) {
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    poiId: poiId,
+                }
+            });
+        } else {
+            // Nếu không có poi_id → clear
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    poiId: undefined,
+                }
+            });
+        }
+    }, [router.isReady, router.pathname, router.query]);
 
     // active tab info & tab kế hoạch
     useEffect(() => {
@@ -254,7 +283,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         if (dataProductionOrderDetail) {
             openSheet({
                 content: <SheetProductionsOrderDetail {...shareProps} />,
-                className: 'w-[90vw] md:w-[700px] xl:w-[65%]',
+                className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
             });
         }
     }, [poiId, dataProductionOrderDetail]);
@@ -438,7 +467,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         //     dataModal: {},
         // });
 
-        router.push("/manufacture/productions-orders?tabModal=1")
+        router.push("/manufacture/productions-orders")
     };
 
     const handleActiveTab = (e, type) => {
@@ -493,7 +522,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 },
             }
         });
-        router.push("/manufacture/productions-orders?tabModal=1")
+        router.push("/manufacture/productions-orders")
     };
 
     const onChangeSearch = debounce((e) => {
@@ -516,8 +545,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     };
 
     const handleShowModel = (item) => {
-        console.log('item item: ', item);
-
         queryStateProvider({
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
@@ -529,20 +556,17 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             content: (
                 <SheetProductionsOrderDetail {...shareProps} />
             ),
-            className: 'w-[90vw] md:w-[700px] xl:w-[65%]',
+            className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
         })
-
-        console.log('router', router);
 
         router.push({
             pathname: router.route,
             query: {
                 ...router.query,
-                tabModal: router.query.tabModal,
                 poi_id: item.poi_id
             },
         });
-        // router.push(`/manufacture/productions-orders?tabModal=1&poi_id=${item.poi_id}`)
+        // router.push(`/manufacture/productions-orders?&poi_id=${item.poi_id}`)
     };
 
     const shareProps = {
@@ -723,7 +747,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                                 onChange={(e) => onChangeSearch(e)}
                                                 className={`
                                                ${isOpenSearch ? "rounded-l-lg border-r-0 border-[#D0D5DD] focus:border-[#3276FA]" : "rounded-lg border-[#D0D5DD]"}
-                                                relative border  bg-white pl-2 3xl:h-10 h-9 text-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
+                                                relative border  bg-white pl-2 3xl:h-10 h-9 text-base-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
                                                 type="text"
                                                 // value={isStateProvider?.productionsOrders.search}
                                                 placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
@@ -776,7 +800,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             }}
                             isClearable
                             placeholderText={`${dataLang?.productions_orders_select_day}` || 'productions_orders_select_day'}
-                            className="pl-8 pr-2 3xl:h-10 h-9 text-default w-[250px] outline-none cursor-pointer focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
+                            className="pl-8 pr-2 3xl:h-10 h-9 text-base-default w-[250px] outline-none cursor-pointer focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
                             onKeyDown={(e) => e.preventDefault()} // 👈 chặn gõ bàn phím
                         />
 

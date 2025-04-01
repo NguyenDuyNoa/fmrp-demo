@@ -45,7 +45,8 @@ const TabSwitcherWithUnderline = ({ className, tabs = [], activeTab, onChange, r
 
                 {/* underline */}
                 {
-                    activeTab && activeTab?.id &&
+                    // activeTab && activeTab?.id &&
+                    activeTab && activeTab?.id && underlineProps.left != null && underlineProps.width != null &&
                     <motion.div
                         layout
                         className="!ml-0 absolute -bottom-[1px] h-[2px] bg-[#0375F3]"

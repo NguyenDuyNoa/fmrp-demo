@@ -2,11 +2,9 @@
 import apiProductionsOrders from '@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders';
 import OnResetData from '@/components/UI/btnResetData/btnReset';
 import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination';
-import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination';
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
 import { ContainerTotal } from '@/components/UI/common/layout';
-import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
 import Loading from '@/components/UI/loading/loading';
@@ -14,14 +12,13 @@ import NoData from '@/components/UI/noData/nodata';
 import Pagination from "@/components/UI/pagination";
 import { optionsQuery } from '@/configs/optionsQuery';
 import useSetingServer from '@/hooks/useConfigNumber';
-import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
+import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems'
 import usePagination from '@/hooks/usePagination';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from '@tanstack/react-query';
-import { Grid6 } from 'iconsax-react';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useState } from 'react';
+import { memo, useState } from 'react';
 import ModalImage from 'react-modal-image';
 import { useSelector } from 'react-redux';
 import { v4 as uddid } from 'uuid';
