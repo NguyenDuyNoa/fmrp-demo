@@ -47,7 +47,7 @@ const Contact = (props) => {
     const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
-
+    // phân quyền
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkExport } = useActionRole(auth, "client_customers");
@@ -57,7 +57,7 @@ const Contact = (props) => {
     const [isState, sIsState] = useState(initilalState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
-
+    // parasm lọc
     const params = {
         search: isState.keySearch,
         limit: limit,
@@ -65,11 +65,12 @@ const Contact = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
         "filter[client_id]": isState.idClient?.length > 0 ? isState.idClient.map((e) => e.value) : null,
     }
-
+    // danh sách liên hệ
     const { data, isLoading, isFetching, refetch } = useContactList(params)
-
+    // danh sách chi nhánh
     const { data: listBr = [] } = useBranchList({});
 
+    // danh sách khách hầng
     const { data: listClientCombobox = [] } = useClientCombobox()
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -80,7 +81,7 @@ const Contact = (props) => {
         queryState({ onFetching: true });
     }, 500);
 
-    //excel
+    //xuất excel
     const multiDataSet = [
         {
             columns: [
@@ -190,13 +191,13 @@ const Contact = (props) => {
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.client_contact_title || "client_contact_title"}
                             </h2>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -243,7 +244,7 @@ const Contact = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData onClick={refetch.bind(this)} sOnFetching={() => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -261,7 +262,7 @@ const Contact = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -330,7 +331,7 @@ const Contact = (props) => {
                                                             {e.address}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2}>
-                                                            <span className="flex gap-2 flex-wrap justify-start ">
+                                                            <span className="flex flex-wrap justify-start gap-2 ">
                                                                 {e?.branch?.map((e) => (
                                                                     <TagBranch key={e?.id ? e?.id : ""}>
                                                                         {e.name}

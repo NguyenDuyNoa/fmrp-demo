@@ -90,6 +90,7 @@ function MainPage({ Component, pageProps }) {
     // state quản lý popup perview image
     const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
 
+    // xử lý các dom dựa theo  statePopupPreviewImage.open
     useEffect(() => {
 
         const parentDatepicker = document.querySelector(".parentDatepicker");
@@ -125,12 +126,13 @@ function MainPage({ Component, pageProps }) {
         };
     }, [router.pathname, statePopupPreviewImage.open]);
 
-
+    // lấy lang mặc định trong local
     useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
 
+    // bỏ scoroll của thư viện khi mở popup chat ai
     useEffect(() => {
         const scroll = document.querySelector('.simplebar-mask')
         if (stateBoxChatAi.open && scroll) {
@@ -143,6 +145,7 @@ function MainPage({ Component, pageProps }) {
         return <LoadingPage />;
     }
 
+    // 2 page này code cho moblie 
     if (router.pathname == '/manufacture/productions-orders-mobile' || router.pathname == '/manufacture/production-plan-mobile') {
 
         return <Customscrollbar className="relative max-h-screen ">
@@ -152,6 +155,7 @@ function MainPage({ Component, pageProps }) {
         </Customscrollbar>
     }
 
+    // kiểm tra login
     if (!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) {
         if (router.pathname == '/auth/register') {
 
@@ -176,7 +180,6 @@ function MainPage({ Component, pageProps }) {
         <Customscrollbar className="relative h-screen text-customize">
             <Layout dataLang={data}>
                 <Component dataLang={data} {...pageProps} />
-
                 <ReusableSheet dataLang={data} />
             </Layout>
         </Customscrollbar>

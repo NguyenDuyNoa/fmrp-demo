@@ -52,22 +52,28 @@ const initalState = {
 };
 
 const Popup_dskh = (props) => {
+    // phân quyền
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
+    // phần quyền
     const { checkAdd, checkEdit } = useActionRole(auth, props?.nameModel);
 
+    // state cờ để show popup xóa
     const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
+    // toast
     const isShow = useToast();
 
     const [isState, sIsState] = useState(initalState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
+    // tab active
     const [tab, sTab] = useState(0);
 
     const _HandleSelectTab = (e) => sTab(e);
 
+    // mở lên thì set data chi nhánh và thành phố
     useEffect(() => {
         queryState({
             dataBr: props?.listBr || [],
@@ -75,6 +81,7 @@ const Popup_dskh = (props) => {
         });
     }, [isState.open]);
 
+    // gọi api lấy dữ liệu chi tiết
     useQuery({
         queryKey: ["api_detail_lient", props?.id],
         queryFn: async () => {
@@ -138,10 +145,11 @@ const Popup_dskh = (props) => {
         enabled: isState.open && props?.id ? true : false
     });
 
+    // danh sách quận huyện
     const { data: dataDitrict } = useDistrictList(isState.valueCt)
-
+    // danh sách phường xã
     const { data: dataWard } = useWardList(isState.valueDitrict)
-
+    // danh sách nhóm kh
     const { data: dataGroup } = useClientGroupClient(isState.valueBr)
 
     const { data: dataChar } = useClientChar(isState)
@@ -167,7 +175,7 @@ const Popup_dskh = (props) => {
             });
     }, [isState.valueCt]);
 
-
+    // lưu tạo khách hàng
     const addClient = useMutation({
         mutationFn: (data, url) => {
             return apiClient.apiHandingClient(data, url);
@@ -262,6 +270,7 @@ const Popup_dskh = (props) => {
         queryState({ option: [...isState.option] });
     };
 
+    // change thông tin địa chỉ giao hàng
     const onChangOptionsDelivery = (id, type, value) => {
         const updatedOptionDelivery = isState.optionDelivery.map((item) => {
             if (item.idFe == id) {
@@ -296,6 +305,7 @@ const Popup_dskh = (props) => {
         });
     };
 
+    // tạo thêm ô địa chỉ gd
     const _HandleAddNewDelivery = () => {
         const newData = {
             idFe: uuidv4(),
@@ -310,6 +320,7 @@ const Popup_dskh = (props) => {
         });
     };
 
+    // xóa lh & giao hàng
     const _HandleDelete = async () => {
         if (tab == 1) {
             queryState({ option: [...isState.option.filter((x) => x.idFe !== isId)] });
