@@ -21,7 +21,7 @@ const PopupRequestUpdateVersion = () => {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <PiSparkleFill className='text-[21px]' size={21} color='#3A3E4C' />
-                        <p className="text-base font-semibold leading-6 text-[#3A3E4C] capitalize ">
+                        <p className="3xl:text-lg text-base font-normal leading-6 text-[#3A3E4C] capitalize ">
                             Quản Lý Chuyên Sâu Hơn
                         </p>
                     </div>
@@ -45,36 +45,39 @@ const PopupRequestUpdateVersion = () => {
                 </div>
 
                 <div className="flex justify-center my-4">
-                    <Image
-                        width={1280}
-                        height={1024}
-                        src={'/popup/illustration.png'}
-                        alt="Illustration"
-                        className="object-cover size-full"
-                    />
+                    <div className="w-[266px] h-[200px]">
+                        <Image
+                            width={1280}
+                            height={1024}
+                            src={'/popup/illustration.webp'}
+                            alt="Illustration"
+                            priority
+                            unoptimized
+                            className="object-cover size-full"
+                        />
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-4">
                     <p className="text-start text-2xl leading-[32px] font-semibold text-[#141522]">
                         Theo dõi đơn hàng theo nhà cung cấp để nguyên vật liệu luôn <span className='text-[#0375F3]'>đúng và đủ</span>.
                     </p>
-
-                    <motion.button
+                    <motion.a
                         whileHover={{ scale: 1.04 }}
                         whileTap={{ scale: 0.985 }}
                         transition={{
                             duration: 0.25,
                             ease: 'easeOut'
                         }}
+                        href='https://zalo.me/fososoft'
+                        target='_blank'
                         style={{
-                            background: `linear-gradient(160.12deg, #1FC583 -28.32%, #1F9285 156.47%)`
+                            background: `linear-gradient(-7deg, #1F9285 0%, #1FC583 100%)`
                         }}
-                        className="w-full py-2 text-white text-lg font-medium rounded-[8px] shadow-md"
+                        className="w-full  text-center h-[52px] text-white text-[20px] font-medium rounded-[8px] flex items-center justify-center"
                     >
                         Nâng cấp
-                    </motion.button>
-
-
+                    </motion.a>
                 </div>
             </div>
         </div>

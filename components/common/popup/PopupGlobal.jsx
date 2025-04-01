@@ -1,8 +1,5 @@
-import { Inter } from '@next/font/google';
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Popup from 'reactjs-popup';
 
 const PopupGlobal = ({ ...props }) => {
@@ -30,8 +27,8 @@ const PopupGlobal = ({ ...props }) => {
                 overlayStyle={{
                     background: '#25387A40',
                     zIndex: 1000,
-                    backdropFilter: 'blur(3px)', // Hiệu ứng blur cho nền overlay
-                    WebkitBackdropFilter: 'blur(3px)', // Hỗ trợ cho trình duyệt Webkit (Safari)
+                    backdropFilter: 'blur(1.5px)', // Hiệu ứng blur cho nền overlay
+                    WebkitBackdropFilter: 'blur(1.5px)', // Hỗ trợ cho trình duyệt Webkit (Safari)
                 }}
             >
                 <motion.div

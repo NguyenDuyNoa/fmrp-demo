@@ -1,9 +1,9 @@
 import apiImport from "@/Api/apiPurchaseOrder/apiImport";
 import { useQuery } from "@tanstack/react-query";
 
-export const useImportItemByOrder = (id, idTheOrder) => {
+export const useImportItemByOrder = (id, idTheOrder, idBranch) => {
     return useQuery({
-        queryKey: ["api_import_search_items", idTheOrder],
+        queryKey: ["api_import_search_items", idTheOrder, idBranch],
         queryFn: async () => {
             const { data } = await apiImport.apiSearchItems({
                 params: {
@@ -13,6 +13,6 @@ export const useImportItemByOrder = (id, idTheOrder) => {
             });
             return data?.result
         },
-        enabled: !!idTheOrder
+        enabled: !!idTheOrder || !!idBranch
     })
 }
