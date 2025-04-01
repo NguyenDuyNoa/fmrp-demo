@@ -224,6 +224,12 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
     const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
 
+    // flag của list production
+    const flagProductionOrders = useMemo(() =>
+        dataProductionOrders ? dataProductionOrders?.pages?.flatMap(page => page?.productionOrders) : [],
+        [dataProductionOrders]
+    );
+
     const poiId = router.query.poi_id
 
     useEffect(() => {
@@ -267,12 +273,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     }, [listLsxTab]);
 
-    // flag của list production
-    const flagProductionOrders = useMemo(() =>
-        dataProductionOrders ? dataProductionOrders?.pages?.flatMap(page => page?.productionOrders) : [],
-        [dataProductionOrders]
-    );
-
     useEffect(() => {
         if (!poiId) {
             closeSheet(false);
@@ -287,7 +287,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             });
         }
     }, [poiId, dataProductionOrderDetail]);
-
 
     // loadmore list LSX
     useEffect(() => {
