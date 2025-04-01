@@ -49,14 +49,6 @@ export const ContainerTotal = ({ children, className }) => {
   );
 };
 export const ContainerTable = ({ children }) => {
-<<<<<<< HEAD
-    return (
-        <div className="space-y-2 3xl:h-[90%] 2xl:h-[84%] xl:h-[84%] lg:h-[86%] overflow-auto">
-            {children}
-        </div>
-    )
-}
-=======
   return <div className="h-full w-full">{children}</div>;
 };
 
@@ -76,14 +68,14 @@ export const LayOutTableDynamic = ({
       <Container>
         {breadcrumb}
         <ContainerBody>
-          <div className="space-y-0.5 overflow-hidden flex flex-col h-full">
+          <div className="overflow-hidden flex flex-col h-full gap-y-3">
             <div className="flex justify-between mt-1 mr-2">{titleButton}</div>
             {fillterTab && (
               <div className="w-full h-fit">
                 <ContainerFilterTab>{fillterTab}</ContainerFilterTab>
               </div>
             )}
-            <div className="flex-1 min-h-0 flex flex-col  overflow-hidden">
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden ">
               <ContainerTable className="flex-1 min-h-0 overflow-hidden">
                 {table}
               </ContainerTable>
@@ -96,4 +88,3 @@ export const LayOutTableDynamic = ({
     </>
   );
 };
->>>>>>> 49a45e86b7098fe0a62fcf51d6342a9bcff5edd3
