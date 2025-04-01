@@ -77,7 +77,9 @@ const PopupDetail = (props) => {
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_the_order || "import_the_order"}
                                             </h3>
-                                            <TagSingle name={data?.purchase_order_code} />
+                                            {
+                                                data?.purchase_order_code && <TagSingle name={data?.purchase_order_code} />
+                                            }
                                         </div>
                                     </div>
 
