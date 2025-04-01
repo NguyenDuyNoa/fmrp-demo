@@ -27,6 +27,7 @@ import TabMaterialIssueHistory from "../tab/TabMaterialIssueHistory";
 import TabFGReceiptHistory from "../tab/TabFGReceiptHistory";
 import TabMaterialReturn from "../tab/TabMaterialReturn";
 import TabMaterialCost from "../tab/TabMaterialCost";
+import TabMaterialOutputTab from "../tab/TabMaterialOutput";
 
 const initialState = {
     isTab: 1,
@@ -85,52 +86,6 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
         },
     ];
 
-    // useEffect(() => {
-    //     const handleResize = () => {
-    //         calcHeights({
-    //             main: {
-    //                 refs: [titleSheetRef, commentSheetRef],
-    //                 subtract: 84 + 24,
-    //             },
-    //             submain: {
-    //                 refs: [titleSheetRef],
-    //                 subtract: 84 + 34,
-    //             },
-    //         });
-    //     };
-
-    //     handleResize();
-    //     window.addEventListener('resize', handleResize);
-    //     return () => window.removeEventListener('resize', handleResize);
-    // }, [isOpenSheet, calcHeights, isStateProvider?.productionsOrders?.isTabSheet?.id]);
-
-    // useEffect(() => {
-    //     const handleResize = () => {
-    //         calcHeights({
-    //             main: {
-    //                 refs: [titleSheetRef, commentSheetRef],
-    //                 subtract: 84 + 24,
-    //             },
-    //             submain: {
-    //                 refs: [titleSheetRef],
-    //                 subtract: 84 + 34,
-    //             },
-    //         });
-    //     };
-
-    //     // delay 1 frame để chờ DOM cập nhật xong khi chuyển tab
-    //     const animationFrame = requestAnimationFrame(() => {
-    //         handleResize();
-    //     });
-
-    //     window.addEventListener('resize', handleResize);
-
-    //     return () => {
-    //         cancelAnimationFrame(animationFrame);
-    //         window.removeEventListener('resize', handleResize);
-    //     };
-    // }, [isOpenSheet, calcHeights, isStateProvider?.productionsOrders?.isTabSheet?.id]);
-
     useEffect(() => {
         const handleResize = () => {
             calcHeights({
@@ -162,7 +117,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
     const components = {
         1: <TabInformation dataLang={dataLang} {...props} />,
-        2: <>Hello</>,
+        2: <TabMaterialOutputTab dataLang={dataLang} {...props} />,
         3: <TabMaterialIssueHistory dataLang={dataLang} {...props} />,
         4: <TabFGReceiptHistory dataLang={dataLang} {...props} />,
         5: <TabMaterialReturn dataLang={dataLang} {...props} />,
@@ -269,10 +224,6 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
             <Customscrollbar
                 className='overflow-auto'
-                // style={{
-                //     height: `${isStateProvider?.productionsOrders?.isTabSheet?.id == 1 ? heightMapRef.current.main : heightMapRef.current?.submain}px`,
-                //     maxHeight: `${isStateProvider?.productionsOrders?.isTabSheet?.id == 1 ? heightMapRef.current.main : heightMapRef.current?.submain}px`
-                // }}
                 style={{
                     height: `${scrollHeight}px`,
                     maxHeight: `${scrollHeight}px`,
