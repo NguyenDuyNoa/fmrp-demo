@@ -37,7 +37,7 @@ const Popup = (props) => {
                         <h1 className="text-[#101828] font-medium !text-base !capitalize">
                             {props.title}
                         </h1>
-                        
+
                         {
                             (props?.type || !props.onClose)
                                 ?

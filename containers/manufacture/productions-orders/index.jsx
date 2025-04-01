@@ -7,14 +7,12 @@ import { ProductionsOrdersProvider } from "./context/productionsOrders";
 import ProductionsOrderMain from "./components/main/ProductionsOrderMain";
 
 const ProductionsOrders = (props) => {
-    const dataLang = props.dataLang;
-
-    const propsDefault = { dataLang, typeScreen: props.type };
+    const propsDefault = { dataLang: props.dataLang, typeScreen: props.type };
 
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.productions_orders || 'productions_orders'}</title>
+                <title>{propsDefault?.dataLang?.productions_orders || 'productions_orders'}</title>
             </Head>
             <Container className={'relative 3xl:!space-y-3 !space-y-2'}>
                 <ProductionsOrdersProvider>

@@ -135,172 +135,175 @@ const ProductionSteps = ({ stages }) => {
 
     return (
         <div className="pl-4 py-4">
-
-
             {
-                visibleSteps && visibleSteps?.map((step, index) => (
-                    <div key={step.id} className="grid grid-cols-8 relative">
-                        <div className='col-span-1 w-full relative'>
-                            <div className={`absolute -top-2 left-0 w-full h-full font-medium 
+                visibleSteps && visibleSteps?.map((step, index) => {
+                    const isLastItem = index === visibleSteps.length - 1;
+                    const noMoreHiddenSteps = hiddenCount <= 0;
+
+                    const shouldShowLine =
+                        !isLastItem || (!showAll && hiddenCount > 0);
+
+                    return (
+                        <div key={`steppp-${step.id}`} className="grid grid-cols-8 relative">
+                            <div className='col-span-1 w-full relative'>
+                                <div className={`absolute -top-2 left-0 w-full h-full font-medium 
                                 ${step.active == "1" ?
-                                    (
-                                        "text-[#141522]"
-                                    )
-                                    :
-                                    (
-                                        step.begin_production == "1"
-                                            ?
-                                            "text-[#667085]"
-                                            :
-                                            "hidden"
-                                    )
-                                }
+                                        (
+                                            "text-[#141522]"
+                                        )
+                                        :
+                                        (
+                                            step.begin_production == "1"
+                                                ?
+                                                "text-[#667085]"
+                                                :
+                                                "hidden"
+                                        )
+                                    }
                                 text-wrap
                                 `}
-                            >
-                                {step.active == "1" ?
-                                    (
-                                        <span className="text-xs font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.DD_MM_HH_mm)}</span>
-                                    )
-                                    :
-                                    (
-                                        step.begin_production == "1"
-                                            ?
-                                            <span className="text-xs font-medium text-[#667085]">{moment(step.date_production).format(FORMAT_MOMENT.DD_MM)}</span>
-                                            :
-                                            null
-                                    )
-                                }
-
-                            </div>
-                        </div>
-
-                        <div className="col-span-1 flex flex-col items-center mr-2 relative h-full">
-                            <div
-                                className={`size-4 flex items-center justify-center shrink-0 rounded-full border-2 
-                                    ${step.active == "1" ?
+                                >
+                                    {step.active == "1" ?
                                         (
-                                            "bg-[#1FC583] !border-[#1FC583]"
+                                            <span className="text-xs font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.DD_MM_HH_mm)}</span>
                                         )
                                         :
                                         (
                                             step.begin_production == "1"
                                                 ?
-                                                "border-[#1FC583] bg-white"
+                                                <span className="text-xs font-medium text-[#667085]">{moment(step.date_production).format(FORMAT_MOMENT.DD_MM)}</span>
                                                 :
-                                                "border-[#9295A4] bg-white"
+                                                null
                                         )
                                     }
+
+                                </div>
+                            </div>
+
+                            <div className="col-span-1 flex flex-col items-center mr-2 relative h-full">
+                                <div
+                                    className={`size-4 flex items-center justify-center shrink-0 rounded-full border-2 
+                                    ${step.active == "1" ?
+                                            (
+                                                "bg-[#1FC583] !border-[#1FC583]"
+                                            )
+                                            :
+                                            (
+                                                step.begin_production == "1"
+                                                    ?
+                                                    "border-[#1FC583] bg-white"
+                                                    :
+                                                    "border-[#9295A4] bg-white"
+                                            )
+                                        }
                                         `}
-                            >
-                                {step.active == "1" ?
-                                    <CheckIcon className='size-3 shrink-0 text-white' />
-                                    :
-                                    (
-                                        step.begin_production == "1"
-                                            ?
-                                            <div className='size-2 rounded-full bg-[#1FC583]' />
-                                            :
-                                            null
-                                    )
-                                }
-
-                            </div>
-
-                            {
-                                visibleSteps?.length - 1 !== index &&
-                                <div className={`w-[2px] h-full 
-                                    ${step.active == "1" ?
-                                        (
-                                            "bg-[#1FC583]"
-                                        )
+                                >
+                                    {step.active == "1" ?
+                                        <CheckIcon className='size-3 shrink-0 text-white' />
                                         :
                                         (
                                             step.begin_production == "1"
                                                 ?
-                                                "bg-[#1FC583]"
+                                                <div className='size-2 rounded-full bg-[#1FC583]' />
                                                 :
-                                                "bg-[#9295A4]"
+                                                null
                                         )
                                     }
-                                    `} />
-                            }
-                        </div>
 
-                        <div className='col-span-6 min-h-[40px]'>
-                            <div
-                                className={`text-sm-default font-medium 
-                                  ${step.active == "1" ?
-                                        (
-                                            "text-[#1FC583]"
-                                        )
-                                        :
-                                        (
-                                            step.begin_production == "1"
-                                                ?
-                                                "text-[#141522]"
-                                                :
-                                                "text-[#9295A4]"
-                                        )
-                                    }`}
-                            >
-                                {step.stage_name}
+                                </div>
+
+                                {
+                                    (shouldShowLine) &&
+                                    <div className={`w-[2px] h-full 
+                                    ${step.active == "1" ?
+                                            (
+                                                "bg-[#1FC583]"
+                                            )
+                                            :
+                                            (
+                                                step.begin_production == "1"
+                                                    ?
+                                                    "bg-[#1FC583]"
+                                                    :
+                                                    "bg-[#9295A4]"
+                                            )
+                                        }
+                                    `} />
+                                }
                             </div>
 
-                            {
-                                step?.purchase_items &&
-                                step?.purchase_items?.map((item) => (
-                                    <div className="text-[10px] flex flex-wrap gap-2 mt-1">
-                                        {/* <span className="border rounded-full px-2 py-0.5 border-gray-300">
+                            <div className='col-span-6 min-h-[40px]'>
+                                <div
+                                    className={`text-sm-default font-medium 
+                                  ${step.active == "1" ?
+                                            (
+                                                "text-[#1FC583]"
+                                            )
+                                            :
+                                            (
+                                                step.begin_production == "1"
+                                                    ?
+                                                    "text-[#141522]"
+                                                    :
+                                                    "text-[#9295A4]"
+                                            )
+                                        }`}
+                                >
+                                    {step.stage_name}
+                                </div>
+
+                                {
+                                    step?.purchase_items &&
+                                    step?.purchase_items?.map((item,index) => (
+                                        <div
+                                            key={`purchase-${index}`}
+                                            className="text-[10px] flex flex-wrap gap-2 mt-1"
+                                        >
+                                            {/* <span className="border rounded-full px-2 py-0.5 border-gray-300">
                                             {item?.reference_no} - SL: {item?.quantity}
                                         </span> */}
 
-                                        <div className='flex flex-col gap-0.5 bg-[#F7F8F9] rounded-md text-[10px] p-1'>
-                                            <div className='text-[#667085]'>
-                                                {item?.reference_no}
-                                            </div>
-
-                                            <div className=''>
-                                                <span className='text-[#667085]'>SL đạt: {item?.quantity_success}</span>
-                                                {item?.quantity_error > 0 && <span className='text-[#EE1E1E]'> - SL lỗi: {item?.quantity_error} </span>}
-                                            </div>
-                                        </div>
-
-                                        {
-                                            item?.lot &&
-                                            <div className='flex flex-col gap-0.5 bg-[#F7F8F9] rounded-md text-[10px] h-fit p-1.5'>
+                                            <div className='flex flex-col gap-0.5 bg-[#F7F8F9] rounded-md text-[10px] p-1'>
                                                 <div className='text-[#667085]'>
-                                                    LOT: {item?.lot}
+                                                    {item?.reference_no}
                                                 </div>
-                                                {item?.expiration_date &&
-                                                    <div className='text-[#667085]'>
-                                                        Date: {moment().format(FORMAT_MOMENT.DATE_SLASH_LONG)}
+
+                                                <div className=''>
+                                                    <span className='text-[#667085]'>SL đạt: {item?.quantity_success}</span>
+                                                    {item?.quantity_error > 0 && <span className='text-[#EE1E1E]'> - SL lỗi: {item?.quantity_error} </span>}
+                                                </div>
+                                            </div>
+
+                                            {
+                                                item?.lot &&
+                                                <div className='flex flex-col gap-0.5 bg-[#F7F8F9] rounded-md text-[10px] h-fit p-1.5'>
+                                                    <div className='text-[#3276FA]'>
+                                                        LOT: {item?.lot}
                                                     </div>
-                                                }
-                                            </div>
-                                        }
-
-                                        {
-                                            item?.serial &&
-                                            <div className='flex flex-col gap-0.5 bg-[#F7F8F9] rounded-md text-[10px] h-fit p-1.5'>
-                                                <div className='text-[#667085]'>
-                                                    SER: {item?.serial}
+                                                    {item?.expiration_date &&
+                                                        <div className='text-[#3276FA]'>
+                                                            Date: {moment().format(FORMAT_MOMENT.DATE_SLASH_LONG)}
+                                                        </div>
+                                                    }
                                                 </div>
-                                            </div>
-                                        }
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    </div>
-                ))
-            }
-            {/* {hiddenCount > 0 && !showAll && (
-                <div className="cursor-pointer text-green-500 text-sm mb-2" onClick={() => setShowAll(true)}>
-                    Xem thêm (+{hiddenCount} công đoạn)
-                </div>
-            )} */}
+                                            }
 
+                                            {
+                                                item?.serial &&
+                                                <div className='flex flex-col gap-0.5 bg-[#F7F8F9] rounded-md text-[10px] h-fit p-1.5'>
+                                                    <div className='text-[#667085]'>
+                                                        SER: {item?.serial}
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                    )
+                })
+            }
             {hiddenCount > 0 && !showAll && (
                 <div
                     className="grid grid-cols-8 cursor-pointer mb-4"

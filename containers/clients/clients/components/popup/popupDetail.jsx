@@ -16,8 +16,6 @@ import AvatarText from "@/components/UI/common/user/AvatarText";
 
 
 const Popup_chitiet = (props) => {
-    const scrollAreaRef = useRef(null);
-
     const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
@@ -26,6 +24,7 @@ const Popup_chitiet = (props) => {
 
     const _HandleSelectTab = (index) => sTab(index);
 
+    // dữ liệu chi tiết
     const { data, isLoading } = useClientDetail(open, props?.id);
 
     const formatNumber = (number) => {

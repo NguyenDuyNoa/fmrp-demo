@@ -13,6 +13,7 @@ import PopupUpdateVersion from '../UI/popup/PopupUpdateVersion';
 import ImagesModal from '../UI/images/ImagesModal';
 import { useRouter } from 'next/router';
 import React from 'react';
+import PopupGlobal from '../common/popup/PopupGlobal';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -33,6 +34,7 @@ const Index = ({ children, ...props }) => {
     const statePopupChangePassword = useSelector((state) => state.statePopupChangePassword);
     const statePopupRecommendation = useSelector((state) => state.statePopupRecommendation);
     const statePopupUpdateVersion = useSelector((state) => state.statePopupUpdateVersion);
+    const statePopupGlobal = useSelector((state) => state.statePopupGlobal);
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -51,6 +53,9 @@ const Index = ({ children, ...props }) => {
                         }
                         {
                             statePopupPreviewImage.open && <ImagesModal {...props} />
+                        }
+                        {
+                            statePopupGlobal.open && <PopupGlobal {...props} />
                         }
 
                         <PopupAppTrial {...props} />

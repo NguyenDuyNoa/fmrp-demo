@@ -8,7 +8,7 @@ import { useRef, useState } from 'react'
 import { Tooltip } from 'react-tippy'
 import Popup from 'reactjs-popup'
 
-export default function ProgressCircle({ title, step, total, quantity, stages = [] }) {
+export default function ProgressCircle({ className, title, step, total, quantity, stages = [] }) {
 
     const percent = (step / total) * 100
     const strokeDashoffset = 100 - percent
@@ -41,9 +41,9 @@ export default function ProgressCircle({ title, step, total, quantity, stages = 
     };
 
     return (
-        <div className="relative w-full h-full">
+        <div className={`${className} relative w-full h-full`}>
             {/* Circle SVG */}
-            <div className='flex flex-col items-center justify-center w-[120px] h-[120px] mx-auto relative'>
+            <div className='flex flex-col items-center justify-center w-[90px] h-[90px] mx-auto relative'>
                 <svg className="absolute top-0 left-0 w-full h-full rotate-[-90deg]" viewBox="0 0 36 36">
                     <circle cx="18" cy="18" r="16" fill="none" stroke="#E5E7EB" strokeWidth="4" />
                     {
@@ -64,9 +64,9 @@ export default function ProgressCircle({ title, step, total, quantity, stages = 
 
                 {/* Info */}
                 <div className="relative z-10 flex flex-col items-center">
-                    <span className="text-[10px] text-[#9295A4] font-medium">{`${step}/${total} công đoạn`}</span>
-                    <h3 className="text-sm font-semibold">{title}</h3>
-                    <span className="text-xs font-medium text-[#9295A4]">SL: {quantity}</span>
+                    <span className="text-[7px] text-[#9295A4] font-medium">{`${step}/${total} công đoạn`}</span>
+                    <h3 className="text-[10px] font-semibold">{title}</h3>
+                    <span className="text-[9px] font-medium text-[#9295A4]">SL: {quantity}</span>
                 </div>
             </div>
 

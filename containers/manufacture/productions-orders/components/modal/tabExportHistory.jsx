@@ -278,7 +278,8 @@ const TabExportHistory = memo(({ isStateModal, width, dataLang, listTab, typePag
                                                         width={36}
                                                         height={36}
                                                         alt={e?.item?.name}
-                                                        className={`object-cover rounded-md ${typePageMoblie ? 'w-[24px] h-[24px] min-w-[24px] min-h-[24px]' : "min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"}`} />
+                                                        className={`object-cover rounded-md ${typePageMoblie ? 'w-[24px] h-[24px] min-w-[24px] min-h-[24px]' : "min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"}`} 
+                                                        />
                                                     <div className={`flex flex-col ${typePageMoblie ? "gap-px" : "gap-1"}`}>
                                                         <div className="flex items-center gap-2">
                                                             <div className='flex flex-col'>

@@ -370,7 +370,7 @@ const PurchaseImport = (props) => {
 
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.import_list || "import_list"}
                             </h2>
@@ -407,7 +407,7 @@ const PurchaseImport = (props) => {
                             })}
                         </ContainerFilterTab>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5">
@@ -476,7 +476,7 @@ const PurchaseImport = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
+                                        <div className="flex items-center justify-end gap-2">
                                             <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -494,7 +494,7 @@ const PurchaseImport = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -565,17 +565,21 @@ const PurchaseImport = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={1}
-                                                            className="flex items-center w-fit mx-auto"
+                                                            className="flex items-center mx-auto w-fit"
                                                         >
-                                                            <div className="mx-auto">
-                                                                <PopupDetailThere
-                                                                    className="3xl:py-0 py-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] px-2 bg-gradient-to-br font-normal text-orange-500 bg-orange-200 items-center rounded-full shadow-2xl cursor-pointer hover:scale-105 transition duration-300 ease-out hover:bg-orange-500 hover:text-white"
-                                                                    name={e?.purchase_order_code}
-                                                                    dataLang={dataLang}
-                                                                    id={e?.purchase_order_id}
-                                                                    type={"typePo"}
-                                                                ></PopupDetailThere>
-                                                            </div>
+                                                            {
+                                                                e?.purchase_order_code && (
+                                                                    <div className="mx-auto">
+                                                                        <PopupDetailThere
+                                                                            className="3xl:py-0 py-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] px-2 bg-gradient-to-br font-normal text-orange-500 bg-orange-200 items-center rounded-full shadow-2xl cursor-pointer hover:scale-105 transition duration-300 ease-out hover:bg-orange-500 hover:text-white"
+                                                                            name={e?.purchase_order_code}
+                                                                            dataLang={dataLang}
+                                                                            id={e?.purchase_order_id}
+                                                                            type={"typePo"}
+                                                                        ></PopupDetailThere>
+                                                                    </div>
+                                                                )
+                                                            }
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatMoney(e.total_price)}
@@ -588,7 +592,7 @@ const PurchaseImport = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={2}
-                                                            className="flex items-center w-fit mx-auto"
+                                                            className="flex items-center mx-auto w-fit"
                                                         >
                                                             {(e?.status_pay === "not_spent" && (
                                                                 <TagColorSky name={"Chưa chi"} />
@@ -640,21 +644,21 @@ const PurchaseImport = (props) => {
                         <RowItemTable
                             colSpan={1}
                             textAlign={"right"}
-                            className="justify-end p-2 mr-1 flex gap-2 flex-wrap"
+                            className="flex flex-wrap justify-end gap-2 p-2 mr-1"
                         >
                             {formatNumber(data?.rTotal?.total_price)}
                         </RowItemTable>
                         <RowItemTable
                             colSpan={1}
                             textAlign={"right"}
-                            className="justify-end p-2 mr-1 flex gap-2 flex-wrap "
+                            className="flex flex-wrap justify-end gap-2 p-2 mr-1 "
                         >
                             {formatNumber(data?.rTotal?.total_tax_price)}
                         </RowItemTable>
                         <RowItemTable
                             colSpan={1}
                             textAlign={"right"}
-                            className="justify-end p-2 mr-1 flex gap-2 flex-wrap "
+                            className="flex flex-wrap justify-end gap-2 p-2 mr-1 "
                         >
                             {formatNumber(data?.rTotal?.total_amount)}
                         </RowItemTable>

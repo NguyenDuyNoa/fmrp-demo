@@ -4,7 +4,7 @@ import { Cd, SearchNormal1, TickCircle } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "react-tippy";
 import Popup from "reactjs-popup";
 import Loading from "./loading/loading";
@@ -12,6 +12,7 @@ import Zoom from "./zoomElement/zoomElement";
 import NoData from "./noData/nodata";
 import { useRouter } from "next/router";
 import HoverEffectButton from "../animations/button/HoverEffectButton";
+import PopupRequestUpdateVersion from "../common/popup/PopupRequestUpdateVersion";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -21,7 +22,10 @@ const deca = Lexend_Deca({
 const inter = Inter({ subsets: ["latin"] });
 
 export const Dropdown = (props) => {
+    const dispatch = useDispatch();
+
     const router = useRouter()
+
     const [open, sOpen] = useState(false);
 
     const { is_admin } = useSelector((state) => state.auth);
@@ -221,47 +225,72 @@ export const Dropdown = (props) => {
                                                 {ce.items?.map((e, i) => {
                                                     return (
                                                         <div key={i}>
-                                                            {is_admin ? (
-                                                                <Link
-                                                                    href={e.link ? e.link : "#"}
-                                                                    title={e.name}
-                                                                    className="outline-none"
-                                                                    key={i}
-                                                                >
-                                                                    <Zoom>
-                                                                        <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
-                                                                            {e?.name}
-                                                                        </li>
-                                                                    </Zoom>
-                                                                </Link>
-                                                            ) : e?.viewOwn == "1" || e?.view == "1" ? (
-                                                                <Link
-                                                                    href={e.link ? e.link : "#"}
-                                                                    title={e.name}
-                                                                    className="outline-none"
-                                                                    key={i}
-                                                                >
-                                                                    <Zoom>
-                                                                        <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
-                                                                            {e?.name}
-                                                                        </li>
-                                                                    </Zoom>
-                                                                </Link>
-                                                            ) : (
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() =>
-                                                                        showToat("warning", "Bạn không có quyền truy cập")
-                                                                    }
-                                                                    className="w-full text-left text-gray-100 outline-none cursor-not-allowed opacity-60"
-                                                                >
-                                                                    <Zoom>
-                                                                        <li className="cursor-not-allowed text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
-                                                                            {e?.name}
-                                                                        </li>
-                                                                    </Zoom>
-                                                                </button>
-                                                            )}
+                                                            {
+                                                                e?.role == '1'
+                                                                    ?
+                                                                    <Link
+                                                                        href={"#"}
+                                                                        title={e.name}
+                                                                        className="outline-none"
+                                                                        key={i}
+                                                                        onClick={() => {
+                                                                            dispatch({
+                                                                                type: "statePopupGlobal",
+                                                                                payload: {
+                                                                                    open: true,
+                                                                                    children: <PopupRequestUpdateVersion />
+                                                                                }
+                                                                            });
+                                                                        }}
+                                                                    >
+                                                                        <Zoom>
+                                                                            <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+                                                                                {e?.name}
+                                                                            </li>
+                                                                        </Zoom>
+                                                                    </Link>
+                                                                    :
+                                                                    is_admin ? (
+                                                                        <Link
+                                                                            href={e.link ? e.link : "#"}
+                                                                            title={e.name}
+                                                                            className="outline-none"
+                                                                            key={i}
+                                                                        >
+                                                                            <Zoom>
+                                                                                <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+                                                                                    {e?.name}
+                                                                                </li>
+                                                                            </Zoom>
+                                                                        </Link>
+                                                                    ) : e?.viewOwn == "1" || e?.view == "1" ? (
+                                                                        <Link
+                                                                            href={e.link ? e.link : "#"}
+                                                                            title={e.name}
+                                                                            className="outline-none"
+                                                                            key={i}
+                                                                        >
+                                                                            <Zoom>
+                                                                                <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+                                                                                    {e?.name}
+                                                                                </li>
+                                                                            </Zoom>
+                                                                        </Link>
+                                                                    ) : (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() =>
+                                                                                showToat("warning", "Bạn không có quyền truy cập")
+                                                                            }
+                                                                            className="w-full text-left text-gray-100 outline-none cursor-not-allowed opacity-60"
+                                                                        >
+                                                                            <Zoom>
+                                                                                <li className="cursor-not-allowed text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+                                                                                    {e?.name}
+                                                                                </li>
+                                                                            </Zoom>
+                                                                        </button>
+                                                                    )}
                                                         </div>
                                                     );
                                                 })}
@@ -273,8 +302,8 @@ export const Dropdown = (props) => {
                         }
                     </div>
                 </div>
-            </Popup>
-        </div>
+            </Popup >
+        </div >
     );
 };
 

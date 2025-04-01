@@ -44,6 +44,8 @@ import { useImportBySupplier } from "./hooks/useImportBySupplier";
 import { useImportItemByOrder } from "./hooks/useImportItemByOrder";
 import SelectItemComponent, { MenuListClickAll } from "@/components/UI/filterComponents/selectItemComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import { motion, AnimatePresence } from "framer-motion";
+
 
 const PurchaseImportForm = (props) => {
     const router = useRouter();
@@ -122,7 +124,7 @@ const PurchaseImportForm = (props) => {
 
     const { data: dataTasxes = [] } = useTaxList();
 
-    const { data: dataItems = [] } = useImportItemByOrder(id, idTheOrder);
+    const { data: dataItems = [] } = useImportItemByOrder(id, idTheOrder, idBranch);
 
     const { data: dataTheOrder = [] } = useImportBySupplier(idSupplier, id, searchOrder);
 
@@ -136,7 +138,7 @@ const PurchaseImportForm = (props) => {
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrSupplier(false);
-        router.query && sErrTheOrder(false);
+        // router.query && sErrTheOrder(false);
         router.query && sErrBranch(false);
         router.query && sErrSerial(false);
         router.query && sErrLot(false);
@@ -197,7 +199,7 @@ const PurchaseImportForm = (props) => {
             sCode(rResult?.code);
             sIdBranch({ label: rResult?.branch_name, value: rResult?.branch_id });
             sIdSupplier({ label: rResult?.supplier_name, value: rResult?.supplier_id, });
-            sIdTheOrder({ label: rResult?.purchase_order_code, value: rResult?.purchase_order_id, });
+            sIdTheOrder(rResult?.purchase_order_id ? { label: rResult?.purchase_order_code, value: rResult?.purchase_order_id, } : null);
             sStartDate(moment(rResult?.date).toDate());
             sNote(rResult?.note);
             return rResult
@@ -365,7 +367,7 @@ const PurchaseImportForm = (props) => {
         if (
             idSupplier == null ||
             idBranch == null ||
-            idTheOrder == null ||
+            // idTheOrder == null ||
             hasNullWarehouse ||
             (dataProductSerial?.is_enable == "1" && hasNullSerial) ||
             ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullLot) ||
@@ -373,7 +375,7 @@ const PurchaseImportForm = (props) => {
         ) {
             idSupplier == null && sErrSupplier(true);
             idBranch == null && sErrBranch(true);
-            idTheOrder == null && sErrTheOrder(true);
+            // idTheOrder == null && sErrTheOrder(true);
             hasNullWarehouse && sErrWarehouse(true);
             hasNullLot && sErrLot(true);
             hasNullSerial && sErrSerial(true);
@@ -399,9 +401,9 @@ const PurchaseImportForm = (props) => {
         sErrBranch(false);
     }, [idBranch != null]);
 
-    useEffect(() => {
-        sErrTheOrder(false);
-    }, [idTheOrder != null]);
+    // useEffect(() => {
+    //     sErrTheOrder(false);
+    // }, [idTheOrder != null]);
 
     const options = dataItems?.map((e) => ({
         label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
@@ -553,7 +555,7 @@ const PurchaseImportForm = (props) => {
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch.value);
         formData.append("suppliers_id", idSupplier.value);
-        formData.append("id_order", idTheOrder.value);
+        formData.append("id_order", idTheOrder?.value ? idTheOrder?.value : "");
         formData.append("warehouse_id", idSurplusWarehouse?.value ?? "");
         formData.append("note", note);
         listData.forEach((item, index) => {
@@ -588,7 +590,7 @@ const PurchaseImportForm = (props) => {
                     sNote("");
                     sErrBranch(false);
                     sErrDate(false);
-                    sErrTheOrder(false);
+                    // sErrTheOrder(false);
                     sErrSupplier(false);
                     sListData([]);
                     router.push(routerImport.home);
@@ -966,6 +968,28 @@ const PurchaseImportForm = (props) => {
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_the_orders || "import_the_orders"}{" "}
+                                    </label>
+                                    <SelectComponent
+                                        onInputChange={(event) => {
+                                            _HandleSeachApi(event)
+                                        }}
+                                        options={dataTheOrder}
+                                        onChange={_HandleChangeInput.bind(this, "theorder")}
+                                        value={idTheOrder}
+                                        isClearable={true}
+                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={dataLang?.import_the_orders || "import_the_orders"}
+                                        className={`border-transparent placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        type="form"
+                                    />
+
+                                </div>
+                                {/* <div className="col-span-2 ">
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {dataLang?.import_the_orders || "import_the_orders"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <SelectComponent
@@ -989,36 +1013,50 @@ const PurchaseImportForm = (props) => {
                                             {dataLang?.import_err_theorder || "import_err_theorder"}
                                         </label>
                                     )}
-                                </div>
-                                <div className="col-span-2 ">
-                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {"Chọn kho nhập dư (nếu có)"}
-                                    </label>
-                                    <SelectComponent
-                                        onChange={_HandleChangeInput.bind(this, "idSurplusWarehouse")}
-                                        value={idSurplusWarehouse}
-                                        formatOptionLabel={(option) => (
-                                            <div className="z-20">
-                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                    {dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}
-                                                </h2>
-                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                    {dataLang?.import_Warehouse_location || "import_Warehouse_ocation"}:{" "}
-                                                    {option?.label}
-                                                </h2>
+                                </div> */}
+                                <AnimatePresence mode="wait">
+                                    {idTheOrder && (
+                                        <motion.div
+                                            key="select-animate"
+                                            initial={{ scaleX: 0, opacity: 0 }}
+                                            animate={{ scaleX: 1, opacity: 1 }}
+                                            exit={{ scaleX: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                            className="col-span-2 origin-left"
+                                        >
+                                            <div className="w-full">
+                                                <label className="text-[#344054] font-normal text-sm mb-1">
+                                                    {"Chọn kho nhập dư (nếu có)"}
+                                                </label>
+
+                                                <SelectComponent
+                                                    onChange={_HandleChangeInput.bind(this, "idSurplusWarehouse")}
+                                                    value={idSurplusWarehouse}
+                                                    formatOptionLabel={(option) => (
+                                                        <div className="z-20">
+                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                {dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}
+                                                            </h2>
+                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                {dataLang?.import_Warehouse_location || "import_Warehouse_location"}: {option?.label}
+                                                            </h2>
+                                                        </div>
+                                                    )}
+                                                    options={dataWarehouse}
+                                                    hideSelectedOptions={false}
+                                                    isClearable
+                                                    placeholder={"Chọn kho nhập dư"}
+                                                    classNamePrefix="surplusWarehouse"
+                                                    className={`border-transparent placeholder:text-slate-300 textt-[8px] w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border`}
+                                                    isSearchable={true}
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                                    type="form"
+                                                />
                                             </div>
-                                        )}
-                                        options={dataWarehouse}
-                                        hideSelectedOptions={false}
-                                        isClearable
-                                        placeholder={"Chọn kho nhập dư"}
-                                        classNamePrefix="surplusWarehouse"
-                                        className={` border-transparent placeholder:text-slate-300 textt-[8px] w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                        isSearchable={true}
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        type="form"
-                                    />
-                                </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
                             </div>
                         </div>
                     </div>

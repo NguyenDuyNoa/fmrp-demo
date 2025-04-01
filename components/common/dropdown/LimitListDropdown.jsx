@@ -9,7 +9,7 @@ const LimitListDropdown = ({ sLimit, limit, dataLang, total }) => {
     const dropdownRef = useRef(null);
     const buttonRef = useRef(null);
 
-    const data = [5, 10, 15, 20, 40, 60];
+    const data = [1,3, 5, 10, 15, 20, 40, 60];
 
     if (dataSeting?.tables_pagination_limit && !data.includes(+dataSeting.tables_pagination_limit)) {
         data.push(+dataSeting.tables_pagination_limit);

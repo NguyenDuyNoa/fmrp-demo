@@ -3,7 +3,7 @@ import ProductionSteps from '../ui/ProductionStep'
 import { useItemOrderDetail } from '@/managers/api/productions-order/useItemOrderDetail'
 import { useSheet } from '@/context/ui/SheetContext'
 import { useRouter } from 'next/router'
-import { useQueryClient } from '@tanstack/react-query'
+import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
 // import ProductionSteps2 from '../ui/ProductionStep2'
 import useSetingServer from '@/hooks/useConfigNumber'
@@ -11,6 +11,9 @@ import useSetingServer from '@/hooks/useConfigNumber'
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ProgressCircle from '../ui/ProgressCircle'
 import LimitListDropdown from '@/components/common/dropdown/LimitListDropdown'
+import NoData from '@/components/UI/noData/nodata'
+import Loading from '@/components/UI/loading/loading'
+import ModalImage from 'react-modal-image'
 
 
 const dataFakeItem = [
@@ -544,6 +547,7 @@ const TabInformation = () => {
     const queryClient = useQueryClient()
 
     const dataItemOrderDetail = queryClient?.getQueryData(["apiItemOrdersDetail", poiId])
+    const isFetchingItemOrderDetail = useIsFetching({ queryKey: ['apiItemOrdersDetail', poiId] }) > 0;
 
     const dataSeting = useSetingServer();
     const formatNumber = useCallback((num) => formatNumberConfig(+num, dataSeting), [dataSeting]);
@@ -634,103 +638,110 @@ const TabInformation = () => {
                     </div>
 
                     {/* body */}
-                    {
-                        dataItemOrderDetail && dataItemOrderDetail?.items_semi && dataItemOrderDetail?.items_semi?.slice(0, limit)?.map((product, index) => (
-                            <div
-                                key={`product-${index}`}
-                                // onClick={() => handleShowModel(product)}
-                                className={`col-span-16 grid grid-cols-16 gap-2 items-start group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out 3xl:py-4 py-2`}
-                            >
-                                <h4 className="col-span-1 text-center text-[#141522] font-semibold text-sm-dêfault uppercase">
-                                    {index + 1 ?? "-"}
-                                </h4>
-
-                                <h4 className="col-span-4 text-[#344054] font-normal flex items-start gap-2">
-                                    <div className="2xl:size-10 size-8 shrink-0">
-                                        <Image
-                                            alt={product?.name ?? "img"}
-                                            width={200}
-                                            height={200}
-                                            src={product?.images ?? "/icon/default/default.png"}
-                                            className="size-full object-cover rounded-md"
-                                        />
-                                    </div>
-
-                                    <div className="flex flex-col 3xl:gap-1 gap-0.5">
-                                        <p className={`font-semibold text-sm-default text-[#141522] group-hover:text-[#0F4F9E]`}>
-                                            {product.item_name}
-                                        </p>
-
-                                        <p className="text-[#667085] font-normal xl:text-[10px] text-[8px]">
-                                            {product.product_variation}
-                                        </p>
-
-                                        <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
-                                            {product.item_code}
-                                        </p>
-                                    </div>
-                                </h4>
-
-                                <h4 className="col-span-2 text-start text-[#141522] font-semibold text-sm-default">
-                                    {product?.unit_name ?? ""}
-                                </h4>
-
-                                <h4 className="col-span-1 text-center text-[#141522] font-semibold text-sm-default">
-                                    {+product.quantity_need_manufactures > 0 ? formatNumber(+product.quantity_need_manufactures) : "-"}
-                                </h4>
-
-                                <h4 className="col-span-2 text-center text-[#141522] font-semibold text-sm-default">
-                                    {+product.quantity_keep > 0 ? formatNumber(+product.quantity_keep) : "-"}
-                                </h4>
-
-                                <h4 className="col-span-2 text-center text-[#141522] font-semibold text-sm-default">
-                                    {+product.quantity_stage > 0 ? formatNumber(+product.quantity_stage) : "-"}
-                                </h4>
-
-                                <h4 className="col-span-4 flex items-center justify-center text-xs-default">
-                                    <ProgressCircle
-                                        title={product?.stage_name_active ?? ""}
-                                        step={product?.count_stage_active}
-                                        total={product?.count_stage}
-                                        quantity={product?.quantity_stage}
-                                        stages={stages}
-                                    />
-                                </h4>
-                            </div>
-                        ))
-                    }
-                    {/* load more click */}
-                    <div className='col-span-16 flex item justify-between'>
-                        <div />
+                    <div className='col-span-16 grid grid-cols-16 min-h-[240px]'>
                         {
-                            // (dataItemOrderDetail?.items_semi?.length || 0) > (visibleProducts["info"] || 4) && (
-                            (limit < dataItemOrderDetail?.items_semi.length) && (
-                                <div className=" flex justify-center py-2">
-                                    <button onClick={() => setLimit(dataItemOrderDetail?.items_semi.length)} className="text-[#667085] 3xl:text-base text-sm hover:underline">
-                                        Xem thêm ({dataItemOrderDetail?.items_semi.length - limit}) Thành phẩm
-                                    </button>
-                                </div>
-                            )
-                        }
+                            isFetchingItemOrderDetail
+                                ?
+                                <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full col-span-16' />
+                                :
+                                (
+                                    dataItemOrderDetail && dataItemOrderDetail?.items_semi?.length > 0 ?
+                                        (
+                                            dataItemOrderDetail?.items_semi?.slice(0, limit)?.map((product, index) => (
+                                                <div
+                                                    key={`product-${index}`}
+                                                    // onClick={() => handleShowModel(product)}
+                                                    className={`col-span-16 grid grid-cols-16 gap-2 items-start group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out 3xl:py-4 py-2`}
+                                                >
+                                                    <h4 className="col-span-1 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default uppercase">
+                                                        {index + 1 ?? "-"}
+                                                    </h4>
 
-                        {/* <LimitListDropdown
-                            limit={isStateProvider?.productionsOrders.limit}
-                            sLimit={(value) => queryStateProvider({
-                                productionsOrders: {
-                                    ...isStateProvider?.productionsOrders,
-                                    limit: value,
-                                    page: 1
+                                                    <h4 className="col-span-4 flex items-center size-full text-[#344054] font-normal gap-2">
+                                                        <ModalImage
+                                                            small={product?.images && product?.images !== "" ? product?.images : '/icon/default/default.png'}
+                                                            large={product?.images && product?.images !== "" ? product?.images : '/icon/default/default.png'}
+                                                            width={200}
+                                                            height={200}
+                                                            alt={product?.name ?? "image"}
+                                                            className={`2xl:size-10 2xl:min-w-10 size-8 min-w-8 object-cover rounded-md shrink-0`}
+                                                        />
+
+                                                        <div className="flex flex-col 3xl:gap-1 gap-0.5">
+                                                            <p className={`font-semibold text-sm-default text-[#141522] group-hover:text-[#0F4F9E]`}>
+                                                                {product.item_name}
+                                                            </p>
+
+                                                            <p className="text-[#667085] font-normal xl:text-[10px] text-[8px]">
+                                                                {product.product_variation}
+                                                            </p>
+
+                                                            <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
+                                                                {product.item_code}
+                                                            </p>
+                                                        </div>
+                                                    </h4>
+
+                                                    <h4 className="col-span-2 flex items-center size-full text-start text-[#141522] font-semibold text-sm-default">
+                                                        {product?.unit_name ?? ""}
+                                                    </h4>
+
+                                                    <h4 className="col-span-1 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default">
+                                                        {+product.quantity_need_manufactures > 0 ? formatNumber(+product.quantity_need_manufactures) : "-"}
+                                                    </h4>
+
+                                                    <h4 className="col-span-2 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default">
+                                                        {+product.quantity_keep > 0 ? formatNumber(+product.quantity_keep) : "-"}
+                                                    </h4>
+
+                                                    <h4 className="col-span-2 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default">
+                                                        {+product.quantity_stage > 0 ? formatNumber(+product.quantity_stage) : "-"}
+                                                    </h4>
+
+                                                    <ProgressCircle
+                                                        title={product?.stage_name_active ?? ""}
+                                                        step={product?.count_stage_active}
+                                                        total={product?.count_stage}
+                                                        quantity={product?.quantity_stage}
+                                                        stages={stages}
+                                                        className="col-span-4 flex items-center justify-center size-full text-xs-default"
+                                                    />
+                                                </div>
+                                            ))
+                                        )
+                                        :
+                                        (
+                                            <NoData
+                                                className="mt-0 col-span-16"
+                                                type="table"
+                                            />
+                                        )
+                                )
+                        }
+                        {/* load more click */}
+                        {
+                            dataItemOrderDetail?.items_semi?.length > 0 &&
+                            <div className='col-span-16 flex item justify-between'>
+                                <div />
+                                {
+                                    // (dataItemOrderDetail?.items_semi?.length || 0) > (visibleProducts["info"] || 4) && (
+                                    (limit < dataItemOrderDetail?.items_semi.length) && (
+                                        <div className=" flex justify-center py-2">
+                                            <button onClick={() => setLimit(dataItemOrderDetail?.items_semi.length)} className="text-[#667085] 3xl:text-base text-sm hover:underline">
+                                                Xem thêm ({dataItemOrderDetail?.items_semi.length - limit}) Thành phẩm
+                                            </button>
+                                        </div>
+                                    )
                                 }
-                            })}
-                            dataLang={dataLang}
-                            total={isStateProvider?.productionsOrders?.countAll}
-                        /> */}
-                        <LimitListDropdown
-                            limit={limit}
-                            sLimit={(value) => setLimit(value)}
-                            dataLang={{ display: "Hiển thị", on: "trên", lsx: "BTP" }}
-                            total={dataItemOrderDetail?.items_semi.length}
-                        />
+
+                                <LimitListDropdown
+                                    limit={limit}
+                                    sLimit={(value) => setLimit(value)}
+                                    dataLang={{ display: "Hiển thị", on: "trên", lsx: "BTP" }}
+                                    total={dataItemOrderDetail?.items_semi.length}
+                                />
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

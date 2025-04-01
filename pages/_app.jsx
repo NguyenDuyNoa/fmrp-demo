@@ -37,10 +37,6 @@ const queryClient = new QueryClient({
 });
 
 const Index = (props) => {
-    console.log('props props', props);
-
-
-
     return (
         <React.Fragment>
             <QueryClientProvider client={queryClient}>
@@ -67,31 +63,34 @@ const Index = (props) => {
 };
 
 function MainPage({ Component, pageProps }) {
+    const router = useRouter()
+
     const dispatch = useDispatch();
 
     const { isOpen: isOpenSheet, closeSheet: closeSheet } = useSheet()
-    const router = useRouter()
 
     const tokenFMRP = CookieCore.get('tokenFMRP')
 
     const databaseappFMRP = CookieCore.get('databaseappFMRP')
-
+    // gọi api seting để lấy data seting theo server config
     const { data: dataSeting } = useSetings()
-
+    // lấy phân quyền
     const auth = useSelector((state) => state.auth);
 
+    // api dữ liệu user
     const { data: dataAuth, isLoading } = useAuththentication(auth)
-
+    // state để quản lý popup ai trong danh sách thành phẩm
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
     const statePopupParent = useSelector((state) => state?.popupParent);
-
+    // lấy data lang mặc định
     const langDefault = useSelector((state) => state.lang);
-
+    // lấy dữ liệu data lang của sserver
     const { data } = useLanguage(langDefault)
-
+    // state quản lý popup perview image
     const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
 
+    // xử lý các dom dựa theo  statePopupPreviewImage.open
     useEffect(() => {
 
         const parentDatepicker = document.querySelector(".parentDatepicker");
@@ -127,12 +126,13 @@ function MainPage({ Component, pageProps }) {
         };
     }, [router.pathname, statePopupPreviewImage.open]);
 
-
+    // lấy lang mặc định trong local
     useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
 
+    // bỏ scoroll của thư viện khi mở popup chat ai
     useEffect(() => {
         const scroll = document.querySelector('.simplebar-mask')
         if (stateBoxChatAi.open && scroll) {
@@ -145,6 +145,7 @@ function MainPage({ Component, pageProps }) {
         return <LoadingPage />;
     }
 
+    // 2 page này code cho moblie 
     if (router.pathname == '/manufacture/productions-orders-mobile' || router.pathname == '/manufacture/production-plan-mobile') {
 
         return <Customscrollbar className="relative max-h-screen ">
@@ -154,6 +155,7 @@ function MainPage({ Component, pageProps }) {
         </Customscrollbar>
     }
 
+    // kiểm tra login
     if (!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) {
         if (router.pathname == '/auth/register') {
 
@@ -178,8 +180,7 @@ function MainPage({ Component, pageProps }) {
         <Customscrollbar className="relative h-screen text-customize">
             <Layout dataLang={data}>
                 <Component dataLang={data} {...pageProps} />
-
-                <ReusableSheet dataLang={data}/>
+                <ReusableSheet dataLang={data} />
             </Layout>
         </Customscrollbar>
     );
