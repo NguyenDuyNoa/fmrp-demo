@@ -8,7 +8,7 @@ export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
       ref={ref}
       className={`${className} overflow-x-auto h-fit demo4 simplebar-scrollable-x`}
       scrollableNodePropsClassName="[&>div]:flex [&>div]:items-center [&>div]:justify-start [&>div]:space-x-3 h-fit"
-      // className="flex items-center justify-start overflow-hidden overflow-y-hidden 2xl:space-x-3 lg:space-x-3 h-fit scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
+    // className="flex items-center justify-start overflow-hidden overflow-y-hidden 2xl:space-x-3 lg:space-x-3 h-fit scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
     >
       {children}
     </Customscrollbar>
@@ -40,24 +40,15 @@ export const ContainerBody = ({ children }) => {
 export const ContainerTotal = ({ children, className }) => {
   return (
     <div
-      className={`${
-        className ? className : ""
-      } grid grid-cols-12 bg-gray-100 items-center`}
+      className={`${className ? className : ""
+        } grid grid-cols-12 bg-gray-100 items-center`}
     >
       {children}
     </div>
   );
 };
 export const ContainerTable = ({ children }) => {
-<<<<<<< HEAD
-    return (
-        <div className="space-y-2 3xl:h-[90%] 2xl:h-[84%] xl:h-[84%] lg:h-[86%] overflow-auto">
-            {children}
-        </div>
-    )
-}
-=======
-  return <div className="h-full w-full">{children}</div>;
+  return <div className="w-full h-full">{children}</div>;
 };
 
 export const LayOutTableDynamic = ({
@@ -83,7 +74,7 @@ export const LayOutTableDynamic = ({
                 <ContainerFilterTab>{fillterTab}</ContainerFilterTab>
               </div>
             )}
-            <div className="flex-1 min-h-0 flex flex-col  overflow-hidden">
+            <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
               <ContainerTable className="flex-1 min-h-0 overflow-hidden">
                 {table}
               </ContainerTable>
@@ -96,4 +87,3 @@ export const LayOutTableDynamic = ({
     </>
   );
 };
->>>>>>> 49a45e86b7098fe0a62fcf51d6342a9bcff5edd3
