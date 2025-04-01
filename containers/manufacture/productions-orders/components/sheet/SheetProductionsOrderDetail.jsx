@@ -23,19 +23,22 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { PiImage, PiPaperclip, PiPaperPlaneRightFill, PiSmiley, PiTextAa } from "react-icons/pi";
 import { variantButtonScaleZoom } from "@/utils/animations/variantsAnimation";
 import TabInformation from "../tab/TabInformation";
+import TabMaterialIssueHistory from "../tab/TabMaterialIssueHistory";
+import TabFGReceiptHistory from "../tab/TabFGReceiptHistory";
+import TabMaterialReturn from "../tab/TabMaterialReturn";
+import TabMaterialCost from "../tab/TabMaterialCost";
 
 const initialState = {
     isTab: 1,
     dataDetail: {},
 };
 
-const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, typePageMoblie }) => {
+const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     const router = useRouter()
 
     const poiId = useMemo(() => router.query.poi_id, [router.query.poi_id])
-    const tabModal = useMemo(() => router.query.tabModal, [router.query])
 
-    console.log('tabModal', tabModal);
+    const [scrollHeight, setScrollHeight] = useState(0);
 
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
@@ -46,7 +49,7 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
     const { isOpen: isOpenSheet, closeSheet } = useSheet()
 
     const { heightMapRef, calcHeights } = useMultiAvailableHeightRef();
-    const { data: dataItemOrderDetail, isLoading: isLoadingItemOrderDetail } = useItemOrderDetail({ poi_id: poiId, enabled: isOpenSheet && !!poiId })
+    const { data: dataItemOrderDetail, isLoading: isLoadingItemOrderDetail } = useItemOrderDetail({ poi_id: isStateProvider?.productionsOrders?.poiId, enabled: isOpenSheet && !!isStateProvider?.productionsOrders?.poiId })
 
     const listTab = [
         {
@@ -82,12 +85,51 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
         },
     ];
 
-    useEffect(() => {
-        if (router.pathname !== "/manufacture/productions-orders") {
-            closeSheet()
-        }
-    }, [router])
+    // useEffect(() => {
+    //     const handleResize = () => {
+    //         calcHeights({
+    //             main: {
+    //                 refs: [titleSheetRef, commentSheetRef],
+    //                 subtract: 84 + 24,
+    //             },
+    //             submain: {
+    //                 refs: [titleSheetRef],
+    //                 subtract: 84 + 34,
+    //             },
+    //         });
+    //     };
 
+    //     handleResize();
+    //     window.addEventListener('resize', handleResize);
+    //     return () => window.removeEventListener('resize', handleResize);
+    // }, [isOpenSheet, calcHeights, isStateProvider?.productionsOrders?.isTabSheet?.id]);
+
+    // useEffect(() => {
+    //     const handleResize = () => {
+    //         calcHeights({
+    //             main: {
+    //                 refs: [titleSheetRef, commentSheetRef],
+    //                 subtract: 84 + 24,
+    //             },
+    //             submain: {
+    //                 refs: [titleSheetRef],
+    //                 subtract: 84 + 34,
+    //             },
+    //         });
+    //     };
+
+    //     // delay 1 frame để chờ DOM cập nhật xong khi chuyển tab
+    //     const animationFrame = requestAnimationFrame(() => {
+    //         handleResize();
+    //     });
+
+    //     window.addEventListener('resize', handleResize);
+
+    //     return () => {
+    //         cancelAnimationFrame(animationFrame);
+    //         window.removeEventListener('resize', handleResize);
+    //     };
+    // }, [isOpenSheet, calcHeights, isStateProvider?.productionsOrders?.isTabSheet?.id]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -101,37 +143,39 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
                     subtract: 84 + 34,
                 },
             });
+
+            // cập nhật scrollHeight sau 1 frame (DOM đã render)
+            requestAnimationFrame(() => {
+                const isTab1 = isStateProvider?.productionsOrders?.isTabSheet?.id === 1;
+                const newHeight = isTab1 ? heightMapRef.current.main : heightMapRef.current.submain;
+                setScrollHeight(newHeight);
+            });
         };
 
         handleResize();
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, [isOpenSheet, calcHeights]);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [isOpenSheet, calcHeights, isStateProvider?.productionsOrders?.isTabSheet?.id]);
 
     const components = {
-        1: <TabInformation />,
+        1: <TabInformation dataLang={dataLang} {...props} />,
         2: <>Hello</>,
-        3: <TabInformation />,
-        4: <TabInformation />,
-        5: <TabInformation />,
-        6: <TabInformation />,
-        // 2: <TabExportSituation {...shareProps} />,
-        // 3: <TabExportHistory {...shareProps} />,
-        // 4: <TabWarehouseHistory {...shareProps} />,
-        // 5: <TabRecallMaterials {...shareProps} />,
-        // 6: <TabProcessingCost {...shareProps} />,
+        3: <TabMaterialIssueHistory dataLang={dataLang} {...props} />,
+        4: <TabFGReceiptHistory dataLang={dataLang} {...props} />,
+        5: <TabMaterialReturn dataLang={dataLang} {...props} />,
+        6: <TabMaterialCost dataLang={dataLang} {...props} />,
     };
-
-    // console.log('isStateProvider', isStateProvider);
-    // console.log('titleSheetRef', titleSheetRef);
+    // 2: <TabExportSituation {...shareProps} />,
+    // 3: <TabExportHistory {...shareProps} />,
+    // 4: <TabWarehouseHistory {...shareProps} />,
+    // 5: <TabRecallMaterials {...shareProps} />,
+    // 6: <TabProcessingCost {...shareProps} />,
 
     console.log('dataItemOrderDetail', dataItemOrderDetail);
     console.log('isLoadingItemOrderDetail', isLoadingItemOrderDetail);
-
-    // useEffect(() => {
-    //   if(router.)
-    // }, [third])
-
 
     const formatMoney = (number) => {
         if (typeof number == "string") {
@@ -145,36 +189,36 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
     const handleCloseSheet = () => {
         closeSheet(false)
 
-        router.push("/manufacture/productions-orders?tabModal=1")
+        router.push("/manufacture/productions-orders")
     }
 
     const handleActiveTab = (value, type) => {
-        if (type === "detail_sheet") {
-            if (router.query.tab) {
-                router.push({
-                    pathname: router.route,
-                    query: { ...router.query, tabModal: value.id, tab: router.query.tab },
-                });
-            } else {
-                router.push({
-                    pathname: router.route,
-                    query: { ...router.query, tabModal: value.id },
-                });
+        if (type !== "detail_sheet") return;
+
+        const currentTabId = isStateProvider?.productionsOrders?.isTabSheet?.id;
+        const newTabId = value?.id;
+
+        // Nếu đang ở đúng tab → không làm gì cả
+        if (currentTabId === newTabId) return;
+
+        // Cập nhật state
+        queryStateProvider({
+            productionsOrders: {
+                ...isStateProvider?.productionsOrders,
+                isTabSheet: value,
             }
-
-            queryStateProvider({
-                productionsOrders: {
-                    ...isStateProvider?.productionsOrders,
-                    isTabSheet: value
-                }
-            });
-
-        }
+        });
     };
 
     return (
-        <div className="flex flex-col gap-2 px-6 py-3 overflow-auto">
-            <div ref={titleSheetRef} className='flex items-center justify-between'>
+        <div className="flex flex-col gap-2 pl-6 pr-2 py-3 overflow-hidden">
+            <div
+                ref={titleSheetRef}
+                className='pr-4 flex items-center justify-between'
+            // style={{
+            //     WebkitMaskImage: "linear-gradient(0deg, rgba(249, 251, 252, 0.00) 1%, #F9FBFC 10%)"
+            // }}
+            >
                 <h1 className='text-title-default font-bold text-[#11315B]'>
                     Chi tiết lệnh sản xuất
                 </h1>
@@ -225,12 +269,17 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
 
             <Customscrollbar
                 className='overflow-auto'
+                // style={{
+                //     height: `${isStateProvider?.productionsOrders?.isTabSheet?.id == 1 ? heightMapRef.current.main : heightMapRef.current?.submain}px`,
+                //     maxHeight: `${isStateProvider?.productionsOrders?.isTabSheet?.id == 1 ? heightMapRef.current.main : heightMapRef.current?.submain}px`
+                // }}
                 style={{
-                    height: `${heightMapRef.current.main}px`,
-                    maxHeight: `${heightMapRef.current.main}px`
+                    height: `${scrollHeight}px`,
+                    maxHeight: `${scrollHeight}px`,
                 }}
+
             >
-                <div className='flex flex-col 3xl:gap-6 gap-4'>
+                <div className='flex flex-col 3xl:gap-6 gap-4 pr-4'>
                     {/* Information */}
                     <div className="flex flex-col gap-6 w-full border border-[#D0D5DD] rounded-2xl bg-white px-8 py-6">
                         <h2 className="text-title-small text-[#11315B] font-medium capitalize">
@@ -240,28 +289,28 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
                         <div className={`grid grid-cols-2`}>
                             <div className="flex flex-col col-span-1 w-full gap-1">
                                 <div className={`flex items-center gap-1`}>
-                                    <h3 className={`text-default text-[#3A3E4C] font-light min-w-[170px]`}>
+                                    <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}:
                                     </h3>
-                                    <h3 className={`text-default font-medium text-[#0375F3]`}>
+                                    <h3 className={`text-base-default font-medium text-[#0375F3]`}>
                                         {dataItemOrderDetail?.poi?.reference_no_detail ?? ""}
                                     </h3>
                                 </div>
 
                                 <div className={`flex items-center gap-1`}>
-                                    <h3 className={`text-default text-[#3A3E4C] font-light min-w-[170px]`}>
+                                    <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_number || 'productions_orders_details_number'}:
                                     </h3>
-                                    <h3 className={`text-default font-medium text-[#141522]`}>
+                                    <h3 className={`text-base-default font-medium text-[#141522]`}>
                                         {dataItemOrderDetail?.poi?.reference_no_po ?? ""}
                                     </h3>
                                 </div>
 
                                 <div className={`flex items-center col-span-3 gap-1`}>
-                                    <h3 className={`text-default text-[#3A3E4C] font-light min-w-[170px]`}>
+                                    <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_plan || 'productions_orders_details_plan'}:
                                     </h3>
-                                    <h3 className={`text-default font-medium text-[#141522]`}>
+                                    <h3 className={`text-base-default font-medium text-[#141522]`}>
                                         {dataItemOrderDetail?.poi?.reference_no_pp ?? ""}
                                     </h3>
                                 </div>
@@ -270,29 +319,29 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
 
                             <div className="flex flex-col col-span-1 gap-1">
                                 <div className={`flex items-center col-span-3 gap-1`}>
-                                    <h3 className={`text-default text-[#3A3E4C] font-light min-w-[170px]`}>{dataLang?.productions_orders_details_orders || 'productions_orders_details_orders'}:</h3>
-                                    <h3 className={`text-default font-medium text-[#141522]`}>
+                                    <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>{dataLang?.productions_orders_details_orders || 'productions_orders_details_orders'}:</h3>
+                                    <h3 className={`text-base-default font-medium text-[#141522]`}>
                                         {dataItemOrderDetail?.poi?.object?.reference_no}
                                     </h3>
                                 </div>
 
                                 <div className={`flex items-center col-span-3 gap-1`}>
-                                    <h3 className={`text-default text-[#3A3E4C] font-light min-w-[170px]`}>
+                                    <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_client || 'productions_orders_details_client'}:
                                     </h3>
-                                    <h3 className={`text-default font-medium text-[#141522]`}>
+                                    <h3 className={`text-base-default font-medium text-[#141522]`}>
                                         {dataItemOrderDetail?.poi?.object?.company ?? ""}
                                     </h3>
                                 </div>
 
                                 <div className={`flex items-center gap-1`}>
-                                    <h3 className={`text-default text-[#3A3E4C] font-light min-w-[170px]`}>
+                                    <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}:
                                     </h3>
                                     {/* <TagBranch className="w-fit">
                                     {dataItemOrderDetail?.poi?.branch_name}
                                     </TagBranch> */}
-                                    <h3 className={`text-default font-medium text-[#141522]`}>
+                                    <h3 className={`text-base-default font-medium text-[#141522]`}>
                                         {dataItemOrderDetail?.poi?.branch_name}
                                     </h3>
                                 </div>
@@ -354,34 +403,37 @@ const SheetProductionsOrderDetail = memo(({ refetchProductionsOrders, dataLang, 
                         <div className="w-full my-2">{components[isStateProvider?.productionsOrders?.isTabSheet?.id]}</div>
                     </div>
                 </div>
-            </Customscrollbar >
+            </Customscrollbar>
 
-            <div ref={commentSheetRef} className="mt-1 w-full border border-[#9295A4] rounded-xl flex items-center px-4 py-3 gap-3">
-                <input
-                    className="flex-1 text-sm-default text-[#344054] placeholder:!text-[#667085] focus:outline-none"
-                    placeholder="Thêm bình luận"
-                // value={comment}
-                // onChange={(e) => setComment(e.target.value)}
-                />
-                <div className="flex items-center gap-3 text-[#3A3E4C]">
-                    <PiSmiley className='size-5 shrink-0 cursor-pointer' />
-                    <PiTextAa className='size-5 shrink-0 cursor-pointer' />
-                    <PiPaperclip className='size-5 shrink-0 cursor-pointer' />
-                    <PiImage className='size-5 shrink-0 cursor-pointer' />
+            {
+                isStateProvider?.productionsOrders?.isTabSheet?.id == 1 &&
+                <div ref={commentSheetRef} className="mt-1 w-full border border-[#9295A4] rounded-xl flex items-center px-4 py-3 gap-3">
+                    <input
+                        className="flex-1 text-sm-default text-[#344054] placeholder:!text-[#667085] focus:outline-none"
+                        placeholder="Thêm bình luận"
+                    // value={comment}
+                    // onChange={(e) => setComment(e.target.value)}
+                    />
+                    <div className="flex items-center gap-3 text-[#3A3E4C]">
+                        <PiSmiley className='size-5 shrink-0 cursor-pointer' />
+                        <PiTextAa className='size-5 shrink-0 cursor-pointer' />
+                        <PiPaperclip className='size-5 shrink-0 cursor-pointer' />
+                        <PiImage className='size-5 shrink-0 cursor-pointer' />
+                    </div>
+
+                    <div className='w-[1px] h-4 bg-[#1F2329]/15' />
+
+                    <ButtonAnimationNew
+                        icon={
+                            <PiPaperPlaneRightFill className='size-5 shrink-0' />
+                        }
+                        hideTitle={true}
+                        disabled={false}
+                        variant={variantButtonScaleZoom}
+                        className='text-[#0375F3] hover:text-[#0375F3]/90 disabled:!text-[#667085] disabled:bg-transparent'
+                    />
                 </div>
-
-                <div className='w-[1px] h-4 bg-[#1F2329]/15' />
-
-                <ButtonAnimationNew
-                    icon={
-                        <PiPaperPlaneRightFill className='size-5 shrink-0' />
-                    }
-                    hideTitle={true}
-                    disabled={false}
-                    variant={variantButtonScaleZoom}
-                    className='text-[#0375F3] hover:text-[#0375F3]/90 disabled:!text-[#667085] disabled:bg-transparent'
-                />
-            </div>
+            }
         </div >
     );
 });

@@ -31,24 +31,32 @@ const apiProductionsOrders = {
         return response.data
     },
     // lịch sử xuất NVL/BTP
-    async apiGetSuggestExporting(data) {
-        const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/getSuggestExporting`, data);
+    // async apiGetSuggestExporting(data) {
+    //     const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/getSuggestExporting?page=${page}&limit=${limit}`, data);
+    //     return response.data
+    // },
+    async apiGetSuggestExporting({ page = 1, limit = 3 }, data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/getItems?page=${page}&limit=${limit}`, data);
         return response.data
     },
 
     //  lịch sử nhập kho tp
-    async apiGetPurchaseProducts(data) {
-        const response = await axiosCustom('POST', `/api_web/Api_Purchase_Products/getPurchaseProducts`, data);
+    // async apiGetPurchaseProducts(data) {
+    //     const response = await axiosCustom('POST', `/api_web/Api_Purchase_Products/getPurchaseProducts`, data);
+    //     return response.data
+    // },
+    async apiGetPurchaseProducts({ page = 1, limit = 3 }, data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Purchase_Products/getItems?page=${page}&limit=${limit}`, data);
         return response.data
     },
     // thu hồi nvl
-    async apiGetRecallProduction(data) {
-        const response = await axiosCustom('POST', `/api_web/Api_Purchase_Internal/getItems`, data);
+    async apiGetRecallProduction({ page = 1, limit = 3 }, data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Purchase_Internal/getItems?page=${page}&limit=${limit}`, data);
         return response.data
     },
     // chi phí nvl
-    async apiGetCostProduction(data) {
-        const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/getFactoryProductionCost`, data);
+    async apiGetCostProduction({ page = 1, limit = 3 }, data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/getFactoryProductionCost?page=${page}&limit=${limit}`, data);
         return response.data
     },
 

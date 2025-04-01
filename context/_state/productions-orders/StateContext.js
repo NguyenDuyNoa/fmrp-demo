@@ -4,6 +4,7 @@ export const StateContext = createContext();
 
 const initialState = {
     productionsOrders: {
+        poiId: undefined,
         isTabSheet: undefined,
         isTabList: undefined, // new
         countAll: 0,
@@ -40,6 +41,18 @@ const initialState = {
         date: { dateStart: null, dateEnd: null },
         idDetailProductionOrder: null,
         itemDetailPoi: undefined,
+        limitSheet: {
+            limitMaterialCost: 5,
+            limitMaterialReturn: 5,
+            limitFGReceiptHistory: 5,
+            limitMaterialIssueHistory: 5,
+        },
+        searchSheet: {
+            searchMaterialCost: "",
+            searchMaterialReturn: "",
+            searchFGReceiptHistory: "",
+            searchMaterialIssueHistory: ""
+        }
     }
 };
 export const StateProvider = ({ children }) => {

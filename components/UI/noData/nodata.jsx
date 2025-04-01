@@ -1,47 +1,47 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-const NoData = (props) => {
-    const type = {
-        'notificationheader': '/icon/nodata-noti-final.svg',
-        // 'notificationheader': '/icon/noti.svg',
-        'dashboard': '/icon/task.svg',
-    }
+const IMAGE_TYPE = {
+    notificationheader: '/icon/nodata-noti-final.svg',
+    dashboard: '/icon/task.svg',
+    table: "/background/system/nodata-table-2.svg"
+};
+
+const NoData = ({
+    type = '',
+    className = '',
+    classNameImage = '3xl:max-w-[180px] max-w-[180px] w-full h-auto object-contain',
+    classNameTitle = 'text-sm',
+    ...rest
+}) => {
+    const imageSrc = IMAGE_TYPE[type] || "/icon/nodata_ok.svg";
+    const isTable = type === "table";
+    const title = isTable ? "Chưa có dữ liệu" : "Không tìm thấy các mục";
+
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            {...props}
-            style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
+            transition={{ duration: 0.8 }}
+            className={`w-full h-full flex items-center justify-center ${className}`}
+            {...rest}
         >
-            <div className={`h-full flex flex-col justify-center items-center gap-5 mx-auto ${props?.className ? `${props?.className} py-5` : "mt-24"}`}>
-                <div className="flex flex-col items-center justify-center">
-                    {/* bg-[#EBF4FF]  */}
-                    <Image
-                        width={1280}
-                        height={1024}
-                        alt="@nodata"
-                        className={`${props?.classNameImage ? `${props?.classNameImage}` : "w-[90%] h-[90%]"} object-contain`}
-                        // src={"/no_data.svg"}
-                        src={type[props?.type] ?? "/icon/nodata_ok.svg"}
-                    // src={type[props?.type] ?? "/data_empty.svg"}
-                    />
-                </div>
-                <h1 className={`text-[#141522] opacity-90 font-medium ${props?.classNameTitle ? props?.classNameTitle : "text-sm"}`}>
-                    Không tìm thấy các mục
+            <div className="h-full flex flex-col justify-center items-center gap-5 py-5 mx-auto">
+                <Image
+                    src={imageSrc}
+                    width={300}
+                    height={300}
+                    alt="nodata"
+                    className={classNameImage}
+                    priority
+                />
+                <h1 className={`${isTable ? "text-title-default text-[#52575E]" : `${classNameTitle} text-[#141522] opacity-90`} font-medium`}>
+                    {title}
                 </h1>
-                {/* <div className="flex items-center justify-around mt-6 ">
-                        <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
-                    </div> */}
             </div>
         </motion.div>
     );
 };
+
 export default NoData;
+

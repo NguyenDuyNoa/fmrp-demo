@@ -605,7 +605,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                                             onChange={(e) => onChangeSearch(e)}
                                             className={`
                                                ${isOpenSearch ? "rounded-l-lg border-r-0 border-[#D0D5DD] focus:border-[#3276FA]" : "rounded-lg border-[#D0D5DD]"}
-                                                relative border  bg-white pl-2 xl:h-10 h-9 text-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
+                                                relative border  bg-white pl-2 xl:h-10 h-9 text-base-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
                                             type="text"
                                             // value={isState.search}
                                             placeholder={dataLang?.productions_orders_find || "productions_orders_find"}
@@ -650,7 +650,7 @@ const MainTable = ({ dataLang, typeScreen }) => {
                             }}
                             isClearable
                             placeholderText={`${dataLang?.productions_orders_day_to_day}...` || 'productions_orders_day_to_day...'}
-                            className="p-2 xl:h-10 h-9 text-default w-[250px] outline-none focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
+                            className="p-2 xl:h-10 h-9 text-base-default w-[250px] outline-none focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
                         />
                         {
                             !isState.date.dateStart &&

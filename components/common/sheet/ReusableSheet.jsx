@@ -2,8 +2,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSheet } from '@/context/ui/SheetContext'
 
-export default function ReusableSheet() {
-    const { isOpen, closeSheet, sheetData } = useSheet()
+export default function ReusableSheet(props) {
+    const { isOpen, sheetData } = useSheet()
 
     return (
         <AnimatePresence>
