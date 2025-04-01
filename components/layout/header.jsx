@@ -19,6 +19,7 @@ import { getColorByParam } from "@/utils/helpers/radomcolor";
 import AvatarText from "../UI/common/user/AvatarText";
 
 import { motion } from 'framer-motion'
+import useSetingServer from "@/hooks/useConfigNumber";
 
 const Header = () => {
     const router = useRouter();
@@ -30,6 +31,9 @@ const Header = () => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const dataPstWH = useSelector((state) => state.statusUser);
+
+    const dataSeting = useSetingServer()
+
     // Khai báo biến state
     const [currentDropdownIndex, setCurrentDropdownIndex] = useState(0);
 
@@ -339,6 +343,7 @@ const Header = () => {
                             view: auth?.purchase_order?.is_view,
                             name: "Đơn hàng mua",
                             link: "/purchase-order/order",
+                            role: dataSeting?.package,
                         },
                         // {
                         //     viewOwn: auth?.services?.is_view_own,
@@ -1297,7 +1302,7 @@ const Header = () => {
                 </div>
             </div>
 
-            <div className="flex items-center 3xl:gap-4 xl:gap-3 gap-2">
+            <div className="flex items-center gap-2 3xl:gap-4 xl:gap-3">
                 <form className="relative flex items-center">
                     <div className="2xl:size-5 xl:size-4 size-3 absolute xl:left-3 left-1.5">
                         <Image
@@ -1429,7 +1434,7 @@ const Header = () => {
                     theme="dark"
                 >
                     <motion.div
-                        className='2xl:size-5 xl:size-4 size-3 shink-0 cursor-pointer'
+                        className='cursor-pointer 2xl:size-5 xl:size-4 size-3 shink-0'
                         onClick={() => window.open("https://help.fmrp.vn")}
                         initial={{ rotate: 0 }}
                         animate={{ rotate: [0, -10, 10, -10, 10, 0] }}

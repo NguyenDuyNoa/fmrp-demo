@@ -203,7 +203,7 @@ const GroupClient = (props) => {
         </>
       }
       table={
-        <div className="h-full flex flex-col">
+        <div className="flex flex-col h-full">
           <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
             <div className="col-span-4">
               <div className="grid items-center grid-cols-5 gap-2">
@@ -238,7 +238,7 @@ const GroupClient = (props) => {
               <div className="flex items-center justify-end space-x-2">
                 <OnResetData
                   onClick={() => refetch()}
-                  sOnFetching={(e) => {}}
+                  sOnFetching={(e) => { }}
                 />
                 {role == true || checkExport ? (
                   <div className={``}>
@@ -348,7 +348,7 @@ const GroupClient = (props) => {
                           )}
                           <BtnAction
                             onRefresh={refetch.bind(this)}
-                            onRefreshGroup={() => {}}
+                            onRefreshGroup={() => { }}
                             dataLang={dataLang}
                             id={e?.id}
                             type="client_group"

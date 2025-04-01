@@ -62,6 +62,10 @@ const adminState = {
     stateFilterDropdown: {
         openDropdownId: null, // ← thêm vào đây thay vì open
     },
+    statePopupGlobal: {
+        open: false,
+        children: null
+    }
 };
 
 function adminReducer(state = adminState, action) {
@@ -110,6 +114,8 @@ function adminReducer(state = adminState, action) {
             return { ...state, statePopupUpdateVersion: action.payload };
         case "statePopupParent":
             return { ...state, statePopupParent: action.payload };
+        case "statePopupGlobal":
+            return { ...state, statePopupGlobal: action.payload };
         case "statePopupPreviewImage":
             return { ...state, statePopupPreviewImage: action.payload };
         case "stateFilterDropdown":

@@ -33,6 +33,7 @@ import { TagColorOrange } from "@/components/UI/common/Tag/TagStatus";
 import { ProductionsOrdersContext } from "@/containers/manufacture/productions-orders/context/productionsOrders";
 import dynamic from "next/dynamic";
 import PopupPurchaseBeta from "../popup/popupPurchaseBeta";
+import useSetingServer from "@/hooks/useConfigNumber";
 // import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
 const ModalDetail = dynamic(() => import("@/containers/manufacture/productions-orders/components/modal/modalDetail"), { ssr: false });
 
@@ -128,6 +129,8 @@ const MainTable = ({ dataLang }) => {
     ];
 
     const isShow = useToast();
+
+    const dataSeting = useSetingServer()
 
     const [isParentId, sIsParentId] = useState(null);
 

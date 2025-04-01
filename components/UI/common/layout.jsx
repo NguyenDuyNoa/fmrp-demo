@@ -8,7 +8,7 @@ export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
       ref={ref}
       className={`${className} overflow-x-auto h-fit demo4 simplebar-scrollable-x`}
       scrollableNodePropsClassName="[&>div]:flex [&>div]:items-center [&>div]:justify-start [&>div]:space-x-3 h-fit"
-      // className="flex items-center justify-start overflow-hidden overflow-y-hidden 2xl:space-x-3 lg:space-x-3 h-fit scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
+    // className="flex items-center justify-start overflow-hidden overflow-y-hidden 2xl:space-x-3 lg:space-x-3 h-fit scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
     >
       {children}
     </Customscrollbar>
@@ -40,16 +40,15 @@ export const ContainerBody = ({ children }) => {
 export const ContainerTotal = ({ children, className }) => {
   return (
     <div
-      className={`${
-        className ? className : ""
-      } grid grid-cols-12 bg-gray-100 items-center`}
+      className={`${className ? className : ""
+        } grid grid-cols-12 bg-gray-100 items-center`}
     >
       {children}
     </div>
   );
 };
 export const ContainerTable = ({ children }) => {
-  return <div className="h-full w-full">{children}</div>;
+  return <div className="w-full h-full">{children}</div>;
 };
 
 export const LayOutTableDynamic = ({
@@ -68,14 +67,14 @@ export const LayOutTableDynamic = ({
       <Container>
         {breadcrumb}
         <ContainerBody>
-          <div className="overflow-hidden flex flex-col h-full gap-y-3">
+          <div className="flex flex-col h-full overflow-hidden gap-y-3">
             <div className="flex justify-between mt-1 mr-2">{titleButton}</div>
             {fillterTab && (
               <div className="w-full h-fit">
                 <ContainerFilterTab>{fillterTab}</ContainerFilterTab>
               </div>
             )}
-            <div className="flex-1 min-h-0 flex flex-col overflow-hidden ">
+            <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
               <ContainerTable className="flex-1 min-h-0 overflow-hidden">
                 {table}
               </ContainerTable>

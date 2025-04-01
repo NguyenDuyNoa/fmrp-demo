@@ -217,9 +217,8 @@ const Client = (props) => {
         { value: `${e.phone_number ? e.phone_number : ""}` },
         { value: `${e.address ? e.address : ""}` },
         {
-          value: `${
-            e.staff_charge ? e.staff_charge?.map((i) => i.full_name) : ""
-          }`,
+          value: `${e.staff_charge ? e.staff_charge?.map((i) => i.full_name) : ""
+            }`,
         },
         {
           value: `${e.client_group ? e.client_group?.map((i) => i.name) : ""}`,
@@ -241,208 +240,211 @@ const Client = (props) => {
   ];
 
   return (
-    <LayOutTableDynamic
-      head={
-        <Head>
-          <title>{dataLang?.client_list_title}</title>
-        </Head>
-      }
-      breadcrumb={
-        <>
-          {statusExprired ? (
-            <EmptyExprired />
-          ) : (
-            <React.Fragment>
-              <Breadcrumb
-                items={breadcrumbItems}
-                className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
-              />
-            </React.Fragment>
-          )}
-        </>
-      }
-      titleButton={
-        <>
-          <h2 className="text-title-section text-[#52575E] capitalize font-medium">
-            {dataLang?.client_list_title}
-          </h2>
-          <div className="flex items-center justify-end gap-2">
-            {role == true || checkAdd ? (
-              <Popup_dskh
-                listBr={listBr || []}
-                listSelectCt={listSelectCt}
-                onRefresh={refetch.bind(this)}
-                dataLang={dataLang}
-                nameModel={"client_contact"}
-                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
-              />
+    <React.Fragment>
+      <LayOutTableDynamic
+        head={
+          <Head>
+            <title>{dataLang?.client_list_title}</title>
+          </Head>
+        }
+        breadcrumb={
+          <>
+            {statusExprired ? (
+              <EmptyExprired />
             ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  isShow("warning", WARNING_STATUS_ROLE);
-                }}
-                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
-              >
-                {dataLang?.branch_popup_create_new}
-              </button>
+              <React.Fragment>
+                <Breadcrumb
+                  items={breadcrumbItems}
+                  className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                />
+              </React.Fragment>
             )}
-          </div>
-        </>
-      }
-      fillterTab={
-        <>
-          {listGroup &&
-            listGroup.map((e) => {
-              return (
-                <div key={e.id}>
-                  <TabFilter
-                    backgroundColor={e.color}
-                    onClick={_HandleSelectTab.bind(this, `${e.id}`)}
-                    total={e.count}
-                    active={e.id}
-                    className={`${
-                      e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "
-                    }`}
-                  >
-                    {e.name}
-                  </TabFilter>
-                </div>
-              );
-            })}
-        </>
-      }
-      table={
-        <div className="h-full flex flex-col">
-          <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-            <div className="col-span-4">
-              <div className="grid grid-cols-9 gap-2">
-                <SearchComponent
+          </>
+        }
+        titleButton={
+          <>
+            <h2 className="text-title-section text-[#52575E] capitalize font-medium">
+              {dataLang?.client_list_title}
+            </h2>
+            <div className="flex items-center justify-end gap-2">
+              {role == true || checkAdd ? (
+                <Popup_dskh
+                  listBr={listBr || []}
+                  listSelectCt={listSelectCt}
+                  onRefresh={refetch.bind(this)}
                   dataLang={dataLang}
-                  onChange={_HandleOnChangeKeySearch.bind(this)}
-                  colSpan={2}
+                  nameModel={"client_contact"}
+                  className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                 />
-                <SelectComponent
-                  options={[
-                    {
-                      value: "",
-                      label:
-                        dataLang?.price_quote_branch || "price_quote_branch",
-                      isDisabled: true,
-                    },
-                    ...listBr,
-                  ]}
-                  onChange={(e) => queryState({ idBranch: e })}
-                  value={isState.idBranch}
-                  placeholder={
-                    dataLang?.price_quote_branch || "price_quote_branch"
-                  }
-                  colSpan={3}
-                  components={{ MultiValue }}
-                  isMulti={true}
-                  closeMenuOnSelect={false}
-                />
-              </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    isShow("warning", WARNING_STATUS_ROLE);
+                  }}
+                  className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                >
+                  {dataLang?.branch_popup_create_new}
+                </button>
+              )}
             </div>
-            <div className="col-span-2">
-              <div className="flex items-center justify-end space-x-2">
-                <OnResetData onClick={() => refetch()} sOnFetching={() => {}} />
-                {role == true || checkExport ? (
-                  <div className={``}>
-                    {data?.rResult?.length > 0 && (
-                      <ExcelFileComponent
-                        multiDataSet={multiDataSet}
-                        filename="Danh sách khách hàng"
-                        title="Dskh"
-                        dataLang={dataLang}
-                      />
-                    )}
+          </>
+        }
+        fillterTab={
+          <>
+            {listGroup &&
+              listGroup.map((e) => {
+                return (
+                  <div key={e.id}>
+                    <TabFilter
+                      backgroundColor={e.color}
+                      onClick={_HandleSelectTab.bind(this, `${e.id}`)}
+                      total={e.count}
+                      active={e.id}
+                      className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "
+                        }`}
+                    >
+                      {e.name}
+                    </TabFilter>
                   </div>
-                ) : (
-                  <button
-                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
-                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                  >
-                    <Grid6
-                      className="scale-75 2xl:scale-100 xl:scale-100"
-                      size={18}
-                    />
-                    <span>{dataLang?.client_list_exportexcel}</span>
-                  </button>
-                )}
-                <div>
-                  <DropdowLimit
-                    sLimit={sLimit}
-                    limit={limit}
+                );
+              })}
+          </>
+        }
+        table={
+          <div className="flex flex-col h-full">
+            <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
+              <div className="col-span-4">
+                <div className="grid grid-cols-9 gap-2">
+                  <SearchComponent
                     dataLang={dataLang}
+                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                    colSpan={2}
+                  />
+                  <SelectComponent
+                    options={[
+                      {
+                        value: "",
+                        label:
+                          dataLang?.price_quote_branch || "price_quote_branch",
+                        isDisabled: true,
+                      },
+                      ...listBr,
+                    ]}
+                    onChange={(e) => queryState({ idBranch: e })}
+                    value={isState.idBranch}
+                    placeholder={
+                      dataLang?.price_quote_branch || "price_quote_branch"
+                    }
+                    colSpan={3}
+                    components={{ MultiValue }}
+                    isMulti={true}
+                    closeMenuOnSelect={false}
                   />
                 </div>
               </div>
-            </div>
-          </div>
-          <Customscrollbar className="h-full overflow-y-auto ">
-            <div className="w-full">
-              <HeaderTable gridCols={12}>
-                <ColumnTable colSpan={1} textAlign={"center"}>
-                  {dataLang?.client_list_namecode}
-                </ColumnTable>
-                <ColumnTable colSpan={2} textAlign={"center"}>
-                  {dataLang?.client_list_name}
-                </ColumnTable>
-                <ColumnTable colSpan={1} textAlign={"center"}>
-                  {dataLang?.client_list_taxtcode}
-                </ColumnTable>
-                <ColumnTable colSpan={1} textAlign={"center"}>
-                  {dataLang?.client_list_phone}
-                </ColumnTable>
-                <ColumnTable colSpan={1} textAlign={"center"}>
-                  {dataLang?.client_list_adress}
-                </ColumnTable>
-                <ColumnTable colSpan={2} textAlign={"center"}>
-                  {dataLang?.client_list_charge}
-                </ColumnTable>
-                <ColumnTable colSpan={2} textAlign={"center"}>
-                  {dataLang?.client_list_group}
-                </ColumnTable>
-                <ColumnTable colSpan={1} textAlign={"center"}>
-                  {dataLang?.client_list_brand}
-                </ColumnTable>
-                <ColumnTable colSpan={1} textAlign={"center"}>
-                  {dataLang?.branch_popup_properties}
-                </ColumnTable>
-              </HeaderTable>
-              {isLoading || isFetching ? (
-                <Loading className="h-80" color="#0f4f9e" />
-              ) : data?.rResult?.length > 0 ? (
-                <div className="divide-y divide-slate-200 h-[100%]">
-                  {data?.rResult?.map((e) => (
-                    <RowTable gridCols={12} key={e.id.toString()}>
-                      <RowItemTable colSpan={1} textAlign={"center"}>
-                        {e.code}
-                      </RowItemTable>
-                      <RowItemTable colSpan={2} textAlign={"left"}>
-                        <Popup_chitiet
+              <div className="col-span-2">
+                <div className="flex items-center justify-end space-x-2">
+                  <OnResetData
+                    onClick={() => refetch()}
+                    sOnFetching={() => { }}
+                  />
+                  {role == true || checkExport ? (
+                    <div className={``}>
+                      {data?.rResult?.length > 0 && (
+                        <ExcelFileComponent
+                          multiDataSet={multiDataSet}
+                          filename="Danh sách khách hàng"
+                          title="Dskh"
                           dataLang={dataLang}
-                          className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5  rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear"
-                          name={e.name}
-                          id={e?.id}
                         />
-                      </RowItemTable>
-                      <RowItemTable colSpan={1} textAlign={"left"}>
-                        {e.tax_code}
-                      </RowItemTable>
-                      <RowItemTable colSpan={1} textAlign={"center"}>
-                        {e.phone_number}
-                      </RowItemTable>
-                      <RowItemTable colSpan={1} textAlign={"left"}>
-                        {e.address}
-                      </RowItemTable>
-                      <RowItemTable
-                        colSpan={2}
-                        className="flex flex-wrap items-center justify-start object-cover gap-2"
-                      >
-                        {e?.staff_charge
-                          ? e.staff_charge?.map((d) => {
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                      className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                    >
+                      <Grid6
+                        className="scale-75 2xl:scale-100 xl:scale-100"
+                        size={18}
+                      />
+                      <span>{dataLang?.client_list_exportexcel}</span>
+                    </button>
+                  )}
+                  <div>
+                    <DropdowLimit
+                      sLimit={sLimit}
+                      limit={limit}
+                      dataLang={dataLang}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Customscrollbar className="h-full overflow-y-auto ">
+              <div className="w-full">
+                <HeaderTable gridCols={12}>
+                  <ColumnTable colSpan={1} textAlign={"center"}>
+                    {dataLang?.client_list_namecode}
+                  </ColumnTable>
+                  <ColumnTable colSpan={2} textAlign={"center"}>
+                    {dataLang?.client_list_name}
+                  </ColumnTable>
+                  <ColumnTable colSpan={1} textAlign={"center"}>
+                    {dataLang?.client_list_taxtcode}
+                  </ColumnTable>
+                  <ColumnTable colSpan={1} textAlign={"center"}>
+                    {dataLang?.client_list_phone}
+                  </ColumnTable>
+                  <ColumnTable colSpan={1} textAlign={"center"}>
+                    {dataLang?.client_list_adress}
+                  </ColumnTable>
+                  <ColumnTable colSpan={2} textAlign={"center"}>
+                    {dataLang?.client_list_charge}
+                  </ColumnTable>
+                  <ColumnTable colSpan={2} textAlign={"center"}>
+                    {dataLang?.client_list_group}
+                  </ColumnTable>
+                  <ColumnTable colSpan={1} textAlign={"center"}>
+                    {dataLang?.client_list_brand}
+                  </ColumnTable>
+                  <ColumnTable colSpan={1} textAlign={"center"}>
+                    {dataLang?.branch_popup_properties}
+                  </ColumnTable>
+                </HeaderTable>
+                {isLoading || isFetching ? (
+                  <Loading className="h-80" color="#0f4f9e" />
+                ) : data?.rResult?.length > 0 ? (
+                  <div className="divide-y divide-slate-200 h-[100%]">
+                    {data?.rResult?.map((e) => (
+                      <RowTable gridCols={12} key={e.id.toString()}>
+                        <RowItemTable colSpan={1} textAlign={"center"}>
+                          {e.code}
+                        </RowItemTable>
+                        <RowItemTable colSpan={2} textAlign={"left"}>
+                          <Popup_chitiet
+                            dataLang={dataLang}
+                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5  rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear"
+                            name={e.name}
+                            id={e?.id}
+                          />
+                        </RowItemTable>
+                        <RowItemTable colSpan={1} textAlign={"left"}>
+                          {e.tax_code}
+                        </RowItemTable>
+                        <RowItemTable colSpan={1} textAlign={"center"}>
+                          {e.phone_number}
+                        </RowItemTable>
+                        <RowItemTable colSpan={1} textAlign={"left"}>
+                          {e.address}
+                        </RowItemTable>
+                        <RowItemTable
+                          colSpan={2}
+                          className="flex flex-wrap items-center justify-start object-cover gap-2"
+                        >
+                          {e?.staff_charge
+                            ? e.staff_charge?.map((d) => {
                               return (
                                 <Tooltip
                                   title={d.full_name}
@@ -465,119 +467,118 @@ const Client = (props) => {
                                 </Tooltip>
                               );
                             })
-                          : ""}
-                      </RowItemTable>
-                      <RowItemTable
-                        colSpan={2}
-                        className="flex flex-wrap items-center justify-start"
-                      >
-                        {e.client_group?.map((h) => {
-                          return (
-                            <span
-                              key={h.id}
-                              style={{
-                                backgroundColor: `${
-                                  h.color == "" || h.color == null
+                            : ""}
+                        </RowItemTable>
+                        <RowItemTable
+                          colSpan={2}
+                          className="flex flex-wrap items-center justify-start"
+                        >
+                          {e.client_group?.map((h) => {
+                            return (
+                              <span
+                                key={h.id}
+                                style={{
+                                  backgroundColor: `${h.color == "" || h.color == null
                                     ? "#e2f0fe"
                                     : h.color
-                                }`,
-                                color: `${
-                                  h.color == "" || h.color == null
+                                    }`,
+                                  color: `${h.color == "" || h.color == null
                                     ? "#0F4F9E"
                                     : "white"
-                                }`,
-                              }}
-                              className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] font-[500] text-[8px] px-2 rounded-full  py-0.5`}
-                            >
-                              {h.name}
-                            </span>
-                          );
-                        })}
-                      </RowItemTable>
-                      <RowItemTable
-                        colSpan={1}
-                        className="flex flex-wrap items-center gap-1"
-                      >
-                        {e.branch?.map((i, index) => (
-                          <TagBranch key={index}>{i.name}</TagBranch>
-                        ))}
-                      </RowItemTable>
-                      <RowItemTable
-                        colSpan={1}
-                        className="flex items-center justify-center space-x-2 text-center"
-                      >
-                        {role == true || checkEdit ? (
-                          <Popup_dskh
-                            listBr={listBr || []}
-                            listSelectCt={listSelectCt}
+                                    }`,
+                                }}
+                                className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] font-[500] text-[8px] px-2 rounded-full  py-0.5`}
+                              >
+                                {h.name}
+                              </span>
+                            );
+                          })}
+                        </RowItemTable>
+                        <RowItemTable
+                          colSpan={1}
+                          className="flex flex-wrap items-center gap-1"
+                        >
+                          {e.branch?.map((i, index) => (
+                            <TagBranch key={index}>{i.name}</TagBranch>
+                          ))}
+                        </RowItemTable>
+                        <RowItemTable
+                          colSpan={1}
+                          className="flex items-center justify-center space-x-2 text-center"
+                        >
+                          {role == true || checkEdit ? (
+                            <Popup_dskh
+                              listBr={listBr || []}
+                              listSelectCt={listSelectCt}
+                              onRefresh={refetch.bind(this)}
+                              className="text-xs xl:text-base "
+                              listDs={listGroup}
+                              dataLang={dataLang}
+                              name={e.name}
+                              representative={e.representative}
+                              code={e.code}
+                              tax_code={e.tax_code}
+                              phone_number={e.phone_number}
+                              address={e.address}
+                              date_incorporation={e.date_incorporation}
+                              note={e.note}
+                              email={e.email}
+                              website={e.website}
+                              debt_limit={e.debt_limit}
+                              debt_limit_day={e.debt_limit_day}
+                              debt_begin={e.debt_begin}
+                              city={e.city}
+                              district={e.district}
+                              ward={e.ward}
+                              id={e?.id}
+                              nameModel={"client_contact"}
+                            />
+                          ) : (
+                            <IconEdit
+                              className="cursor-pointer"
+                              onClick={() =>
+                                isShow("warning", WARNING_STATUS_ROLE)
+                              }
+                            />
+                          )}
+                          <BtnAction
                             onRefresh={refetch.bind(this)}
-                            className="text-xs xl:text-base "
-                            listDs={listGroup}
+                            onRefreshGroup={refetchGroup.bind(this)}
                             dataLang={dataLang}
-                            name={e.name}
-                            representative={e.representative}
-                            code={e.code}
-                            tax_code={e.tax_code}
-                            phone_number={e.phone_number}
-                            address={e.address}
-                            date_incorporation={e.date_incorporation}
-                            note={e.note}
-                            email={e.email}
-                            website={e.website}
-                            debt_limit={e.debt_limit}
-                            debt_limit_day={e.debt_limit_day}
-                            debt_begin={e.debt_begin}
-                            city={e.city}
-                            district={e.district}
-                            ward={e.ward}
                             id={e?.id}
-                            nameModel={"client_contact"}
+                            type="client_customers"
                           />
-                        ) : (
-                          <IconEdit
-                            className="cursor-pointer"
-                            onClick={() =>
-                              isShow("warning", WARNING_STATUS_ROLE)
-                            }
-                          />
-                        )}
-                        <BtnAction
-                          onRefresh={refetch.bind(this)}
-                          onRefreshGroup={refetchGroup.bind(this)}
-                          dataLang={dataLang}
-                          id={e?.id}
-                          type="client_customers"
-                        />
-                      </RowItemTable>
-                    </RowTable>
-                  ))}
-                </div>
-              ) : (
-                <NoData />
-              )}
-            </div>
-          </Customscrollbar>
-        </div>
-      }
-      pagination={
-        <>
-          {data?.rResult?.length != 0 && (
-            <ContainerPagination>
-              <TitlePagination
-                dataLang={dataLang}
-                totalItems={data?.output?.iTotalDisplayRecords}
-              />
-              <Pagination
-                postsPerPage={limit}
-                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
-                paginate={paginate}
-                currentPage={router.query?.page || 1}
-              />
-            </ContainerPagination>
-          )}
-        </>
-      }
-    />
+                        </RowItemTable>
+                      </RowTable>
+                    ))}
+                  </div>
+                ) : (
+                  <NoData />
+                )}
+              </div>
+            </Customscrollbar>
+          </div>
+        }
+        pagination={
+          <>
+            {data?.rResult?.length != 0 && (
+              <ContainerPagination>
+                <TitlePagination
+                  dataLang={dataLang}
+                  totalItems={data?.output?.iTotalDisplayRecords}
+                />
+                <Pagination
+                  postsPerPage={limit}
+                  totalPosts={Number(data?.output?.iTotalDisplayRecords)}
+                  paginate={paginate}
+                  currentPage={router.query?.page || 1}
+                />
+              </ContainerPagination>
+            )}
+          </>
+        }
+      />
+    </React.Fragment>
   );
 };
 export default Client;

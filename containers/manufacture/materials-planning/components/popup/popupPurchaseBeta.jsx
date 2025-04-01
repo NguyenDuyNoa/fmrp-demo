@@ -26,6 +26,8 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { fi } from "date-fns/locale";
 import { useSupplierList } from "@/containers/suppliers/supplier/hooks/useSupplierList";
 import Image from "next/image";
+import { useDispatch } from "react-redux";
+import PopupRequestUpdateVersion from "@/components/common/popup/PopupRequestUpdateVersion";
 
 const initialState = {
     onFetching: false,
@@ -55,9 +57,11 @@ const initForm = {
 }
 
 const PopupPurchaseBeta = ({ dataLang, icon, title, dataTable, className, queryValue, fetchDataTable, ...rest }) => {
-    const [open, sOpen] = useState(false);
-
     const isShow = useToast();
+
+    const dispatch = useDispatch()
+
+    const [open, sOpen] = useState(false);
 
     const _ToggleModal = (e) => sOpen(e);
 
@@ -196,6 +200,16 @@ const PopupPurchaseBeta = ({ dataLang, icon, title, dataTable, className, queryV
                 <button
                     className="bg-blue-100 rounded-lg outline-none focus:outline-none"
                     onClick={() => {
+                        if (dataSeting?.package == "1") {
+                            dispatch({
+                                type: "statePopupGlobal",
+                                payload: {
+                                    open: true,
+                                    children: <PopupRequestUpdateVersion />
+                                }
+                            });
+                            return
+                        }
                         if (+dataTable?.countAll == 0) {
                             return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
                         }
