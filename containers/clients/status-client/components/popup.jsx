@@ -46,6 +46,7 @@ const Popup_status = (props) => {
         });
     }, [isState.open]);
 
+    // lưu dữ liệu
     const handingStatus = useMutation({
         mutationFn: (data) => {
             return apiStatus.apiHandingStatus(data, props.id)
@@ -112,7 +113,7 @@ const Popup_status = (props) => {
             onClose={() => queryState({ open: false })}
             classNameBtn={props.className}
         >
-            <div className="w-96 mt-4">
+            <div className="mt-4 w-96">
                 <form onSubmit={_HandleSubmit.bind(this)}>
                     <div>
                         <div className="flex flex-wrap justify-between">
@@ -204,7 +205,7 @@ const Popup_status = (props) => {
                                 </label>
                             )}
                         </div>
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={() => queryState({ open: false })}

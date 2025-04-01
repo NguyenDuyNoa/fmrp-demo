@@ -29,6 +29,7 @@ const Popup_groupKh = (props) => {
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
 
+    // lấy dữ liệu lưu chi nhánh, tên, màu, slected chi nhánh
     useEffect(() => {
         queryState({
             listBr: props.listBr || [],
@@ -49,6 +50,7 @@ const Popup_groupKh = (props) => {
         }
     })
 
+    // lưu dữ liệu
     const _ServerSending = async () => {
         let data = new FormData();
         data.append("name", isState.name);
@@ -73,7 +75,7 @@ const Popup_groupKh = (props) => {
         })
         queryState({ open: false });
     };
-    //da up date
+
     useEffect(() => {
         isState.onSending && _ServerSending();
     }, [isState.onSending]);
@@ -104,7 +106,7 @@ const Popup_groupKh = (props) => {
             onClose={() => queryState({ open: false })}
             classNameBtn={props.className}
         >
-            <div className="w-96 mt-4">
+            <div className="mt-4 w-96">
                 <form onSubmit={_HandleSubmit.bind(this)}>
                     <div>
                         <div className="flex flex-wrap justify-between">
@@ -187,7 +189,7 @@ const Popup_groupKh = (props) => {
                                 className="placeholder-[color:#667085] w-full min-h-[50px] bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
                             />
                         </div>
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={() => queryState({ open: false })}

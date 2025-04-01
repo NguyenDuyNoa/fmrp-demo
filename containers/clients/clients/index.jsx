@@ -53,24 +53,30 @@ const initalState = {
   idBranch: null,
 };
 const Client = (props) => {
+  // show toast
   const isShow = useToast();
 
+  // data lanng
   const dataLang = props.dataLang;
 
   const router = useRouter();
 
   const { paginate } = usePagination();
 
+  // check xem tài khoản user tới hạn hay chưa
   const statusExprired = useStatusExprired();
 
+  // hook tab filter
   const { handleTab: _HandleSelectTab } = useTab("0");
 
   const [isState, setIsState] = useState(initalState);
 
+  // phân quyền
   const { is_admin: role, permissions_current: auth } = useSelector(
     (state) => state.auth
   );
 
+  // phân quyền
   const { checkAdd, checkEdit, checkExport } = useActionRole(
     auth,
     "client_customers"
@@ -78,8 +84,10 @@ const Client = (props) => {
 
   const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
+  // phân trang
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
+  // params lọc
   const params = {
     search: isState.keySearch,
     limit: limit,
@@ -96,14 +104,19 @@ const Client = (props) => {
         : null,
   };
 
+  // danh sách chi nhánh
   const { data: listBr = [] } = useBranchList({});
 
+  // danh sách tỉnh thành
   const { data: listSelectCt } = useProvinceList({});
 
+  // danh sách nhóm khách hàng
   const { data: listGroup, refetch: refetchGroup } = useClientGroup(params);
 
+  //  danh sách khách hàng
   const { data, isLoading, isFetching, refetch } = useClientList(params);
 
+  // bộ lọc tìm kiếm
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
     queryState({ keySearch: value });
     router.replace({
@@ -114,7 +127,7 @@ const Client = (props) => {
     });
   }, 500);
 
-  //excel
+  // xuất excel
   const multiDataSet = [
     {
       columns: [
@@ -229,6 +242,7 @@ const Client = (props) => {
     },
   ];
 
+  // breadcrumb
   const breadcrumbItems = [
     {
       label: `${dataLang?.client_group_client || "client_list_title"}`,

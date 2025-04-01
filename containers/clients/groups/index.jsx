@@ -65,16 +65,18 @@ const GroupClient = (props) => {
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
   const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
-
+  // phân quyền
   const { is_admin: role, permissions_current: auth } = useSelector(
     (state) => state.auth
   );
 
+  // phân quyền
   const { checkExport, checkEdit, checkAdd } = useActionRole(
     auth,
     "client_group"
   );
 
+  // bộ lọc nhóm
   const params = {
     search: isState.keySearch,
     limit: limit,
@@ -85,6 +87,7 @@ const GroupClient = (props) => {
         : null,
   };
 
+  // danh sách nhóm khách hàng
   const {
     data,
     isLoading: loadingGroup,
@@ -92,13 +95,16 @@ const GroupClient = (props) => {
     refetch,
   } = useGroupClientList(params);
 
+  // danh sách chi nhánh
   const { data: listBr = [] } = useBranchList({});
 
+  // hàm tìm kiếm
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
     queryState({ keySearch: value });
     router.replace("/clients/groups");
   }, 500);
 
+  // xuất exel
   const multiDataSet = [
     {
       columns: [

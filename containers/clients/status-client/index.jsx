@@ -67,8 +67,9 @@ const StatusClient = (props) => {
         "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
     }
 
+    // danh sách chi nhánh
     const { data: listBr = [] } = useBranchList({});
-
+    // dnahs sách trạng thái
     const { data, isLoading, isFetching, refetch } = useStatusClient(params)
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -76,6 +77,7 @@ const StatusClient = (props) => {
         router.replace("/clients/status-client");
     }, 500);
 
+    // xuất exel
     const multiDataSet = [
         {
             columns: [
@@ -138,12 +140,12 @@ const StatusClient = (props) => {
                     </div>
                 )}
                 <ContainerBody>
-                    <div className="space-y-3 h-full overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
+                    <div className="h-full space-y-3 overflow-hidden">
+                        <div className="flex justify-between mt-1 mr-2">
                             <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.client_group_statusctitle}
                             </h2>
-                            <div className="flex justify-end items-center">
+                            <div className="flex items-center justify-end">
                                 {role == true || checkAdd ? (
                                     <Popup_status
                                         listBr={listBr}
@@ -165,7 +167,7 @@ const StatusClient = (props) => {
                             </div>
                         </div>
                         <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
                                         <div className="grid grid-cols-9 gap-2">
@@ -194,7 +196,7 @@ const StatusClient = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <OnResetData onClick={() => refetch()} sOnFetching={(e) => { }} />
                                             {role == true || checkExport ? (
                                                 <div className={``}>
@@ -212,7 +214,7 @@ const StatusClient = (props) => {
                                                     onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             )}
@@ -259,7 +261,7 @@ const StatusClient = (props) => {
                                                             colSpan={2}
                                                             textAlign="center"
                                                             backgroundColor={e.color}
-                                                            className="rounded-md py-1"
+                                                            className="py-1 rounded-md"
                                                         >
                                                             {e.color}
                                                         </RowItemTable>
@@ -272,14 +274,14 @@ const StatusClient = (props) => {
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             colSpan={2}
-                                                            className="space-x-2 text-center flex items-center justify-center"
+                                                            className="flex items-center justify-center space-x-2 text-center"
                                                         >
                                                             {role == true || checkEdit ? (
                                                                 <Popup_status
                                                                     listBr={listBr}
                                                                     sValueBr={e.branch}
                                                                     onRefresh={refetch.bind(this)}
-                                                                    className="xl:text-base text-xs "
+                                                                    className="text-xs xl:text-base "
                                                                     dataLang={dataLang}
                                                                     name={e.name}
                                                                     color={e.color}
