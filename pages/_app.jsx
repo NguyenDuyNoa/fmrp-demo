@@ -67,29 +67,31 @@ const Index = (props) => {
 };
 
 function MainPage({ Component, pageProps }) {
+    const router = useRouter()
+
     const dispatch = useDispatch();
 
     const { isOpen: isOpenSheet, closeSheet: closeSheet } = useSheet()
-    const router = useRouter()
 
     const tokenFMRP = CookieCore.get('tokenFMRP')
 
     const databaseappFMRP = CookieCore.get('databaseappFMRP')
-
+    // gọi api seting để lấy data seting theo server config
     const { data: dataSeting } = useSetings()
-
+    // lấy phân quyền
     const auth = useSelector((state) => state.auth);
 
+    // api dữ liệu user
     const { data: dataAuth, isLoading } = useAuththentication(auth)
-
+    // state để quản lý popup ai trong danh sách thành phẩm
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
     const statePopupParent = useSelector((state) => state?.popupParent);
-
+    // lấy data lang mặc định
     const langDefault = useSelector((state) => state.lang);
-
+    // lấy dữ liệu data lang của sserver
     const { data } = useLanguage(langDefault)
-
+    // state quản lý popup perview image
     const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
 
     useEffect(() => {
@@ -179,7 +181,7 @@ function MainPage({ Component, pageProps }) {
             <Layout dataLang={data}>
                 <Component dataLang={data} {...pageProps} />
 
-                <ReusableSheet dataLang={data}/>
+                <ReusableSheet dataLang={data} />
             </Layout>
         </Customscrollbar>
     );
