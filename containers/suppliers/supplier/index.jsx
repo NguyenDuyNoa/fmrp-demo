@@ -55,7 +55,6 @@ const initalState = {
 
 const Supplier = (props) => {
   const dataLang = props.dataLang;
-  console.log("🚀 ~ Supplier ~ dataLang:", props);
 
   const isShow = useToast();
 
@@ -92,15 +91,16 @@ const Supplier = (props) => {
         ? isState.idBranch.map((e) => e.value)
         : null,
   };
-
+  // danh sách nhà cung cấp
   const { data, isLoading, isFetching, refetch } = useSupplierList(params);
-
+  // danh sách chi nhánh
   const { data: listBr = [] } = useBranchList({});
-
+  // danh sách bộ lọc nhóm nhà cung cấp
   const { data: listGroup, refetch: refetchGroup } = useSupplierGroup(params);
-
+  // danh sách tỉnh thành
   const { data: listProvince } = useProvinceList({});
 
+  // tìm kiếm table
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
     queryState({ keySearch: value });
     router.replace({
@@ -205,9 +205,8 @@ const Supplier = (props) => {
         { value: `${e.phone_number ? e.phone_number : ""}` },
         { value: `${e.address ? e.address : ""}` },
         {
-          value: `${
-            e.supplier_group ? e.supplier_group?.map((i) => i.name) : ""
-          }`,
+          value: `${e.supplier_group ? e.supplier_group?.map((i) => i.name) : ""
+            }`,
         },
         { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
         { value: `${e.date_create ? e.date_create : ""}` },
@@ -221,9 +220,8 @@ const Supplier = (props) => {
       // href: "/",
     },
     {
-      label: `${
-        dataLang?.suppliers_supplier_title || "suppliers_supplier_title"
-      }`,
+      label: `${dataLang?.suppliers_supplier_title || "suppliers_supplier_title"
+        }`,
     },
   ];
 
@@ -302,7 +300,7 @@ const Supplier = (props) => {
           </>
         }
         table={
-          <div className="h-full flex flex-col">
+          <div className="flex flex-col h-full">
             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
               <div className="col-span-4">
                 <div className="grid grid-cols-9 gap-2">
@@ -337,7 +335,7 @@ const Supplier = (props) => {
                 <div className="flex items-center justify-end space-x-2">
                   <OnResetData
                     onClick={refetch.bind(this)}
-                    sOnFetching={(e) => {}}
+                    sOnFetching={(e) => { }}
                   />
                   {role == true || checkExport ? (
                     <div className={``}>

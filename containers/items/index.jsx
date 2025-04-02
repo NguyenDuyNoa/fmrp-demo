@@ -81,7 +81,7 @@ const Items = (props) => {
   const [keySearch, sKeySearch] = useState("");
 
   const [idCategory, sIdCategory] = useState(null);
-
+  // check xem có đnag mở nguyên vật liệu hay không
   const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
@@ -101,14 +101,19 @@ const Items = (props) => {
       idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
   };
 
-  const {} = useUnitList();
+  // gọi api lấy danh sách đơn vị
+  const { } = useUnitList();
 
-  const {} = useVariantList();
+  // gọi api lấy danh sách biến thể
+  const { } = useVariantList();
 
+  // danh sách nhóm nguyên vật liệu
   const { data: dataCateOption = [] } = useItemCategoryOptions({});
 
+  // danh sách chi nhánh
   const { data: dataBranchOption = [] } = useBranchList();
 
+  // danh sách nguyên vật liệu
   const {
     isFetching,
     isLoading,
@@ -124,6 +129,7 @@ const Items = (props) => {
     return formatNumberConfig(+number, dataSeting);
   };
 
+  // hàm change bộ lọc
   const _HandleFilterOpt = (type, value) => {
     if (type == "category") {
       sIdCategory(value);
@@ -250,10 +256,9 @@ const Items = (props) => {
       // href: "/",
     },
     {
-      label: `${
-        dataLang?.header_category_material_list ||
+      label: `${dataLang?.header_category_material_list ||
         "header_category_material_list"
-      }`,
+        }`,
     },
   ];
 
@@ -308,7 +313,7 @@ const Items = (props) => {
           </>
         }
         table={
-          <div className="h-full flex flex-col">
+          <div className="flex flex-col h-full">
             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
               <div className="col-span-4">
                 <div className="grid grid-cols-9 gap-2">
@@ -365,7 +370,7 @@ const Items = (props) => {
               <div className="col-span-2 ">
                 <div className="flex items-center justify-end space-x-2">
                   <OnResetData
-                    sOnFetching={() => {}}
+                    sOnFetching={() => { }}
                     onClick={refetch.bind(this)}
                   />
                   {role == true || checkExport ? (
@@ -535,7 +540,7 @@ const Items = (props) => {
                             )}
                             <BtnAction
                               onRefresh={refetch.bind(this)}
-                              onRefreshGroup={() => {}}
+                              onRefreshGroup={() => { }}
                               dataLang={dataLang}
                               id={e?.id}
                               type="materials"
@@ -612,21 +617,19 @@ const Popup_Detail = React.memo((props) => {
         <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
           <button
             onClick={_HandleSelectTab.bind(this, 0)}
-            className={`${
-              tab === 0
-                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                : "hover:text-[#0F4F9E] "
-            }  px-4 py-2 outline-none font-medium`}
+            className={`${tab === 0
+              ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+              : "hover:text-[#0F4F9E] "
+              }  px-4 py-2 outline-none font-medium`}
           >
             {props.dataLang?.information || "information"}
           </button>
           <button
             onClick={_HandleSelectTab.bind(this, 1)}
-            className={`${
-              tab === 1
-                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                : "hover:text-[#0F4F9E] "
-            }  px-4 py-2 outline-none font-medium`}
+            className={`${tab === 1
+              ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+              : "hover:text-[#0F4F9E] "
+              }  px-4 py-2 outline-none font-medium`}
           >
             {props.dataLang?.category_material_list_variant ||
               "category_material_list_variant"}
@@ -812,9 +815,8 @@ const Popup_Detail = React.memo((props) => {
                         {list?.variation_option_value?.map((e) => (
                           <div
                             key={e?.id ? e?.id.toString() : ""}
-                            className={`${
-                              list?.variation[1] ? "grid-cols-3" : "grid-cols-2"
-                            } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
+                            className={`${list?.variation[1] ? "grid-cols-3" : "grid-cols-2"
+                              } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
                           >
                             <div className="flex self-center justify-center">
                               {e?.image == null ? (

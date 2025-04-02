@@ -242,7 +242,7 @@ const SuppliersGroups = (props) => {
               <div className="flex items-center justify-end space-x-2">
                 <OnResetData
                   onClick={refetch.bind(this)}
-                  sOnFetching={(e) => {}}
+                  sOnFetching={(e) => { }}
                 />
                 {role == true || checkExport ? (
                   <div className={``}>
@@ -334,7 +334,7 @@ const SuppliersGroups = (props) => {
                           )}
                           <BtnAction
                             onRefresh={refetch.bind(this)}
-                            onRefreshGroup={() => {}}
+                            onRefreshGroup={() => { }}
                             dataLang={dataLang}
                             id={e?.id}
                             type="suppliers_groups"
