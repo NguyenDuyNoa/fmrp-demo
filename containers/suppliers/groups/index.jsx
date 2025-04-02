@@ -188,26 +188,8 @@ const SuppliersGroups = (props) => {
           </div>
         </>
       }
-      pagination={
-        <>
-          {data?.rResult?.length != 0 && (
-            <ContainerPagination>
-              <TitlePagination
-                dataLang={dataLang}
-                totalItems={data?.output?.iTotalDisplayRecords}
-              />
-              <Pagination
-                postsPerPage={limit}
-                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
-                paginate={paginate}
-                currentPage={router.query?.page || 1}
-              />
-            </ContainerPagination>
-          )}
-        </>
-      }
       table={
-        <div lassName="h-full flex flex-col bg-red-300">
+        <div className="h-full flex flex-col">
           <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
             <div className="col-span-4">
               <div className="grid items-center grid-cols-9 gap-2">
@@ -277,7 +259,7 @@ const SuppliersGroups = (props) => {
               </div>
             </div>
           </div>
-          <Customscrollbar className="h-full overflow-auto">
+          <Customscrollbar className="h-full overflow-y-auto">
             <div className="w-full">
               <HeaderTable gridCols={12}>
                 <ColumnTable colSpan={6} textAlign={"center"}>
@@ -293,63 +275,79 @@ const SuppliersGroups = (props) => {
               {isLoading || isFetching ? (
                 <Loading className="h-80" color="#0f4f9e" />
               ) : data?.rResult?.length > 0 ? (
-                <>
-                  <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                    {data?.rResult?.map((e) => (
-                      <RowTable gridCols={12} key={e.id.toString()}>
-                        <RowItemTable colSpan={6} textAlign={"left"}>
-                          {e.name}
-                        </RowItemTable>
-                        <RowItemTable
-                          colSpan={4}
-                          className="flex flex-wrap items-center gap-1"
-                        >
-                          {e.branch?.map((i) => (
-                            <TagBranch key={i}>{i.name}</TagBranch>
-                          ))}
-                        </RowItemTable>
-                        <RowItemTable
-                          colSpan={2}
-                          className="flex items-center justify-center my-auto space-x-2 text-center"
-                        >
-                          {role == true || checkEdit ? (
-                            <Popup_groupKh
-                              onRefresh={refetch.bind(this)}
-                              className="text-xs xl:text-base "
-                              isState={isState}
-                              sValueBr={e.branch}
-                              dataLang={dataLang}
-                              name={e.name}
-                              color={e.color}
-                              id={e.id}
-                              listBr={listBr}
-                            />
-                          ) : (
-                            <IconEdit
-                              className="cursor-pointer"
-                              onClick={() =>
-                                isShow("warning", WARNING_STATUS_ROLE)
-                              }
-                            />
-                          )}
-                          <BtnAction
+                <div className="divide-y divide-slate-200 h-full">
+                  {data?.rResult?.map((e) => (
+                    <RowTable gridCols={12} key={e.id.toString()}>
+                      <RowItemTable colSpan={6} textAlign={"left"}>
+                        {e.name}
+                      </RowItemTable>
+                      <RowItemTable
+                        colSpan={4}
+                        className="flex flex-wrap items-center gap-1"
+                      >
+                        {e.branch?.map((i) => (
+                          <TagBranch key={i}>{i.name}</TagBranch>
+                        ))}
+                      </RowItemTable>
+                      <RowItemTable
+                        colSpan={2}
+                        className="flex items-center justify-center my-auto space-x-2 text-center"
+                      >
+                        {role == true || checkEdit ? (
+                          <Popup_groupKh
                             onRefresh={refetch.bind(this)}
-                            onRefreshGroup={() => {}}
+                            className="text-xs xl:text-base "
+                            isState={isState}
+                            sValueBr={e.branch}
                             dataLang={dataLang}
-                            id={e?.id}
-                            type="suppliers_groups"
+                            name={e.name}
+                            color={e.color}
+                            id={e.id}
+                            listBr={listBr}
                           />
-                        </RowItemTable>
-                      </RowTable>
-                    ))}
-                  </div>
-                </>
+                        ) : (
+                          <IconEdit
+                            className="cursor-pointer"
+                            onClick={() =>
+                              isShow("warning", WARNING_STATUS_ROLE)
+                            }
+                          />
+                        )}
+                        <BtnAction
+                          onRefresh={refetch.bind(this)}
+                          onRefreshGroup={() => {}}
+                          dataLang={dataLang}
+                          id={e?.id}
+                          type="suppliers_groups"
+                        />
+                      </RowItemTable>
+                    </RowTable>
+                  ))}
+                </div>
               ) : (
                 <NoData />
               )}
             </div>
           </Customscrollbar>
         </div>
+      }
+      pagination={
+        <>
+          {data?.rResult?.length != 0 && (
+            <ContainerPagination>
+              <TitlePagination
+                dataLang={dataLang}
+                totalItems={data?.output?.iTotalDisplayRecords}
+              />
+              <Pagination
+                postsPerPage={limit}
+                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
+                paginate={paginate}
+                currentPage={router.query?.page || 1}
+              />
+            </ContainerPagination>
+          )}
+        </>
       }
     />
   );
