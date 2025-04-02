@@ -8,10 +8,25 @@ import ContainerPagination from "@/components/UI/common/ContainerPagination/Cont
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import {
+    ColumnTable,
+    HeaderTable,
+    RowItemTable,
+    RowTable,
+} from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, } from "@/components/UI/common/layout";
+import {
+    TagColorOrange,
+    TagColorSky,
+} from "@/components/UI/common/Tag/TagStatus";
+import {
+    Container,
+    ContainerBody,
+    ContainerFilterTab,
+    ContainerTable,
+    ContainerTotal,
+    LayOutTableDynamic,
+} from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -21,7 +36,10 @@ import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import {
+    CONFIRMATION_OF_CHANGES,
+    TITLE_STATUS,
+} from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useSupplierList } from "@/containers/suppliers/supplier/hooks/useSupplierList";
@@ -50,6 +68,7 @@ import PopupDetail from "./components/popup";
 import { useReturnCombobox } from "./hooks/useReturnCombobox";
 import { useReturnFilterbar } from "./hooks/useReturnFilterbar";
 import { useReturnList } from "./hooks/useReturnList";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initialState = {
     onSending: false,
@@ -59,7 +78,7 @@ const initialState = {
     refreshing: false,
     valueCode: null,
     valueSupplier: null,
-    valueDate: { startDate: null, endDate: null, }
+    valueDate: { startDate: null, endDate: null },
 };
 const PurchaseReturns = (props) => {
     const dataLang = props.dataLang;
@@ -76,7 +95,7 @@ const PurchaseReturns = (props) => {
 
     const [checkedWare, sCheckedWare] = useState({});
 
-    const { handleTab: _HandleSelectTab } = useTab('all');
+    const { handleTab: _HandleSelectTab } = useTab("all");
 
     const [isState, sIstate] = useState(initialState);
 
@@ -86,7 +105,9 @@ const PurchaseReturns = (props) => {
 
     const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    const { is_admin: role, permissions_current: auth } = useSelector(
+        (state) => state.auth
+    );
 
     const { checkAdd, checkExport } = useActionRole(auth, "returns");
 
@@ -97,24 +118,32 @@ const PurchaseReturns = (props) => {
         "filter[status_bar]": router.query?.tab ?? null,
         "filter[id]": isState.valueCode != null ? isState.valueCode?.value : null,
         "filter[branch_id]": isState.valueBr != null ? isState.valueBr.value : null,
-        "filter[supplier_id]": isState.valueSupplier ? isState.valueSupplier.value : null,
-        "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-        "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-    }
+        "filter[supplier_id]": isState.valueSupplier
+            ? isState.valueSupplier.value
+            : null,
+        "filter[start_date]":
+            isState.valueDate?.startDate != null
+                ? isState.valueDate?.startDate
+                : null,
+        "filter[end_date]":
+            isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+    };
 
-    const { data: listBranch = [] } = useBranchList()
+    const { data: listBranch = [] } = useBranchList();
 
-    const { data: dataSupplier } = useSupplierList({})
+    const { data: dataSupplier } = useSupplierList({});
 
     const { data, isFetching, refetch } = useReturnList(params);
 
-    const newParam = { ...params, limit: 0, "filter[status_bar]": undefined }
+    const newParam = { ...params, limit: 0, "filter[status_bar]": undefined };
 
     const { data: listCode = [] } = useReturnCombobox(isState.keySearchCode);
 
-    const { data: dataFilterbar, refetch: refetchFilter } = useReturnFilterbar(newParam)
+    const { data: dataFilterbar, refetch: refetchFilter } =
+        useReturnFilterbar(newParam);
 
-    const listSupplier = dataSupplier?.rResult?.map((e) => ({ label: e.name, value: e.id })) || []
+    const listSupplier =
+        dataSupplier?.rResult?.map((e) => ({ label: e.name, value: e.id })) || [];
 
     const _HandleSeachApi = debounce(async (inputValue) => {
         queryState({ keySearchCode: inputValue });
@@ -206,7 +235,8 @@ const PurchaseReturns = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}`,
+                    title: `${dataLang?.import_brow_storekeepers || "import_brow_storekeepers"
+                        }`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -239,16 +269,19 @@ const PurchaseReturns = (props) => {
                     value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
                 },
                 {
-                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`,
+                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""
+                        }`,
                 },
                 {
                     value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`,
                 },
                 {
-                    value: `${e?.treatment_methods === "2" ? "Giảm trừ công nợ" : "Trả tiền mặt"}`,
+                    value: `${e?.treatment_methods === "2" ? "Giảm trừ công nợ" : "Trả tiền mặt"
+                        }`,
                 },
                 {
-                    value: `${e?.warehouseman_id === "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}`,
+                    value: `${e?.warehouseman_id === "0" ? "Chưa duyệt kho" : "Đã duyệt kho"
+                        }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -280,28 +313,31 @@ const PurchaseReturns = (props) => {
 
     const handingStatus = useMutation({
         mutationFn: (data) => apiReturns.apiHandingStatus(data),
-    })
+    });
 
     const _ServerSending = () => {
         let data = new FormData();
-        data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
+        data.append(
+            "warehouseman_id",
+            checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : ""
+        );
         data.append("id", checkedWare?.id);
         handingStatus.mutate(data, {
             onSuccess: async ({ isSuccess, message }) => {
                 if (isSuccess) {
                     isShow("success", `${dataLang[message]}` || message);
                     queryState({ refreshing: true });
-                    await refetch()
-                    await refetchFilter()
+                    await refetch();
+                    await refetchFilter();
                     queryState({ refreshing: false });
                 } else {
                     isShow("error", `${dataLang[message]}` || message);
                 }
             },
             onError: (error) => {
-                throw error
+                throw error;
             },
-        })
+        });
         queryState({ onSending: false });
     };
 
@@ -317,292 +353,361 @@ const PurchaseReturns = (props) => {
         checkedWare.id != null && queryState({ onSending: true });
     }, [checkedWare.id != null]);
 
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.returns_title || "returns_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.returns_list || "returns_list"}`,
+        },
+    ];
+
     return (
         <React.Fragment>
-            <Head>
-                <title>{dataLang?.returns_title || "returns_title"} </title>
-            </Head>
-            <Container>
-                {statusExprired ? (
-                    <EmptyExprired />
-                ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.returns_title || "returns_title"}</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.returns_list || "returns_list"}</h6>
-                    </div>
-                )}
-                <ContainerBody>
-                    <div className="space-y-0.5 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
-                            <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.returns_list || "returns_list"}
-                            </h2>
-                            <ButtonAddNew
-                                onClick={() => {
-                                    if (role) {
-                                        router.push(routerReturns.form);
-                                    } else if (checkAdd) {
-                                        router.push(routerReturns.form);
-                                    } else {
-                                        isShow("warning", WARNING_STATUS_ROLE);
-                                    }
-                                }}
-                                dataLang={dataLang}
-                            />
-                        </div>
-                        <ContainerFilterTab>
-                            {dataFilterbar &&
-                                dataFilterbar?.map((e) => {
-                                    return (
-                                        <TabFilter
-                                            backgroundColor="#e2f0fe"
-                                            dataLang={dataLang}
-                                            key={e?.id}
-                                            onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                            total={e?.count}
-                                            active={e?.id}
-                                        >
-                                            {dataLang[e?.name] || e?.name}
-                                        </TabFilter>
-                                    );
-                                })}
-                        </ContainerFilterTab>
-                        <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
-                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                                    <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                        <div className="grid grid-cols-5">
-                                            <SearchComponent
-                                                colSpan={1}
-                                                dataLang={dataLang}
-                                                placeholder={dataLang?.branch_search}
-                                                onChange={_HandleOnChangeKeySearch.bind(this)}
-                                            />
-                                            <SelectComponent
-                                                options={[
-                                                    {
-                                                        value: "",
-                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
-                                                        isDisabled: true,
-                                                    },
-                                                    ...listBranch,
-                                                ]}
-                                                onChange={(e) => queryState({ valueBr: e })}
-                                                value={isState.valueBr}
-                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
-                                                isClearable={true}
-                                                colSpan={1}
-                                            />
-                                            <SelectComponent
-                                                onInputChange={(event) => {
-                                                    _HandleSeachApi(event);
-                                                }}
-                                                options={[
-                                                    {
-                                                        value: "",
-                                                        label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
-                                                        isDisabled: true,
-                                                    },
-                                                    ...listCode,
-                                                ]}
-                                                onChange={(e) => queryState({ valueCode: e })}
-                                                value={isState.valueCode}
-                                                placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
-                                                isClearable={true}
-                                                colSpan={1}
-                                            />
-                                            <SelectComponent
-                                                options={[
-                                                    {
-                                                        value: "",
-                                                        label: dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier",
-                                                        isDisabled: true,
-                                                    },
-                                                    ...listSupplier,
-                                                ]}
-                                                onChange={(e) => queryState({ valueSupplier: e })}
-                                                value={isState.valueSupplier}
-                                                placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
-                                                hideSelectedOptions={false}
-                                                isClearable={true}
-                                                isSearchable={true}
-                                                colSpan={1}
-                                            />
-                                            <DateToDateComponent
-                                                colSpan={1}
-                                                value={isState.valueDate}
-                                                onChange={(e) => queryState({ valueDate: e })}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                        <div className="flex justify-end items-center gap-2">
-                                            <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
-                                            {role == true || checkExport ? (
-                                                <div className={``}>
-                                                    {data?.rResult?.length > 0 && (
-                                                        <ExcelFileComponent
-                                                            dataLang={dataLang}
-                                                            filename={dataLang?.returns_list || "returns_list"}
-                                                            title="DSTH"
-                                                            multiDataSet={multiDataSet}
-                                                        />
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <button
-                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
-                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                                                >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
-                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                </button>
+            <LayOutTableDynamic
+                head={
+                    <Head>
+                        <title>{dataLang?.returns_title || "returns_title"} </title>
+                    </Head>
+                }
+                breadcrumb={
+                    <>
+                        {statusExprired ? (
+                            <EmptyExprired />
+                        ) : (
+                            <React.Fragment>
+                                <Breadcrumb
+                                    items={breadcrumbItems}
+                                    className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                                />
+                            </React.Fragment>
+                        )}
+                    </>
+                }
+                titleButton={
+                    <>
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
+                            {dataLang?.returns_list || "returns_list"}
+                        </h2>
+                        <ButtonAddNew
+                            onClick={() => {
+                                if (role) {
+                                    router.push(routerReturns.form);
+                                } else if (checkAdd) {
+                                    router.push(routerReturns.form);
+                                } else {
+                                    isShow("warning", WARNING_STATUS_ROLE);
+                                }
+                            }}
+                            dataLang={dataLang}
+                        />
+                    </>
+                }
+                fillterTab={
+                    <>
+                        {dataFilterbar &&
+                            dataFilterbar?.map((e) => {
+                                return (
+                                    <TabFilter
+                                        backgroundColor="#e2f0fe"
+                                        dataLang={dataLang}
+                                        key={e?.id}
+                                        onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                        total={e?.count}
+                                        active={e?.id}
+                                    >
+                                        {dataLang[e?.name] || e?.name}
+                                    </TabFilter>
+                                );
+                            })}
+                    </>
+                }
+                table={
+                    <div className="flex flex-col h-full">
+                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                            <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
+                                <div className="grid grid-cols-5">
+                                    <SearchComponent
+                                        colSpan={1}
+                                        dataLang={dataLang}
+                                        placeholder={dataLang?.branch_search}
+                                        onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    />
+                                    <SelectComponent
+                                        options={[
+                                            {
+                                                value: "",
+                                                label:
+                                                    dataLang?.purchase_order_table_branch ||
+                                                    "purchase_order_table_branch",
+                                                isDisabled: true,
+                                            },
+                                            ...listBranch,
+                                        ]}
+                                        onChange={(e) => queryState({ valueBr: e })}
+                                        value={isState.valueBr}
+                                        placeholder={
+                                            dataLang?.purchase_order_table_branch ||
+                                            "purchase_order_table_branch"
+                                        }
+                                        isClearable={true}
+                                        colSpan={1}
+                                    />
+                                    <SelectComponent
+                                        onInputChange={(event) => {
+                                            _HandleSeachApi(event);
+                                        }}
+                                        options={[
+                                            {
+                                                value: "",
+                                                label:
+                                                    dataLang?.purchase_order_table_code ||
+                                                    "purchase_order_table_code",
+                                                isDisabled: true,
+                                            },
+                                            ...listCode,
+                                        ]}
+                                        onChange={(e) => queryState({ valueCode: e })}
+                                        value={isState.valueCode}
+                                        placeholder={
+                                            dataLang?.purchase_order_table_code ||
+                                            "purchase_order_table_code"
+                                        }
+                                        isClearable={true}
+                                        colSpan={1}
+                                    />
+                                    <SelectComponent
+                                        options={[
+                                            {
+                                                value: "",
+                                                label:
+                                                    dataLang?.purchase_order_table_supplier ||
+                                                    "purchase_order_table_supplier",
+                                                isDisabled: true,
+                                            },
+                                            ...listSupplier,
+                                        ]}
+                                        onChange={(e) => queryState({ valueSupplier: e })}
+                                        value={isState.valueSupplier}
+                                        placeholder={
+                                            dataLang?.purchase_order_table_supplier ||
+                                            "purchase_order_table_supplier"
+                                        }
+                                        hideSelectedOptions={false}
+                                        isClearable={true}
+                                        isSearchable={true}
+                                        colSpan={1}
+                                    />
+                                    <DateToDateComponent
+                                        colSpan={1}
+                                        value={isState.valueDate}
+                                        onChange={(e) => queryState({ valueDate: e })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-span-1 xl:col-span-2 lg:col-span-2">
+                                <div className="flex justify-end items-center gap-2">
+                                    <OnResetData
+                                        sOnFetching={(e) => { }}
+                                        onClick={() => refetch()}
+                                    />
+                                    {role == true || checkExport ? (
+                                        <div className={``}>
+                                            {data?.rResult?.length > 0 && (
+                                                <ExcelFileComponent
+                                                    dataLang={dataLang}
+                                                    filename={dataLang?.returns_list || "returns_list"}
+                                                    title="DSTH"
+                                                    multiDataSet={multiDataSet}
+                                                />
                                             )}
-                                            <div>
-                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                            </div>
                                         </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                            className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                        >
+                                            <Grid6
+                                                className="2xl:scale-100 xl:scale-100 scale-75"
+                                                size={18}
+                                            />
+                                            <span>{dataLang?.client_list_exportexcel}</span>
+                                        </button>
+                                    )}
+                                    <div>
+                                        <DropdowLimit
+                                            sLimit={sLimit}
+                                            limit={limit}
+                                            dataLang={dataLang}
+                                        />
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar>
-                                <div className="w-full">
-                                    <HeaderTable gridCols={10}>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_day_vouchers || "import_day_vouchers"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_code_vouchers || "import_code_vouchers"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_supplier || "import_supplier"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_total_amount || "import_total_amount"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_tax_money || "import_tax_money"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_into_money || "import_into_money"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.returns_form || "returns_form"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_branch || "import_branch"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_action || "import_action"}
-                                        </ColumnTable>
-                                    </HeaderTable>
-                                    {(isFetching && !isState.refreshing) ? (
-                                        <Loading className="h-80" color="#0f4f9e" />
-                                    ) : data?.rResult?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                {data?.rResult?.map((e) => (
-                                                    <RowTable gridCols={10} key={e.id.toString()}>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <PopupDetail
-                                                                dataLang={dataLang}
-                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
-                                                                name={e?.code}
-                                                                id={e?.id}
+                        </div>
+                        <Customscrollbar className="h-full overflow-y-auto">
+                            <div className="w-full">
+                                <HeaderTable gridCols={10}>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_day_vouchers || "import_day_vouchers"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_code_vouchers || "import_code_vouchers"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_supplier || "import_supplier"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_total_amount || "import_total_amount"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_tax_money || "import_tax_money"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_into_money || "import_into_money"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.returns_form || "returns_form"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_brow_storekeepers ||
+                                            "import_brow_storekeepers"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_branch || "import_branch"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_action || "import_action"}
+                                    </ColumnTable>
+                                </HeaderTable>
+                                {isFetching && !isState.refreshing ? (
+                                    <Loading className="h-80" color="#0f4f9e" />
+                                ) : data?.rResult?.length > 0 ? (
+                                    <>
+                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                            {data?.rResult?.map((e) => (
+                                                <RowTable gridCols={10} key={e.id.toString()}>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        {e?.date != null
+                                                            ? formatMoment(
+                                                                e?.date,
+                                                                FORMAT_MOMENT.DATE_SLASH_LONG
+                                                            )
+                                                            : ""}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        <PopupDetail
+                                                            dataLang={dataLang}
+                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                            name={e?.code}
+                                                            id={e?.id}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                        {e.supplier_name}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"right"}>
+                                                        {formatMoney(e.total_price)}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"right"}>
+                                                        {formatMoney(e.total_tax_price)}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"right"}>
+                                                        {formatMoney(e.total_amount)}
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        className="mx-auto flex items-center w-fit"
+                                                    >
+                                                        {(e?.treatment_methods === "1" && (
+                                                            <TagColorSky
+                                                                name={dataLang?.pay_down || "pay_down"}
                                                             />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"left"}>
-                                                            {e.supplier_name}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"right"}>
-                                                            {formatMoney(e.total_price)}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"right"}>
-                                                            {formatMoney(e.total_tax_price)}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"right"}>
-                                                            {formatMoney(e.total_amount)}
-                                                        </RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            className="mx-auto flex items-center w-fit"
-                                                        >
-                                                            {(e?.treatment_methods === "1" && (
-                                                                <TagColorSky name={dataLang?.pay_down || "pay_down"} />
-                                                            )) ||
-                                                                (e?.treatment_methods === "2" && (
-                                                                    <TagColorOrange
-                                                                        name={dataLang?.debt_reduction || "debt_reduction"}
-                                                                    />
-                                                                ))}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1}>
-                                                            <ButtonWarehouse
-                                                                warehouseman_id={e?.warehouseman_id}
-                                                                _HandleChangeInput={_HandleChangeInput}
-                                                                id={e?.id}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="mx-auto">
-                                                            <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex justify-center">
-                                                            <BtnAction
-                                                                onRefresh={refetch.bind(this)}
-                                                                onRefreshGroup={refetchFilter.bind(this)}
-                                                                dataLang={dataLang}
-                                                                warehouseman_id={e?.warehouseman_id}
-                                                                status_pay={e?.status_pay}
-                                                                id={e?.id}
-                                                                type="returns"
-                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                            />
-                                                        </RowItemTable>
-                                                    </RowTable>
-                                                ))}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <NoData />
-                                    )}
-                                </div>
-                            </Customscrollbar>
-                        </ContainerTable>
+                                                        )) ||
+                                                            (e?.treatment_methods === "2" && (
+                                                                <TagColorOrange
+                                                                    name={
+                                                                        dataLang?.debt_reduction || "debt_reduction"
+                                                                    }
+                                                                />
+                                                            ))}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1}>
+                                                        <ButtonWarehouse
+                                                            warehouseman_id={e?.warehouseman_id}
+                                                            _HandleChangeInput={_HandleChangeInput}
+                                                            id={e?.id}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="mx-auto">
+                                                        <TagBranch className="w-fit">
+                                                            {e?.branch_name}
+                                                        </TagBranch>
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        className="flex justify-center"
+                                                    >
+                                                        <BtnAction
+                                                            onRefresh={refetch.bind(this)}
+                                                            onRefreshGroup={refetchFilter.bind(this)}
+                                                            dataLang={dataLang}
+                                                            warehouseman_id={e?.warehouseman_id}
+                                                            status_pay={e?.status_pay}
+                                                            id={e?.id}
+                                                            type="returns"
+                                                            className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                        />
+                                                    </RowItemTable>
+                                                </RowTable>
+                                            ))}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <NoData />
+                                )}
+                            </div>
+                        </Customscrollbar>
                     </div>
-                    <ContainerTotal className="!grid-cols-10">
-                        <RowItemTable colSpan={3} textAlign={"center"} className="p-2">
-                            {dataLang?.import_total || "import_total"}
-                        </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
-                            {formatMoney(data?.rTotal?.total_price)}
-                        </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
-                            {formatMoney(data?.rTotal?.total_tax_price)}
-                        </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
-                            {formatMoney(data?.rTotal?.total_amount)}
-                        </RowItemTable>
-                    </ContainerTotal>
-                    {data?.rResult?.length != 0 && (
-                        <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
-                            <Pagination
-                                postsPerPage={limit}
-                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
-                                paginate={paginate}
-                                currentPage={router.query?.page || 1}
-                            />
-                        </ContainerPagination>
-                    )}
-                </ContainerBody>
-            </Container>
+                }
+                showTotal={true}
+                total={
+                    <>
+                        <ContainerTotal className="!grid-cols-10">
+                            <RowItemTable colSpan={3} textAlign={"center"} className="p-2">
+                                {dataLang?.import_total || "import_total"}
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
+                                {formatMoney(data?.rTotal?.total_price)}
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
+                                {formatMoney(data?.rTotal?.total_tax_price)}
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
+                                {formatMoney(data?.rTotal?.total_amount)}
+                            </RowItemTable>
+                        </ContainerTotal>
+                    </>
+                }
+                pagination={
+                    <>
+                        {data?.rResult?.length != 0 && (
+                            <ContainerPagination>
+                                <TitlePagination
+                                    dataLang={dataLang}
+                                    totalItems={data?.output?.iTotalDisplayRecords}
+                                />
+                                <Pagination
+                                    postsPerPage={limit}
+                                    totalPosts={Number(data?.output?.iTotalDisplayRecords)}
+                                    paginate={paginate}
+                                    currentPage={router.query?.page || 1}
+                                />
+                            </ContainerPagination>
+                        )}
+                    </>
+                }
+            />
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
