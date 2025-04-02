@@ -2,7 +2,7 @@ import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiD
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container } from "@/components/UI/common/layout";
+import { Container, LayOutTableDynamic } from "@/components/UI/common/layout";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading/loading";
@@ -42,6 +42,7 @@ import { useClientComboboxByFilterBranch } from "@/hooks/common/useClients";
 import { useTaxList } from "@/hooks/common/useTaxs";
 import { useStaffOptions } from "@/hooks/common/useStaffs";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 const DeliveryReceiptForm = (props) => {
     const router = useRouter();
 
@@ -907,6 +908,18 @@ const DeliveryReceiptForm = (props) => {
         onSending && _ServerSending();
     }, [onSending]);
 
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.returnSales_title || "returnSales_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
+                : dataLang?.delivery_receipt_add || "delivery_receipt_add"}`,
+        },
+    ];
+
+
     return (
         <React.Fragment>
             <Head>
@@ -917,20 +930,17 @@ const DeliveryReceiptForm = (props) => {
             <Container className="!h-auto">
                 {statusExprired ? (
                     <EmptyExprired />
-
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6> {id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
-                            : dataLang?.delivery_receipt_add || "delivery_receipt_add"}</h6>
-                    </div>
+                    <React.Fragment>
+                        <Breadcrumb
+                            items={breadcrumbItems}
+                            className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                        />
+                    </React.Fragment>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between ">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium ">
                             {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">
