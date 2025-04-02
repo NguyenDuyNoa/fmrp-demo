@@ -914,6 +914,9 @@ const DeliveryReceiptForm = (props) => {
             // href: "/",
         },
         {
+            label: `${dataLang?.delivery_receipt_list || "delivery_receipt_list"}`,
+        },
+        {
             label: `${id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
                 : dataLang?.delivery_receipt_add || "delivery_receipt_add"}`,
         },

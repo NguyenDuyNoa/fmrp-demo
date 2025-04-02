@@ -677,6 +677,9 @@ const ReturnSalesForm = (props) => {
             // href: "/",
         },
         {
+            label: `${dataLang?.returnSales_titleLits || "returnSales_titleLits"}`,
+        },
+        {
             label: `${id ? dataLang?.returnSales_edit || "returnSales_edit"
                 : dataLang?.returnSales_add || "returnSales_add"}`,
         },
