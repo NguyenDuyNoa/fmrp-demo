@@ -22,8 +22,11 @@ const PopupDetail = (props) => {
 
     const [dataRole, sDataRole] = useState([])
 
+    // data chi tiết người dùng
     const { data, isFetching } = useStaffDetail(open, props?.id);
 
+
+    // danh sách module
     useQuery({
         queryKey: ["api_permissions_staff_detail"],
         queryFn: async () => {

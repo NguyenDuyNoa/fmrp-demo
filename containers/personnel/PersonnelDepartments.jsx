@@ -1,13 +1,11 @@
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import {
-  Container,
-  ContainerBody,
-  ContainerTable,
-  LayOutTableDynamic,
+  LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import {
   ColumnTable,
@@ -40,7 +38,6 @@ import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import Popup_phongban from "./components/departments/popup";
 import { useDepartmentList } from "./hooks/departments/useDepartmentList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initalState = {
   keySearch: "",
@@ -62,17 +59,13 @@ const PersonnelDepartments = (props) => {
 
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-  const { is_admin: role, permissions_current: auth } = useSelector(
-    (state) => state.auth
-  );
+  const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-  const { checkAdd, checkEdit, checkExport } = useActionRole(
-    auth,
-    "department"
-  );
+  const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "department");
 
   const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
+  // parasm tìm kiếm table
   const params = {
     search: isState.keySearch,
     limit: limit,
@@ -81,15 +74,19 @@ const PersonnelDepartments = (props) => {
       isState.valueBr?.length > 0 ? isState.valueBr.map((e) => e.value) : null,
   };
 
+  // danh sách phòng ban
   const { data, isFetching, refetch } = useDepartmentList(params);
 
+  // danh sách chi nhánh
   const { data: listBranch = [] } = useBranchList();
 
+  // tìm kiếm table
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
     queryState({ keySearch: value });
     router.replace("/personnels/departments");
   }, 500);
 
+  // xuất exel
   const multiDataSet = [
     {
       columns: [
@@ -137,16 +134,11 @@ const PersonnelDepartments = (props) => {
 
   const breadcrumbItems = [
     {
-      label: `${
-        dataLang?.header_category_personnel || "header_category_personnel"
-      }`,
+      label: `${dataLang?.header_category_personnel || "header_category_personnel"}`,
       // href: "/",
     },
     {
-      label: `${
-        dataLang?.personnels_deparrtments_title ||
-        "personnels_deparrtments_title"
-      }`,
+      label: `${dataLang?.personnels_deparrtments_title || "personnels_deparrtments_title"}`,
     },
   ];
 
@@ -202,7 +194,7 @@ const PersonnelDepartments = (props) => {
           </>
         }
         table={
-          <div className="h-full flex flex-col">
+          <div className="flex flex-col h-full">
             <div className="grid items-center justify-between w-full grid-cols-6 p-2 rounded bg-slate-100 xl:p-3">
               <div className="col-span-4">
                 <div className="grid grid-cols-9 gap-2">
@@ -237,7 +229,7 @@ const PersonnelDepartments = (props) => {
                 <div className="flex items-center justify-end space-x-2">
                   <OnResetData
                     onClick={refetch.bind(this)}
-                    sOnFetching={(e) => {}}
+                    sOnFetching={(e) => { }}
                   />
                   {role == true || checkExport ? (
                     <div className={``}>
@@ -337,7 +329,7 @@ const PersonnelDepartments = (props) => {
                             )}
                             <BtnAction
                               onRefresh={refetch.bind(this)}
-                              onRefreshGroup={() => {}}
+                              onRefreshGroup={() => { }}
                               dataLang={dataLang}
                               id={e?.id}
                               type="department"

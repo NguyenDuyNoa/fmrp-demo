@@ -1,5 +1,6 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { BtnAction } from "@/components/UI/BtnAction";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -13,10 +14,7 @@ import {
 } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
-  Container,
-  ContainerBody,
-  ContainerTable,
-  LayOutTableDynamic,
+  LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -45,6 +43,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { getColorByParam } from "@/utils/helpers/radomcolor";
 import { useMutation } from "@tanstack/react-query";
 import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
@@ -56,8 +55,6 @@ import { useSelector } from "react-redux";
 import PopupStaff from "./components/staff/popup";
 import PopupDetail from "./components/staff/popupDetail";
 import { useStaffList } from "./hooks/staff/useStaffList";
-import { getColorByParam, getRandomColors } from "@/utils/helpers/radomcolor";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initalState = {
   onSending: false,
@@ -68,10 +65,12 @@ const initalState = {
   refreshing: false,
 };
 const PersonelStaff = (props) => {
-  const dataLang = props.dataLang;
   const router = useRouter();
 
   const isShow = useToast();
+
+  const dataLang = props.dataLang;
+
   // hook phân trang
   const { paginate } = usePagination();
 

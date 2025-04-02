@@ -275,7 +275,7 @@ const Popup_dsnd = (props) => {
         isState.onSending && _ServerSending();
     }, [isState.onSending]);
 
-    //
+    // danh sách chức vụ
     useQuery({
         queryKey: ["api_staff_manage", isState.idPos],
         queryFn: async () => {
@@ -327,6 +327,7 @@ const Popup_dsnd = (props) => {
     }, [isState.password != ""]);
 
 
+    // tìm kiếm thì ẩn hiện modlue theo key search
     useEffect(() => {
         const filteredData = isState.room.filter((item) =>
             item.name.toLowerCase().includes(isState.valueSearch.toLowerCase())
@@ -351,11 +352,7 @@ const Popup_dsnd = (props) => {
     return (
         <>
             <PopupCustom
-                title={
-                    props.id
-                        ? `${props.dataLang?.personnels_staff_popup_edit}`
-                        : `${props.dataLang?.personnels_staff_popup_add}`
-                }
+                title={props.id ? `${props.dataLang?.personnels_staff_popup_edit}` : `${props.dataLang?.personnels_staff_popup_add}`}
                 button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={() => queryState({ open: true })}
                 open={isState.open}
