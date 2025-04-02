@@ -19,6 +19,8 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import TabSwitcherWithSlidingBackground from '@/components/common/tab/TabSwitcherWithSlidingBackground'
 import { useMaterialOutput } from '@/managers/api/productions-order/useMaterialOutput'
+import { TagColorProductNew } from '@/components/common/tag/TagStatusNew'
+import StackedBarChart from '../ui/StackedBarChart'
 
 const tabs = [
     { id: "dashboard", name: "Biểu đồ thống kê" },
@@ -29,10 +31,11 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
     const [isLoadingTable, setIsLoadingTable] = useState(false)
     const [isOpenSearch, setIsOpenSearch] = useState(false);
     const [activeTab, setActiveTab] = useState(tabs[0]) // tab biểu đồ
+    const [limit, setLimit] = useState(5);
 
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
-    const [searchMaterialReturn] = useDebounce(isStateProvider?.productionsOrders?.searchSheet?.searchMaterialReturn, 1000);
+    const [searchMaterialOutput] = useDebounce(isStateProvider?.productionsOrders?.searchSheet?.searchMaterialOutput, 1000);
 
     const {
         data: dataMaterialOutput,
@@ -61,7 +64,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                 ...isStateProvider?.productionsOrders,
                 searchSheet: {
                     ...isStateProvider?.productionsOrders?.searchSheet,
-                    searchMaterialReturn: e.target.value
+                    searchMaterialOutput: e.target.value
                 }
             }
         });
@@ -79,15 +82,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                     },
                 },
                 {
-                    title: "Ngày CT",
-                    width: { wch: 4 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                {
-                    title: `${'Phiếu nhập'}`,
+                    title: "Nguyên vật liệu",
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -95,7 +90,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                     },
                 },
                 {
-                    title: `${'Nguyên vật liệu'}`,
+                    title: "Biến thể",
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -103,38 +98,13 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                     },
                 },
                 {
-                    title: `${'Biến thể'}`,
+                    title: "Mã nguyên vật liệu",
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
                         font: { bold: true },
                     },
                 },
-                ...[dataProductSerial.is_enable === "1" && {
-                    title: `${'Serial'}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
-                    title: `${'Lot'}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
-                    title: `${'Date'}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                ].filter(Boolean),
                 {
                     title: `${'Đơn vị tính'}`,
                     width: { wch: 40 },
@@ -143,8 +113,16 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                         font: { bold: true },
                     },
                 },
+                // {
+                //     title: `${'Loại'}`,
+                //     width: { wch: 40 },
+                //     style: {
+                //         fill: { fgColor: { rgb: "C7DFFB" } },
+                //         font: { bold: true },
+                //     },
+                // },
                 {
-                    title: `${'Số lượng'}`,
+                    title: `${'Kế hoạch'}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -152,7 +130,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                     },
                 },
                 {
-                    title: `${'Kho hàng'}`,
+                    title: `${'Đề xuất'}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -160,7 +138,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                     },
                 },
                 {
-                    title: `${'Vị trí kho'}`,
+                    title: `${'Còn lại'}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -168,7 +146,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                     },
                 },
                 {
-                    title: `${'Ghi chú'}`,
+                    title: `${'Thu hồi'}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -177,28 +155,39 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                 },
             ],
             data: dataMaterialOutput?.map((e, index) => [
-                { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
-                { value: `${e?.date ? formatMoment(e.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ''}` },
-                { value: `${e?.reference_no ?? ""}` },
-                { value: `${e?.item_name ?? ""}` },
-                { value: `${e?.variation ?? ""}` },
-                ...[
-                    dataProductSerial.is_enable === "1" && { value: `${e?.serial ?? ""}` },
-                    (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && { value: `${e?.lot ?? ""}` },
-                    (dataProductExpiry.is_enable === "1" || dataMaterialExpiry.is_enable === "1") && {
-                        value: `${e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}`
-                    },
-                ].filter(Boolean),
+                { value: `${e?.item_id ? e.item_id : ""}`, style: { numFmt: "0" } },
+                { value: `${e?.item_name ? e?.item_name : ''}` },
+                { value: `${e?.product_variation ?? ""}` },
+                { value: `${e?.item_code ?? ""}` },
                 { value: `${e?.unit_name ?? ""}` },
-                { value: `${e?.quantity ? formatNumber(e?.quantity) : ""}` },
-                { value: `${e?.warehouse?.name ?? ""}` },
-                { value: `${e?.location?.name ?? ""}` },
-                { value: `${e?.note_item ?? ""}` },
+                { value: `${+e?.quantity_total_quota ? formatNumber(+e?.quantity_total_quota) : "0"}` },
+                { value: `${+e?.quantity_exported ? formatNumber(+e?.quantity_exported) : "0"}` },
+                { value: `${+e?.quantity_rest ? formatNumber(+e?.quantity_rest) : "0"}` },
+                { value: `${+e?.quantity_recovery ? formatNumber(+e?.quantity_recovery) : "0"}` },
             ]),
         },
     ];
 
-    console.log('dataMaterialOutput', dataMaterialOutput);
+    const filteredData = useMemo(() => {
+        if (!searchMaterialOutput) return dataMaterialOutput;
+
+        const keyword = searchMaterialOutput.toLowerCase();
+
+        return dataMaterialOutput?.filter((item) => {
+            const name = item?.item_name?.toLowerCase() || "";
+            const code = item?.item_code?.toLowerCase() || "";
+            const variation = item?.product_variation?.toLowerCase() || "";
+            const reference = item?.reference_no?.toLowerCase() || "";
+
+            return (
+                name.includes(keyword) ||
+                code.includes(keyword) ||
+                variation.includes(keyword) ||
+                reference.includes(keyword)
+            );
+        }) || [];
+    }, [searchMaterialOutput, dataMaterialOutput]);
+
     console.log('dataMaterialOutput', dataMaterialOutput);
 
     return (
@@ -216,7 +205,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                         <AnimatedSearchInput
                             isOpen={isOpenSearch}
                             onToggle={toggleSearch}
-                            value={isStateProvider?.productionsOrders?.searchSheet?.searchMaterialReturn}
+                            value={isStateProvider?.productionsOrders?.searchSheet?.searchMaterialOutput}
                             onChange={onChangeSearch}
                             placeholder={dataLang?.productions_orders_find || 'Tìm kiếm...'}
                         />
@@ -267,9 +256,10 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
             </div>
             {
                 activeTab?.id == "dashboard" &&
-                <>
-                    Hello dashboard
-                </>
+                // <>
+                //     Hello
+                // </>
+                <StackedBarChart rawData={dataMaterialOutput} />
             }
             {
                 activeTab?.id == "table" &&
@@ -280,63 +270,53 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                             <h4 className="text-xs-default text-center text-[#9295A4] font-semibold col-span-1 px-1">
                                 STT
                             </h4>
-                            <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-2 px-1">
-                                Ngày chứng từ
-                            </h4>
-                            <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-2 px-1">
-                                Phiếu nhập
-                            </h4>
+
                             <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-3 px-1">
                                 Nguyên vật liệu
                             </h4>
-                            <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-1 px-1">
-                                Đơn vị tính
+
+                            <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-1 px-1">
+                                ĐVT
                             </h4>
-                            <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-1 px-1">
-                                Số lượng
+
+                            <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-3 px-1">
+                                Loại
                             </h4>
-                            <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-2 px-1">
-                                Kho hàng
+
+                            <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
+                                Kế hoạch
                             </h4>
-                            <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-2 px-1">
-                                Vị trí kho
+
+                            <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
+                                Đề xuất
                             </h4>
-                            <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-2 px-1">
-                                Ghi chú
+
+                            <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
+                                Còn lại
+                            </h4>
+
+                            <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
+                                Thu hồi
                             </h4>
                         </div>
 
                         <div className='col-span-16 grid grid-cols-16 min-h-[240px]'>
-                            {/* {
+                            {
                                 (isLoadingMaterialOutput || isLoadingTable)
                                     ?
                                     <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full col-span-16' />
                                     :
                                     (
-                                        dataMaterialOutput && dataMaterialOutput?.length > 0 ?
+                                        filteredData && filteredData?.length > 0 ?
                                             (
-                                                dataMaterialOutput?.map((product, index) => (
+                                                filteredData?.slice(0, limit)?.map((product, index) => (
                                                     <div
                                                         key={`product-${index}`}
                                                         // onClick={() => handleShowModel(product)}
-                                                        className={`${dataMaterialOutput?.length - 1 !== index ? "border-[#F3F3F4]" : "border-transparent"} border-b col-span-16 grid grid-cols-16 gap-2 items-start group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out`}
+                                                        className={`${filteredData?.length - 1 !== index ? "border-[#F3F3F4]" : "border-transparent"} border-b col-span-16 grid grid-cols-16 gap-2 items-start group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out`}
                                                     >
                                                         <h4 className="col-span-1 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default uppercase 3xl:py-4 py-2 px-1">
                                                             {index + 1 ?? "-"}
-                                                        </h4>
-
-                                                        <h4 className="col-span-2 flex flex-col justify-center size-full gap-1 text-[#141522] 3xl:py-4 py-2 px-1">
-                                                            <div className='text-sm-default font-semibold'>
-                                                                {product?.date ? formatMoment(product?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
-                                                            </div>
-
-                                                            <div className='text-xs-default font-normal'>
-                                                                {product?.date ? formatMoment(product?.date, FORMAT_MOMENT.TIME_LONG) : ""}
-                                                            </div>
-                                                        </h4>
-
-                                                        <h4 className="col-span-2 flex items-center justify-start size-full text-start text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1">
-                                                            {product?.reference_no ?? "-"}
                                                         </h4>
 
                                                         <h4 className="col-span-3 flex items-center justify-center size-full text-[#344054] font-normal gap-2 3xl:py-4 py-2 px-1">
@@ -347,20 +327,20 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                                                                     width={200}
                                                                     height={200}
                                                                     alt={product?.item_name ?? "image"}
-                                                                    className={`2xl:size-10 size-8 object-cover rounded-md shrink-0`}
+                                                                    className={`2xl:size-10 2xl:min-w-10 size-8 min-w-8 object-cover rounded-md shrink-0`}
                                                                 />
 
                                                                 <div className="flex flex-col 3xl:gap-1 gap-0.5">
                                                                     <p className={`font-semibold text-sm-default text-[#141522] group-hover:text-[#0F4F9E]`}>
-                                                                        {product.item_name}
+                                                                        {product?.item_name ?? ""}
                                                                     </p>
 
                                                                     <p className="text-[#667085] font-normal xl:text-[10px] text-[8px]">
-                                                                        {product.variation}
+                                                                        {product?.product_variation ?? ""}
                                                                     </p>
 
                                                                     <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
-                                                                        {product.item_code}
+                                                                        {product?.item_code ?? ""}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -370,20 +350,36 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                                                             {product?.unit_name ?? "-"}
                                                         </h4>
 
-                                                        <h4 className={` col-span-1 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
-                                                            {+product?.quantity > 0 ? formatNumber(+product?.quantity) : '-'}
+                                                        <h4 className="col-span-3 flex flex-col justify-center size-full gap-1 text-[#141522] 3xl:py-4 py-2 px-1">
+                                                            <TagColorProductNew
+                                                                dataKey={
+                                                                    product?.type_products === "products" ? 0 :
+                                                                        product?.type_products === "semi_products" ? 1 :
+                                                                            product?.type_products === "out_side" ? 2 :
+                                                                                product?.type_products === "materials" ? 3 :
+                                                                                    product?.type_products === "semi_products_outside" ? 4 :
+                                                                                        null
+                                                                }
+                                                                className={'!px-2 !py-1 !rounded-[4px] !font-normal text-sm-default'}
+                                                                dataLang={dataLang}
+                                                                name={product?.type_products}
+                                                            />
                                                         </h4>
 
-                                                        <h4 className={`${product?.warehouse?.name ? "justify-start" : "justify-start"} col-span-2 flex items-center size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
-                                                            {product?.warehouse?.name ?? "-"}
+                                                        <h4 className={`col-span-2 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
+                                                            {+product?.quantity_total_quota > 0 ? formatNumber(+product?.quantity_total_quota) : '-'}
                                                         </h4>
 
-                                                        <h4 className={`${product?.location?.name ? "justify-start" : "justify-start"} col-span-2 flex items-center size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
-                                                            {product?.location?.name ?? "-"}
+                                                        <h4 className={`col-span-2 flex items-center justify-center size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
+                                                            {+product?.quantity_exported > 0 ? formatNumber(+product?.quantity_exported) : '-'}
                                                         </h4>
 
-                                                        <h4 className={`${product?.note_item ? "justify-start" : "justify-start"} col-span-2 flex items-center size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
-                                                            {product?.note ?? "-"}
+                                                        <h4 className={`col-span-2 flex items-center justify-center size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
+                                                            {+product?.quantity_rest > 0 ? formatNumber(+product?.quantity_rest) : '-'}
+                                                        </h4>
+
+                                                        <h4 className={`col-span-2 flex items-center justify-center size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
+                                                            {+product?.quantity_recovery > 0 ? formatNumber(+product?.quantity_recovery) : '-'}
                                                         </h4>
                                                     </div>
                                                 ))
@@ -396,57 +392,30 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                                                 />
                                             )
                                     )
-                            } */}
+                            }
                         </div>
 
+                        {/* load more click */}
                         {
-                            dataMaterialOutput?.length > 0 &&
+                            filteredData?.length > 0 &&
                             <div className='col-span-16 flex item justify-between'>
                                 <div />
-
                                 {
-                                    (hasNextPage) && (
+                                    // (dataMaterialOutputi?.length || 0) > (visibleProducts["info"] || 4) && (
+                                    (limit < filteredData.length) && (
                                         <div className=" flex justify-center py-2">
-                                            <button
-                                                onClick={() => {
-                                                    const currentLimit = isStateProvider?.productionsOrders?.limitSheet?.limitMaterialReturn || 0;
-                                                    const newLimit = Math.min(currentLimit + 5, totalDataCountMaterialReturn); // tăng thêm 5, nhưng không vượt quá total
-
-                                                    queryStateProvider({
-                                                        productionsOrders: {
-                                                            ...isStateProvider.productionsOrders,
-                                                            limitSheet: {
-                                                                ...isStateProvider.productionsOrders.limitSheet,
-                                                                limitMaterialReturn: newLimit
-                                                            }
-                                                        }
-                                                    });
-                                                }}
-                                                disabled={isFetchingNextPage}
-                                                className="text-[#667085] 3xl:text-base text-sm hover:underline"
-                                            >
-                                                Xem thêm
+                                            <button onClick={() => setLimit(filteredData.length)} className="text-[#667085] 3xl:text-base text-sm hover:underline">
+                                                Xem thêm mặt hàng ({filteredData.length - limit}) Thành phẩm
                                             </button>
                                         </div>
                                     )
                                 }
 
                                 <LimitListDropdown
-                                    limit={isStateProvider?.productionsOrders?.limitSheet?.limitMaterialReturn}
-                                    sLimit={(value) => {
-
-                                        queryStateProvider({
-                                            productionsOrders: {
-                                                ...isStateProvider?.productionsOrders,
-                                                limitSheet: {
-                                                    ...isStateProvider?.productionsOrders?.limitSheet,
-                                                    limitMaterialReturn: value
-                                                }
-                                            }
-                                        })
-                                    }}
+                                    limit={limit}
+                                    sLimit={(value) => setLimit(value)}
                                     dataLang={{ display: "Hiển thị", on: "trên", lsx: "BTP" }}
-                                    total={totalDataCountMaterialReturn}
+                                    total={filteredData.length}
                                 />
                             </div>
                         }

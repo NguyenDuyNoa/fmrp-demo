@@ -621,7 +621,7 @@ const TabInformation = () => {
                             Bán thành phẩm
                         </h4>
                         <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-2">
-                            Đơn vị tính
+                            ĐVT
                         </h4>
                         <h4 className="text-xs-default text-center text-[#9295A4] font-semibold col-span-1">
                             SL cần
@@ -728,7 +728,7 @@ const TabInformation = () => {
                                     (limit < dataItemOrderDetail?.items_semi.length) && (
                                         <div className=" flex justify-center py-2">
                                             <button onClick={() => setLimit(dataItemOrderDetail?.items_semi.length)} className="text-[#667085] 3xl:text-base text-sm hover:underline">
-                                                Xem thêm ({dataItemOrderDetail?.items_semi.length - limit}) Thành phẩm
+                                                Xem thêm mặt hàng ({dataItemOrderDetail?.items_semi.length - limit}) Thành phẩm
                                             </button>
                                         </div>
                                     )
