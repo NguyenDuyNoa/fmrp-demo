@@ -15,6 +15,7 @@ import Select from "react-select";
 import { v4 as uddidV4 } from "uuid";
 
 const Popup_Stage = React.memo((props) => {
+    // lấy danh sách công đoạn trong redux
     const listCd = useSelector((state) => state.stage_finishedProduct);
 
     const isShow = useToast();
@@ -52,13 +53,14 @@ const Popup_Stage = React.memo((props) => {
     const [radio2, sRadio2] = useState(0);
 
     const [enabled, setEnabled] = useState(false);
-
+    // hook drag item
     const { onDragEnd } = useDragAndDrop(option, (updatedData) => { sOption(updatedData) })
 
     useEffect(() => {
         setEnabled(true)
     }, []);
 
+    // set mặc định cho state về initial khi mở popup
     useEffect(() => {
         isOpen && sOption([]);
         isOpen && sListCdChosen([]);
@@ -66,10 +68,12 @@ const Popup_Stage = React.memo((props) => {
         isOpen && sErrName(false);
     }, [isOpen]);
 
+    // nếu add hết công đoạn thì ko chạy
     useEffect(() => {
         sStatusBtnAdd(listCd?.length == option?.length);
     }, [option]);
 
+    // chi tiết công đoạn khi có id
     const { isFetching, isLoading } = useQuery({
         queryKey: ["api_product_getDesignStages", props.id],
         queryFn: async () => {
@@ -93,6 +97,7 @@ const Popup_Stage = React.memo((props) => {
         enabled: isOpen && !!props.id,
     })
 
+    // lưu công đoạn
     const _ServerSending = async () => {
         const formData = new FormData();
         formData.append("product_id", props.id);
@@ -135,6 +140,7 @@ const Popup_Stage = React.memo((props) => {
         sOnSending(true);
     };
 
+    // ad thêm công đoạn
     const _HandleAddNew = () => {
         sOption([...option, { id: uddidV4(), name: name, radio1: radio1, radio2: radio2 }]);
         sName(null);
@@ -142,15 +148,18 @@ const Popup_Stage = React.memo((props) => {
         sRadio2(0);
     };
 
+    // check value trong từng công đoạn có rồi thì filter ra khỏi select
     useEffect(() => {
         isOpen && listCdChosen && sListCdRest(listCd?.filter((item1) => !listCdChosen.some((item2) => item1.label === item2?.label && item1.value === item2?.value)));
     }, [listCdChosen]);
 
+    // xóa công đoạn
     const handleDelete = (id) => {
         const updatedData = option.filter((item) => item.id != id);
         sOption(updatedData);
     };
 
+    // change option trong công đoạn
     const handleRatioChange = (id, type) => {
         const updatedData = option.map((item) => {
             if (item.id == id) {
@@ -170,6 +179,7 @@ const Popup_Stage = React.memo((props) => {
         sOption(updatedData);
     };
 
+    /// change option trong công đoạn
     const handleSelectChange = (id, value) => {
         const index = option.findIndex((x) => x.id == id);
         option[index].name = value;

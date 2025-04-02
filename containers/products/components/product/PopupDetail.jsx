@@ -2,25 +2,24 @@ import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useToast from "@/hooks/useToast";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { useQuery } from "@tanstack/react-query";
-import { SearchNormal1 as IconSearch, TickCircle as IconTick, UserEdit as IconUserEdit, } from "iconsax-react";
+import { TickCircle as IconTick, UserEdit as IconUserEdit } from "iconsax-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useProductDetail } from "../../hooks/product/useProductDetail";
 import { useProductDetailStage } from "../../hooks/product/useProductDetailStage";
 import Popup_Bom from "./popupBom";
 import Popup_GiaiDoan from "./popupStage";
-import { is } from "date-fns/locale";
-import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
-import useToast from "@/hooks/useToast";
 const Popup_Detail = React.memo((props) => {
     const isShow = useToast();
 
@@ -50,10 +49,13 @@ const Popup_Detail = React.memo((props) => {
 
     const [selectedListBom, sSelectedListBom] = useState([]);
 
+    // dữ liệu chi tiết thành  phẩm
     const { data: list, isFetching, isLoading } = useProductDetail(open, props.id)
 
+    // dữ liệu công đoạn
     const { data: dataStage, isFetching: isFetchingStage, isLoading: isLoadingStage, refetch: refetchStage } = useProductDetailStage(open, props.id)
 
+    // dữ liệu định mức BOM
     const { isFetching: isFetchingBom, isLoading: isLoadingBom, refetch: refetchBom } = useQuery({
         queryKey: ["detail_bom_product"],
         queryFn: async () => {
@@ -76,11 +78,13 @@ const Popup_Detail = React.memo((props) => {
         open && sTab(0);
     }, [open]);
 
+    // kiểm tra tab và data có trùng với tab BOM hay không, nếu có thì chuyển tab BOM
     useEffect(() => {
         open && tabBom && sSelectedListBom(dataBom.find((item) => item.product_variation_option_value_id === tabBom));
         open && dataBom && sSelectedListBom(dataBom.find((item) => item.product_variation_option_value_id === tabBom));
     }, [tabBom, dataBom]);
 
+    // 4 tab ở trên popup
     const dataTab = [
         {
             id: 0,

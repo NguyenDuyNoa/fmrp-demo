@@ -21,12 +21,14 @@ import { useSelector } from "react-redux";
 import Select from "react-select";
 
 const Popup_Products = React.memo((props) => {
+    const isShow = useToast();
+    // danh sách chi nhánh
     const dataOptBranch = useSelector((state) => state.branch);
-
+    //    danh sách loại thành phẩm
     const dataOptType = useSelector((state) => state.type_finishedProduct);
-
+    //  danh sách đơn vị tính
     const dataOptUnit = useSelector((state) => state.unit_finishedProduct);
-
+    // danh sách biến thể
     const dataOptVariant = useSelector((state) => state.variant_NVL);
 
     const [isOpen, sIsOpen] = useState(false);
@@ -34,9 +36,7 @@ const Popup_Products = React.memo((props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit } = useActionRole(auth, 'products');
-
-    const isShow = useToast();
-
+    // cờ để show popup khi xóa
     const { isOpen: openDelete, isId, isIdChild, handleOpen, handleToggle, handleQueryId } = useToggle();
 
     const scrollAreaRef = useRef(null);
@@ -46,7 +46,7 @@ const Popup_Products = React.memo((props) => {
         return { menuPortalTarget };
     };
 
-
+    // validate input
     const [errGroup, sErrGroup] = useState(false);
 
     const [errName, sErrName] = useState(false);
@@ -115,6 +115,7 @@ const Popup_Products = React.memo((props) => {
     const [dataTotalVariant, sDataTotalVariant] = useState([]);
 
     const [dataVariantSending, sDataVariantSending] = useState([]);
+    // check biến thể trùng
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
         // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
@@ -126,6 +127,7 @@ const Popup_Products = React.memo((props) => {
         }
     }, [variantMain]);
 
+    // check biến thể trùng
     useEffect(() => {
         sOptVariantSub(dataOptVariant?.find((e) => e.value == variantSub)?.option);
         // variantSub && optSelectedVariantSub?.length === 0 && sOptSelectedVariantSub([])
@@ -139,6 +141,7 @@ const Popup_Products = React.memo((props) => {
 
     const checkEqual = (prevValue, nextValue) => prevValue && nextValue && prevValue === nextValue;
 
+    // chọn biến thể
     const _HandleSelectedVariant = (type, event) => {
         if (type == "main") {
             const name = event?.target.value;
@@ -165,6 +168,7 @@ const Popup_Products = React.memo((props) => {
         }
     };
 
+    // chọn tất cả biến thể
     const _HandleSelectedAllVariant = (type) => {
         if (type == "main") {
             const uncheckedOptions = optVariantMain.filter(
@@ -182,6 +186,7 @@ const Popup_Products = React.memo((props) => {
             sOptSelectedVariantSub(updatedOptions);
         }
     };
+    // áp dụng biến thể
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
             const newData = optSelectedVariantMain?.map(e => {
@@ -248,9 +253,8 @@ const Popup_Products = React.memo((props) => {
             isShow("error", `Phải chọn tùy chọn của biến thể chính`);
         }
     };
-    //////
 
-
+    // set initital cho sác state khi popup mở
     useEffect(() => {
         isOpen && sTab(0);
         isOpen && sName("");
@@ -280,6 +284,7 @@ const Popup_Products = React.memo((props) => {
         isOpen && sPrevVariantSub(null);
     }, [isOpen]);
 
+    // change các input
     const _HandleChangeInput = (type, value) => {
         if (type === "code") {
             sCode(value?.target.value);
@@ -315,6 +320,7 @@ const Popup_Products = React.memo((props) => {
         }
     };
 
+    // chọn ảnh đại diện
     const _HandleChangeFileThumb = ({ target: { files } }) => {
         var [file] = files;
         if (file) {
@@ -323,6 +329,7 @@ const Popup_Products = React.memo((props) => {
         }
     };
 
+    // xóa hình đại diện
     const _DeleteThumb = (e) => {
         e.preventDefault();
         sThumbFile(null);
@@ -334,6 +341,7 @@ const Popup_Products = React.memo((props) => {
         sThumb(thumb);
     }, [thumb]);
 
+    // dữ liệu chi tiết khi sửa
     useQuery({
         queryKey: ["detail_product", props?.id],
         enabled: !!isOpen && !!props?.id,
@@ -375,6 +383,7 @@ const Popup_Products = React.memo((props) => {
         },
     })
 
+    // danh sách danh mục
     useQuery({
         queryKey: ["api_category", branch],
         queryFn: async () => {
@@ -402,6 +411,7 @@ const Popup_Products = React.memo((props) => {
         }
     })
 
+    // lưu thành phẩm
     const _ServerSending = () => {
         let formData = new FormData();
 
@@ -475,6 +485,7 @@ const Popup_Products = React.memo((props) => {
         }
     };
 
+    // change biến thể
     const _HandleChangeVariant = (id, type, value) => {
         var index = dataTotalVariant?.findIndex((x) => x.id === id);
         if (type === "image") {
@@ -486,12 +497,15 @@ const Popup_Products = React.memo((props) => {
         }
     };
 
+    // change tiền trong biến thể
     const _HandleChangePrice = (parentId, id, value) => {
         var parentIndex = dataTotalVariant?.findIndex((x) => x.id === parentId);
         var index = dataTotalVariant[parentIndex].variation_option_2.findIndex((x) => x.id === id);
         dataTotalVariant[parentIndex].variation_option_2[index].price = Number(value.value);
         sDataTotalVariant([...dataTotalVariant]);
     };
+
+    // xóa biến thể
     const handleDeleteVariantItems = () => {
         if (isId && isIdChild) {
             const newData = dataTotalVariant.map((item) => {

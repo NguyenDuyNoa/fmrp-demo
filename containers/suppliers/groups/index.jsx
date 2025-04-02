@@ -83,9 +83,9 @@ const SuppliersGroups = (props) => {
         ? isState.idBranch.map((e) => e.value)
         : null,
   };
-
+  // danh sách nhóm nhà cung cấp
   const { data, isLoading, isFetching, refetch } = useSupplierGroupList(params);
-
+  // danh sách chi nhánh
   const { data: listBr = [] } = useBranchList({});
 
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -93,6 +93,7 @@ const SuppliersGroups = (props) => {
     router.replace("/suppliers/groups");
   }, 500);
 
+  // xuất exel
   const multiDataSet = [
     {
       columns: [
