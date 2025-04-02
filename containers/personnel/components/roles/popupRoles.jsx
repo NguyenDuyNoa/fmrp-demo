@@ -27,13 +27,14 @@ const initalState = {
     valueSearch: ""
 }
 const PopupRoles = React.memo((props) => {
-    const dataOptBranch = useSelector((state) => state.branch);
-
-    const dataOptDepartment = useSelector((state) => state.department_staff);
-
-    const dataOptPosition = useSelector((state) => state.position_staff);
-
     const isShow = useToast();
+
+    // danh sách chi nhánh
+    const dataOptBranch = useSelector((state) => state.branch);
+    // danh sách phòng ban
+    const dataOptDepartment = useSelector((state) => state.department_staff);
+    // sách sách vị trí
+    const dataOptPosition = useSelector((state) => state.position_staff);
 
     const [isState, setIsState] = useState(initalState)
 
@@ -43,6 +44,7 @@ const PopupRoles = React.memo((props) => {
         isState.open && props?.id && queryState({ open: true });
     }, [isState.open]);
 
+    // convert lại data quyền hạn
     const transformData = (data) => {
         const transformedData = {};
         data.forEach(item => {
@@ -77,6 +79,7 @@ const PopupRoles = React.memo((props) => {
         return transformedData;
     }
 
+    // lấy danh sách quyền
     useQuery({
         queryKey: ["api_permissions"],
         queryFn: async () => {
@@ -97,9 +100,11 @@ const PopupRoles = React.memo((props) => {
                 queryState({ dataPower: permissionsArray })
             }
         },
-        enabled: isState.open && !!props?.id
+        enabled: isState.open
+        // enabled: isState.open && !!props?.id
     })
 
+    // lưu chức vụ
     const handingRoles = useMutation({
         mutationFn: (data) => {
             return apiRoles.apiHandingRoles(data, props?.id);
@@ -160,7 +165,7 @@ const PopupRoles = React.memo((props) => {
         queryState({ errBranch: false });
     }, [isState.valueBranch?.length > 0])
 
-
+    /// danh sách vị trí
     useQuery({
         queryKey: ["api_position"],
         queryFn: async () => {
@@ -179,6 +184,7 @@ const PopupRoles = React.memo((props) => {
         enabled: isState.open && !!props?.id
     })
 
+    // dnah sách chức
     const { isFetching } = useQuery({
         queryKey: ["api_position_option"],
         queryFn: async () => {
@@ -195,6 +201,7 @@ const PopupRoles = React.memo((props) => {
         enabled: isState.open && !!props?.id
     })
 
+    // change modlue
     const handleChange = (parent, child = null, permissions = null) => {
         const newData = isState.dataPower?.map((e) => {
             if (child == null && e?.key == parent?.key) {
@@ -242,6 +249,7 @@ const PopupRoles = React.memo((props) => {
     };
 
 
+    // ẩn hiện module khi tìm kiếm
     useEffect(() => {
         const filteredData = isState.dataPower.filter(item => item.name.toLowerCase().includes(isState.valueSearch.toLowerCase()));
         const newdb = isState.dataPower.map((item) => {
@@ -423,15 +431,15 @@ const PopupRoles = React.memo((props) => {
                                     </div>
 
                                 </div>
-                                <div className="space-y-2 max-h-[500px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                <div className="space-y-2 max-h-[280px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className={`grid grid-cols-1`}>
                                         {isState.dataPower?.map((e) => {
                                             return (
                                                 <div className={e?.hidden ? "hidden" : ""} key={e?.key}>
-                                                    <div className="flex w-max items-center">
+                                                    <div className="flex items-center w-max">
                                                         <div className="inline-flex items-center">
                                                             <label
-                                                                className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                className="relative flex items-center p-3 rounded-full cursor-pointer"
                                                                 htmlFor={e?.key}
                                                                 data-ripple-dark="true"
                                                             >
@@ -443,7 +451,7 @@ const PopupRoles = React.memo((props) => {
                                                                     checked={e?.is_check == 1 ? true : false}
                                                                     onChange={(value) => handleChange(e)}
                                                                 />
-                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                                     <svg
                                                                         xmlns="http://www.w3.org/2000/svg"
                                                                         className="h-3.5 w-3.5"
@@ -473,14 +481,14 @@ const PopupRoles = React.memo((props) => {
                                                             {e?.child?.map((i, index) => {
                                                                 return (
                                                                     <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
-                                                                        <div className="border-b p-2 text-sm">{i?.name}</div>
+                                                                        <div className="p-2 text-sm border-b">{i?.name}</div>
                                                                         <div className="grid grid-cols-3 gap-1 ">
                                                                             {i?.permissions?.map((s) => {
                                                                                 return (
-                                                                                    <div key={s?.key} className="flex w-full items-center">
+                                                                                    <div key={s?.key} className="flex items-center w-full">
                                                                                         <div className="inline-flex items-center">
                                                                                             <label
-                                                                                                className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                                                className="relative flex items-center p-3 rounded-full cursor-pointer"
                                                                                                 htmlFor={s?.key + "" + i?.key}
                                                                                                 data-ripple-dark="true"
                                                                                             >
@@ -494,7 +502,7 @@ const PopupRoles = React.memo((props) => {
                                                                                                         handleChange(e?.key, i?.key, s)
                                                                                                     }}
                                                                                                 />
-                                                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                                                <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                                                                     <svg
                                                                                                         xmlns="http://www.w3.org/2000/svg"
                                                                                                         className="h-3.5 w-3.5"
@@ -538,7 +546,7 @@ const PopupRoles = React.memo((props) => {
                         <div className="flex justify-end space-x-2">
                             <button
                                 onClick={() => queryState({ open: false, })}
-                                className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
+                                className="px-4 py-2 text-base transition rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105"
                             >
                                 {props.dataLang?.branch_popup_exit}
                             </button>

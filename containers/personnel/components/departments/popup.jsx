@@ -27,6 +27,7 @@ const Popup_phongban = (props) => {
 
     const [valueBr, sValueBr] = useState([]);
 
+    // set initiaal cho state mặc định khi open popup
     useEffect(() => {
         sErrInputBr(false);
         sErrInput(false);
@@ -36,10 +37,12 @@ const Popup_phongban = (props) => {
         sValueBr(props.sValueBr?.map(e => ({ label: e.name, value: e.id })) || [])
     }, [open]);
 
+    // xử lý vlaue chi nhánh thành mảng value
     const branch_id = valueBr?.map((e) => {
         return e?.value;
     });
 
+    // change input
     const _HandleChangeInput = (type, value) => {
         if (type == "name") {
             sName(value.target?.value);
@@ -58,6 +61,7 @@ const Popup_phongban = (props) => {
         sErrInputBr(false);
     }, [branch_id?.length > 0]);
 
+    // lưu phòng ban
     const handingDepartment = useMutation({
         mutationFn: (data) => {
             return apiDepartments.apiHandingDepartment(data, props.id)
@@ -90,7 +94,8 @@ const Popup_phongban = (props) => {
         })
         sOnSending(false);
     };
-    //da up date
+
+
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
