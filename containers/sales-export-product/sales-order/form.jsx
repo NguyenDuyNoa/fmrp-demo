@@ -1350,7 +1350,12 @@ const SalesOrderForm = (props) => {
             // href: "/",
         },
         {
-            label: `${dataLang?.sales_product_edit_order || "sales_product_list"}`,
+            label: `${dataLang?.sales_product_list || "sales_product_list"}`,
+        },
+        {
+            label: `${id
+                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                : dataLang?.sales_product_add_order || "sales_product_add_order"}`,
         },
     ];
 
@@ -1547,8 +1552,8 @@ const SalesOrderForm = (props) => {
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
                                             className={`border ${errDate
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                 } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                         />
                                         {startDate && (
@@ -2251,8 +2256,8 @@ const SalesOrderForm = (props) => {
                                                     )
                                                 }
                                                 className={`${errDeliveryDate && e?.delivery_date === null
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                     } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
                                             />
                                             {e?.delivery_date && (
