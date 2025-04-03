@@ -8,7 +8,7 @@ export const HeaderTable = ({ ref, children, className, gridCols, display }) => 
             }}
             className={`
             ${className} 
-             items-center sticky top-0 bg-white p-2 z-10 rounded-xl shadow-sm  divide-x`}
+             items-center sticky top-0 bg-white p-2 z-[15] shadow-sm  divide-x`}
         >
             {children}
         </div>

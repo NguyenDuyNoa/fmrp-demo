@@ -6,7 +6,7 @@ import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePag
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { Container, ContainerBody, ContainerTable, LayOutTableDynamic } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
@@ -36,6 +36,7 @@ import { useSelector } from "react-redux";
 import { useWarehouseList } from "../warehouse/hooks/useWarehouseList";
 import PopupLocationWarehouse from "./components/popup";
 import { useLocationList } from "./hooks/useLocationList";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initialState = {
     keySearch: "",
@@ -69,6 +70,7 @@ const Location = (props) => {
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "warehouse_location");
 
+    // parasm lọc
     const params = {
         search: isState.keySearch,
         limit: limit,
@@ -76,13 +78,16 @@ const Location = (props) => {
         "filter[warehouse_id]": isState.valueWarehouse ? isState.valueWarehouse?.value : null,
     };
 
+    // danh sách vị trí kho
     const { data, isFetching, isLoading, refetch } = useLocationList(params)
 
+    // danh sách kho hàng
     const { data: listWarehouse } = useWarehouseList(params)
 
+    // convert mảng danh sách kho hàng
     const dataWarehouse = listWarehouse?.rResult?.map((e) => ({ label: e.name, value: e.id })) || [];
 
-    // 1true 0 fal
+    // 1true 0 fal, xóa vị trí kho hàng
     const handleDelete = async () => {
         sActive(isKeyState);
         let index = data?.rResult.findIndex((x) => x.id === isKeyState);
@@ -96,6 +101,7 @@ const Location = (props) => {
         handleQueryId({ status: false });
     };
 
+    // đổi trạng thái hoạt động vị trí kho
     const mutateStatus = useMutation({
         mutationFn: async () => {
             try {
@@ -114,6 +120,7 @@ const Location = (props) => {
         }
     })
 
+    // tìm kiếm vị trí kho
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace({
@@ -123,7 +130,8 @@ const Location = (props) => {
             },
         });
     }, 500);
-    //excel
+
+    // xuất excel
     const multiDataSet = [
         {
             columns: [
@@ -187,234 +195,250 @@ const Location = (props) => {
         },
     ];
 
-    return (
-        <React.Fragment>
-            <Head>
-                <title>{dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}</title>
-            </Head>
-            <Container>
-                {statusExprired ? (
-                    <EmptyExprired />
-                ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}</h6>
-                    </div>
-                )}
 
-                <ContainerBody>
-                    <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex justify-between  mt-1 mr-2">
-                            <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}
-                            </h2>
-                            <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ? (
-                                    <PopupLocationWarehouse
-                                        isState={isState}
-                                        dataWarehouse={dataWarehouse}
-                                        onRefresh={refetch.bind(this)}
-                                        dataLang={dataLang}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
-                                    />
-                                ) : (
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            isShow("warning", WARNING_STATUS_ROLE);
-                                        }}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
-                                    >
-                                        {dataLang?.branch_popup_create_new}
-                                    </button>
-                                )}
-                            </div>
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.Warehouse_title || "Warehouse_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}`,
+        },
+    ];
+
+    return (
+        <>
+            <LayOutTableDynamic
+                head={
+                    <Head>
+                        <title>{dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}</title>
+                    </Head>
+                }
+                breadcrumb={
+                    <>
+                        {statusExprired ? (
+                            <EmptyExprired />
+                        ) : (
+                            <Breadcrumb
+                                items={breadcrumbItems}
+                                className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                            />
+                        )}
+                    </>
+                }
+                pagination={
+                    <>
+                        {data?.rResult?.length != 0 && (
+                            <ContainerPagination>
+                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
+                                <Pagination
+                                    postsPerPage={limit}
+                                    totalPosts={Number(data?.output?.iTotalDisplayRecords)}
+                                    paginate={paginate}
+                                    currentPage={router.query?.page || 1}
+                                />
+                            </ContainerPagination>
+                        )}
+                    </>
+                }
+
+                titleButton={
+                    <>
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
+                            {dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}
+                        </h2>
+                        <div className="flex items-center justify-end gap-2">
+                            {role == true || checkAdd ? (
+                                <PopupLocationWarehouse
+                                    isState={isState}
+                                    dataWarehouse={dataWarehouse}
+                                    onRefresh={refetch.bind(this)}
+                                    dataLang={dataLang}
+                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                />
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        isShow("warning", WARNING_STATUS_ROLE);
+                                    }}
+                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                >
+                                    {dataLang?.branch_popup_create_new}
+                                </button>
+                            )}
                         </div>
-                        <ContainerTable>
-                            <div className="xl:space-y-3 space-y-2">
-                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                                    <div className="col-span-4">
-                                        <div className="grid grid-cols-9 gap-2">
-                                            <SearchComponent
-                                                colSpan={2}
-                                                onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                dataLang={dataLang}
-                                            />
-                                            <SelectComponent
-                                                placeholder={"kho hàng"}
-                                                colSpan={2}
-                                                onChange={(e) => queryState({ valueWarehouse: e })}
-                                                value={isState.valueWarehouse}
-                                                components={{ MultiValue }}
-                                                aria-label={"kho hàng"}
-                                                options={[
-                                                    {
-                                                        value: "",
-                                                        label: "kho hàng",
-                                                        isDisabled: true,
-                                                    },
-                                                    ...dataWarehouse,
-                                                ]}
-                                                isClearable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-span-2">
-                                        <div className="flex space-x-2 items-center justify-end">
-                                            <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
-                                            {role == true || checkExport ? (
-                                                <div className={``}>
-                                                    {data?.rResult?.length > 0 && (
-                                                        <ExcelFileComponent
-                                                            filename="Vị trí kho"
-                                                            title="Vtk"
-                                                            dataSet={multiDataSet}
-                                                            data={multiDataSet}
-                                                            dataLang={dataLang}
-                                                        />
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <button
-                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
-                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                                                >
-                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
-                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                </button>
-                                            )}
-                                            <div>
-                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                            </div>
-                                        </div>
-                                    </div>
+                    </>
+                }
+                table={
+                    <div className="flex flex-col h-full overflow-hidden">
+                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                            <div className="col-span-4">
+                                <div className="grid grid-cols-9 gap-2">
+                                    <SearchComponent
+                                        colSpan={2}
+                                        onChange={_HandleOnChangeKeySearch.bind(this)}
+                                        dataLang={dataLang}
+                                    />
+                                    <SelectComponent
+                                        placeholder={"kho hàng"}
+                                        colSpan={2}
+                                        onChange={(e) => queryState({ valueWarehouse: e })}
+                                        value={isState.valueWarehouse}
+                                        components={{ MultiValue }}
+                                        aria-label={"kho hàng"}
+                                        options={[
+                                            {
+                                                value: "",
+                                                label: "kho hàng",
+                                                isDisabled: true,
+                                            },
+                                            ...dataWarehouse,
+                                        ]}
+                                        isClearable={true}
+                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                    />
                                 </div>
                             </div>
-                            <Customscrollbar className="min:h-[500px] 2xl:h-[88%] xl:h-[73%] h-[100%] max:h-[800px]">
-                                <div className="w-full">
-                                    <HeaderTable display={"grid"} gridCols={12}>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.warehouses_localtion_ware}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.warehouses_localtion_code}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.warehouses_localtion_NAME}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.warehouses_localtion_status}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.warehouses_localtion_date}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.branch_popup_properties}
-                                        </ColumnTable>
-                                    </HeaderTable>
-                                    {isLoading ? (
-                                        <Loading className="h-80" color="#0f4f9e" />
-                                    ) : data?.rResult?.length > 0 ? (
-                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
-                                            {data?.rResult?.map((e) => (
-                                                <RowTable gridCols={12} key={e?.id?.toString()}>
-                                                    <RowItemTable colSpan={2} textAlign={"left"}>
-                                                        {e.warehouse_name}
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={2} textAlign={"left"}>
-                                                        {e.code}
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={2} textAlign={"left"}>
-                                                        {e.name}
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={2} textAlign={"center"}>
-                                                        <label
-                                                            htmlFor={e.id}
-                                                            className="relative inline-flex items-center cursor-pointer"
-                                                        >
-                                                            <input
-                                                                type="checkbox"
-                                                                className="sr-only peer"
-                                                                value={e.status}
-                                                                id={e.id}
-                                                                checked={e.status == "0" ? false : true}
-                                                                onChange={() =>
-                                                                    handleQueryId({
-                                                                        initialKey: e.id,
-                                                                        status: true,
-                                                                    })
-                                                                }
-                                                            />
-
-                                                            <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                                        </label>
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={2} textAlign={"left"}>
-                                                        {e?.date_create != null
-                                                            ? formatMoment(e.date_create, FORMAT_MOMENT.TIME_SHORT)
-                                                            : ""}
-                                                    </RowItemTable>
-
-                                                    <RowItemTable
-                                                        colSpan={2}
-                                                        className="space-x-2 text-center flex items-center justify-center"
-                                                    >
-                                                        {role == true || checkEdit ? (
-                                                            <PopupLocationWarehouse
-                                                                onRefresh={refetch.bind(this)}
-                                                                warehouse_name={e.warehouse_name}
-                                                                warehouse_id={e.warehouse_id}
-                                                                isState={isState}
-                                                                className="xl:text-base text-xs "
-                                                                dataLang={dataLang}
-                                                                dataWarehouse={dataWarehouse}
-                                                                name={e.name}
-                                                                code={e.code}
-                                                                id={e?.id}
-                                                            />
-                                                        ) : (
-                                                            <IconEdit
-                                                                className="cursor-pointer"
-                                                                onClick={() =>
-                                                                    isShow("warning", WARNING_STATUS_ROLE)
-                                                                }
-                                                            />
-                                                        )}
-                                                        <BtnAction
-                                                            onRefresh={refetch.bind(this)}
-                                                            onRefreshGroup={() => { }}
-                                                            dataLang={dataLang}
-                                                            id={e?.id}
-                                                            type="warehouse_location"
-                                                        />
-                                                    </RowItemTable>
-                                                </RowTable>
-                                            ))}
+                            <div className="col-span-2">
+                                <div className="flex items-center justify-end space-x-2">
+                                    <OnResetData sOnFetching={(e) => { }} onClick={refetch.bind(this)} />
+                                    {role == true || checkExport ? (
+                                        <div className={``}>
+                                            {data?.rResult?.length > 0 && (
+                                                <ExcelFileComponent
+                                                    filename="Vị trí kho"
+                                                    title="Vtk"
+                                                    dataSet={multiDataSet}
+                                                    data={multiDataSet}
+                                                    dataLang={dataLang}
+                                                />
+                                            )}
                                         </div>
                                     ) : (
-                                        <NoData />
+                                        <button
+                                            onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                            className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                        >
+                                            <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
+                                            <span>{dataLang?.client_list_exportexcel}</span>
+                                        </button>
                                     )}
+                                    <div>
+                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                    </div>
                                 </div>
-                            </Customscrollbar>
-                        </ContainerTable>
+                            </div>
+                        </div>
+                        <Customscrollbar className="h-full overflow-y-auto">
+                            <div className="w-full">
+                                <HeaderTable display={"grid"} gridCols={12}>
+                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                        {dataLang?.warehouses_localtion_ware}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                        {dataLang?.warehouses_localtion_code}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                        {dataLang?.warehouses_localtion_NAME}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                        {dataLang?.warehouses_localtion_status}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                        {dataLang?.warehouses_localtion_date}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                        {dataLang?.branch_popup_properties}
+                                    </ColumnTable>
+                                </HeaderTable>
+                                {isLoading ? (
+                                    <Loading className="h-80" color="#0f4f9e" />
+                                ) : data?.rResult?.length > 0 ? (
+                                    <div className="h-full divide-y divide-slate-200">
+                                        {data?.rResult?.map((e) => (
+                                            <RowTable gridCols={12} key={e?.id?.toString()}>
+                                                <RowItemTable colSpan={2} textAlign={"left"}>
+                                                    {e.warehouse_name}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={2} textAlign={"left"}>
+                                                    {e.code}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={2} textAlign={"left"}>
+                                                    {e.name}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={2} textAlign={"center"}>
+                                                    <label
+                                                        htmlFor={e.id}
+                                                        className="relative inline-flex items-center cursor-pointer"
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            className="sr-only peer"
+                                                            value={e.status}
+                                                            id={e.id}
+                                                            checked={e.status == "0" ? false : true}
+                                                            onChange={() =>
+                                                                handleQueryId({
+                                                                    initialKey: e.id,
+                                                                    status: true,
+                                                                })
+                                                            }
+                                                        />
+
+                                                        <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                                    </label>
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={2} textAlign={"left"}>
+                                                    {e?.date_create != null
+                                                        ? formatMoment(e.date_create, FORMAT_MOMENT.TIME_SHORT)
+                                                        : ""}
+                                                </RowItemTable>
+
+                                                <RowItemTable
+                                                    colSpan={2}
+                                                    className="flex items-center justify-center space-x-2 text-center"
+                                                >
+                                                    {role == true || checkEdit ? (
+                                                        <PopupLocationWarehouse
+                                                            onRefresh={refetch.bind(this)}
+                                                            warehouse_name={e.warehouse_name}
+                                                            warehouse_id={e.warehouse_id}
+                                                            isState={isState}
+                                                            className="text-xs xl:text-base "
+                                                            dataLang={dataLang}
+                                                            dataWarehouse={dataWarehouse}
+                                                            name={e.name}
+                                                            code={e.code}
+                                                            id={e?.id}
+                                                        />
+                                                    ) : (
+                                                        <IconEdit
+                                                            className="cursor-pointer"
+                                                            onClick={() =>
+                                                                isShow("warning", WARNING_STATUS_ROLE)
+                                                            }
+                                                        />
+                                                    )}
+                                                    <BtnAction
+                                                        onRefresh={refetch.bind(this)}
+                                                        onRefreshGroup={() => { }}
+                                                        dataLang={dataLang}
+                                                        id={e?.id}
+                                                        type="warehouse_location"
+                                                    />
+                                                </RowItemTable>
+                                            </RowTable>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <NoData />
+                                )}
+                            </div>
+                        </Customscrollbar>
                     </div>
-                    {data?.rResult?.length != 0 && (
-                        <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
-                            <Pagination
-                                postsPerPage={limit}
-                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
-                                paginate={paginate}
-                                currentPage={router.query?.page || 1}
-                            />
-                        </ContainerPagination>
-                    )}
-                </ContainerBody>
-            </Container>
+                }
+            />
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
@@ -425,7 +449,7 @@ const Location = (props) => {
                 nameModel="warehouse_location_status"
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment>
+        </>
     );
 };
 
