@@ -31,6 +31,7 @@ const PopupDetailWarehouseTransfer = (props) => {
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
+    // dữ liệu chi tiết
     const { data, isFetching } = useWarehouseTransferDetail(open, props?.id);
 
     const formatNumber = (number) => {

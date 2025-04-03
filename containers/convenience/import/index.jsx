@@ -11,13 +11,14 @@ import { ArrowRight, Trash as IconDelete, Notification, RefreshCircle } from "ic
 
 import Loading from "@/components/UI/loading/loading";
 
-import dynamic from "next/dynamic";
 
 
 import Select from "react-select";
 
 import { TiTick } from "react-icons/ti";
 
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -1235,6 +1236,17 @@ const Import = (props) => {
         const roundedNumber = integerPart + roundedDecimalPart;
         return roundedNumber.toLocaleString("en");
     };
+
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.import_data || "import_data"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.import_category || "import_category"}`,
+        },
+    ];
     return (
         <React.Fragment>
             <Head>
@@ -1245,38 +1257,39 @@ const Import = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.import_data || "import_data"}</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.import_category || "import_category"}</h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
                 )}
 
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {dataLang?.import_catalog || "import_catalog"}
                         </h2>
 
                         <div className="grid items-center justify-center grid-cols-12 mx-auto space-x-3">
                             <div className="col-span-2"></div>
-                            <div className="flex items-center col-span-8 gap-4 overflow-auto flex-nowrap scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {dataTab &&
-                                    dataTab.map((e) => {
+                            <Customscrollbar className="col-span-8 overflow-auto">
+                                <div className="flex items-center gap-4 flex-nowrap">
+                                    {dataTab && dataTab.map((e) => {
                                         return (
-                                            <div>
+                                            <div key={e?.id}>
                                                 <TabClient
                                                     key={e.id}
-                                                    onClick={_HandleSelectTab.bind(this, `${e.id}`)}
+                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
                                                     active={e.id}
                                                     className="text-[#0F4F9E] my-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear"
                                                 >
-                                                    {e.name}
+                                                    {e?.name}
                                                 </TabClient>
                                             </div>
                                         );
                                     })}
-                            </div>
+                                </div>
+
+                            </Customscrollbar>
                             <div className="col-span-2"></div>
                             <div className="col-span-2"></div>
                             <div className="col-span-8 border-b">
