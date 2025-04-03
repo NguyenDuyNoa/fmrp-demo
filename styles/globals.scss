@@ -5,36 +5,36 @@
 //input eye password
 input::-ms-reveal,
 input::-ms-clear {
-    display: none;
+  display: none;
 }
 
 html {
-    scroll-behavior: smooth;
-    height: 100vh;
-    overflow: hidden;
-    // font-size: 105%;
+  scroll-behavior: smooth;
+  height: 100vh;
+  overflow: hidden;
+  // font-size: 105%;
 }
 body {
-    background-color: white;
+  background-color: white;
 }
 
 .tippy-tooltip {
-    border-radius: 6px;
-    background-color: #555f6d;
+  border-radius: 6px;
+  background-color: #555f6d;
 }
 .tippy-tooltip-content {
-    font-size: 12px;
-    font-weight: 500;
+  font-size: 12px;
+  font-weight: 500;
 }
 .tippy-popper[x-placement^="bottom"] [x-arrow] {
-    border-bottom: 7px solid #555f6d !important;
+  border-bottom: 7px solid #555f6d !important;
 }
 .tippy-popper[x-placement^="top"] [x-arrow] {
-    border-top: 7px solid #555f6d !important;
+  border-top: 7px solid #555f6d !important;
 }
 
 .react-datepicker {
-    width: max-content;
+  width: max-content;
 }
 // body::-webkit-scrollbar {
 //     width: 4px;
@@ -54,7 +54,7 @@ body {
 // }
 
 .simplebar-content {
-    height: 100%;
+  height: 100%;
 }
 
 /* Ngăn focus trên toàn bộ SimpleBar */
@@ -64,33 +64,33 @@ body {
 .simplebar-content:focus,
 .simplebar-offset:focus,
 .simplebar-mask:focus {
-    outline: none !important;
-    box-shadow: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 @layer utilities {
-    .hide-scrollbar .simplebar-track {
-        display: none !important;
-    }
+  .hide-scrollbar .simplebar-track {
+    display: none !important;
+  }
 }
 
 /// cuộn dọc
 .simplebar-track.simplebar-vertical .simplebar-scrollbar:before {
-    background-color: #94a3b8;
-    // background-color: #94a3b8;
+  background-color: #94a3b8;
+  // background-color: #94a3b8;
 }
 .simplebar-track.simplebar-vertical .simplebar-scrollbar:before {
-    // background-image: linear-gradient(yellow, red);
+  // background-image: linear-gradient(yellow, red);
 }
 .simplebar-track {
-    opacity: 1;
+  opacity: 1;
 }
 
 .simplebar-track.simplebar-vertical {
-    width: 9px;
+  width: 9px;
 }
 .simplebar-track.simplebar-horizontal {
-    height: 9px;
+  height: 9px;
 }
 
 // .simplebar-mask {
@@ -99,145 +99,144 @@ body {
 /// cuộn ngang
 ///
 .simplebar-track.simplebar-horizontal .simplebar-scrollbar:before {
-    background-color: #94a3b8;
-    // background-color: #94a3b8;
+  background-color: #94a3b8;
+  // background-color: #94a3b8;
 }
 .no-select {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 .popup-overlay.popup-updated-version-overlay {
-    .popup-content {
-        width: inherit;
-        padding: inherit;
-        border-radius: 8px;
-        -webkit-animation: anvil 0.1s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
-        top: 0px;
-    }
+  .popup-content {
+    width: inherit;
+    padding: inherit;
+    border-radius: 8px;
+    -webkit-animation: anvil 0.1s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+    top: 0px;
+  }
 }
 
 //Popup
 .popup-edit-overlay {
-    .popup-content {
-        width: inherit;
-        padding: inherit;
-        border-radius: 8px;
-        -webkit-animation: anvil 0.1s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
-        // top: -120px;
-    }
+  .popup-content {
+    width: inherit;
+    padding: inherit;
+    border-radius: 8px;
+    -webkit-animation: anvil 0.1s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+    // top: -120px;
+  }
 }
 .popup-overlay {
-    background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
 [data-popup="tooltip"].popup-overlay {
-    background: transparent;
+  background: transparent;
 }
 
 @keyframes anvil {
-    0% {
-        transform: scale(1) translateY(0px);
-        opacity: 0;
-        box-shadow: 0 0 0 rgba(241, 241, 241, 0);
-    }
+  0% {
+    transform: scale(1) translateY(0px);
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+  }
 
-    1% {
-        transform: scale(0.96) translateY(10px);
-        opacity: 0;
-        box-shadow: 0 0 0 rgba(241, 241, 241, 0);
-    }
+  1% {
+    transform: scale(0.96) translateY(10px);
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+  }
 
-    100% {
-        transform: scale(1) translateY(0px);
-        opacity: 1;
-        box-shadow: 0 0 500px rgba(241, 241, 241, 0);
-    }
+  100% {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+    box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+  }
 }
 
 .custom-transition {
-    @apply duration-300 ease-in-out transition-all;
+  @apply duration-300 ease-in-out transition-all;
 }
-
 
 .popover-edit-content {
-    margin: 24px 0px 0px 0px !important;
-    width: inherit !important;
-    border: none !important;
-    // box-shadow: 0 0 5px rgb(0 0 0 / 16%) !important;
-    box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
-    -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
-    position: fixed !important;
-    top: 38px !important;
+  margin: 24px 0px 0px 0px !important;
+  width: inherit !important;
+  border: none !important;
+  // box-shadow: 0 0 5px rgb(0 0 0 / 16%) !important;
+  box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
+  -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+  position: fixed !important;
+  top: 38px !important;
 }
 .react-datepicker-popper {
-    z-index: 999 !important;
+  z-index: 999 !important;
 }
 
 .popover-bottom-left-content {
-    margin: 24px 0px 0px -20px !important;
+  margin: 24px 0px 0px -20px !important;
 }
 
 .popover-bottom-left-muanhaphang-content {
-    margin: 24px 0px 0px -220px !important;
+  margin: 24px 0px 0px -220px !important;
 }
 
 .popover-khosanxuat-content {
-    margin: 24px 0px 0px 40px !important;
+  margin: 24px 0px 0px 40px !important;
 }
 
 .popover-khac-content {
-    margin: 24px 0px 0px 0px !important;
+  margin: 24px 0px 0px 0px !important;
 }
 
 .popover-quytrinh-content {
-    margin: 24px 0px 0px 25px !important;
+  margin: 24px 0px 0px 25px !important;
 }
 .popover-thongbao-content {
-    margin: 24px 0px 0px 30px !important;
+  margin: 24px 0px 0px 30px !important;
 }
 
 .dropdown-edit-content {
-    margin: 5px 0px 0px 15px !important;
-    width: inherit !important;
-    border: none !important;
-    box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
-    -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+  margin: 5px 0px 0px 15px !important;
+  width: inherit !important;
+  border: none !important;
+  box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
+  -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
 }
 
 // arrow tooltip
 .arrow-danhmuc-arrow {
-    position: relative !important;
-    left: 21px;
+  position: relative !important;
+  left: 21px;
 }
 
 .arrow-banxuathang-arrow {
-    position: relative !important;
-    left: 19px;
+  position: relative !important;
+  left: 19px;
 }
 
 .arrow-muanhaphang-arrow {
-    position: relative !important;
-    left: 220px;
+  position: relative !important;
+  left: 220px;
 }
 
 .popover-khosanxuat-arrow {
-    position: relative !important;
-    left: -43px;
+  position: relative !important;
+  left: -43px;
 }
 
 .popover-khac-arrow {
-    position: relative !important;
-    left: 0px;
+  position: relative !important;
+  left: 0px;
 }
 
 .popover-quytrinh-arrow {
-    position: relative !important;
-    left: -20px;
+  position: relative !important;
+  left: -20px;
 }
 .popover-thongbao-arrow {
-    position: relative !important;
-    left: -28px;
+  position: relative !important;
+  left: -28px;
 }
 
 // .popover-productionPlan-arrow {
@@ -247,56 +246,120 @@ body {
 //     // color: gray;
 // }
 .popover-ai-content {
-    transform: translateX(-2%);
-    z-index: 99999 !important;
+  transform: translateX(-2%);
+  z-index: 99999 !important;
 }
 
 //scroll bar
 .scrollarea .scrollbar-container.vertical .scrollbar {
-    background: #94a3b8 !important;
-    border-radius: 50px;
+  background: #94a3b8 !important;
+  border-radius: 50px;
 }
 
 .scrollarea .scrollbar-container.active,
 .scrollarea .scrollbar-container:hover {
-    background: #f1f5f9 !important;
-    border-radius: 50px !important;
+  background: #f1f5f9 !important;
+  border-radius: 50px !important;
 }
 
 //button animation
 .btn-animation {
-    background-size: 300% 100%;
-    transition: all 0.4s ease-in-out;
+  background-size: 300% 100%;
+  transition: all 0.4s ease-in-out;
 
-    &:hover {
-        background-position: 100% 0;
-        transition: all 0.4s ease-in-out;
-    }
+  &:hover {
+    background-position: 100% 0;
+    transition: all 0.4s ease-in-out;
+  }
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Animation hiệu ứng viền chạy */
+
+.border-gradient {
+  --border-width: 1px;
+  --border-width-hover: 2px;
+}
+
+.border-gradient-button-foso {
+  --border-color: rgba(9, 9, 11, 0.2);
+  --border-width: 1px;
+  --border-width-hover: 2px;
+  position: relative;
+  border: none; /* Đảm bảo không có border mặc định */
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+      50% 93.75% at 50% 6.25%,
+      #a3eed6 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor; /* hoặc destination-out */
+    transition: background 0.5s ease-in-out;
+  }
+
+  &:hover::before {
+    background: conic-gradient(
+      from var(--angle),
+      #a3eed6,
+      rgba(255, 255, 255, 0),
+      #a3eed6
+    );
+    padding: 2px;
+    animation: borderMove 1.5s linear infinite;
+  }
+}
+
+@keyframes borderMove {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
 }
 
 //alert
 .swal2-popup.swal2-toast {
-    .swal2-html-container {
-        font-size: 14px !important;
-        margin: 0em 1em !important;
-    }
+  .swal2-html-container {
+    font-size: 14px !important;
+    margin: 0em 1em !important;
+  }
 }
 
 /// .Select__single-value,
 .Select__custom .Select__single-value {
-    white-space: initial !important;
-    overflow: visible !important;
-    text-overflow: ellipsis !important;
-    display: block;
+  white-space: initial !important;
+  overflow: visible !important;
+  text-overflow: ellipsis !important;
+  display: block;
 }
 
 .removeDivide .css-1u9des2-indicatorSeparator {
-    width: 0px;
+  width: 0px;
 }
 .transition-all.ease-out.duration-300.absolute.z-10 {
-    bottom: 0 !important;
-    transform: translateY(100%) !important;
-    z-index: 999;
+  bottom: 0 !important;
+  transform: translateY(100%) !important;
+  z-index: 999;
 }
 
 /// model img Chi tiet YCMH
@@ -312,71 +375,71 @@ body {
 //   }
 
 .i::before {
-    content: "";
-    position: absolute;
-    width: 0px;
-    height: 0px;
-    opacity: 20%;
-    background: white;
-    /*   background: #3B82F6; */
-    /* Centering */
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
+  content: "";
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  opacity: 20%;
+  background: white;
+  /*   background: #3B82F6; */
+  /* Centering */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
 }
 
 .i:hover:before {
-    animation: anim-in 0.7s forwards ease-out;
+  animation: anim-in 0.7s forwards ease-out;
 }
 
 @keyframes anim-in {
-    100% {
-        opacity: 0%;
-        border-radius: 0;
-        width: 600px;
-        height: 600px;
-    }
-    0% {
-        width: 0px;
-        height: 0px;
-        border-radius: 100%;
-        opacity: 20%;
-    }
+  100% {
+    opacity: 0%;
+    border-radius: 0;
+    width: 600px;
+    height: 600px;
+  }
+  0% {
+    width: 0px;
+    height: 0px;
+    border-radius: 100%;
+    opacity: 20%;
+  }
 }
 
 .css-1wrc81n-control,
 .css-nrfwoj-control {
-    cursor: pointer !important;
+  cursor: pointer !important;
 }
 .css-13cymwt-control {
-    cursor: pointer !important;
+  cursor: pointer !important;
 }
 .customDropdow__indicator {
-    padding: 15px 0px !important;
+  padding: 15px 0px !important;
 }
 .customDropdow__control {
-    cursor: pointer !important;
+  cursor: pointer !important;
 }
 .customDropdowTax__indicator {
-    padding: 0px 0px !important;
+  padding: 0px 0px !important;
 }
 .customDropdowDefault__control {
-    border: none !important;
-    padding: 0;
+  border: none !important;
+  padding: 0;
 }
 .customDropdowDefault__indicator {
-    padding: 0px 0px !important;
+  padding: 0px 0px !important;
 }
 .CircularProgressbar {
-    width: 80px;
+  width: 80px;
 }
 .classNamePrefixLotDateSerial__value-container
-    .classNamePrefixLotDateSerial__multi-value
-    .classNamePrefixLotDateSerial__multi-value__label
-    div {
-    display: none;
+  .classNamePrefixLotDateSerial__multi-value
+  .classNamePrefixLotDateSerial__multi-value__label
+  div {
+  display: none;
 }
 // .classNamePrefixLotDateSerial__value-container .customDropdow  {
 //     display: none;
@@ -387,175 +450,176 @@ body {
  */
 
 .CircularProgressbar {
-    width: 50%;
-    vertical-align: middle;
-    margin: 0 auto;
+  width: 50%;
+  vertical-align: middle;
+  margin: 0 auto;
 }
 
 .CircularProgressbar .CircularProgressbar-path {
-    stroke: #3e98c7;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.5s ease 0s;
+  stroke: #3e98c7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease 0s;
 }
 
 .CircularProgressbar .CircularProgressbar-trail {
-    stroke: #d6d6d6;
-    stroke-linecap: round;
+  stroke: #d6d6d6;
+  stroke-linecap: round;
 }
 .CircularProgressbar .CircularProgressbar-text {
-    fill: #3e98c7;
-    font-size: 20px;
-    dominant-baseline: middle;
-    text-anchor: middle;
+  fill: #3e98c7;
+  font-size: 20px;
+  dominant-baseline: middle;
+  text-anchor: middle;
 }
 
 .CircularProgressbar .CircularProgressbar-background {
-    fill: #d6d6d6;
+  fill: #d6d6d6;
 }
-.CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-background {
-    fill: #3e98c7;
+.CircularProgressbar.CircularProgressbar-inverted
+  .CircularProgressbar-background {
+  fill: #3e98c7;
 }
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-text {
-    fill: #fff;
+  fill: #fff;
 }
 
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-path {
-    stroke: #fff;
+  stroke: #fff;
 }
 
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-trail {
-    stroke: transparent;
+  stroke: transparent;
 }
 
 @keyframes bounce {
-    0%,
-    100% {
-        transform: translateY(-5%);
-        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-    }
-    50% {
-        transform: none;
-        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-    }
+  0%,
+  100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
 }
 .animate-bounce-custom {
-    animation: bounce 1s infinite;
+  animation: bounce 1s infinite;
 }
 .columns {
-    display: flex;
+  display: flex;
 }
 
 .draggable {
-    user-select: none;
-    padding: 8px;
-    margin: 0 0 8px 0;
-    background-color: #ccc;
-    border-radius: 2px;
+  user-select: none;
+  padding: 8px;
+  margin: 0 0 8px 0;
+  background-color: #ccc;
+  border-radius: 2px;
 }
 // Trong tổng quan sản xuất/
 
 .customSlectFilter__control {
-    outline: none !important;
-    border: none !important;
-    background-color: #f9fafb !important;
-    border-radius: 8px !important;
+  outline: none !important;
+  border: none !important;
+  background-color: #f9fafb !important;
+  border-radius: 8px !important;
 }
 .customSlectFilter__placeholder {
-    font-size: 11px !important;
-    color: #6b7280 !important;
+  font-size: 11px !important;
+  color: #6b7280 !important;
 }
 .customSlectFilter__input-container {
-    padding: 8px 5px !important;
-    // font-size: 10px !important;
+  padding: 8px 5px !important;
+  // font-size: 10px !important;
 }
 .customSlectFilter__indicator svg {
-    width: 12px !important;
-    height: 12px !important;
+  width: 12px !important;
+  height: 12px !important;
 }
 .customSlectFilter__indicator-separator {
-    display: none;
+  display: none;
 }
 .customSlectFilter__single-value {
-    font-size: 14px;
+  font-size: 14px;
 }
 .customSlectFilter__menu {
-    border-radius: 12px !important;
-    box-shadow: none !important;
-    border: 1px solid #9ca3af !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  border: 1px solid #9ca3af !important;
 }
 .customSlectFilter__menu-list {
-    padding: 0 !important;
-    border-radius: 12px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
 }
 .customSlectFilter__option {
-    font-size: 13px !important;
-    color: #4b5563 !important;
-    background-color: #f1f5f9 !important;
-    transition: all 0.5s ease-in-out !important;
+  font-size: 13px !important;
+  color: #4b5563 !important;
+  background-color: #f1f5f9 !important;
+  transition: all 0.5s ease-in-out !important;
 }
 .customSlectFilter__option--is-selected {
-    background-color: #6b7280 !important;
-    color: white !important;
+  background-color: #6b7280 !important;
+  color: white !important;
 }
 .customSlectFilter__option:hover {
-    transition: all 0.5s ease-in-out !important;
-    color: white !important;
-    background-color: #6b7280 !important;
+  transition: all 0.5s ease-in-out !important;
+  color: white !important;
+  background-color: #6b7280 !important;
 }
 .react-datepicker__close-icon::after {
-    color: gray !important;
-    background-color: transparent !important;
+  color: gray !important;
+  background-color: transparent !important;
 }
 .react-datepicker-wrapper {
-    width: 100% !important;
+  width: 100% !important;
 }
 
 /// select trong model  Điều độ sản xuất productionSmoothing
 .productionSmoothing__menu {
-    z-index: 9999 !important;
-    position: absolute !important;
+  z-index: 9999 !important;
+  position: absolute !important;
 }
 .productionSmoothing__control {
-    position: relative !important;
-    z-index: 0 !important;
-    border: 1px solid #d8dae5 !important;
-    border-radius: 6px !important;
+  position: relative !important;
+  z-index: 0 !important;
+  border: 1px solid #d8dae5 !important;
+  border-radius: 6px !important;
 }
 .productionSmoothing__indicator-separator {
-    display: none !important;
+  display: none !important;
 }
 .productionSmoothing__indicator svg {
-    width: 15px !important;
-    height: 15px !important;
+  width: 15px !important;
+  height: 15px !important;
 }
 
 .productionSmoothing__placeholder {
-    @apply text-sm   font-light;
+  @apply text-sm   font-light;
 }
 /// select trong model  Điều độ sản xuất productionSmoothing popup
 
 ///lịch
 
 #menu-time {
-    z-index: 9999;
+  z-index: 9999;
 }
 
 //nhân viên
 .productionSmoothingPopupStaf__control {
-    border: 1px solid #e1e1e1 !important;
-    border-radius: 9px !important;
-    padding: 3px 0 !important;
+  border: 1px solid #e1e1e1 !important;
+  border-radius: 9px !important;
+  padding: 3px 0 !important;
 }
 .productionSmoothingPopupStaf__indicator-separator {
-    display: none !important;
+  display: none !important;
 }
 .productionSmoothingPopupStaf__indicator svg {
-    width: 20px !important;
-    height: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
 }
 .productionSmoothingPopupStaf__placeholder {
-    font-size: 12px !important;
-    color: #6b7280 !important;
+  font-size: 12px !important;
+  color: #6b7280 !important;
 }
 // .productionSmoothingPopupStaf__input-container {
 //     padding: 4px !important;
@@ -574,94 +638,94 @@ body {
 
 ///công đoạn
 .productionSmoothingPopupStages__control {
-    border: 1px solid #e1e1e1 !important;
-    border-radius: 9px !important;
-    padding: 3px 0 !important;
+  border: 1px solid #e1e1e1 !important;
+  border-radius: 9px !important;
+  padding: 3px 0 !important;
 }
 .productionSmoothingPopupStages__indicator-separator {
-    display: none !important;
+  display: none !important;
 }
 .productionSmoothingPopupStages__indicator svg {
-    width: 20px !important;
-    height: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
 }
 .productionSmoothingPopupStages__placeholder {
-    font-size: 12px !important;
-    color: #6b7280 !important;
+  font-size: 12px !important;
+  color: #6b7280 !important;
 }
 
 .clip-arrow {
-    clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 15% 50%, 0% 0%);
+  clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 15% 50%, 0% 0%);
 }
 /// css phân trang
 .disabled-page {
-    color: #808e9b;
+  color: #808e9b;
 }
 
 .page-item.active a {
-    color: white;
-    background-color: #0f4f9e;
-    padding: 6px 12px;
-    font-size: 13px;
-    border-radius: 8px;
-    font-weight: 600;
+  color: white;
+  background-color: #0f4f9e;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  font-weight: 600;
 }
 .page-item a {
-    background-color: #e2e8f0;
-    color: black;
-    padding: 6px 12px;
-    font-size: 13px;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out;
-    display: block;
+  background-color: #e2e8f0;
+  color: black;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  display: block;
 }
 .page-item a:hover {
-    background-color: #e3e3e3;
+  background-color: #e3e3e3;
 }
 
 .pagination {
-    align-items: center;
-    display: flex;
-    gap: 4px;
+  align-items: center;
+  display: flex;
+  gap: 4px;
 }
 
 /* custom-datepicker.css */
 .react-datepicker__input-container {
-    @apply relative;
+  @apply relative;
 
-    .react-datepicker__close-icon::after {
-        background-color: transparent !important;
-        color: transparent !important;
-        content: url("/icon/new/X.svg") !important;
+  .react-datepicker__close-icon::after {
+    background-color: transparent !important;
+    color: transparent !important;
+    content: url("/icon/new/X.svg") !important;
 
-        // vertical-align: middle;
-        @apply size-4 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer;
-    }
+    // vertical-align: middle;
+    @apply size-4 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer;
+  }
 }
 
 .text-customize {
-    .text-title-section {
-        @apply 3xl:text-[28px] xl:text-2xl text-xl;
-    }
+  .text-title-section {
+    @apply 3xl:text-[28px] xl:text-2xl text-xl;
+  }
 
-    .text-title-default {
-        @apply 3xl:text-2xl xl:text-xl text-xl;
-    }
+  .text-title-default {
+    @apply 3xl:text-2xl xl:text-xl text-xl;
+  }
 
-    .text-title-small {
-        @apply 3xl:text-xl xl:text-lg text-lg;
-    }
+  .text-title-small {
+    @apply 3xl:text-xl xl:text-lg text-lg;
+  }
 
-    .text-base-default {
-        @apply 3xl:text-base xl:text-sm lg:text-sm text-base 3xl:placeholder:text-base placeholder:text-sm tracking-[1%];
-    }
+  .text-base-default {
+    @apply 3xl:text-base xl:text-sm lg:text-sm text-base 3xl:placeholder:text-base placeholder:text-sm tracking-[1%];
+  }
 
-    .text-sm-default {
-        @apply 3xl:text-sm xl:text-xs lg:text-xs text-xs 3xl:placeholder:text-sm placeholder:text-xs tracking-[1%];
-    }
+  .text-sm-default {
+    @apply 3xl:text-sm xl:text-xs lg:text-xs text-xs 3xl:placeholder:text-sm placeholder:text-xs tracking-[1%];
+  }
 
-    .text-xs-default {
-        @apply 3xl:text-xs xl:text-[10px] lg:text-[10px] text-[10px] 3xl:placeholder:text-xs placeholder:text-[10px] tracking-[1%];
-    }
+  .text-xs-default {
+    @apply 3xl:text-xs xl:text-[10px] lg:text-[10px] text-[10px] 3xl:placeholder:text-xs placeholder:text-[10px] tracking-[1%];
+  }
 }
