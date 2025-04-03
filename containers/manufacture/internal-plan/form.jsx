@@ -32,6 +32,7 @@ import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { useInternalPlanItems } from "./hooks/useInternalPlanItems";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initsFetching = {
     onLoading: false,
@@ -425,6 +426,22 @@ const InternalPlanForm = (props) => {
         fetChingData.onSending && _ServerSending();
     }, [fetChingData.onSending]);
 
+
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `Sản xuất`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.internal_plan || "internal_plan"}`,
+            href: "/manufacture/internal-plan",
+        },
+        {
+            label: id ? dataLang?.internal_plan_edit || "internal_plan_edit" : dataLang?.internal_plan_add || "internal_plan_add"
+        }
+    ];
+
     return (
         <React.Fragment>
             <Head>
@@ -436,17 +453,21 @@ const InternalPlanForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {id ? dataLang?.internal_plan_edit || "internal_plan_edit" : dataLang?.internal_plan_add || "internal_plan_add"}
-                        </h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
+                    // <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                    //     <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
+                    //     <span className="text-[#141522]/40">/</span>
+                    //     <h6>
+                    //         {id ? dataLang?.internal_plan_edit || "internal_plan_edit" : dataLang?.internal_plan_add || "internal_plan_add"}
+                    //     </h6>
+                    // </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {id ? dataLang?.internal_plan_edit || "internal_plan_edit" : dataLang?.internal_plan_add || "internal_plan_add"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">

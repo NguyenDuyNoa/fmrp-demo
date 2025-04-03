@@ -2,7 +2,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
-import ImageErrors from "@/components/UI/imageErrors";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import Loading from "@/components/UI/loading/loading";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
@@ -16,7 +16,6 @@ import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import { useProductionWarehouseDetail } from "../hooks/useProductionWarehouseDetail";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 
 const PopupDetail = (props) => {
     const dataSeting = useSetingServer();
@@ -24,9 +23,9 @@ const PopupDetail = (props) => {
     const _ToggleModal = (e) => sOpen(e);
 
     const [open, sOpen] = useState(false);
-
+    // dữ liệu chi tiết
     const { data, isFetching } = useProductionWarehouseDetail(open, props?.id);
-
+    // dữ liệu lot, date, serial
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);

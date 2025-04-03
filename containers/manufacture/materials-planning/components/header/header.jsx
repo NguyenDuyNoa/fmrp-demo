@@ -1,17 +1,33 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { ssr: false });
 const Header = ({ dataLang }) => {
+
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `Sản xuất`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.materials_planning || "materials_planning"}`,
+        },
+    ];
     return (
         <>
-            <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+            {/* <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                 <h6 className="text-[#141522]/40">{dataLang?.materials_planning_manufacture || "materials_planning_manufacture"}</h6>
                 <span className="text-[#141522]/40">/</span>
                 <h6>{dataLang?.materials_planning || 'materials_planning'}</h6>
-            </div>
-            <div className="flex justify-between items-center">
-                <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+            </div> */}
+            <Breadcrumb
+                items={breadcrumbItems}
+                className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+            />
+            <div className="flex items-center justify-between">
+                <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                     {dataLang?.materials_planning || 'materials_planning'}
                 </h2>
                 <div>

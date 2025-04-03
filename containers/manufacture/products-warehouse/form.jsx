@@ -34,6 +34,7 @@ import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { useProductsWarehouseItems } from "./hooks/useProductsWarehouseItems";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const ProductsWarehouseForm = (props) => {
     const router = useRouter();
@@ -90,14 +91,16 @@ const ProductsWarehouseForm = (props) => {
 
     const [errSerial, sErrSerial] = useState(false);
 
+    // danh sách chi nhánh
     const { data: dataBranch = [] } = useBranchList();
-
+    // danh sách vị trí kho
     const { data: dataLocation = [] } = useLocationByWarehouseTo(idImportWarehouse, idBranch)
-
+    // danh sách kho
     const { data: dataWarehouse } = useWarehouseComboboxByManufactureByBranch(idBranch, idImportWarehouse)
-
+    // danh sách mặt hàng
     const { data: dataItems } = useProductsWarehouseItems(searchItems, idBranch)
 
+    // set state mặc định
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrBranch(false);
@@ -105,7 +108,7 @@ const ProductsWarehouseForm = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-
+    // lấy dữ liệu khi sửa
     const { isFetching } = useQuery({
         queryKey: ['api_products_warehouse_detail', id],
         queryFn: async () => {
@@ -161,11 +164,12 @@ const ProductsWarehouseForm = (props) => {
         ...optionsQuery
     })
 
-
+    // tìm kiếm mặt hàng
     const _HandleSeachApi = debounce(async (inputValue) => {
         setSearchItems(inputValue);
     }, 500);
 
+    // reset mặt hàng khi thay đổi value
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
             sListData([]);
@@ -179,6 +183,7 @@ const ProductsWarehouseForm = (props) => {
         handleQueryId({ status: false });
     };
 
+    // change các input và select
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
             sCode(value.target.value);
@@ -203,6 +208,8 @@ const ProductsWarehouseForm = (props) => {
             }
         }
     };
+
+    // xóa ngày
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
             sEffectiveDate(null);
@@ -211,10 +218,13 @@ const ProductsWarehouseForm = (props) => {
             sStartDate(new Date());
         }
     };
+
+    // change ngày
     const handleTimeChange = (date) => {
         sStartDate(date);
     };
 
+    // lưu dữ liệu
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const hasNullOrCondition = (data, conditionFn) =>
@@ -265,6 +275,8 @@ const ProductsWarehouseForm = (props) => {
             sOnSending(true);
         }
     };
+
+    // check validate các trường
     useEffect(() => {
         sErrDate(false);
     }, [date != null]);
@@ -285,12 +297,14 @@ const ProductsWarehouseForm = (props) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
+    // lưu dữ liệu
     const haningProductionsWarehouse = useMutation({
         mutationFn: ({ id, formData }) => {
             return apiProductsWarehouse.apiHandingProdcutsWarehouse(id, formData)
         }
     })
 
+    // lưu dữ liệu
     const _ServerSending = async () => {
         let formData = new FormData();
 
@@ -346,7 +360,7 @@ const ProductsWarehouseForm = (props) => {
         onSending && _ServerSending();
     }, [onSending]);
 
-    //new
+    // thêm hàng mặt hàng con
     const _HandleAddChild = (parentId, value) => {
         sOnLoadingChild(true);
         const newData = listData?.map((e) => {
@@ -378,6 +392,7 @@ const ProductsWarehouseForm = (props) => {
         sListData(newData);
     };
 
+    // thêm mặt hàng cha
     const _HandleAddParent = (value) => {
         sOnLoadingChild(true);
         const checkData = listData?.some((e) => e?.item?.value === value?.value);
@@ -413,6 +428,8 @@ const ProductsWarehouseForm = (props) => {
             handleCheckError(dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect");
         }
     };
+
+    // xóa dòng mặt hàng con
     const _HandleDeleteChild = (parentId, childId) => {
         const newData = listData.map((e) => {
             if (e.id === parentId) {
@@ -424,6 +441,7 @@ const ProductsWarehouseForm = (props) => {
         sListData([...newData]);
     };
 
+    // xóa tất cả mặt hàng con
     const _HandleDeleteAllChild = (parentId) => {
         const newData = listData.map((e) => {
             if (e.id === parentId) {
@@ -435,6 +453,7 @@ const ProductsWarehouseForm = (props) => {
         sListData([...newData]);
     };
 
+    // change dữ liệu hàng con
     const _HandleChangeChild = (parentId, childId, type, value) => {
         // Tạo một bản sao của listData để thay đổi
         const newData = [...listData];
@@ -494,6 +513,7 @@ const ProductsWarehouseForm = (props) => {
 
     const handleQuantityError = (e) => isShow("error", e);
 
+    /// change mặt hàng
     const _HandleChangeValue = (parentId, value) => {
         sOnLoadingChild(true);
         const checkData = listData?.some((e) => e?.item?.value === value?.value);
@@ -532,6 +552,21 @@ const ProductsWarehouseForm = (props) => {
 
     const handleCheckError = (e) => isShow("error", `${e}`);
 
+
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.Warehouse_title || "Warehouse_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.productsWarehouse_title || "productsWarehouse_title"}`,
+            href: "/manufacture/products-warehouse",
+        },
+        {
+            label: id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit" : dataLang?.productsWarehouse_add || "productsWarehouse_add"
+        },
+    ];
+
     return (
         <React.Fragment>
             <Head>
@@ -543,19 +578,14 @@ const ProductsWarehouseForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.productsWarehouse_title || "productsWarehouse_title"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit" : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
-                        </h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit" : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">

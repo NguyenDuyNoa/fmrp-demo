@@ -6,7 +6,7 @@ const DateToDateComponent = ({ value, onChange, colSpan, className }) => {
         <div
             id="parentDatepicker"
             className={`z-20 ml-1 parentDatepicker ${className}`}
-            tyle={{ gridColumn: `span ${colSpan || 1}` }}>
+            style={{ gridColumn: `span ${colSpan || 1}` }}>
             <Datepicker
                 {...styleDatePicker}
                 value={value}

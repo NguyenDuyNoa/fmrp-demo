@@ -1,6 +1,8 @@
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
@@ -30,7 +32,6 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { useProductionWarehouseItems } from "./hooks/useProductionWarehouseItems";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const ProductionWarehouseForm = (props) => {
     const router = useRouter();
@@ -77,11 +78,12 @@ const ProductionWarehouseForm = (props) => {
     const [errUnit, sErrUnit] = useState(false);
 
     const [errQty, sErrQty] = useState(false);
-
+    // danh sách chi nhánh
     const { data: dataBranch = [] } = useBranchList();
-
+    // danh sách mặt hàng
     const { data: dataItems } = useProductionWarehouseItems({ idBranch })
 
+    // set state mặc định
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrBranch(false);
@@ -89,6 +91,7 @@ const ProductionWarehouseForm = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
+    // lấy dữ liệu khi sửa
     const { isFetching } = useQuery({
         queryKey: ["api_production_warehouse_detail_page", id],
         queryFn: async () => {
@@ -157,6 +160,7 @@ const ProductionWarehouseForm = (props) => {
         enabled: !!id,
     })
 
+    // reset data đã chọn khi thay đổi value
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
             sListData([]);
@@ -165,6 +169,7 @@ const ProductionWarehouseForm = (props) => {
         handleQueryId({ status: false });
     };
 
+    // change input
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
             sCode(value.target.value);
@@ -182,6 +187,8 @@ const ProductionWarehouseForm = (props) => {
             }
         }
     };
+
+    // xóa ngày
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
         }
@@ -189,10 +196,13 @@ const ProductionWarehouseForm = (props) => {
             sStartDate(new Date());
         }
     };
+
+    // chọn ngày
     const handleTimeChange = (date) => {
         sStartDate(date);
     };
 
+    // lưu dữ liệu
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const hasNullKho = listData.some((item) => item.child?.some((childItem) => childItem.location === null));
@@ -275,7 +285,7 @@ const ProductionWarehouseForm = (props) => {
         onSending && _ServerSending();
     }, [onSending]);
 
-    //new
+    // add dòng con
     const _HandleAddChild = (parentId, value) => {
         sOnLoadingChild(true);
         const newData = listData?.map((e) => {
@@ -318,6 +328,7 @@ const ProductionWarehouseForm = (props) => {
         sListData(newData);
     };
 
+    // add dòng cha
     const _HandleAddParent = (value) => {
         sOnLoadingChild(true);
 
@@ -370,6 +381,7 @@ const ProductionWarehouseForm = (props) => {
         }
     };
 
+    // xóa dòng con
     const _HandleDeleteChild = (parentId, childId) => {
         const newData = listData.map((e) => {
             if (e.id === parentId) {
@@ -381,6 +393,7 @@ const ProductionWarehouseForm = (props) => {
         sListData([...newData]);
     };
 
+    // xóa tất cả dòng con
     const _HandleDeleteAllChild = (parentId) => {
         const newData = listData.map((e) => {
             if (e.id === parentId) {
@@ -392,6 +405,7 @@ const ProductionWarehouseForm = (props) => {
         sListData([...newData]);
     };
 
+    // change dòng con
     const _HandleChangeChild = (parentId, childId, type, value) => {
         // Tạo một bản sao của listData để thay đổi
         const newData = [...listData];
@@ -469,6 +483,7 @@ const ProductionWarehouseForm = (props) => {
         sListData(newData);
     };
 
+    // validate số lượng
     const handleQuantityError = (e) => {
         isShow("error", `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(e)} số lượng tồn`);
         setTimeout(() => {
@@ -479,6 +494,7 @@ const ProductionWarehouseForm = (props) => {
         }, 1000);
     };
 
+    // change value mặt hàng
     const _HandleChangeValue = (parentId, value) => {
         sOnLoadingChild(true);
         const checkData = listData?.some((e) => e?.item?.value === value?.value);
@@ -545,6 +561,19 @@ const ProductionWarehouseForm = (props) => {
 
     const handleCheckError = (e) => isShow("error", `${e}`);
 
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.Warehouse_title || "Warehouse_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.production_warehouse || "production_warehouse"}`,
+            href: "/manufacture/production-warehouse?tab=all",
+        },
+        {
+            label: id ? dataLang?.production_warehouse_edit || "production_warehouse_edit" : dataLang?.production_warehouse_add || "production_warehouse_add"
+        },
+    ];
     return (
         <React.Fragment>
             <Head>
@@ -554,25 +583,15 @@ const ProductionWarehouseForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.production_warehouse || "production_warehouse"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {" "}
-                            {id
-                                ? dataLang?.production_warehouse_edit || "production_warehouse_edit"
-                                : dataLang?.production_warehouse_add || "production_warehouse_add"}
-                        </h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                            {id
-                                ? dataLang?.production_warehouse_edit || "production_warehouse_edit"
-                                : dataLang?.production_warehouse_add || "production_warehouse_add"}
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
+                            {id ? dataLang?.production_warehouse_edit || "production_warehouse_edit" : dataLang?.production_warehouse_add || "production_warehouse_add"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">
                             <ButtonBack
@@ -585,8 +604,7 @@ const ProductionWarehouseForm = (props) => {
                     <div className="w-full rounded ">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione ||
-                                    "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid items-center grid-cols-6 gap-3 mt-2">
                                 <div className="col-span-2">
@@ -622,8 +640,7 @@ const ProductionWarehouseForm = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>

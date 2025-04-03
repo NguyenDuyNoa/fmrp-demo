@@ -34,6 +34,7 @@ import { MdClear } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { useExportToOtherItems } from "./hooks/useExportToOtherItems";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const ExportToOtherForm = (props) => {
     const router = useRouter();
@@ -562,6 +563,21 @@ const ExportToOtherForm = (props) => {
         isShow("error", `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(e)} số lượng tồn`);
     };
 
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.Warehouse_title || "Warehouse_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.exportToOthe_list || "exportToOthe_list"}`,
+            href: "/manufacture/export-to-other",
+        },
+        {
+            label: id ? dataLang?.exportToOthe_exporttoOtherEdit || "exportToOthe_exporttoOtherEdit" : dataLang?.exportToOthe_exporttoOtherAdd || "exportToOthe_exporttoOtherAdd",
+        },
+    ];
+
     return (
         <React.Fragment>
             <Head>
@@ -573,19 +589,23 @@ const ExportToOtherForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.exportToOthe_exporttoOther || "exportToOthe_exporttoOther"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {id ? dataLang?.exportToOthe_exporttoOtherEdit || "exportToOthe_exporttoOtherEdit" : dataLang?.exportToOthe_exporttoOtherAdd || "exportToOthe_exporttoOtherAdd"}
-                        </h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
+                    // <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                    //     <h6 className="text-[#141522]/40">
+                    //         {dataLang?.exportToOthe_exporttoOther || "exportToOthe_exporttoOther"}
+                    //     </h6>
+                    //     <span className="text-[#141522]/40">/</span>
+                    //     <h6>
+                    //         {id ? dataLang?.exportToOthe_exporttoOtherEdit || "exportToOthe_exporttoOtherEdit" : dataLang?.exportToOthe_exporttoOtherAdd || "exportToOthe_exporttoOtherAdd"}
+                    //     </h6>
+                    // </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {id ? dataLang?.exportToOthe_exporttoOtherEdit || "exportToOthe_exporttoOtherEdit" : dataLang?.exportToOthe_exporttoOtherAdd || "exportToOthe_exporttoOtherAdd"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">

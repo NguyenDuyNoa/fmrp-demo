@@ -33,6 +33,7 @@ import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import PopupDetailError from "./components/popupDetailError";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 const CheckQualityForm = (props) => {
     const initialState = {
         onFetching: false,
@@ -395,6 +396,21 @@ const CheckQualityForm = (props) => {
     useEffect(() => {
         isStateQlty.onSending && _ServerSending();
     }, [isStateQlty.onSending]);
+
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `QC`,
+            // href: "/",
+        },
+        {
+            label: `Phiếu kiểm tra chất lượng`,
+            href: "/manufacture/check-quality",
+        },
+        {
+            label: id ? "Sửa phiếu kiểm tra chất lượng" : "Tạo phiếu kiểm tra chất lượng",
+        },
+    ];
     return (
         <React.Fragment>
             <Head>
@@ -404,15 +420,14 @@ const CheckQualityForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{"QC"}</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{id ? "Sửa phiếu kiểm tra chất lượng" : "Tạo phiếu kiểm tra chất lượng"}</h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {id ? "Sửa phiếu kiểm tra chất lượng" : "Tạo phiếu kiểm tra chất lượng"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">
