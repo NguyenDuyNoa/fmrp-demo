@@ -1,15 +1,25 @@
+import { useCallback } from "react";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+
 // utils/transformChartData.ts
 export function transformChartData(data) {
+    const dataSeting = useSetingServer();
+
+    const formatNumber = useCallback((num) => formatNumberConfig(+num, dataSeting), [dataSeting]);
+    console.log('data transformChart: ', data);
+
     const chartData = [];
 
     data?.forEach((item) => {
         const name = item?.item_name;
+        const item_code = item?.item_code;
 
         chartData.push(
-            { name, type: 'Đổ xuất', value: parseFloat(item.quantity_exported || 0) },
-            { name, type: 'Còn lại', value: parseFloat(item.quantity_rest || 0) },
-            { name, type: 'Thu hồi', value: parseFloat(item.quantity_recovery || 0) },
-            { name, type: 'Kế hoạch', value: parseFloat(item.quantity_total_quota || 0) }
+            { item_code: item_code, name, type: 'Đã xuất', value: formatNumber(item.quantity_exported) },
+            { item_code: item_code, name, type: 'Còn lại', value: formatNumber(item.quantity_rest) },
+            { item_code: item_code, name, type: 'Thu hồi', value: formatNumber(item.quantity_recovery) },
+            { item_code: item_code, name, type: 'Kế hoạch', value: formatNumber(item.quantity_total_quota) }
         );
     });
 

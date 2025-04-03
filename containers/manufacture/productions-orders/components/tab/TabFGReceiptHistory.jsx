@@ -216,7 +216,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                     onToggle={toggleSearch}
                     value={isStateProvider?.productionsOrders?.searchSheet?.searchFgReceiptHistory}
                     onChange={onChangeSearch}
-                    placeholder={dataLang?.productions_orders_find || 'Tìm kiếm...'}
+                    placeholder={dataLang?.productions_orders_find_table || 'Tìm kiếm...'}
                 />
 
                 <ButtonAnimationNew
@@ -339,7 +339,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                                             width={200}
                                                             height={200}
                                                             alt={product?.product?.item_name ?? "image"}
-                                                            className={`2xl:size-10 2xl:min-w-10 size-8 min-w-8 object-cover rounded-md shrink-0`}
+                                                            className={`3xl:size-10 3xl:min-w-10 size-8 min-w-8 text-xs-default object-cover rounded-md shrink-0`}
                                                         />
 
                                                         <div className="flex flex-col 3xl:gap-1 gap-0.5">

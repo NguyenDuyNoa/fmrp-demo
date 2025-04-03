@@ -30,7 +30,8 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
         const colorMap = {
             "0": { color: 'bg-[#FF811A]/15 text-[#C25705]', title: dataLang?.productions_orders_produced || "produced" },
             "1": { color: 'bg-[#3ECeF7]/20 text-[#076A94]', title: dataLang?.productions_orders_in_progress || "in progress" },
-            "2": { color: 'bg-[#35BD4B]/20 text-[#1A7526]', title: dataLang?.productions_orders_completed || "completed" }
+            "2": { color: 'bg-[#35BD4B]/20 text-[#1A7526]', title: dataLang?.productions_orders_completed || "completed" },
+            "3": { color: 'bg-[#F54A45]/20 text-[#C02A26]', title: dataLang?.productions_orders_overdue || "overdue" }
         };
         const color = colorMap[product?.status_item];
 
@@ -40,53 +41,59 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
                 onClick={() => handleShowModel(product)}
                 className={`col-span-16 grid grid-cols-16 gap-2 items-center group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out 3xl:py-4 py-2 ${totalLength - 1 === index ? "border-transparent" : "border-b"}`}
             >
-                <h4 className="col-span-5 text-[#344054] font-normal flex items-center py-2 px-4 gap-2">
-                    <div className="2xl:size-16 size-14 shrink-0">
-                        <Image
-                            alt={product?.name ?? "img"}
-                            width={200}
-                            height={200}
-                            src={product?.images ?? "/icon/default/default.png"}
-                            className="size-full object-cover rounded-md"
-                        />
-                    </div>
+                <h4 className="col-span-1 flex items-center justify-center text-center text-[#141522] font-semibold xl:text-sm text-xs uppercase px-1">
+                    {(index + 1) ?? "-"}
+                </h4>
 
-                    <div className="flex flex-col 3xl:gap-1 gap-0.5">
-                        <p className={`font-semibold 3xl:text-base xl:text-sm text-xs ${isStateProvider?.productionsOrders.dataModal.id === product.id ? "text-[#0F4F9E]" : "text-[#141522] group-hover:text-[#0F4F9E]"}`}>
-                            {product.item_name}
-                        </p>
-                        <div className="space-y-0.5">
-                            <p className="text-[#667085] font-normal xl:text-[10px] text-[8px]">
-                                {product.product_variation}
+                <h4 className="col-span-5 text-[#344054] font-normal flex items-center py-2 px-1">
 
+                    <div className='flex items-start gap-2'>
+                        <div className="2xl:size-16 size-14 shrink-0">
+                            <Image
+                                alt={product?.name ?? "img"}
+                                width={200}
+                                height={200}
+                                src={product?.images ?? "/icon/default/default.png"}
+                                className="size-full object-cover rounded-md"
+                            />
+                        </div>
+
+                        <div className="flex flex-col 3xl:gap-1 gap-0.5">
+                            <p className={`font-semibold 3xl:text-base xl:text-sm text-xs ${isStateProvider?.productionsOrders.dataModal.id === product.id ? "text-[#0F4F9E]" : "text-[#141522] group-hover:text-[#0F4F9E]"}`}>
+                                {product.item_name}
                             </p>
+                            <div className="space-y-0.5">
+                                <p className="text-[#667085] font-normal xl:text-[10px] text-[8px]">
+                                    {product.product_variation}
 
-                            <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
-                                {product.item_code}
-                            </p>
+                                </p>
 
-                            <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
-                                {product.reference_no_detail}
-                            </p>
+                                <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
+                                    {product.item_code}
+                                </p>
+
+                                <p className="text-[#3276FA] font-normal 3xl:text-sm xl:text-xs text-[10px]">
+                                    {product.reference_no_detail}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </h4>
 
-                <h4 className="col-span-2 text-start text-[#141522] font-semibold xl:text-sm text-xs">
+                <h4 className="col-span-2 text-start text-[#141522] font-semibold xl:text-sm text-xs px-1">
                     {product?.unit_name ?? ""}
 
                 </h4>
 
-                <h4 className="col-span-1 text-start text-[#141522] font-semibold xl:text-sm text-xs uppercase">
+                <h4 className="col-span-1 text-start text-[#141522] font-semibold xl:text-sm text-xs uppercase px-1">
                     {product.quantity > 0 ? formatNumber(product.quantity) : "-"}
-
                 </h4>
 
-                <h4 className="col-span-3 flex items-center justify-start">
+                <h4 className="col-span-3 flex items-center justify-start px-1">
                     <p className={`${color?.color} 3xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}>{color?.title}</p>
                 </h4>
 
-                <h4 className="col-span-5 flex items-center justify-center xl:text-sm text-xs">
+                <h4 className="col-span-4 flex items-center justify-center xl:text-sm text-xs px-1">
                     <ProgressStageBar
                         total={product?.count_stage}
                         done={product?.count_stage_active}
@@ -130,7 +137,7 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
                                 <CaretDownIcon className="size-full" />
                             </div>
                         </div>
-                        
+
                         <AnimatePresence initial={false}>
                             {
                                 item.showChild && (
@@ -144,24 +151,31 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
                                     >
                                         {/* header */}
                                         <div className="col-span-16 grid grid-cols-16 gap-2 py-4 border-b">
-                                            <h4 className="xl:text-sm text-xs text-start text-[#9295A4] font-semibold col-span-5">
+                                            <h4 className='xl:text-sm text-xs text-center text-[#9295A4] font-semibold col-span-1 px-1'>
+                                                STT
+                                            </h4>
+
+                                            <h4 className="xl:text-sm text-xs text-start text-[#9295A4] font-semibold col-span-5 px-1">
                                                 {dataLang?.Q_materials_finish_product || "Q_materials_finish_product"}
                                             </h4>
-                                            <h4 className="xl:text-sm text-xs text-start text-[#9295A4] font-semibold col-span-2">
+
+                                            <h4 className="xl:text-sm text-xs text-start text-[#9295A4] font-semibold col-span-2 px-1">
                                                 {dataLang?.Q_materials_unit || "Q_materials_unit"}
 
                                             </h4>
-                                            <h4 className="xl:text-sm text-xs text-start text-[#9295A4] font-semibold col-span-1">
+
+                                            <h4 className="xl:text-sm text-xs text-start text-[#9295A4] font-semibold col-span-1 px-1">
                                                 {dataLang?.Q_materials_quantity || "Q_materials_quantity"}
 
                                             </h4>
-                                            <h4 className="xl:text-sm text-xs text-start text-[#9295A4] font-semibold col-span-3">
+
+                                            <h4 className="xl:text-sm text-xs text-start text-[#9295A4] font-semibold col-span-3 px-1">
                                                 {dataLang?.Q_materials_status || "Q_materials_status"}
 
                                             </h4>
-                                            <h4 className="xl:text-sm text-xs text-center text-[#9295A4] font-semibold block col-span-5">
-                                                {dataLang?.Q_materials_progress || "Q_materials_progress"}
 
+                                            <h4 className="xl:text-sm text-xs text-center text-[#9295A4] font-semibold block col-span-4 px-1">
+                                                {dataLang?.Q_materials_progress || "Q_materials_progress"}
                                             </h4>
                                         </div>
                                         {

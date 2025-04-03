@@ -14,17 +14,89 @@ import { PiTable } from 'react-icons/pi'
 import ModalImage from 'react-modal-image'
 import { useDebounce } from 'use-debounce'
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import moment from 'moment/moment'
-import { formatMoment } from '@/utils/helpers/formatMoment'
-import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import TabSwitcherWithSlidingBackground from '@/components/common/tab/TabSwitcherWithSlidingBackground'
 import { useMaterialOutput } from '@/managers/api/productions-order/useMaterialOutput'
 import { TagColorProductNew } from '@/components/common/tag/TagStatusNew'
-import StackedBarChart from '../ui/StackedBarChart'
+import StackedBarChart2 from '../ui/StackedBarChart2'
 
 const tabs = [
     { id: "dashboard", name: "Biểu đồ thống kê" },
     { id: "table", name: "Danh sách dữ liệu" }
+]
+
+const dataChartFake = [
+    {
+        "type_products": "semi_products",
+        "type_item": "product",
+        "item_id": "84",
+        "item_variation_option_value_id": "626",
+        "item_code": "KHUNGPC",
+        "item_name": "Khung đỡ Porsche Cayenne S chính hãng",
+        "unit_name": "Cái",
+        "unit_name_primary": "Cái",
+        "quantity_total_quota": "2",
+        "quantity_quota_primary": "2",
+        "quota_exchange": "1",
+        "quantity_exported": 2,
+        "quantity_rest": 2,
+        "quantity_recovery": 3,
+        "images": null,
+        "product_variation": "(NONE)"
+    },
+    {
+        "type_products": "semi_products_outside",
+        "type_item": "product",
+        "item_id": "85",
+        "item_variation_option_value_id": "636",
+        "item_code": "LOGOPC2023",
+        "item_name": "LOGO PORSCHE 2023",
+        "unit_name": "Cái",
+        "unit_name_primary": "Cái",
+        "quantity_total_quota": "2",
+        "quantity_quota_primary": "2",
+        "quota_exchange": "1",
+        "quantity_exported": "2.0000",
+        "quantity_rest": 0,
+        "quantity_recovery": 0,
+        "images": null,
+        "product_variation": "(NONE)"
+    },
+    {
+        "type_products": "materials",
+        "type_item": "material",
+        "item_id": "11116",
+        "item_variation_option_value_id": "944",
+        "item_code": "CU99",
+        "item_name": "Đồng 99%",
+        "unit_name": "kg",
+        "unit_name_primary": "kg",
+        "quantity_total_quota": "22",
+        "quantity_quota_primary": "22",
+        "quota_exchange": "1",
+        "quantity_exported": "22.0000",
+        "quantity_rest": 0,
+        "quantity_recovery": 0,
+        "images": null,
+        "product_variation": "(NONE)"
+    },
+    {
+        "type_products": "materials",
+        "type_item": "material",
+        "item_id": "11126",
+        "item_variation_option_value_id": "955",
+        "item_code": "Sơn",
+        "item_name": "Sơn xe",
+        "unit_name": "Lọ",
+        "unit_name_primary": "Lọ",
+        "quantity_total_quota": "20.2",
+        "quantity_quota_primary": "20.2",
+        "quota_exchange": "1",
+        "quantity_exported": "20.2000",
+        "quantity_rest": 30.2,
+        "quantity_recovery": 40.2,
+        "images": null,
+        "product_variation": "(NONE)"
+    }
 ]
 
 const TabMaterialOutputTab = ({ dataLang, ...props }) => {
@@ -207,7 +279,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                             onToggle={toggleSearch}
                             value={isStateProvider?.productionsOrders?.searchSheet?.searchMaterialOutput}
                             onChange={onChangeSearch}
-                            placeholder={dataLang?.productions_orders_find || 'Tìm kiếm...'}
+                            placeholder={dataLang?.productions_orders_find_table || 'Tìm kiếm...'}
                         />
 
                         <ButtonAnimationNew
@@ -259,7 +331,9 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                 // <>
                 //     Hello
                 // </>
-                <StackedBarChart rawData={dataMaterialOutput} />
+                // <StackedBarChart rawData={dataMaterialOutput} />
+                // <StackedBarChart2 rawData={dataMaterialOutput} />
+                <StackedBarChart2 rawData={dataChartFake} />
             }
             {
                 activeTab?.id == "table" &&
@@ -327,7 +401,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                                                                     width={200}
                                                                     height={200}
                                                                     alt={product?.item_name ?? "image"}
-                                                                    className={`2xl:size-10 2xl:min-w-10 size-8 min-w-8 object-cover rounded-md shrink-0`}
+                                                                    className={`3xl:size-10 3xl:min-w-10 size-8 min-w-8 text-xs-default object-cover rounded-md shrink-0`}
                                                                 />
 
                                                                 <div className="flex flex-col 3xl:gap-1 gap-0.5">

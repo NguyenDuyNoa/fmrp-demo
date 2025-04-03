@@ -229,6 +229,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         if (isStateProvider?.productionsOrders?.[type] === value) return; // không update nếu không thay đổi
 
         queryStateProvider({
+            
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
                 [type]: value,
@@ -397,6 +398,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             });
 
             openSheet({
+                type:"manufacture-productions-orders",
                 content: <SheetProductionsOrderDetail {...shareProps} />,
                 className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
             });
@@ -410,7 +412,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 }
             });
 
-            closeSheet(false);
+            closeSheet("manufacture-productions-orders");
         }
     }, [flagProductionOrders, router.isReady]);
 
@@ -613,7 +615,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         //     openModal: false,
         //     dataModal: {},
         // });
-        closeSheet()
+        closeSheet("manufacture-productions-orders")
         router.push("/manufacture/productions-orders")
     };
 
@@ -702,6 +704,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         });
 
         openSheet({
+            type:"manufacture-productions-orders",
             content: (
                 <SheetProductionsOrderDetail {...shareProps} />
             ),
