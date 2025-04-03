@@ -109,16 +109,22 @@ const WarehouseTransfer = (props) => {
         "filter[warehouses_to]": isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
     };
 
+    // danh sách chi nhánh
     const { data: dataBranch = [] } = useBranchList();
 
+    // danh sách kho 
     const { data: dataWarehouse = [] } = useWarehouseByBranch()
 
+    // danh sách chuyển kho
     const { data, isFetching, refetch } = useWarehouseTransferList(params);
 
+    // danh sách mã chứng từ
     const { data: dataCode = [] } = useWarehouseTransferCombobox(isState.keySearchCode);
 
+    // danh sách tab lọc
     const { data: dataFilterbar, refetch: refetchFilterBar } = useWarehouseTransferFilterbar(params);
 
+    // tìm kiếm mã chứng từ
     const _HandleSeachApi = debounce(async (inputValue) => {
         queryState({ keySearchCode: inputValue });
     }, 500);
@@ -127,6 +133,7 @@ const WarehouseTransfer = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     };
 
+    // tìm kiếm table
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace({
@@ -137,6 +144,7 @@ const WarehouseTransfer = (props) => {
         });
     }, 500);
 
+    // đổi trạng thái duyệt thủ kho
     const handleSaveStatus = () => {
         if (isKeyState?.type === "browser") {
             const checked = isKeyState.value.target.checked;
@@ -153,6 +161,7 @@ const WarehouseTransfer = (props) => {
 
         handleQueryId({ status: false });
     };
+
 
     const _HandleChangeInput = (id, checkedUn, type, value) => {
         handleQueryId({

@@ -77,67 +77,50 @@ const Warehouse = (props) => {
 
     const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } =
-        useFeature();
+    // check cài đặt lot, date,serial
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
-    const { is_admin: role, permissions_current: auth } = useSelector(
-        (state) => state.auth
-    );
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkExport, checkEdit } = useActionRole(auth, "warehouse");
 
     const queryKeyIsState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
+    // bộ lọc kho hàng
     const paramsWarehouse = {
         limit: undefined,
         page: router.query?.page || 1,
-        "filter[branch_id]":
-            isState?.idBranch?.length > 0
-                ? isState?.idBranch?.map((e) => e.value)
-                : null,
+        "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch?.map((e) => e.value) : null,
     };
 
+    // bộ lọc chi tiết kho hàng
     const paramsDetail = {
         search: isState.keySearchItem,
         limit: isState.limitItemWarehouseDetail,
         page: router.query?.page || 1,
-        "filter[location_id]": isState.idLocationWarehouse?.value
-            ? isState.idLocationWarehouse?.value
-            : null,
-        "filter[variation_option_id_1]": isState.idVariantMain?.value
-            ? isState.idVariantMain?.value
-            : null,
-        "filter[variation_option_id_2]": isState.idVariantSub?.value
-            ? isState.idVariantSub?.value
-            : null,
+        "filter[location_id]": isState.idLocationWarehouse?.value ? isState.idLocationWarehouse?.value : null,
+        "filter[variation_option_id_1]": isState.idVariantMain?.value ? isState.idVariantMain?.value : null,
+        "filter[variation_option_id_2]": isState.idVariantSub?.value ? isState.idVariantSub?.value : null,
     };
 
+    // danh sách chi nhánh
     const { data: listBranch = [] } = useBranchList();
 
+    // danh sách biến thể
     const { data: listVariant = [] } = useVariantList();
 
-    const { data: listLocationWarehouse = [] } = useWarehouseLocation(
-        isState.idWarehouse
-    );
+    const { data: listLocationWarehouse = [] } = useWarehouseLocation(isState.idWarehouse);
 
-    const {
-        data: dataWarehouse,
-        isFetching,
-        refetch,
-    } = useWarehouseList(paramsWarehouse);
+    const { data: dataWarehouse, isFetching, refetch, } = useWarehouseList(paramsWarehouse);
 
-    const {
-        data,
-        refetch: refetchWarehouseDetail,
-        isFetching: isFetchingWarehouseDetail,
-    } = useWarehouseDetail(isState?.idWarehouse, paramsDetail);
+    // danh sách dữ liệu chi tiết
+    const { data, refetch: refetchWarehouseDetail, isFetching: isFetchingWarehouseDetail, } = useWarehouseDetail(isState?.idWarehouse, paramsDetail);
 
+    // nếu có dữ liệu thì set active dữ liệu đầu tiên
     useEffect(() => {
         if (dataWarehouse?.rResult?.length > 0) {
             queryKeyIsState({
-                idWarehouse: isState?.idWarehouse
-                    ? isState?.idWarehouse
-                    : dataWarehouse?.rResult[0].id,
+                idWarehouse: isState?.idWarehouse ? isState?.idWarehouse : dataWarehouse?.rResult[0].id,
             });
         }
     }, [dataWarehouse?.rResult]);
@@ -146,6 +129,7 @@ const Warehouse = (props) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
+    // change bộ lọc
     const onChangeFilter = (type, value) => {
         if (type == "branch") {
             queryKeyIsState({ idBranch: value });
@@ -164,21 +148,22 @@ const Warehouse = (props) => {
         });
     };
 
+    // hàm tìm kiếm
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryKeyIsState({ keySearchItem: value });
         router.replace(router.route);
     }, 500);
 
-    const newResult = data?.rResult
-        ?.map((item) => {
-            const detail = item.detail || [];
-            return detail.map((detailItem) => ({
-                ...item,
-                detail: detailItem,
-            }));
-        })
-        .flat();
+    // flat dữ liệu chi tiết kho
+    const newResult = data?.rResult?.map((item) => {
+        const detail = item?.detail || [];
+        return detail?.map((detailItem) => ({
+            ...item,
+            detail: detailItem,
+        }));
+    }).flat();
 
+    // xuất excel
     const multiDataSet = [
         {
             columns: [
@@ -385,7 +370,6 @@ const Warehouse = (props) => {
                         <div className="flex items-center justify-end gap-2">
                             {role == true || checkAdd ? (
                                 <PopupWarehouse
-                                    W
                                     onRefresh={refetch.bind(this)}
                                     onRefreshGroup={refetchWarehouseDetail.bind(this)}
                                     dataLang={dataLang}
@@ -406,7 +390,7 @@ const Warehouse = (props) => {
                     </>
                 }
                 table={
-                    <div className="flex flex-col h-full overflow-hidden">
+                    <div className="flex flex-col h-full ">
                         <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                             <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                 <div className="grid grid-cols-5 gap-2">
@@ -556,7 +540,7 @@ const Warehouse = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-10 min-h-0 ">
+                        <div className="grid min-h-0 grid-cols-10 ">
                             <Customscrollbar className="col-span-2 h-full rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-y-auto">
                                 {dataWarehouse?.rResult &&
                                     dataWarehouse?.rResult?.map((item, index) => (
@@ -640,8 +624,8 @@ const Warehouse = (props) => {
                                         </PopupParent>
                                     ))}
                             </Customscrollbar>
-                            <Customscrollbar className="col-span-8 h-full overflow-y-auto pb-2">
-                                <div className={`2xl:w-[100%] pr-2`}>
+                            <Customscrollbar className="h-full col-span-8 overflow-y-auto">
+                                <div className={`w-full`}>
                                     {/* header table */}
                                     <HeaderTable
                                         gridCols={
@@ -661,47 +645,39 @@ const Warehouse = (props) => {
                                         }
                                     >
                                         <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.warehouses_detail_product ||
-                                                "warehouses_detail_product"}
+                                            {dataLang?.warehouses_detail_product || "warehouses_detail_product"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouses_detail_wareLoca ||
-                                                "warehouses_detail_wareLoca"}
+                                            {dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouses_detail_mainVar ||
-                                                "warehouses_detail_mainVar"}
+                                            {dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouses_detail_subVar ||
-                                                "warehouses_detail_subVar"}
+                                            {dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}
                                         </ColumnTable>
                                         {dataProductSerial?.is_enable === "1" && (
                                             <ColumnTable colSpan={1} textAlign={"center"}>
                                                 {"Serial"}
                                             </ColumnTable>
                                         )}
-                                        {dataMaterialExpiry?.is_enable === "1" ||
-                                            dataProductExpiry?.is_enable === "1" ? (
+                                        {dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1" ? (
                                             <>
                                                 <ColumnTable colSpan={1} textAlign={"center"}>
                                                     {"Lot"}
                                                 </ColumnTable>
                                                 <ColumnTable colSpan={1} textAlign={"center"}>
-                                                    {dataLang?.warehouses_detail_date ||
-                                                        "warehouses_detail_date"}
+                                                    {dataLang?.warehouses_detail_date || "warehouses_detail_date"}
                                                 </ColumnTable>
                                             </>
                                         ) : (
                                             ""
                                         )}
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouses_detail_quantity ||
-                                                "warehouses_detail_quantity"}
+                                            {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.warehouses_detail_value ||
-                                                "warehouses_detail_value"}
+                                            {dataLang?.warehouses_detail_value || "warehouses_detail_value"}
                                         </ColumnTable>
                                     </HeaderTable>
                                     {/* data table */}
@@ -711,7 +687,7 @@ const Warehouse = (props) => {
                                             color="#0f4f9e"
                                         />
                                     ) : data?.rResult && data?.rResult?.length > 0 ? (
-                                        <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
+                                        <div className="w-full h-full">
                                             {data?.rResult &&
                                                 data?.rResult?.map((e) => (
                                                     <div

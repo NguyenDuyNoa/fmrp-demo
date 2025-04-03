@@ -35,6 +35,7 @@ const PopupLocationWarehouse = (props) => {
 
     const [valueWarehouse, sValueWarehouse] = useState(null);
 
+    // set state khi mở popup lên
     useEffect(() => {
         sErrInputCode(false);
         sErrInputName(false);
@@ -44,6 +45,7 @@ const PopupLocationWarehouse = (props) => {
         sValueWarehouse(props.id ? { label: props.warehouse_name, value: props.warehouse_id } : null);
     }, [open]);
 
+    // change input
     const _HandleChangeInput = (type, value) => {
         if (type == "name") {
             sName(value.target?.value);
@@ -54,6 +56,7 @@ const PopupLocationWarehouse = (props) => {
         }
     };
 
+    // lưu vị trí kho
     const handingLocation = useMutation({
         mutationFn: ({ url, data }) => {
             return apiLocationWarehouse.apiHandingLocation(url, data);
