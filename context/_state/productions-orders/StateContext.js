@@ -54,7 +54,7 @@ const initialState = {
             searchMaterialIssueHistory: "",
             searchMaterialOutput: ""
         }
-    }
+    },
 };
 export const StateProvider = ({ children }) => {
     const [isStateProvider, setIsStateProvider] = useState(initialState);

@@ -12,8 +12,9 @@ import PopupRecommendation from '../UI/popup/PopupRecommendation';
 import PopupUpdateVersion from '../UI/popup/PopupUpdateVersion';
 import ImagesModal from '../UI/images/ImagesModal';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import PopupGlobal from '../common/popup/PopupGlobal';
+import { useSheet } from '@/context/ui/SheetContext';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -26,6 +27,9 @@ const queryClient = new QueryClient({
 const Index = ({ children, ...props }) => {
     const router = useRouter()
 
+
+    const { closeSheet } = useSheet()
+
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
     const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
@@ -35,6 +39,15 @@ const Index = ({ children, ...props }) => {
     const statePopupRecommendation = useSelector((state) => state.statePopupRecommendation);
     const statePopupUpdateVersion = useSelector((state) => state.statePopupUpdateVersion);
     const statePopupGlobal = useSelector((state) => state.statePopupGlobal);
+
+    useEffect(() => {
+        if (!router?.route?.startsWith("/manufacture/productions-orders")) {
+            closeSheet("manufacture-productions-orders")
+        }
+    }, [router.isReady, router?.route])
+
+    console.log('router', router);
+
 
     return (
         <QueryClientProvider client={queryClient}>

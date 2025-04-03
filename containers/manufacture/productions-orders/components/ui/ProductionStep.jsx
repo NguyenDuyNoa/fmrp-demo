@@ -134,7 +134,7 @@ const ProductionSteps = ({ stages }) => {
     const hiddenCount = stages?.length - visibleSteps?.length;
 
     return (
-        <div className="pl-4 py-4">
+        <div className="3xl:pl-4 pl-2 3xl:py-4 py-2">
             {
                 visibleSteps && visibleSteps?.map((step, index) => {
                     const isLastItem = index === visibleSteps.length - 1;
@@ -144,8 +144,8 @@ const ProductionSteps = ({ stages }) => {
                         !isLastItem || (!showAll && hiddenCount > 0);
 
                     return (
-                        <div key={`steppp-${step.id}`} className="grid grid-cols-8 relative">
-                            <div className='col-span-1 w-full relative'>
+                        <div key={`steppp-${step.id}`} className="grid 3xl:grid-cols-8 grid-cols-14 relative">
+                            <div className='3xl:col-span-1 col-span-2 w-full relative'>
                                 <div className={`absolute -top-2 left-0 w-full h-full font-medium 
                                 ${step.active == "1" ?
                                         (
@@ -165,13 +165,16 @@ const ProductionSteps = ({ stages }) => {
                                 >
                                     {step.active == "1" ?
                                         (
-                                            <span className="text-xs font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.DD_MM_HH_mm)}</span>
+                                            <div className='flex flex-col'>
+                                                <span className="text-xs-default font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.DD_MM)}</span>
+                                                <span className="3xl:text-[10px] text-[9px] font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.TIME_SHORT)}</span>
+                                            </div>
                                         )
                                         :
                                         (
                                             step.begin_production == "1"
                                                 ?
-                                                <span className="text-xs font-medium text-[#667085]">{moment(step.date_production).format(FORMAT_MOMENT.DD_MM)}</span>
+                                                <span className="text-xs-default font-medium text-[#667085]">{moment(step.date_production).format(FORMAT_MOMENT.DD_MM)}</span>
                                                 :
                                                 null
                                         )
@@ -182,7 +185,7 @@ const ProductionSteps = ({ stages }) => {
 
                             <div className="col-span-1 flex flex-col items-center mr-2 relative h-full">
                                 <div
-                                    className={`size-4 flex items-center justify-center shrink-0 rounded-full border-2 
+                                    className={`3xl:size-4 size-3.5 flex items-center justify-center shrink-0 rounded-full border-2 
                                     ${step.active == "1" ?
                                             (
                                                 "bg-[#1FC583] !border-[#1FC583]"
@@ -199,7 +202,7 @@ const ProductionSteps = ({ stages }) => {
                                         `}
                                 >
                                     {step.active == "1" ?
-                                        <CheckIcon className='size-3 shrink-0 text-white' />
+                                        <CheckIcon className='3xl:size-3 size-2.5 shrink-0 text-white' />
                                         :
                                         (
                                             step.begin_production == "1"
@@ -232,7 +235,7 @@ const ProductionSteps = ({ stages }) => {
                                 }
                             </div>
 
-                            <div className='col-span-6 min-h-[40px]'>
+                            <div className='3xl:col-span-6 col-span-11 min-h-[40px] pb-2'>
                                 <div
                                     className={`text-sm-default font-medium 
                                   ${step.active == "1" ?
@@ -254,7 +257,7 @@ const ProductionSteps = ({ stages }) => {
 
                                 {
                                     step?.purchase_items &&
-                                    step?.purchase_items?.map((item,index) => (
+                                    step?.purchase_items?.map((item, index) => (
                                         <div
                                             key={`purchase-${index}`}
                                             className="text-[10px] flex flex-wrap gap-2 mt-1"
@@ -306,21 +309,21 @@ const ProductionSteps = ({ stages }) => {
             }
             {hiddenCount > 0 && !showAll && (
                 <div
-                    className="grid grid-cols-8 cursor-pointer mb-4"
+                    className="grid 3xl:grid-cols-8 grid-cols-14 cursor-pointer mb-4"
                     onClick={() => setShowAll(true)}
                 >
                     {/* Cột thời gian để trống */}
-                    <div className="col-span-1"></div>
+                    <div className="3xl:col-span-1 col-span-2"></div>
 
                     {/* Cột timeline */}
                     <div className="col-span-1 flex flex-col items-center mr-2 relative h-full">
-                        <div className="size-4 shrink-0 rounded-full border-2 bg-[#1FC583] border-[#1FC583] flex items-center justify-center">
-                            <CheckIcon className='size-3 shrink-0 text-white' />
+                        <div className="3xl:size-4 size-3.5 shrink-0 rounded-full border-2 bg-[#1FC583] border-[#1FC583] flex items-center justify-center">
+                            <CheckIcon className='3xl:size-3 size-2.5 shrink-0 text-white' />
                         </div>
                     </div>
 
                     {/* Cột nội dung */}
-                    <div className="col-span-6 flex items-center gap-1 text-sm">
+                    <div className="3xl:col-span-6 col-span-11 flex items-center gap-1 text-sm-default">
                         <span className="text-[#1FC583] font-medium">Xem thêm</span>
                         <span className="text-[#9295A4]">(+{hiddenCount} công đoạn)</span>
                         <PiCaretDownBold className='size-4 shrink-0 text-[#1FC583]' />
@@ -340,11 +343,11 @@ const ProductionSteps = ({ stages }) => {
             )} */}
 
             {showAll && stepFake.length > 2 && (
-                <div className="flex items-center justify-center gap-2 cursor-pointer text-[#1FC583] text-center text-sm-default mt-2" onClick={() => setShowAll(false)}>
+                <div className="flex items-center justify-center gap-2 cursor-pointer text-[#1FC583] text-center text-sm-default 3xl:mt-2 mt-0.5" onClick={() => setShowAll(false)}>
                     <span>
                         Thu gọn
                     </span>
-                    <PiCaretUpBold className='size-4 shrink-0 text-[#1FC583]' />
+                    <PiCaretUpBold className='3xl:size-4 size-3 shrink-0 text-[#1FC583]' />
                 </div>
             )}
         </div>

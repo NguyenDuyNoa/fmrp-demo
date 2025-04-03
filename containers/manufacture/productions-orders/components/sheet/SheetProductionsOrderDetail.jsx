@@ -93,7 +93,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                 },
                 submain: {
                     refs: [titleSheetRef],
-                    subtract: 84 + 34,
+                    subtract: 84 + 10,
                 },
             });
 
@@ -127,9 +127,6 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     // 5: <TabRecallMaterials {...shareProps} />,
     // 6: <TabProcessingCost {...shareProps} />,
 
-    console.log('dataItemOrderDetail', dataItemOrderDetail);
-    console.log('isLoadingItemOrderDetail', isLoadingItemOrderDetail);
-
     const formatMoney = (number) => {
         if (typeof number == "string") {
             return formatMoneyConfig(+number ? +number : 0, dataSeting);
@@ -140,7 +137,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     };
 
     const handleCloseSheet = () => {
-        closeSheet(false)
+        closeSheet("manufacture-productions-orders")
 
         router.push("/manufacture/productions-orders")
     }
@@ -164,10 +161,10 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     };
 
     return (
-        <div className="flex flex-col gap-2 pl-6 pr-2 py-3 overflow-hidden">
+        <div className="flex flex-col gap-2 3xl:pl-6 pl-4 pr-2 3xl:py-3 py-1 overflow-hidden">
             <div
                 ref={titleSheetRef}
-                className='pr-4 flex items-center justify-between'
+                className='3xl:pr-4 pr-2 flex items-center justify-between'
             // style={{
             //     WebkitMaskImage: "linear-gradient(0deg, rgba(249, 251, 252, 0.00) 1%, #F9FBFC 10%)"
             // }}
@@ -221,7 +218,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
             </div>
 
             <Customscrollbar
-                className='overflow-auto'
+                className='overflow-auto pb-0'
                 style={{
                     height: `${scrollHeight}px`,
                     maxHeight: `${scrollHeight}px`,
@@ -230,14 +227,14 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
             >
                 <div className='flex flex-col 3xl:gap-6 gap-4 pr-4'>
                     {/* Information */}
-                    <div className="flex flex-col gap-6 w-full border border-[#D0D5DD] rounded-2xl bg-white px-8 py-6">
+                    <div className="flex flex-col 3xl:gap-6 gap-4 w-full border border-[#D0D5DD] rounded-2xl bg-white 3xl:px-8 px-6 3xl:py-6 py-4">
                         <h2 className="text-title-small text-[#11315B] font-medium capitalize">
                             Thông tin chung
                         </h2>
 
-                        <div className={`grid grid-cols-2`}>
-                            <div className="flex flex-col col-span-1 w-full gap-1">
-                                <div className={`flex items-center gap-1`}>
+                        <div className="grid grid-cols-2">
+                            <div className="flex flex-col gap-1 col-span-1 w-full">
+                                <div className="flex items-center gap-1">
                                     <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}:
                                     </h3>
@@ -246,7 +243,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                     </h3>
                                 </div>
 
-                                <div className={`flex items-center gap-1`}>
+                                <div className="flex items-center gap-1">
                                     <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_number || 'productions_orders_details_number'}:
                                     </h3>
@@ -255,7 +252,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                     </h3>
                                 </div>
 
-                                <div className={`flex items-center col-span-3 gap-1`}>
+                                <div className="flex items-center col-span-3 gap-1">
                                     <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_plan || 'productions_orders_details_plan'}:
                                     </h3>
@@ -266,7 +263,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
                             </div>
 
-                            <div className="flex flex-col col-span-1 gap-1">
+                            <div className="flex flex-col gap-1 col-span-1 w-full">
                                 <div className={`flex items-center col-span-3 gap-1`}>
                                     <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>{dataLang?.productions_orders_details_orders || 'productions_orders_details_orders'}:</h3>
                                     <h3 className={`text-base-default font-medium text-[#141522]`}>
@@ -297,7 +294,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-3 3xl:gap-4 gap-2">
                             <CostCard
                                 className="col-span-1 w-full"
                                 title="Chi phí vật tư"
@@ -331,9 +328,9 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                             tabs={listTab}
                             activeTab={isStateProvider?.productionsOrders?.isTabSheet}
                             onChange={(tab) => handleActiveTab(tab, "detail_sheet")}
-                            className={"flex items-center justify-between w-full"}
+                            className={"flex items-center justify-start xxl:gap-2 gap-0 w-full"}
                             renderLabel={(tab, activeTab) => (
-                                <h3 className={`${isStateProvider?.productionsOrders?.isTabSheet?.id === tab.id ? "text-[#0375F3] scale-[1.02]" : "text-[#9295A4] scale-[1]"} flex items-center gap-2 col-span-1 font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}>
+                                <h3 className={`${isStateProvider?.productionsOrders?.isTabSheet?.id === tab.id ? "text-[#0375F3] scale-[1.02]" : "text-[#9295A4] scale-[1]"} 3xl:text-base xxl:text-sm xl:text-xs lg:text-xs text-xs flex items-center gap-2 col-span-1 font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}>
                                     <span>
                                         {tab.name}
                                     </span>
@@ -356,7 +353,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
             {
                 isStateProvider?.productionsOrders?.isTabSheet?.id == 1 &&
-                <div ref={commentSheetRef} className="mt-1 w-full border border-[#9295A4] rounded-xl flex items-center px-4 py-3 gap-3">
+                <div ref={commentSheetRef} className="mt-1 w-full border border-[#9295A4] rounded-xl flex items-center px-4 py-2 gap-3">
                     <input
                         className="flex-1 text-sm-default text-[#344054] placeholder:!text-[#667085] focus:outline-none"
                         placeholder="Thêm bình luận"

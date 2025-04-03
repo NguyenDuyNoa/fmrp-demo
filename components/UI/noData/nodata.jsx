@@ -10,7 +10,7 @@ const IMAGE_TYPE = {
 const NoData = ({
     type = '',
     className = '',
-    classNameImage = '3xl:max-w-[180px] max-w-[180px] w-full h-auto object-contain',
+    classNameImage = '3xl:max-w-[180px] max-w-[160px] w-full h-auto object-contain',
     classNameTitle = 'text-sm',
     ...rest
 }) => {
@@ -26,7 +26,7 @@ const NoData = ({
             className={`w-full h-full flex items-center justify-center ${className}`}
             {...rest}
         >
-            <div className="h-full flex flex-col justify-center items-center gap-5 py-5 mx-auto">
+            <div className="h-full flex flex-col justify-center items-center 3xl:gap-5 gap-3 3xl:py-5 py-3 mx-auto">
                 <Image
                     src={imageSrc}
                     width={300}
@@ -35,7 +35,7 @@ const NoData = ({
                     className={classNameImage}
                     priority
                 />
-                <h1 className={`${isTable ? "text-title-default text-[#52575E]" : `${classNameTitle} text-[#141522] opacity-90`} font-medium`}>
+                <h1 className={`${isTable ? "3xl:text-2xl xl:text-base text-lg text-[#52575E]" : `${classNameTitle} text-[#141522] opacity-90`} font-medium`}>
                     {title}
                 </h1>
             </div>

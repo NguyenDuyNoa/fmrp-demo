@@ -513,15 +513,25 @@ const ChartColumn = memo(({ dataChart }) => {
                 }
             },
         },
-        color: ({ name }) => {
+        // color: ({ name }) => {
+        //     const colors = {
+        //         'Kế hoạch': '#1f77b4',
+        //         'Đã xuất': '#ff7f0e',
+        //         'Còn lại': '#2ca02c',
+        //         'Hồi phục': '#d62728'
+        //     };
+        //     return colors[name];
+        // }
+
+        color: ({ type }) => {
             const colors = {
                 'Kế hoạch': '#1f77b4',
                 'Đã xuất': '#ff7f0e',
                 'Còn lại': '#2ca02c',
-                'Hồi phục': '#d62728'
+                'Thu hồi': '#d62728',
             };
-            return colors[name];
-        }
+            return colors[type];
+        },
     };
     return (
         <div className='relative'>
