@@ -58,6 +58,10 @@ const apiProducts = {
         return response.data
     },
 
+    async apiGetQRProductCompleted(id) {
+        const response = await axiosCustom('GET', `/api_web/Api_Production_orders/printQRProductCompleted/${id}`);
+        return response.data
+    }
 
 }
 
