@@ -11,7 +11,7 @@ export const useMaterialOutput = ({
     const fetchMaterialOutput = async () => {
         const { data } = await apiProductionsOrders.apiExportSituation(poiId)
 
-        return data
+        return data.boms
     };
 
     return useQuery({

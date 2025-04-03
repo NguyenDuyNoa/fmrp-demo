@@ -15,10 +15,8 @@ import { useRouter } from "next/router";
 import CostCard from "../ui/CostCard";
 
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import TabSwitcherWithUnderline from "@/components/common/tab/TabSwitcherWithUnderline";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { PiImage, PiPaperclip, PiPaperPlaneRightFill, PiSmiley, PiTextAa } from "react-icons/pi";
 import { variantButtonScaleZoom } from "@/utils/animations/variantsAnimation";

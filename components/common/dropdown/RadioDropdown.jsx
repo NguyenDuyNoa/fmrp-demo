@@ -1,5 +1,5 @@
 import CaretDropdownThinIcon from '@/components/icons/common/CaretDropdownThinIcon';
-import { ProductionsOrdersContext } from '@/containers/manufacture/productions-orders/context/productionsOrders';
+import { StateContext } from '@/context/_state/productions-orders/StateContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState, useRef, useEffect, useContext } from 'react';
 
@@ -11,7 +11,7 @@ const options = [
 const RadioDropdown = () => {
     const [open, setOpen] = useState(false);
 
-    const { isStateProvider, queryState } = useContext(ProductionsOrdersContext);
+    const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
     const ref = useRef(null);
 
@@ -37,8 +37,8 @@ const RadioDropdown = () => {
             >
                 <span className="">
                     {
-                        isStateProvider?.seletedRadioFilter ?
-                            <span className='text-sm font-medium text-[#141522]'>{isStateProvider?.seletedRadioFilter?.label}</span>
+                        isStateProvider?.productionsOrders?.seletedRadioFilter ?
+                            <span className='text-sm font-medium text-[#141522]'>{isStateProvider?.productionsOrders?.seletedRadioFilter?.label}</span>
                             :
                             <span className='text-sm font-light text-[#52575E]'>Chọn bộ lọc</span>
                     }
@@ -64,18 +64,40 @@ const RadioDropdown = () => {
                                     >
                                         <input
                                             type="radio"
-                                            checked={isStateProvider?.seletedRadioFilter?.id === option.id}
+                                            checked={isStateProvider?.productionsOrders?.seletedRadioFilter?.id === option.id}
                                             onChange={() => {
                                                 if (option.id == 1) {
-                                                    queryState({
-                                                        seletedRadioFilter: option,
-                                                        valuePlan: null,
+                                                    // queryStateProvider((prev) => ({
+                                                    //     productionsOrders: {
+                                                    //         ...prev.productionsOrders,
+                                                    //         seletedRadioFilter: option,
+                                                    //         valuePlan: null,
+                                                    //     }
+                                                    // }))
+
+                                                    queryStateProvider({
+                                                        productionsOrders: {
+                                                            ...isStateProvider?.productionsOrders,
+                                                            seletedRadioFilter: option,
+                                                            valuePlan: null,
+                                                        }
                                                     })
 
                                                 } else if (option.id == 2) {
-                                                    queryState({
-                                                        seletedRadioFilter: option,
-                                                        valueOrders: null,
+                                                    // queryStateProvider((prev) => ({
+                                                    //     productionsOrders: {
+                                                    //         ...prev.productionsOrders,
+                                                    //         seletedRadioFilter: option,
+                                                    //         valueOrders: null,
+                                                    //     }
+                                                    // }))
+
+                                                    queryStateProvider({
+                                                        productionsOrders: {
+                                                            ...isStateProvider?.productionsOrders,
+                                                            seletedRadioFilter: option,
+                                                            valueOrders: null,
+                                                        }
                                                     })
                                                 }
                                                 // ✅ Delay đóng dropdown để tránh xung đột với FilterDropdown
