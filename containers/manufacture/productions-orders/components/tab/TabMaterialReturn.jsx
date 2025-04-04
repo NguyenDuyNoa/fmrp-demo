@@ -278,7 +278,7 @@ const TabMaterialReturn = ({ dataLang, ...props }) => {
                         ĐVT
                     </h4>
                     <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-1 px-1">
-                        Số lượng
+                        SL
                     </h4>
                     <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-2 px-1">
                         Kho hàng
@@ -385,7 +385,7 @@ const TabMaterialReturn = ({ dataLang, ...props }) => {
                 </div>
 
                 {
-                    flagMaterialReturn?.length > 0 &&
+                    flagMaterialReturn?.length > 0 && !isLoadingTable &&
                     <div className='col-span-16 flex item justify-between'>
                         <div />
 

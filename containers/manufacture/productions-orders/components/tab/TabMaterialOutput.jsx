@@ -8,7 +8,6 @@ import NoData from '@/components/UI/noData/nodata'
 import { StateContext } from '@/context/_state/productions-orders/StateContext'
 import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
-import { useMaterialReturn } from '@/managers/api/productions-order/useMaterialReturn'
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { PiTable } from 'react-icons/pi'
 import ModalImage from 'react-modal-image'
@@ -17,7 +16,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import TabSwitcherWithSlidingBackground from '@/components/common/tab/TabSwitcherWithSlidingBackground'
 import { useMaterialOutput } from '@/managers/api/productions-order/useMaterialOutput'
 import { TagColorProductNew } from '@/components/common/tag/TagStatusNew'
-import StackedBarChart2 from '../ui/StackedBarChart2'
+import StackedBarChart from '../ui/StackedBarChart'
 
 const tabs = [
     { id: "dashboard", name: "Biểu đồ thống kê" },
@@ -331,9 +330,8 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                 // <>
                 //     Hello
                 // </>
-                // <StackedBarChart rawData={dataMaterialOutput} />
-                // <StackedBarChart2 rawData={dataMaterialOutput} />
-                <StackedBarChart2 rawData={dataChartFake} />
+                <StackedBarChart rawData={dataMaterialOutput} />
+                // <StackedBarChart2 rawData={dataChartFake} />
             }
             {
                 activeTab?.id == "table" &&
@@ -387,7 +385,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                                                     <div
                                                         key={`product-${index}`}
                                                         // onClick={() => handleShowModel(product)}
-                                                        className={`${filteredData?.length - 1 !== index ? "border-[#F3F3F4]" : "border-transparent"} border-b col-span-16 grid grid-cols-16 gap-2 items-start group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out`}
+                                                        className={`${filteredData?.slice(0, limit)?.length - 1 !== index ? "border-[#F3F3F4]" : "border-transparent"} border-b col-span-16 grid grid-cols-16 gap-2 items-start group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out`}
                                                     >
                                                         <h4 className="col-span-1 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default uppercase 3xl:py-4 py-2 px-1">
                                                             {index + 1 ?? "-"}
@@ -434,7 +432,7 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                                                                                     product?.type_products === "semi_products_outside" ? 4 :
                                                                                         null
                                                                 }
-                                                                className={'!px-2 !py-1 !rounded-[4px] !font-normal text-sm-default'}
+                                                                className={'!px-2 !py-1 !rounded-[4px] !font-normal 3xl:text-sm xl:text-xs text-[13px]'}
                                                                 dataLang={dataLang}
                                                                 name={product?.type_products}
                                                             />
@@ -471,14 +469,14 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
 
                         {/* load more click */}
                         {
-                            filteredData?.length > 0 &&
+                            filteredData?.length > 0 && !isLoadingTable &&
                             <div className='col-span-16 flex item justify-between'>
                                 <div />
                                 {
                                     // (dataMaterialOutputi?.length || 0) > (visibleProducts["info"] || 4) && (
                                     (limit < filteredData.length) && (
                                         <div className=" flex justify-center py-2">
-                                            <button onClick={() => setLimit(filteredData.length)} className="text-[#667085] 3xl:text-base text-sm hover:underline">
+                                            <button onClick={() => setLimit(filteredData.length)} className="text-[#667085] 3xl:text-base xl:text-sm text-xs hover:underline">
                                                 Xem thêm mặt hàng ({filteredData.length - limit}) Thành phẩm
                                             </button>
                                         </div>

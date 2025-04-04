@@ -622,10 +622,10 @@ const TabInformation = () => {
                         <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-4">
                             Bán thành phẩm
                         </h4>
-                        <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-2">
+                        <h4 className="text-xs-default text-start text-[#9295A4] font-semibold xxl:col-span-2 col-span-1">
                             ĐVT
                         </h4>
-                        <h4 className="text-xs-default text-center text-[#9295A4] font-semibold col-span-1">
+                        <h4 className="text-xs-default text-center text-[#9295A4] font-semibold xxl:col-span-1 col-span-2">
                             SL cần
                         </h4>
                         <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2">
@@ -684,11 +684,11 @@ const TabInformation = () => {
                                                         </div>
                                                     </h4>
 
-                                                    <h4 className="col-span-2 flex items-center size-full text-start text-[#141522] font-semibold text-sm-default">
+                                                    <h4 className="xxl:col-span-2 col-span-1 flex items-center size-full text-start text-[#141522] font-semibold text-sm-default">
                                                         {product?.unit_name ?? ""}
                                                     </h4>
 
-                                                    <h4 className="col-span-1 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default">
+                                                    <h4 className="xxl:col-span-1 col-span-2 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default">
                                                         {+product.quantity_need_manufactures > 0 ? formatNumber(+product.quantity_need_manufactures) : "-"}
                                                     </h4>
 
@@ -722,7 +722,7 @@ const TabInformation = () => {
                         }
                         {/* load more click */}
                         {
-                            dataItemOrderDetail?.items_semi?.length > 0 &&
+                            dataItemOrderDetail?.items_semi?.length > 0  &&
                             <div className='col-span-16 flex item justify-between'>
                                 <div />
                                 {

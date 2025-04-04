@@ -229,7 +229,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         if (isStateProvider?.productionsOrders?.[type] === value) return; // không update nếu không thay đổi
 
         queryStateProvider({
-            
+
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
                 [type]: value,
@@ -398,9 +398,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             });
 
             openSheet({
-                type:"manufacture-productions-orders",
+                type: "manufacture-productions-orders",
                 content: <SheetProductionsOrderDetail {...shareProps} />,
-                className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
+                className: 'w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]',
             });
         } else {
             // Không có poi_id hoặc không tìm thấy trong cookie
@@ -416,13 +416,13 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     }, [flagProductionOrders, router.isReady]);
 
-
     // active tab info & tab kế hoạch
     useEffect(() => {
         if (
-            listLsxTab?.length > 0 &&
-            (!isStateProvider?.productionsOrders?.isTabList || isStateProvider?.productionsOrders?.isTabList?.id !== listLsxTab[0]?.id)
+            listLsxTab?.length > 0 && (!isStateProvider?.productionsOrders?.isTabList)
         ) {
+            console.log('check');
+
             queryStateProvider({
                 productionsOrders: {
                     ...isStateProvider?.productionsOrders,
@@ -430,8 +430,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 },
             });
         }
-    }, [listLsxTab, isStateProvider]);
-
+    }, [listLsxTab]);
 
     // loadmore list LSX
     useEffect(() => {
@@ -591,6 +590,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     }, 500)
 
     const handleShow = (item) => {
+        if (item.id === isStateProvider?.productionsOrders?.idDetailProductionOrder) return
+
         queryStateProvider({
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
@@ -696,6 +697,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     };
 
     const handleShowModel = (item) => {
+        console.log('isStateProvider?.productionsOrders?.poiId',isStateProvider?.productionsOrders?.poiId);
+        console.log('item',item);
+        
+        if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return
+
         queryStateProvider({
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
@@ -704,11 +710,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         });
 
         openSheet({
-            type:"manufacture-productions-orders",
+            type: "manufacture-productions-orders",
             content: (
                 <SheetProductionsOrderDetail {...shareProps} />
             ),
-            className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
+            className: 'w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]',
         })
 
         router.push({
@@ -857,6 +863,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             return window.innerHeight - breadcrumb - titleInfo - filter - groupButton - 84 - 34;
         }
     };
+
+    // console.log('isStateProvider: ', isStateProvider);
+
 
     return (
         <React.Fragment>
@@ -1474,8 +1483,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             (dataProductionOrderDetail?.listPOItems?.length > 0)
                                 ?
                                 <React.Fragment>
-                                    {isStateProvider?.productionsOrders.isTabList?.type == "products" && <DetailProductionOrderList {...shareProps} />}
-                                    {isStateProvider?.productionsOrders.isTabList?.type == "semiProduct" && <>Hello</>}
+                                    {isStateProvider?.productionsOrders?.isTabList?.type == "products" && <DetailProductionOrderList {...shareProps} />}
+                                    {isStateProvider?.productionsOrders?.isTabList?.type == "semiProduct" && <>Hello</>}
                                     {/* {isStateProvider?.productionsOrders.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
                                 </React.Fragment>
                                 :

@@ -19,7 +19,7 @@ export const useItemOrderDetail = ({ poi_id, enabled }) => {
 
     return useQuery({
         queryKey: ['apiItemOrdersDetail', poi_id],
-        queryFn: () => fetchItemOrderDetail(),
+        queryFn: fetchItemOrderDetail,
         enabled: enabled,
         placeholderData: keepPreviousData,
         ...optionsQuery

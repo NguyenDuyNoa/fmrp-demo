@@ -277,23 +277,23 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                         Mã chứng từ
                     </h4>
 
-                    <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-3 px-1">
+                    <h4 className="text-xs-default text-start text-[#9295A4] font-semibold 2xl:col-span-3 col-span-4 px-1">
                         Mặt hàng
                     </h4>
 
-                    <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-2 px-1">
+                    <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block 2xl:col-span-2 col-span-3 px-1">
                         Kho thành phẩm
                     </h4>
 
-                    <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
-                        Số lượng
+                    <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block 2xl:col-span-2 col-span-1 px-1">
+                        SL
                     </h4>
 
                     <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
                         Kho QC
                     </h4>
 
-                    <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
+                    <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block 2xl:col-span-2 col-span-1 px-1">
                         SL Lỗi
                     </h4>
                 </div>
@@ -331,7 +331,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                                     {product?.code ?? "-"}
                                                 </h4>
 
-                                                <h4 className="col-span-3 flex items-center size-full text-[#344054] font-normal gap-2 3xl:py-4 py-2 px-1">
+                                                <h4 className="2xl:col-span-3 col-span-4 flex items-center size-full text-[#344054] font-normal gap-2 3xl:py-4 py-2 px-1">
                                                     <div className='flex items-start justify-start w-full gap-2'>
                                                         <ModalImage
                                                             small={product?.product?.images && product?.product?.images !== "" ? product?.product?.images : '/icon/default/default.png'}
@@ -395,11 +395,11 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                                     </div>
                                                 </h4>
 
-                                                <h4 className={`${product?.warehouse?.name ? "text-start" : "text-center"} flex items-center size-full col-span-2 text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
+                                                <h4 className={`${product?.warehouse?.name ? "text-start" : "text-center"} flex items-center size-full 2xl:col-span-2 col-span-3 text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
                                                     {product?.warehouse?.name ?? "-"}
                                                 </h4>
 
-                                                <h4 className={`flex items-center justify-center size-full col-span-2 text-center text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
+                                                <h4 className={`flex items-center justify-center size-full 2xl:col-span-2 col-span-1 text-center text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
                                                     {+product?.quantity > 0 ? formatNumber(+product?.quantity) : '-'}
                                                 </h4>
 
@@ -407,7 +407,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                                     {product?.name_warehouse_qc && product?.name_warehouse_qc !== "" ? product?.name_warehouse_qc : "-"}
                                                 </h4>
 
-                                                <h4 className={`flex items-center justify-center bg-[#FFEEF0] group-hover:bg-[#FFEEF0] col-span-2 size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1 custom-transition`}>
+                                                <h4 className={`flex items-center justify-center bg-[#FFEEF0] group-hover:bg-[#FFEEF0] 2xl:col-span-2 col-span-1 size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1 custom-transition`}>
                                                     {product?.quantity_error > 0 ? product?.quantity_error : "-"}
                                                 </h4>
                                             </div>
@@ -425,7 +425,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                 </div>
 
                 {
-                    flagFGReceiptHistory?.length > 0 &&
+                    flagFGReceiptHistory?.length > 0 && !isLoadingTable &&
                     <div className='col-span-16 flex item justify-between'>
                         <div />
 
