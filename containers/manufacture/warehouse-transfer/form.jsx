@@ -34,6 +34,7 @@ import { useWarehouseTransferExport } from "./hooks/useWarehouseTransferExport";
 import { useWarehouseTransferItems } from "./hooks/useWarehouseTransferItems";
 import { useWarehouseTransferTo } from "./hooks/useWarehouseTransferTo";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 /// Hậu viết API
 const WarehouseTransferForm = (props) => {
     const router = useRouter();
@@ -75,6 +76,8 @@ const WarehouseTransferForm = (props) => {
 
     const [load, sLoad] = useState(false);
 
+    const [errQty, sErrQty] = useState(false);
+
     const [errDate, sErrDate] = useState(false);
 
     const [errBranch, sErrBranch] = useState(false);
@@ -87,18 +90,18 @@ const WarehouseTransferForm = (props) => {
 
     const [errReceivingLocation, sErrReceivingLocation] = useState(false);
 
-    const [errQty, sErrQty] = useState(false);
-
+    // danh sách chi nhánh
     const { data: dataBranch = [] } = useBranchList();
-
+    // danh sách kho nhận
     const { data: dataReceiveWarehouse = [] } = useWarehouseTransferTo()
-
+    // danh sách mặt hàng
     const { data: dataItems } = useWarehouseTransferItems(idBranch, idExportWarehouse)
-
+    // danh sách vị trí nhận
     const { data: dataReceivingLocation = [] } = useLocationByWarehouseTo(idReceiveWarehouse)
-
+    // danh sách kho 
     const { data: dataWarehouse = [] } = useWarehouseTransferExport(idBranch, idExportWarehouse)
 
+    // set state lại initital khi render
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrBranch(false);
@@ -109,6 +112,7 @@ const WarehouseTransferForm = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
+    // lấy dữ liệu khi sửa
     const { isFetching } = useQuery({
         queryKey: ["api_detail_page_warehouse_transfer", id],
         queryFn: async () => {
@@ -185,6 +189,7 @@ const WarehouseTransferForm = (props) => {
         ...optionsQuery
     })
 
+    // reset lại value khi có mặt hàng
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
             sListData([]);
@@ -210,6 +215,7 @@ const WarehouseTransferForm = (props) => {
         handleQueryId({ status: false });
     };
 
+    // change các trường input trong giao diện
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
             sCode(value.target.value);
@@ -244,6 +250,8 @@ const WarehouseTransferForm = (props) => {
             }
         }
     };
+
+    // xóa ngày
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
         }
@@ -254,6 +262,7 @@ const WarehouseTransferForm = (props) => {
 
     const handleTimeChange = (date) => sStartDate(date);
 
+    // lưu chuyển kho
     const _HandleSubmit = (e) => {
         e.preventDefault();
 
@@ -295,7 +304,7 @@ const WarehouseTransferForm = (props) => {
         }, [condition]);
     };
 
-    //Tham chiếu đến hàm rồi xử lý
+    //Tham chiếu đến hàm rồi xử lý validate
     useClearErrorEffect(sErrDate, date != null);
 
     useClearErrorEffect(sErrBranch, idBranch != null);
@@ -367,7 +376,7 @@ const WarehouseTransferForm = (props) => {
         onSending && _ServerSending();
     }, [onSending]);
 
-    //new
+    //add thêm dòng mặt hàng con trong cha mới
     const _HandleAddChild = (parentId, value) => {
         sOnLoadingChild(true);
 
@@ -405,6 +414,7 @@ const WarehouseTransferForm = (props) => {
         sListData(newData);
     };
 
+    // add thêm cha mới
     const _HandleAddParent = (value) => {
         sOnLoadingChild(true);
 
@@ -447,6 +457,7 @@ const WarehouseTransferForm = (props) => {
         }
     };
 
+    // xóa dòng con
     const _HandleDeleteChild = (parentId, childId) => {
         const newData = listData.map((e) => {
             if (e.id === parentId) {
@@ -458,6 +469,7 @@ const WarehouseTransferForm = (props) => {
         sListData([...newData]);
     };
 
+    // xóa tất cả dòng con
     const _HandleDeleteAllChild = (parentId) => {
         const newData = listData.map((e) => {
             if (e.id === parentId) {
@@ -469,6 +481,7 @@ const WarehouseTransferForm = (props) => {
         sListData([...newData]);
     };
 
+    // change dòng con
     const _HandleChangeChild = (parentId, childId, type, value) => {
         // Tạo một bản sao của listData để thay đổi
         const newData = [...listData];
@@ -543,6 +556,7 @@ const WarehouseTransferForm = (props) => {
         }, 1000);
     };
 
+    // change value
     const _HandleChangeValue = (parentId, value) => {
         sOnLoadingChild(true);
         const checkData = listData?.some((e) => e?.item?.value === value?.value);
@@ -589,6 +603,19 @@ const WarehouseTransferForm = (props) => {
 
     const handleCheckError = (e) => isShow("error", e);
 
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.Warehouse_title || "Warehouse_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.warehouseTransfer_list || "warehouseTransfer_list"}`,
+            href: "/manufacture/warehouse-transfer",
+        },
+        {
+            label: id ? dataLang?.warehouseTransfer_titleEdit || "warehouseTransfer_titleEdit" : dataLang?.warehouseTransfer_titleAadd || "warehouseTransfer_titleAadd"
+        },
+    ];
     return (
         <React.Fragment>
             <Head>
@@ -600,19 +627,14 @@ const WarehouseTransferForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.warehouseTransfer_title || "warehouseTransfer_title"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {id ? dataLang?.warehouseTransfer_titleEdit || "warehouseTransfer_titleEdit" : dataLang?.warehouseTransfer_titleAadd || "warehouseTransfer_titleAadd"}
-                        </h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {id ? dataLang?.warehouseTransfer_titleEdit || "warehouseTransfer_titleEdit" : dataLang?.warehouseTransfer_titleAadd || "warehouseTransfer_titleAadd"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">

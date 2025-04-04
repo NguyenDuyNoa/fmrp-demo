@@ -85,12 +85,11 @@ const Products = (props) => {
 
     const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-    const { is_admin: role, permissions_current: auth } = useSelector(
-        (state) => state.auth
-    );
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkExport } = useActionRole(auth, "products");
 
+    // bộ lọc table
     const params = {
         search: keySearch,
         limit: limit,
@@ -103,33 +102,36 @@ const Products = (props) => {
         "filter[id]": valueFinishedPro?.value ? valueFinishedPro?.value : "",
     };
 
+    // danh sách đơn vị tính
     const { data: dataUnit } = useUnitList();
-
+    // danh sách công đoạn
     const { data: dataStage } = useStageList(dataLang);
-
+    // dnah sách biến thể
     const { data: dataVariant } = useVariantList();
-
+    // danh sách sản phẩm theo type
     const { data: dataProductType } = useProductTypeProducts(dataLang);
-
+    // danh sách danh mục
     const { data: dataCategory = [] } = useCategoryOptions({});
-
+    // danh sách chi nhánh
     const { data: dataBranchOption = [] } = useBranchList();
-
+    // danh sách sản phẩm
     const { data, isFetching, refetch } = useProductList(params);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
+    // hàm tìm kiếm trong table
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
     }, 500);
 
+    // set state trạng thái thành phẩm 
     useEffect(() => {
         sDataProductExpiry(feature?.dataProductExpiry);
     }, []);
-
+    // change bộ lọc
     const _HandleFilterOpt = (type, value) => {
         if (type == "category") {
             sValueCategory(value);
@@ -140,7 +142,7 @@ const Products = (props) => {
         }
     };
 
-    //excel
+    //xuất excel
     const multiDataSet = [
         {
             columns: [
@@ -247,14 +249,11 @@ const Products = (props) => {
 
     const breadcrumbItems = [
         {
-            label: `${dataLang?.header_category_material || "header_category_material"
-                }`,
+            label: `${dataLang?.header_category_material || "header_category_material"}`,
             // href: "/",
         },
         {
-            label: `${dataLang?.header_category_finishedProduct_list ||
-                "header_category_finishedProduct_list"
-                }`,
+            label: `${dataLang?.header_category_finishedProduct_list || "header_category_finishedProduct_list"}`,
         },
     ];
     return (
@@ -315,8 +314,8 @@ const Products = (props) => {
                             <button
                                 onClick={_HandleSelectTab.bind(this, "all")}
                                 className={`${router.query?.tab === "all"
-                                        ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                        : "hover:text-[#0F4F9E] "
+                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                                    : "hover:text-[#0F4F9E] "
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {props.dataLang?.all_group}
@@ -324,8 +323,8 @@ const Products = (props) => {
                             <button
                                 onClick={_HandleSelectTab.bind(this, "products")}
                                 className={`${router.query?.tab === "products"
-                                        ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                        : "hover:text-[#0F4F9E] "
+                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                                    : "hover:text-[#0F4F9E] "
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {dataLang?.product}
@@ -333,8 +332,8 @@ const Products = (props) => {
                             <button
                                 onClick={_HandleSelectTab.bind(this, "semi_products")}
                                 className={`${router.query?.tab === "semi_products"
-                                        ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                        : "hover:text-[#0F4F9E] "
+                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                                    : "hover:text-[#0F4F9E] "
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {dataLang?.catagory_finishedProduct_type_semi_products}
@@ -342,8 +341,8 @@ const Products = (props) => {
                             <button
                                 onClick={_HandleSelectTab.bind(this, "semi_products_outside")}
                                 className={`${router.query?.tab === "semi_products_outside"
-                                        ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                        : "hover:text-[#0F4F9E] "
+                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                                    : "hover:text-[#0F4F9E] "
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {dataLang?.catagory_finishedProduct_type_semi_products_outside}
@@ -352,7 +351,7 @@ const Products = (props) => {
                     </>
                 }
                 table={
-                    <div className="h-full flex flex-col">
+                    <div className="flex flex-col h-full">
                         <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                             <div className="col-span-4">
                                 <div className="grid items-center grid-cols-12 gap-2">

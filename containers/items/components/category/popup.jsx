@@ -39,9 +39,10 @@ const Popup_NVL = React.memo((props) => {
     const [errName, sErrName] = useState(false);
 
     const [idCategory, sIdCategory] = useState(null);
-
+    // danh sách nhóm dnah mục
     const { data: dataOption = [] } = useItemCategoryOptoptions(open, props.data?.id)
 
+    // set state các input chi nhánh, mã, tên, nhóm, ghi chú khi sửa, lấy data từ props
     useEffect(() => {
         open && sCode(props.data?.code ? props.data?.code : "");
         open && sName(props.data?.name ? props.data?.name : "");
@@ -65,6 +66,7 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
+    // lưu dữ liệu
     const handingCategory = useMutation({
         mutationFn: async (data) => {
             return apiCategory.apiHandingCategory(data, props.data?.id)

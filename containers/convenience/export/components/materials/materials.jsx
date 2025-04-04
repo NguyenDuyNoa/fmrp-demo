@@ -5,12 +5,14 @@ import TitleForm from "../common/titleForm";
 import ListItem from "../common/listItem";
 const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, dataEmty, sDataEmty }) => {
     return (
-        <div>
-            <div className="grid grid-cols-12 gap-2">
-                <div className="col-span-4 bg-zinc-50 border-2 rounded my-2 3xl:h-auto xxl:h-[270px]  2xl:h-[375px] xl:h-[265px] lg:h-[270px] h-auto">
-                    <div className="grid grid-cols-2  divide-x-2">
-                        <div className="">
+        <div className="grid h-full min-h-0 grid-cols-12 gap-2 ">
+            <div className="h-full min-h-0 col-span-4 my-2 border-2 rounded bg-zinc-50">
+                <div className="grid h-full grid-cols-2 divide-x-2">
+                    <div className="flex flex-col h-full min-h-0 ">
+                        <div className="h-fit">
                             <TitleForm title={"Trường dữ liệu"} />
+                        </div>
+                        <div className="h-fit">
                             <BtnClickAddItem
                                 dataEmty={dataEmty}
                                 dataBe={dataColumnNew.materials}
@@ -19,6 +21,8 @@ const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, da
                                 type="addAll"
                                 parent="materials"
                             />
+                        </div>
+                        <div className="flex-1 min-h-0">
                             <ListItem
                                 dataEmty={dataEmty}
                                 dataLang={dataLang}
@@ -28,8 +32,12 @@ const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, da
                                 HandlePushItem={HandlePushItem}
                             />
                         </div>
-                        <div>
+                    </div>
+                    <div className="flex flex-col h-full min-h-0 ">
+                        <div className="h-fit">
                             <TitleForm title={"Trường dữ liệu xuất"} />
+                        </div>
+                        <div className="h-fit">
                             <BtnClickDeleteItem
                                 sDataEmty={sDataEmty}
                                 dataBe={dataEmty?.materials}
@@ -38,6 +46,8 @@ const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, da
                                 HandleCheckAll={HandleCheckAll}
                                 parent="materials"
                             />
+                        </div>
+                        <div className="flex-1 min-h-0">
                             <ListItem
                                 sDataEmty={sDataEmty}
                                 dataEmty={dataEmty}

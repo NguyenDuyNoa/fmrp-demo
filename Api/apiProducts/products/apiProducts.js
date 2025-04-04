@@ -58,7 +58,15 @@ const apiProducts = {
         return response.data
     },
 
+    async apiGetQRProductCompleted(id) {
+        const response = await axiosCustom('GET', `/api_web/Api_Production_orders/printQRProductCompleted/${id}`);
+        return response.data
+    },
 
+    async apiPostLinkPDFManufactures(data) {
+        const response = await axiosCustom('POST', `/api_web/api_print/Print_manufacturesWeb?csrf_protection=true`, data)
+        return response.data
+    }
 }
 
 export default apiProducts

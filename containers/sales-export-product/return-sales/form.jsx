@@ -38,6 +38,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useReturnSalesItems } from "./hooks/useReturnSalesItems";
 import { useTaxList } from "@/hooks/common/useTaxs";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initsFetching = {
     onFetchingCondition: false,
@@ -669,6 +670,22 @@ const ReturnSalesForm = (props) => {
         fetChingData.onSending && _ServerSending();
     }, [fetChingData.onSending]);
 
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.returnSales_title || "returnSales_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.returnSales_titleLits || "returnSales_titleLits"}`,
+        },
+        {
+            label: `${id ? dataLang?.returnSales_edit || "returnSales_edit"
+                : dataLang?.returnSales_add || "returnSales_add"}`,
+        },
+    ];
+
+
     return (
         <React.Fragment>
             <Head>
@@ -680,19 +697,16 @@ const ReturnSalesForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6> {id ? dataLang?.returnSales_edit || "returnSales_edit"
-                            : dataLang?.returnSales_add || "returnSales_add"}</h6>
-                    </div>
+                    <React.Fragment>
+                        <Breadcrumb
+                            items={breadcrumbItems}
+                            className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                        />
+                    </React.Fragment>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {dataLang?.returnSales_titleLits || "returnSales_titleLits"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">

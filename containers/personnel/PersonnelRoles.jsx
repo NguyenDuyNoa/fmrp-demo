@@ -1,4 +1,5 @@
 import { BtnAction } from "@/components/UI/BtnAction";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -12,10 +13,7 @@ import {
 } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
-  Container,
-  ContainerBody,
-  ContainerTable,
-  LayOutTableDynamic,
+  LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -48,18 +46,17 @@ import { useSelector } from "react-redux";
 import PopupRoles from "./components/roles/popupRoles";
 import { useDepartmentList } from "./hooks/departments/useDepartmentList";
 import { useRolesList } from "./hooks/roles/useRolesList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const PersonnelRoles = (props) => {
+  const router = useRouter();
+
+  const isShow = useToast();
+
   const dataLang = props.dataLang;
 
   const statusExprired = useStatusExprired();
 
   const { paginate } = usePagination();
-
-  const router = useRouter();
-
-  const isShow = useToast();
 
   const [idBranch, sIdBranch] = useState(null);
 
@@ -69,15 +66,11 @@ const PersonnelRoles = (props) => {
 
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-  const { is_admin: role, permissions_current: auth } = useSelector(
-    (state) => state.auth
-  );
+  const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-  const { checkAdd, checkEdit, checkExport } = useActionRole(
-    auth,
-    "personnel_roles"
-  );
+  const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "personnel_roles");
 
+  // lọc danh sách trong table
   const params = {
     search: keySearch,
     limit: limit,
@@ -87,15 +80,22 @@ const PersonnelRoles = (props) => {
       idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
   };
 
+  // danh sách chi nhánh
   const { data: dataBranchOption = [] } = useBranchList({});
 
+  // danh sách table
   const { data, isFetching, refetch } = useRolesList(params);
 
+  // danh sách phòng ban
   const { data: dataDepartmentOption = [] } = useDepartmentList({}, undefined);
 
-  const { refetch: refetchPosition, data: dataPositionOption = [] } =
-    usePositionLits();
+  // danh sách chức vụ
+  const { refetch: refetchPosition, data: dataPositionOption = [] } = usePositionLits();
+  console.log("dataPositionOption", dataPositionOption);
 
+  // const { refetch: refetchPosition, data: dataPositionOption = [] } = usePositionLits();
+
+  // change bộ lọc
   const _HandleFilterOpt = (type, value) => {
     if (type == "position") {
       sIdPosition(value);
@@ -104,6 +104,7 @@ const PersonnelRoles = (props) => {
     }
   };
 
+  // tìm kiếm table
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
     sKeySearch(value);
     router.replace(router.route);
@@ -116,6 +117,7 @@ const PersonnelRoles = (props) => {
     (x) => !hiddenOptions.includes(x.value)
   );
 
+  // xuất exel
   const multiDataSet = [
     {
       columns: [
@@ -128,10 +130,9 @@ const PersonnelRoles = (props) => {
           },
         },
         {
-          title: `${
-            dataLang?.category_personnel_position_name ||
+          title: `${dataLang?.category_personnel_position_name ||
             "category_personnel_position_name"
-          }`,
+            }`,
           width: { wpx: 150 },
           style: {
             fill: { fgColor: { rgb: "C7DFFB" } },
@@ -139,10 +140,9 @@ const PersonnelRoles = (props) => {
           },
         },
         {
-          title: `${
-            dataLang?.category_personnel_position_amount ||
+          title: `${dataLang?.category_personnel_position_amount ||
             "category_personnel_position_amount"
-          }`,
+            }`,
           width: { wch: 30 },
           style: {
             fill: { fgColor: { rgb: "C7DFFB" } },
@@ -150,10 +150,9 @@ const PersonnelRoles = (props) => {
           },
         },
         {
-          title: `${
-            dataLang?.category_personnel_position_department ||
+          title: `${dataLang?.category_personnel_position_department ||
             "category_personnel_position_department"
-          }`,
+            }`,
           width: { wch: 30 },
           style: {
             fill: { fgColor: { rgb: "C7DFFB" } },
@@ -181,16 +180,11 @@ const PersonnelRoles = (props) => {
 
   const breadcrumbItems = [
     {
-      label: `${
-        dataLang?.header_category_personnel || "header_category_personnel"
-      }`,
+      label: `${dataLang?.header_category_personnel || "header_category_personnel"}`,
       // href: "/",
     },
     {
-      label: `${
-        dataLang?.header_category_personnel_position ||
-        "header_category_personnel_position"
-      }`,
+      label: `${dataLang?.header_category_personnel_position || "header_category_personnel_position"}`,
     },
   ];
 
@@ -200,8 +194,7 @@ const PersonnelRoles = (props) => {
         head={
           <Head>
             <title>
-              {dataLang?.header_category_personnel_position ||
-                "header_category_personnel_position"}
+              {dataLang?.header_category_personnel_position || "header_category_personnel_position"}
             </title>
           </Head>
         }
@@ -225,7 +218,7 @@ const PersonnelRoles = (props) => {
               {dataLang?.category_personnel_position_title ||
                 "category_personnel_position_title"}
             </h2>
-            <div className="flex justify-end items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               {role == true || checkAdd ? (
                 <PopupRoles
                   dataLang={dataLang}
@@ -248,7 +241,7 @@ const PersonnelRoles = (props) => {
           </>
         }
         table={
-          <div className="h-full flex flex-col">
+          <div className="flex flex-col h-full">
             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
               <div className="col-span-4">
                 <div className="grid grid-cols-9 gap-2">
@@ -281,12 +274,10 @@ const PersonnelRoles = (props) => {
                     options={[
                       {
                         value: "",
-                        label:
-                          dataLang?.category_personnel_position_name ||
-                          "category_personnel_position_name",
+                        label: dataLang?.category_personnel_position_name || "category_personnel_position_name",
                         isDisabled: true,
                       },
-                      ...dataPositionOption,
+                      ...dataPositionOption
                     ]}
                     formatOptionLabel={SelectOptionLever}
                     onChange={_HandleFilterOpt.bind(this, "position")}
@@ -297,20 +288,17 @@ const PersonnelRoles = (props) => {
                 </div>
               </div>
               <div className="col-span-2">
-                <div className="flex space-x-2 items-center justify-end">
+                <div className="flex items-center justify-end space-x-2">
                   <OnResetData
                     onClick={refetch.bind(this)}
-                    sOnFetching={(e) => {}}
+                    sOnFetching={(e) => { }}
                   />
                   {role == true || checkExport ? (
                     <div className={``}>
                       {data?.rResult?.length > 0 && (
                         <ExcelFileComponent
                           multiDataSet={multiDataSet}
-                          filename={
-                            dataLang?.header_category_personnel_position ||
-                            "header_category_personnel_position"
-                          }
+                          filename={dataLang?.header_category_personnel_position || "header_category_personnel_position"}
                           title="DSCV"
                           dataLang={dataLang}
                         />
@@ -322,7 +310,7 @@ const PersonnelRoles = (props) => {
                       className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                     >
                       <Grid6
-                        className="2xl:scale-100 xl:scale-100 scale-75"
+                        className="scale-75 2xl:scale-100 xl:scale-100"
                         size={18}
                       />
                       <span>{dataLang?.client_list_exportexcel}</span>
@@ -344,23 +332,19 @@ const PersonnelRoles = (props) => {
                 <HeaderTable gridCols={10} display={"grid"}>
                   <ColumnTable colSpan={1} />
                   <ColumnTable colSpan={2} textAlign={"center"}>
-                    {dataLang?.category_personnel_position_name ||
-                      "category_personnel_position_name"}
+                    {dataLang?.category_personnel_position_name || "category_personnel_position_name"}
                   </ColumnTable>
                   <ColumnTable colSpan={2} textAlign={"center"}>
-                    {dataLang?.category_personnel_position_amount ||
-                      "category_personnel_position_amount"}
+                    {dataLang?.category_personnel_position_amount || "category_personnel_position_amount"}
                   </ColumnTable>
                   <ColumnTable colSpan={2} textAlign={"center"}>
-                    {dataLang?.category_personnel_position_department ||
-                      "category_personnel_position_department"}
+                    {dataLang?.category_personnel_position_department || "category_personnel_position_department"}
                   </ColumnTable>
                   <ColumnTable colSpan={2} textAlign={"center"}>
                     {dataLang?.client_list_brand || "client_list_brand"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
-                    {dataLang?.branch_popup_properties ||
-                      "branch_popup_properties"}
+                    {dataLang?.branch_popup_properties || "branch_popup_properties"}
                   </ColumnTable>
                 </HeaderTable>
                 <div className="divide-y divide-slate-200">
@@ -412,9 +396,7 @@ const Item = React.memo((props) => {
 
   const _ToggleHasChild = () => sHasChild(!hasChild);
 
-  const { is_admin: role, permissions_current: auth } = useSelector(
-    (state) => state.auth
-  );
+  const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
   const { checkEdit } = useActionRole(auth, "personnel_roles");
 
@@ -431,9 +413,8 @@ const Item = React.memo((props) => {
           <button
             disabled={props.data?.children?.length > 0 ? false : true}
             onClick={_ToggleHasChild.bind(this)}
-            className={`${
-              hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
-            } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
+            className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
+              } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
           >
             <IconMinus size={16} />
             <IconMinus
@@ -453,7 +434,7 @@ const Item = React.memo((props) => {
         </RowItemTable>
         <RowItemTable
           colSpan={2}
-          className="flex items-center justify-start gap-1 flex-wrap"
+          className="flex flex-wrap items-center justify-start gap-1"
         >
           {props?.data?.branch?.map((i) => (
             <TagBranch key={i}>{i.name}</TagBranch>
@@ -461,7 +442,7 @@ const Item = React.memo((props) => {
         </RowItemTable>
         <RowItemTable
           colSpan={1}
-          className="flex justify-center space-x-2 px-2"
+          className="flex justify-center px-2 space-x-2"
         >
           {role == true || checkEdit ? (
             <PopupRoles
@@ -526,9 +507,7 @@ const Item = React.memo((props) => {
 const ItemsChild = React.memo((props) => {
   const isShow = useToast();
 
-  const { is_admin: role, permissions_current: auth } = useSelector(
-    (state) => state.auth
-  );
+  const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
   const { checkEdit } = useActionRole(auth, "personnel_roles");
 
@@ -538,7 +517,7 @@ const ItemsChild = React.memo((props) => {
         {props.data?.level == "3" && (
           <RowItemTable
             colSpan={1}
-            className="h-full flex justify-center items-center pl-24"
+            className="flex items-center justify-center h-full pl-24"
           >
             <IconDown className="rotate-45" />
           </RowItemTable>
@@ -546,7 +525,7 @@ const ItemsChild = React.memo((props) => {
         {props.data?.level == "2" && (
           <RowItemTable
             colSpan={1}
-            className="h-full flex justify-center items-center pl-12"
+            className="flex items-center justify-center h-full pl-12"
           >
             <IconDown className="rotate-45" />
             <IconMinus className="mt-1.5" />
@@ -556,7 +535,7 @@ const ItemsChild = React.memo((props) => {
         {props.data?.level == "1" && (
           <RowItemTable
             colSpan={1}
-            className="h-full flex justify-center items-center "
+            className="flex items-center justify-center h-full "
           >
             <IconDown className="rotate-45" />
             <IconMinus className="mt-1.5" />
@@ -574,7 +553,7 @@ const ItemsChild = React.memo((props) => {
         <RowItemTable colSpan={2} textAlign={"left"}>
           {props.data?.department_name}
         </RowItemTable>
-        <RowItemTable colSpan={2} className="flex gap-1 flex-wrap">
+        <RowItemTable colSpan={2} className="flex flex-wrap gap-1">
           {props.data.branch?.map((i) => (
             <TagBranch key={i}>{i.name}</TagBranch>
           ))}

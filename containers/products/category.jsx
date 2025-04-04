@@ -84,12 +84,12 @@ const ProductsCategory = (props) => {
       idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
   };
 
+  // danh sách chi nhánh
   const { data: dataBranchOption = [] } = useBranchList();
-
+  // danh sách nhóm thành phẩm
   const { data, isFetching, refetch } = useProductCategory(params);
-
-  const { data: dataCategoryOption = [], refetch: refetchSup } =
-    useCategoryOptions();
+  // nhóm danh mục con
+  const { data: dataCategoryOption = [], refetch: refetchSup } = useCategoryOptions();
   // const { data: dataCategoryOption = [], refetch: refetchSup } = useItemCategoryCombobox()
 
   const _HandleFilterOpt = (type, value) => {
@@ -124,10 +124,9 @@ const ProductsCategory = (props) => {
           },
         },
         {
-          title: `${
-            dataLang?.category_material_group_code ||
+          title: `${dataLang?.category_material_group_code ||
             "category_material_group_code"
-          }`,
+            }`,
           width: { wpx: 150 },
           style: {
             fill: { fgColor: { rgb: "C7DFFB" } },
@@ -135,10 +134,9 @@ const ProductsCategory = (props) => {
           },
         },
         {
-          title: `${
-            dataLang?.category_material_group_name ||
+          title: `${dataLang?.category_material_group_name ||
             "category_material_group_name"
-          }`,
+            }`,
           width: { wch: 30 },
           style: {
             fill: { fgColor: { rgb: "C7DFFB" } },
@@ -174,16 +172,14 @@ const ProductsCategory = (props) => {
 
   const breadcrumbItems = [
     {
-      label: `${
-        dataLang?.header_category_material || "header_category_material"
-      }`,
+      label: `${dataLang?.header_category_material || "header_category_material"
+        }`,
       // href: "/",
     },
     {
-      label: `${
-        dataLang?.header_category_finishedProduct_group ||
+      label: `${dataLang?.header_category_finishedProduct_group ||
         "header_category_finishedProduct_group"
-      }`,
+        }`,
     },
   ];
 
@@ -242,7 +238,7 @@ const ProductsCategory = (props) => {
           </>
         }
         table={
-          <div className="h-full flex flex-col">
+          <div className="flex flex-col h-full">
             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
               <div className="col-span-4">
                 <div className="grid grid-cols-9 gap-2">
@@ -299,7 +295,7 @@ const ProductsCategory = (props) => {
               <div className="col-span-2">
                 <div className="flex items-center justify-end space-x-2">
                   <OnResetData
-                    sOnFetching={() => {}}
+                    sOnFetching={() => { }}
                     onClick={refetch.bind(this)}
                   />
                   {role == true || checkExport ? (
@@ -429,9 +425,8 @@ const Item = React.memo((props) => {
           <button
             disabled={props.data?.children?.length > 0 ? false : true}
             onClick={_ToggleHasChild.bind(this)}
-            className={`${
-              hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
-            } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
+            className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
+              } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
           >
             <IconMinus size={16} />
             <IconMinus

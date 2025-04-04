@@ -45,6 +45,7 @@ import { useImportItemByOrder } from "./hooks/useImportItemByOrder";
 import SelectItemComponent, { MenuListClickAll } from "@/components/UI/filterComponents/selectItemComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { motion, AnimatePresence } from "framer-motion";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 
 const PurchaseImportForm = (props) => {
@@ -120,11 +121,13 @@ const PurchaseImportForm = (props) => {
         totalAmountMoney: 0,
     });
 
+    const [inputValue, setInputValue] = useState('');
+
     const { data: dataBranch = [] } = useBranchList();
 
     const { data: dataTasxes = [] } = useTaxList();
 
-    const { data: dataItems = [] } = useImportItemByOrder(id, idTheOrder, idBranch);
+    const { data: dataItems = [] } = useImportItemByOrder(id, idTheOrder, idBranch, idSupplier, inputValue);
 
     const { data: dataTheOrder = [] } = useImportBySupplier(idSupplier, id, searchOrder);
 
@@ -162,6 +165,7 @@ const PurchaseImportForm = (props) => {
                 child: e?.child.map((ce) => ({
                     id: Number(ce?.id),
                     id_plan: ce?.id_plan,
+                    purchase_order_item_id: ce?.purchase_order_item_id,
                     reference_no_plan: ce?.reference_no_plan,
                     disabledDate:
                         (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
@@ -426,6 +430,7 @@ const PurchaseImportForm = (props) => {
                 {
                     id_plan: e?.e?.id_plan,
                     reference_no_plan: e?.e?.reference_no_plan,
+                    purchase_order_item_id: e?.e?.purchase_order_item_id,
                     id: uuidv4(),
                     disabledDate:
                         (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
@@ -555,27 +560,34 @@ const PurchaseImportForm = (props) => {
         formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch.value);
         formData.append("suppliers_id", idSupplier.value);
-        formData.append("id_order", idTheOrder?.value ? idTheOrder?.value : "");
-        formData.append("warehouse_id", idSurplusWarehouse?.value ?? "");
+        formData.append("id_order", idTheOrder?.value ? idTheOrder?.value : 0);
+        formData.append("warehouse_id", idSurplusWarehouse?.value ?? 0);
         formData.append("note", note);
         listData.forEach((item, index) => {
+            console.log("item", item);
+
             formData.append(`items[${index}][id]`, item?.id);
             formData.append(`items[${index}][item]`, item?.item?.value);
-            formData.append(`items[${index}][purchase_order_item_id]`, item?.item?.e?.purchase_order_item_id);
+            formData.append(`items[${index}][purchase_order_item_id]`, item?.item?.e?.purchase_order_item_id ?? 0);
             item?.child?.forEach((childItem, childIndex) => {
+                // formData.append(`items[${index}][child][${childIndex}][purchase_order_item_id]`, childItem?.purchase_order_item_id ?? 0);
                 formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
-                formData.append(`items[${index}][child][${childIndex}][id_plan]`, childItem?.id_plan);
+                formData.append(`items[${index}][child][${childIndex}][id_plan]`, childItem?.id_plan ?? 0);
                 { id && formData.append(`items[${index}][child][${childIndex}][row_id]`, typeof childItem?.id == "number" ? childItem?.id : 0); }
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
                 formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
                 formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
                 formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : formatMoment(childItem?.date, FORMAT_MOMENT.DATE_TIME_LONG));
                 formData.append(`items[${index}][child][${childIndex}][unit_name]`, childItem?.unit);
-                formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
-                formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
+                formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
+                formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value ?? 0);
                 formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
-                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.id_plan == 0 ? childItem?.warehouse?.value : "");
-                formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.discount);
+                if (childItem?.id_plan) {
+                    formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, (childItem?.id_plan == 0) ? childItem?.warehouse?.value : "");
+                } else {
+                    formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.warehouse?.value ? childItem?.warehouse?.value : 0);
+                }
+                formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.discount ? childItem?.discount : "");
             });
         });
         handingImport.mutate(formData, {
@@ -633,7 +645,8 @@ const PurchaseImportForm = (props) => {
                     discount: discount ? discount : Number(value?.e?.discount_percent),
                     priceAfter: Number(value?.e?.price_after_discount),
                     tax: tax ? tax : {
-                        label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                        label: value?.e?.tax_name,
+                        // label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
                         value: value?.e?.tax_id,
                         tax_rate: value?.e?.tax_rate,
                     },
@@ -836,6 +849,25 @@ const PurchaseImportForm = (props) => {
         sSearchOrder(inputValue);
     }, 500)
 
+
+    const _HandleSeachApiProductItems = debounce(async (e) => {
+        setInputValue(e);
+    }, 500);
+    console.log("inputValue", inputValue);
+
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.import_title || "import_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.import_list || "import_list"}`,
+        },
+        {
+            label: `${id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}`,
+        },
+    ];
+
     return (
         <React.Fragment>
             <Head>
@@ -845,18 +877,16 @@ const PurchaseImportForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.import_title || "import_title"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}</h6>
-
-                    </div>
+                    <React.Fragment>
+                        <Breadcrumb
+                            items={breadcrumbItems}
+                            className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                        />
+                    </React.Fragment>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {dataLang?.import_title || "import_title"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">
@@ -1261,6 +1291,9 @@ const PurchaseImportForm = (props) => {
                                 onChange={_HandleChangeInput.bind(this, "itemAll")}
                                 value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.item)}
                                 isMulti
+                                onInputChange={(event) => {
+                                    _HandleSeachApiProductItems(event)
+                                }}
                                 maxShowMuti={0}
                                 components={{
                                     MenuList: (props) => <MenuListClickAll
@@ -1374,6 +1407,9 @@ const PurchaseImportForm = (props) => {
                                 noOptionsMessage={() => "Không có dữ liệu"}
                                 menuPortalTarget={document.body}
                                 dataLang={dataLang}
+                                onInputChange={(event) => {
+                                    _HandleSeachApiProductItems(event)
+                                }}
                             />
                         </div>
                         <div className="col-span-13">
@@ -1518,6 +1554,9 @@ const PurchaseImportForm = (props) => {
                                                     <SelectItemComponent
                                                         options={options}
                                                         value={e?.item}
+                                                        onInputChange={(event) => {
+                                                            _HandleSeachApiProductItems(event)
+                                                        }}
                                                         className=""
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}

@@ -10,7 +10,10 @@ import Loading from "@/components/UI/loading/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { optionsQuery } from "@/configs/optionsQuery";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import {
+    CONFIRMATION_OF_CHANGES,
+    TITLE_DELETE_ITEMS,
+} from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranch";
 import { useContactCombobox } from "@/hooks/common/useContacts";
@@ -40,6 +43,7 @@ import { useClientComboboxByBranch } from "@/hooks/common/useClients";
 import { useStaffComboboxByBranch } from "@/hooks/common/useStaffs";
 import { useTaxList } from "@/hooks/common/useTaxs";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const SalesOrderForm = (props) => {
     const router = useRouter();
@@ -117,19 +121,27 @@ const SalesOrderForm = (props) => {
     const params = {
         "filter[branch_id]": branch !== null ? +branch?.value : null,
         "filter[client_id]": customer !== null ? +customer?.value : null,
-    }
+    };
 
     const { data: dataTasxes = [] } = useTaxList();
 
     const { data: dataBranch = [] } = useBranchList();
 
-    const { data: dataQuotes, refetch: refetchQuote } = useSalesOrderQuotaByBranch(params)
+    const { data: dataQuotes, refetch: refetchQuote } =
+        useSalesOrderQuotaByBranch(params);
 
-    const { data: dataPersonContact = [] } = useContactCombobox({ client_id: customer != null ? customer.value : null });
+    const { data: dataPersonContact = [] } = useContactCombobox({
+        client_id: customer != null ? customer.value : null,
+    });
 
-    const { data: dataStaffs = [] } = useStaffComboboxByBranch({ branch_id: branch != null ? [+branch?.value]?.map((e) => e) : null });
+    const { data: dataStaffs = [] } = useStaffComboboxByBranch({
+        branch_id: branch != null ? [+branch?.value]?.map((e) => e) : null,
+    });
 
-    const { data: dataCustomer = [] } = useClientComboboxByBranch({ search: "", branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null });
+    const { data: dataCustomer = [] } = useClientComboboxByBranch({
+        search: "",
+        branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null,
+    });
 
     // const { data: dataCustomer = [] } = useClientComboboxByBranch({ search: "", branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null, });
 
@@ -148,13 +160,17 @@ const SalesOrderForm = (props) => {
     useQuery({
         queryKey: ["api_detail_sale_order", id],
         queryFn: async () => {
-            const rResult = await apiSalesOrder.apiDetail(id)
+            const rResult = await apiSalesOrder.apiDetail(id);
             const items = rResult?.items?.map((e) => ({
                 price_quote_order_item_id: e?.id,
                 id: e.id,
                 item: {
                     e: e?.item,
-                    label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
+                    label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.code +
+                        e.item?.product_variation +
+                        e.item?.text_type +
+                        e.item?.unit_name
+                        }</span>`,
                     value: e.item?.id,
                 },
                 quantity: +e?.quantity,
@@ -164,7 +180,8 @@ const SalesOrderForm = (props) => {
                 unit: e.item?.unit_name,
                 price_after_discount: +e?.price_after_discount,
                 note: e?.note,
-                total_amount: +e?.price_after_discount * (1 + +e?.tax_rate / 100) * +e?.quantity,
+                total_amount:
+                    +e?.price_after_discount * (1 + +e?.tax_rate / 100) * +e?.quantity,
                 delivery_date: moment(e?.delivery_date).toDate(),
             }));
 
@@ -172,12 +189,12 @@ const SalesOrderForm = (props) => {
             setCodeProduct(rResult?.code);
             setContactPerson(
                 rResult?.contact_name !== null && rResult?.contact_name !== "0"
-                    ? { label: rResult?.contact_name, value: rResult?.contact_id, }
+                    ? { label: rResult?.contact_name, value: rResult?.contact_id }
                     : null
             );
-            setBranch({ label: rResult?.branch_name, value: rResult?.branch_id, });
-            setStaff({ label: rResult?.staff_name, value: rResult?.staff_id, });
-            setCustomer({ label: rResult?.client_name, value: rResult?.client_id, });
+            setBranch({ label: rResult?.branch_name, value: rResult?.branch_id });
+            setStaff({ label: rResult?.staff_name, value: rResult?.staff_id });
+            setCustomer({ label: rResult?.client_name, value: rResult?.client_id });
             setStartDate(moment(rResult?.date).toDate());
             setNote(rResult?.note);
 
@@ -186,71 +203,74 @@ const SalesOrderForm = (props) => {
                 // setHidden(true);
                 // setQuote({ label: rResult?.quote_code, value: rResult?.quote_id, });
             }
-            return rResult
+            return rResult;
         },
         ...optionsQuery,
         enabled: !!id,
-    })
-
+    });
 
     // fetch items
     const handleFetchingItemsAll = async () => {
         let form = new FormData();
 
         if (branch != null) {
-            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
+            [+branch?.value].forEach((e, index) =>
+                form.append(`branch_id[${index}]`, e)
+            );
         }
         try {
-            const { data: { result } } = await apiSalesOrder.apiItems(form);
+            const {
+                data: { result },
+            } = await apiSalesOrder.apiItems(form);
 
             setDataItems(result);
 
             setOnFetchingItemsAll(false);
-        } catch (error) {
-
-        }
+        } catch (error) { }
     };
 
     const handleFetchingItem = async () => {
         let form = new FormData();
         if (branch != null) {
-            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
+            [+branch?.value].forEach((e, index) =>
+                form.append(`branch_id[${index}]`, e)
+            );
         }
         if (typeOrder === "1") {
             if (quote && quote.value !== null) {
                 try {
-                    const { data: { result } } = await apiSalesOrder.apiQuotaItems({
+                    const {
+                        data: { result },
+                    } = await apiSalesOrder.apiQuotaItems({
                         params: {
                             "filter[quote_id]": quote !== null ? +quote?.value : null,
-                        }
-                    })
+                        },
+                    });
                     setDataItems(result);
 
                     setOnFetchingItem(false);
-                } catch (error) {
-
-                }
+                } catch (error) { }
             } else {
                 try {
-                    const { data: { result } } = await apiSalesOrder.apiItems(form);
+                    const {
+                        data: { result },
+                    } = await apiSalesOrder.apiItems(form);
 
                     setDataItems(result);
 
                     setOnFetchingItem(false);
-                } catch (error) {
-
-                }
+                } catch (error) { }
             }
         } else if (typeOrder === "0") {
             try {
-                const { data: { result } } = await apiSalesOrder.apiItems(form);
+                const {
+                    data: { result },
+                } = await apiSalesOrder.apiItems(form);
 
                 setDataItems(result);
 
                 setOnFetchingItem(false);
-            } catch (error) {
-
-            }
+            } catch (error) { }
         }
     };
 
@@ -262,7 +282,6 @@ const SalesOrderForm = (props) => {
         };
     });
 
-
     // tổng thay đổi
     useEffect(() => {
         if (totalTax == null) return;
@@ -272,7 +291,8 @@ const SalesOrderForm = (props) => {
             const chietKhauValue = totalDiscount || 0;
             newOption.forEach((item, index) => {
                 const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100);
-                const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity;
+                const thanhTien =
+                    dongiasauchietkhau * (1 + thueValue / 100) * item.quantity;
                 item.tax = totalTax;
                 item.total_amount = isNaN(thanhTien) ? 0 : thanhTien;
             });
@@ -296,15 +316,19 @@ const SalesOrderForm = (props) => {
         if (totalDiscount == null) return;
         setOption((prevOption) => {
             const newOption = [...prevOption];
-            const thueValue = totalTax?.tax_rate != undefined ? totalTax?.tax_rate : 0;
+            const thueValue =
+                totalTax?.tax_rate != undefined ? totalTax?.tax_rate : 0;
             const chietKhauValue = totalDiscount ? totalDiscount : 0;
 
             newOption.forEach((item, index) => {
                 const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100);
-                const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity;
+                const thanhTien =
+                    dongiasauchietkhau * (1 + thueValue / 100) * item.quantity;
                 item.tax = totalTax;
                 item.discount = Number(totalDiscount);
-                item.price_after_discount = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
+                item.price_after_discount = isNaN(dongiasauchietkhau)
+                    ? 0
+                    : dongiasauchietkhau;
                 item.total_amount = isNaN(thanhTien) ? 0 : thanhTien;
             });
             return newOption;
@@ -319,7 +343,6 @@ const SalesOrderForm = (props) => {
         branch !== null && setOnFetchingItemsAll(true);
         branch == null && setItemsAll([]);
     }, [branch]);
-
 
     useEffect(() => {
         quote !== null && setOnFetchingItem(true);
@@ -360,13 +383,17 @@ const SalesOrderForm = (props) => {
         let form = new FormData();
 
         if (branch != null) {
-            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
+            [+branch?.value].forEach((e, index) =>
+                form.append(`branch_id[${index}]`, e)
+            );
         }
 
         form.append("term", inputValue);
 
         if (typeOrder === "1" && quote && +quote.value) {
-            const { data: { result } } = await apiSalesOrder.apiQuotaItems({
+            const {
+                data: { result },
+            } = await apiSalesOrder.apiQuotaItems({
                 data: {
                     term: inputValue,
                 },
@@ -377,7 +404,9 @@ const SalesOrderForm = (props) => {
             setDataItems(result);
         }
         if (typeOrder === "0") {
-            const { data: { result } } = await apiSalesOrder.apiItems(form);
+            const {
+                data: { result },
+            } = await apiSalesOrder.apiItems(form);
             setDataItems(result);
         }
     }, 500);
@@ -412,7 +441,7 @@ const SalesOrderForm = (props) => {
             setTypeOrder(isId);
             // setHidden(isId === "1");
             // setQuote(isId === "0" ? null : quote);
-            isId == 1 && refetchQuote()
+            isId == 1 && refetchQuote();
             setOnFetchingItem(isId === "0" && true);
             setOnFetchingItemsAll(isId === "1" && true);
 
@@ -488,11 +517,15 @@ const SalesOrderForm = (props) => {
                             return check;
                         }
 
-                        let money = 0
+                        let money = 0;
                         if (e.e?.tax?.tax_rate == undefined) {
-                            money = Number(1) * (1 + Number(0) / 100) * Number(e?.e?.quantity);
+                            money =
+                                Number(1) * (1 + Number(0) / 100) * Number(e?.e?.quantity);
                         } else {
-                            money = Number(e?.e?.affterDiscount) * (1 + Number(e?.e?.tax?.tax_rate) / 100) * Number(e?.e?.quantity);
+                            money =
+                                Number(e?.e?.affterDiscount) *
+                                (1 + Number(e?.e?.tax?.tax_rate) / 100) *
+                                Number(e?.e?.quantity);
                         }
 
                         return {
@@ -518,7 +551,6 @@ const SalesOrderForm = (props) => {
                     setOption([...newData]);
                 }
                 if (typeOrder === "1" && quote !== null) {
-
                     const newData = value
                         ?.map((e, index) => {
                             return {
@@ -533,14 +565,23 @@ const SalesOrderForm = (props) => {
                                 sortIndex: index,
                                 price: e?.e?.price_sell,
                                 discount: e?.e?.discount_percent,
-                                price_after_discount: +e?.e?.price_sell * (1 - +e?.e?.discount_percent / 100),
+                                price_after_discount:
+                                    +e?.e?.price_sell * (1 - +e?.e?.discount_percent / 100),
                                 tax: {
                                     label: e?.e?.tax_name,
                                     value: e?.e?.tax_id,
                                     tax_rate: e?.e?.tax_rate,
                                 },
-                                price_after_tax: +e?.e?.price_sell * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
-                                total_amount: +e?.e?.price_sell * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
+                                price_after_tax:
+                                    +e?.e?.price_sell *
+                                    e?.e?.quantity *
+                                    (1 - +e?.e?.discount_percent / 100) *
+                                    (1 + e?.e?.tax_rate / 100),
+                                total_amount:
+                                    +e?.e?.price_sell *
+                                    (1 - +e?.e?.discount_percent / 100) *
+                                    (1 + +e?.e?.tax_rate / 100) *
+                                    +e?.e?.quantity,
                                 note: e?.e?.note_item,
                                 delivery_date: null,
                             };
@@ -549,7 +590,10 @@ const SalesOrderForm = (props) => {
 
                     setOption([...newData]);
                 } else if (typeOrder === "1" && quote === null) {
-                    isShow("error", `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`);
+                    isShow(
+                        "error",
+                        `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`
+                    );
                 }
             }
         }
@@ -558,12 +602,14 @@ const SalesOrderForm = (props) => {
     const handleAddParent = (value) => {
         const checkData = option?.some((e) => e?.item?.value === value?.value);
         if (!checkData) {
-
-            let money = 0
+            let money = 0;
             if (value.e?.tax?.tax_rate == undefined) {
                 money = Number(1) * (1 + Number(0) / 100) * Number(value?.e?.quantity);
             } else {
-                money = Number(value?.e?.affterDiscount) * (1 + Number(value?.e?.tax?.tax_rate) / 100) * Number(value?.e?.quantity);
+                money =
+                    Number(value?.e?.affterDiscount) *
+                    (1 + Number(value?.e?.tax?.tax_rate) / 100) *
+                    Number(value?.e?.quantity);
             }
             if (typeOrder === "0") {
                 const newData = {
@@ -594,7 +640,8 @@ const SalesOrderForm = (props) => {
                     quantity: value?.e?.quantity,
                     price: value?.e?.price_sell,
                     discount: value?.e?.discount_percent,
-                    price_after_discount: +value?.e?.price_sell * (1 - +value?.e?.discount_percent / 100),
+                    price_after_discount:
+                        +value?.e?.price_sell * (1 - +value?.e?.discount_percent / 100),
                     tax: {
                         label: value?.e?.tax_name,
                         value: value?.e?.tax_id,
@@ -632,7 +679,9 @@ const SalesOrderForm = (props) => {
             option[index].quantity = Number(value?.value);
             if (option[index].tax?.tax_rate == undefined) {
                 const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                    Number(option[index].price_after_discount) *
+                    (1 + Number(0) / 100) *
+                    Number(option[index].quantity);
                 option[index].total_amount = Number(tien.toFixed(2));
             } else {
                 const tien =
@@ -644,11 +693,16 @@ const SalesOrderForm = (props) => {
             setOption([...option]);
         } else if (type == "price") {
             option[index].price = Number(value.value);
-            option[index].price_after_discount = +option[index].price * (1 - option[index].discount / 100);
-            option[index].price_after_discount = +(Math.round(option[index].price_after_discount + "e+2") + "e-2");
+            option[index].price_after_discount =
+                +option[index].price * (1 - option[index].discount / 100);
+            option[index].price_after_discount = +(
+                Math.round(option[index].price_after_discount + "e+2") + "e-2"
+            );
             if (option[index].tax?.tax_rate == undefined) {
                 const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                    Number(option[index].price_after_discount) *
+                    (1 + Number(0) / 100) *
+                    Number(option[index].quantity);
                 option[index].total_amount = Number(tien.toFixed(2));
             } else {
                 const tien =
@@ -659,11 +713,16 @@ const SalesOrderForm = (props) => {
             }
         } else if (type == "discount") {
             option[index].discount = Number(value.value);
-            option[index].price_after_discount = +option[index].price * (1 - option[index].discount / 100);
-            option[index].price_after_discount = +(Math.round(option[index].price_after_discount + "e+2") + "e-2");
+            option[index].price_after_discount =
+                +option[index].price * (1 - option[index].discount / 100);
+            option[index].price_after_discount = +(
+                Math.round(option[index].price_after_discount + "e+2") + "e-2"
+            );
             if (option[index].tax?.tax_rate == undefined) {
                 const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                    Number(option[index].price_after_discount) *
+                    (1 + Number(0) / 100) *
+                    Number(option[index].quantity);
                 option[index].total_amount = Number(tien.toFixed(2));
             } else {
                 const tien =
@@ -676,7 +735,9 @@ const SalesOrderForm = (props) => {
             option[index].tax = value;
             if (option[index].tax?.tax_rate == undefined) {
                 const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                    Number(option[index].price_after_discount) *
+                    (1 + Number(0) / 100) *
+                    Number(option[index].quantity);
                 option[index].total_amount = Number(tien.toFixed(2));
             } else {
                 const tien =
@@ -706,7 +767,9 @@ const SalesOrderForm = (props) => {
         option[index].quantity = newQuantity;
         if (option[index].tax?.tax_rate == undefined) {
             const tien =
-                Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                Number(option[index].price_after_discount) *
+                (1 + Number(0) / 100) *
+                Number(option[index].quantity);
             option[index].total_amount = Number(tien.toFixed(2));
         } else {
             const tien =
@@ -726,7 +789,9 @@ const SalesOrderForm = (props) => {
             option[index].quantity = Number(newQuantity);
             if (option[index].tax?.tax_rate == undefined) {
                 const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+                    Number(option[index].price_after_discount) *
+                    (1 + Number(0) / 100) *
+                    Number(option[index].quantity);
                 option[index].total_amount = Number(tien.toFixed(2));
             } else {
                 const tien =
@@ -784,7 +849,10 @@ const SalesOrderForm = (props) => {
         }
     };
 
-    const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
+    const taxOptions = [
+        { label: "Miễn thuế", value: "0", tax_rate: "0" },
+        ...dataTasxes,
+    ];
 
     const totalMoney = (option) => {
         const totalPrice = option.reduce((acc, item) => {
@@ -793,7 +861,8 @@ const SalesOrderForm = (props) => {
         }, 0);
 
         const totalDiscountPrice = option.reduce((acc, item) => {
-            const totalDiscountPrice = item?.price * (item?.discount / 100) * item?.quantity;
+            const totalDiscountPrice =
+                item?.price * (item?.discount / 100) * item?.quantity;
             return acc + totalDiscountPrice;
         }, 0);
 
@@ -851,7 +920,13 @@ const SalesOrderForm = (props) => {
         let deliveryDateInOption = option.some((e) => e?.delivery_date === null);
 
         if (typeOrder === "0") {
-            if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true) {
+            if (
+                startDate == null ||
+                customer == null ||
+                branch == null ||
+                staff == null ||
+                deliveryDateInOption === true
+            ) {
                 startDate == null && setErrDate(true);
                 customer?.value == null && sErrCustomer(true);
                 branch?.value == null && setErrBranch(true);
@@ -863,7 +938,14 @@ const SalesOrderForm = (props) => {
                 setOnSending(true);
             }
         } else if (typeOrder === "1") {
-            if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true || quote == null) {
+            if (
+                startDate == null ||
+                customer == null ||
+                branch == null ||
+                staff == null ||
+                deliveryDateInOption === true ||
+                quote == null
+            ) {
                 startDate == null && setErrDate(true);
                 customer?.value == null && sErrCustomer(true);
                 branch?.value == null && setErrBranch(true);
@@ -883,22 +965,50 @@ const SalesOrderForm = (props) => {
     const handleSubmit = async () => {
         let formData = new FormData();
         formData.append("code", codeProduct);
-        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
+        formData.append(
+            "date",
+            formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG)
+        );
         formData.append("branch_id", branch?.value ? branch?.value : "");
         formData.append("client_id", customer?.value ? customer?.value : "");
-        formData.append("person_contact_id", contactPerson?.value ? contactPerson?.value : "");
+        formData.append(
+            "person_contact_id",
+            contactPerson?.value ? contactPerson?.value : ""
+        );
         formData.append("staff_id", staff?.value ? staff?.value : "");
         formData.append("note", note ? note : "");
         formData.append("quote_id", typeOrder === "1" ? quote?.value : "");
         newDataOption.forEach((item, index) => {
-            formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
-            formData.append(`items[${index}][id]`, item?.price_quote_order_item_id != undefined ? item?.price_quote_order_item_id : "");
+            formData.append(
+                `items[${index}][item]`,
+                item?.item != undefined ? item?.item : ""
+            );
+            formData.append(
+                `items[${index}][id]`,
+                item?.price_quote_order_item_id != undefined
+                    ? item?.price_quote_order_item_id
+                    : ""
+            );
             formData.append(`items[${index}][quantity]`, item?.quantity.toString());
             formData.append(`items[${index}][price]`, item?.price);
-            formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
-            formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
-            formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
-            formData.append(`items[${index}][delivery_date]`, item?.delivery_date != undefined ? formatMoment(item?.delivery_date, FORMAT_MOMENT.DATE_TIME_LONG) : "");
+            formData.append(
+                `items[${index}][discount_percent]`,
+                item?.discount_percent
+            );
+            formData.append(
+                `items[${index}][tax_id]`,
+                item?.tax_id != undefined ? item?.tax_id : ""
+            );
+            formData.append(
+                `items[${index}][note]`,
+                item?.note != undefined ? item?.note : ""
+            );
+            formData.append(
+                `items[${index}][delivery_date]`,
+                item?.delivery_date != undefined
+                    ? formatMoment(item?.delivery_date, FORMAT_MOMENT.DATE_TIME_LONG)
+                    : ""
+            );
         });
 
         if (
@@ -909,7 +1019,10 @@ const SalesOrderForm = (props) => {
             isTotalMoney?.totalAmount > 0
         ) {
             try {
-                const { isSuccess, message } = await apiSalesOrder.apiHandingSalesOrder(id, formData);
+                const { isSuccess, message } = await apiSalesOrder.apiHandingSalesOrder(
+                    id,
+                    formData
+                );
                 if (isSuccess) {
                     isShow("success", `${dataLang[message]}` || message);
                     setCodeProduct("");
@@ -933,13 +1046,13 @@ const SalesOrderForm = (props) => {
                     isShow("error", `${dataLang[message]}` || message);
                 }
                 setOnSending(false);
-            } catch (error) {
-
-            }
+            } catch (error) { }
         } else {
             isShow(
                 "error",
-                newDataOption?.length === 0 ? `Chưa chọn thông tin mặt hàng!` : "Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!"
+                newDataOption?.length === 0
+                    ? `Chưa chọn thông tin mặt hàng!`
+                    : "Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!"
             );
             setOnSending(false);
         }
@@ -960,7 +1073,10 @@ const SalesOrderForm = (props) => {
 
     // codeProduct new
     const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : [];
-    const fakeDataQuotes = branch != null ? dataQuotes?.filter((x) => !hiddenOptions.includes(x.value)) : [];
+    const fakeDataQuotes =
+        branch != null
+            ? dataQuotes?.filter((x) => !hiddenOptions.includes(x.value))
+            : [];
 
     // const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
     const allItems = [...options];
@@ -1066,7 +1182,8 @@ const SalesOrderForm = (props) => {
                     quantity: e?.e?.quantity,
                     price: e?.e?.price,
                     discount: e?.e?.discount_percent,
-                    price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
+                    price_after_discount:
+                        +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
                     tax: {
                         label: e?.e?.tax_name,
                         value: e?.e?.tax_id,
@@ -1098,7 +1215,8 @@ const SalesOrderForm = (props) => {
                     quantity: e?.e?.quantity,
                     price: e?.e?.price,
                     discount: e?.e?.discount_percent,
-                    price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
+                    price_after_discount:
+                        +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
                     tax: {
                         label: e?.e?.tax_name,
                         value: e?.e?.tax_id,
@@ -1197,7 +1315,9 @@ const SalesOrderForm = (props) => {
                                 </h5>
 
                                 <h5 className=" font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : "0"}
+                                    {option.e?.qty_warehouse
+                                        ? formatNumber(option.e?.qty_warehouse)
+                                        : "0"}
                                 </h5>
                             </div>
                         </div>
@@ -1211,42 +1331,69 @@ const SalesOrderForm = (props) => {
     const taxRateLabel = (option) => {
         return (
             <div className="flex items-center justify-start">
-                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">{option?.label}</h2>
+                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">
+                    {option?.label}
+                </h2>
                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">{`(${option?.tax_rate})`}</h2>
             </div>
         );
     };
 
-    const sortedArr = id ? option.sort((a, b) => a.id - b.id) : option.sort((a, b) => b.id - a.id);
+    const sortedArr = id
+        ? option.sort((a, b) => a.id - b.id)
+        : option.sort((a, b) => b.id - a.id);
+
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.returnSales_title || "returnSales_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.sales_product_list || "sales_product_list"}`,
+        },
+        {
+            label: `${id
+                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                : dataLang?.sales_product_add_order || "sales_product_add_order"}`,
+        },
+    ];
 
     return (
         <React.Fragment className="overflow-hidden">
             <Head>
                 <title>
-                    {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                    {id
+                        ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                        : dataLang?.sales_product_add_order || "sales_product_add_order"}
                 </title>
             </Head>
             <Container className="!h-auto">
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.sales_product_list || "sales_product_list"}</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {" "}
-                            {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
-                        </h6>
-                    </div>
+                    <React.Fragment>
+                        <Breadcrumb
+                            items={breadcrumbItems}
+                            className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                        />
+                    </React.Fragment>
                 )}
                 <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
-                    <div className="flex items-center justify-between ">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium ">
                             {" "}
-                            {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                            {id
+                                ? dataLang?.sales_product_edit_order ||
+                                "sales_product_edit_order"
+                                : dataLang?.sales_product_add_order ||
+                                "sales_product_add_order"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">
-                            <ButtonBack onClick={() => router.push(routerSalesOrder.home)} dataLang={dataLang} />
+                            <ButtonBack
+                                onClick={() => router.push(routerSalesOrder.home)}
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
 
@@ -1254,8 +1401,10 @@ const SalesOrderForm = (props) => {
                     <div className="w-full rounded ">
                         <div>
                             <h2 className="3xl:text-[17px] 2xl:text-[16px] xl:text-[15px] text-[14px] font-normal bg-[#ECF0F4] p-1">
-                                {dataLang?.detail_general_information || "detail_general_information"}
+                                {dataLang?.detail_general_information ||
+                                    "detail_general_information"}
                             </h2>
+
                             <div className="grid items-center grid-cols-12 gap-1">
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px]">
@@ -1273,7 +1422,8 @@ const SalesOrderForm = (props) => {
 
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
-                                        {dataLang?.branch || "branch"} <span className="text-red-500">*</span>
+                                        {dataLang?.branch || "branch"}{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <SelectComponent
                                         options={dataBranch}
@@ -1301,14 +1451,16 @@ const SalesOrderForm = (props) => {
                                     />
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.sales_product_err_branch || "sales_product_err_branch"}
+                                            {dataLang?.sales_product_err_branch ||
+                                                "sales_product_err_branch"}
                                         </label>
                                     )}
                                 </div>
 
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
-                                        {dataLang?.customer || "customer"} <span className="text-red-500">*</span>
+                                        {dataLang?.customer || "customer"}{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <SelectComponent
                                         options={dataCustomer}
@@ -1317,7 +1469,8 @@ const SalesOrderForm = (props) => {
                                         placeholder={dataLang?.select_customer || "select_customer"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errCustomer ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${errCustomer ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1340,7 +1493,8 @@ const SalesOrderForm = (props) => {
                                     />
                                     {errCustomer && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.sales_product_err_customer || "sales_product_err_customer"}
+                                            {dataLang?.sales_product_err_customer ||
+                                                "sales_product_err_customer"}
                                         </label>
                                     )}
                                 </div>
@@ -1353,7 +1507,9 @@ const SalesOrderForm = (props) => {
                                         options={dataPersonContact}
                                         onChange={handleOnChangeInput.bind(this, "contactPerson")}
                                         value={contactPerson}
-                                        placeholder={dataLang?.select_contact_person || "select_contact_person"}
+                                        placeholder={
+                                            dataLang?.select_contact_person || "select_contact_person"
+                                        }
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={` rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
@@ -1395,7 +1551,9 @@ const SalesOrderForm = (props) => {
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            className={`border ${errDate
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                 } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                         />
                                         {startDate && (
@@ -1417,17 +1575,22 @@ const SalesOrderForm = (props) => {
 
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
-                                        {dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}{" "}
+                                        {dataLang?.sales_product_staff_in_charge ||
+                                            "sales_product_staff_in_charge"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <SelectComponent
                                         options={dataStaffs}
                                         onChange={(value) => handleOnChangeInput("staff", value)}
                                         value={staff}
-                                        placeholder={dataLang?.sales_product_select_staff_in_charge || "sales_product_select_staff_in_charge"}
+                                        placeholder={
+                                            dataLang?.sales_product_select_staff_in_charge ||
+                                            "sales_product_select_staff_in_charge"
+                                        }
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errStaff ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${errStaff ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1450,7 +1613,8 @@ const SalesOrderForm = (props) => {
                                     />
                                     {errStaff && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.sales_product_err_staff_in_charge || "sales_product_err_staff_in_charge"}
+                                            {dataLang?.sales_product_err_staff_in_charge ||
+                                                "sales_product_err_staff_in_charge"}
                                         </label>
                                     )}
                                 </div>
@@ -1558,15 +1722,27 @@ const SalesOrderForm = (props) => {
                                 options={typeOrder === "1" && quote === null ? [] : allItems}
                                 // closeMenuOnSelect={false}
                                 onChange={(value) => handleOnChangeInput("itemAll", value)}
-                                value={itemsAll?.value ? itemsAll?.value : option?.map((e) => e?.item)}
+                                value={
+                                    itemsAll?.value
+                                        ? itemsAll?.value
+                                        : option?.map((e) => e?.item)
+                                }
                                 isMulti
                                 maxShowMuti={0}
                                 components={{ MenuList, MultiValue }}
                                 formatOptionLabel={(option) => {
                                     if (option.value === "0") {
-                                        return <div className="font-medium text-gray-400">{option.label}</div>;
+                                        return (
+                                            <div className="font-medium text-gray-400">
+                                                {option.label}
+                                            </div>
+                                        );
                                     } else if (option.value === null) {
-                                        return <div className="font-medium text-gray-400">{option.label}</div>;
+                                        return (
+                                            <div className="font-medium text-gray-400">
+                                                {option.label}
+                                            </div>
+                                        );
                                     } else {
                                         return (
                                             <>
@@ -1620,7 +1796,8 @@ const SalesOrderForm = (props) => {
                                                             <div className="flex gap-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <h5 className="font-normal text-gray-400">
-                                                                        {dataLang?.purchase_survive || "purchase_survive"}
+                                                                        {dataLang?.purchase_survive ||
+                                                                            "purchase_survive"}
                                                                         :
                                                                     </h5>
                                                                     <h5 className="font-medium ">
@@ -1673,19 +1850,23 @@ const SalesOrderForm = (props) => {
                                 {dataLang?.sales_product_quantity || "sales_product_quantity"}
                             </h4>
                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {dataLang?.sales_product_unit_price || "sales_product_unit_price"}
+                                {dataLang?.sales_product_unit_price ||
+                                    "sales_product_unit_price"}
                             </h4>
                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {`${dataLang?.sales_product_rate_discount}` || "sales_product_rate_discount"}
+                                {`${dataLang?.sales_product_rate_discount}` ||
+                                    "sales_product_rate_discount"}
                             </h4>
                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    font-[400] whitespace-nowrap">
-                                {dataLang?.sales_product_after_discount || "sales_product_after_discount"}
+                                {dataLang?.sales_product_after_discount ||
+                                    "sales_product_after_discount"}
                             </h4>
                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
                                 {dataLang?.sales_product_tax || "sales_product_tax"}
                             </h4>
                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]">
-                                {dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}
+                                {dataLang?.sales_product_total_into_money ||
+                                    "sales_product_total_into_money"}
                             </h4>
                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center font-[400] whitespace-nowrap">
                                 {dataLang?.sales_product_item_date || "sales_product_item_date"}
@@ -1694,7 +1875,8 @@ const SalesOrderForm = (props) => {
                                 {dataLang?.sales_product_note || "sales_product_note"}
                             </h4>
                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {dataLang?.sales_product_operations || "sales_product_operations"}
+                                {dataLang?.sales_product_operations ||
+                                    "sales_product_operations"}
                             </h4>
                         </div>
                     </div>
@@ -1715,7 +1897,10 @@ const SalesOrderForm = (props) => {
                                         onChange={(value) => handleAddParent(value)}
                                         value={null}
                                         formatOptionLabel={selectItemsLabel}
-                                        placeholder={dataLang?.sales_product_select_item || "sales_product_select_item"}
+                                        placeholder={
+                                            dataLang?.sales_product_select_item ||
+                                            "sales_product_select_item"
+                                        }
                                         hideSelectedOptions={false}
                                         className={`cursor-pointer rounded-md bg-white  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
@@ -1752,7 +1937,10 @@ const SalesOrderForm = (props) => {
                                             disabled={true}
                                             className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                         >
-                                            <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90 " />
+                                            <Minus
+                                                size="16"
+                                                className="scale-75 2xl:scale-100 xl:scale-90 "
+                                            />
                                         </button>
                                         <InPutNumericFormat
                                             className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
@@ -1764,7 +1952,10 @@ const SalesOrderForm = (props) => {
                                             disabled={true}
                                             className=" 2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                         >
-                                            <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                            <Add
+                                                size="16"
+                                                className="scale-75 2xl:scale-100 xl:scale-90"
+                                            />
                                         </button>
                                     </div>
                                     <div className="flex items-center justify-center col-span-1 text-center">
@@ -1870,7 +2061,10 @@ const SalesOrderForm = (props) => {
 
                             {/* phân chia  */}
                             {sortedArr.map((e, index) => (
-                                <div className="grid items-center grid-cols-12 gap-1 py-1" key={e?.id}>
+                                <div
+                                    className="grid items-center grid-cols-12 gap-1 py-1"
+                                    key={e?.id}
+                                >
                                     <div className="col-span-2 ">
                                         <SelectComponent
                                             onInputChange={(event) => {
@@ -1885,7 +2079,8 @@ const SalesOrderForm = (props) => {
                                             // components={{ MenuList, MultiValue }}
                                             formatOptionLabel={selectItemsLabel}
                                             placeholder={
-                                                dataLang?.sales_product_select_item || "sales_product_select_item"
+                                                dataLang?.sales_product_select_item ||
+                                                "sales_product_select_item"
                                             }
                                             hideSelectedOptions={false}
                                             className={`cursor-pointer rounded-md bg-white 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
@@ -1925,7 +2120,10 @@ const SalesOrderForm = (props) => {
                                                 onClick={() => handleDecrease(e?.id)}
                                                 className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                             >
-                                                <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                                <Minus
+                                                    size="16"
+                                                    className="scale-75 2xl:scale-100 xl:scale-90"
+                                                />
                                             </button>
                                             <InPutNumericFormat
                                                 value={e?.quantity}
@@ -1940,14 +2138,18 @@ const SalesOrderForm = (props) => {
                                                     }
                                                 }}
                                                 allowNegative={false}
-                                                className={`${(e?.quantity == 0 && "border-red-500") || (e?.quantity == "" && "border-red-500")
+                                                className={`${(e?.quantity == 0 && "border-red-500") ||
+                                                    (e?.quantity == "" && "border-red-500")
                                                     } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
                                             <button
                                                 onClick={() => handleIncrease(e.id)}
                                                 className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                             >
-                                                <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                                <Add
+                                                    size="16"
+                                                    className="scale-75 2xl:scale-100 xl:scale-90"
+                                                />
                                             </button>
                                         </div>
                                     </div>
@@ -1959,7 +2161,8 @@ const SalesOrderForm = (props) => {
                                             }
                                             isAllowed={isAllowedNumber}
                                             allowNegative={false}
-                                            className={`${(e?.price == 0 && "border-red-500") || (e?.price == "" && "border-red-500")
+                                            className={`${(e?.price == 0 && "border-red-500") ||
+                                                (e?.price == "" && "border-red-500")
                                                 } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                         />
                                     </div>
@@ -1984,7 +2187,9 @@ const SalesOrderForm = (props) => {
                                     <div className="flex items-center justify-center col-span-1 p-0">
                                         <SelectComponent
                                             options={taxOptions}
-                                            onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
+                                            onChange={(value) =>
+                                                handleOnChangeInputOption(e?.id, "tax", value)
+                                            }
                                             value={
                                                 e?.tax
                                                     ? {
@@ -2037,10 +2242,18 @@ const SalesOrderForm = (props) => {
                                                 placeholderText="DD/MM/YYYY"
                                                 dateFormat="dd/MM/yyyy"
                                                 onSelect={(date) =>
-                                                    handleOnChangeInputOption(e?.id, "delivery_date", date)
+                                                    handleOnChangeInputOption(
+                                                        e?.id,
+                                                        "delivery_date",
+                                                        date
+                                                    )
                                                 }
                                                 onChange={(date) =>
-                                                    handleOnChangeInputOption(e?.id, "delivery_date", date)
+                                                    handleOnChangeInputOption(
+                                                        e?.id,
+                                                        "delivery_date",
+                                                        date
+                                                    )
                                                 }
                                                 className={`${errDeliveryDate && e?.delivery_date === null
                                                     ? "border-red-500"
@@ -2052,7 +2265,10 @@ const SalesOrderForm = (props) => {
                                                     <MdClear
                                                         className="absolute right-0 3xl:-translate-x-[320%] 3xl:translate-y-[1%] 2xl:-translate-x-[150%] 2xl:translate-y-[1%] xl:-translate-x-[140%] xl:translate-y-[1%] -translate-x-[90%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-110 xl:scale-90 scale-75 cursor-pointer"
                                                         onClick={() =>
-                                                            handleOnChangeInputOption(e?.id, "clear_delivery_date")
+                                                            handleOnChangeInputOption(
+                                                                e?.id,
+                                                                "clear_delivery_date"
+                                                            )
                                                         }
                                                     />
                                                 </>
@@ -2068,7 +2284,9 @@ const SalesOrderForm = (props) => {
                                     <div className="flex items-center justify-center col-span-1">
                                         <input
                                             value={e?.note}
-                                            onChange={(value) => handleOnChangeInputOption(e?.id, "note", value)}
+                                            onChange={(value) =>
+                                                handleOnChangeInputOption(e?.id, "note", value)
+                                            }
                                             name="optionEmail"
                                             placeholder="Ghi chú"
                                             type="text"
@@ -2098,7 +2316,10 @@ const SalesOrderForm = (props) => {
                             <div className="flex items-center justify-center col-span-1 text-center">
                                 <InPutNumericFormat
                                     value={totalDiscount}
-                                    onValueChange={handleOnChangeInput.bind(this, "totaldiscount")}
+                                    onValueChange={handleOnChangeInput.bind(
+                                        this,
+                                        "totaldiscount"
+                                    )}
                                     className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] text-center py-1 px-2 bg-transparent font-normal xl:w-20 w-24 focus:outline-none border-b-2 border-gray-300"
                                     isAllowed={isAllowedDiscount}
                                 />
@@ -2156,7 +2377,9 @@ const SalesOrderForm = (props) => {
                             <div className="relative flex flex-row custom-date-picker">
                                 <DatePicker
                                     selected={null}
-                                    onChange={(date) => handleOnChangeInput("total_delivery_date", date)}
+                                    onChange={(date) =>
+                                        handleOnChangeInput("total_delivery_date", date)
+                                    }
                                     blur
                                     placeholderText="DD/MM/YYYY"
                                     dateFormat="dd/MM/yyyy"
@@ -2194,15 +2417,21 @@ const SalesOrderForm = (props) => {
                                 <h3>{dataLang?.price_quote_total || "price_quote_total"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalPrice)}</h3>
+                                <h3 className="text-blue-600">
+                                    {formatMoney(isTotalMoney.totalPrice)}
+                                </h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3>{dataLang?.sales_product_discount || "sales_product_discount"}</h3>
+                                <h3>
+                                    {dataLang?.sales_product_discount || "sales_product_discount"}
+                                </h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalDiscountPrice)}</h3>
+                                <h3 className="text-blue-600">
+                                    {formatMoney(isTotalMoney.totalDiscountPrice)}
+                                </h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2213,27 +2442,42 @@ const SalesOrderForm = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalDiscountAfterPrice)}</h3>
+                                <h3 className="text-blue-600">
+                                    {formatMoney(isTotalMoney.totalDiscountAfterPrice)}
+                                </h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3>{dataLang?.sales_product_total_tax || "sales_product_total_tax"}</h3>
+                                <h3>
+                                    {dataLang?.sales_product_total_tax ||
+                                        "sales_product_total_tax"}
+                                </h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalTax)}</h3>
+                                <h3 className="text-blue-600">
+                                    {formatMoney(isTotalMoney.totalTax)}
+                                </h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h3>
+                                <h3>
+                                    {dataLang?.sales_product_total_into_money ||
+                                        "sales_product_total_into_money"}
+                                </h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatMoney(isTotalMoney.totalAmount)}</h3>
+                                <h3 className="text-blue-600">
+                                    {formatMoney(isTotalMoney.totalAmount)}
+                                </h3>
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <ButtonBack onClick={() => router.push(routerSalesOrder.home)} dataLang={dataLang} />
+                            <ButtonBack
+                                onClick={() => router.push(routerSalesOrder.home)}
+                                dataLang={dataLang}
+                            />
                             <ButtonSubmit
                                 onClick={handleSubmitValidate.bind(this)}
                                 dataLang={dataLang}
@@ -2256,6 +2500,5 @@ const SalesOrderForm = (props) => {
         </React.Fragment>
     );
 };
-
 
 export default SalesOrderForm;

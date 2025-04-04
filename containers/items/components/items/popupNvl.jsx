@@ -75,6 +75,7 @@ const Popup_NVL = React.memo((props) => {
 
     const [isDeleteThumb, sIsDeleteThumb] = useState(false);
 
+    // validate các input
     const [errGroup, sErrGroup] = useState(false);
 
     const [errName, sErrName] = useState(false);
@@ -106,12 +107,14 @@ const Popup_NVL = React.memo((props) => {
 
     const [dataVariantSending, sDataVariantSending] = useState([]);
 
+    // danh sách nhóm nguyên vật liệu
     const { data: dataOptGr = [] } = useItemCategoryOptions({
         params: {
             "branch_id[]": branch_id.length > 0 ? branch_id : -1,
         }
     })
 
+    // check khi biến thể bị trùng
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
         prevVariantMain === undefined && sOptSelectedVariantMain([]);
@@ -122,6 +125,7 @@ const Popup_NVL = React.memo((props) => {
         }
     }, [variantMain]);
 
+    // check khi biến thể con bị trùng
     useEffect(() => {
         sOptVariantSub(dataOptVariant?.find((e) => e.value == variantSub)?.option);
         prevVariantSub === undefined && sOptSelectedVariantSub([]);
@@ -132,8 +136,10 @@ const Popup_NVL = React.memo((props) => {
         }
     }, [variantSub]);
 
+    // check biến thể
     const checkEqual = (prevValue, nextValue) => prevValue && nextValue && prevValue === nextValue;
 
+    // change biến thể
     const _HandleSelectedVariant = (type, event) => {
         if (type == "main") {
             const name = event?.target.value;
@@ -160,6 +166,7 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
+    /// thêm biến thể
     const _HandleSelectedAllVariant = (type) => {
         if (type == "main") {
             const uncheckedOptions = optVariantMain.filter(
@@ -178,6 +185,7 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
+    // áp dụng biến thể
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
             const newData = optSelectedVariantMain?.map(e => {
@@ -275,7 +283,7 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
-
+    // khởi tạo initial state khi mở popup
     useEffect(() => {
         open && sTab(0);
         open && sGroupId();
@@ -304,6 +312,7 @@ const Popup_NVL = React.memo((props) => {
         open && sErrBranch(false);
     }, [open]);
 
+    // change các trường input
     const _HandleChangeInput = (type, value) => {
         if (type == "name") {
             sName(value.target?.value);
@@ -341,6 +350,7 @@ const Popup_NVL = React.memo((props) => {
         }
     };
 
+    // change hình đại diện
     const _HandleChangeFileThumb = ({ target: { files } }) => {
         var [file] = files;
         if (file) {
@@ -350,6 +360,7 @@ const Popup_NVL = React.memo((props) => {
         sIsDeleteThumb(false);
     };
 
+    // xóa hình đại diện
     const _DeleteThumb = (e) => {
         e.preventDefault();
         sThumbFile(null);
@@ -362,6 +373,7 @@ const Popup_NVL = React.memo((props) => {
         sThumb(thumb);
     }, [thumb]);
 
+    // lưu tạo nguyên vật liệu
     const handingItems = useMutation({
         mutationFn: async (data) => {
             return apiItems.apiHandingItems(data, props.id);
@@ -483,7 +495,7 @@ const Popup_NVL = React.memo((props) => {
         sErrBranch(false);
     }, [branch.length > 0]);
 
-
+    // get dữ liệu chi tiết khi sửa
     const { isLoading, isFetching } = useQuery({
         queryKey: ['api_detail_items', props?.id],
         queryFn: async () => {
@@ -519,6 +531,7 @@ const Popup_NVL = React.memo((props) => {
         enabled: open && !!props?.id
     })
 
+    // change biến thể
     const _HandleChangeVariant = (id, type, value) => {
         var index = dataTotalVariant?.findIndex((x) => x.id === id);
         if (type === "image") {
@@ -529,6 +542,8 @@ const Popup_NVL = React.memo((props) => {
             sDataTotalVariant([...dataTotalVariant]);
         }
     };
+
+    // xóa biến thể
     const handleDeleteVariantItems = async () => {
         if (isId && isIdChild) {
             const newData = dataTotalVariant
@@ -619,7 +634,7 @@ const Popup_NVL = React.memo((props) => {
                         <React.Fragment>
                             {tab === 0 && (
                                 <div className="grid grid-cols-2 gap-5">
-                                    <div className="2xl:space-y-3 space-y-2">
+                                    <div className="space-y-2 2xl:space-y-3">
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
                                                 {props.dataLang?.client_list_brand || "client_list_brand"}{" "}
@@ -806,7 +821,7 @@ const Popup_NVL = React.memo((props) => {
                                                 <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
                                                     {props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}
                                                 </label>
-                                                <div className="relative flex flex-col justify-center items-center">
+                                                <div className="relative flex flex-col items-center justify-center">
                                                     <InPutNumericFormat
                                                         isAllowed={(values) => {
                                                             const { floatValue, value } = values;
@@ -826,7 +841,7 @@ const Popup_NVL = React.memo((props) => {
                                                         }
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`}
                                                     />
-                                                    <span className="absolute right-2 text-slate-400 select-none">
+                                                    <span className="absolute select-none right-2 text-slate-400">
                                                         {props.dataLang?.date || "date"}
                                                     </span>
                                                 </div>
@@ -835,7 +850,7 @@ const Popup_NVL = React.memo((props) => {
                                             ""
                                         )}
                                     </div>
-                                    <div className="2xl:space-y-3 space-y-2">
+                                    <div className="space-y-2 2xl:space-y-3">
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
                                                 {props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"}{" "}
@@ -969,7 +984,7 @@ const Popup_NVL = React.memo((props) => {
                                                 {props.dataLang?.avatar || "avatar"}
                                             </label>
                                             <div className="flex justify-center">
-                                                <div className="relative h-36 w-36 rounded bg-slate-200">
+                                                <div className="relative rounded h-36 w-36 bg-slate-200">
                                                     {thumb && (
                                                         <Image
                                                             width={120}
@@ -981,18 +996,18 @@ const Popup_NVL = React.memo((props) => {
                                                                     : URL.createObjectURL(thumb)
                                                             }
                                                             alt="thumb type"
-                                                            className="w-36 h-36 rounded object-contain"
+                                                            className="object-contain rounded w-36 h-36"
                                                             loading="lazy"
                                                             crossOrigin="anonymous"
                                                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                                         />
                                                     )}
                                                     {!thumb && (
-                                                        <div className="h-full w-full flex flex-col justify-center items-center">
+                                                        <div className="flex flex-col items-center justify-center w-full h-full">
                                                             <IconImage />
                                                         </div>
                                                     )}
-                                                    <div className="absolute bottom-0 -right-12 flex flex-col space-y-2">
+                                                    <div className="absolute bottom-0 flex flex-col space-y-2 -right-12">
                                                         <input
                                                             onChange={_HandleChangeFileThumb.bind(this)}
                                                             type="file"
@@ -1003,7 +1018,7 @@ const Popup_NVL = React.memo((props) => {
                                                         <label
                                                             htmlFor={`upload`}
                                                             title="Sửa hình"
-                                                            className="cursor-pointer w-8 h-8 rounded-full bg-slate-100 flex flex-col justify-center items-center"
+                                                            className="flex flex-col items-center justify-center w-8 h-8 rounded-full cursor-pointer bg-slate-100"
                                                         >
                                                             <IconEditImg size="17" />
                                                         </label>
@@ -1011,7 +1026,7 @@ const Popup_NVL = React.memo((props) => {
                                                             disabled={!thumb ? true : false}
                                                             onClick={_DeleteThumb.bind(this)}
                                                             title="Xóa hình"
-                                                            className="w-8 h-8 rounded-full bg-red-500 disabled:opacity-30 flex flex-col justify-center items-center text-white"
+                                                            className="flex flex-col items-center justify-center w-8 h-8 text-white bg-red-500 rounded-full disabled:opacity-30"
                                                         >
                                                             <IconDelete size="17" />
                                                         </button>
@@ -1087,8 +1102,8 @@ const Popup_NVL = React.memo((props) => {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="flex justify-between items-center">
-                                                <h5 className="text-slate-400 text-sm">
+                                            <div className="flex items-center justify-between">
+                                                <h5 className="text-sm text-slate-400">
                                                     {props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantMain && (
@@ -1114,7 +1129,7 @@ const Popup_NVL = React.memo((props) => {
                                                     {optVariantMain?.map((e) => (
                                                         <div key={e?.id.toString()} className="flex items-center ">
                                                             <label
-                                                                className="relative flex cursor-pointer items-center rounded-full p-2"
+                                                                className="relative flex items-center p-2 rounded-full cursor-pointer"
                                                                 htmlFor={e.id}
                                                                 data-ripple-dark="true"
                                                             >
@@ -1128,7 +1143,7 @@ const Popup_NVL = React.memo((props) => {
                                                                     )}
                                                                     onChange={_HandleSelectedVariant.bind(this, "main")}
                                                                 />
-                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                                     <svg
                                                                         xmlns="http://www.w3.org/2000/svg"
                                                                         className="h-3.5 w-3.5"
@@ -1206,8 +1221,8 @@ const Popup_NVL = React.memo((props) => {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="flex justify-between items-center">
-                                                <h5 className="text-slate-400 text-sm">
+                                            <div className="flex items-center justify-between">
+                                                <h5 className="text-sm text-slate-400">
                                                     {props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantSub && (
@@ -1234,7 +1249,7 @@ const Popup_NVL = React.memo((props) => {
                                                     {optVariantSub?.map((e) => (
                                                         <div key={e?.id.toString()} className="flex items-center ">
                                                             <label
-                                                                className="relative flex cursor-pointer items-center rounded-full p-2"
+                                                                className="relative flex items-center p-2 rounded-full cursor-pointer"
                                                                 htmlFor={e.id}
                                                                 data-ripple-dark="true"
                                                             >
@@ -1248,7 +1263,7 @@ const Popup_NVL = React.memo((props) => {
                                                                     )}
                                                                     onChange={_HandleSelectedVariant.bind(this, "sub")}
                                                                 />
-                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                                     <svg
                                                                         xmlns="http://www.w3.org/2000/svg"
                                                                         className="h-3.5 w-3.5"
@@ -1328,7 +1343,7 @@ const Popup_NVL = React.memo((props) => {
                                                                 } grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
                                                             key={e?.id ? e?.id.toString() : index + 1}
                                                         >
-                                                            <div className="w-full h-full flex flex-col justify-center items-center col-span-1">
+                                                            <div className="flex flex-col items-center justify-center w-full h-full col-span-1">
                                                                 {e?.id != null && <input
                                                                     onChange={_HandleChangeVariant.bind(
                                                                         this,
@@ -1359,7 +1374,7 @@ const Popup_NVL = React.memo((props) => {
                                                                                     ? e.image
                                                                                     : URL.createObjectURL(e.image)
                                                                             }
-                                                                            className="h-14 w-14 object-contain"
+                                                                            className="object-contain h-14 w-14"
                                                                         />
                                                                     )}
                                                                 </label>
@@ -1367,7 +1382,7 @@ const Popup_NVL = React.memo((props) => {
                                                             <div className="">{e.name}</div>
                                                             {
                                                                 e?.variation_option_2?.length > 0 ? (
-                                                                    <div className="col-span-2 grid grid-cols-2 gap-1 items-center">
+                                                                    <div className="grid items-center grid-cols-2 col-span-2 gap-1">
                                                                         {e?.variation_option_2?.map((ce) => (
                                                                             <React.Fragment key={ce.id?.toString()}>
                                                                                 <div>{ce.name}</div>
@@ -1438,7 +1453,7 @@ const Popup_NVL = React.memo((props) => {
                 <div className="flex justify-end space-x-2">
                     <button
                         onClick={_ToggleModal.bind(this, false)}
-                        className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
+                        className="px-4 py-2 text-base transition rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105"
                     >
                         {props.dataLang?.branch_popup_exit}
                     </button>

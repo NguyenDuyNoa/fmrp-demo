@@ -6,10 +6,13 @@ import { routerPproductionPlan } from "@/routers/manufacture";
 import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { ssr: false });
 
 const Header = (props) => {
+    const dataLang = props?.dataLang;
+
     const router = useRouter();
 
     const showToat = useToast();
@@ -21,15 +24,30 @@ const Header = (props) => {
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'production_plans_fmrp');
 
+
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `Sản xuất`,
+            // href: "/",
+        },
+        {
+            label: `Kế hoạch sản xuất`,
+        },
+    ];
     return (
         <>
-            <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                <h6 className="text-[#141522]/40">{"Sản xuất"}</h6>
+            <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                {/* <h6 className="text-[#141522]/40">{"Sản xuất"}</h6>
                 <span className="text-[#141522]/40">/</span>
-                <h6>{"Kế hoạch sản xuất"}</h6>
+                <h6>{"Kế hoạch sản xuất"}</h6> */}
+                <Breadcrumb
+                    items={breadcrumbItems}
+                    className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                />
             </div>
             <div className="flex items-center justify-between">
-                <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                     Kế hoạch sản xuất
                 </h2>
                 <div className="flex items-center gap-4">

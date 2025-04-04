@@ -802,7 +802,6 @@ const GanttChart = ({
 
     return (
         <React.Fragment>
-            {typePageMoblie && <TabProduction />}
             <div className={`flex flex-col ${typePageMoblie ? "h-[85vh]" : "3xl:h-[73vh] xxl:h-[68vh] 2xl:h-[68vh] xl:h-[76vh] lg:h-[65vh] h-[65vh]"}   overflow-hidden border`}>
                 <div className="sticky top-0 z-10 flex border-b border-b-[#e5e7eb]">
                     <div className={`${typePageMoblie ? "w-[23%]" : "w-[40%]"}  border-r border-[#e5e7eb]`}>
@@ -1249,6 +1248,7 @@ const GanttChart = ({
                 }
 
             </div>
+            {typePageMoblie && <TabProduction />}
             <ModalDetail {...shareProps} />
         </React.Fragment >
     )

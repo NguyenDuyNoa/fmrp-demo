@@ -15,6 +15,7 @@ import { useCategoryOptions } from "../../hooks/product/useCategoryOptions";
 const Popup_Products = React.memo((props) => {
     const isShow = useToast()
 
+    // lấy danh sách chi nhánh
     const dataOptBranch = useSelector((state) => state.branch);
 
     const [open, sOpen] = useState(false);
@@ -39,10 +40,13 @@ const Popup_Products = React.memo((props) => {
 
     const [errCode, sErrCode] = useState(false);
 
+    // danh sách nhóm danh mục
     const { data: dataOptAll = [] } = useCategoryOptions()
 
+    // khi sửa thì truyền id lấy danh sách theo sửa
     const { data: dataOption = [] } = useProductCategoryDetailOptions(open, { branch: branch }, props?.id)
 
+    // set initital cho các sate khi mở poup
     useEffect(() => {
         open && sErrBranch(false);
         open && sErrName(false);
@@ -68,6 +72,7 @@ const Popup_Products = React.memo((props) => {
         }
     };
 
+    // lưu nhóm thành phẩm
     const handingCategory = useMutation({
         mutationFn: async (data) => {
             return apiCategory.apiHandingCategory(props?.id, data);
@@ -134,6 +139,7 @@ const Popup_Products = React.memo((props) => {
         sErrBranch(false);
     }, [branch?.length > 0]);
 
+    // get dữ liệu chi tiết khi sửa
     useQuery({
         queryKey: ["api_detail_category"],
         queryFn: async () => {

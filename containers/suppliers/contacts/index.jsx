@@ -66,8 +66,10 @@ const SuppliersContact = (props) => {
         "filter[supplier_id]": isState.idSupplier?.length > 0 ? isState.idSupplier?.map((e) => e.value) : "",
     }
 
+    // dnah sách liên hệ ncc
     const { data, isLoading, isFetching, refetch } = usseSuppilerContactList(params);
 
+    // danh sách chi nhánh
     const { data: listBr = [] } = useBranchList({})
 
     const { data: dataSupplier = [] } = usseSupplierCombobox()
