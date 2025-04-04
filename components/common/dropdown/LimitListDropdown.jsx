@@ -9,7 +9,7 @@ const LimitListDropdown = ({ sLimit, limit, dataLang, total }) => {
     const dropdownRef = useRef(null);
     const buttonRef = useRef(null);
 
-    const data = [1,3, 5, 10, 15, 20, 40, 60];
+    const data = [5, 10, 15, 20, 40, 60];
 
     if (dataSeting?.tables_pagination_limit && !data.includes(+dataSeting.tables_pagination_limit)) {
         data.push(+dataSeting.tables_pagination_limit);
@@ -51,7 +51,7 @@ const LimitListDropdown = ({ sLimit, limit, dataLang, total }) => {
     }, []);
 
     return (
-        <div className="flex items-center gap-2 text-[#9295A4] 3xl:text-sm text-[13px]" ref={dropdownRef}>
+        <div className="flex items-center gap-2 text-[#9295A4] 3xl:text-sm text-[13px] mt-1" ref={dropdownRef}>
             <span>{dataLang?.display || "Hiển thị"}</span>
 
             <div className="relative">

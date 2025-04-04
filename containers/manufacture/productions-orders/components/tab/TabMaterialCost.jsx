@@ -159,7 +159,7 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
     return (
         <div className='flex flex-col 3xl:gap-6 gap-4'>
             <div className='flex items-center justify-between gap-2'>
-                <div className='text-title-small font-medium text-[#11315B] capitalize'>
+                <div className='3xl:text-xl xl:text-lg text-base font-medium text-[#11315B] capitalize'>
                     chi phí NVL sản xuất tại xưởng
                 </div>
 
@@ -169,7 +169,7 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
                         onToggle={toggleSearch}
                         value={isStateProvider?.productionsOrders?.searchSheet?.searchMaterialCost}
                         onChange={onChangeSearch}
-                        placeholder={dataLang?.productions_orders_find || 'Tìm kiếm...'}
+                        placeholder={dataLang?.productions_orders_find_table || 'Tìm kiếm...'}
                     />
 
                     <ButtonAnimationNew
@@ -227,7 +227,7 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
                     </h4>
 
                     <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-2">
-                        Đơn vị tính
+                        ĐVT
                     </h4>
 
                     <h4 className="text-xs-default text-center text-[#9295A4] font-semibold col-span-2">
@@ -278,7 +278,7 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
                                                             width={200}
                                                             height={200}
                                                             alt={product?.item_name ?? "image"}
-                                                            className={`2xl:size-10 size-8 object-cover rounded-md shrink-0`}
+                                                            className={`3xl:size-10 3xl:min-w-10 size-8 min-w-8 text-xs-default object-cover rounded-md shrink-0`}
                                                         />
 
                                                         <div className="flex flex-col 3xl:gap-1 gap-0.5">
@@ -335,7 +335,7 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
                 </div>
 
                 {
-                    flagMaterialCost?.length > 0 &&
+                    flagMaterialCost?.length > 0 && !isLoadingTable &&
                     <div className='col-span-16 flex item justify-between'>
                         <div />
                         {
@@ -359,7 +359,7 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
                                         disabled={isFetchingNextPage}
                                         className="text-[#667085] 3xl:text-base text-sm hover:underline"
                                     >
-                                        Xem thêm
+                                        Xem thêm mặt hàng
                                     </button>
                                 </div>
                             )

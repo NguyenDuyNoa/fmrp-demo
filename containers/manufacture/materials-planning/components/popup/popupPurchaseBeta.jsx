@@ -159,6 +159,8 @@ const PopupPurchaseBeta = ({ dataLang, icon, title, dataTable, className, queryV
     })
 
     const onSubmit = async (value) => {
+        console.log('value', value);
+
         if (value.arrayItem.length == 0) {
             return shhowToat("error", dataLang?.materials_planning_no_items_purchase || "materials_planning_no_items_purchase");
         }
@@ -168,14 +170,19 @@ const PopupPurchaseBeta = ({ dataLang, icon, title, dataTable, className, queryV
         formData.append("name", value.purchaseName ?? "");
         formData.append("type", value.type == "material" ? 1 : 2);
         formData.append("plan_id", dataTable?.listDataRight?.idCommand);
+
+
+
         formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG));
         formData.append("suppliers_id", value?.supplier?.value ?? "");
         formData.append("branch_id", value?.idBranch ?? "");
         value.arrayItem?.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
-            formData.append(`items[${index}][quantity]`, typeof e?.quantity == 'number' ? e?.quantity : parseFloat(e?.quantity.replace(/,/g, '')));
+            formData.append(`items[${index}][quantity]`, typeof e?.quantity == 'number' ? e?.quantity : parseFloat(e?.quantity?.replace(/,/g, '')));
             formData.append(`items[${index}][item_id]`, e?.item?.item_id);
             formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
+            formData.append(`items[${index}][quantity_rest]`, typeof e?.quantityRest == 'number' ? e?.quantityRest : parseFloat(e?.quantityRest?.replace(/,/g, '')))
+            formData.append(`items[${index}][quantity_purchase]`, typeof e?.quantityPurchased == 'number' ? e?.quantityPurchased : parseFloat(e?.quantityPurchased?.replace(/,/g, '')))
         });
 
         hangdingMutation.mutate(formData, {

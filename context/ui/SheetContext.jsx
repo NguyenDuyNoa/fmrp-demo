@@ -26,9 +26,14 @@ export const SheetProvider = ({ children, props }) => {
         setIsOpen(true)
     }
 
-    const closeSheet = () => {
-        setIsOpen(false)
-        setSheetData(null)
+    const closeSheet = (type) => {
+        // setIsOpen(false)
+        // setSheetData(null)
+        // Chỉ đóng nếu không truyền type hoặc type trùng
+        if (!type || (sheetData && sheetData.type === type)) {
+            setIsOpen(false)
+            setSheetData(null)
+        }
     }
 
     return (

@@ -213,7 +213,7 @@ const TabMaterialReturn = ({ dataLang, ...props }) => {
                     onToggle={toggleSearch}
                     value={isStateProvider?.productionsOrders?.searchSheet?.searchMaterialReturn}
                     onChange={onChangeSearch}
-                    placeholder={dataLang?.productions_orders_find || 'Tìm kiếm...'}
+                    placeholder={dataLang?.productions_orders_find_table || 'Tìm kiếm...'}
                 />
 
                 <ButtonAnimationNew
@@ -275,10 +275,10 @@ const TabMaterialReturn = ({ dataLang, ...props }) => {
                         Nguyên vật liệu
                     </h4>
                     <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-1 px-1">
-                        Đơn vị tính
+                        ĐVT
                     </h4>
                     <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-1 px-1">
-                        Số lượng
+                        SL
                     </h4>
                     <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-2 px-1">
                         Kho hàng
@@ -332,7 +332,7 @@ const TabMaterialReturn = ({ dataLang, ...props }) => {
                                                             width={200}
                                                             height={200}
                                                             alt={product?.item_name ?? "image"}
-                                                            className={`2xl:size-10 size-8 object-cover rounded-md shrink-0`}
+                                                            className={`3xl:size-10 3xl:min-w-10 size-8 min-w-8 text-xs-default object-cover rounded-md shrink-0`}
                                                         />
 
                                                         <div className="flex flex-col 3xl:gap-1 gap-0.5">
@@ -385,7 +385,7 @@ const TabMaterialReturn = ({ dataLang, ...props }) => {
                 </div>
 
                 {
-                    flagMaterialReturn?.length > 0 &&
+                    flagMaterialReturn?.length > 0 && !isLoadingTable &&
                     <div className='col-span-16 flex item justify-between'>
                         <div />
 
@@ -410,7 +410,7 @@ const TabMaterialReturn = ({ dataLang, ...props }) => {
                                         disabled={isFetchingNextPage}
                                         className="text-[#667085] 3xl:text-base text-sm hover:underline"
                                     >
-                                        Xem thêm
+                                        Xem thêm mặt hàng
                                     </button>
                                 </div>
                             )

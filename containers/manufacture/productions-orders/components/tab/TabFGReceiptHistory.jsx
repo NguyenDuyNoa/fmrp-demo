@@ -216,7 +216,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                     onToggle={toggleSearch}
                     value={isStateProvider?.productionsOrders?.searchSheet?.searchFgReceiptHistory}
                     onChange={onChangeSearch}
-                    placeholder={dataLang?.productions_orders_find || 'Tìm kiếm...'}
+                    placeholder={dataLang?.productions_orders_find_table || 'Tìm kiếm...'}
                 />
 
                 <ButtonAnimationNew
@@ -277,23 +277,23 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                         Mã chứng từ
                     </h4>
 
-                    <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-3 px-1">
+                    <h4 className="text-xs-default text-start text-[#9295A4] font-semibold 2xl:col-span-3 col-span-4 px-1">
                         Mặt hàng
                     </h4>
 
-                    <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block col-span-2 px-1">
+                    <h4 className="text-xs-default text-start text-[#9295A4] font-semibold block 2xl:col-span-2 col-span-3 px-1">
                         Kho thành phẩm
                     </h4>
 
-                    <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
-                        Số lượng
+                    <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block 2xl:col-span-2 col-span-1 px-1">
+                        SL
                     </h4>
 
                     <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
                         Kho QC
                     </h4>
 
-                    <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2 px-1">
+                    <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block 2xl:col-span-2 col-span-1 px-1">
                         SL Lỗi
                     </h4>
                 </div>
@@ -311,13 +311,13 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                             <div
                                                 key={`product-${index}`}
                                                 // onClick={() => handleShowModel(product)}
-                                                className={`${flagFGReceiptHistory?.length - 1 !== index ? "border-[#F3F3F4]" : "border-transparent"} border-b col-span-16 grid grid-cols-16 gap-2 items-start group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out`}
+                                                className={`${flagFGReceiptHistory?.length - 1 !== index ? "border-[#F3F3F4]" : "border-transparent"} border-b col-span-16 grid grid-cols-16 items-start group hover:bg-gray-100 group cursor-pointer custom-transition`}
                                             >
-                                                <h4 className="col-span-1 flex items-center justify-center text-center h-full text-[#141522] font-semibold text-sm-default uppercase 3xl:py-4 py-2">
+                                                <h4 className="col-span-1 flex items-center justify-center text-center h-full text-[#141522] font-semibold text-sm-default uppercase 3xl:py-4 py-2 px-1">
                                                     {index + 1 ?? "-"}
                                                 </h4>
 
-                                                <h4 className="col-span-2 flex flex-col justify-center gap-1 h-full text-[#141522] 3xl:py-4 py-2">
+                                                <h4 className="col-span-2 flex flex-col justify-center gap-1 h-full text-[#141522] 3xl:py-4 py-2 px-1">
                                                     <div className='text-sm-default font-semibold'>
                                                         {product?.date ? formatMoment(product?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                     </div>
@@ -327,11 +327,11 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                                     </div>
                                                 </h4>
 
-                                                <h4 className={`${product?.code ? "text-start" : "text-center"} flex items-center size-full col-span-2 text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2`}>
+                                                <h4 className={`${product?.code ? "text-start" : "text-center"} flex items-center size-full col-span-2 text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
                                                     {product?.code ?? "-"}
                                                 </h4>
 
-                                                <h4 className="col-span-3 flex items-center size-full text-[#344054] font-normal gap-2 3xl:py-4 py-2">
+                                                <h4 className="2xl:col-span-3 col-span-4 flex items-center size-full text-[#344054] font-normal gap-2 3xl:py-4 py-2 px-1">
                                                     <div className='flex items-start justify-start w-full gap-2'>
                                                         <ModalImage
                                                             small={product?.product?.images && product?.product?.images !== "" ? product?.product?.images : '/icon/default/default.png'}
@@ -339,7 +339,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                                             width={200}
                                                             height={200}
                                                             alt={product?.product?.item_name ?? "image"}
-                                                            className={`2xl:size-10 size-8 object-cover rounded-md shrink-0`}
+                                                            className={`3xl:size-10 3xl:min-w-10 size-8 min-w-8 text-xs-default object-cover rounded-md shrink-0`}
                                                         />
 
                                                         <div className="flex flex-col 3xl:gap-1 gap-0.5">
@@ -395,29 +395,21 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                                     </div>
                                                 </h4>
 
-                                                <h4 className={`${product?.warehouse?.name ? "text-start" : "text-center"} flex items-center size-full col-span-2 text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2`}>
+                                                <h4 className={`${product?.warehouse?.name ? "text-start" : "text-center"} flex items-center size-full 2xl:col-span-2 col-span-3 text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
                                                     {product?.warehouse?.name ?? "-"}
                                                 </h4>
 
-                                                <h4 className={`flex items-center justify-center size-full col-span-2 text-center text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2`}>
+                                                <h4 className={`flex items-center justify-center size-full 2xl:col-span-2 col-span-1 text-center text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1`}>
                                                     {+product?.quantity > 0 ? formatNumber(+product?.quantity) : '-'}
                                                 </h4>
 
-                                                <h4 className={`${product?.warehouse?.name ? "justify-center" : "justify-center"} flex items-center size-full col-span-2 text-[#141522] font-semibold text-sm-default px-1`}>
-                                                    {product?.warehouse?.name ?? "-"}
+                                                <h4 className={`${product?.name_warehouse_qc ? "justify-center" : "justify-center"} bg-[#FFEEF0] group-hover:bg-[#FFEEF0] flex items-center size-full col-span-2 text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1 custom-transition`}>
+                                                    {product?.name_warehouse_qc && product?.name_warehouse_qc !== "" ? product?.name_warehouse_qc : "-"}
                                                 </h4>
 
-                                                <h4 className={`flex items-center justify-center col-span-2 size-full text-[#141522] font-semibold text-sm-default px-1`}>
-                                                    {/* <h4 className={`${product?.location?.name ? "text-start" : "text-center"} col-span-2 text-[#141522] font-semibold text-sm-default px-1`}> */}
-                                                    {product?.location?.name ?? "-"}
+                                                <h4 className={`flex items-center justify-center bg-[#FFEEF0] group-hover:bg-[#FFEEF0] 2xl:col-span-2 col-span-1 size-full text-[#141522] font-semibold text-sm-default 3xl:py-4 py-2 px-1 custom-transition`}>
+                                                    {product?.quantity_error > 0 ? product?.quantity_error : "-"}
                                                 </h4>
-                                                {/* <h4 className={`flex items-center justify-center col-span-2 size-full bg-[#FFEEF0] text-[#141522] font-semibold text-sm-default px-1`}>
-                                                    {"-"}
-                                                </h4> */}
-
-                                                {/* <h4 className={`${product?.note_item ? "text-start" : "text-center"} col-span-2 text-[#141522] font-semibold text-sm-default px-1`}>
-                                                    {product?.note ?? "-"}
-                                                </h4> */}
                                             </div>
                                         ))
                                     )
@@ -433,7 +425,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                 </div>
 
                 {
-                    flagFGReceiptHistory?.length > 0 &&
+                    flagFGReceiptHistory?.length > 0 && !isLoadingTable &&
                     <div className='col-span-16 flex item justify-between'>
                         <div />
 
@@ -458,7 +450,7 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
                                         disabled={isFetchingNextPage}
                                         className="text-[#667085] 3xl:text-base text-sm hover:underline"
                                     >
-                                        Xem thêm
+                                        Xem thêm mặt hàng
                                     </button>
                                 </div>
                             )

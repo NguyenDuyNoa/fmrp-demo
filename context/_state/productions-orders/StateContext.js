@@ -51,14 +51,33 @@ const initialState = {
             searchMaterialCost: "",
             searchMaterialReturn: "",
             searchFGReceiptHistory: "",
-            searchMaterialIssueHistory: ""
+            searchMaterialIssueHistory: "",
+            searchMaterialOutput: ""
         }
-    }
+    },
 };
 export const StateProvider = ({ children }) => {
     const [isStateProvider, setIsStateProvider] = useState(initialState);
 
-    const queryStateProvider = (key) => setIsStateProvider((prve) => ({ ...prve, ...key }));
+    // const queryStateProvider = (key) => setIsStateProvider((prve) => ({ ...prve, ...key }));
+
+    // const queryStateProvider = (updater) =>
+    //     setIsStateProvider((prev) =>
+    //         typeof updater === "function" ? updater(prev) : { ...prev, ...updater }
+    //     );
+
+    const queryStateProvider = (updater) => {
+        setIsStateProvider((prev) => {
+            const next = typeof updater === "function" ? updater(prev) : updater;
+
+            return {
+                productionsOrders: {
+                    ...prev.productionsOrders, // Giữ lại state hiện tại
+                    ...next.productionsOrders // Gộp với state mới
+                }
+            };
+        });
+    };
 
     return (
         <StateContext.Provider value={{ isStateProvider, setIsStateProvider, queryStateProvider }}>

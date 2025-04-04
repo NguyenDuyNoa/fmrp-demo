@@ -559,46 +559,48 @@ const TabInformation = () => {
 
     return (
         <div className='flex items-start gap-4'>
-            <div className='flex flex-col gap-4 w-[25%]'>
-                <h4 className="text-[#344054] font-normal flex items-center py-2 px-4 gap-2">
-                    <div className="2xl:size-16 size-14 shrink-0">
-                        <Image
-                            alt={dataItemOrderDetail?.poi?.item_name ?? "img"}
-                            width={200}
-                            height={200}
-                            src={dataItemOrderDetail?.poi?.images ?? "/icon/default/default.png"}
-                            className="size-full object-cover rounded-md"
-                        />
-                    </div>
-
-                    <div className="flex flex-col 3xl:gap-1.5 gap-1 w-full">
-                        <p className="text-[#141522] font-semibold text-sm-default">
-                            {dataItemOrderDetail?.poi?.item_name}
-                        </p>
-
-                        <div className='grid grid-cols-3 gap-2'>
-                            <p className="col-span-1 text-[#667085] font-normal xl:text-xs text-[10px]">
-                                Số lượng
-                            </p>
-
-                            <p className="col-span-2 text-[#667085] font-normal xl:text-xs text-[10px]">
-                                {dataItemOrderDetail?.poi?.product_variation}
-                            </p>
+            <div className='flex flex-col gap-4 3xl:w-[25%] xxl:w-[30%] w-[28%]'>
+                <h4 className="text-[#344054] font-normal flex items-center py-2 3xl:px-4 px-2 gap-2">
+                    <div className='flex items-start gap-2'>
+                        <div className="3xl:size-16 xxl:size-12 size-10 shrink-0">
+                            <Image
+                                alt={dataItemOrderDetail?.poi?.item_name ?? "img"}
+                                width={200}
+                                height={200}
+                                src={dataItemOrderDetail?.poi?.images ?? "/icon/default/default.png"}
+                                className="size-full object-cover rounded-md"
+                            />
                         </div>
 
-                        <div className='grid grid-cols-3 items-center gap-2'>
-                            <p className="col-span-1 font-medium flex items-center">
-                                <span className='text-sm-default text-[#EE1E1E]'>
-                                    {dataItemOrderDetail?.poi?.quantity}
-                                </span>
-                                <span className='text-[10px] text-[#141522]'>
-                                    /{dataItemOrderDetail?.poi?.unit_name}
-                                </span>
+                        <div className="flex flex-col 3xl:gap-1.5 gap-1 w-full">
+                            <p className="text-[#141522] font-semibold text-sm-default">
+                                {dataItemOrderDetail?.poi?.item_name}
                             </p>
 
-                            <p className="col-span-2 text-[#3276FA] font-normal xl:text-xs text-[10px]">
-                                {dataItemOrderDetail?.poi?.item_code}
-                            </p>
+                            <div className='grid grid-cols-3 gap-2'>
+                                <p className="col-span-1 text-[#667085] font-normal xl:text-xs text-[10px]">
+                                    Số lượng
+                                </p>
+
+                                <p className="col-span-2 text-[#667085] font-normal xl:text-xs text-[10px]">
+                                    {dataItemOrderDetail?.poi?.product_variation}
+                                </p>
+                            </div>
+
+                            <div className='grid grid-cols-3 items-center gap-2'>
+                                <p className="col-span-1 font-medium flex items-center">
+                                    <span className='text-sm-default text-[#EE1E1E]'>
+                                        {dataItemOrderDetail?.poi?.quantity}
+                                    </span>
+                                    <span className='text-[10px] text-[#141522]'>
+                                        /{dataItemOrderDetail?.poi?.unit_name}
+                                    </span>
+                                </p>
+
+                                <p className="col-span-2 text-[#3276FA] font-normal xl:text-xs text-[10px]">
+                                    {dataItemOrderDetail?.poi?.item_code}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </h4>
@@ -608,7 +610,7 @@ const TabInformation = () => {
                 {/* <ProductionSteps2 /> */}
             </div>
 
-            <div className='w-[75%]'>
+            <div className='3xl:w-[75%] xxl:w-[70%] w-[72%]'>
                 <div
                     className="col-span-12 grid grid-cols-16 mt-2"
                 >
@@ -620,10 +622,10 @@ const TabInformation = () => {
                         <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-4">
                             Bán thành phẩm
                         </h4>
-                        <h4 className="text-xs-default text-start text-[#9295A4] font-semibold col-span-2">
-                            Đơn vị tính
+                        <h4 className="text-xs-default text-start text-[#9295A4] font-semibold xxl:col-span-2 col-span-1">
+                            ĐVT
                         </h4>
-                        <h4 className="text-xs-default text-center text-[#9295A4] font-semibold col-span-1">
+                        <h4 className="text-xs-default text-center text-[#9295A4] font-semibold xxl:col-span-1 col-span-2">
                             SL cần
                         </h4>
                         <h4 className="text-xs-default text-center text-[#9295A4] font-semibold block col-span-2">
@@ -664,7 +666,7 @@ const TabInformation = () => {
                                                             width={200}
                                                             height={200}
                                                             alt={product?.name ?? "image"}
-                                                            className={`2xl:size-10 2xl:min-w-10 size-8 min-w-8 object-cover rounded-md shrink-0`}
+                                                            className={`3xl:size-10 3xl:min-w-10 size-8 min-w-8 text-xs-default object-cover rounded-md shrink-0`}
                                                         />
 
                                                         <div className="flex flex-col 3xl:gap-1 gap-0.5">
@@ -682,11 +684,11 @@ const TabInformation = () => {
                                                         </div>
                                                     </h4>
 
-                                                    <h4 className="col-span-2 flex items-center size-full text-start text-[#141522] font-semibold text-sm-default">
+                                                    <h4 className="xxl:col-span-2 col-span-1 flex items-center size-full text-start text-[#141522] font-semibold text-sm-default">
                                                         {product?.unit_name ?? ""}
                                                     </h4>
 
-                                                    <h4 className="col-span-1 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default">
+                                                    <h4 className="xxl:col-span-1 col-span-2 flex items-center justify-center size-full text-center text-[#141522] font-semibold text-sm-default">
                                                         {+product.quantity_need_manufactures > 0 ? formatNumber(+product.quantity_need_manufactures) : "-"}
                                                     </h4>
 
@@ -720,7 +722,7 @@ const TabInformation = () => {
                         }
                         {/* load more click */}
                         {
-                            dataItemOrderDetail?.items_semi?.length > 0 &&
+                            dataItemOrderDetail?.items_semi?.length > 0  &&
                             <div className='col-span-16 flex item justify-between'>
                                 <div />
                                 {
@@ -728,7 +730,7 @@ const TabInformation = () => {
                                     (limit < dataItemOrderDetail?.items_semi.length) && (
                                         <div className=" flex justify-center py-2">
                                             <button onClick={() => setLimit(dataItemOrderDetail?.items_semi.length)} className="text-[#667085] 3xl:text-base text-sm hover:underline">
-                                                Xem thêm ({dataItemOrderDetail?.items_semi.length - limit}) Thành phẩm
+                                                Xem thêm mặt hàng ({dataItemOrderDetail?.items_semi.length - limit}) Thành phẩm
                                             </button>
                                         </div>
                                     )

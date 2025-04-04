@@ -75,6 +75,7 @@ import { useSheet } from "@/context/ui/SheetContext";
 import SheetProductionsOrderDetail from "../sheet/SheetProductionsOrderDetail";
 import DetailProductionOrderList from "../ui/DetailProductionOrderList";
 import { StateContext } from "@/context/_state/productions-orders/StateContext";
+import { CookieCore } from "@/utils/lib/cookie";
 
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
@@ -169,6 +170,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const paginationRef = useRef(null);
     const groupButtonRef = useRef(null);
 
+    const isInitialRun = useRef(true);
+
     const [isOpenSearch, setIsOpenSearch] = useState(false);
 
     const { isOpen: isOpenSheet, openSheet, closeSheet, sheetData } = useSheet()
@@ -177,7 +180,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     // const { isStateProvider: isStateProvider?.productionsOrders, queryStateProvider } = useContext(ProductionsOrdersContext);
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
-    const params = {
+    const params = useMemo(() => ({
         branch_id: isStateProvider?.productionsOrders.valueBr?.value || "",
         _po_id: isStateProvider?.productionsOrders.valueProductionOrders?.value || "",
         search: isStateProvider?.productionsOrders.search == "" ? "" : isStateProvider?.productionsOrders.search,
@@ -188,7 +191,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         date_start: isStateProvider?.productionsOrders.date.dateStart ? formatMoment(isStateProvider?.productionsOrders.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
         item_variation_id: isStateProvider?.productionsOrders.valueProducts?.length > 0 ? isStateProvider?.productionsOrders.valueProducts.map((e) => e?.e?.item_variation_id) : null,
         ...(isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0 && { status: isStateProvider?.productionsOrders.selectStatusFilter })
-    };
+    }), [isStateProvider]);
 
     const { data: listOrders = [] } = useOrdersSearchCombobox(isStateProvider?.productionsOrders.searchOrders);
     const { data: listPlan = [] } = useInternalPlansSearchCombobox(isStateProvider?.productionsOrders.searchPlan);
@@ -215,12 +218,25 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         isRefetching: isRefetchingProductionOrderDetail
     } = useProductionOrderDetail({ id: isStateProvider?.productionsOrders?.idDetailProductionOrder, enabled: !!isStateProvider?.productionsOrders?.idDetailProductionOrder })
 
-    const handleFilter = (type, value) => queryStateProvider({
-        productionsOrders: {
-            ...isStateProvider?.productionsOrders,
-            [type]: value, page: 1
-        }
-    });
+    // const handleFilter = (type, value) => queryStateProvider({
+    //     productionsOrders: {
+    //         ...isStateProvider?.productionsOrders,
+    //         [type]: value, page: 1
+    //     }
+    // });
+
+    const handleFilter = (type, value) => {
+        if (isStateProvider?.productionsOrders?.[type] === value) return; // không update nếu không thay đổi
+
+        queryStateProvider({
+
+            productionsOrders: {
+                ...isStateProvider?.productionsOrders,
+                [type]: value,
+                page: 1,
+            },
+        });
+    };
 
     const stateFilterDropdown = useSelector(state => state.stateFilterDropdown)
 
@@ -261,9 +277,152 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     }, [router.isReady, router.pathname, router.query]);
 
+    // useEffect(() => {
+    //     if (!poiId) {
+    //         closeSheet(false);
+    //         return;
+    //     }
+
+    //     //   Chờ có data thì mới mở sheet
+    //     if (dataProductionOrderDetail) {
+    //         openSheet({
+    //             content: <SheetProductionsOrderDetail {...shareProps} />,
+    //             className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
+    //         });
+    //     }
+    // }, [poiId, dataProductionOrderDetail]);
+
+
+    // useEffect(() => {
+    //     const cookieLsxActive = CookieCore.get("lsx_active") || "{}"
+    //     const parseCookieLsxActive = JSON?.parse(cookieLsxActive)
+
+    //     console.log('parseCookieLsxActive', parseCookieLsxActive);
+
+    //     if (flagProductionOrders?.length > 0) {
+    //         if (flagProductionOrders?.find((item) => item?.id === parseCookieLsxActive?.id)) {
+    //             if (dataProductionOrderDetail?.listPOItems?.length > 0 && poiId) {
+    //                 openSheet({
+    //                     content: <SheetProductionsOrderDetail {...shareProps} />,
+    //                     className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
+    //                 });
+    //                 queryStateProvider({
+    //                     productionsOrders: {
+    //                         ...isStateProvider?.productionsOrders,
+    //                         idDetailProductionOrder: parseCookieLsxActive?.id
+    //                     }
+    //                 })
+    //             } else {
+    //                 closeSheet(false);
+    //                 queryStateProvider({
+    //                     productionsOrders: {
+    //                         ...isStateProvider?.productionsOrders,
+    //                         idDetailProductionOrder: flagProductionOrders[0]?.id
+    //                     }
+    //                 })
+    //                 return;
+    //             }
+
+    //             return
+    //         }
+    //         if (!isStateProvider?.productionsOrders?.idDetailProductionOrder) {
+    //             closeSheet()
+
+    //             queryStateProvider({
+    //                 productionsOrders: {
+    //                     ...isStateProvider?.productionsOrders,
+    //                     idDetailProductionOrder: flagProductionOrders[0]?.id
+    //                 }
+    //             })
+    //         }
+
+    //         return
+    //     }
+
+    // }, [flagProductionOrders, dataProductionOrderDetail])
+
+    // useEffect(() => {
+    //     if (!isInitialRun.current) return;
+    //     if (!flagProductionOrders?.length) return;
+
+    //     isInitialRun.current = false; // Đánh dấu đã chạy lần đầu
+
+    //     const cookieLsxActive = CookieCore.get("lsx_active") || "{}";
+    //     const parseCookieLsxActive = JSON?.parse(cookieLsxActive);
+
+    //     const foundFlag = flagProductionOrders.find((item) => item?.id === parseCookieLsxActive?.id);
+
+    //     if (isStateProvider?.productionsOrders?.poiId && foundFlag) {
+    //         queryStateProvider({
+    //             productionsOrders: {
+    //                 ...isStateProvider?.productionsOrders,
+    //                 idDetailProductionOrder: parseCookieLsxActive?.id
+    //             }
+    //         });
+
+    //         openSheet({
+    //             content: <SheetProductionsOrderDetail {...shareProps} />,
+    //             className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
+    //         });
+
+    //     } else {
+    //         queryStateProvider({
+    //             productionsOrders: {
+    //                 ...isStateProvider?.productionsOrders,
+    //                 idDetailProductionOrder: flagProductionOrders[0]?.id
+    //             }
+    //         });
+
+    //         closeSheet(false);
+    //     }
+    // }, [flagProductionOrders,dataProductionOrderDetail]);
+
+    useEffect(() => {
+        if (!isInitialRun.current || !router.isReady) return;
+        if (!flagProductionOrders?.length) return;
+
+        isInitialRun.current = false;
+
+        const cookieLsxActive = CookieCore.get("lsx_active") || "{}";
+        const parseCookieLsxActive = JSON?.parse(cookieLsxActive);
+        const foundFlag = flagProductionOrders.find((item) => item?.id === parseCookieLsxActive?.id);
+
+        if (router.query?.poi_id && foundFlag) {
+            // Có poi_id trên URL + có trong cookie
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    idDetailProductionOrder: parseCookieLsxActive?.id,
+                    poiId: router.query.poi_id,
+                }
+            });
+
+            openSheet({
+                type: "manufacture-productions-orders",
+                content: <SheetProductionsOrderDetail {...shareProps} />,
+                className: 'w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]',
+            });
+        } else {
+            // Không có poi_id hoặc không tìm thấy trong cookie
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    idDetailProductionOrder: flagProductionOrders[0]?.id,
+                    poiId: undefined,
+                }
+            });
+
+            closeSheet("manufacture-productions-orders");
+        }
+    }, [flagProductionOrders, router.isReady]);
+
     // active tab info & tab kế hoạch
     useEffect(() => {
-        if (listLsxTab?.length > 0 && !isStateProvider?.productionsOrders?.isTabList) {
+        if (
+            listLsxTab?.length > 0 && (!isStateProvider?.productionsOrders?.isTabList)
+        ) {
+            console.log('check');
+
             queryStateProvider({
                 productionsOrders: {
                     ...isStateProvider?.productionsOrders,
@@ -272,21 +431,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             });
         }
     }, [listLsxTab]);
-
-    useEffect(() => {
-        if (!poiId) {
-            closeSheet(false);
-            return;
-        }
-
-        // Chờ có data thì mới mở sheet
-        if (dataProductionOrderDetail) {
-            openSheet({
-                content: <SheetProductionsOrderDetail {...shareProps} />,
-                className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
-            });
-        }
-    }, [poiId, dataProductionOrderDetail]);
 
     // loadmore list LSX
     useEffect(() => {
@@ -390,68 +534,75 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     }, [isStateProvider?.productionsOrders?.idDetailProductionOrder, dataProductionOrderDetail]);
 
-    const fetchComboboxProductionOrders = debounce(async (value) => {
+    const handleSearchProductionOrders = debounce((value) => {
         try {
-            queryStateProvider({
+            queryStateProvider((prev) => ({
                 productionsOrders: {
-                    ...isStateProvider?.productionsOrders,
+                    ...prev.productionsOrders,
                     searchProductionOrders: value
                 }
-            });
+            }));
         } catch (error) { }
-    }, 500);
+    }, 500)
 
-    const fetchDataItems = debounce(async (value) => {
+    const handleSearchDataItems = debounce((value) => {
         try {
-            queryStateProvider({
+            queryStateProvider((prev) => ({
                 productionsOrders: {
-                    ...isStateProvider?.productionsOrders,
+                    ...prev.productionsOrders,
                     searchItemsVariant: value
                 }
-            });
+            }));
         } catch (error) { }
-    }, 500);
+    }, 500)
 
-    const fetDataOrder = debounce(async (value) => {
+    const handleSearchDataOrder = debounce((value) => {
         try {
-            queryStateProvider({
+            queryStateProvider((prev) => ({
                 productionsOrders: {
-                    ...isStateProvider?.productionsOrders,
+                    ...prev.productionsOrders,
                     searchOrders: value
                 }
-            });
+            }));
         } catch (error) { }
-    }, 500);
+    }, 500)
 
-    const fetDataPoDetail = debounce(async (value) => {
+    const handleSearchDataPoDetail = debounce((value) => {
         try {
-            queryStateProvider({
+            queryStateProvider((prev) => ({
                 productionsOrders: {
-                    ...isStateProvider?.productionsOrders,
+                    ...prev.productionsOrders,
                     searchPODetail: value
                 }
-            });
+            }));
         } catch (error) { }
-    }, 500);
+    }, 500)
 
-    const fetchDataPlan = debounce(async (value) => {
+    const handleSearchDataPlan = debounce((value) => {
         try {
-            queryStateProvider({
+            queryStateProvider((prev) => ({
                 productionsOrders: {
-                    ...isStateProvider?.productionsOrders,
+                    ...prev.productionsOrders,
                     searchPlan: value
                 }
-            });
+            }));
         } catch (error) { }
-    }, 500);
+    }, 500)
 
-    const handleShow = (id) => {
+    const handleShow = (item) => {
+        if (item.id === isStateProvider?.productionsOrders?.idDetailProductionOrder) return
+
         queryStateProvider({
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
-                idDetailProductionOrder: id
+                idDetailProductionOrder: item?.id
             }
         })
+
+        CookieCore.set("lsx_active", JSON.stringify(item), {
+            expires: new Date(Date.now() + 86400 * 1000),
+            sameSite: true,
+        });
 
         // queryStateProvider({
         //     productionOrdersList: isStateProvider?.productionsOrders.productionOrdersList.map((e) => {
@@ -465,7 +616,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         //     openModal: false,
         //     dataModal: {},
         // });
-
+        closeSheet("manufacture-productions-orders")
         router.push("/manufacture/productions-orders")
     };
 
@@ -521,17 +672,19 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 },
             }
         });
+
         router.push("/manufacture/productions-orders")
     };
 
-    const onChangeSearch = debounce((e) => {
+    const onChangeSearch = useMemo(() => debounce((e) => {
         queryStateProvider({
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
-                search: e.target.value, page: 1,
+                search: e.target.value,
+                page: 1,
             }
         });
-    }, 500);
+    }, 500), [isStateProvider]);
 
     const handDeleteItem = (id, type) => {
         queryStateProvider({
@@ -544,6 +697,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     };
 
     const handleShowModel = (item) => {
+        console.log('isStateProvider?.productionsOrders?.poiId',isStateProvider?.productionsOrders?.poiId);
+        console.log('item',item);
+        
+        if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return
+
         queryStateProvider({
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
@@ -552,10 +710,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         });
 
         openSheet({
+            type: "manufacture-productions-orders",
             content: (
                 <SheetProductionsOrderDetail {...shareProps} />
             ),
-            className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
+            className: 'w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]',
         })
 
         router.push({
@@ -574,11 +733,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         handDeleteItem,
         handleShowModel,
         handleFilter,
-        fetchComboboxProductionOrders,
-        fetDataOrder,
-        fetchDataPlan,
-        fetchDataItems,
-        fetDataPoDetail,
+        handleSearchProductionOrders,
+        handleSearchDataOrder,
+        handleSearchDataPlan,
+        handleSearchDataItems,
+        handleSearchDataPoDetail,
         listBr,
         listOrders,
         listPlan,
@@ -705,9 +864,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     };
 
-    console.log('dataProductionOrderDetail', dataProductionOrderDetail);
-    console.log('isStateProvider', isStateProvider);
-    console.log('router', router);
+    // console.log('isStateProvider: ', isStateProvider);
+
 
     return (
         <React.Fragment>
@@ -852,7 +1010,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     value={isStateProvider?.productionsOrders.valueOrders}
                                     options={listOrders}
                                     onInputChange={(e) => {
-                                        fetDataOrder(e);
+                                        handleSearchDataOrder(e);
                                     }}
                                     classParent="ml-0 text-sm"
                                     onChange={(e) => handleFilter("valueOrders", e)}
@@ -869,7 +1027,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     value={isStateProvider?.productionsOrders.valuePlan}
                                     options={listPlan}
                                     onInputChange={(e) => {
-                                        fetchDataPlan(e);
+                                        handleSearchDataPlan(e);
                                     }}
                                     classParent="ml-0 text-sm"
                                     onChange={(e) => handleFilter("valuePlan", e)}
@@ -885,7 +1043,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     isClearable={true}
                                     value={isStateProvider?.productionsOrders.valueProductionOrders}
                                     onInputChange={(e) => {
-                                        fetchComboboxProductionOrders(e);
+                                        handleSearchProductionOrders(e);
                                     }}
                                     onChange={(e) => handleFilter("valueProductionOrders", e)}
                                     options={comboboxProductionOrders}
@@ -901,7 +1059,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     isClearable={true}
                                     value={isStateProvider?.productionsOrders.valueProductionOrdersDetail}
                                     onInputChange={(e) => {
-                                        fetDataPoDetail(e);
+                                        handleSearchDataPoDetail(e);
                                     }}
                                     onChange={(e) => handleFilter("valueProductionOrdersDetail", e)}
                                     options={comboboxProductionOrdersDetail}
@@ -922,7 +1080,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     classNamePrefix={"productionSmoothing"}
                                     placeholder={dataLang?.productions_orders_item || 'productions_orders_item'}
                                     onInputChange={(e) => {
-                                        fetchDataItems(e);
+                                        handleSearchDataItems(e);
                                     }}
                                     isMulti={true}
                                     components={{ MultiValue }}
@@ -1092,7 +1250,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                                 return (
                                                     <div
                                                         key={item.id}
-                                                        onClick={() => handleShow(item.id)}
+                                                        onClick={() => handleShow(item)}
                                                         className={`
                                                         ${typePageMoblie ? "px-px" : "pl-1 pr-3"}
                                                         ${item.id == isStateProvider?.productionsOrders.idDetailProductionOrder && "bg-[#F0F7FF]"}
@@ -1194,7 +1352,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                 }
                             })}
                             dataLang={dataLang}
-                            total={isStateProvider?.productionsOrders?.countAll}
+                            total={dataProductionOrders?.pages[0]?.countAll}
                         />
                     </div>
                 </div>
@@ -1325,8 +1483,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             (dataProductionOrderDetail?.listPOItems?.length > 0)
                                 ?
                                 <React.Fragment>
-                                    {isStateProvider?.productionsOrders.isTabList?.type == "products" && <DetailProductionOrderList {...shareProps} />}
-                                    {isStateProvider?.productionsOrders.isTabList?.type == "semiProduct" && <>Hello</>}
+                                    {isStateProvider?.productionsOrders?.isTabList?.type == "products" && <DetailProductionOrderList {...shareProps} />}
+                                    {isStateProvider?.productionsOrders?.isTabList?.type == "semiProduct" && <>Hello</>}
                                     {/* {isStateProvider?.productionsOrders.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
                                 </React.Fragment>
                                 :

@@ -6,8 +6,6 @@ import { Customscrollbar } from "../../UI/common/Customscrollbar";
 import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
 
 export const CustomOption = (props) => {
-    console.log('custom option props: ', props);
-
     return (
         <components.Option   {...props}>
             <div className={`flex items-center justify-between font-normal w-full text-sm relative z-[999999] ${props.isDisabled ? "cursor-default" : "cursor-pointer"}`} >
@@ -120,9 +118,6 @@ const SelectComponentNew = ({
                 zIndex: 99999 // hoặc cao hơn nếu cần, miễn cao hơn tất cả các thành phần khác
             })
         }
-
-    console.log('isDisabled', isDisabled);
-
 
     return (
         <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
