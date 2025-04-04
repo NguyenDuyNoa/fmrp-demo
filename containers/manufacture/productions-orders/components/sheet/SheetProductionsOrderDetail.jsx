@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { useSheet } from "@/context/ui/SheetContext";
 import CloseXIcon from "@/components/icons/common/CloseXIcon";
@@ -27,6 +27,8 @@ import TabMaterialReturn from "../tab/TabMaterialReturn";
 import TabMaterialCost from "../tab/TabMaterialCost";
 import TabMaterialOutputTab from "../tab/TabMaterialOutput";
 import Skeleton from "@/components/common/skeleton/Skeleton";
+import CostCardSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/CostCardSkeleton";
+import TabSwitcherWithUnderlineSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/TabSwitcherWithUnderlineSkeleton";
 
 const initialState = {
     isTab: 1,
@@ -169,7 +171,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     };
 
     // console.log('isLoadingItemOrderDetail: ', isLoadingItemOrderDetail);
-    // console.log('isFetchingItemOrderDetail: ', isFetchingItemOrderDetail);
+    // console.log(isFetchingItemOrderDetail: ',isFetchingItemOrderDetail);
 
 
     return (
@@ -323,9 +325,6 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                     <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>
                                         {dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}:
                                     </h3>
-                                    {/* <TagBranch className="w-fit">
-                                    {dataItemOrderDetail?.poi?.branch_name}
-                                    </TagBranch> */}
 
                                     {
                                         isFetchingItemOrderDetail ?
@@ -340,58 +339,72 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                         </div>
 
                         <div className="grid grid-cols-3 3xl:gap-4 gap-2">
-                            <CostCard
-                                className="col-span-1 w-full"
-                                title="Chi phí vật tư"
-                                amount={formatMoney(dataItemOrderDetail?.cost?.cost_material)}
-                                color="text-[#25387A]"
-                                percent={Math.abs(dataItemOrderDetail?.cost?.percent_cost_material ?? 0)}
-                                isUp={(dataItemOrderDetail?.cost?.percent_cost_material ?? 0) >= 0}
-                                isFetching={isFetchingItemOrderDetail}
-                            />
-                            <CostCard
-                                className="col-span-1 w-full"
-                                title="Chi phí khác"
-                                amount={formatMoney(dataItemOrderDetail?.cost?.cost_other)}
-                                color="text-[#DC6803]"
-                                percent={Math.abs(dataItemOrderDetail?.cost?.percent_cost_other ?? 0)}
-                                isUp={(dataItemOrderDetail?.cost?.percent_cost_other ?? 0) >= 0}
-                                isFetching={isFetchingItemOrderDetail}
-                            />
-                            <CostCard
-                                className="col-span-1 w-full"
-                                title="Tổng chi phí"
-                                amount={formatMoney(dataItemOrderDetail?.cost?.total_cost)}
-                                color="text-[#991B1B]"
-                                percent={Math.abs(dataItemOrderDetail?.cost?.percent_total_cost ?? 0)}
-                                isUp={(dataItemOrderDetail?.cost?.percent_total_cost ?? 0) >= 0}
-                                isFetching={isFetchingItemOrderDetail}
-                            />
+                            {
+                                isFetchingItemOrderDetail ?
+                                    [...Array(3)].map((_, index) => (
+                                        <React.Fragment key={`skeleton-cost-${index}`}>
+                                            <CostCardSkeleton className="col-span-1 w-full" />
+                                        </React.Fragment>
+                                    ))
+                                    :
+                                    <React.Fragment>
+                                        <CostCard
+                                            className="col-span-1 w-full"
+                                            title="Chi phí vật tư"
+                                            amount={formatMoney(dataItemOrderDetail?.cost?.cost_material)}
+                                            color="text-[#25387A]"
+                                            percent={Math.abs(dataItemOrderDetail?.cost?.percent_cost_material ?? 0)}
+                                            isUp={(dataItemOrderDetail?.cost?.percent_cost_material ?? 0) >= 0}
+                                        />
+                                        <CostCard
+                                            className="col-span-1 w-full"
+                                            title="Chi phí khác"
+                                            amount={formatMoney(dataItemOrderDetail?.cost?.cost_other)}
+                                            color="text-[#DC6803]"
+                                            percent={Math.abs(dataItemOrderDetail?.cost?.percent_cost_other ?? 0)}
+                                            isUp={(dataItemOrderDetail?.cost?.percent_cost_other ?? 0) >= 0}
+                                        />
+                                        <CostCard
+                                            className="col-span-1 w-full"
+                                            title="Tổng chi phí"
+                                            amount={formatMoney(dataItemOrderDetail?.cost?.total_cost)}
+                                            color="text-[#991B1B]"
+                                            percent={Math.abs(dataItemOrderDetail?.cost?.percent_total_cost ?? 0)}
+                                            isUp={(dataItemOrderDetail?.cost?.percent_total_cost ?? 0) >= 0}
+                                        />
+                                    </React.Fragment>
+                            }
                         </div>
                     </div>
 
                     <div className='flex flex-col gap-2'>
                         {/* tab */}
-                        <TabSwitcherWithUnderline
-                            tabs={listTab}
-                            activeTab={isStateProvider?.productionsOrders?.isTabSheet}
-                            onChange={(tab) => handleActiveTab(tab, "detail_sheet")}
-                            className={"flex items-center justify-start xxl:gap-2 gap-0 w-full"}
-                            renderLabel={(tab, activeTab) => (
-                                <h3 className={`${isStateProvider?.productionsOrders?.isTabSheet?.id === tab.id ? "text-[#0375F3] scale-[1.02]" : "text-[#9295A4] scale-[1]"} 3xl:text-base xxl:text-sm xl:text-xs lg:text-[10px] text-xs flex items-center gap-2 col-span-1 font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}>
-                                    <span>
-                                        {tab.name}
-                                    </span>
-                                    {
-                                        tab.count > 0 && (
-                                            <span className={`${isStateProvider?.productionsOrders?.isTabSheet?.id === tab.id ? "bg-[#0375F3]" : "bg-[#9295A4]"} 3xl:size-5 size-4 3xl:text-[11px] text-[10px] text-white rounded-full flex items-center justify-center`}>
-                                                {tab.count}
+                        {
+                            isFetchingItemOrderDetail
+                                ?
+                                <TabSwitcherWithUnderlineSkeleton tabCount={6} />
+                                :
+                                <TabSwitcherWithUnderline
+                                    tabs={listTab}
+                                    activeTab={isStateProvider?.productionsOrders?.isTabSheet}
+                                    onChange={(tab) => handleActiveTab(tab, "detail_sheet")}
+                                    className={"flex items-center justify-start xxl:gap-2 gap-0 w-full"}
+                                    renderLabel={(tab, activeTab) => (
+                                        <h3 className={`${isStateProvider?.productionsOrders?.isTabSheet?.id === tab.id ? "text-[#0375F3] scale-[1.02]" : "text-[#9295A4] scale-[1]"} 3xl:text-base xxl:text-sm xl:text-xs lg:text-[10px] text-xs flex items-center gap-2 col-span-1 font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}>
+                                            <span>
+                                                {tab.name}
                                             </span>
-                                        )
-                                    }
-                                </h3>
-                            )}
-                        />
+                                            {
+                                                tab.count > 0 && (
+                                                    <span className={`${isStateProvider?.productionsOrders?.isTabSheet?.id === tab.id ? "bg-[#0375F3]" : "bg-[#9295A4]"} 3xl:size-5 size-4 3xl:text-[11px] text-[10px] text-white rounded-full flex items-center justify-center`}>
+                                                        {tab.count}
+                                                    </span>
+                                                )
+                                            }
+                                        </h3>
+                                    )}
+                                />
+                        }
 
                         {/* content tab */}
                         <div className="w-full my-2">{components[isStateProvider?.productionsOrders?.isTabSheet?.id]}</div>

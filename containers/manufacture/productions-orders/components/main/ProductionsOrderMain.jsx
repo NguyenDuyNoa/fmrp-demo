@@ -90,10 +90,7 @@ import { useDispatch } from "react-redux";
 import PopupQRCode from "../popup/PopupQRCode";
 import { useQRCodProductCompleted } from "@/managers/api/productions-order/useQR";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
-import {
-    fetchPDFManufactures,
-    usePrintManufactures,
-} from "@/managers/api/productions-order/useLinkFilePDF";
+import { fetchPDFManufactures } from "@/managers/api/productions-order/useLinkFilePDF";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const statusExprired = useStatusExprired();
@@ -630,6 +627,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         dataProductionOrderDetail,
     ]);
 
+    // onchange search combobox new
     const handleSearchProductionOrders = debounce((value) => {
         try {
             queryStateProvider((prev) => ({
@@ -641,6 +639,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         } catch (error) { }
     }, 500);
 
+    // onchange search combobox new
     const handleSearchDataItems = debounce((value) => {
         try {
             queryStateProvider((prev) => ({
@@ -652,6 +651,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         } catch (error) { }
     }, 500);
 
+    // onchange search combobox new
     const handleSearchDataOrder = debounce((value) => {
         try {
             queryStateProvider((prev) => ({
@@ -663,6 +663,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         } catch (error) { }
     }, 500);
 
+    // onchange search combobox new
     const handleSearchDataPoDetail = debounce((value) => {
         try {
             queryStateProvider((prev) => ({
@@ -674,6 +675,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         } catch (error) { }
     }, 500);
 
+    // onchange search combobox new
     const handleSearchDataPlan = debounce((value) => {
         try {
             queryStateProvider((prev) => ({
@@ -685,7 +687,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         } catch (error) { }
     }, 500);
 
-    const handleShow = (item) => {
+    // Hàm mở danh sách công đoạn khi click vào lệnh sản xuất
+    const handleShowListDetail = (item) => {
         if (item.id === isStateProvider?.productionsOrders?.idDetailProductionOrder) return
 
         queryStateProvider({
@@ -700,22 +703,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             sameSite: true,
         });
 
-        // queryStateProvider({
-        //     productionOrdersList: isStateProvider?.productionsOrders.productionOrdersList.map((e) => {
-        //         const showParent = e.id == id;
-        //         // showParent && queryStateProvider({ idDetailProductionOrder: id })
-        //         return {
-        //             ...e,
-        //             showParent: showParent,
-        //         };
-        //     }),
-        //     openModal: false,
-        //     dataModal: {},
-        // });
         closeSheet("manufacture-productions-orders");
         router.push("/manufacture/productions-orders");
     };
 
+    // Hàm change tab 
     const handleActiveTab = (e, type) => {
         if (type === "detail") {
             queryStateProvider({
@@ -747,7 +739,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         } catch (error) { }
     };
 
-    const handShowItem = (id, type) => {
+    // Hàm mở accordion trong danh sách công đoạn
+    const handleToggleAccordionList = (id, type) => {
         queryStateProvider({
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
@@ -768,10 +761,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 },
             },
         });
-
-        router.push("/manufacture/productions-orders");
     };
 
+    // Search lệnh sản xuất có debounce
     const onChangeSearch = useMemo(
         () =>
             debounce((e) => {
@@ -786,6 +778,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         [isStateProvider]
     );
 
+    // Hàm xóa chi tiết công đoạn
     const handDeleteItem = (id, type) => {
         queryStateProvider({
             productionsOrders: {
@@ -796,10 +789,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         handleQueryId({ status: true, id: id, idChild: type });
     };
 
-    const handleShowModel = (item) => {
-        console.log('isStateProvider?.productionsOrders?.poiId',isStateProvider?.productionsOrders?.poiId);
-        console.log('item',item);
-        
+    // Hàm mở Sheet chi tiết công đoạn
+    const handleToggleSheetDetail = (item) => {
         if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return
 
         queryStateProvider({
@@ -829,9 +820,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
     const shareProps = {
         dataLang,
-        handShowItem,
+        handleToggleAccordionList,
         handDeleteItem,
-        handleShowModel,
+        handleToggleSheetDetail,
         handleFilter,
         handleSearchProductionOrders,
         handleSearchDataOrder,
@@ -866,8 +857,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const triggerFilterAll = (
         <button
             className={`${stateFilterDropdown?.open || activeFilterCount > 0
-                    ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
-                    : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
+                ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
+                : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
                 } flex items-center space-x-2 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition`}
         >
             <span className="3xl:size-5 size-4 shrink-0">
@@ -875,8 +866,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             </span>
             <span
                 className={`${stateFilterDropdown?.open || activeFilterCount > 0
-                        ? "text-[#0F4F9E]"
-                        : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
+                    ? "text-[#0F4F9E]"
+                    : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
                     } text-nowrap 3xl:text-base text-sm custom-transition`}
             >
                 {dataLang?.productions_orders_filter || "productions_orders_filter"}
@@ -893,8 +884,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             <span className="3xl:size-4 size-3.5 shrink-0">
                 <CaretDownIcon
                     className={`${stateFilterDropdown?.open || activeFilterCount > 0
-                            ? "rotate-180"
-                            : "rotate-0"
+                        ? "rotate-180"
+                        : "rotate-0"
                         } w-full h-full custom-transition`}
                 />
             </span>
@@ -905,18 +896,18 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const triggerFilterStatus = (
         <button
             className={`${stateFilterDropdown?.open ||
-                    isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-                    ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
-                    : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
+                isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+                ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
+                : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
                 } relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}
         >
             <ChartDonutIcon className="absolute -translate-y-1/2 top-1/2 3xl:size-5 size-4" />
 
             <span
                 className={`${stateFilterDropdown?.open ||
-                        isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-                        ? "text-[#0F4F9E]"
-                        : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
+                    isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+                    ? "text-[#0F4F9E]"
+                    : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
                     } xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}
             >
                 {dataLang?.purchase_status || "purchase_status"}
@@ -925,9 +916,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             <span className="3xl:size-4 size-3.5 shrink-0">
                 <CaretDownIcon
                     className={`${stateFilterDropdown?.open ||
-                            isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-                            ? "rotate-180"
-                            : "rotate-0"
+                        isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+                        ? "rotate-180"
+                        : "rotate-0"
                         } w-full h-full custom-transition`}
                 />
             </span>
@@ -1045,20 +1036,24 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
     // console.log('isStateProvider: ', isStateProvider);
 
-
     return (
         <React.Fragment>
             <div ref={breadcrumbRef}>
-                {statusExprired ? (
-                    <EmptyExprired />
-                ) : (
-                    <React.Fragment>
-                        <BreadcrumbCustom
-                            items={breadcrumbItems}
-                            className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
-                        />
-                    </React.Fragment>
-                )}
+                {
+                    statusExprired ?
+                        (
+                            <EmptyExprired />
+                        )
+                        :
+                        (
+                            <React.Fragment>
+                                <BreadcrumbCustom
+                                    items={breadcrumbItems}
+                                    className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                                />
+                            </React.Fragment>
+                        )
+                }
             </div>
 
             <div ref={titleRef} className="flex items-center justify-between w-full">
@@ -1111,8 +1106,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                 }
                                 hideTitle={true}
                                 className={`${isOpenSearch
-                                        ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]"
-                                        : "rounded-lg text-[#9295A4] border-[#D0D5DD]"
+                                    ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]"
+                                    : "rounded-lg text-[#9295A4] border-[#D0D5DD]"
                                     } flex items-center justify-center 3xl:w-12 w-10 3xl:h-10 h-9 shrink-0 border`}
                                 onClick={toggleSearch}
                             />
@@ -1276,10 +1271,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     options={comboboxProductionOrders}
                                     classParent="ml-0 text-sm"
                                     classNamePrefix={"productionSmoothing"}
-                                    placeholder={
-                                        dataLang?.productions_orders_details_number ||
-                                        "productions_orders_details_number"
-                                    }
+                                    placeholder={dataLang?.productions_orders_details_number || "productions_orders_details_number"}
                                 />
                             </div>
 
@@ -1439,8 +1431,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                     renderLabel={(tab, activeTab) => (
                         <h3
                             className={`${isStateProvider?.productionsOrders?.isTabList?.id === tab.id
-                                    ? "text-[#0375F3] scale-[1.02]"
-                                    : "text-[#9295A4] scale-[1]"
+                                ? "text-[#0375F3] scale-[1.02]"
+                                : "text-[#9295A4] scale-[1]"
                                 } font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}
                         >
                             <span>{tab.name}</span>
@@ -1463,150 +1455,157 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             maxHeight: calcAvailableHeight("main"),
                         }}
                     >
-                        {isLoadingProductionOrderList ? (
-                            // (isLoadingProductionOrderList || isRefetching)
-                            <Loading className="h-full 3xl:h-full 2xl:h-full xl:h-full" />
-                        ) : flagProductionOrders?.length > 0 ? (
-                            flagProductionOrders?.map((item, eIndex) => {
-                                const color = {
-                                    0: {
-                                        color: "bg-[#FF811A]/15 text-[#C25705]",
-                                        title:
-                                            dataLang?.productions_orders_produced ??
-                                            "productions_orders_produced",
-                                    },
-                                    1: {
-                                        color: "bg-[#3ECeF7]/20 text-[#076A94]",
-                                        title:
-                                            dataLang?.productions_orders_in_progress ??
-                                            "productions_orders_in_progress",
-                                    },
-                                    2: {
-                                        color: "bg-[#35BD4B]/20 text-[#1A7526]",
-                                        title:
-                                            dataLang?.productions_orders_completed ??
-                                            "productions_orders_completed",
-                                    },
-                                };
+                        {
+                            isLoadingProductionOrderList ?
+                                (
+                                    <Loading className="h-full 3xl:h-full 2xl:h-full xl:h-full" />
+                                )
+                                :
+                                flagProductionOrders?.length > 0 ?
+                                    (
+                                        flagProductionOrders?.map((item, eIndex) => {
+                                            const color = {
+                                                0: {
+                                                    color: "bg-[#FF811A]/15 text-[#C25705]",
+                                                    title:
+                                                        dataLang?.productions_orders_produced ??
+                                                        "productions_orders_produced",
+                                                },
+                                                1: {
+                                                    color: "bg-[#3ECeF7]/20 text-[#076A94]",
+                                                    title:
+                                                        dataLang?.productions_orders_in_progress ??
+                                                        "productions_orders_in_progress",
+                                                },
+                                                2: {
+                                                    color: "bg-[#35BD4B]/20 text-[#1A7526]",
+                                                    title:
+                                                        dataLang?.productions_orders_completed ??
+                                                        "productions_orders_completed",
+                                                },
+                                            };
 
-                                return (
-                                    <div
-                                        key={item.id}
-                                        onClick={() => handleShow(item)}
-                                        className={`
+                                            return (
+                                                <div
+                                                    key={item.id}
+                                                    onClick={() => handleShowListDetail(item)}
+                                                    className={`
                                                         ${typePageMoblie
-                                                ? "px-px"
-                                                : "pl-1 pr-3"
-                                            }
+                                                            ? "px-px"
+                                                            : "pl-1 pr-3"
+                                                        }
                                                         ${item.id ==
-                                            isStateProvider
-                                                ?.productionsOrders
-                                                .idDetailProductionOrder &&
-                                            "bg-[#F0F7FF]"
-                                            }
+                                                        isStateProvider
+                                                            ?.productionsOrders
+                                                            .idDetailProductionOrder &&
+                                                        "bg-[#F0F7FF]"
+                                                        }
                                                         ${flagProductionOrders?.length -
-                                                1 ==
-                                                eIndex
-                                                ? "border-b-none"
-                                                : "border-b"
-                                            }
+                                                            1 ==
+                                                            eIndex
+                                                            ? "border-b-none"
+                                                            : "border-b"
+                                                        }
                                                         py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
-                                        style={{
-                                            background:
-                                                item.id ===
-                                                    isStateProvider?.productionsOrders
-                                                        .idDetailProductionOrder
-                                                    ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)"
-                                                    : "",
-                                        }}
-                                    >
-                                        {/* Gạch xanh bên trái */}
-                                        <div className="relative pl-5 xl:space-y-2 space-y-1.5">
-                                            {item.id ===
-                                                isStateProvider?.productionsOrders
-                                                    .idDetailProductionOrder && (
-                                                    <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
-                                                )}
-
-                                            {isStateProvider?.productionsOrders
-                                                .dataProductionOrderDetail?.title && (
-                                                    <span
-                                                        className={`${color[item?.status_manufacture]?.color
-                                                            } xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}
-                                                    >
-                                                        {color[item?.status_manufacture]?.title}
-                                                    </span>
-                                                )}
-                                            <h1 className="3xl:text-2xl xl:text-xl text-lg font-semibold text-[#003DA0]">
-                                                {item.reference_no}
-                                            </h1>
-
-                                            <div className="flex flex-col gap-0.5">
-                                                <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
-                                                    <span>
-                                                        {dataLang?.materials_planning_create_on ||
-                                                            "materials_planning_create_on"}
-                                                        {": "}
-                                                    </span>
-                                                    <span>
-                                                        {formatMoment(
-                                                            item?.date,
-                                                            FORMAT_MOMENT.DATE_SLASH_LONG
-                                                        )}
-                                                    </span>
-                                                </h3>
-
-                                                <div className="flex flex-wrap items-start gap-x-1">
-                                                    <span className="text-[#667085] whitespace-nowrap font-normal 3xl:text-base xl:text-sm text-xs">
-                                                        {dataLang?.materials_planning_foloww_up ||
-                                                            "materials_planning_foloww_up"}
-                                                        :
-                                                    </span>
-                                                    {item?.listObject?.map((i, index) => (
-                                                        <span
-                                                            key={index}
-                                                            className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs"
-                                                        >
-                                                            {i.reference_no}
-                                                            {index < item.listObject.length - 1 && (
-                                                                <span>,</span>
+                                                    style={{
+                                                        background:
+                                                            item.id ===
+                                                                isStateProvider?.productionsOrders
+                                                                    .idDetailProductionOrder
+                                                                ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)"
+                                                                : "",
+                                                    }}
+                                                >
+                                                    {/* Gạch xanh bên trái */}
+                                                    <div className="relative pl-5 xl:space-y-2 space-y-1.5">
+                                                        {item.id ===
+                                                            isStateProvider?.productionsOrders
+                                                                .idDetailProductionOrder && (
+                                                                <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
                                                             )}
-                                                        </span>
-                                                    ))}
-                                                </div>
 
-                                                <AnimatePresence initial={false}>
-                                                    {item.id ===
-                                                        isStateProvider?.productionsOrders
-                                                            .idDetailProductionOrder && (
-                                                            <motion.div
-                                                                key="extra-info"
-                                                                layout
-                                                                initial={{ height: 0, opacity: 0 }}
-                                                                animate={{ height: "auto", opacity: 1 }}
-                                                                exit={{ height: 0, opacity: 0 }}
-                                                                transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                                className="flex flex-col w-full overflow-hidden gap-0.5"
-                                                            >
-                                                                <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
-                                                                    <span>
-                                                                        {dataLang?.client_list_brand ||
-                                                                            "client_list_brand"}
-                                                                        :{" "}
+                                                        {isStateProvider?.productionsOrders
+                                                            .dataProductionOrderDetail?.title && (
+                                                                <span
+                                                                    className={`${color[item?.status_manufacture]?.color
+                                                                        } xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}
+                                                                >
+                                                                    {color[item?.status_manufacture]?.title}
+                                                                </span>
+                                                            )}
+                                                        <h1 className="3xl:text-2xl xl:text-xl text-lg font-semibold text-[#003DA0]">
+                                                            {item.reference_no}
+                                                        </h1>
+
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
+                                                                <span>
+                                                                    {dataLang?.materials_planning_create_on ||
+                                                                        "materials_planning_create_on"}
+                                                                    {": "}
+                                                                </span>
+                                                                <span>
+                                                                    {formatMoment(
+                                                                        item?.date,
+                                                                        FORMAT_MOMENT.DATE_SLASH_LONG
+                                                                    )}
+                                                                </span>
+                                                            </h3>
+
+                                                            <div className="flex flex-wrap items-start gap-x-1">
+                                                                <span className="text-[#667085] whitespace-nowrap font-normal 3xl:text-base xl:text-sm text-xs">
+                                                                    {dataLang?.materials_planning_foloww_up ||
+                                                                        "materials_planning_foloww_up"}
+                                                                    :
+                                                                </span>
+                                                                {item?.listObject?.map((i, index) => (
+                                                                    <span
+                                                                        key={index}
+                                                                        className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs"
+                                                                    >
+                                                                        {i.reference_no}
+                                                                        {index < item.listObject.length - 1 && (
+                                                                            <span>,</span>
+                                                                        )}
                                                                     </span>
-                                                                    <span>{item?.name_branch}</span>
-                                                                </h3>
-                                                            </motion.div>
-                                                        )}
-                                                </AnimatePresence>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <NoData className="mt-0" />
-                        )}
+                                                                ))}
+                                                            </div>
+
+                                                            <AnimatePresence initial={false}>
+                                                                {item.id ===
+                                                                    isStateProvider?.productionsOrders
+                                                                        .idDetailProductionOrder && (
+                                                                        <motion.div
+                                                                            key="extra-info"
+                                                                            layout
+                                                                            initial={{ height: 0, opacity: 0 }}
+                                                                            animate={{ height: "auto", opacity: 1 }}
+                                                                            exit={{ height: 0, opacity: 0 }}
+                                                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                            className="flex flex-col w-full overflow-hidden gap-0.5"
+                                                                        >
+                                                                            <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
+                                                                                <span>
+                                                                                    {dataLang?.client_list_brand ||
+                                                                                        "client_list_brand"}
+                                                                                    :{" "}
+                                                                                </span>
+                                                                                <span>{item?.name_branch}</span>
+                                                                            </h3>
+                                                                        </motion.div>
+                                                                    )}
+                                                            </AnimatePresence>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    )
+                                    :
+                                    (
+                                        <NoData className="mt-0" />
+                                    )
+                        }
 
                         {hasNextPageProductionOrderList && (
                             <LoadingComponent ref={refInviewListLsx} />

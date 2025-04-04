@@ -323,7 +323,7 @@ const ProductionSteps = ({ stages }) => {
                     </div>
 
                     {/* Cột nội dung */}
-                    <div className="3xl:col-span-6 col-span-11 flex items-center gap-1 text-sm-default">
+                    <div className="3xl:col-span-6 col-span-11 flex items-center gap-1 3xl:text-sm xl:text-xs lg:text-[11px] text-xs">
                         <span className="text-[#1FC583] font-medium">Xem thêm</span>
                         <span className="text-[#9295A4]">(+{hiddenCount} công đoạn)</span>
                         <PiCaretDownBold className='size-4 shrink-0 text-[#1FC583]' />
@@ -343,7 +343,7 @@ const ProductionSteps = ({ stages }) => {
             )} */}
 
             {showAll && stepFake.length > 2 && (
-                <div className="flex items-center justify-center gap-2 cursor-pointer text-[#1FC583] text-center text-sm-default 3xl:mt-2 mt-0.5" onClick={() => setShowAll(false)}>
+                <div className="flex items-center justify-center gap-2 cursor-pointer text-[#1FC583] text-center 3xl:text-sm xl:text-xs lg:text-[11px] text-xs 3xl:mt-2 mt-0.5" onClick={() => setShowAll(false)}>
                     <span>
                         Thu gọn
                     </span>
