@@ -8,7 +8,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Bar = dynamic(() => import("@ant-design/plots").then(({ Bar }) => Bar), { ssr: false });
 
-const StackedBarChart2 = memo(({ rawData }) => {
+const StackedBarChart = memo(({ rawData }) => {
     const dataSeting = useSetingServer();
 
     const formatNumber = useCallback((num) => formatNumberConfig(+num, dataSeting), [dataSeting]);
@@ -146,4 +146,4 @@ const StackedBarChart2 = memo(({ rawData }) => {
     )
 })
 
-export default StackedBarChart2;
+export default StackedBarChart;

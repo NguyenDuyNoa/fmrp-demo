@@ -159,7 +159,7 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
     return (
         <div className='flex flex-col 3xl:gap-6 gap-4'>
             <div className='flex items-center justify-between gap-2'>
-                <div className='text-title-small font-medium text-[#11315B] capitalize'>
+                <div className='3xl:text-xl xl:text-lg text-base font-medium text-[#11315B] capitalize'>
                     chi phí NVL sản xuất tại xưởng
                 </div>
 
@@ -335,7 +335,7 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
                 </div>
 
                 {
-                    flagMaterialCost?.length > 0 &&
+                    flagMaterialCost?.length > 0 && !isLoadingTable &&
                     <div className='col-span-16 flex item justify-between'>
                         <div />
                         {

@@ -635,58 +635,60 @@ const MainTable = ({ dataLang }) => {
                                 </h1>
                             </div>
                             <div className="flex gap-4">
-                                {arrButton.map((e) => (
-                                    <Zoom
-                                        key={e.id}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 1.08 }}
-                                        className="w-fit"
-                                    >
-                                        {(e.id == 3 && (
-                                            <button
-                                                className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                                                onClick={() => {
-                                                    if (+dataTable?.countAll == 0) {
-                                                        return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
-                                                    }
-                                                    if (e.id == 3) {
-                                                        queryValue({ page: 1 });
-                                                        handleQueryId({ status: true, id: dataTable.listDataRight?.idCommand });
-                                                    }
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-2 px-3 py-2 ">
-                                                    {e.icon}
-                                                    <h3 className="text-xs font-medium text-red-600 3xl:text-base">
-                                                        {e.name}
-                                                    </h3>
-                                                </div>
-                                            </button>
-                                        )) ||
-                                            (e.id == 1 && (
-                                                <PopupKeepStock
-                                                    id={e.id}
-                                                    queryValue={queryValue}
-                                                    fetchDataTable={fetchDataTable}
-                                                    dataLang={dataLang}
-                                                    title={e.name}
-                                                    dataTable={dataTable}
-                                                    icon={e.icon}
-                                                />
+                                {
+                                    arrButton.map((e) => (
+                                        <Zoom
+                                            key={e.id}
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 1.08 }}
+                                            className="w-fit"
+                                        >
+                                            {(e.id == 3 && (
+                                                <button
+                                                    className="bg-red-100 rounded-lg outline-none focus:outline-none"
+                                                    onClick={() => {
+                                                        if (+dataTable?.countAll == 0) {
+                                                            return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
+                                                        }
+                                                        if (e.id == 3) {
+                                                            queryValue({ page: 1 });
+                                                            handleQueryId({ status: true, id: dataTable.listDataRight?.idCommand });
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-2 px-3 py-2 ">
+                                                        {e.icon}
+                                                        <h3 className="text-xs font-medium text-red-600 3xl:text-base">
+                                                            {e.name}
+                                                        </h3>
+                                                    </div>
+                                                </button>
                                             )) ||
-                                            (e.id == 2 && (
-                                                <PopupPurchaseBeta
-                                                    id={e.id}
-                                                    queryValue={queryValue}
-                                                    fetchDataTable={fetchDataTable}
-                                                    dataLang={dataLang}
-                                                    title={e.name}
-                                                    dataTable={dataTable}
-                                                    icon={e.icon}
-                                                />
-                                            ))}
-                                    </Zoom>
-                                ))}
+                                                (e.id == 1 && (
+                                                    <PopupKeepStock
+                                                        id={e.id}
+                                                        queryValue={queryValue}
+                                                        fetchDataTable={fetchDataTable}
+                                                        dataLang={dataLang}
+                                                        title={e.name}
+                                                        dataTable={dataTable}
+                                                        icon={e.icon}
+                                                    />
+                                                )) ||
+                                                (e.id == 2 && (
+                                                    <PopupPurchaseBeta
+                                                        id={e.id}
+                                                        queryValue={queryValue}
+                                                        fetchDataTable={fetchDataTable}
+                                                        dataLang={dataLang}
+                                                        title={e.name}
+                                                        dataTable={dataTable}
+                                                        icon={e.icon}
+                                                    />
+                                                ))}
+                                        </Zoom>
+                                    ))
+                                }
                             </div>
                         </div>
                         <div className="mx-4">

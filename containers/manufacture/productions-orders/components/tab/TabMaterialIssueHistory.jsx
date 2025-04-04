@@ -394,7 +394,7 @@ const TabMaterialIssueHistory = ({ dataLang, ...props }) => {
                 </div>
 
                 {
-                    flagMaterialIssueHistory?.length > 0 &&
+                    flagMaterialIssueHistory?.length > 0 && !isLoadingTable &&
                     <div className='col-span-16 flex item justify-between'>
                         <div />
 

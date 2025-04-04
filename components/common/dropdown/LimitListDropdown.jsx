@@ -51,7 +51,7 @@ const LimitListDropdown = ({ sLimit, limit, dataLang, total }) => {
     }, []);
 
     return (
-        <div className="flex items-center gap-2 text-[#9295A4] 3xl:text-sm text-[13px]" ref={dropdownRef}>
+        <div className="flex items-center gap-2 text-[#9295A4] 3xl:text-sm text-[13px] mt-1" ref={dropdownRef}>
             <span>{dataLang?.display || "Hiển thị"}</span>
 
             <div className="relative">

@@ -729,3 +729,15 @@ body {
     @apply 3xl:text-xs xl:text-[10px] lg:text-[10px] text-[10px] 3xl:placeholder:text-xs placeholder:text-[10px] tracking-[1%];
   }
 }
+
+@keyframes skeleton-loading {
+    0% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.4;
+    }
+}
