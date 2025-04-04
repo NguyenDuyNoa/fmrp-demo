@@ -15,11 +15,11 @@ const PopupQRCode = ({ urlQR }) => {
       style={{
         boxShadow: `0px 20px 40px -8px rgba(16, 24, 40, 0.1)`,
       }}
-      className={`bg-[#ffffff] xlg:p-9 p-8 rounded-[24px] min-w-[478] h-fit relative flex flex-col gap-y-8 justify-center items-center ${deca.className}`}
+      className={`bg-[#ffffff] xlg:p-9 p-8 lg:p-7 rounded-[24px] min-w-[478] h-fit relative flex flex-col xlg:gap-y-8 gap-y-6 justify-center items-center ${deca.className}`}
     >
       <div className="flex items-start justify-between relative w-full">
         <div className="flex items-center justify-center flex-1 px-5">
-          <p className=" lgd:text-xl lg:text-2xl font-semibold leading-8 text-[#0375F3] text-center capitalize">
+          <p className=" lgd:text-xl lg:text-xl std:text-2xl font-semibold leading-8 text-[#0375F3] text-center capitalize">
             Sử dụng app FMRP để <br /> hoàn thành công đoạn ngay
           </p>
         </div>
@@ -39,7 +39,7 @@ const PopupQRCode = ({ urlQR }) => {
           </button>
         </div>
       </div>
-      <div className="w-[285px] h-auto aspect-1 relative overflow-hidden">
+      <div className="w-[250px] xlg:w-[285px] h-auto aspect-1 relative overflow-hidden">
         <Image
           src={urlQR ? urlQR : "/qrCode/QR.png"}
           fill
@@ -51,23 +51,21 @@ const PopupQRCode = ({ urlQR }) => {
       </div>
 
       <div className="flex flex-row justify-center items-center gap-x-[18px]">
-        <div className="w-[197px] h-[57px] relative">
+        <div className="w-[160px] h-[50px] xlg:w-[197px] xlg:h-[57px] relative">
           <Image
             src="/popup/appstore.png"
             fill
             className="object-contain"
             alt="appstore"
-            quality={100}
             loading="eager"
           />
         </div>
-        <div className="w-[197px] h-[57px] relative">
+        <div className="w-[160px] h-[50px] xlg:w-[197px] xlg:h-[57px]  relative">
           <Image
             src="/popup/googleplay.png"
             fill
             className="object-contain"
             alt="google"
-            quality={100}
             loading="eager"
           />
         </div>
