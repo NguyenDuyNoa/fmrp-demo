@@ -4,7 +4,8 @@ import Image from "next/image";
 const IMAGE_TYPE = {
     notificationheader: '/icon/nodata-noti-final.svg',
     dashboard: '/icon/task.svg',
-    table: "/background/system/nodata-table-2.svg"
+    table: "/background/system/nodata-table-2.svg",
+    comment: "/background/system/message_empty.svg"
 };
 
 const NoData = ({
@@ -16,7 +17,13 @@ const NoData = ({
 }) => {
     const imageSrc = IMAGE_TYPE[type] || "/icon/nodata_ok.svg";
     const isTable = type === "table";
-    const title = isTable ? "Chưa có dữ liệu" : "Không tìm thấy các mục";
+    const isComment = type === "comment";
+    const title = isTable ?
+        ("Chưa có dữ liệu")
+        :
+        (
+            isComment ? "Chưa có bình luận. Hãy thảo luận trao đổi tình hình sản xuất ngay!" : "Không tìm thấy các mục"
+        )
 
     return (
         <motion.div

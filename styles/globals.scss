@@ -299,17 +299,16 @@ body {
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: radial-gradient(
-      50% 93.75% at 50% 6.25%,
-      #a3eed6 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
+    background: radial-gradient(50% 93.75% at 50% 6.25%, #a3eed6 0%, rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
     z-index: 1;
 
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
 
-    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
     mask-composite: exclude;
     -webkit-mask-composite: xor; /* hoặc destination-out */
@@ -317,12 +316,7 @@ body {
   }
 
   &:hover::before {
-    background: conic-gradient(
-      from var(--angle),
-      #a3eed6,
-      rgba(255, 255, 255, 0),
-      #a3eed6
-    );
+    background: conic-gradient(from var(--angle), #a3eed6, rgba(255, 255, 255, 0), #a3eed6);
     padding: 2px;
     animation: borderMove 1.5s linear infinite;
   }
@@ -475,8 +469,7 @@ body {
 .CircularProgressbar .CircularProgressbar-background {
   fill: #d6d6d6;
 }
-.CircularProgressbar.CircularProgressbar-inverted
-  .CircularProgressbar-background {
+.CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-background {
   fill: #3e98c7;
 }
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-text {
@@ -731,13 +724,28 @@ body {
 }
 
 @keyframes skeleton-loading {
-    0% {
-        opacity: 0.4;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0.4;
-    }
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.image-gallery-image {
+  @apply max-h-[600px];
+}
+
+.image-gallery-thumbnails-container {
+  @apply absolute bottom-10 mx-auto w-full;
+
+  .image-gallery-thumbnail {
+    @apply w-auto h-auto;
+  }
+  .image-gallery-thumbnail-image {
+    @apply max-h-[150px] w-auto;
+  }
 }

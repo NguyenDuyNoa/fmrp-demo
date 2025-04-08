@@ -5,10 +5,20 @@ import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "
 import dynamic from "next/dynamic";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import ButtonAnimationNew from "@/components/common/button/ButtonAnimationNew";
+import { PiImageBold, PiTable } from "react-icons/pi";
+import ExcelFileComponent from "@/components/common/excel/ExcelFileComponent";
+import html2canvas from "html2canvas";
+import Loading from "@/components/UI/loading/loading";
 
 const Bar = dynamic(() => import("@ant-design/plots").then(({ Bar }) => Bar), { ssr: false });
 
-const StackedBarChart = memo(({ rawData }) => {
+const StackedBarChart = memo(({ rawData, dataLang, multiDataSet, isLoadingMaterialOutput }) => {
+    const chartInstanceRef = useRef(null);
+
+    const onReady = (plot) => {
+        chartInstanceRef.current = plot;
+    };
     const dataSeting = useSetingServer();
 
     const formatNumber = useCallback((num) => formatNumberConfig(+num, dataSeting), [dataSeting]);
@@ -135,12 +145,60 @@ const StackedBarChart = memo(({ rawData }) => {
         },
     };
 
+    const handleExportPNG = useCallback(() => {
+        const chart = chartInstanceRef.current;
+        if (!chart) return;
+
+        // Cách 1 (dễ nhất): dùng API gốc của G2Plot
+        chart.downloadImage?.("chart", "image/png");
+
+        // Cách 2: dùng dataURL (nếu cần custom)
+        // const dataUrl = chart.toDataURL?.("image/png");
+        // if (dataUrl) {
+        //   const link = document.createElement("a");
+        //   link.download = "chart.png";
+        //   link.href = dataUrl;
+        //   link.click();
+        // } else {
+        //   console.error("Không thể lấy hình ảnhs từ chart.");
+        // }
+    }, []);
+
     return (
-        <div className="bg-white w-full min-h-[330px] px-4 pt-4 pb-2 ">
-            <Bar {...config} />
+        <div className="bg-white w-full min-h-[330px] px-4 pt-4 pb-2">
+            {
+                isLoadingMaterialOutput ?
+                    <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full col-span-16' />
+                    :
+                    <div ref={chartInstanceRef} className="chart-wrapper" >
+                        <Bar {...config} onReady={(plot) => chartInstanceRef.current = plot} />
+                    </div>
+            }
             <div className="flex justify-end gap-2 mt-4">
-                <button className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-100">📤 Xuất PNG</button>
-                <button className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-100">📊 Xuất Excel</button>
+                {/* <button className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-100">📤 Xuất PNG</button> */}
+                {/* <button className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-100">📊 Xuất Excel</button> */}
+                <ButtonAnimationNew
+                    onClick={handleExportPNG}
+                    icon={
+                        <PiImageBold className='xl:size-4 size-3.5' />
+                    }
+                    title="Xuất PNG"
+                    className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
+                />
+                <ExcelFileComponent
+                    dataLang={dataLang}
+                    filename={"Danh sách dữ liệu thu hồi NVL"}
+                    multiDataSet={multiDataSet}
+                    title="DSDL Thu hồi NVL"
+                >
+                    <ButtonAnimationNew
+                        icon={
+                            <PiTable className='xl:size-4 size-3.5' />
+                        }
+                        title="Xuất Excel"
+                        className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
+                    />
+                </ExcelFileComponent>
             </div>
         </div>
     )

@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react'
-import { PiTable } from 'react-icons/pi';
+import { PiCaretDownBold, PiTable } from 'react-icons/pi';
 import { useMaterialCost } from '@/managers/api/productions-order/useMaterialCost';
 import { StateContext } from '@/context/_state/productions-orders/StateContext';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -357,9 +357,12 @@ const TabMaterialCost = ({ dataLang, ...props }) => {
                                             });
                                         }}
                                         disabled={isFetchingNextPage}
-                                        className="text-[#667085] 3xl:text-base text-sm hover:underline"
+                                        className="flex items-center gap-2 text-[#667085] 3xl:text-base text-sm hover:underline"
                                     >
-                                        Xem thêm mặt hàng
+                                         <span>
+                                            Xem Thêm Mặt Hàng
+                                        </span>
+                                        <PiCaretDownBold className='3xl:size-5 size-4' />
                                     </button>
                                 </div>
                             )

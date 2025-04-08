@@ -12,6 +12,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      aspectRatio: {
+        '16/9': '16 / 9',
+      },
       boxShadow: {
         "hover-button": "0px 1px 2px 0px #1018280D",
       },

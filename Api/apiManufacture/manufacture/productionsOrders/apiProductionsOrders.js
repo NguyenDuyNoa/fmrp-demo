@@ -114,5 +114,11 @@ const apiProductionsOrders = {
         const response = await axiosCustom('DELETE', `/api_web/api_manufactures/deleteProductionOrders/${id}`);
         return response.data
     },
+
+    // get list comment
+    async apiGetListComment({ page = 1, limit = 3, type = "", post_id = "" }, data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Comments_Chat/getComments?page=${page}&limit=${limit}&type=${type}&post_id=${post_id}`, data);
+        return response.data
+    },
 }
 export default apiProductionsOrders

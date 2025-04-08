@@ -9,7 +9,7 @@ import { StateContext } from '@/context/_state/productions-orders/StateContext'
 import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
 import React, { useCallback, useContext, useMemo, useState } from 'react'
-import { PiTable } from 'react-icons/pi'
+import { PiCaretDownBold, PiTable } from 'react-icons/pi'
 import ModalImage from 'react-modal-image'
 import { useDebounce } from 'use-debounce'
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -330,7 +330,12 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                 // <>
                 //     Hello
                 // </>
-                <StackedBarChart rawData={dataMaterialOutput} />
+                <StackedBarChart
+                    rawData={dataMaterialOutput}
+                    dataLang={dataLang}
+                    multiDataSet={multiDataSet}
+                    isLoadingMaterialOutput={isLoadingMaterialOutput}
+                />
                 // <StackedBarChart2 rawData={dataChartFake} />
             }
             {
@@ -476,8 +481,13 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
                                     // (dataMaterialOutputi?.length || 0) > (visibleProducts["info"] || 4) && (
                                     (limit < filteredData.length) && (
                                         <div className=" flex justify-center py-2">
-                                            <button onClick={() => setLimit(filteredData.length)} className="text-[#667085] 3xl:text-base xl:text-sm text-xs hover:underline">
-                                                Xem thêm mặt hàng ({filteredData.length - limit}) Thành phẩm
+                                            <button onClick={() => setLimit(filteredData.length)} className="flex items-center gap-2 text-[#667085] 3xl:text-base xl:text-sm text-xs hover:underline">
+                                                <div className='space-x-2'>
+                                                    <span>Xem Thêm</span>
+                                                    <span>({filteredData.length - limit})</span>
+                                                    <span>Nguyên Vật Liệu</span>
+                                                </div>
+                                                <PiCaretDownBold className='3xl:size-5 size-4' />
                                             </button>
                                         </div>
                                     )
