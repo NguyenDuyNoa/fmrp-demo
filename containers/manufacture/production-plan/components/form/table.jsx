@@ -21,39 +21,45 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable })
     return (
         <>
             <div className="grid grid-cols-13 items-center bg-[#F7F8F9] rounded sticky top-0 z-[200]">
-                <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs uppercase flex items-center">
-                    <h3 className="text-[#64748B] w-fit py-2 px-6 font-medium 3xl:text-sm text-xs uppercase">
+                <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs capitalize flex items-center">
+                    <h3 className="text-[#64748B] w-fit py-2 px-6 font-medium 3xl:text-sm text-xs capitalize">
                         Stt
                     </h3>
-                    <h3 className="text-[#64748B] w-full py-2 px-4 font-medium 3xl:text-sm text-xs uppercase whitespace-nowrap">
+                    <h3 className="text-[#64748B] w-full py-2 px-4 font-medium 3xl:text-sm text-xs capitalize whitespace-nowrap">
                         {getLocalStorageTab == "order" ? "Đơn hàng" : "Kế hoạch nội bộ"}
                     </h3>
                 </h3>
-                <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    {dataLang?.production_plan_form_materials_finished_product || 'production_plan_form_materials_finished_product'}
+                <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
+                    Thành phẩm
+                    {/* {dataLang?.production_plan_form_materials_finished_product || 'production_plan_form_materials_finished_product'} */}
                 </h3>
-                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    {dataLang?.production_plan_form_materials_bom_rate || 'production_plan_form_materials_bom_rate'}
+                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
+                    Định mức BOM
+                    {/* {dataLang?.production_plan_form_materials_bom_rate || 'production_plan_form_materials_bom_rate'} */}
                 </h3>
-                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    {dataLang?.production_plan_form_materials_unit || 'production_plan_form_materials_unit'}
+                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
+                    Đơn vị
+                    {/* {dataLang?.production_plan_form_materials_unit || 'production_plan_form_materials_unit'} */}
                 </h3>
-                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    {dataLang?.production_plan_form_materials_stage || 'production_plan_form_materials_stage'}
+                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
+                    Công đoạn
+                    {/* {dataLang?.production_plan_form_materials_stage || 'production_plan_form_materials_stage'} */}
                 </h3>
-                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    {dataLang?.production_plan_form_materials_in_stock || 'production_plan_form_materials_in_stock'}
+                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
+                    SL Trong kho
+                    {/* {dataLang?.production_plan_form_materials_in_stock || 'production_plan_form_materials_in_stock'} */}
                 </h3>
-                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                    {dataLang?.production_plan_form_materials_need || 'production_plan_form_materials_need'}
+                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
+                    SL Cần
+                    {/* {dataLang?.production_plan_form_materials_need || 'production_plan_form_materials_need'} */}
                 </h3>
-                <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
+                <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
                     {dataLang?.production_plan_form_materials_timeline || 'production_plan_form_materials_timeline'}
                 </h3>
-                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
+                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
                     {dataLang?.production_plan_form_materials_expected || 'production_plan_form_materials_expected'}
                 </h3>
-                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
+                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
                     {dataLang?.production_plan_form_materials_task || 'production_plan_form_materials_task'}
                 </h3>
             </div>

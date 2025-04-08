@@ -1,5 +1,5 @@
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container } from "@/components/UI/common/layout";
+import { Container, LayOutTableDynamic } from "@/components/UI/common/layout";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import Head from "next/head";
 import Header from "./components/header/header";
@@ -13,17 +13,32 @@ const MaterialsPlanning = (props) => {
 
     const propsDefault = { dataLang };
 
+
     return (
         <>
-            <Head>
-                <title>{dataLang?.materials_planning || 'materials_planning'}</title>
-            </Head>
-            <Container>
+            <LayOutTableDynamic
+                head={
+                    <Head>
+                        <title>{dataLang?.materials_planning || 'materials_planning'}</title>
+                    </Head>
+                }
+                breadcrumb={
+                    <>
+                        {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}
+                    </>
+                }
+                table={
+                    <ProductionsOrdersProvider>
+                        <MainTable {...propsDefault} />
+                    </ProductionsOrdersProvider>
+                }
+            />
+            {/* <Container>
                 {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}
                 <ProductionsOrdersProvider>
                     <MainTable {...propsDefault} />
                 </ProductionsOrdersProvider>
-            </Container>
+            </Container> */}
         </>
     );
 };

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container } from "@/components/UI/common/layout";
+import { Container, LayOutTableDynamic } from "@/components/UI/common/layout";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
@@ -18,6 +18,7 @@ import Materials from "./components/materials/materials";
 import Products from "./components/products/products";
 import Supplier from "./components/supplier/supplier";
 import TabClient from "./components/tabExport";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const Export = (props) => {
     const initsArr = {
@@ -125,7 +126,8 @@ const Export = (props) => {
         Axios("GET", `${apiUrlComLumn}`, {}, (err, response) => {
             if (!err) {
                 const arrData = response.data;
-                const db = { ...arrData };
+                const db = arrData
+                // const db = { ...arrData };
                 sDataColumn((tabPage == 3 && { materials: db }) || (tabPage == 4 && { products: db }) || db);
             }
         });
@@ -150,13 +152,15 @@ const Export = (props) => {
             (err, response) => {
                 if (!err) {
                     var db = response.data;
-                    const data = db?.map((e) => ({
-                        label: e?.code,
-                        value: e?.id,
-                        date: formatMoment(e?.date_create, FORMAT_MOMENT.DATE_SLASH_LONG),
-                        setup_colums: e?.setup_colums,
-                    }));
-                    sDataTemplate(data);
+                    if (Array.isArray(db)) {
+                        const data = db?.map((e) => ({
+                            label: e?.code,
+                            value: e?.id,
+                            date: formatMoment(e?.date_create, FORMAT_MOMENT.DATE_SLASH_LONG),
+                            setup_colums: e?.setup_colums,
+                        }));
+                        sDataTemplate(data);
+                    }
                 }
                 sOnFetchTemple(false);
             }
@@ -535,26 +539,45 @@ const Export = (props) => {
         HandlePushItem,
         dataEmty: arrEmty,
     };
+
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `Export dữ liệu`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.import_category || "import_category"}`,
+        },
+    ];
+
     return (
-        <div>
-            <Head>
-                <title>{"Export dữ liệu"}</title>
-            </Head>
-            <Container className="!h-auto">
-                {statusExprired ? (
-                    <EmptyExprired />
-                ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">Export dữ liệu</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.import_category || "import_category"}</h6>
-                    </div>
-                )}
-                <div className="flex flex-col gap-3 mx-auto">
-                    <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+        <>
+            <LayOutTableDynamic
+                head={
+                    <Head>
+                        <title>{"Export dữ liệu"}</title>
+                    </Head>
+                }
+                breadcrumb={
+                    <>
+                        {statusExprired ? (
+                            <EmptyExprired />
+                        ) : (
+                            <Breadcrumb
+                                items={breadcrumbItems}
+                                className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                            />
+                        )}
+                    </>
+                }
+                titleButton={
+                    <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                         Export dữ liệu danh mục
                     </h2>
-                    <div className="flex items-center col-span-6 gap-4 flex-nowrap ">
+                }
+                fillterTab={
+                    <div className="flex items-center col-span-6 gap-4 flex-nowrap h-fit">
                         {dataTab &&
                             dataTab.map((e) => {
                                 return (
@@ -571,7 +594,9 @@ const Export = (props) => {
                                 );
                             })}
                     </div>
-                    <div className="">
+                }
+                table={
+                    <div className="flex flex-col w-full h-full">
                         <TitleHeader {...objectProps} />
                         {onFetchTemple ? (
                             <Loading />
@@ -582,7 +607,12 @@ const Export = (props) => {
                             (tabPage == 4 && <Products {...objectProps} />)
                         )}
                     </div>
+                }
+                showTotal={true}
+                total={
                     <Progress multipleProgress={multipleProgress} />
+                }
+                pagination={
                     <BtnParent
                         sPageLimit={sPageLimit}
                         {...objectProps}
@@ -600,9 +630,9 @@ const Export = (props) => {
                         sMultipleProgress={sMultipleProgress}
                         _HandleSubmit={_HandleSubmit}
                     />
-                </div>
-            </Container>
-        </div>
+                }
+            />
+        </>
     );
 };
 export default Export;

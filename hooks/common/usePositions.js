@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 export const usePositionLits = () => {
     const dispatch = useDispatch();
     return useQuery({
-        queryKey: ["api_position"],
+        queryKey: ["api_position_list"],
         queryFn: async () => {
 
             const { rResult } = await apiSatff.apiListPositionOption({});

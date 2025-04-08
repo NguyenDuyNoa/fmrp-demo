@@ -26,6 +26,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import PopupProduct from "./components/popupProduct";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 const InventoryForm = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
@@ -464,6 +465,20 @@ const InventoryForm = (props) => {
     // Trong render của component
     const duplicateIds = checkDuplicateSerial();
 
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.Warehouse_title || "Warehouse_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.inventory_title || "inventory_title"}`,
+            href: "/manufacture/inventory",
+        },
+        {
+            label: `Thêm Phiếu Kiểm Kê Kho`,
+        },
+    ];
     return (
         <>
             <Head>
@@ -471,27 +486,21 @@ const InventoryForm = (props) => {
             </Head>
 
             <Container className={"!h-auto"}>
-                <PopupStatus
-                    dataErr={dataErr}
-                    sDataErr={sDataErr}
-                    isSubmitted={isSubmitted}
-                    sIsSubmitted={sIsSubmitted}
-                    db={sDataChoose}
-                    dataChoose={dataChoose}
-                    dataLang={dataLang}
-                    errData={errData}
-                    setOpen={true}
-                />
+
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">Kiểm kê kho</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>Thêm phiếu kiểm kê kho</h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
+                    // <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                    //     <h6 className="text-[#141522]/40">Kiểm kê kho</h6>
+                    //     <span className="text-[#141522]/40">/</span>
+                    //     <h6>Thêm phiếu kiểm kê kho</h6>
+                    // </div>
                 )}
-                <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                     Thêm Phiếu Kiểm Kê Kho
                 </h2>
                 <div className="space-y-5">
@@ -1068,6 +1077,17 @@ const InventoryForm = (props) => {
                     </div>
                 </div>
             </Container>
+            <PopupStatus
+                dataErr={dataErr}
+                sDataErr={sDataErr}
+                isSubmitted={isSubmitted}
+                sIsSubmitted={sIsSubmitted}
+                db={sDataChoose}
+                dataChoose={dataChoose}
+                dataLang={dataLang}
+                errData={errData}
+                setOpen={true}
+            />
         </>
     );
 };

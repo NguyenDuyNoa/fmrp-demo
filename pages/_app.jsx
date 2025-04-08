@@ -47,7 +47,7 @@ const Index = (props) => {
                 <Suspense fallback={<LoadingPage />}>
                     <Provider store={store}>
                         {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
-                        <main className={deca.className}>
+                        <main className={` border-gradient ${deca.className}`}>
                             <StateProvider>
                                 <SheetProvider {...props}>
                                     {/* <main className={deca.className}> */}

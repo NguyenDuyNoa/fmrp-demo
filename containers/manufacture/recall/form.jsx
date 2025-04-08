@@ -36,6 +36,7 @@ import { useRecallItems } from "./hooks/useRecallItems";
 import { optionsQuery } from "@/configs/optionsQuery";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 const RecallForm = (props) => {
     const router = useRouter();
 
@@ -547,6 +548,20 @@ const RecallForm = (props) => {
 
     const handleCheckError = (e) => isShow("error", `${e}`);
 
+
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.Warehouse_title || "Warehouse_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.recall_title || "recall_title"}`,
+            href: "/manufacture/recall?tab=all",
+        },
+        {
+            label: id ? dataLang?.recall_title_edit || "recall_title_edit" : dataLang?.recall_title_add || "recall_title_add"
+        },
+    ];
     return (
         <React.Fragment>
             <Head>
@@ -559,17 +574,14 @@ const RecallForm = (props) => {
                     {statusExprired ? (
                         <EmptyExprired />
                     ) : (
-                        <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                            <h6 className="text-[#141522]/40">{dataLang?.recall_title || "recall_title"}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id ? dataLang?.recall_title_edit || "recall_title_edit" : dataLang?.recall_title_add || "recall_title_add"}
-                            </h6>
-                        </div>
+                        <Breadcrumb
+                            items={breadcrumbItems}
+                            className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                        />
                     )}
 
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {id ? dataLang?.recall_title_edit || "recall_title_edit" : dataLang?.recall_title_add || "recall_title_add"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">

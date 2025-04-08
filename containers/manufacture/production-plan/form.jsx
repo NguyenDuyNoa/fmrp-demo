@@ -18,6 +18,7 @@ import { useBranchList } from "@/hooks/common/useBranch";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useMutation } from "@tanstack/react-query";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const InFo = dynamic(() => import("./components/form/info"), { ssr: false });
 const Table = dynamic(() => import("./components/form/table"), { ssr: false });
@@ -270,6 +271,20 @@ const ProductionPlanForm = (props) => {
         dataLang
     };
 
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `Sản xuất`,
+            // href: "/",
+        },
+        {
+            label: `Kế hoạch sản xuất`,
+            href: "/manufacture/production-plan?tab=order",
+        },
+        {
+            label: dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'
+        },
+    ];
     return (
         <>
             <Head>
@@ -279,15 +294,19 @@ const ProductionPlanForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.production_plan_form_materials_planning || 'production_plan_form_materials_planning'}</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'}</h6>
-                    </div>
+                    <Breadcrumb
+                        items={breadcrumbItems}
+                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                    />
+                    // <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                    //     <h6 className="text-[#141522]/40">{dataLang?.production_plan_form_materials_planning || 'production_plan_form_materials_planning'}</h6>
+                    //     <span className="text-[#141522]/40">/</span>
+                    //     <h6>{dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'}</h6>
+                    // </div>
                 )}
                 <ContainerBody>
                     <div className="flex items-center justify-between mt-1 mr-2">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             {dataLang?.production_plan_form_add || 'production_plan_form_add'}
                         </h2>
                         <div className="flex items-center gap-2">

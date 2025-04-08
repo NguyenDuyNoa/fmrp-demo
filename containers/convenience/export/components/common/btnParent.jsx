@@ -38,11 +38,11 @@ const BtnParent = ({
     const { checkExport } = useActionRole(
         auth,
         (tabPage == 1 && "client_customers") ||
-            (tabPage == 2 && "suppliers") ||
-            (tabPage == 3 && "materials") ||
-            (tabPage == 4 && "products") ||
-            (tabPage == 5 && "products") ||
-            (tabPage == 6 && "products")
+        (tabPage == 2 && "suppliers") ||
+        (tabPage == 3 && "materials") ||
+        (tabPage == 4 && "products") ||
+        (tabPage == 5 && "products") ||
+        (tabPage == 6 && "products")
         // ... thêm các type
     );
 
@@ -133,11 +133,10 @@ const BtnParent = ({
 
         XLSX.writeFile(
             wb,
-            `${"Export dữ liệu"}${
-                (tabPage == 1 && "danh mục khách hàng") ||
-                (tabPage == 2 && "danh mục nhà cung cấp") ||
-                (tabPage == 3 && "danh mục nguyên vật liệu") ||
-                (tabPage == 4 && "danh mục thành phẩm")
+            `${"Export dữ liệu"}${(tabPage == 1 && "danh mục khách hàng") ||
+            (tabPage == 2 && "danh mục nhà cung cấp") ||
+            (tabPage == 3 && "danh mục nguyên vật liệu") ||
+            (tabPage == 4 && "danh mục thành phẩm")
             }.xlsx`
         );
     };
@@ -145,13 +144,12 @@ const BtnParent = ({
     return (
         <div className="col-span-12 mt-2 grid-cols-10 grid gap-2.5 justify-center">
             <div className="col-span-2">
-                <div className="w-full relative group">
+                <div className="relative w-full group">
                     <NumericFormat
                         id="page"
                         onChange={(e) => sPageLimit((prevState) => ({ ...prevState, page: e.target.value }))}
                         value={pageLimit.page}
-                        className="w-full p-2 xl:text-sm text-xs peer bg-white outline-none focus:border-blue-400 transition-all duration-200 ease-in-out 
-                     border-gray-300 border rounded"
+                        className="w-full p-2 text-xs transition-all duration-200 ease-in-out bg-white border border-gray-300 rounded outline-none xl:text-sm peer focus:border-blue-400"
                         thousandSeparator=","
                         allowNegative={false}
                         decimalScale={0}
@@ -165,22 +163,18 @@ const BtnParent = ({
                     />
                     <label
                         htmlFor="page"
-                        className="transform transition-all absolute top-0 left-0 h-full flex items-center pl-2 xl:text-sm text-xs
-                        group-focus-within:text-xs peer-valid:text-xs group-focus-within:h-1/2 peer-valid:h-1/2 group-focus-within:text-blue-400 duration-200 ease-in-out 
-                        group-focus-within:-translate-y-full peer-valid:-translate-y-full group-focus-within:pl-0 peer-valid:pl-0
-                        "
+                        className="absolute top-0 left-0 flex items-center h-full pl-2 text-xs transition-all duration-200 ease-in-out transform xl:text-sm group-focus-within:text-xs peer-valid:text-xs group-focus-within:h-1/2 peer-valid:h-1/2 group-focus-within:text-blue-400 group-focus-within:-translate-y-full peer-valid:-translate-y-full group-focus-within:pl-0 peer-valid:pl-0 "
                     >
                         Trang export
                     </label>
                 </div>
             </div>
             <div className="col-span-2">
-                <div className="w-full relative group">
+                <div className="relative w-full group">
                     <NumericFormat
                         id="limit"
                         onChange={(e) => sPageLimit((prevState) => ({ ...prevState, limit: e.target.value }))}
-                        className="appearance-none focus:placeholder:text-gray-400 placeholder:text-white  focus:border-blue-400 transition-all duration-200 ease-in-out 
-                        w-full  p-2 xl:text-sm text-xs peer bg-white outline-none border-gray-300 border rounded"
+                        className="w-full p-2 text-xs transition-all duration-200 ease-in-out bg-white border border-gray-300 rounded outline-none appearance-none focus:placeholder:text-gray-400 placeholder:text-white focus:border-blue-400 xl:text-sm peer"
                         thousandSeparator=","
                         value={pageLimit.limit}
                         allowNegative={true}
@@ -191,8 +185,7 @@ const BtnParent = ({
                     />
                     <label
                         htmlFor="limit"
-                        className=" transform transition-all absolute top-0 left-0 h-full flex items-center pl-2 xl:text-sm text-xs group-focus-within:text-blue-400 duration-200 ease-in-out 
-                    group-focus-within:text-xs peer-valid:text-xs group-focus-within:h-1/2 peer-valid:h-1/2  group-focus-within:-translate-y-full peer-valid:-translate-y-full group-focus-within:pl-0 peer-valid:pl-0"
+                        className="absolute top-0 left-0 flex items-center h-full pl-2 text-xs transition-all duration-200 ease-in-out transform xl:text-sm group-focus-within:text-blue-400 group-focus-within:text-xs peer-valid:text-xs group-focus-within:h-1/2 peer-valid:h-1/2 group-focus-within:-translate-y-full peer-valid:-translate-y-full group-focus-within:pl-0 peer-valid:pl-0"
                     >
                         Số lượng export
                     </label>
@@ -208,9 +201,9 @@ const BtnParent = ({
                     value={templateValue}
                     LoadingIndicator
                     formatOptionLabel={(option) => (
-                        <div className="flex justify-start items-center gap-1 ">
+                        <div className="flex items-center justify-start gap-1 ">
                             <h2 className="font-medium">
-                                {option?.label} <span className="italic text-sm">{`(${option?.date})`}</span>
+                                {option?.label} <span className="text-sm italic">{`(${option?.date})`}</span>
                             </h2>
                         </div>
                     )}
@@ -252,9 +245,9 @@ const BtnParent = ({
                         value={sampleImport}
                         id="example12"
                         name="checkGroup1"
-                        className="h-4 w-4 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400"
+                        className="w-4 h-4 border-gray-300 rounded shadow-sm text-primary-600 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400"
                     />
-                    <label htmlFor="example12" className=" space-x-2 text-sm cursor-pointer">
+                    <label htmlFor="example12" className="space-x-2 text-sm cursor-pointer ">
                         {"Lưu mẫu export"}
                     </label>
                 </div>
@@ -282,7 +275,7 @@ const BtnParent = ({
                                         "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
                                     }
                                 ></div>
-                                <span className="xl:text-sm text-xs">{"Export dữ liệu"}</span>
+                                <span className="text-xs xl:text-sm">{"Export dữ liệu"}</span>
                             </button>
                         }
                     >
@@ -304,7 +297,7 @@ const BtnParent = ({
                         <div
                             className={"w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"}
                         ></div>
-                        <span className="xl:text-sm text-xs">{"Export dữ liệu"}</span>
+                        <span className="text-xs xl:text-sm">{"Export dữ liệu"}</span>
                     </button>
                 </div>
             ) : (
@@ -319,7 +312,7 @@ const BtnParent = ({
                     type="button"
                     className="col-span-2  p-2.5  bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center z-0"
                 >
-                    <span className="xl:text-sm text-xs">{"Export dữ liệu"}</span>
+                    <span className="text-xs xl:text-sm">{"Export dữ liệu"}</span>
                 </button>
             )}
         </div>

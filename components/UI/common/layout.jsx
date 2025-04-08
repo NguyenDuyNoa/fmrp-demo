@@ -79,7 +79,7 @@ export const LayOutTableDynamic = ({
                 {table}
               </ContainerTable>
             </div>
-            {showTotal && total}
+            {showTotal && <div className="w-full h-fit ">{total}</div>}
             <div className="w-full h-fit ">{pagination}</div>
           </div>
         </ContainerBody>

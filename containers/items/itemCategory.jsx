@@ -82,11 +82,11 @@ const ItemCategory = (props) => {
     "filter[branch_id][]":
       idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
   };
-
+  // danh sách chi nhánh
   const { data: listBr = [] } = useBranchList();
-
+  // danh sách mã danh mục
   const { data: dataOpt = [], refetch: refetchOpt } = useItemCategoryCombobox();
-
+  // danh sách table
   const { data, isFetching, isLoading, refetch } = useItemCategoryList(params);
 
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -94,6 +94,7 @@ const ItemCategory = (props) => {
     router.replace(router.route);
   }, 500);
 
+  // hàm change bộ lọc
   const _HandleFilterOpt = (type, value) => {
     if (type == "category") {
       sIdCategory(value);
@@ -155,16 +156,14 @@ const ItemCategory = (props) => {
 
   const breadcrumbItems = [
     {
-      label: `${
-        dataLang?.header_category_material || "header_category_material"
-      }`,
+      label: `${dataLang?.header_category_material || "header_category_material"
+        }`,
       // href: "/",
     },
     {
-      label: `${
-        dataLang?.header_category_material_group ||
+      label: `${dataLang?.header_category_material_group ||
         "header_category_material_group"
-      }`,
+        }`,
     },
   ];
 
@@ -195,7 +194,7 @@ const ItemCategory = (props) => {
             <h2 className="text-title-section text-[#52575E] capitalize font-medium">
               {dataLang?.category_material_group_title}
             </h2>
-            <div className="flex justify-end items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               {role == true || checkAdd ? (
                 <Popup_NVL
                   onRefresh={refetch.bind(this)}
@@ -219,7 +218,7 @@ const ItemCategory = (props) => {
           </>
         }
         table={
-          <div className="h-full flex flex-col">
+          <div className="flex flex-col h-full">
             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
               <div className="col-span-4">
                 <div className="grid grid-cols-9 gap-2">
@@ -273,10 +272,10 @@ const ItemCategory = (props) => {
                 </div>
               </div>
               <div className="col-span-2">
-                <div className="flex space-x-2 items-center justify-end">
+                <div className="flex items-center justify-end space-x-2">
                   <OnResetData
                     onClick={refetch.bind(this)}
-                    sOnFetching={() => {}}
+                    sOnFetching={() => { }}
                   />
 
                   {role == true || checkExport ? (
@@ -296,7 +295,7 @@ const ItemCategory = (props) => {
                       className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                     >
                       <Grid6
-                        className="2xl:scale-100 xl:scale-100 scale-75"
+                        className="scale-75 2xl:scale-100 xl:scale-100"
                         size={18}
                       />
                       <span>{dataLang?.client_list_exportexcel}</span>
@@ -403,9 +402,8 @@ const Items = React.memo((props) => {
           <button
             disabled={props.data?.children?.length > 0 ? false : true}
             onClick={_ToggleHasChild.bind(this)}
-            className={`${
-              hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
-            } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
+            className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
+              } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
           >
             <IconMinus size={16} />
             <IconMinus
@@ -424,7 +422,7 @@ const Items = React.memo((props) => {
           {props.data?.note}
         </RowItemTable>
         <RowItemTable colSpan={2} textAlign={"left"}>
-          <span className="flex gap-2 flex-wrap justify-start ">
+          <span className="flex flex-wrap justify-start gap-2 ">
             {props.data?.branch?.map((e) => (
               <TagBranch>{e.name}</TagBranch>
             ))}
@@ -504,7 +502,7 @@ const ItemsChild = React.memo((props) => {
         {props.data?.level == "3" && (
           <RowItemTable
             colSpan={1}
-            className="h-full flex justify-center items-center pl-24"
+            className="flex items-center justify-center h-full pl-24"
           >
             <IconDown className="rotate-45" />
           </RowItemTable>
@@ -512,7 +510,7 @@ const ItemsChild = React.memo((props) => {
         {props.data?.level == "2" && (
           <RowItemTable
             colSpan={1}
-            className="h-full flex justify-center items-center pl-12"
+            className="flex items-center justify-center h-full pl-12"
           >
             <IconDown className="rotate-45" />
             <IconMinus className="mt-1.5" />
@@ -522,7 +520,7 @@ const ItemsChild = React.memo((props) => {
         {props.data?.level == "1" && (
           <RowItemTable
             colSpan={1}
-            className="h-full flex justify-center items-center "
+            className="flex items-center justify-center h-full "
           >
             <IconDown className="rotate-45" />
             <IconMinus className="mt-1.5" />
@@ -540,7 +538,7 @@ const ItemsChild = React.memo((props) => {
         <RowItemTable colSpan={2} textAlign={"left"}>
           {props.data?.note}
         </RowItemTable>
-        <RowItemTable colSpan={2} className="gap-2 flex flex-wrap px-2">
+        <RowItemTable colSpan={2} className="flex flex-wrap gap-2 px-2">
           {props.data?.branch.map((e) => (
             <TagBranch key={e?.id}>{e.name}</TagBranch>
           ))}

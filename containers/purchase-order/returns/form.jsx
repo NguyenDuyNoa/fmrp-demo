@@ -8,7 +8,10 @@ import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericF
 import Loading from "@/components/UI/loading/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { optionsQuery } from "@/configs/optionsQuery";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import {
+    CONFIRMATION_OF_CHANGES,
+    TITLE_DELETE_ITEMS,
+} from "@/constants/delete/deleteItems";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useSupplierList } from "@/containers/suppliers/supplier/hooks/useSupplierList";
 import { useBranchList } from "@/hooks/common/useBranch";
@@ -40,6 +43,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useReturnItemsBySupplier } from "./hooks/useReturnItemsBySupplier";
 import { useReturnQuantitiStock } from "./hooks/useReturnQuantitiStock";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 const PurchaseReturnsForm = (props) => {
     const router = useRouter();
 
@@ -49,7 +53,7 @@ const PurchaseReturnsForm = (props) => {
 
     const dataLang = props?.dataLang;
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const statusExprired = useStatusExprired();
 
@@ -100,23 +104,34 @@ const PurchaseReturnsForm = (props) => {
 
     const [warehouseAll, sWarehouseAll] = useState(null);
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } =
+        useFeature();
 
     const { data: dataTasxes = [] } = useTaxList();
 
     const { data: listBranch = [] } = useBranchList();
 
-    const { data: dataDepartment = [] } = useTreatmentList(dataLang)
+    const { data: dataDepartment = [] } = useTreatmentList(dataLang);
 
-    const params = { "filter[supplier_id]": idSupplier ? idSupplier?.value : null, "filter[branch_id]": idBranch ? idBranch?.value : null }
+    const params = {
+        "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
+        "filter[branch_id]": idBranch ? idBranch?.value : null,
+    };
 
-    const { data: dataItems = [] } = useReturnItemsBySupplier(idSupplier, params)
+    const { data: dataItems = [] } = useReturnItemsBySupplier(idSupplier, params);
 
-    const { data: listSupplier } = useSupplierList({ "filter[branch_id]": idBranch != null ? idBranch.value : null, });
+    const { data: listSupplier } = useSupplierList({
+        "filter[branch_id]": idBranch != null ? idBranch.value : null,
+    });
 
-    const dataSupplier = idBranch ? listSupplier?.rResult?.map((e) => ({ label: e?.name, value: e?.id, e })) : []
+    const dataSupplier = idBranch
+        ? listSupplier?.rResult?.map((e) => ({ label: e?.name, value: e?.id, e }))
+        : [];
 
-    const { data: dataWarehouse = [] } = useReturnQuantitiStock(idParen, idBranch);
+    const { data: dataWarehouse = [] } = useReturnQuantitiStock(
+        idParen,
+        idBranch
+    );
 
     useEffect(() => {
         router.query && sErrDate(false);
@@ -132,50 +147,69 @@ const PurchaseReturnsForm = (props) => {
         queryKey: ["api_detailpage", id],
         queryFn: async () => {
             const rResult = await apiReturns.apiDetailPageReturns(id);
-            sListData(rResult?.items.map((e) => ({
-                id: e?.item?.id,
-                item: {
-                    e: e?.item,
-                    label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
-                    value: e.item?.id,
-                },
-                child: e?.child.map((ce) => ({
-                    id: Number(ce?.id),
-                    disabledDate:
-                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                    kho: {
-                        label: ce?.location_name,
-                        value: ce?.location_warehouses_id,
-                        warehouse_name: ce?.warehouse_name,
-                        qty: ce?.quantity_warehouse,
+            sListData(
+                rResult?.items.map((e) => ({
+                    id: e?.item?.id,
+                    item: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code +
+                            e.item?.product_variation +
+                            e.item?.text_type +
+                            e.item?.unit_name
+                            }</span>`,
+                        value: e.item?.id,
                     },
-                    serial: ce?.serial == null ? "" : ce?.serial,
-                    quantityLeft: Number(e?.item?.quantity_left),
-                    quantityReturned: Number(e?.item?.quantity_returned),
-                    quantityCreate: Number(e?.item?.quantity_create),
-                    lot: ce?.lot == null ? "" : ce?.lot,
-                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                    unit: e?.item?.unit_name,
-                    amount: Number(ce?.quantity),
-                    price: Number(ce?.price),
-                    discount: Number(ce?.discount_percent),
-                    tax: {
-                        tax_rate: ce?.tax_rate,
-                        value: ce?.tax_id,
-                        label: ce?.tax_name,
-                    },
-                    note: ce?.note,
-                })),
-            })));
+                    child: e?.child.map((ce) => ({
+                        id: Number(ce?.id),
+                        disabledDate:
+                            (e.item?.text_type == "material" &&
+                                dataMaterialExpiry?.is_enable == "1" &&
+                                false) ||
+                            (e.item?.text_type == "material" &&
+                                dataMaterialExpiry?.is_enable == "0" &&
+                                true) ||
+                            (e.item?.text_type == "products" &&
+                                dataProductExpiry?.is_enable == "1" &&
+                                false) ||
+                            (e.item?.text_type == "products" &&
+                                dataProductExpiry?.is_enable == "0" &&
+                                true),
+                        kho: {
+                            label: ce?.location_name,
+                            value: ce?.location_warehouses_id,
+                            warehouse_name: ce?.warehouse_name,
+                            qty: ce?.quantity_warehouse,
+                        },
+                        serial: ce?.serial == null ? "" : ce?.serial,
+                        quantityLeft: Number(e?.item?.quantity_left),
+                        quantityReturned: Number(e?.item?.quantity_returned),
+                        quantityCreate: Number(e?.item?.quantity_create),
+                        lot: ce?.lot == null ? "" : ce?.lot,
+                        date:
+                            ce?.expiration_date != null
+                                ? moment(ce?.expiration_date).toDate()
+                                : null,
+                        unit: e?.item?.unit_name,
+                        amount: Number(ce?.quantity),
+                        price: Number(ce?.price),
+                        discount: Number(ce?.discount_percent),
+                        tax: {
+                            tax_rate: ce?.tax_rate,
+                            value: ce?.tax_id,
+                            label: ce?.tax_name,
+                        },
+                        note: ce?.note,
+                    })),
+                }))
+            );
 
-            const checkQty = rResult?.items?.map((e) => e?.item).reduce((obj, e) => {
-                obj.id = e?.id;
-                obj.qty = Number(e?.quantity_left);
-                return obj;
-            }, {});
+            const checkQty = rResult?.items
+                ?.map((e) => e?.item)
+                .reduce((obj, e) => {
+                    obj.id = e?.id;
+                    obj.qty = Number(e?.quantity_left);
+                    return obj;
+                }, {});
 
             sIdParent(checkQty?.id);
             sQtyHouse(checkQty?.qty);
@@ -194,11 +228,11 @@ const PurchaseReturnsForm = (props) => {
             });
             sStartDate(moment(rResult?.date).toDate());
             sNote(rResult?.note);
-            return rResult
+            return rResult;
         },
         enabled: !!id,
-        ...optionsQuery
-    })
+        ...optionsQuery,
+    });
 
     const resetValue = () => {
         if (isKeyState?.type === "supplier") {
@@ -269,7 +303,6 @@ const PurchaseReturnsForm = (props) => {
     };
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
-
         }
         if (type === "startDate") {
             sStartDate(new Date());
@@ -282,18 +315,45 @@ const PurchaseReturnsForm = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
 
-        const hasNullKho = listData.some((item) => item.child?.some((childItem) => childItem.kho === null || (id && (childItem.kho?.label === null || childItem.kho?.warehouse_name === null))));
+        const hasNullKho = listData.some((item) =>
+            item.child?.some(
+                (childItem) =>
+                    childItem.kho === null ||
+                    (id &&
+                        (childItem.kho?.label === null ||
+                            childItem.kho?.warehouse_name === null))
+            )
+        );
 
-        const hasNullAmount = listData.some((item) => item.child?.some((childItem) => childItem.amount === null || childItem.amount === "" || childItem.amount == 0));
+        const hasNullAmount = listData.some((item) =>
+            item.child?.some(
+                (childItem) =>
+                    childItem.amount === null ||
+                    childItem.amount === "" ||
+                    childItem.amount == 0
+            )
+        );
 
-        const isTotalExceeded = listData?.some((e) => !hasNullKho && e.child?.some((opt) => {
-            const amount = parseFloat(opt?.amount) || 0;
-            const qty = parseFloat(opt?.kho?.qty) || 0;
-            return amount > qty;
-        }));
+        const isTotalExceeded = listData?.some(
+            (e) =>
+                !hasNullKho &&
+                e.child?.some((opt) => {
+                    const amount = parseFloat(opt?.amount) || 0;
+                    const qty = parseFloat(opt?.kho?.qty) || 0;
+                    return amount > qty;
+                })
+        );
 
         const isEmpty = listData?.length === 0 ? true : false;
-        if (idSupplier == null || idBranch == null || idTreatment == null || hasNullKho || hasNullAmount || isTotalExceeded || isEmpty) {
+        if (
+            idSupplier == null ||
+            idBranch == null ||
+            idTreatment == null ||
+            hasNullKho ||
+            hasNullAmount ||
+            isTotalExceeded ||
+            isEmpty
+        ) {
             idSupplier == null && sErrSupplier(true);
             idBranch == null && sErrBranch(true);
             idTreatment == null && sErrTreatment(true);
@@ -303,7 +363,11 @@ const PurchaseReturnsForm = (props) => {
                 isShow("error", `Chưa nhập thông tin mặt hàng`);
             } else if (isTotalExceeded) {
                 sErrSurvive(true);
-                isShow("error", `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`);
+                isShow(
+                    "error",
+                    `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"
+                    }`
+                );
             } else {
                 isShow("error", `${dataLang?.required_field_null}`);
             }
@@ -336,18 +400,21 @@ const PurchaseReturnsForm = (props) => {
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
-    }
+    };
 
     const handingReturn = useMutation({
         mutationFn: (data) => {
-            return apiReturns.apiHandingReturn(id, data)
-        }
-    })
+            return apiReturns.apiHandingReturn(id, data);
+        },
+    });
 
     const _ServerSending = () => {
         let formData = new FormData();
         formData.append("code", code);
-        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
+        formData.append(
+            "date",
+            formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG)
+        );
         formData.append("branch_id", idBranch?.value);
         formData.append("supplier_id", idSupplier?.value);
         formData.append("treatment_methods", idTreatment?.value);
@@ -357,18 +424,48 @@ const PurchaseReturnsForm = (props) => {
             formData.append(`items[${index}][item]`, item?.item?.value);
             // formData.append(`items[${index}][purchase_order_item_id]`, item?.item?.e?.purchase_order_item_id);
             item?.child?.forEach((childItem, childIndex) => {
-                formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
-                { id && formData.append(`items[${index}][child][${childIndex}][row_id]`, typeof childItem?.id == "number" ? childItem?.id : 0); }
-                formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
+                formData.append(
+                    `items[${index}][child][${childIndex}][id]`,
+                    childItem?.id
+                );
+                {
+                    id &&
+                        formData.append(
+                            `items[${index}][child][${childIndex}][row_id]`,
+                            typeof childItem?.id == "number" ? childItem?.id : 0
+                        );
+                }
+                formData.append(
+                    `items[${index}][child][${childIndex}][quantity]`,
+                    childItem?.amount
+                );
                 // formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
                 // formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
                 // formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss"));
-                formData.append(`items[${index}][child][${childIndex}][unit_name]`, childItem?.unit);
-                formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
-                formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
-                formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
-                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.kho?.value);
-                formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.discount);
+                formData.append(
+                    `items[${index}][child][${childIndex}][unit_name]`,
+                    childItem?.unit
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][note]`,
+                    childItem?.note
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][tax_id]`,
+                    childItem?.tax?.value
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][price]`,
+                    childItem?.price
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
+                    childItem?.kho?.value
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][discount_percent]`,
+                    childItem?.discount
+                );
             });
         });
         handingReturn.mutate(formData, {
@@ -390,7 +487,7 @@ const PurchaseReturnsForm = (props) => {
                 } else {
                     isShow("error", dataLang[message] || message);
                 }
-            }
+            },
         });
         sOnSending(false);
     };
@@ -407,10 +504,18 @@ const PurchaseReturnsForm = (props) => {
                 const newChild = {
                     id: uuidv4(),
                     disabledDate:
-                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
-                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
-                        (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
-                        (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
+                        (value?.e?.text_type === "material" &&
+                            dataMaterialExpiry?.is_enable === "1" &&
+                            false) ||
+                        (value?.e?.text_type === "material" &&
+                            dataMaterialExpiry?.is_enable === "0" &&
+                            true) ||
+                        (value?.e?.text_type === "products" &&
+                            dataProductExpiry?.is_enable === "1" &&
+                            false) ||
+                        (value?.e?.text_type === "products" &&
+                            dataProductExpiry?.is_enable === "0" &&
+                            true),
                     quantityLeft: Number(value?.e?.quantity_left),
                     quantityReturned: Number(value?.e?.quantity_returned),
                     quantityCreate: Number(value?.e?.quantity_create),
@@ -421,11 +526,14 @@ const PurchaseReturnsForm = (props) => {
                     amount: null,
                     discount: discount ? discount : Number(value?.e?.discount_percent),
                     priceAfter: Number(value?.e?.price_after_discount),
-                    tax: tax ? tax : {
-                        label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                        value: value?.e?.tax_id,
-                        tax_rate: value?.e?.tax_rate,
-                    },
+                    tax: tax
+                        ? tax
+                        : {
+                            label:
+                                value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                            value: value?.e?.tax_id,
+                            tax_rate: value?.e?.tax_rate,
+                        },
                     totalMoney: Number(value?.e?.amount),
                     note: value?.e?.note,
                 };
@@ -449,10 +557,18 @@ const PurchaseReturnsForm = (props) => {
                     {
                         id: uuidv4(),
                         disabledDate:
-                            (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
-                            (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
-                            (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
-                            (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
+                            (value?.e?.text_type === "material" &&
+                                dataMaterialExpiry?.is_enable === "1" &&
+                                false) ||
+                            (value?.e?.text_type === "material" &&
+                                dataMaterialExpiry?.is_enable === "0" &&
+                                true) ||
+                            (value?.e?.text_type === "products" &&
+                                dataProductExpiry?.is_enable === "1" &&
+                                false) ||
+                            (value?.e?.text_type === "products" &&
+                                dataProductExpiry?.is_enable === "0" &&
+                                true),
                         kho: null,
                         unit: value?.e?.unit_name,
                         quantityLeft: Number(value?.e?.quantity_left),
@@ -465,7 +581,10 @@ const PurchaseReturnsForm = (props) => {
                         tax: tax
                             ? tax
                             : {
-                                label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                                label:
+                                    value?.e?.tax_name == null
+                                        ? "Miễn thuế"
+                                        : value?.e?.tax_name,
                                 value: value?.e?.tax_id,
                                 tax_rate: value?.e?.tax_rate,
                             },
@@ -476,7 +595,10 @@ const PurchaseReturnsForm = (props) => {
             };
             sListData([newData, ...listData]);
         } else {
-            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            isShow(
+                "error",
+                `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`
+            );
         }
     };
 
@@ -506,16 +628,23 @@ const PurchaseReturnsForm = (props) => {
         sListData([...newData]);
     };
 
-
     const FunCheckQuantity = (parentId, childId) => {
         const e = listData.find((item) => item?.id == parentId);
         if (!e) return;
         const ce = e.child.find((child) => child?.id == childId);
         if (!ce) return;
-        const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
+        const checkChild = e.child.reduce(
+            (sum, opt) => sum + parseFloat(opt?.amount || 0),
+            0
+        );
 
         if (checkChild > qtyHouse) {
-            isShow("error", `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`);
+            isShow(
+                "error",
+                `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                    qtyHouse
+                )} số lượng còn lại`
+            );
             ce.amount = "";
             setTimeout(() => {
                 sLoad(true);
@@ -572,16 +701,24 @@ const PurchaseReturnsForm = (props) => {
                         } else if (type === "increase") {
                             sErrSurvive(false);
 
-                            const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
+                            const totalSoLuong = e.child.reduce(
+                                (sum, opt) => sum + parseFloat(opt?.amount || 0),
+                                0
+                            );
 
                             if (ce?.id === childId && totalSoLuong == qtyHouse) {
                                 isShow(
                                     "error",
-                                    `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`
+                                    `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                        qtyHouse
+                                    )} số lượng còn lại`
                                 );
 
                                 return { ...ce };
-                            } else if (ce?.id === childId && totalSoLuong == Number(ce?.kho?.qty)) {
+                            } else if (
+                                ce?.id === childId &&
+                                totalSoLuong == Number(ce?.kho?.qty)
+                            ) {
                                 isShow(
                                     "error",
                                     `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
@@ -590,7 +727,10 @@ const PurchaseReturnsForm = (props) => {
                                 );
 
                                 return { ...ce };
-                            } else if (ce?.id === childId && totalSoLuong > Number(ce?.kho?.qty)) {
+                            } else if (
+                                ce?.id === childId &&
+                                totalSoLuong > Number(ce?.kho?.qty)
+                            ) {
                                 isShow(
                                     "error",
                                     `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
@@ -602,7 +742,9 @@ const PurchaseReturnsForm = (props) => {
                             } else if (ce?.id === childId && totalSoLuong > qtyHouse) {
                                 isShow(
                                     "error",
-                                    `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng tồn`
+                                    `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                        qtyHouse
+                                    )} số lượng tồn`
                                 );
 
                                 return { ...ce };
@@ -630,7 +772,11 @@ const PurchaseReturnsForm = (props) => {
                                 ?.some((i) => i?.kho?.value === value?.value);
                             sErrSurvive(false);
                             if (checkKho) {
-                                isShow("error", `${dataLang?.returns_err_Warehouse || "returns_err_Warehouse"}`);
+                                isShow(
+                                    "error",
+                                    `${dataLang?.returns_err_Warehouse || "returns_err_Warehouse"
+                                    }`
+                                );
                                 return { ...ce };
                             } else {
                                 return { ...ce, kho: value };
@@ -683,12 +829,17 @@ const PurchaseReturnsForm = (props) => {
                                 quantityLeft: Number(value?.e?.quantity_left),
                                 quantityReturned: Number(value?.e?.quantity_returned),
                                 quantityCreate: Number(value?.e?.quantity_create),
-                                discount: discount ? discount : Number(value?.e?.discount_percent),
+                                discount: discount
+                                    ? discount
+                                    : Number(value?.e?.discount_percent),
                                 priceAfter: Number(value?.e?.price_after_discount),
                                 tax: tax
                                     ? tax
                                     : {
-                                        label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                                        label:
+                                            value?.e?.tax_name == null
+                                                ? "Miễn thuế"
+                                                : value?.e?.tax_name,
                                         value: value?.e?.tax_id,
                                         tax_rate: value?.e?.tax_rate,
                                     },
@@ -703,9 +854,28 @@ const PurchaseReturnsForm = (props) => {
             });
             sListData([...newData]);
         } else {
-            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            isShow(
+                "error",
+                `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`
+            );
         }
     };
+
+    const breadcrumbItems = [
+        {
+            label: `${dataLang?.returns_title || "returns_title"}`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.returns_list || "returns_list"}`,
+        },
+        {
+            label: `${id
+                ? dataLang?.returns_title_edit || "returns_title_edit"
+                : dataLang?.returns_title_child || "returns_title_child"
+                }`,
+        },
+    ];
 
     return (
         <React.Fragment>
@@ -720,20 +890,19 @@ const PurchaseReturnsForm = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.returns_title || "returns_title"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{id
-                            ? dataLang?.returns_title_edit || "returns_title_edit"
-                            : dataLang?.returns_title_child || "returns_title_child"}</h6>
-                    </div>
+                    <React.Fragment>
+                        <Breadcrumb
+                            items={breadcrumbItems}
+                            className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                        />
+                    </React.Fragment>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                            {dataLang?.returns_title || "returns_title"}
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
+                            {id
+                                ? dataLang?.returns_title_edit || "returns_title_edit"
+                                : dataLang?.returns_title_child || "returns_title_child"}
                         </h2>
                         <div className="flex items-center justify-end mr-2">
                             <ButtonBack
@@ -746,7 +915,8 @@ const PurchaseReturnsForm = (props) => {
                     <div className="w-full rounded ">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione ||
+                                    "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid items-center grid-cols-10 gap-3 mt-2">
                                 <div className="col-span-2">
@@ -758,7 +928,10 @@ const PurchaseReturnsForm = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
-                                        placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
+                                        placeholder={
+                                            dataLang?.purchase_order_system_default ||
+                                            "purchase_order_system_default"
+                                        }
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
@@ -777,8 +950,13 @@ const PurchaseReturnsForm = (props) => {
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
-                                            placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            placeholder={
+                                                dataLang?.price_quote_system_default ||
+                                                "price_quote_system_default"
+                                            }
+                                            className={`border ${errDate
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                 } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
@@ -805,7 +983,8 @@ const PurchaseReturnsForm = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -842,7 +1021,8 @@ const PurchaseReturnsForm = (props) => {
                                     />
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}
+                                            {dataLang?.purchase_order_errBranch ||
+                                                "purchase_order_errBranch"}
                                         </label>
                                     )}
                                 </div>
@@ -858,9 +1038,12 @@ const PurchaseReturnsForm = (props) => {
                                         placeholder={dataLang?.import_supplier || "import_supplier"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errSupplier ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
+                                        noOptionsMessage={() =>
+                                            dataLang?.returns_nodata || "returns_nodata"
+                                        }
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
                                         style={{
@@ -898,13 +1081,15 @@ const PurchaseReturnsForm = (props) => {
                                     />
                                     {errSupplier && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.purchase_order_errSupplier || "purchase_order_errSupplier"}
+                                            {dataLang?.purchase_order_errSupplier ||
+                                                "purchase_order_errSupplier"}
                                         </label>
                                     )}
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.returns_treatment_methods || "returns_treatment_methods"}{" "}
+                                        {dataLang?.returns_treatment_methods ||
+                                            "returns_treatment_methods"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <SelectCore
@@ -912,10 +1097,15 @@ const PurchaseReturnsForm = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "treatment")}
                                         value={idTreatment}
                                         isClearable={true}
-                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
+                                        noOptionsMessage={() =>
+                                            dataLang?.returns_nodata || "returns_nodata"
+                                        }
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={dataLang?.returns_treatment_methods || "returns_treatment_methods"}
+                                        placeholder={
+                                            dataLang?.returns_treatment_methods ||
+                                            "returns_treatment_methods"
+                                        }
                                         className={`${errTreatment ? "border-red-500" : "border-transparent"
                                             } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
@@ -954,7 +1144,8 @@ const PurchaseReturnsForm = (props) => {
                                     />
                                     {errTreatment && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.returns_treatment_methods_err || "returns_treatment_methods_err"}
+                                            {dataLang?.returns_treatment_methods_err ||
+                                                "returns_treatment_methods_err"}
                                         </label>
                                     )}
                                 </div>
@@ -1013,7 +1204,9 @@ const PurchaseReturnsForm = (props) => {
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                 placeholder={dataLang?.returns_items || "returns_items"}
-                                noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
+                                noOptionsMessage={() =>
+                                    dataLang?.returns_nodata || "returns_nodata"
+                                }
                                 menuPortalTarget={document.body}
                                 formatOptionLabel={(option) => (
                                     <div className="py-2">
@@ -1052,7 +1245,10 @@ const PurchaseReturnsForm = (props) => {
                                                         {option.e?.import_code} -{" "}
                                                     </h5>
                                                     <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                        {`(ĐGSCK: ${formatMoney(option.e?.price_after_discount)}) -`}</h5>
+                                                        {`(ĐGSCK: ${formatMoney(
+                                                            option.e?.price_after_discount
+                                                        )}) -`}
+                                                    </h5>
                                                     <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                         {dataLang[option.e?.text_type]}
                                                     </h5>
@@ -1061,16 +1257,24 @@ const PurchaseReturnsForm = (props) => {
                                                 <div className="flex items-center gap-2 italic">
                                                     {dataProductSerial.is_enable === "1" && (
                                                         <div className="text-[11px] text-[#667085] font-[500]">
-                                                            Serial: {option.e?.serial ? option.e?.serial : "-"}
+                                                            Serial:{" "}
+                                                            {option.e?.serial ? option.e?.serial : "-"}
                                                         </div>
                                                     )}
-                                                    {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                    {dataMaterialExpiry.is_enable === "1" ||
+                                                        dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Lot: {option.e?.lot ? option.e?.lot : "-"}
                                                             </div>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
-                                                                Date:{" "}{option.e?.expiration_date ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                Date:{" "}
+                                                                {option.e?.expiration_date
+                                                                    ? formatMoment(
+                                                                        option.e?.expiration_date,
+                                                                        FORMAT_MOMENT.DATE_SLASH_LONG
+                                                                    )
+                                                                    : "-"}
                                                             </div>
                                                         </>
                                                     ) : (
@@ -1131,13 +1335,19 @@ const PurchaseReturnsForm = (props) => {
                                 <div className="col-span-1"></div>
                                 <div className="flex items-center justify-center col-span-1">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
+                                        <Minus
+                                            className="scale-50 2xl:scale-100 xl:scale-100"
+                                            size="16"
+                                        />
                                     </button>
                                     <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
+                                        <Add
+                                            className="scale-50 2xl:scale-100 xl:scale-100"
+                                            size="16"
+                                        />
                                     </button>
                                 </div>
                                 <div className="flex items-center justify-center col-span-1">
@@ -1235,7 +1445,10 @@ const PurchaseReturnsForm = (props) => {
                                                                                 {option.e?.import_code} -{" "}
                                                                             </h5>
                                                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {`(ĐGSCK: ${formatMoney(option.e?.price_after_discount)}) -`}</h5>
+                                                                                {`(ĐGSCK: ${formatMoney(
+                                                                                    option.e?.price_after_discount
+                                                                                )}) -`}
+                                                                            </h5>
                                                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                                 {dataLang[option.e?.text_type]}
                                                                             </h5>
@@ -1244,16 +1457,29 @@ const PurchaseReturnsForm = (props) => {
                                                                         <div className="flex items-center gap-2 italic">
                                                                             {dataProductSerial.is_enable === "1" && (
                                                                                 <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                    Serial:{" "}{option.e?.serial ? option.e?.serial : "-"}
+                                                                                    Serial:{" "}
+                                                                                    {option.e?.serial
+                                                                                        ? option.e?.serial
+                                                                                        : "-"}
                                                                                 </div>
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" ||
+                                                                                dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                        Lot:{" "}{option.e?.lot ? option.e?.lot : "-"}
+                                                                                        Lot:{" "}
+                                                                                        {option.e?.lot
+                                                                                            ? option.e?.lot
+                                                                                            : "-"}
                                                                                     </div>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                        Date:{" "}{option.e?.expiration_date ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                                        Date:{" "}
+                                                                                        {option.e?.expiration_date
+                                                                                            ? formatMoment(
+                                                                                                option.e?.expiration_date,
+                                                                                                FORMAT_MOMENT.DATE_SLASH_LONG
+                                                                                            )
+                                                                                            : "-"}
                                                                                     </div>
                                                                                 </>
                                                                             ) : (
@@ -1308,22 +1534,32 @@ const PurchaseReturnsForm = (props) => {
                                                         <Add className="" />
                                                     </button>
                                                 </div>
-                                                {e?.child?.filter((e) => e?.kho == null).length >= 2 && (
-                                                    <button
-                                                        onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.item)}
-                                                        className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
-                                                    >
-                                                        <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
-                                                        <span className="relative text-xs">
-                                                            Xóa {e?.child?.filter((e) => e?.kho == null).length} hàng chưa chọn kho
-                                                        </span>
-                                                    </button>
-                                                )}
+                                                {e?.child?.filter((e) => e?.kho == null).length >=
+                                                    2 && (
+                                                        <button
+                                                            onClick={_HandleDeleteAllChild.bind(
+                                                                this,
+                                                                e?.id,
+                                                                e?.item
+                                                            )}
+                                                            className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
+                                                        >
+                                                            <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
+                                                            <span className="relative text-xs">
+                                                                Xóa{" "}
+                                                                {e?.child?.filter((e) => e?.kho == null).length}{" "}
+                                                                hàng chưa chọn kho
+                                                            </span>
+                                                        </button>
+                                                    )}
                                             </div>
                                             <div className="items-center col-span-10">
                                                 <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                                                     {load ? (
-                                                        <Loading className="h-2 col-span-11" color="#0f4f9e" />
+                                                        <Loading
+                                                            className="h-2 col-span-11"
+                                                            color="#0f4f9e"
+                                                        />
                                                     ) : (
                                                         e?.child?.map((ce) => (
                                                             <React.Fragment key={ce?.id?.toString()}>
@@ -1338,19 +1574,27 @@ const PurchaseReturnsForm = (props) => {
                                                                             "kho"
                                                                         )}
                                                                         className={`${(errWarehouse && ce?.kho == null) ||
-                                                                            (errWarehouse && (ce?.kho?.label == null || ce?.kho?.warehouse_name == null))
+                                                                            (errWarehouse &&
+                                                                                (ce?.kho?.label == null ||
+                                                                                    ce?.kho?.warehouse_name == null))
                                                                             ? "border-red-500 border"
                                                                             : ""
                                                                             }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                        placeholder={dataLang?.returns_point || "returns_point"}
+                                                                        placeholder={
+                                                                            dataLang?.returns_point || "returns_point"
+                                                                        }
                                                                         menuPortalTarget={document.body}
                                                                         formatOptionLabel={(option) => {
                                                                             return (
-                                                                                (option?.warehouse_name || option?.label || option?.qty) && (
+                                                                                (option?.warehouse_name ||
+                                                                                    option?.label ||
+                                                                                    option?.qty) && (
                                                                                     <div className="">
                                                                                         <div className="flex gap-1">
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                                {dataLang?.returns_wareshoue || "returns_wareshoue"}:
+                                                                                                {dataLang?.returns_wareshoue ||
+                                                                                                    "returns_wareshoue"}
+                                                                                                :
                                                                                             </h2>
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                                                                                 {option?.warehouse_name}
@@ -1358,7 +1602,9 @@ const PurchaseReturnsForm = (props) => {
                                                                                         </div>
                                                                                         <div className="flex gap-1">
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                                {dataLang?.returns_wareshouePosition || "returns_wareshouePosition"}:
+                                                                                                {dataLang?.returns_wareshouePosition ||
+                                                                                                    "returns_wareshouePosition"}
+                                                                                                :
                                                                                             </h2>
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                                                                                 {option?.label}
@@ -1366,7 +1612,9 @@ const PurchaseReturnsForm = (props) => {
                                                                                         </div>
                                                                                         <div className="flex gap-1">
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                                {dataLang?.returns_survive || "returns_survive"}:
+                                                                                                {dataLang?.returns_survive ||
+                                                                                                    "returns_survive"}
+                                                                                                :
                                                                                             </h2>
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
                                                                                                 {formatNumber(option?.qty)}
@@ -1406,7 +1654,12 @@ const PurchaseReturnsForm = (props) => {
                                                                                 ce?.amount === 0
                                                                             }
                                                                             className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                            onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}
+                                                                            onClick={_HandleChangeChild.bind(
+                                                                                this,
+                                                                                e?.id,
+                                                                                ce?.id,
+                                                                                "decrease"
+                                                                            )}
                                                                         >
                                                                             <Minus
                                                                                 className="scale-50 2xl:scale-100 xl:scale-100"
@@ -1414,26 +1667,57 @@ const PurchaseReturnsForm = (props) => {
                                                                             />
                                                                         </button>
                                                                         <InPutNumericFormat
-                                                                            onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
+                                                                            onValueChange={_HandleChangeChild.bind(
+                                                                                this,
+                                                                                e?.id,
+                                                                                ce?.id,
+                                                                                "amount"
+                                                                            )}
                                                                             value={ce?.amount || null}
-                                                                            className={`${errAmount && (ce?.amount == null || ce?.amount == "" || ce?.amount == 0)
+                                                                            className={`${errAmount &&
+                                                                                (ce?.amount == null ||
+                                                                                    ce?.amount == "" ||
+                                                                                    ce?.amount == 0)
                                                                                 ? "border-b border-red-500"
-                                                                                : errSurvive ? "border-b border-red-500" : "border-b border-gray-200"
+                                                                                : errSurvive
+                                                                                    ? "border-b border-red-500"
+                                                                                    : "border-b border-gray-200"
                                                                                 }
-                                                                                ${ce?.amount == null || ce?.amount == "" || ce?.amount == 0 ? "border-b border-red-500" : ""}
+                                                                                ${ce?.amount ==
+                                                                                    null ||
+                                                                                    ce?.amount ==
+                                                                                    "" ||
+                                                                                    ce?.amount ==
+                                                                                    0
+                                                                                    ? "border-b border-red-500"
+                                                                                    : ""
+                                                                                }
                                                                                 appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                                             isAllowed={(values) => {
                                                                                 if (!values.value) return true;
                                                                                 const { floatValue } = values;
-                                                                                if (floatValue > ce?.quantityLeft || floatValue > qtyHouse) {
-                                                                                    isShow("error", `${props.dataLang?.returns_err_Qty || "returns_err_Qty"} ${formatNumber(ce?.quantityLeft)}`);
+                                                                                if (
+                                                                                    floatValue > ce?.quantityLeft ||
+                                                                                    floatValue > qtyHouse
+                                                                                ) {
+                                                                                    isShow(
+                                                                                        "error",
+                                                                                        `${props.dataLang?.returns_err_Qty ||
+                                                                                        "returns_err_Qty"
+                                                                                        } ${formatNumber(ce?.quantityLeft)}`
+                                                                                    );
                                                                                 }
                                                                                 return floatValue <= ce?.quantityLeft;
                                                                             }}
                                                                         />
                                                                         <button
                                                                             className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                            onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}
+                                                                            onClick={_HandleChangeChild.bind(
+                                                                                this,
+                                                                                e?.id,
+                                                                                ce?.id,
+                                                                                "increase"
+                                                                            )}
                                                                         >
                                                                             <Add
                                                                                 className="scale-50 2xl:scale-100 xl:scale-100"
@@ -1463,13 +1747,19 @@ const PurchaseReturnsForm = (props) => {
                                                                         >
                                                                             <div className="flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm">
                                                                                 <span className="text-xs font-medium">
-                                                                                    {dataLang?.returns_sldn || "returns_sldn"}: {formatNumber(ce?.quantityCreate)}{" "}
+                                                                                    {dataLang?.returns_sldn ||
+                                                                                        "returns_sldn"}
+                                                                                    : {formatNumber(ce?.quantityCreate)}{" "}
                                                                                 </span>
                                                                                 <span className="text-xs font-medium">
-                                                                                    {dataLang?.returns_sldt || "returns_sldt"}: {formatNumber(ce?.quantityReturned)}
+                                                                                    {dataLang?.returns_sldt ||
+                                                                                        "returns_sldt"}
+                                                                                    : {formatNumber(ce?.quantityReturned)}
                                                                                 </span>
                                                                                 <span className="text-xs font-medium">
-                                                                                    {dataLang?.returns_slcl || "returns_slcl"}: {formatNumber(ce?.quantityLeft)}
+                                                                                    {dataLang?.returns_slcl ||
+                                                                                        "returns_slcl"}
+                                                                                    : {formatNumber(ce?.quantityLeft)}
                                                                                 </span>
                                                                             </div>
                                                                         </PopupParent>
@@ -1478,9 +1768,23 @@ const PurchaseReturnsForm = (props) => {
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                     <InPutMoneyFormat
                                                                         className={`
-                                                                        ${ce?.price == 0 && 'border-red-500' || ce?.price == "" && 'border-red-500' || ce?.price == null && 'border-red-500'}
+                                                                        ${(ce?.price ==
+                                                                                0 &&
+                                                                                "border-red-500") ||
+                                                                            (ce?.price ==
+                                                                                "" &&
+                                                                                "border-red-500") ||
+                                                                            (ce?.price ==
+                                                                                null &&
+                                                                                "border-red-500")
+                                                                            }
                                                                         appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b border-gray-200 h-fit`}
-                                                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
+                                                                        onValueChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "price"
+                                                                        )}
                                                                         value={ce?.price}
                                                                         isAllowed={isAllowedNumber}
                                                                     />
@@ -1488,22 +1792,45 @@ const PurchaseReturnsForm = (props) => {
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                     <NumericFormat
                                                                         className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b border-gray-200"
-                                                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "discount")}
+                                                                        onValueChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "discount"
+                                                                        )}
                                                                         value={ce?.discount}
                                                                         isAllowed={isAllowedDiscount}
                                                                     />
                                                                 </div>
                                                                 <div className="col-span-1 text-right flex items-center justify-end  h-full p-0.5">
                                                                     <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                        {formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}
+                                                                        {formatMoney(
+                                                                            Number(ce?.price) *
+                                                                            (1 - Number(ce?.discount) / 100)
+                                                                        )}
                                                                     </h3>
                                                                 </div>
                                                                 <div className="flex flex-col items-center justify-center h-full p-1 ">
                                                                     <SelectCore
-                                                                        options={[{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes]}
+                                                                        options={[
+                                                                            {
+                                                                                label: "Miễn thuế",
+                                                                                value: "0",
+                                                                                tax_rate: "0",
+                                                                            },
+                                                                            ...dataTasxes,
+                                                                        ]}
                                                                         value={ce?.tax}
-                                                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "tax")}
-                                                                        placeholder={dataLang?.import_from_tax || "import_from_tax"}
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "tax"
+                                                                        )}
+                                                                        placeholder={
+                                                                            dataLang?.import_from_tax ||
+                                                                            "import_from_tax"
+                                                                        }
                                                                         className={`  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                                                                         menuPortalTarget={document.body}
                                                                         style={{
@@ -1532,12 +1859,22 @@ const PurchaseReturnsForm = (props) => {
                                                                     />
                                                                 </div>
                                                                 <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                    {formatMoney(ce?.price * (1 - Number(ce?.discount) / 100) * (1 + Number(ce?.tax?.tax_rate) / 100) * Number(ce?.amount))}
+                                                                    {formatMoney(
+                                                                        ce?.price *
+                                                                        (1 - Number(ce?.discount) / 100) *
+                                                                        (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                                                        Number(ce?.amount)
+                                                                    )}
                                                                 </div>
                                                                 <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
                                                                     <input
                                                                         value={ce?.note}
-                                                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "note"
+                                                                        )}
                                                                         placeholder="Ghi chú"
                                                                         type="text"
                                                                         className="  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
@@ -1546,7 +1883,11 @@ const PurchaseReturnsForm = (props) => {
                                                                 <div className=" h-full p-0.5 flex flex-col items-center justify-center">
                                                                     <button
                                                                         title="Xóa"
-                                                                        onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                                                                        onClick={_HandleDeleteChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id
+                                                                        )}
                                                                         className="flex flex-col items-center justify-center p-2 text-red-500 transition-all ease-linear rounded-md  hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
                                                                     >
                                                                         <IconDelete />
@@ -1565,7 +1906,10 @@ const PurchaseReturnsForm = (props) => {
                     </Customscrollbar>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
                         <div className="flex items-center col-span-2 gap-2">
-                            <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
+                            <h2>
+                                {dataLang?.purchase_order_detail_discount ||
+                                    "purchase_order_detail_discount"}
+                            </h2>
                             <div className="flex items-center justify-center col-span-1 text-center">
                                 <NumericFormat
                                     value={discount}
@@ -1576,9 +1920,15 @@ const PurchaseReturnsForm = (props) => {
                             </div>
                         </div>
                         <div className="flex items-center col-span-2 gap-2 ">
-                            <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
+                            <h2>
+                                {dataLang?.purchase_order_detail_tax ||
+                                    "purchase_order_detail_tax"}
+                            </h2>
                             <SelectCore
-                                options={[{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes]}
+                                options={[
+                                    { label: "Miễn thuế", value: "0", tax_rate: "0" },
+                                    ...dataTasxes,
+                                ]}
                                 onChange={_HandleChangeInput.bind(this, "tax")}
                                 value={tax}
                                 formatOptionLabel={(option) => (
@@ -1587,11 +1937,16 @@ const PurchaseReturnsForm = (props) => {
                                         <h2>{`(${option?.tax_rate})`}</h2>
                                     </div>
                                 )}
-                                placeholder={dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}
+                                placeholder={
+                                    dataLang?.purchase_order_detail_tax ||
+                                    "purchase_order_detail_tax"
+                                }
                                 hideSelectedOptions={false}
                                 className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                                 isSearchable={true}
-                                noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
+                                noOptionsMessage={() =>
+                                    dataLang?.returns_nodata || "returns_nodata"
+                                }
                                 //  dangerouslySetInnerHTML={{__html: option.label}}
                                 menuPortalTarget={document.body}
                                 closeMenuOnSelect={true}
@@ -1631,7 +1986,8 @@ const PurchaseReturnsForm = (props) => {
                         </div>
                     </div>
                     <h2 className="font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]">
-                        {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}{" "}
+                        {dataLang?.purchase_order_table_total_outside ||
+                            "purchase_order_table_total_outside"}{" "}
                     </h2>
                 </div>
                 <div className="grid grid-cols-12">
@@ -1652,16 +2008,24 @@ const PurchaseReturnsForm = (props) => {
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal ">
-                                <h3>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3>
+                                <h3>
+                                    {dataLang?.purchase_order_table_total ||
+                                        "purchase_order_table_total"}
+                                </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {formatMoney(
                                         listData?.reduce((accumulator, item) => {
-                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                                                const product = Number(childItem?.price) * Number(childItem?.amount);
-                                                return childAccumulator + product;
-                                            }, 0);
+                                            const childTotal = item.child?.reduce(
+                                                (childAccumulator, childItem) => {
+                                                    const product =
+                                                        Number(childItem?.price) *
+                                                        Number(childItem?.amount);
+                                                    return childAccumulator + product;
+                                                },
+                                                0
+                                            );
                                             return accumulator + childTotal;
                                         }, 0)
                                     )}
@@ -1671,20 +2035,24 @@ const PurchaseReturnsForm = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}
+                                    {dataLang?.purchase_order_detail_discounty ||
+                                        "purchase_order_detail_discounty"}
                                 </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {formatMoney(
                                         listData?.reduce((accumulator, item) => {
-                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                                                const product =
-                                                    Number(childItem?.price) *
-                                                    (Number(childItem?.discount) / 100) *
-                                                    Number(childItem?.amount);
-                                                return childAccumulator + product;
-                                            }, 0);
+                                            const childTotal = item.child?.reduce(
+                                                (childAccumulator, childItem) => {
+                                                    const product =
+                                                        Number(childItem?.price) *
+                                                        (Number(childItem?.discount) / 100) *
+                                                        Number(childItem?.amount);
+                                                    return childAccumulator + product;
+                                                },
+                                                0
+                                            );
                                             return accumulator + childTotal;
                                         }, 0)
                                     )}
@@ -1694,19 +2062,24 @@ const PurchaseReturnsForm = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}
+                                    {dataLang?.purchase_order_detail_money_after_discount ||
+                                        "purchase_order_detail_money_after_discount"}
                                 </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {formatMoney(
                                         listData?.reduce((accumulator, item) => {
-                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                                                const product =
-                                                    Number(childItem?.price * (1 - childItem?.discount / 100)) *
-                                                    Number(childItem?.amount);
-                                                return childAccumulator + product;
-                                            }, 0);
+                                            const childTotal = item.child?.reduce(
+                                                (childAccumulator, childItem) => {
+                                                    const product =
+                                                        Number(
+                                                            childItem?.price * (1 - childItem?.discount / 100)
+                                                        ) * Number(childItem?.amount);
+                                                    return childAccumulator + product;
+                                                },
+                                                0
+                                            );
                                             return accumulator + childTotal;
                                         }, 0)
                                     )}
@@ -1716,22 +2089,28 @@ const PurchaseReturnsForm = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}
+                                    {dataLang?.purchase_order_detail_tax_money ||
+                                        "purchase_order_detail_tax_money"}
                                 </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {formatMoney(
                                         listData?.reduce((accumulator, item) => {
-                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                                                const product =
-                                                    Number(childItem?.price * (1 - childItem?.discount / 100)) *
-                                                    (isNaN(childItem?.tax?.tax_rate)
-                                                        ? 0
-                                                        : Number(childItem?.tax?.tax_rate) / 100) *
-                                                    Number(childItem?.amount);
-                                                return childAccumulator + product;
-                                            }, 0);
+                                            const childTotal = item.child?.reduce(
+                                                (childAccumulator, childItem) => {
+                                                    const product =
+                                                        Number(
+                                                            childItem?.price * (1 - childItem?.discount / 100)
+                                                        ) *
+                                                        (isNaN(childItem?.tax?.tax_rate)
+                                                            ? 0
+                                                            : Number(childItem?.tax?.tax_rate) / 100) *
+                                                        Number(childItem?.amount);
+                                                    return childAccumulator + product;
+                                                },
+                                                0
+                                            );
                                             return accumulator + childTotal;
                                         }, 0)
                                     )}
@@ -1741,20 +2120,26 @@ const PurchaseReturnsForm = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}
+                                    {dataLang?.purchase_order_detail_into_money ||
+                                        "purchase_order_detail_into_money"}
                                 </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {formatMoney(
                                         listData?.reduce((accumulator, item) => {
-                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                                                const product =
-                                                    Number(childItem?.price * (1 - childItem?.discount / 100)) *
-                                                    (1 + Number(childItem?.tax?.tax_rate) / 100) *
-                                                    Number(childItem?.amount);
-                                                return childAccumulator + product;
-                                            }, 0);
+                                            const childTotal = item.child?.reduce(
+                                                (childAccumulator, childItem) => {
+                                                    const product =
+                                                        Number(
+                                                            childItem?.price * (1 - childItem?.discount / 100)
+                                                        ) *
+                                                        (1 + Number(childItem?.tax?.tax_rate) / 100) *
+                                                        Number(childItem?.amount);
+                                                    return childAccumulator + product;
+                                                },
+                                                0
+                                            );
                                             return accumulator + childTotal;
                                         }, 0)
                                     )}
@@ -1782,7 +2167,7 @@ const PurchaseReturnsForm = (props) => {
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={resetValue}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>

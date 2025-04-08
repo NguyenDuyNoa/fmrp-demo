@@ -1209,7 +1209,7 @@ const Header = () => {
                 // Sau 3000ms, hiển thị phần tử tiếp theo
                 const timer = setTimeout(() => {
                     setCurrentDropdownIndex((prevIndex) => (prevIndex + 1) % dropdowns.length);
-                }, 3000);
+                }, 3000)
 
                 return () => {
                     clearTimeout(timer);

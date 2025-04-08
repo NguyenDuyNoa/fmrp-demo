@@ -27,11 +27,16 @@ const Popup_Bom = React.memo((props) => {
         return { menuPortalTarget };
     };
 
-    const [isOpen, sIsOpen] = useState(false);
 
     const isShow = useToast();
 
     const dispatch = useDispatch()
+
+    const [isOpen, sIsOpen] = useState(false);
+
+    const [loadingData, sLoadingData] = useState(false);
+
+    const [onFetchingCd, sOnFetchingCd] = useState(false);
 
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
@@ -39,10 +44,7 @@ const Popup_Bom = React.memo((props) => {
 
     const { checkAdd, checkEdit } = useActionRole(auth, "products");
 
-    const [loadingData, sLoadingData] = useState(false);
-
-    const [onFetchingCd, sOnFetchingCd] = useState(false);
-
+    // change vào trợ lý để tắt mở trợ lý ai
     const _ToggleModal = (e) => {
         sIsOpen(e);
         if (!e) {
@@ -83,6 +85,7 @@ const Popup_Bom = React.memo((props) => {
 
     const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
 
+    // change tab biến thể
     const _HandleSelectTab = (e) => {
         if (e == tab) return;
         sTab(e);
@@ -100,8 +103,10 @@ const Popup_Bom = React.memo((props) => {
         return () => clearTimeout();
     };
 
+    // xóa đi biến thể đã được chọn
     const dataRestVariant = dataVariant?.filter((item1) => !dataSelectedVariant?.some((item2) => item1?.label === item2?.label && item1?.value === item2?.value));
 
+    /// set initital cho các state
     useEffect(() => {
         isOpen && props?.id && sOnFetchingCd(true);
         isOpen && sLoadingData(false);
@@ -122,7 +127,7 @@ const Popup_Bom = React.memo((props) => {
     }, [isOpen]);
 
 
-
+    // dữ liệu khi sửa bom
     const { isFetching, isLoading, refetch } = useQuery({
         queryKey: ["detail_bom_product", props.id],
         queryFn: async () => {
@@ -166,6 +171,7 @@ const Popup_Bom = React.memo((props) => {
         enabled: isOpen && props.type == "edit"
     })
 
+    //  dữ liêu công đoạn
     const _ServerFetchingCd = async () => {
         try {
             const { data } = await apiProducts.apiDataDesignBomProducts({
@@ -220,9 +226,10 @@ const Popup_Bom = React.memo((props) => {
     }, [onFetchingCd]);
 
     const hiddenOptions = valueVariant?.length > 2 ? valueVariant?.slice(0, 2) : [];
-
+    // xóa đi biến thể đã đươc chọn
     const options = dataRestVariant.filter((x) => !hiddenOptions.includes(x?.value));
 
+    /// chhange biến thể
     const _HandleChangeSelect = (value) => {
         const newValue = value?.map((e) => {
             const checkValue = currentData.find((x) => x?.value == e?.value);
@@ -237,6 +244,7 @@ const Popup_Bom = React.memo((props) => {
         sValueVariant(newValue);
     };
 
+    // xử lý dữ liệu khi có data trong chat ai
     useEffect(() => {
         if (!stateBoxChatAi?.isShowAi) return
         const convertArrayBom = (arrParent, arrayChild) => {
@@ -302,6 +310,7 @@ const Popup_Bom = React.memo((props) => {
         }
     }, [stateBoxChatAi?.isShowAi, stateBoxChatAi.typeData])
 
+    /// xử lý khi chọn biến thể
     useEffect(() => {
         if (isOpen && dataSelectedVariant?.length == 0 && dataVariant?.length > 0) {
             const newValue = dataVariant?.map((e) => {
@@ -330,12 +339,14 @@ const Popup_Bom = React.memo((props) => {
         }
     }, [dataSelectedVariant, isOpen, dataVariant]);
 
+    // mở tab biến thể
     useEffect(() => {
         if (selectedList?.child?.length == 0 && dataSelectedVariant?.some(e => e?.child?.length == 0)) {
             _HandleAddNew(tab);
         }
     }, [selectedList, isOpen]);
 
+    // kiểm tra biến thể đã chọn hay chưa
     const _HandleApplyVariant = () => {
         const newData = valueVariant?.filter((x) => dataSelectedVariant.some((e) => e?.value != x?.value));
         if (valueVariant.some((x) => dataSelectedVariant.some((e) => e?.value == x?.value))) {
@@ -349,6 +360,7 @@ const Popup_Bom = React.memo((props) => {
         sValueVariant([]);
     };
 
+    // thêm dòng dữ liệu
     const _HandleAddNew = (id) => {
         let itemFound = false;
         const newData = dataSelectedVariant.map((item) => {
@@ -383,6 +395,7 @@ const Popup_Bom = React.memo((props) => {
         }
     };
 
+    // xóa bom
     const _HandleDeleteItemBOM = (parentId, id) => {
         const index = dataSelectedVariant.findIndex((obj) => obj?.value === parentId);
         const newData = [...dataSelectedVariant];
@@ -394,6 +407,7 @@ const Popup_Bom = React.memo((props) => {
         sDataSelectedVariant(newData);
     };
 
+    // tìm bom ajax
     const _HandleSeachApi = debounce(async (value, Idparent, type, id, name) => {
         try {
             const { data } = await apiProducts.apiSearchItemsVariants({ data: { term: value, type: type?.value } })
@@ -428,6 +442,7 @@ const Popup_Bom = React.memo((props) => {
     }, 500);
 
 
+    // change bom
     const _HandleChangeItemBOM = async (parentId, childId, type, value) => {
         const newData = dataSelectedVariant.map((parent) => {
             if (parent?.value === parentId) {
@@ -532,6 +547,7 @@ const Popup_Bom = React.memo((props) => {
         }
     };
 
+    // xóa bom
     const _HandleDeleteBOM = (id) => {
         const newData = dataSelectedVariant.filter((item) => item?.value !== id);
         if (newData?.length == 0) {
@@ -556,6 +572,7 @@ const Popup_Bom = React.memo((props) => {
         return prevValue && nextValue && JSON.stringify(prevValue) == JSON.stringify(nextValue);
     };
 
+    // kiểm tra đang sửa hay thêm mới khi change sẽ cập nhật dữ liệu cho bom
     useEffect(() => {
         if (checkEqual(currentData, dataSelectedVariant)) {
             // dataSelectedVariant.forEach((e) => {
@@ -672,6 +689,7 @@ const Popup_Bom = React.memo((props) => {
         }
     }, [dataSelectedVariant]);
 
+    // lưu dữ liệu
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("product_id", props?.id);

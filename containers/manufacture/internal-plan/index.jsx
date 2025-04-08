@@ -1,7 +1,7 @@
 import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import { BtnAction } from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import {BtnStatusApproved} from "@/components/UI/btnStatusApproved/BtnStatusApproved";
+import { BtnStatusApproved } from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -9,7 +9,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { Container, ContainerBody, ContainerTable, LayOutTableDynamic } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -41,6 +41,7 @@ import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import { useInternalPlanList } from "./hooks/useInternalPlanList";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const PopupDetail = dynamic(() => import("./components/PopupDetail"), { ssr: false });
 
@@ -202,223 +203,246 @@ const InternalPlan = (props) => {
         },
     ];
 
+    // breadcrumb
+    const breadcrumbItems = [
+        {
+            label: `Sản xuất`,
+            // href: "/",
+        },
+        {
+            label: `${dataLang?.internal_plan || "internal_plan"}`,
+        },
+    ];
+
     return (
         <React.Fragment>
-            <Head>
-                <title>{dataLang?.internal_plan || "internal_plan"} </title>
-            </Head>
-            <Container>
-                {statusExprired ? (
-                    <EmptyExprired />
-                ) : (
-                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.internal_plan || "internal_plan"}</h6>
-                    </div>
-                )}
-                <ContainerBody>
-                    <div className="space-y-3 h-[96%] overflow-hidden">
-                        <div className="flex items-center justify-between mt-1 mr-2">
-                            <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.internal_plan || "internal_plan"}
-                            </h2>
-                            <div className="flex items-center justify-end gap-2">
-                                <ButtonAddNew
-                                    onClick={() => {
-                                        if (role || checkAdd) {
-                                            router.push(routerInternalPlan.form);
-                                        } else {
-                                            isShow("warning", WARNING_STATUS_ROLE);
-                                        }
-                                    }}
-                                    dataLang={dataLang}
-                                />
+            <LayOutTableDynamic
+                head={
+                    <Head>
+                        <title>{dataLang?.internal_plan || "internal_plan"}</title>
+                    </Head>
+                }
+                breadcrumb={
+                    <>
+                        {statusExprired ? (
+                            <EmptyExprired />
+                        ) : (
+                            // <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                            //     <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
+                            //     <span className="text-[#141522]/40">/</span>
+                            //     <h6>{dataLang?.internal_plan || "internal_plan"}</h6>
+                            // </div>
+                            <Breadcrumb
+                                items={breadcrumbItems}
+                                className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                            />
+                        )}
+                    </>
+                }
+                titleButton={
+                    <>
+                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
+                            {dataLang?.internal_plan || "internal_plan"}
+                        </h2>
+                        <div className="flex items-center justify-end gap-2">
+                            <ButtonAddNew
+                                onClick={() => {
+                                    if (role || checkAdd) {
+                                        router.push(routerInternalPlan.form);
+                                    } else {
+                                        isShow("warning", WARNING_STATUS_ROLE);
+                                    }
+                                }}
+                                dataLang={dataLang}
+                            />
+                        </div>
+                    </>
+                }
+                table={
+                    <div className="flex flex-col h-full">
+                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                            <div className="col-span-4">
+                                <div className="grid grid-cols-9 gap-2">
+                                    <SearchComponent
+                                        dataLang={dataLang}
+                                        colSpan={3}
+                                        onChange={handleOnChangeKeySearch.bind(this)}
+                                    />
+                                    <SelectComponent
+                                        colSpan={3}
+                                        options={[
+                                            {
+                                                value: "",
+                                                label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                isDisabled: true,
+                                            },
+                                            ...dataBranch,
+                                        ]}
+                                        onChange={onChangeFilter("idBranch")}
+                                        value={idFillter.idBranch}
+                                        placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
+                                        hideSelectedOptions={false}
+                                        isClearable={true}
+                                        isSearchable={true}
+                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                        closeMenuOnSelect={true}
+                                    />
+                                    <DateToDateComponent
+                                        className='col-span-3'
+                                        value={idFillter.valueDate}
+                                        onChange={onChangeFilter("valueDate")}
+                                        colSpan={3}
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-span-2">
+                                <div className="flex items-center justify-end gap-2">
+                                    <OnResetData sOnFetching={() => { }} onClick={() => refetch()} />
+                                    {role == true || checkExport ? (
+                                        <div className={``}>
+                                            {data?.rResult?.length > 0 && (
+                                                <ExcelFileComponent
+                                                    dataLang={dataLang}
+                                                    filename={"Danh sách kế hoạch nội bộ"}
+                                                    multiDataSet={multiDataSet}
+                                                    title="DSKHNB"
+                                                />
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                            className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                        >
+                                            <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
+                                            <span>{dataLang?.client_list_exportexcel}</span>
+                                        </button>
+                                    )}
+                                    <div>
+                                        <DropdowLimit dataLang={dataLang} sLimit={sLimit} limit={limit} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <ContainerTable>
-                            <div className="space-y-2 xl:space-y-3">
-                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                                    <div className="col-span-4">
-                                        <div className="grid grid-cols-9 gap-2">
-                                            <SearchComponent
-                                                dataLang={dataLang}
-                                                colSpan={3}
-                                                onChange={handleOnChangeKeySearch.bind(this)}
-                                            />
-                                            <SelectComponent
-                                                colSpan={3}
-                                                options={[
-                                                    {
-                                                        value: "",
-                                                        label: dataLang?.price_quote_branch || "price_quote_branch",
-                                                        isDisabled: true,
-                                                    },
-                                                    ...dataBranch,
-                                                ]}
-                                                onChange={onChangeFilter("idBranch")}
-                                                value={idFillter.idBranch}
-                                                placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
-                                                hideSelectedOptions={false}
-                                                isClearable={true}
-                                                isSearchable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
-                                                closeMenuOnSelect={true}
-                                            />
-                                            <DateToDateComponent
-                                                className=''
-                                                value={idFillter.valueDate}
-                                                onChange={onChangeFilter("valueDate")}
-                                                colSpan={3}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-span-2">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <OnResetData sOnFetching={() => { }} onClick={() => refetch()} />
-                                            {role == true || checkExport ? (
-                                                <div className={``}>
-                                                    {data?.rResult?.length > 0 && (
-                                                        <ExcelFileComponent
+                        <Customscrollbar className="h-full overflow-y-auto">
+                            <div className="w-full">
+                                <HeaderTable gridCols={9}>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_day_vouchers || "import_day_vouchers"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_code_vouchers || "import_code_vouchers"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                        {dataLang?.internal_plan_name || "internal_plan_name"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.internal_plan_status || "internal_plan_status"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.internal_plan_creators || "internal_plan_creators"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_branch || "import_branch"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.recall_noteChild || "recall_noteChild"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.import_action || "import_action"}
+                                    </ColumnTable>
+                                </HeaderTable>
+                                {(isFetching && !refreshing) ? (
+                                    <Loading className="h-full" color="#0f4f9e" />
+                                ) : data?.rResult?.length > 0 ? (
+                                    <>
+                                        <div className="divide-y divide-slate-200 h-[100%]">
+                                            {data?.rResult?.map((e, index) => (
+                                                <RowTable key={e.id.toString()} gridCols={9}>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                        <PopupDetail
                                                             dataLang={dataLang}
-                                                            filename={"Danh sách kế hoạch nội bộ"}
-                                                            multiDataSet={multiDataSet}
-                                                            title="DSKHNB"
+                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                            name={e?.reference_no}
+                                                            id={e?.id}
                                                         />
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <button
-                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
-                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                                                >
-                                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
-                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                </button>
-                                            )}
-                                            <div>
-                                                <DropdowLimit dataLang={dataLang} sLimit={sLimit} limit={limit} />
-                                            </div>
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={2} textAlign={"left"}>
+                                                        {e.plan_name}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="mx-auto">
+                                                        <BtnStatusApproved
+                                                            onClick={() =>
+                                                                handleQueryId({
+                                                                    id: e?.id,
+                                                                    status: true,
+                                                                    idChild: e.status == "1" ? "0" : "1",
+                                                                })
+                                                            }
+                                                            type={e.status == "1" ? "1" : "0"}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        textAlign={"left"}
+                                                        className="flex items-center space-x-1"
+                                                    >
+                                                        <CustomAvatar
+                                                            classNameAvatar='max-w-[26%] w-[26%]'
+                                                            profileImage={e?.created_by_profile_image}
+                                                            fullName={e?.created_by_full_name}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="mx-auto">
+                                                        <TagBranch className="w-fit">{e?.name_branch}</TagBranch>
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        textAlign={"left"}
+                                                        className="truncate"
+                                                    >
+                                                        {e.note}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="flex justify-center">
+                                                        <BtnAction
+                                                            onRefresh={refetch.bind(this)}
+                                                            dataLang={dataLang}
+                                                            id={e?.id}
+                                                            status={e?.status}
+                                                            type="internal_plan"
+                                                            className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                        />
+                                                    </RowItemTable>
+                                                </RowTable>
+                                            ))}
                                         </div>
-                                    </div>
-                                </div>
+                                    </>
+                                ) : (
+                                    <NoData />
+                                )}
                             </div>
-                            <Customscrollbar className="3xl:h-[90%] 2xl:h-[89%] xl:h-[82%] lg:h-[90%]">
-                                <div className="w-full">
-                                    <HeaderTable gridCols={9}>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_day_vouchers || "import_day_vouchers"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_code_vouchers || "import_code_vouchers"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.internal_plan_name || "internal_plan_name"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.internal_plan_status || "internal_plan_status"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.internal_plan_creators || "internal_plan_creators"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_branch || "import_branch"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.recall_noteChild || "recall_noteChild"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.import_action || "import_action"}
-                                        </ColumnTable>
-                                    </HeaderTable>
-                                    {(isFetching && !refreshing) ? (
-                                        <Loading className="h-80" color="#0f4f9e" />
-                                    ) : data?.rResult?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 h-[100%]">
-                                                {data?.rResult?.map((e, index) => (
-                                                    <RowTable key={e.id.toString()} gridCols={9}>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            <PopupDetail
-                                                                dataLang={dataLang}
-                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
-                                                                name={e?.reference_no}
-                                                                id={e?.id}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={"left"}>
-                                                            {e.plan_name}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="mx-auto">
-                                                            <BtnStatusApproved
-                                                                onClick={() =>
-                                                                    handleQueryId({
-                                                                        id: e?.id,
-                                                                        status: true,
-                                                                        idChild: e.status == "1" ? "0" : "1",
-                                                                    })
-                                                                }
-                                                                type={e.status == "1" ? "1" : "0"}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            textAlign={"left"}
-                                                            className="flex items-center space-x-1"
-                                                        >
-                                                            <CustomAvatar
-                                                                classNameAvatar='max-w-[26%] w-[26%]'
-                                                                profileImage={e?.created_by_profile_image}
-                                                                fullName={e?.created_by_full_name}
-                                                            />
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="mx-auto">
-                                                            <TagBranch className="w-fit">{e?.name_branch}</TagBranch>
-                                                        </RowItemTable>
-                                                        <RowItemTable
-                                                            colSpan={1}
-                                                            textAlign={"left"}
-                                                            className="truncate"
-                                                        >
-                                                            {e.note}
-                                                        </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex justify-center">
-                                                            <BtnAction
-                                                                onRefresh={refetch.bind(this)}
-                                                                dataLang={dataLang}
-                                                                id={e?.id}
-                                                                status={e?.status}
-                                                                type="internal_plan"
-                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                            />
-                                                        </RowItemTable>
-                                                    </RowTable>
-                                                ))}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <NoData />
-                                    )}
-                                </div>
-                            </Customscrollbar>
-                        </ContainerTable>
+                        </Customscrollbar>
                     </div>
-                    {data?.rResult?.length != 0 && (
-                        <ContainerPagination>
-                            <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
-                            <Pagination
-                                postsPerPage={limit}
-                                totalPosts={Number(data?.output?.iTotalDisplayRecords)}
-                                paginate={paginate}
-                                currentPage={router.query?.page || 1}
-                            />
-                        </ContainerPagination>
-                    )}
-                </ContainerBody>
-            </Container>
+                }
+                pagination={
+                    <>
+                        {data?.rResult?.length != 0 && (
+                            <ContainerPagination>
+                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
+                                <Pagination
+                                    postsPerPage={limit}
+                                    totalPosts={Number(data?.output?.iTotalDisplayRecords)}
+                                    paginate={paginate}
+                                    currentPage={router.query?.page || 1}
+                                />
+                            </ContainerPagination>
+                        )}
+                    </>
+                }
+            />
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

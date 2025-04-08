@@ -1,5 +1,6 @@
 import apiSatff from "@/Api/apiPersonnel/apiStaff";
 import { BtnAction } from "@/components/UI/BtnAction";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -13,10 +14,7 @@ import {
 } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
-  Container,
-  ContainerBody,
-  ContainerTable,
-  LayOutTableDynamic,
+  LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -45,6 +43,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { getColorByParam } from "@/utils/helpers/radomcolor";
 import { useMutation } from "@tanstack/react-query";
 import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
@@ -56,8 +55,6 @@ import { useSelector } from "react-redux";
 import PopupStaff from "./components/staff/popup";
 import PopupDetail from "./components/staff/popupDetail";
 import { useStaffList } from "./hooks/staff/useStaffList";
-import { getColorByParam, getRandomColors } from "@/utils/helpers/radomcolor";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initalState = {
   onSending: false,
@@ -68,15 +65,14 @@ const initalState = {
   refreshing: false,
 };
 const PersonelStaff = (props) => {
-  const dataLang = props.dataLang;
+  const router = useRouter();
 
   const isShow = useToast();
 
+  const dataLang = props.dataLang;
+
+  // hook phân trang
   const { paginate } = usePagination();
-
-  const { isOpen, isKeyState, handleQueryId } = useToggle();
-
-  const router = useRouter();
 
   const [status, sStatus] = useState("");
 
@@ -86,14 +82,18 @@ const PersonelStaff = (props) => {
 
   const [isState, sIsState] = useState(initalState);
 
-  const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
+  // cờ để show popup xóa
+  const { isOpen, isKeyState, handleQueryId } = useToggle();
 
+  const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
+  // hook set limit table
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
   const { is_admin: role, permissions_current: auth } = useSelector(
     (state) => state.auth
   );
 
+  // params lọc danh sách
   const params = {
     search: isState.keySearch,
     limit: limit,
@@ -102,13 +102,17 @@ const PersonelStaff = (props) => {
       isState.valueBr?.length > 0 ? isState.valueBr.map((e) => e.value) : null,
     "filter[position_id]": isState.idPos?.value,
   };
-  
+
+  // danh sách chức vụ
   const { data: listPosition = [] } = usePositionLits();
 
+  // danh sách chi nhánh
   const { data: listBranch = [] } = useBranchList();
 
+  // danh sách table
   const { data, isFetching, isLoading, refetch } = useStaffList(params);
 
+  // hàm tiếm kiếm trong table
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
     queryState({ keySearch: value });
     router.replace({
@@ -119,6 +123,7 @@ const PersonelStaff = (props) => {
     });
   }, 500);
 
+  // xóa trong table
   const handleDelete = async () => {
     sStatus(isKeyState);
     const index = data?.rResult.findIndex((x) => x.id === isKeyState);
@@ -135,6 +140,7 @@ const PersonelStaff = (props) => {
     handleQueryId({ status: false });
   };
 
+  /// đổi trạng thái hoạt động
   const handingStatus = useMutation({
     mutationFn: (data) => {
       return apiSatff.apiHandingStatus(data, status);
@@ -168,6 +174,7 @@ const PersonelStaff = (props) => {
     }
   }, [active, status]);
 
+  // xuất excel
   const multiDataSet = [
     {
       columns: [
@@ -269,18 +276,16 @@ const PersonelStaff = (props) => {
         { value: `${e.position_name ? e.position_name : ""}` },
         { value: `${e.last_login ? e.last_login : ""}` },
         {
-          value: `${
-            e.active
-              ? e.active == "1"
-                ? "Đang hoạt động"
-                : "Không hoạt động"
-              : ""
-          }`,
+          value: `${e.active
+            ? e.active == "1"
+              ? "Đang hoạt động"
+              : "Không hoạt động"
+            : ""
+            }`,
         },
         {
-          value: `${
-            e.admin ? e.admin == "1" && "Có" : e.admin == "0" && "Không"
-          }`,
+          value: `${e.admin ? e.admin == "1" && "Có" : e.admin == "0" && "Không"
+            }`,
         },
         { value: `${e.position_name ? e.position_name : ""}` },
         { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
@@ -290,9 +295,7 @@ const PersonelStaff = (props) => {
 
   const breadcrumbItems = [
     {
-      label: `${
-        dataLang?.header_category_personnel || "header_category_personnel"
-      }`,
+      label: `${dataLang?.header_category_personnel || "header_category_personnel"}`,
       // href: "/",
     },
     {
@@ -352,7 +355,7 @@ const PersonelStaff = (props) => {
           </>
         }
         table={
-          <div className="h-full flex flex-col">
+          <div className="flex flex-col h-full">
             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
               <div className="col-span-4">
                 <div className="grid grid-cols-9 gap-2">
@@ -408,7 +411,7 @@ const PersonelStaff = (props) => {
                 <div className="flex items-center justify-end space-x-2">
                   <OnResetData
                     onClick={refetch.bind(this)}
-                    sOnFetching={(e) => {}}
+                    sOnFetching={(e) => { }}
                   />
                   {role ? (
                     <div className={``}>
@@ -558,9 +561,9 @@ const PersonelStaff = (props) => {
                             <RowItemTable colSpan={2} textAlign={"center"}>
                               {e.last_login != null
                                 ? formatMoment(
-                                    e.last_login,
-                                    FORMAT_MOMENT.DATE_TIME_SLASH_LONG
-                                  )
+                                  e.last_login,
+                                  FORMAT_MOMENT.DATE_TIME_SLASH_LONG
+                                )
                                 : ""}
                             </RowItemTable>
                             <RowItemTable colSpan={1} textAlign={"center"}>
@@ -623,7 +626,7 @@ const PersonelStaff = (props) => {
                               />
                               <BtnAction
                                 onRefresh={refetch.bind(this)}
-                                onRefreshGroup={() => {}}
+                                onRefreshGroup={() => { }}
                                 dataLang={dataLang}
                                 id={e?.id}
                                 type="personnel_staff"

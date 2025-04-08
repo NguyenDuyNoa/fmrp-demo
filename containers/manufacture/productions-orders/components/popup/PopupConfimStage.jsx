@@ -26,6 +26,7 @@ import { useListFinishedStages } from "../../hooks/useListFinishedStages";
 import { useLoadOutOfStock } from "../../hooks/useLoadOutOfStock";
 import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 import ButtonAnimationNew from "@/components/common/button/ButtonAnimationNew";
+import KanbanIcon from "@/components/icons/common/KanbanIcon";
 
 
 const initialState = {
@@ -449,15 +450,23 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                 //         Hoàn thành công đoạn
                 //     </h3>
                 // </div>
-                <ButtonAnimationNew
-                    icon={
-                        <div className='size-4'>
-                            <FaCheck className={`size-full`} />
-                        </div>
-                    }
-                    title="Hoàn thành công đoạn"
-                    className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-white border border-[#0375D3] bg-[#0375D3] hover:shadow-hover-button rounded-lg"
-                />
+                // <ButtonAnimationNew
+                //     icon={
+                //         <div className='size-4'>
+                //             <FaCheck className={`size-full`} />
+                //         </div>
+                //     }
+                //     title="Hoàn thành công đoạn"
+                //     className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-white border border-[#0375D3] bg-[#0375D3] hover:shadow-hover-button rounded-lg"
+                // />
+                <div className="flex items-center gap-2">
+                    <span className="3xl:size-5 size-4 text-[#0375F3] shrink-0">
+                        <KanbanIcon className="size-full" />
+                    </span>
+                    <span className="3xl:text-base text-sm font-normal text-[#101828]">
+                        Chi tiết công đoạn
+                    </span>
+                </div>
             }
             onClickOpen={() => {
                 if (dataRight?.listDataRight?.statusManufacture == "2") {
@@ -469,7 +478,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
             lockScroll={true}
             open={isState.open}
             onClose={() => { queryState({ open: false }); }}
-            // classNameBtn={`${dataRight?.listDataRight?.statusManufacture == "2" ? "bg-gray-400" : "bg-blue-500"} rounded-lg`}
+        // classNameBtn={`${dataRight?.listDataRight?.statusManufacture == "2" ? "bg-gray-400" : "bg-blue-500"} rounded-lg`}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
             <div className={`w-[85vw] xl:h-[80vh] h-[575px] overflow-hidden `}>

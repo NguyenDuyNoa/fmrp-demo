@@ -63,6 +63,7 @@ const Popup_dsnd = (props) => {
 
     const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
+    // change ảnh đại diện
     const _HandleChangeFileThumb = ({ target: { files } }) => {
         const [file] = files;
         if (file) {
@@ -73,6 +74,7 @@ const Popup_dsnd = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
+    // xóa ảnh đại diện
     const _DeleteThumb = (e) => {
         e.preventDefault();
         document.getElementById("upload").value = null;
@@ -83,7 +85,7 @@ const Popup_dsnd = (props) => {
         queryState({ thumb: isState.thumb });
     }, [isState.thumb]);
 
-
+    //  danh sách modlue
     useQuery({
         queryKey: ["api_permissions_staff"],
         queryFn: async () => {
@@ -114,11 +116,12 @@ const Popup_dsnd = (props) => {
     })
 
 
-
+    // không có chức vụ thì set rỗng nhân viên
     useEffect(() => {
         isState.idPos == null && queryState({ manage: [], valueManage: [] });
     }, [isState.idPos]);
 
+    //  chi tiết người dùng
     useQuery({
         queryKey: ["api_handle_detail_staff"],
         queryFn: async () => {
@@ -146,6 +149,7 @@ const Popup_dsnd = (props) => {
         enabled: !!isState.open && !!props?.id
     })
 
+    // change modlue
     const handleChange = (parent, child = null, permissions = null) => {
         const newData = isState.room?.map((e) => {
             if (child == null && e?.key == parent?.key) {
@@ -226,6 +230,7 @@ const Popup_dsnd = (props) => {
         return transformedData;
     };
 
+    // lưu người dùng
     const handingStaff = useMutation({
         mutationFn: (data) => {
             return apiSatff.apiHandingStaff(props?.id, data);
@@ -270,6 +275,7 @@ const Popup_dsnd = (props) => {
         isState.onSending && _ServerSending();
     }, [isState.onSending]);
 
+    // danh sách chức vụ
     useQuery({
         queryKey: ["api_staff_manage", isState.idPos],
         queryFn: async () => {
@@ -321,6 +327,7 @@ const Popup_dsnd = (props) => {
     }, [isState.password != ""]);
 
 
+    // tìm kiếm thì ẩn hiện modlue theo key search
     useEffect(() => {
         const filteredData = isState.room.filter((item) =>
             item.name.toLowerCase().includes(isState.valueSearch.toLowerCase())
@@ -345,11 +352,7 @@ const Popup_dsnd = (props) => {
     return (
         <>
             <PopupCustom
-                title={
-                    props.id
-                        ? `${props.dataLang?.personnels_staff_popup_edit}`
-                        : `${props.dataLang?.personnels_staff_popup_add}`
-                }
+                title={props.id ? `${props.dataLang?.personnels_staff_popup_edit}` : `${props.dataLang?.personnels_staff_popup_add}`}
                 button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={() => queryState({ open: true })}
                 open={isState.open}

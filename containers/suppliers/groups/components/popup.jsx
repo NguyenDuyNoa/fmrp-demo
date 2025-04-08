@@ -33,6 +33,7 @@ const Popup_groupKh = (props) => {
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
 
+    // set data cho chi nhánh, tên, selected chi nhánh
     useEffect(() => {
         if (props?.id) {
             queryState({
@@ -54,7 +55,7 @@ const Popup_groupKh = (props) => {
         }
     }, [open]);
 
-
+    // vlaidate input
     useEffect(() => {
         isState.name == "" && queryState({ errInput: false });
     }, [isState.name]);
@@ -63,7 +64,7 @@ const Popup_groupKh = (props) => {
         isState.valueBr?.length > 0 && queryState({ errInputBr: false });
     }, [isState.valueBr]);
 
-
+    // lưu dữ liệu
     const handingGroupSuppliers = useMutation({
         mutationFn: (data) => {
             return apiGroups.apiHandingGroup(data, props.id);
@@ -115,7 +116,7 @@ const Popup_groupKh = (props) => {
             onClose={_ToggleModal.bind(this, false)}
             classNameBtn={props.className}
         >
-            <div className="w-96 mt-4">
+            <div className="mt-4 w-96">
                 <form onSubmit={_HandleSubmit.bind(this)}>
                     <div>
                         <div className="flex flex-wrap justify-between">
@@ -189,7 +190,7 @@ const Popup_groupKh = (props) => {
                                 </label>
                             )}
                         </div>
-                        <div className="text-right mt-5 space-x-2">
+                        <div className="mt-5 space-x-2 text-right">
                             <button
                                 type="button"
                                 onClick={_ToggleModal.bind(this, false)}

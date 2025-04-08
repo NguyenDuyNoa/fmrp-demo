@@ -3,15 +3,14 @@ import NoData from "@/components/UI/noData/nodata";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Image from "next/image";
-import React, { memo, useContext, useState, useCallback, useMemo } from "react";
-import { ProductionsOrdersContext } from "../../context/productionsOrders";
+import React, { memo, useContext, useState, useCallback } from "react";
 import NoteIcon from "@/components/icons/common/NoteIcon";
 import CaretDownIcon from "@/components/icons/common/CaretDownIcon";
 import ProgressStageBar from "@/components/common/progress/ProgressStageBar";
 import { AnimatePresence, motion } from "framer-motion";
 import { StateContext } from "@/context/_state/productions-orders/StateContext";
 
-const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang, handleShowModel }) => {
+const DetailProductionOrderList = memo(({ handleToggleAccordionList, isLoadingRight, dataLang, handleToggleSheetDetail }) => {
     const dataSeting = useSetingServer();
     const formatNumber = useCallback((num) => formatNumberConfig(+num, dataSeting), [dataSeting]);
     const { isStateProvider } = useContext(StateContext);
@@ -22,9 +21,9 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
     }, []);
 
     const handleToggleAccordion = useCallback((id) => {
-        handShowItem(id, "listPOItems");
+        handleToggleAccordionList(id, "listPOItems");
         setVisibleProducts((prev) => ({ ...prev, [id]: 4 }));
-    }, [handShowItem]);
+    }, [handleToggleAccordionList]);
 
     const renderProductRow = useCallback((product, index, item, totalLength) => {
         const colorMap = {
@@ -38,7 +37,7 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
         return (
             <div
                 key={`product-${index}`}
-                onClick={() => handleShowModel(product)}
+                onClick={() => handleToggleSheetDetail(product)}
                 className={`col-span-16 grid grid-cols-16 gap-2 items-center group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out 3xl:py-4 py-2 ${totalLength - 1 === index ? "border-transparent" : "border-b"}`}
             >
                 <h4 className="col-span-1 flex items-center justify-center text-center text-[#141522] font-semibold xl:text-sm text-xs uppercase px-1">
@@ -103,7 +102,7 @@ const DetailProductionOrderList = memo(({ handShowItem, isLoadingRight, dataLang
                 </h4>
             </div>
         );
-    }, [formatNumber, handleShowModel, isStateProvider?.productionsOrders.dataModal.id, dataLang]);
+    }, [formatNumber, handleToggleSheetDetail, isStateProvider?.productionsOrders.dataModal.id, dataLang]);
 
     if (isLoadingRight) return <Loading className="h-80" color="#0f4f9e" />;
 
