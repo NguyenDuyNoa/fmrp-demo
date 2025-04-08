@@ -7,6 +7,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import ButtonAnimationNew from "../button/ButtonAnimationNew";
+import UpgradeIcon from "@/components/icons/common/UpgradeIcon";
+import { FaL } from "react-icons/fa6";
 
 // const inter = Inter({ subsets: ['latin'] });
 
@@ -15,7 +17,7 @@ const deca = Lexend_Deca({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-const PopupRequestUpdateVersion = () => {
+const PopupRequestUpdateVersion = ({ children }) => {
   const dispatch = useDispatch();
   return (
     <div className="">
@@ -23,7 +25,7 @@ const PopupRequestUpdateVersion = () => {
         style={{
           boxShadow: `0px 20px 40px -8px rgba(16, 24, 40, 0.1)`,
         }}
-        className={`bg-[#ffffff] xlg:p-9 p-6 rounded-[24px] w-fit h-fit max-w-[455px] relative flex flex-col gap-1 ${deca.className}`}
+        className={`bg-[#ffffff] xlg:p-9 p-6 rounded-[24px] w-fit h-fit max-w-[420px] relative flex flex-col gap-1 ${deca.className}`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -48,7 +50,7 @@ const PopupRequestUpdateVersion = () => {
         </div>
 
         <div className="flex justify-center my-4">
-          <div className="relative w-[266px] h-[200px]">
+          <div className="relative w-[246px] h-[180px] xlg:w-[266px] xlg:h-[200px] ">
             <Image
               // width={1280}
               // height={1024}
@@ -63,14 +65,13 @@ const PopupRequestUpdateVersion = () => {
         </div>
 
         <div className="flex flex-col gap-8">
-          <p className="text-start xlg:text-2xl text-xl leading-[32px] font-semibold text-[#141522]">
-            Theo dõi đơn hàng theo nhà cung cấp để nguyên vật liệu luôn{" "}
-            <span className="text-[#0375F3]">đúng và đủ</span>.
-          </p>
+          {children}
 
           <Link target="_blank" href="https://zalo.me/fososoft">
             <ButtonAnimationNew
-              reverse={true}
+              icon={<UpgradeIcon className="text-white text-[15px]" size={15} />}
+              classNameWithIcon="space-x-2"
+              reverse={false}
               title="Nâng cấp"
               className="border-gradient-button-foso w-full text-white text-[20px] font-medium rounded-[8px] text-center flex items-center justify-center py-3 transition-colors duration-300 ease-in-out"
               style={{
