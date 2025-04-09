@@ -10,3 +10,13 @@ export const fetchPDFManufactures = async ({ idManufacture }) => {
 
     return pdf_url;
 };
+
+export const fetchPDFPlanManufactures = async ({ idManufacture }) => {
+    const { pdf_url } = await apiProducts.apiPostLinkPDFPlanManufactures({
+        data: {
+            id: idManufacture,
+        },
+    });
+
+    return pdf_url;
+};

@@ -7,19 +7,13 @@ import {
   RowTable,
 } from "@/components/UI/common/Table";
 import Loading from "@/components/UI/loading/loading";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import usePagination from "@/hooks/usePagination";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import React, { memo, useCallback, useContext } from "react";
+import React, { memo, useContext, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import Pagination from "@/components/UI/pagination";
 import { StateContext } from "@/context/_state/productions-orders/StateContext";
-import LimitListDropdown from "@/components/common/dropdown/LimitListDropdown";
 import { useListBomProductPlan } from "@/managers/api/productions-order/useListBomProductPlan";
 import NoData from "@/components/UI/noData/nodata";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
+import ProgressBar from "@/components/common/progress/ProgressBar";
 
 const CardProductionOrder = ({
   imageURL,
@@ -32,7 +26,7 @@ const CardProductionOrder = ({
 }) => {
   return (
     <div className=" w-full h-full flex flex-row items-start gap-x-2">
-      <div className="rounded bg-background-gray-1 px-2 py-[6px]">
+      <div className="rounded bg-background-gray-1 xlg:px-2 xlg:py-[6px] xl:px-1 xl:py-[3px] shrink-0">
         <Image
           alt="default"
           src={imageURL || "/productionPlan/default-product.svg"}
@@ -42,21 +36,25 @@ const CardProductionOrder = ({
         />
       </div>
       <div className="flex flex-col items-start justify-start gap-y-1 w-full">
-        <h3 className="font-semibold text-sm text-typo-black-1">{name}</h3>
-        <p className="text-[10px] font-normal text-typo-gray-2">
+        <h3 className="font-semibold text-[10px] xl:text-[12px] text-typo-black-1 xlg:text-sm">
+          {name}
+        </h3>
+        <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-gray-2">
           {variation || "(none)"}
         </p>
-        <p className="text-[10px] font-normal text-typo-blue-2">{code}</p>
-        {typeTable === "product" && (
+        <p className="xlg:text-[10px] text-[8px] font-normal text-typo-blue-2">
+          {code}
+        </p>
+        {typeTable === "products" && (
           <div
             className={twMerge(
-              "rounded px-1",
+              "rounded xl:px-1 px-[2px] w-fit",
               typeProduct === "semi_products"
                 ? "bg-background-green-1/20 text-typo-green-1 "
                 : "bg-background-blue-1/20 text-typo-blue-3 "
             )}
           >
-            <p className="text-[8px] font-medium leading-4 ">
+            <p className="xl:text-[8px] font-medium leading-4 text-[6px]">
               {typeProduct === "semi_products"
                 ? dataLang?.semi_products
                 : dataLang?.semi_products_outside}
@@ -68,38 +66,9 @@ const CardProductionOrder = ({
   );
 };
 
-const ProgressBar = ({ current, total, name }) => {
-  const percent = Math.floor((current / total) * 100);
-  const isFull = current === total;
-
-  const formatNumber = (value) => {
-    const number = Number(value);
-
-    if (isNaN(number)) return "0"; // fallback nếu không phải số
-
-    const fixed = number.toFixed(1); // giữ 1 số thập phân
-    return fixed.endsWith(".0") ? fixed.slice(0, -2) : fixed;
-  };
-
-  return (
-    <div className="w-full max-w-md mx-auto text-center">
-      <div className="relative h-2 bg-background-gray-1 rounded-full overflow-hidden">
-        <div
-          className={twMerge(
-            `h-full rounded-full transition-all duration-500 min-w-0`,
-            isFull ? "bg-linear-bg-progress-full" : "bg-background-blue-2"
-          )}
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-      <p className="mt-2 text-[8px] font-normal text-typo-gray-3">{`${formatNumber(
-        current
-      )}/${formatNumber(total)} ${name}`}</p>
-    </div>
-  );
-};
-
 const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
+  const [limit, setLimit] = useState(5);
+
   return (
     <div className="flex flex-col h-full">
       <h3 className="font-medium text-xl leading-5 text-typo-blue-1 capitalize mb-6">
@@ -128,7 +97,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                 className={`border-none normal-case leading-5 text-typo-gray-1 px-3 !text-[14px] 
                                     }`}
               >
-                {typeTable === "product"
+                {typeTable === "products"
                   ? dataLang?.materials_planning_semi
                   : dataLang?.import_materials}
               </ColumnTable>
@@ -185,41 +154,46 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                 Tiến độ mua hàng
               </ColumnTable>
             </HeaderTable>
-            {data.map((item, index) => (
+            {data?.slice(0, limit).map((item, index) => (
               <div
                 className="divide-y divide-slate-200 h-[100%] "
                 key={item.item_id}
               >
                 {
                   <RowTable gridCols={12}>
+                    {/* stt */}
                     <RowItemTable
                       colSpan={1}
                       textAlign={"center"}
-                      textSize={`"!text-sm"`}
-                      className="font-semibold text-sm leading-6 text-typo-black-1"
+                      // textSize={`"!text-sm"`}
+                      className="font-semibold xlg:text-sm leading-6 text-typo-black-1 "
                     >
                       {index + 1}
                     </RowItemTable>
                     <RowItemTable
                       colSpan={3}
                       textAlign={"start"}
-                      textSize={`"!text-xs"`}
+                    // textSize={`"!text-xs"`}
                     >
+                      {/* card */}
                       <CardProductionOrder
                         name={item.item_name}
                         code={item.item_code}
                         typeProduct={item.type_products}
                         imageURL={item.images}
                         variation={item.item_variation}
+                        typeTable={typeTable}
+                        dataLang={dataLang}
                       />
                     </RowItemTable>
                     {typeTable === "products" && (
                       <RowItemTable
                         colSpan={2}
                         textAlign={"center"}
-                        textSize={`"!text-sm"`}
-                        className="font-semibold text-sm leading-6 text-typo-black-1"
+                        // textSize={`"!text-sm"`}
+                        className="font-semibold xlg:text-sm leading-6 text-typo-black-1 xl:text-xs"
                       >
+                        {/* Đơn vị tính */}
                         {item.unit_name}
                       </RowItemTable>
                     )}
@@ -227,9 +201,10 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                     <RowItemTable
                       colSpan={1}
                       textAlign={"center"}
-                      textSize={`"!text-sm"`}
-                      className="font-semibold text-sm leading-6 text-typo-black-1"
+                      // textSize={`"!text-sm"`}
+                      className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
                     >
+                      {/* sử dụng  */}
                       {typeTable === "materials" ? (
                         <p>
                           {item.total_quota === "0" ? (
@@ -237,7 +212,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                           ) : (
                             <span>
                               {item.total_quota}/ <br />{" "}
-                              <span className="font-normal text-xs text-typo-black-1">
+                              <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
                                 {" "}
                                 {item.unit_name}
                               </span>
@@ -254,35 +229,87 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                       <RowItemTable
                         colSpan={2}
                         textAlign={"center"}
-                        textSize={`"!text-sm"`}
-                        className="font-semibold text-sm leading-6 text-typo-black-1"
+                        // textSize={`"!text-sm"`}
+                        className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
                       >
-                        {item.quota_primary === "0"
-                          ? " - "
-                          : item.quota_primary}
+                        {/* quy đổi  */}
+                        {item.quota_primary === "0" ? (
+                          " - "
+                        ) : (
+                          <span>
+                            {item.quota_primary}/ <br />{" "}
+                            <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                              {" "}
+                              {item.unit_name_primary}
+                            </span>
+                          </span>
+                        )}
                       </RowItemTable>
                     )}
                     <RowItemTable
                       colSpan={1}
                       textAlign={"center"}
                       textSize={`"!text-sm"`}
-                      className="font-semibold text-sm leading-6 text-typo-black-1"
+                      className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
                     >
-                      {item.quantity_keep === "0" ? " - " : item.quantity_keep}
+                      {/* Đã giữ */}
+
+                      {typeTable === "materials" ? (
+                        <p>
+                          {item.quantity_keep === "0" ? (
+                            " - "
+                          ) : (
+                            <span>
+                              {item.quantity_keep}/ <br />{" "}
+                              <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                {" "}
+                                {item.unit_name_primary}
+                              </span>
+                            </span>
+                          )}
+                        </p>
+                      ) : (
+                        <p>
+                          {item.quantity_keep === "0"
+                            ? " - "
+                            : item.quantity_keep}
+                        </p>
+                      )}
                     </RowItemTable>
                     <RowItemTable
                       colSpan={1}
                       textAlign={"center"}
-                      textSize={`"!text-sm"`}
-                      className="font-semibold text-sm leading-6 text-typo-black-1"
+                      // textSize={`"!text-sm"`}
+                      className="font-semibold xlg:text-sm  leading-6 text-typo-black-1"
                     >
-                      {item.quota_primary === "0" ? " - " : item.quota_primary}
+                      {/* Thiếu */}
+                      {typeTable === "materials" ? (
+                        <p>
+                          {item.quantity_rest === "0" ? (
+                            " - "
+                          ) : (
+                            <span>
+                              {item.quantity_rest}/ <br />{" "}
+                              <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                {" "}
+                                {item.unit_name_primary}
+                              </span>
+                            </span>
+                          )}
+                        </p>
+                      ) : (
+                        <p>
+                          {item.quantity_rest === "0"
+                            ? " - "
+                            : item.quantity_rest}
+                        </p>
+                      )}
                     </RowItemTable>
                     <RowItemTable
                       colSpan={3}
                       textAlign={"start"}
-                      textSize={`"!text-sm"`}
-                      className={"font-semibold"}
+                      // textSize={`"!text-sm"`}
+                      className={"font-semibold xlg:text-sm"}
                     >
                       <ProgressBar
                         current={+item.quantity_import}
@@ -294,6 +321,26 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                 }
               </div>
             ))}
+          </div>
+          <div className="w-full">
+            {data?.length > 0 && (
+              <div className="flex items-center w-full justify-center h-fit">
+                <div />
+                {limit < data.length && (
+                  <div className=" flex justify-center py-2">
+                    <button
+                      onClick={() => setLimit(data.length)}
+                      className="text-[#667085] 3xl:text-base xl:text-sm text-xs hover:underline font-semibold"
+                    >
+                      Xem thêm ({data.length - limit}){" "}
+                      {typeTable === "products"
+                        ? `${dataLang?.materials_planning_semi}`
+                        : `${dataLang?.import_materials}`}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </Customscrollbar>
       </div>
@@ -308,9 +355,7 @@ const PlaningProductionOrder = memo(({ dataLang, isLoading }) => {
     useListBomProductPlan({
       id: isStateProvider?.productionsOrders?.dataProductionOrderDetail?.pp_id,
     });
-
-  console.log("🚀 ~ dataListBom:", dataListBom?.data);
-
+  console.log("🚀 ~ PlaningProductionOrder ~ dataListBom:", dataListBom)
   return (
     <div className="flex flex-row w-full h-full items-start justify-between">
       {/* bảng bán thành phẩm  */}
@@ -349,5 +394,6 @@ const PlaningProductionOrder = memo(({ dataLang, isLoading }) => {
     </div>
   );
 });
+
 
 export default PlaningProductionOrder;
