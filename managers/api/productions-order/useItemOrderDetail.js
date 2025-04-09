@@ -13,9 +13,9 @@ export const useItemOrderDetail = ({ poi_id, enabled }) => {
 
             return data
         } catch (error) {
-            throw new Error(error);
-        }
-    };
+            throw new Er
+   ror(error);
+        } };
 
     return useQuery({
         queryKey: ['apiItemOrdersDetail', poi_id],

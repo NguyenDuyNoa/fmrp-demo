@@ -616,12 +616,12 @@ const MainTable = ({ dataLang }) => {
                                                     dataTable.listDataRight?.referenceNoPo && <span>
                                                         /  <TagColorOrange
                                                             onClick={() => {
-                                                                queryStateProviderProductions({
-                                                                    openModal: true,
-                                                                    dataModal: {
-                                                                        id: dataTable.listDataRight?.poId
-                                                                    }
-                                                                });
+                                                                // queryStateProviderProductions({
+                                                                //     openModal: true,
+                                                                //     dataModal: {
+                                                                //         id: dataTable.listDataRight?.poId
+                                                                //     }
+                                                                // });
                                                             }}
                                                             name={dataTable.listDataRight?.referenceNoPo}
                                                             className={'relative !text-[11px] top-0 3xl:!py-1 !py-1 cursor-pointer select-none'}

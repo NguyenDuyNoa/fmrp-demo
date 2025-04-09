@@ -29,6 +29,7 @@ import TabMaterialOutputTab from "../tab/TabMaterialOutput";
 import Skeleton from "@/components/common/skeleton/Skeleton";
 import CostCardSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/CostCardSkeleton";
 import TabSwitcherWithUnderlineSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/TabSwitcherWithUnderlineSkeleton";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 
 const initialState = {
     isTab: 1,
@@ -40,8 +41,6 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
     const poiId = useMemo(() => router.query.poi_id, [router.query.poi_id])
 
-    const [scrollHeight, setScrollHeight] = useState(0);
-
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
     const dataSeting = useSetingServer();
@@ -50,7 +49,6 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     const commentSheetRef = useRef(null);
     const { isOpen: isOpenSheet, closeSheet } = useSheet()
 
-    const { heightMapRef, calcHeights } = useMultiAvailableHeightRef();
     const {
         data: dataItemOrderDetail,
         isLoading: isLoadingItemOrderDetail,
@@ -94,34 +92,18 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
         },
     ];
 
+    console.log('isStateProvider?.productionsOrders?.poiId', isStateProvider?.productionsOrders?.poiId);
+
     useEffect(() => {
-        const handleResize = () => {
-            calcHeights({
-                main: {
-                    refs: [titleSheetRef, commentSheetRef],
-                    subtract: 84 + 24,
-                },
-                submain: {
-                    refs: [titleSheetRef],
-                    subtract: 84 + 10,
-                },
+        if (isOpenSheet && isStateProvider?.productionsOrders?.poiId) {
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    isTabSheet: listTab[0],
+                }
             });
-
-            // cập nhật scrollHeight sau 1 frame (DOM đã render)
-            requestAnimationFrame(() => {
-                const isTab1 = isStateProvider?.productionsOrders?.isTabSheet?.id === 1;
-                const newHeight = isTab1 ? heightMapRef.current.main : heightMapRef.current.submain;
-                setScrollHeight(newHeight);
-            });
-        };
-
-        handleResize();
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [isOpenSheet, calcHeights, isStateProvider?.productionsOrders?.isTabSheet?.id]);
+        }
+    }, [isOpenSheet, isStateProvider?.productionsOrders?.poiId]);
 
     const components = {
         1: <TabInformation dataLang={dataLang} {...props} />,
@@ -149,7 +131,9 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     const handleCloseSheet = () => {
         closeSheet("manufacture-productions-orders")
 
-        router.push("/manufacture/productions-orders")
+        if (router.pathname.startsWith("/manufacture/productions-orders")) {
+            router.push("/manufacture/productions-orders");
+        }
     }
 
     const handleActiveTab = (value, type) => {
@@ -170,20 +154,34 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
         });
     };
 
-    // console.log('isLoadingItemOrderDetail: ', isLoadingItemOrderDetail);
-    // console.log(isFetchingItemOrderDetail: ',isFetchingItemOrderDetail);
+    const handleCopyLink = () => {
+        const currentUrl = window.location.href;
+        navigator?.clipboard?.writeText(currentUrl)
+            .then(() => {
+                // Có thể dùng toast hoặc alert thông báo
+                // ToatstNotifi.success("Đã sao chép liên kết!");
+                ToatstNotifi("success", `Đã sao chép liên kết!`);
+            })
+            .catch((err) => {
+                console.error("Lỗi khi sao chép URL:", err);
+                ToatstNotifi("error", `Không thể sao chép liên kết!`);
+                // toast.error("Không thể sao chép liên kết.");
+            })
+    }
+
+    console.log('dataItemOrderDetail dataItemOrderDetail:', dataItemOrderDetail);
 
 
     return (
-        <div className="flex flex-col gap-2 3xl:pl-6 pl-4 pr-2 3xl:py-3 py-1 overflow-hidden">
+        <div className="flex flex-col overflow-hidden !bg-white h-full">
             <div
                 ref={titleSheetRef}
-                className='3xl:pr-4 pr-2 flex items-center justify-between'
-            // style={{
-            //     WebkitMaskImage: "linear-gradient(0deg, rgba(249, 251, 252, 0.00) 1%, #F9FBFC 10%)"
-            // }}
+                className='3xl:pl-6 pl-4 3xl:pr-4 pr-2 3xl:py-3 py-1 flex items-center justify-between bg-white'
+                style={{
+                    boxShadow: "0px 4px 30px 0px #0000000D"
+                }}
             >
-                <h1 className='text-title-default font-bold text-[#11315B]'>
+                <h1 className='text-title-default font-bold text-[#11315B] capitalize'>
                     Chi tiết lệnh sản xuất
                 </h1>
 
@@ -201,6 +199,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                         icon={
                             <ArrowBendUpRightIcon className='xl:size-4 size-3.5' />
                         }
+                        onClick={() => handleCopyLink()}
                         title="Chia sẻ LSX"
                         className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
                     />
@@ -232,11 +231,11 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
             </div>
 
             <Customscrollbar
-                className='overflow-auto pb-0'
-                style={{
-                    height: `${scrollHeight}px`,
-                    maxHeight: `${scrollHeight}px`,
-                }}
+                className='overflow-auto pb-0 3xl:pl-6 pl-4 pr-2 py-2 h-full min-h-0'
+            // style={{
+            //     height: `${scrollHeight}px`,
+            //     maxHeight: `${scrollHeight}px`,
+            // }}
 
             >
                 <div className='flex flex-col 3xl:gap-6 gap-4 pr-4'>
@@ -414,31 +413,39 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
             {
                 isStateProvider?.productionsOrders?.isTabSheet?.id == 1 &&
-                <div ref={commentSheetRef} className="mt-1 w-full border border-[#9295A4] rounded-xl flex items-center px-4 py-2 gap-3">
-                    <input
-                        className="flex-1 text-sm-default text-[#344054] placeholder:!text-[#667085] focus:outline-none"
-                        placeholder="Thêm bình luận"
-                    // value={comment}
-                    // onChange={(e) => setComment(e.target.value)}
-                    />
-                    <div className="flex items-center gap-3 text-[#3A3E4C]">
-                        <PiSmiley className='size-5 shrink-0 cursor-pointer' />
-                        <PiTextAa className='size-5 shrink-0 cursor-pointer' />
-                        <PiPaperclip className='size-5 shrink-0 cursor-pointer' />
-                        <PiImage className='size-5 shrink-0 cursor-pointer' />
+                <div
+                    className='3xl:pl-6 pl-4 pr-2 3xl:py-3 py-1 bg-white'
+                    style={{
+                        boxShadow: "0px -4px 30px 0px #0000000D"
+                    }}
+
+                >
+                    <div ref={commentSheetRef} className="mt-1 px-4 py-2 w-full border border-[#9295A4] rounded-xl flex items-center gap-3">
+                        <input
+                            className="flex-1 text-sm-default text-[#344054] placeholder:!text-[#667085] focus:outline-none"
+                            placeholder="Thêm thảo luận..."
+                        // value={comment}
+                        // onChange={(e) => setComment(e.target.value)}
+                        />
+                        <div className="flex items-center gap-3 text-[#3A3E4C]">
+                            <PiSmiley className='size-5 shrink-0 cursor-pointer' />
+                            <PiTextAa className='size-5 shrink-0 cursor-pointer' />
+                            <PiPaperclip className='size-5 shrink-0 cursor-pointer' />
+                            <PiImage className='size-5 shrink-0 cursor-pointer' />
+                        </div>
+
+                        <div className='w-[1px] h-4 bg-[#1F2329]/15' />
+
+                        <ButtonAnimationNew
+                            icon={
+                                <PiPaperPlaneRightFill className='size-5 shrink-0' />
+                            }
+                            hideTitle={true}
+                            disabled={false}
+                            variant={variantButtonScaleZoom}
+                            className='text-[#0375F3] hover:text-[#0375F3]/90 disabled:!text-[#667085] disabled:bg-transparent'
+                        />
                     </div>
-
-                    <div className='w-[1px] h-4 bg-[#1F2329]/15' />
-
-                    <ButtonAnimationNew
-                        icon={
-                            <PiPaperPlaneRightFill className='size-5 shrink-0' />
-                        }
-                        hideTitle={true}
-                        disabled={false}
-                        variant={variantButtonScaleZoom}
-                        className='text-[#0375F3] hover:text-[#0375F3]/90 disabled:!text-[#667085] disabled:bg-transparent'
-                    />
                 </div>
             }
         </div >

@@ -12,7 +12,7 @@ import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react'
 import { useContext } from 'react';
-import { PiTable } from 'react-icons/pi';
+import { PiCaretDownBold, PiTable } from 'react-icons/pi';
 import { useDebounce } from 'use-debounce';
 
 import { formatMoment } from '@/utils/helpers/formatMoment'
@@ -417,9 +417,12 @@ const TabMaterialIssueHistory = ({ dataLang, ...props }) => {
                                             });
                                         }}
                                         disabled={isFetchingNextPage}
-                                        className="text-[#667085] 3xl:text-base text-sm hover:underline"
+                                        className="flex items-center gap-2 text-[#667085] 3xl:text-base text-sm hover:underline"
                                     >
-                                        Xem thêm mặt hàng
+                                        <span>
+                                            Xem thêm NVL/BTP
+                                        </span>
+                                        <PiCaretDownBold className='3xl:size-5 size-4' />
                                     </button>
                                 </div>
                             )

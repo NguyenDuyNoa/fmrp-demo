@@ -17,6 +17,9 @@ import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate"
 import { formatMoment } from "@/utils/helpers/formatMoment"
 import { useInView } from "react-intersection-observer"
 import LoadingButton from "@/components/UI/loading/loadingButton"
+import SheetProductionsOrderDetail from "@/containers/manufacture/productions-orders/components/sheet/SheetProductionsOrderDetail"
+import { StateContext } from "@/context/_state/productions-orders/StateContext"
+import { useSheet } from "@/context/ui/SheetContext"
 
 
 // e74c3c đỏ nhạt
@@ -474,9 +477,9 @@ const GanttChart = ({
         );
     };
 
-
     const renderGanttBars = (order, product) => {
-
+        const { isOpen: isOpenSheet, openSheet, closeSheet, sheetData } = useSheet();
+        const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
         const totalHeight = product?.processArr?.length * ROW_HEIGHT
 
@@ -493,6 +496,38 @@ const GanttChart = ({
             const index = ticks.findIndex((d) => d3.timeFormat("%Y-%m-%d")(d) === d3.timeFormat("%Y-%m-%d")(date))
             return index !== -1 ? index * minWidthPerDay : xScale(date)
         }
+
+        // Hàm mở Sheet chi tiết công đoạn
+        const handleToggleSheetDetail = (item) => {
+            console.log('item item:', item);
+            console.log('isStateProvider isStateProvider:', isStateProvider);
+
+            // if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return
+
+            queryStateProvider({
+                productionsOrders: {
+                    ...isStateProvider?.productionsOrders,
+                    poiId: item?.poi_id,
+                },
+            });
+
+            openSheet({
+                type: "manufacture-productions-orders",
+                content: (
+                    <SheetProductionsOrderDetail {...shareProps} />
+                ),
+                className: 'w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]',
+            })
+
+            // router.push({
+            //     pathname: router.route,
+            //     query: {
+            //         ...router.query,
+            //         poi_id: item.poi_id,
+            //     },
+            // });
+            // router.push(`/manufacture/productions-orders?&poi_id=${item.poi_id}`)
+        };
 
         return (
             <svg width={totalMinWidth} height="100%"
@@ -518,13 +553,14 @@ const GanttChart = ({
                                             cursor={'pointer'}
                                             onClick={() => {
                                                 if (poi?.reference_no_detail) {
-                                                    queryState({
-                                                        openModal: true,
-                                                        dataModal: {
-                                                            ...poi,
-                                                            id: poi?.poi_id
-                                                        }
-                                                    });
+                                                    // queryState({
+                                                    //     openModal: true,
+                                                    //     dataModal: {
+                                                    //         ...poi,
+                                                    //         id: poi?.poi_id
+                                                    //     }
+                                                    // });
+                                                    handleToggleSheetDetail(poi)
                                                     return
                                                 }
                                                 showToast('error', 'Chưa có lệnh sản xuất')

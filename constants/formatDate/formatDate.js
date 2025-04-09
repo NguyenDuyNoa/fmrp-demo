@@ -15,6 +15,7 @@ export const FORMAT_MOMENT = {
     DATE_TIME_SLASH_SHORT: "DD/MM/YYYY HH:mm",
     TIME_LONG: "HH:mm:ss",
     TIME_SHORT: "HH:mm",
+    TIME_24H_SHORT: "HH:mm A",
     YYYY: "HH:mm",
     HH_MM_DD_MM_YY: "HH:mm DD-MM-YY",
 };
