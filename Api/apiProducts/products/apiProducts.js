@@ -66,6 +66,12 @@ const apiProducts = {
     async apiPostLinkPDFManufactures(data) {
         const response = await axiosCustom('POST', `/api_web/api_print/Print_manufacturesWeb?csrf_protection=true`, data)
         return response.data
+    },
+
+
+    async apiPostLinkPDFPlanManufactures(data) {
+        const response = await axiosCustom('POST', `/api_web/api_print/Print_plan_manufactures_web?csrf_protection=true`, data)
+        return response.data
     }
 }
 

@@ -15,12 +15,11 @@ export const RowItemTable = ({
         color: `${textColor ? textColor : "#52525b"}`,
         backgroundColor: backgroundColor || "",
       }}
-      className={`px-2 ${className} 
-            ${
-              textSize
-                ? textSize
-                : "3xl:text-base 2xl:text-[14px] xl:text-[13.5px]  text-[11.5px]  font-medium"
-            } `}
+      className={`xl:px-2 px-0 ${className} 
+            ${textSize
+          ? textSize
+          : "3xl:text-base 2xl:text-[14px] xl:text-[13.5px]  text-[11.5px]  font-medium"
+        } `}
     >
       {children}
     </h6>
