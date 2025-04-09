@@ -13,7 +13,12 @@ const apiProductionPlan = {
     async apiHandlingProductionPlans(data) {
         const response = await axiosCustom('POST', `/api_web/api_manufactures/handlingProductionPlans?csrf_protection=true`, data);
         return response.data
-    }
+    },
+     // plan bán thành phẩm 
+     async apiListBom(id) {
+        const response = await axiosCustom('GET', `/api_web/Api_Production_Plans/getListBom/${id}`);
+        return response.data
+    },
 
 }
 

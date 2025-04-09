@@ -91,6 +91,8 @@ import PopupQRCode from "../popup/PopupQRCode";
 import { useQRCodProductCompleted } from "@/managers/api/productions-order/useQR";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { fetchPDFManufactures } from "@/managers/api/productions-order/useLinkFilePDF";
+import TabSemi from "../table/tabSemi";
+import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
@@ -1523,14 +1525,14 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
                                             return (
                                                 <div
-                                                    key={item.id}
+                                                    key={item?.id}
                                                     onClick={() => handleShowListDetail(item)}
                                                     className={`
                                                         ${typePageMoblie
                                                             ? "px-px"
                                                             : "pl-1 pr-3"
                                                         }
-                                                        ${item.id ==
+                                                        ${item?.id ==
                                                         isStateProvider
                                                             ?.productionsOrders
                                                             .idDetailProductionOrder &&
@@ -1545,7 +1547,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                                         py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
                                                     style={{
                                                         background:
-                                                            item.id ===
+                                                            item?.id ===
                                                                 isStateProvider?.productionsOrders
                                                                     .idDetailProductionOrder
                                                                 ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)"
@@ -1554,7 +1556,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                                 >
                                                     {/* Gạch xanh bên trái */}
                                                     <div className="relative pl-5 xl:space-y-2 space-y-1.5">
-                                                        {item.id ===
+                                                        {item?.id ===
                                                             isStateProvider?.productionsOrders
                                                                 .idDetailProductionOrder && (
                                                                 <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
@@ -1570,7 +1572,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                                                 </span>
                                                             )}
                                                         <h1 className="3xl:text-2xl xl:text-xl text-lg font-semibold text-[#003DA0]">
-                                                            {item.reference_no}
+                                                            {item?.reference_no}
                                                         </h1>
 
                                                         <div className="flex flex-col gap-0.5">
@@ -1608,7 +1610,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                                             </div>
 
                                                             <AnimatePresence initial={false}>
-                                                                {item.id ===
+                                                                {item?.id ===
                                                                     isStateProvider?.productionsOrders
                                                                         .idDetailProductionOrder && (
                                                                         <motion.div
@@ -1668,7 +1670,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
                 <div className="2xl:max-w-[85%] xl:max-w-[82%] max-w-[78%] size-full space-y-4 border-none border-[#D0D5DD] border overflow-y-hidden">
                     {!isLoadingProductionOrderDetail &&
-                        dataProductionOrderDetail?.listPOItems?.length > 0 && (
+                        dataProductionOrderDetail?.listPOItems?.length > 0 && isStateProvider?.productionsOrders?.isTabList?.type == "products" && (
                             <div
                                 ref={groupButtonRef}
                                 className="flex items-center justify-end gap-2 p-0.5 mb-2"
@@ -1805,6 +1807,29 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             </div>
                         )}
 
+                    {isStateProvider?.productionsOrders?.isTabList?.type == "semiProduct" && (
+                        <div
+                            ref={groupButtonRef}
+                            className="flex items-center justify-end gap-2 p-0.5 mb-2"
+                        >
+
+
+                            <ButtonAnimationNew
+                                icon={
+                                    <div className="size-4">
+                                        <PrinterIcon className="size-full" />
+                                    </div>
+                                }
+                                title="In kế hoạch BTP & NVL"
+                                className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
+                                onClick={() => {
+                                    console.log("In kế hoạch btp")
+                                }
+                                }
+                            />
+                        </div>
+                    )}
+
                     <Customscrollbar
                         className="h-full pr-3"
                         style={{
@@ -1820,8 +1845,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                 ?
                                 <React.Fragment>
                                     {isStateProvider?.productionsOrders?.isTabList?.type == "products" && <DetailProductionOrderList {...shareProps} />}
-                                    {isStateProvider?.productionsOrders?.isTabList?.type == "semiProduct" && <>Hello</>}
-                                    {/* {isStateProvider?.productionsOrders.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
+                                    {isStateProvider?.productionsOrders?.isTabList?.type == "semiProduct" && <PlaningProductionOrder {...shareProps} />}
+                                    {/* {isStateProvider?.productionsOrders.isTab == "semiProduct" && <PlaningProductionOrder {...shareProps} />} */}
                                 </React.Fragment>
                                 :
                                 <NoData className="mt-0" />

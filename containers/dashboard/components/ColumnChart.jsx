@@ -19,7 +19,7 @@ const ColumnChart = React.memo((props) => {
 
     const { data: dataProductionPlan, isLoading } = useGetProductionPlan()
 
-    const dataConvert = dataProductionPlan?.data?.items.flatMap((item) => [
+    const dataConvert = dataProductionPlan?.data?.items?.flatMap((item) => [
         { item_name: item?.item_name, type: dataLang?.column_chart_actual ?? "column_chart_actual", value: +item?.quantity },
         { item_name: item?.item_name, type: dataLang?.column_chart_plan ?? "column_chart_plan", value: +item?.quantity_plan }
     ]);
