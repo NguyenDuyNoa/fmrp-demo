@@ -31,7 +31,7 @@ const TabSwitcherWithUnderline = ({ className, tabs = [], activeTab, onChange, r
 
                                     {
                                         tab.count > 0 && (
-                                            <span className="absolute top-0 right-0 translate-x-1/2 h-[16px] w-[16px] text-[11px] bg-[#9295A4] text-white rounded-full flex items-center justify-center">
+                                            <span className="absolute top-0 right-0 translate-x-1/2 h-[16px] w-[16px] text-[11px] bg-[#9295A4] group-hover:bg-[#0375F3] text-white rounded-full flex items-center justify-center">
                                                 {tab.count}
                                             </span>
                                         )

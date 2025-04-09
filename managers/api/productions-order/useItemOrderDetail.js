@@ -13,15 +13,16 @@ export const useItemOrderDetail = ({ poi_id, enabled }) => {
 
             return data
         } catch (error) {
-            throw new Er
-   ror(error);
-        } };
+            throw new Error(error);
+        }
+    };
 
     return useQuery({
         queryKey: ['apiItemOrdersDetail', poi_id],
         queryFn: fetchItemOrderDetail,
         enabled: enabled,
         placeholderData: keepPreviousData,
+        // staleTime:  * 60 * 1000, // ← không refetch trong vòng 5 phút (tuỳ chọn)
         ...optionsQuery
     });
 };
