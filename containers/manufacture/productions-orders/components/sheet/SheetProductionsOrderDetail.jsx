@@ -18,7 +18,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import TabSwitcherWithUnderline from "@/components/common/tab/TabSwitcherWithUnderline";
 
-import { PiImage, PiPaperclip, PiPaperPlaneRightFill, PiSmiley, PiTextAa } from "react-icons/pi";
+import { PiImage, PiLinkBold, PiPaperclip, PiPaperPlaneRightFill, PiSmiley, PiTextAa } from "react-icons/pi";
 import { variantButtonScaleZoom } from "@/utils/animations/variantsAnimation";
 import TabInformation from "../tab/TabInformation";
 import TabMaterialIssueHistory from "../tab/TabMaterialIssueHistory";
@@ -30,6 +30,7 @@ import Skeleton from "@/components/common/skeleton/Skeleton";
 import CostCardSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/CostCardSkeleton";
 import TabSwitcherWithUnderlineSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/TabSwitcherWithUnderlineSkeleton";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
+import Loading from "@/components/UI/loading/loading";
 
 const initialState = {
     isTab: 1,
@@ -37,6 +38,7 @@ const initialState = {
 };
 
 const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
+    const [isMounted, setIsMounted] = useState(false)
     const router = useRouter()
 
     const poiId = useMemo(() => router.query.poi_id, [router.query.poi_id])
@@ -55,7 +57,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
         isFetching: isFetchingItemOrderDetail
     } = useItemOrderDetail({
         poi_id: isStateProvider?.productionsOrders?.poiId,
-        enabled: isOpenSheet && !!isStateProvider?.productionsOrders?.poiId
+        enabled: isOpenSheet && !!isStateProvider?.productionsOrders?.poiId && isStateProvider?.productionsOrders?.isTabSheet?.id == 1
     })
 
     const listTab = [
@@ -94,6 +96,11 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
     console.log('isStateProvider?.productionsOrders?.poiId', isStateProvider?.productionsOrders?.poiId);
 
+    // useEffect(() => {
+    //     setIsMounted(true)
+    // }, [])
+
+
     useEffect(() => {
         if (isOpenSheet && isStateProvider?.productionsOrders?.poiId) {
             queryStateProvider({
@@ -113,11 +120,6 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
         5: <TabMaterialReturn dataLang={dataLang} {...props} />,
         6: <TabMaterialCost dataLang={dataLang} {...props} />,
     };
-    // 2: <TabExportSituation {...shareProps} />,
-    // 3: <TabExportHistory {...shareProps} />,
-    // 4: <TabWarehouseHistory {...shareProps} />,
-    // 5: <TabRecallMaterials {...shareProps} />,
-    // 6: <TabProcessingCost {...shareProps} />,
 
     const formatMoney = (number) => {
         if (typeof number == "string") {
@@ -170,7 +172,10 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     }
 
     console.log('dataItemOrderDetail dataItemOrderDetail:', dataItemOrderDetail);
+    console.log('isFetchingItemOrderDetail:', isFetchingItemOrderDetail);
+    console.log('isLoadingItemOrderDetail:', isLoadingItemOrderDetail);
 
+    // if (!poiId && isMounted) return <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full col-span-16' />
 
     return (
         <div className="flex flex-col overflow-hidden !bg-white h-full">
@@ -197,10 +202,10 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
                     <ButtonAnimationNew
                         icon={
-                            <ArrowBendUpRightIcon className='xl:size-4 size-3.5' />
+                            <PiLinkBold className='xl:size-4 size-3.5' />
                         }
                         onClick={() => handleCopyLink()}
-                        title="Chia sẻ LSX"
+                        title="Sao chép LSX"
                         className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
                     />
 
@@ -252,7 +257,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                         {dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}:
                                     </h3>
                                     {
-                                        isFetchingItemOrderDetail ?
+                                        isLoadingItemOrderDetail ?
                                             <Skeleton className="w-[150px] h-6" />
                                             :
                                             <h3 className={`text-base-default font-medium text-[#0375F3]`}>
@@ -266,7 +271,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                         {dataLang?.productions_orders_details_number || 'productions_orders_details_number'}:
                                     </h3>
                                     {
-                                        isFetchingItemOrderDetail ?
+                                        isLoadingItemOrderDetail ?
                                             <Skeleton className="w-[150px] h-6" />
                                             :
                                             <h3 className={`text-base-default font-medium text-[#141522]`}>
@@ -281,7 +286,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                     </h3>
 
                                     {
-                                        isFetchingItemOrderDetail ?
+                                        isLoadingItemOrderDetail ?
                                             <Skeleton className="w-[150px] h-6" />
                                             :
                                             <h3 className={`text-base-default font-medium text-[#141522]`}>
@@ -296,7 +301,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                 <div className={`flex items-center col-span-3 gap-1`}>
                                     <h3 className={`text-base-default text-[#3A3E4C] font-light min-w-[170px]`}>{dataLang?.productions_orders_details_orders || 'productions_orders_details_orders'}:</h3>
                                     {
-                                        isFetchingItemOrderDetail ?
+                                        isLoadingItemOrderDetail ?
                                             <Skeleton className="w-[150px] h-6" />
                                             :
                                             <h3 className={`text-base-default font-medium text-[#141522]`}>
@@ -311,7 +316,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                     </h3>
 
                                     {
-                                        isFetchingItemOrderDetail ?
+                                        isLoadingItemOrderDetail ?
                                             <Skeleton className="w-[150px] h-6" />
                                             :
                                             <h3 className={`text-base-default font-medium text-[#141522]`}>
@@ -326,7 +331,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                     </h3>
 
                                     {
-                                        isFetchingItemOrderDetail ?
+                                        isLoadingItemOrderDetail ?
                                             <Skeleton className="w-[150px] h-6" />
                                             :
                                             <h3 className={`text-base-default font-medium text-[#141522]`}>
@@ -339,7 +344,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
                         <div className="grid grid-cols-3 3xl:gap-4 gap-2">
                             {
-                                isFetchingItemOrderDetail ?
+                                isLoadingItemOrderDetail ?
                                     [...Array(3)].map((_, index) => (
                                         <React.Fragment key={`skeleton-cost-${index}`}>
                                             <CostCardSkeleton className="col-span-1 w-full" />
@@ -379,7 +384,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                     <div className='flex flex-col gap-2'>
                         {/* tab */}
                         {
-                            isFetchingItemOrderDetail
+                            isLoadingItemOrderDetail
                                 ?
                                 <TabSwitcherWithUnderlineSkeleton tabCount={6} />
                                 :
@@ -395,7 +400,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                                             </span>
                                             {
                                                 tab.count > 0 && (
-                                                    <span className={`${isStateProvider?.productionsOrders?.isTabSheet?.id === tab.id ? "bg-[#0375F3]" : "bg-[#9295A4]"} 3xl:size-5 size-4 3xl:text-[11px] text-[10px] text-white rounded-full flex items-center justify-center`}>
+                                                    <span className={`${isStateProvider?.productionsOrders?.isTabSheet?.id === tab.id ? "bg-[#0375F3]" : "bg-[#9295A4] group-hover:bg-[#0375F3]"} 3xl:size-5 size-4 3xl:text-[11px] text-[10px] text-white rounded-full flex items-center justify-center custom-transition`}>
                                                         {tab.count}
                                                     </span>
                                                 )

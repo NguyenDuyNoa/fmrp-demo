@@ -790,9 +790,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     };
 
     // Hàm mở Sheet chi tiết công đoạn
-    const handleToggleSheetDetail = (item) => {
+    const handleToggleSheetDetail = async (item) => {
         if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return
 
+        // Cập nhật state trước để Sheet có đủ thông tin
         queryStateProvider({
             productionsOrders: {
                 ...isStateProvider?.productionsOrders,
@@ -800,6 +801,16 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             },
         });
 
+        // Đợi router.push xong thì mới mở Sheet
+        await router.push({
+            pathname: router.pathname,
+            query: {
+                ...router.query,
+                poi_id: item.poi_id,
+            },
+        }, undefined, { shallow: true }); // tránh reload trang
+
+        // Mở Sheet sau khi URL đã cập nhật
         openSheet({
             type: "manufacture-productions-orders",
             content: (
@@ -808,14 +819,13 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             className: 'w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]',
         })
 
-        router.push({
-            pathname: router.route,
-            query: {
-                ...router.query,
-                poi_id: item.poi_id,
-            },
-        });
-        // router.push(`/manufacture/productions-orders?&poi_id=${item.poi_id}`)
+        // router.push({
+        //     pathname: router.route,
+        //     query: {
+        //         ...router.query,
+        //         poi_id: item.poi_id,
+        //     },
+        // });
     };
 
     const shareProps = {
