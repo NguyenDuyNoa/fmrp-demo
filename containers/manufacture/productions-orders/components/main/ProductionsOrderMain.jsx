@@ -91,6 +91,7 @@ import PopupQRCode from "../popup/PopupQRCode";
 import { useQRCodProductCompleted } from "@/managers/api/productions-order/useQR";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
 import { fetchPDFManufactures } from "@/managers/api/productions-order/useLinkFilePDF";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const statusExprired = useStatusExprired();
@@ -174,6 +175,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
     const router = useRouter();
     const { ref: refInviewListLsx, inView: inViewListLsx } = useInView();
+    const dataSeting = useSetingServer();
 
     const typePageMoblie = typeScreen == "mobile";
 
@@ -1016,6 +1018,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
     //phần dropdown hoàn thành công đoạn 
     const handClickDropdownCompleteStage = (type) => {
+        const currentPackage = dataSeting?.package;
+
+        // xử lý button tổng toàn lệnh
         if (type === "normal") {
             dispatch({
                 type: "statePopupGlobal",
@@ -1024,8 +1029,29 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                     children: <PopupQRCode urlQR={QRCode?.data.qr} />,
                 },
             });
-        } else {
-            console.log("complete_stage");
+        }
+
+        //xử lý button hoàn thành công đoạn  (đang điều kiện là gói user basic)
+        if (type === "complete_stage" && currentPackage === "1") {
+            dispatch({
+                type: "statePopupGlobal",
+                payload: {
+                    open: true,
+                    children: (
+                        <PopupRequestUpdateVersion>
+                            <p className="text-start xlg:text-2xl text-xl leading-[32px] font-semibold text-[#141522]">
+                                Theo dõi chặt{" "}
+                                <span className="text-[#0375F3]">
+                                    từng bước – từ bán thành phẩm
+                                </span>{" "}
+                                đến thành phẩm cuối cùng
+                            </p>
+                        </PopupRequestUpdateVersion>
+                    ),
+                },
+            });
+
+            return;
         }
     };
 
@@ -1689,14 +1715,28 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                                         handClickDropdownCompleteStage(tab.type)
                                                     }
                                                 >
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="3xl:size-5 size-4 text-[#0375F3] shrink-0">
-                                                            {tab.icon}
-                                                        </span>
-                                                        <span className="3xl:text-base text-sm font-normal text-[#101828]">
-                                                            {tab.label}
-                                                        </span>
-                                                    </div>
+                                                    {/* nút 'hoàn thành chi tiết' có modal riêng khi là gói pro*/}
+                                                    {tab.type === "complete_stage" &&
+                                                        dataSeting?.package === "2" ? (
+                                                        <PopupConfimStage
+                                                            dataLang={dataLang}
+                                                            dataRight={isStateProvider?.productionsOrders}
+                                                            typePageMoblie={typePageMoblie}
+                                                            refetch={() => {
+                                                                refetchProductionOrderList();
+                                                                refetch();
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="3xl:size-5 size-4 text-[#0375F3] shrink-0">
+                                                                {tab.icon}
+                                                            </span>
+                                                            <span className="3xl:text-base text-sm font-normal text-[#101828]">
+                                                                {tab.label}
+                                                            </span>
+                                                        </div>
+                                                    )}
 
                                                     {/* {tab.isPremium && (
                                                         <span className="text-[10px] font-normal bg-[#1F2329]/10 text-[#646A73] rounded-[4px] px-2.5 py-1">
