@@ -363,17 +363,6 @@ const PlaningProductionOrder = memo(({ dataLang }) => {
 
   return (
     <div className="flex flex-row w-full h-full items-start justify-between">
-      {/* bảng bán thành phẩm  */}
-      <div className="w-[50%] border-r border-border-gray-1 h-full pr-4">
-        {isLoadingDataListBom ? (
-          <Loading className="h-80" color="#0f4f9e" />
-        ) : <TablePlaning
-          Title="kế hoạch bán thành phẩm"
-          dataLang={dataLang}
-          data={dataListBom?.data?.productsBom}
-          typeTable="products"
-        />}
-      </div>
 
       {/* bảng nguyên liêu */}
       <div className=" w-[50%] h-full pl-4">
@@ -386,6 +375,19 @@ const PlaningProductionOrder = memo(({ dataLang }) => {
           typeTable="materials"
         />}
       </div>
+
+      {/* bảng bán thành phẩm  */}
+      <div className="w-[50%] border-r border-border-gray-1 h-full pr-4">
+        {isLoadingDataListBom ? (
+          <Loading className="h-80" color="#0f4f9e" />
+        ) : <TablePlaning
+          Title="kế hoạch bán thành phẩm"
+          dataLang={dataLang}
+          data={dataListBom?.data?.productsBom}
+          typeTable="products"
+        />}
+      </div>
+
     </div>
   );
 });
