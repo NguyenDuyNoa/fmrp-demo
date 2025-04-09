@@ -8,5 +8,6 @@ export const useQRCodProductCompleted = (id) => {
       const response = await apiProducts.apiGetQRProductCompleted(id);
       return response;
     },
+    enabled: !!id
   });
 };

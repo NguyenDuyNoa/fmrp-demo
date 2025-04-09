@@ -267,9 +267,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         isStateProvider?.productionsOrders.searchProductionOrders
     );
     //lấy mã QR code để nhảy qua app  ở button tổng lệnh sản xuất
-    const { data: QRCode } = useQRCodProductCompleted(
-        isStateProvider?.productionsOrders.idDetailProductionOrder
-    );
+    // const { data: QRCode } = useQRCodProductCompleted(
+    //     isStateProvider?.productionsOrders.idDetailProductionOrder
+    // );
     //lấy link print lệnh sản xuất
 
     // call api list production
@@ -800,7 +800,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
     // Hàm mở Sheet chi tiết công đoạn
     const handleToggleSheetDetail = async (item) => {
-        if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return
+        if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return;
 
         // Cập nhật state trước để Sheet có đủ thông tin
         queryStateProvider({
@@ -811,13 +811,17 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         });
 
         // Đợi router.push xong thì mới mở Sheet
-        await router.push({
-            pathname: router.pathname,
-            query: {
-                ...router.query,
-                poi_id: item.poi_id,
+        await router.push(
+            {
+                pathname: router.pathname,
+                query: {
+                    ...router.query,
+                    poi_id: item.poi_id,
+                },
             },
-        }, undefined, { shallow: true }); // tránh reload trang
+            undefined,
+            { shallow: true }
+        ); // tránh reload trang
 
         // Mở Sheet sau khi URL đã cập nhật
         openSheet({
@@ -874,8 +878,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const triggerFilterAll = (
         <button
             className={`${stateFilterDropdown?.open || activeFilterCount > 0
-                ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
-                : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
+                    ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
+                    : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
                 } flex items-center space-x-2 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition`}
         >
             <span className="3xl:size-5 size-4 shrink-0">
@@ -883,8 +887,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             </span>
             <span
                 className={`${stateFilterDropdown?.open || activeFilterCount > 0
-                    ? "text-[#0F4F9E]"
-                    : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
+                        ? "text-[#0F4F9E]"
+                        : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
                     } text-nowrap 3xl:text-base text-sm custom-transition`}
             >
                 {dataLang?.productions_orders_filter || "productions_orders_filter"}
@@ -901,8 +905,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             <span className="3xl:size-4 size-3.5 shrink-0">
                 <CaretDownIcon
                     className={`${stateFilterDropdown?.open || activeFilterCount > 0
-                        ? "rotate-180"
-                        : "rotate-0"
+                            ? "rotate-180"
+                            : "rotate-0"
                         } w-full h-full custom-transition`}
                 />
             </span>
@@ -913,18 +917,18 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const triggerFilterStatus = (
         <button
             className={`${stateFilterDropdown?.open ||
-                isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-                ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
-                : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
+                    isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+                    ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
+                    : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
                 } relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}
         >
             <ChartDonutIcon className="absolute -translate-y-1/2 top-1/2 3xl:size-5 size-4" />
 
             <span
                 className={`${stateFilterDropdown?.open ||
-                    isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-                    ? "text-[#0F4F9E]"
-                    : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
+                        isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+                        ? "text-[#0F4F9E]"
+                        : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
                     } xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}
             >
                 {dataLang?.purchase_status || "purchase_status"}
@@ -933,9 +937,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             <span className="3xl:size-4 size-3.5 shrink-0">
                 <CaretDownIcon
                     className={`${stateFilterDropdown?.open ||
-                        isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-                        ? "rotate-180"
-                        : "rotate-0"
+                            isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+                            ? "rotate-180"
+                            : "rotate-0"
                         } w-full h-full custom-transition`}
                 />
             </span>
@@ -1031,7 +1035,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 type: "statePopupGlobal",
                 payload: {
                     open: true,
-                    children: <PopupQRCode urlQR={QRCode?.data.qr} />,
+                    children: (
+                        <PopupQRCode
+                        // urlQR={QRCode?.data.qr}
+                        />
+                    ),
                 },
             });
         }
@@ -1060,11 +1068,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     };
 
-    const [loadingButton, setLoading] = useState(false)
+    const [loadingButton, setLoading] = useState(false);
 
     //phần in ra phiếu in lệnh sản xuất
     const handPrintManufacture = async (idManufacture) => {
-        setLoading(true)
+        setLoading(true);
         try {
             const response = await fetchPDFManufactures({
                 idManufacture: idManufacture,
@@ -1073,15 +1081,15 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             if (response && typeof response === "string") {
                 window.open(response, "_blank");
             }
-            setLoading(false)
+            setLoading(false);
         } catch (error) {
             console.log("🚀 ~ handPrintManufacture ~ error:", error);
-            setLoading(false)
+            setLoading(false);
         }
     };
 
     const handPrintPlanManufacture = async (idManufacture) => {
-        setLoading(true)
+        setLoading(true);
         try {
             const response = await fetchPDFPlanManufactures({
                 idManufacture: idManufacture,
@@ -1089,10 +1097,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             if (response && typeof response === "string") {
                 window.open(response, "_blank");
             }
-            setLoading(false)
+            setLoading(false);
         } catch (error) {
             console.log("🚀 ~ handPrintManufacture ~ error:", error);
-            setLoading(false)
+            setLoading(false);
         }
     };
 
@@ -1163,8 +1171,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                 }
                                 hideTitle={true}
                                 className={`${isOpenSearch
-                                    ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]"
-                                    : "rounded-lg text-[#9295A4] border-[#D0D5DD]"
+                                        ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]"
+                                        : "rounded-lg text-[#9295A4] border-[#D0D5DD]"
                                     } flex items-center justify-center 3xl:w-12 w-10 3xl:h-10 h-9 shrink-0 border`}
                                 onClick={toggleSearch}
                             />
@@ -1491,8 +1499,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                     renderLabel={(tab, activeTab) => (
                         <h3
                             className={`${isStateProvider?.productionsOrders?.isTabList?.id === tab.id
-                                ? "text-[#0375F3] scale-[1.02]"
-                                : "text-[#9295A4] scale-[1]"
+                                    ? "text-[#0375F3] scale-[1.02]"
+                                    : "text-[#9295A4] scale-[1]"
                                 } font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}
                         >
                             <span>{tab.name}</span>
@@ -1728,7 +1736,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                             return (
                                                 <div
                                                     key={tab.id}
-                                                    className={`hover:bg-[#F3F4F6] border-b border-[#F7F8F9] border-t flex items-center gap-3 cursor-pointer px-4 py-3 custom-transition ${borderClass}`}
+                                                    className={`hover:bg-[#F3F4F6] border-b border-[#F7F8F9] border-t flex items-center gap-3 cursor-pointer px-4 py-3 custom-transition ${borderClass} select-none`}
                                                     onClick={() =>
                                                         handClickDropdownCompleteStage(tab.type)
                                                     }
@@ -1826,7 +1834,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                         )}
 
                     {isStateProvider?.productionsOrders?.isTabList?.type ==
-                        "semiProduct" && (
+                        "semiProduct" &&
+                        dataProductionOrderDetail?.listPOItems?.length > 0 && !isLoadingProductionOrderDetail && (
                             <div
                                 ref={groupButtonRef}
                                 className="flex items-center justify-end gap-2 p-0.5 mb-2"
@@ -1841,7 +1850,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
                                     onClick={() => {
                                         handPrintPlanManufacture(
-                                            isStateProvider?.productionsOrders?.dataProductionOrderDetail?.pp_id
+                                            isStateProvider?.productionsOrders
+                                                ?.dataProductionOrderDetail?.pp_id
                                         );
                                     }}
                                     isLoading={loadingButton}

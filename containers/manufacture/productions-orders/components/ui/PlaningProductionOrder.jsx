@@ -66,7 +66,7 @@ const CardProductionOrder = ({
   );
 };
 
-const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
+const TablePlaning = ({ Title, typeTable, dataLang, data, isLoading }) => {
   const [limit, setLimit] = useState(5);
 
   return (
@@ -154,173 +154,178 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                 Tiến độ mua hàng
               </ColumnTable>
             </HeaderTable>
-            {data?.slice(0, limit).map((item, index) => (
-              <div
-                className="divide-y divide-slate-200 h-[100%] "
-                key={item.item_id}
-              >
-                {
-                  <RowTable gridCols={12}>
-                    {/* stt */}
-                    <RowItemTable
-                      colSpan={1}
-                      textAlign={"center"}
-                      // textSize={`"!text-sm"`}
-                      className="font-semibold xlg:text-sm leading-6 text-typo-black-1 "
-                    >
-                      {index + 1}
-                    </RowItemTable>
-                    <RowItemTable
-                      colSpan={3}
-                      textAlign={"start"}
-                    // textSize={`"!text-xs"`}
-                    >
-                      {/* card */}
-                      <CardProductionOrder
-                        name={item.item_name}
-                        code={item.item_code}
-                        typeProduct={item.type_products}
-                        imageURL={item.images}
-                        variation={item.item_variation}
-                        typeTable={typeTable}
-                        dataLang={dataLang}
-                      />
-                    </RowItemTable>
-                    {typeTable === "products" && (
+            {data && data?.length > 0 ? <>
+              {data?.slice(0, limit).map((item, index) => (
+                <div
+                  className="divide-y divide-slate-200 h-[100%] "
+                  key={item.item_id}
+                >
+                  {
+                    <RowTable gridCols={12}>
+                      {/* stt */}
                       <RowItemTable
-                        colSpan={2}
+                        colSpan={1}
                         textAlign={"center"}
                         // textSize={`"!text-sm"`}
-                        className="font-semibold xlg:text-sm leading-6 text-typo-black-1 xl:text-xs"
+                        className="font-semibold xlg:text-sm leading-6 text-typo-black-1 "
                       >
-                        {/* Đơn vị tính */}
-                        {item.unit_name}
+                        {index + 1}
                       </RowItemTable>
-                    )}
-
-                    <RowItemTable
-                      colSpan={1}
-                      textAlign={"center"}
-                      // textSize={`"!text-sm"`}
-                      className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
-                    >
-                      {/* sử dụng  */}
-                      {typeTable === "materials" ? (
-                        <p>
-                          {item.total_quota === "0" ? (
-                            " - "
-                          ) : (
-                            <span>
-                              {item.total_quota}/ <br />{" "}
-                              <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
-                                {" "}
-                                {item.unit_name}
-                              </span>
-                            </span>
-                          )}
-                        </p>
-                      ) : (
-                        <p>
-                          {item.total_quota === "0" ? " - " : item.total_quota}
-                        </p>
-                      )}
-                    </RowItemTable>
-                    {typeTable === "materials" && (
                       <RowItemTable
-                        colSpan={2}
+                        colSpan={3}
+                        textAlign={"start"}
+                      // textSize={`"!text-xs"`}
+                      >
+                        {/* card */}
+                        <CardProductionOrder
+                          name={item.item_name}
+                          code={item.item_code}
+                          typeProduct={item.type_products}
+                          imageURL={item.images}
+                          variation={item.item_variation}
+                          typeTable={typeTable}
+                          dataLang={dataLang}
+                        />
+                      </RowItemTable>
+                      {typeTable === "products" && (
+                        <RowItemTable
+                          colSpan={2}
+                          textAlign={"center"}
+                          // textSize={`"!text-sm"`}
+                          className="font-semibold xlg:text-sm leading-6 text-typo-black-1 xl:text-xs"
+                        >
+                          {/* Đơn vị tính */}
+                          {item.unit_name}
+                        </RowItemTable>
+                      )}
+
+                      <RowItemTable
+                        colSpan={1}
                         textAlign={"center"}
                         // textSize={`"!text-sm"`}
                         className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
                       >
-                        {/* quy đổi  */}
-                        {item.quota_primary === "0" ? (
-                          " - "
+                        {/* sử dụng  */}
+                        {typeTable === "materials" ? (
+                          <p>
+                            {item.total_quota === "0" ? (
+                              " - "
+                            ) : (
+                              <span>
+                                {item.total_quota}/ <br />{" "}
+                                <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                  {" "}
+                                  {item.unit_name}
+                                </span>
+                              </span>
+                            )}
+                          </p>
                         ) : (
-                          <span>
-                            {item.quota_primary}/ <br />{" "}
-                            <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
-                              {" "}
-                              {item.unit_name_primary}
-                            </span>
-                          </span>
+                          <p>
+                            {item.total_quota === "0" ? " - " : item.total_quota}
+                          </p>
                         )}
                       </RowItemTable>
-                    )}
-                    <RowItemTable
-                      colSpan={1}
-                      textAlign={"center"}
-                      textSize={`"!text-sm"`}
-                      className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
-                    >
-                      {/* Đã giữ */}
+                      {typeTable === "materials" && (
+                        <RowItemTable
+                          colSpan={2}
+                          textAlign={"center"}
+                          // textSize={`"!text-sm"`}
+                          className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
+                        >
+                          {/* quy đổi  */}
+                          {item.quota_primary === "0" ? (
+                            " - "
+                          ) : (
+                            <span>
+                              {item.quota_primary}/ <br />{" "}
+                              <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                {" "}
+                                {item.unit_name_primary}
+                              </span>
+                            </span>
+                          )}
+                        </RowItemTable>
+                      )}
+                      <RowItemTable
+                        colSpan={1}
+                        textAlign={"center"}
+                        textSize={`"!text-sm"`}
+                        className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
+                      >
+                        {/* Đã giữ */}
 
-                      {typeTable === "materials" ? (
-                        <p>
-                          {item.quantity_keep === "0" ? (
-                            " - "
-                          ) : (
-                            <span>
-                              {item.quantity_keep}/ <br />{" "}
-                              <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
-                                {" "}
-                                {item.unit_name_primary}
+                        {typeTable === "materials" ? (
+                          <p>
+                            {item.quantity_keep === "0" ? (
+                              " - "
+                            ) : (
+                              <span>
+                                {item.quantity_keep}/ <br />{" "}
+                                <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                  {" "}
+                                  {item.unit_name_primary}
+                                </span>
                               </span>
-                            </span>
-                          )}
-                        </p>
-                      ) : (
-                        <p>
-                          {item.quantity_keep === "0"
-                            ? " - "
-                            : item.quantity_keep}
-                        </p>
-                      )}
-                    </RowItemTable>
-                    <RowItemTable
-                      colSpan={1}
-                      textAlign={"center"}
-                      // textSize={`"!text-sm"`}
-                      className="font-semibold xlg:text-sm  leading-6 text-typo-black-1"
-                    >
-                      {/* Thiếu */}
-                      {typeTable === "materials" ? (
-                        <p>
-                          {item.quantity_rest === "0" ? (
-                            " - "
-                          ) : (
-                            <span>
-                              {item.quantity_rest}/ <br />{" "}
-                              <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
-                                {" "}
-                                {item.unit_name_primary}
+                            )}
+                          </p>
+                        ) : (
+                          <p>
+                            {item.quantity_keep === "0"
+                              ? " - "
+                              : item.quantity_keep}
+                          </p>
+                        )}
+                      </RowItemTable>
+                      <RowItemTable
+                        colSpan={1}
+                        textAlign={"center"}
+                        // textSize={`"!text-sm"`}
+                        className="font-semibold xlg:text-sm  leading-6 text-typo-black-1"
+                      >
+                        {/* Thiếu */}
+                        {typeTable === "materials" ? (
+                          <p>
+                            {item.quantity_rest === "0" ? (
+                              " - "
+                            ) : (
+                              <span>
+                                {item.quantity_rest}/ <br />{" "}
+                                <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                  {" "}
+                                  {item.unit_name_primary}
+                                </span>
                               </span>
-                            </span>
-                          )}
-                        </p>
-                      ) : (
-                        <p>
-                          {item.quantity_rest === "0"
-                            ? " - "
-                            : item.quantity_rest}
-                        </p>
-                      )}
-                    </RowItemTable>
-                    <RowItemTable
-                      colSpan={3}
-                      textAlign={"start"}
-                      // textSize={`"!text-sm"`}
-                      className={"font-semibold xlg:text-sm"}
-                    >
-                      <ProgressBar
-                        current={+item.quantity_import}
-                        total={+item.quantity_rest}
-                        name={item.unit_name_primary}
-                      />
-                    </RowItemTable>
-                  </RowTable>
-                }
-              </div>
-            ))}
+                            )}
+                          </p>
+                        ) : (
+                          <p>
+                            {item.quantity_rest === "0"
+                              ? " - "
+                              : item.quantity_rest}
+                          </p>
+                        )}
+                      </RowItemTable>
+                      <RowItemTable
+                        colSpan={3}
+                        textAlign={"start"}
+                        // textSize={`"!text-sm"`}
+                        className={"font-semibold xlg:text-sm"}
+                      >
+                        <ProgressBar
+                          current={+item.quantity_import}
+                          total={+item.quantity_rest}
+                          name={item.unit_name_primary}
+                        />
+                      </RowItemTable>
+                    </RowTable>
+                  }
+                </div>
+              ))}
+            </> : <>
+              <NoData className="mt-0 col-span-16" type="table" />
+            </>}
+
           </div>
           <div className="w-full">
             {data?.length > 0 && (
@@ -348,48 +353,38 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
   );
 };
 
-const PlaningProductionOrder = memo(({ dataLang, isLoading }) => {
+const PlaningProductionOrder = memo(({ dataLang }) => {
   const { isStateProvider, queryStateProvider } = useContext(StateContext);
   //truyền id của kế hoạch sản xuất
   const { data: dataListBom, isLoading: isLoadingDataListBom } =
     useListBomProductPlan({
       id: isStateProvider?.productionsOrders?.dataProductionOrderDetail?.pp_id,
     });
-  console.log("🚀 ~ PlaningProductionOrder ~ dataListBom:", dataListBom)
+
   return (
     <div className="flex flex-row w-full h-full items-start justify-between">
       {/* bảng bán thành phẩm  */}
       <div className="w-[50%] border-r border-border-gray-1 h-full pr-4">
         {isLoadingDataListBom ? (
           <Loading className="h-80" color="#0f4f9e" />
-        ) : dataListBom?.data?.productsBom &&
-          dataListBom?.data?.productsBom.length > 0 ? (
-          <TablePlaning
-            Title="kế hoạch bán thành phẩm"
-            dataLang={dataLang}
-            data={dataListBom?.data?.productsBom}
-            typeTable="products"
-          />
-        ) : (
-          <NoData className="mt-0 col-span-16" type="table" />
-        )}
+        ) : <TablePlaning
+          Title="kế hoạch bán thành phẩm"
+          dataLang={dataLang}
+          data={dataListBom?.data?.productsBom}
+          typeTable="products"
+        />}
       </div>
 
       {/* bảng nguyên liêu */}
       <div className=" w-[50%] h-full pl-4">
         {isLoadingDataListBom ? (
           <Loading className="h-80" color="#0f4f9e" />
-        ) : dataListBom?.data?.materialsBom &&
-          dataListBom?.data?.materialsBom.length > 0 ? (
-          <TablePlaning
-            Title="kế hoạch nguyên vật liệu"
-            dataLang={dataLang}
-            data={dataListBom?.data?.materialsBom}
-            typeTable="materials"
-          />
-        ) : (
-          <NoData className="mt-0 col-span-16" type="table" />
-        )}
+        ) : <TablePlaning
+          Title="kế hoạch nguyên vật liệu"
+          dataLang={dataLang}
+          data={dataListBom?.data?.materialsBom}
+          typeTable="materials"
+        />}
       </div>
     </div>
   );
