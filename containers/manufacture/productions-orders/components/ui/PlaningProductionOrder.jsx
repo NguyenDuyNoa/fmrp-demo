@@ -67,18 +67,10 @@ const CardProductionOrder = ({
 };
 
 const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
-
   const formatNumber = (value) => {
     const number = Number(value);
     return isNaN(number) ? "-" : number.toLocaleString("vi-VN");
   };
-  const dataFormat = data.map((item) => ({
-    ...item,
-    total_quota: formatNumber(item.total_quota),
-    quota_primary: formatNumber(item.quota_primary),
-    quantity_keep: formatNumber(item.quantity_keep),
-    quantity_rest: formatNumber(item.quantity_rest),
-  }));
 
   const [limit, setLimit] = useState(5);
 
@@ -167,9 +159,9 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                 Tiến độ mua hàng
               </ColumnTable>
             </HeaderTable>
-            {dataFormat && dataFormat?.length > 0 ? (
+            {data && data?.length > 0 ? (
               <>
-                {dataFormat?.slice(0, limit).map((item, index) => (
+                {data?.slice(0, limit).map((item, index) => (
                   <div
                     className="divide-y divide-slate-200 h-[100%] "
                     key={item.item_id}
@@ -226,7 +218,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                                 " - "
                               ) : (
                                 <span>
-                                  {item.total_quota}/ <br />{" "}
+                                  {formatNumber(item.total_quota)}/ <br />{" "}
                                   <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
                                     {" "}
                                     {item.unit_name}
@@ -238,7 +230,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                             <p>
                               {item.total_quota === "0"
                                 ? " - "
-                                : item.total_quota}
+                                : formatNumber(item.total_quota)}
                             </p>
                           )}
                         </RowItemTable>
@@ -254,7 +246,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                               " - "
                             ) : (
                               <span>
-                                {item.quota_primary}/ <br />{" "}
+                                {formatNumber(item.quota_primary)}/ <br />{" "}
                                 <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
                                   {" "}
                                   {item.unit_name_primary}
@@ -277,7 +269,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                                 " - "
                               ) : (
                                 <span>
-                                  {item.quantity_keep}/ <br />{" "}
+                                  {formatNumber(item.quantity_keep)}/ <br />{" "}
                                   <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
                                     {" "}
                                     {item.unit_name_primary}
@@ -289,7 +281,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                             <p>
                               {item.quantity_keep === "0"
                                 ? " - "
-                                : item.quantity_keep}
+                                : formatNumber(item.quantity_keep)}
                             </p>
                           )}
                         </RowItemTable>
@@ -306,7 +298,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                                 " - "
                               ) : (
                                 <span>
-                                  {item.quantity_rest}/ <br />{" "}
+                                  {formatNumber(item.quantity_rest)}/ <br />{" "}
                                   <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
                                     {" "}
                                     {item.unit_name_primary}
@@ -318,7 +310,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                             <p>
                               {item.quantity_rest === "0"
                                 ? " - "
-                                : item.quantity_rest}
+                                : formatNumber(item.quantity_rest)}
                             </p>
                           )}
                         </RowItemTable>
@@ -332,6 +324,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                             current={+item.quantity_import}
                             total={+item.quantity_rest}
                             name={item.unit_name_primary}
+                            typeProgress="tablePlaning"
                           />
                         </RowItemTable>
                       </RowTable>
@@ -346,16 +339,16 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
             )}
           </div>
           <div className="w-full">
-            {dataFormat?.length > 0 && (
+            {data?.length > 0 && (
               <div className="flex items-center w-full justify-center h-fit">
                 <div />
-                {limit < dataFormat.length && (
+                {limit < data.length && (
                   <div className=" flex justify-center py-2">
                     <button
-                      onClick={() => setLimit(dataFormat.length)}
+                      onClick={() => setLimit(data.length)}
                       className="text-[#667085] 3xl:text-base xl:text-sm text-xs hover:underline font-semibold"
                     >
-                      Xem thêm ({dataFormat.length - limit}){" "}
+                      Xem thêm ({data.length - limit}){" "}
                       {typeTable === "products"
                         ? `${dataLang?.materials_planning_semi}`
                         : `${dataLang?.import_materials}`}
