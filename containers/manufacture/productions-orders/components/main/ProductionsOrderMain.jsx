@@ -90,8 +90,15 @@ import { useDispatch } from "react-redux";
 import PopupQRCode from "../popup/PopupQRCode";
 import { useQRCodProductCompleted } from "@/managers/api/productions-order/useQR";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
-import { fetchPDFManufactures } from "@/managers/api/productions-order/useLinkFilePDF";
+import {
+    fetchPDFManufactures,
+    fetchPDFPlanManufactures,
+} from "@/managers/api/productions-order/useLinkFilePDF";
+import TabSemi from "../table/tabSemi";
+import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
+import PopupUpdateNewVersion from "@/components/common/popup/PopupUpdateNewVersion";
+import { useVersionApplication } from "@/managers/api/version-application/useVersionApplication";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const statusExprired = useStatusExprired();
@@ -262,9 +269,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         isStateProvider?.productionsOrders.searchProductionOrders
     );
     //lấy mã QR code để nhảy qua app  ở button tổng lệnh sản xuất
-    const { data: QRCode } = useQRCodProductCompleted(
-        isStateProvider?.productionsOrders.idDetailProductionOrder
-    );
+    // const { data: QRCode } = useQRCodProductCompleted(
+    //     isStateProvider?.productionsOrders.idDetailProductionOrder
+    // );
     //lấy link print lệnh sản xuất
 
     // call api list production
@@ -376,7 +383,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             openSheet({
                 type: "manufacture-productions-orders",
                 content: <SheetProductionsOrderDetail {...shareProps} />,
-                className: 'w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]',
+                className: "w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]",
             });
         } else {
             // Không có poi_id hoặc không tìm thấy trong cookie
@@ -403,9 +410,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     // active tab info & tab kế hoạch
     useEffect(() => {
         if (
-            listLsxTab?.length > 0 && (!isStateProvider?.productionsOrders?.isTabList)
+            listLsxTab?.length > 0 &&
+            !isStateProvider?.productionsOrders?.isTabList
         ) {
-            console.log('check');
+            console.log("check");
 
             queryStateProvider({
                 productionsOrders: {
@@ -600,7 +608,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
     // Hàm mở danh sách công đoạn khi click vào lệnh sản xuất
     const handleShowListDetail = (item) => {
-        if (item.id === isStateProvider?.productionsOrders?.idDetailProductionOrder) return
+        if (item.id === isStateProvider?.productionsOrders?.idDetailProductionOrder)
+            return;
 
         queryStateProvider({
             productionsOrders: {
@@ -628,7 +637,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         router.push("/manufacture/productions-orders");
     };
 
-    // Hàm change tab 
+    // Hàm change tab
     const handleActiveTab = (e, type) => {
         if (type === "detail") {
             queryStateProvider({
@@ -712,7 +721,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
     // Hàm mở Sheet chi tiết công đoạn
     const handleToggleSheetDetail = async (item) => {
-        if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return
+        if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return;
 
         // Cập nhật state trước để Sheet có đủ thông tin
         queryStateProvider((prev) => ({
@@ -725,22 +734,32 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }));
 
         // Đợi router.push xong thì mới mở Sheet
-        await router.push({
-            pathname: router.pathname,
-            query: {
-                ...router.query,
-                poi_id: item.poi_id,
+        await router.push(
+            {
+                pathname: router.pathname,
+                query: {
+                    ...router.query,
+                    poi_id: item.poi_id,
+                },
             },
-        }, undefined, { shallow: true }); // tránh reload trang
+            undefined,
+            { shallow: true }
+        ); // tránh reload trang
 
         // Mở Sheet sau khi URL đã cập nhật
         openSheet({
             type: "manufacture-productions-orders",
-            content: (
-                <SheetProductionsOrderDetail {...shareProps} />
-            ),
-            className: 'w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]',
-        })
+            content: <SheetProductionsOrderDetail {...shareProps} />,
+            className: "w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]",
+        });
+
+        // router.push({
+        //     pathname: router.route,
+        //     query: {
+        //         ...router.query,
+        //         poi_id: item.poi_id,
+        //     },
+        // });
     };
 
     const shareProps = {
@@ -929,7 +948,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     };
 
-    //phần dropdown hoàn thành công đoạn 
+    // const { data: version, isLoading: isLoadingVersion } = useVersionApplication()
+
+
+    //phần dropdown hoàn thành công đoạn
     const handClickDropdownCompleteStage = (type) => {
         const currentPackage = dataSeting?.package;
 
@@ -939,7 +961,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 type: "statePopupGlobal",
                 payload: {
                     open: true,
-                    children: <PopupQRCode urlQR={QRCode?.data.qr} />,
+                    children: (
+                        <PopupQRCode
+                        // urlQR={QRCode?.data.qr}
+                        />
+                    ),
                 },
             });
         }
@@ -950,6 +976,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 type: "statePopupGlobal",
                 payload: {
                     open: true,
+                    allowOutsideClick: false,
+                    allowEscape: false,
                     children: (
                         <PopupRequestUpdateVersion>
                             <p className="text-start xlg:text-2xl text-xl leading-[32px] font-semibold text-[#141522]">
@@ -960,6 +988,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                 đến thành phẩm cuối cùng
                             </p>
                         </PopupRequestUpdateVersion>
+                        // <>
+                        //     {!isLoadingVersion && <>
+                        //         <PopupUpdateNewVersion version={version} />
+                        //     </>}
+                        // </>
                     ),
                 },
             });
@@ -968,8 +1001,11 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     };
 
-    //phần in ra phiếu in lệnh sản xuất 
+    const [loadingButton, setLoading] = useState(false);
+
+    //phần in ra phiếu in lệnh sản xuất
     const handPrintManufacture = async (idManufacture) => {
+        setLoading(true);
         try {
             const response = await fetchPDFManufactures({
                 idManufacture: idManufacture,
@@ -978,31 +1014,45 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             if (response && typeof response === "string") {
                 window.open(response, "_blank");
             }
+            setLoading(false);
         } catch (error) {
             console.log("🚀 ~ handPrintManufacture ~ error:", error);
+            setLoading(false);
         }
     };
 
-    console.log('isStateProvider: ', isStateProvider);
+    const handPrintPlanManufacture = async (idManufacture) => {
+        setLoading(true);
+        try {
+            const response = await fetchPDFPlanManufactures({
+                idManufacture: idManufacture,
+            });
+            if (response && typeof response === "string") {
+                window.open(response, "_blank");
+            }
+            setLoading(false);
+        } catch (error) {
+            console.log("🚀 ~ handPrintManufacture ~ error:", error);
+            setLoading(false);
+        }
+    };
+
+
+
 
     return (
         <React.Fragment>
             <div ref={breadcrumbRef}>
-                {
-                    statusExprired ?
-                        (
-                            <EmptyExprired />
-                        )
-                        :
-                        (
-                            <React.Fragment>
-                                <BreadcrumbCustom
-                                    items={breadcrumbItems}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
-                                />
-                            </React.Fragment>
-                        )
-                }
+                {statusExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <React.Fragment>
+                        <BreadcrumbCustom
+                            items={breadcrumbItems}
+                            className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
+                        />
+                    </React.Fragment>
+                )}
             </div>
 
             <div ref={titleRef} className="flex items-center justify-between w-full">
@@ -1220,7 +1270,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     options={comboboxProductionOrders}
                                     classParent="ml-0 text-sm"
                                     classNamePrefix={"productionSmoothing"}
-                                    placeholder={dataLang?.productions_orders_details_number || "productions_orders_details_number"}
+                                    placeholder={
+                                        dataLang?.productions_orders_details_number ||
+                                        "productions_orders_details_number"
+                                    }
                                 />
                             </div>
 
@@ -1404,157 +1457,149 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             maxHeight: calcAvailableHeight("main"),
                         }}
                     >
-                        {
-                            isLoadingProductionOrderList ?
-                                (
-                                    <Loading className="h-full 3xl:h-full 2xl:h-full xl:h-full" />
-                                )
-                                :
-                                flagProductionOrders?.length > 0 ?
-                                    (
-                                        flagProductionOrders?.map((item, eIndex) => {
-                                            const color = {
-                                                0: {
-                                                    color: "bg-[#FF811A]/15 text-[#C25705]",
-                                                    title:
-                                                        dataLang?.productions_orders_produced ??
-                                                        "productions_orders_produced",
-                                                },
-                                                1: {
-                                                    color: "bg-[#3ECeF7]/20 text-[#076A94]",
-                                                    title:
-                                                        dataLang?.productions_orders_in_progress ??
-                                                        "productions_orders_in_progress",
-                                                },
-                                                2: {
-                                                    color: "bg-[#35BD4B]/20 text-[#1A7526]",
-                                                    title:
-                                                        dataLang?.productions_orders_completed ??
-                                                        "productions_orders_completed",
-                                                },
-                                            };
+                        {isLoadingProductionOrderList ? (
+                            <Loading className="h-full 3xl:h-full 2xl:h-full xl:h-full" />
+                        ) : flagProductionOrders?.length > 0 ? (
+                            flagProductionOrders?.map((item, eIndex) => {
+                                const color = {
+                                    0: {
+                                        color: "bg-[#FF811A]/15 text-[#C25705]",
+                                        title:
+                                            dataLang?.productions_orders_produced ??
+                                            "productions_orders_produced",
+                                    },
+                                    1: {
+                                        color: "bg-[#3ECeF7]/20 text-[#076A94]",
+                                        title:
+                                            dataLang?.productions_orders_in_progress ??
+                                            "productions_orders_in_progress",
+                                    },
+                                    2: {
+                                        color: "bg-[#35BD4B]/20 text-[#1A7526]",
+                                        title:
+                                            dataLang?.productions_orders_completed ??
+                                            "productions_orders_completed",
+                                    },
+                                };
 
-                                            return (
-                                                <div
-                                                    key={item.id}
-                                                    onClick={() => handleShowListDetail(item)}
-                                                    className={`
+                                return (
+                                    <div
+                                        key={item?.id}
+                                        onClick={() => handleShowListDetail(item)}
+                                        className={`
                                                         ${typePageMoblie
-                                                            ? "px-px"
-                                                            : "pl-1 pr-3"
-                                                        }
-                                                        ${item.id ==
-                                                        isStateProvider
-                                                            ?.productionsOrders
-                                                            .idDetailProductionOrder &&
-                                                        "bg-[#F0F7FF]"
-                                                        }
+                                                ? "px-px"
+                                                : "pl-1 pr-3"
+                                            }
+                                                        ${item?.id ==
+                                            isStateProvider
+                                                ?.productionsOrders
+                                                .idDetailProductionOrder &&
+                                            "bg-[#F0F7FF]"
+                                            }
                                                         ${flagProductionOrders?.length -
-                                                            1 ==
-                                                            eIndex
-                                                            ? "border-b-none"
-                                                            : "border-b"
-                                                        }
+                                                1 ==
+                                                eIndex
+                                                ? "border-b-none"
+                                                : "border-b"
+                                            }
                                                         py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
-                                                    style={{
-                                                        background:
-                                                            item.id ===
-                                                                isStateProvider?.productionsOrders
-                                                                    .idDetailProductionOrder
-                                                                ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)"
-                                                                : "",
-                                                    }}
-                                                >
-                                                    {/* Gạch xanh bên trái */}
-                                                    <div className="relative pl-5 xl:space-y-2 space-y-1.5">
-                                                        {item.id ===
-                                                            isStateProvider?.productionsOrders
-                                                                .idDetailProductionOrder && (
-                                                                <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
+                                        style={{
+                                            background:
+                                                item?.id ===
+                                                    isStateProvider?.productionsOrders
+                                                        .idDetailProductionOrder
+                                                    ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)"
+                                                    : "",
+                                        }}
+                                    >
+                                        {/* Gạch xanh bên trái */}
+                                        <div className="relative pl-5 xl:space-y-2 space-y-1.5">
+                                            {item?.id ===
+                                                isStateProvider?.productionsOrders
+                                                    .idDetailProductionOrder && (
+                                                    <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
+                                                )}
+
+                                            {isStateProvider?.productionsOrders
+                                                .dataProductionOrderDetail?.title && (
+                                                    <span
+                                                        className={`${color[item?.status_manufacture]?.color
+                                                            } xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}
+                                                    >
+                                                        {color[item?.status_manufacture]?.title}
+                                                    </span>
+                                                )}
+                                            <h1 className="3xl:text-2xl xl:text-xl text-lg font-semibold text-[#003DA0]">
+                                                {item?.reference_no}
+                                            </h1>
+
+                                            <div className="flex flex-col gap-0.5">
+                                                <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
+                                                    <span>
+                                                        {dataLang?.materials_planning_create_on ||
+                                                            "materials_planning_create_on"}
+                                                        {": "}
+                                                    </span>
+                                                    <span>
+                                                        {formatMoment(
+                                                            item?.date,
+                                                            FORMAT_MOMENT.DATE_SLASH_LONG
+                                                        )}
+                                                    </span>
+                                                </h3>
+
+                                                <div className="flex flex-wrap items-start gap-x-1">
+                                                    <span className="text-[#667085] whitespace-nowrap font-normal 3xl:text-base xl:text-sm text-xs">
+                                                        {dataLang?.materials_planning_foloww_up ||
+                                                            "materials_planning_foloww_up"}
+                                                        :
+                                                    </span>
+                                                    {item?.listObject?.map((i, index) => (
+                                                        <span
+                                                            key={index}
+                                                            className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs"
+                                                        >
+                                                            {i.reference_no}
+                                                            {index < item.listObject.length - 1 && (
+                                                                <span>,</span>
                                                             )}
-
-                                                        {isStateProvider?.productionsOrders
-                                                            .dataProductionOrderDetail?.title && (
-                                                                <span
-                                                                    className={`${color[item?.status_manufacture]?.color
-                                                                        } xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}
-                                                                >
-                                                                    {color[item?.status_manufacture]?.title}
-                                                                </span>
-                                                            )}
-                                                        <h1 className="3xl:text-2xl xl:text-xl text-lg font-semibold text-[#003DA0]">
-                                                            {item.reference_no}
-                                                        </h1>
-
-                                                        <div className="flex flex-col gap-0.5">
-                                                            <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
-                                                                <span>
-                                                                    {dataLang?.materials_planning_create_on ||
-                                                                        "materials_planning_create_on"}
-                                                                    {": "}
-                                                                </span>
-                                                                <span>
-                                                                    {formatMoment(
-                                                                        item?.date,
-                                                                        FORMAT_MOMENT.DATE_SLASH_LONG
-                                                                    )}
-                                                                </span>
-                                                            </h3>
-
-                                                            <div className="flex flex-wrap items-start gap-x-1">
-                                                                <span className="text-[#667085] whitespace-nowrap font-normal 3xl:text-base xl:text-sm text-xs">
-                                                                    {dataLang?.materials_planning_foloww_up ||
-                                                                        "materials_planning_foloww_up"}
-                                                                    :
-                                                                </span>
-                                                                {item?.listObject?.map((i, index) => (
-                                                                    <span
-                                                                        key={index}
-                                                                        className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs"
-                                                                    >
-                                                                        {i.reference_no}
-                                                                        {index < item.listObject.length - 1 && (
-                                                                            <span>,</span>
-                                                                        )}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-
-                                                            <AnimatePresence initial={false}>
-                                                                {item.id ===
-                                                                    isStateProvider?.productionsOrders
-                                                                        .idDetailProductionOrder && (
-                                                                        <motion.div
-                                                                            key="extra-info"
-                                                                            layout
-                                                                            initial={{ height: 0, opacity: 0 }}
-                                                                            animate={{ height: "auto", opacity: 1 }}
-                                                                            exit={{ height: 0, opacity: 0 }}
-                                                                            transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                                            className="flex flex-col w-full overflow-hidden gap-0.5"
-                                                                        >
-                                                                            <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
-                                                                                <span>
-                                                                                    {dataLang?.client_list_brand ||
-                                                                                        "client_list_brand"}
-                                                                                    :{" "}
-                                                                                </span>
-                                                                                <span>{item?.name_branch}</span>
-                                                                            </h3>
-                                                                        </motion.div>
-                                                                    )}
-                                                            </AnimatePresence>
-                                                        </div>
-                                                    </div>
+                                                        </span>
+                                                    ))}
                                                 </div>
-                                            );
-                                        })
-                                    )
-                                    :
-                                    (
-                                        <NoData className="mt-0" />
-                                    )
-                        }
+
+                                                <AnimatePresence initial={false}>
+                                                    {item?.id ===
+                                                        isStateProvider?.productionsOrders
+                                                            .idDetailProductionOrder && (
+                                                            <motion.div
+                                                                key="extra-info"
+                                                                layout
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: "auto", opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                className="flex flex-col w-full overflow-hidden gap-0.5"
+                                                            >
+                                                                <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
+                                                                    <span>
+                                                                        {dataLang?.client_list_brand ||
+                                                                            "client_list_brand"}
+                                                                        :{" "}
+                                                                    </span>
+                                                                    <span>{item?.name_branch}</span>
+                                                                </h3>
+                                                            </motion.div>
+                                                        )}
+                                                </AnimatePresence>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <NoData className="mt-0" />
+                        )}
 
                         {hasNextPageProductionOrderList && (
                             <LoadingComponent ref={refInviewListLsx} />
@@ -1581,7 +1626,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
                 <div className="2xl:max-w-[85%] xl:max-w-[82%] max-w-[78%] size-full space-y-4 border-none border-[#D0D5DD] border overflow-y-hidden">
                     {!isLoadingProductionOrderDetail &&
-                        dataProductionOrderDetail?.listPOItems?.length > 0 && (
+                        dataProductionOrderDetail?.listPOItems?.length > 0 &&
+                        isStateProvider?.productionsOrders?.isTabList?.type ==
+                        "products" && (
                             <div
                                 ref={groupButtonRef}
                                 className="flex items-center justify-end gap-2 p-0.5 mb-2"
@@ -1623,7 +1670,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                             return (
                                                 <div
                                                     key={tab.id}
-                                                    className={`hover:bg-[#F3F4F6] border-b border-[#F7F8F9] border-t flex items-center gap-3 cursor-pointer px-4 py-3 custom-transition ${borderClass}`}
+                                                    className={`hover:bg-[#F3F4F6] border-b border-[#F7F8F9] border-t flex items-center gap-3 cursor-pointer px-4 py-3 custom-transition ${borderClass} select-none`}
                                                     onClick={() =>
                                                         handClickDropdownCompleteStage(tab.type)
                                                     }
@@ -1674,6 +1721,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                             isStateProvider?.productionsOrders.idDetailProductionOrder
                                         )
                                     }
+                                    isLoading={loadingButton}
+                                    disabled={loadingButton}
                                 />
 
                                 {/* <ButtonAnimationNew
@@ -1718,6 +1767,33 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             </div>
                         )}
 
+                    {isStateProvider?.productionsOrders?.isTabList?.type ==
+                        "semiProduct" &&
+                        dataProductionOrderDetail?.listPOItems?.length > 0 && !isLoadingProductionOrderDetail && (
+                            <div
+                                ref={groupButtonRef}
+                                className="flex items-center justify-end gap-2 p-0.5 mb-2"
+                            >
+                                <ButtonAnimationNew
+                                    icon={
+                                        <div className="size-4">
+                                            <PrinterIcon className="size-full" />
+                                        </div>
+                                    }
+                                    title="In kế hoạch BTP & NVL"
+                                    className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
+                                    onClick={() => {
+                                        handPrintPlanManufacture(
+                                            isStateProvider?.productionsOrders
+                                                ?.dataProductionOrderDetail?.pp_id
+                                        );
+                                    }}
+                                    isLoading={loadingButton}
+                                    disabled={loadingButton}
+                                />
+                            </div>
+                        )}
+
                     <Customscrollbar
                         className="h-full pr-3"
                         style={{
@@ -1725,20 +1801,22 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             maxHeight: calcAvailableHeight("submain"),
                         }}
                     >
-                        {(isLoadingProductionOrderDetail || isRefetchingProductionOrderDetail || isRefetchingProductionOrderList || isLoadingProductionOrderList)
-                            ?
-                            <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full' />
-                            :
-                            (dataProductionOrderDetail?.listPOItems?.length > 0)
-                                ?
-                                <React.Fragment>
-                                    {isStateProvider?.productionsOrders?.isTabList?.type == "products" && <DetailProductionOrderList {...shareProps} />}
-                                    {isStateProvider?.productionsOrders?.isTabList?.type == "semiProduct" && <>Hello</>}
-                                    {/* {isStateProvider?.productionsOrders.isTab == "semiProduct" && <TabSemi {...shareProps} />} */}
-                                </React.Fragment>
-                                :
-                                <NoData className="mt-0" />
-                        }
+                        {isLoadingProductionOrderDetail ||
+                            isRefetchingProductionOrderDetail ||
+                            isRefetchingProductionOrderList ||
+                            isLoadingProductionOrderList ? (
+                            <Loading className="3xl:h-full 2xl:h-full xl:h-full h-full" />
+                        ) : dataProductionOrderDetail?.listPOItems?.length > 0 ? (
+                            <React.Fragment>
+                                {isStateProvider?.productionsOrders?.isTabList?.type ==
+                                    "products" && <DetailProductionOrderList {...shareProps} />}
+                                {isStateProvider?.productionsOrders?.isTabList?.type ==
+                                    "semiProduct" && <PlaningProductionOrder {...shareProps} />}
+                                {/* {isStateProvider?.productionsOrders.isTab == "semiProduct" && <PlaningProductionOrder {...shareProps} />} */}
+                            </React.Fragment>
+                        ) : (
+                            <NoData className="mt-0" />
+                        )}
                     </Customscrollbar>
                 </div>
             </div>

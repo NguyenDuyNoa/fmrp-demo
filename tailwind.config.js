@@ -12,6 +12,50 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        typo: {
+          blue: {
+            1: "#11315B",
+            2: "#3276FA",
+            3: '#4752E6',
+            4: '#0375F3'
+
+          },
+          gray: {
+            1: "#9295A4",
+            2: "#667085",
+            3: "#3A3E4C"
+          },
+          black: {
+            1: '#141522',
+            2: '#101828',
+            3: '#17181A'
+          },
+          green: {
+            1: "#1A7526"
+          }
+        },
+        border: {
+          gray: {
+            1: "#D0D5DD",
+          },
+        },
+        background: {
+          gray: {
+            1: "#D0D5DD",
+            2: "#9295A4"
+          },
+          green: {
+            1: "#35BD4B"
+          },
+          blue: {
+            1: '#5B65F5',
+            2: '#0375F3',
+            3: '#EBF5FF',
+            4: '#0F4F9E'
+          }
+        }
+      },
       aspectRatio: {
         '16/9': '16 / 9',
       },
@@ -57,6 +101,8 @@ module.exports = {
         logo: "url('/logo_1.png')",
         "linear-bg-green":
           "linear-gradient(to bottom right, #1FC583 0%, #1F9285 100%)",
+        "linear-bg-progress-full":
+          "linear-gradient(to bottom right, #1FBA83 0%, #1FA484 100%)",
       },
     },
   },
