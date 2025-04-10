@@ -9,13 +9,6 @@ const initialState = {
         isTabList: undefined, // new
         countAll: 0,
         productionOrdersList: [],
-        // listDataRight: {
-        //     title: "",
-        //     statusManufacture: null,
-        //     dataPPItems: [],
-        //     dataSemiItems: [],
-        // },
-        // openModal: false,
         next: null,
         page: 1,
         limit: 10,
@@ -53,18 +46,15 @@ const initialState = {
             searchFGReceiptHistory: "",
             searchMaterialIssueHistory: "",
             searchMaterialOutput: ""
-        }
+        },
+        selectedImages: [], // ✅ thêm mới
+        uploadProgress: {},  // ✅ thêm mới
+        inputCommentText: "",
+        taggedUsers: []
     },
 };
 export const StateProvider = ({ children }) => {
     const [isStateProvider, setIsStateProvider] = useState(initialState);
-
-    // const queryStateProvider = (key) => setIsStateProvider((prve) => ({ ...prve, ...key }));
-
-    // const queryStateProvider = (updater) =>
-    //     setIsStateProvider((prev) =>
-    //         typeof updater === "function" ? updater(prev) : { ...prev, ...updater }
-    //     );
 
     const queryStateProvider = (updater) => {
         setIsStateProvider((prev) => {

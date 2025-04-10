@@ -115,9 +115,33 @@ const apiProductionsOrders = {
         return response.data
     },
 
-    // get list comment
+    // GET list comment
     async apiGetListComment({ page = 1, limit = 3, type = "", post_id = "" }, data) {
         const response = await axiosCustom('POST', `/api_web/Api_Comments_Chat/getComments?page=${page}&limit=${limit}&type=${type}&post_id=${post_id}`, data);
+        return response.data
+    },
+
+    // POST like comment
+    async apiPostAddComment(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Comments_Chat/add_comment`, data);
+        return response.data
+    },
+
+    // POST like comment
+    async apiPostLikeComment({ idComment }) {
+        const response = await axiosCustom('GET', `/api_web/Api_Comments_Chat/like_comment/${idComment}`);
+        return response.data
+    },
+
+    // POST unlike comment
+    async apiPostUnlikeComment({ idComment }) {
+        const response = await axiosCustom('GET', `/api_web/Api_Comments_Chat/unlike_comment/${idComment}`);
+        return response.data
+    },
+
+    // GET danh sách khách hàng or nhân viên
+    async apiGetListStaffs({ limit = 500 }, data) {
+        const response = await axiosCustom('GET', `/api_web/Api_staff/searchStaffs?limit=${limit}`, data);
         return response.data
     },
 }

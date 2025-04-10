@@ -14,7 +14,8 @@ const GalleryModal = ({ images, startIndex = 0, onClose }) => {
     // ✅ Custom layout ảnh bên trong modal
     const renderItem = (item) => {
         return (
-            <div className="flex justify-center items-center w-full h-screen pb-[200px]">
+            <div className="flex justify-center items-center w-full h-screen pb-[100px]">
+            {/* <div className="flex justify-center items-center w-full h-screen pb-[200px]"> */}
                 <img
                     src={item.original}
                     alt=""

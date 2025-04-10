@@ -31,6 +31,7 @@ import CostCardSkeleton from "@/containers/manufacture/productions-orders/compon
 import TabSwitcherWithUnderlineSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/TabSwitcherWithUnderlineSkeleton";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import Loading from "@/components/UI/loading/loading";
+import CommentInputAdvanced from "@/components/common/input/CommentInputAdvanced";
 
 const initialState = {
     isTab: 1,
@@ -38,17 +39,14 @@ const initialState = {
 };
 
 const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
-    const [isMounted, setIsMounted] = useState(false)
     const router = useRouter()
-
-    const poiId = useMemo(() => router.query.poi_id, [router.query.poi_id])
+    const scrollRef = useRef(null);
+    // const poiId = useMemo(() => router.query.poi_id, [router.query.poi_id])
 
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
     const dataSeting = useSetingServer();
 
-    const titleSheetRef = useRef(null);
-    const commentSheetRef = useRef(null);
     const { isOpen: isOpenSheet, closeSheet } = useSheet()
 
     const {
@@ -94,12 +92,11 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
         },
     ];
 
-    console.log('isStateProvider?.productionsOrders?.poiId', isStateProvider?.productionsOrders?.poiId);
-
-    // useEffect(() => {
-    //     setIsMounted(true)
-    // }, [])
-
+    useEffect(() => {
+        if (isOpenSheet && scrollRef.current && isStateProvider?.productionsOrders?.poiId) {
+            scrollRef.current.scrollTo({ top: 0, behavior: "smooth" }); // hoặc "auto"
+        }
+    }, [isOpenSheet, isStateProvider?.productionsOrders?.poiId]);
 
     useEffect(() => {
         if (isOpenSheet && isStateProvider?.productionsOrders?.poiId) {
@@ -132,6 +129,15 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
     const handleCloseSheet = () => {
         closeSheet("manufacture-productions-orders")
+
+        queryStateProvider((prev) => ({
+            productionsOrders: {
+                ...prev.productionsOrders,
+                selectedImages: [],
+                uploadProgress: {},
+                inputCommentText:""
+            }
+        }))
 
         if (router.pathname.startsWith("/manufacture/productions-orders")) {
             router.push("/manufacture/productions-orders");
@@ -171,16 +177,11 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
             })
     }
 
-    console.log('dataItemOrderDetail dataItemOrderDetail:', dataItemOrderDetail);
-    console.log('isFetchingItemOrderDetail:', isFetchingItemOrderDetail);
-    console.log('isLoadingItemOrderDetail:', isLoadingItemOrderDetail);
-
     // if (!poiId && isMounted) return <Loading className='3xl:h-full 2xl:h-full xl:h-full h-full col-span-16' />
 
     return (
         <div className="flex flex-col overflow-hidden !bg-white h-full">
             <div
-                ref={titleSheetRef}
                 className='3xl:pl-6 pl-4 3xl:pr-4 pr-2 3xl:py-3 py-1 flex items-center justify-between bg-white'
                 style={{
                     boxShadow: "0px 4px 30px 0px #0000000D"
@@ -235,14 +236,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                 </div>
             </div>
 
-            <Customscrollbar
-                className='overflow-auto pb-0 3xl:pl-6 pl-4 pr-2 py-2 h-full min-h-0'
-            // style={{
-            //     height: `${scrollHeight}px`,
-            //     maxHeight: `${scrollHeight}px`,
-            // }}
-
-            >
+            <Customscrollbar ref={scrollRef} className='overflow-auto pb-0 3xl:pl-6 pl-4 pr-2 py-2 h-full min-h-0' >
                 <div className='flex flex-col 3xl:gap-6 gap-4 pr-4'>
                     {/* Information */}
                     <div className="flex flex-col 3xl:gap-6 gap-4 w-full border border-[#D0D5DD] rounded-2xl bg-white 3xl:px-8 px-6 3xl:py-6 py-4">
@@ -381,8 +375,8 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                         </div>
                     </div>
 
+                    {/* tab */}
                     <div className='flex flex-col gap-2'>
-                        {/* tab */}
                         {
                             isLoadingItemOrderDetail
                                 ?
@@ -418,40 +412,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
 
             {
                 isStateProvider?.productionsOrders?.isTabSheet?.id == 1 &&
-                <div
-                    className='3xl:pl-6 pl-4 pr-2 3xl:py-3 py-1 bg-white'
-                    style={{
-                        boxShadow: "0px -4px 30px 0px #0000000D"
-                    }}
-
-                >
-                    <div ref={commentSheetRef} className="mt-1 px-4 py-2 w-full border border-[#9295A4] rounded-xl flex items-center gap-3">
-                        <input
-                            className="flex-1 text-sm-default text-[#344054] placeholder:!text-[#667085] focus:outline-none"
-                            placeholder="Thêm thảo luận..."
-                        // value={comment}
-                        // onChange={(e) => setComment(e.target.value)}
-                        />
-                        <div className="flex items-center gap-3 text-[#3A3E4C]">
-                            <PiSmiley className='size-5 shrink-0 cursor-pointer' />
-                            <PiTextAa className='size-5 shrink-0 cursor-pointer' />
-                            <PiPaperclip className='size-5 shrink-0 cursor-pointer' />
-                            <PiImage className='size-5 shrink-0 cursor-pointer' />
-                        </div>
-
-                        <div className='w-[1px] h-4 bg-[#1F2329]/15' />
-
-                        <ButtonAnimationNew
-                            icon={
-                                <PiPaperPlaneRightFill className='size-5 shrink-0' />
-                            }
-                            hideTitle={true}
-                            disabled={false}
-                            variant={variantButtonScaleZoom}
-                            className='text-[#0375F3] hover:text-[#0375F3]/90 disabled:!text-[#667085] disabled:bg-transparent'
-                        />
-                    </div>
-                </div>
+                <CommentInputAdvanced />
             }
         </div >
     );
