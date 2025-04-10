@@ -98,6 +98,7 @@ import TabSemi from "../table/tabSemi";
 import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
 import PopupUpdateNewVersion from "@/components/common/popup/PopupUpdateNewVersion";
+import { useVersionApplication } from "@/managers/api/version-application/useVersionApplication";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     const statusExprired = useStatusExprired();
@@ -1026,6 +1027,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     };
 
+    // const { data: version, isLoading: isLoadingVersion } = useVersionApplication()
+
+
     //phần dropdown hoàn thành công đoạn
     const handClickDropdownCompleteStage = (type) => {
         const currentPackage = dataSeting?.package;
@@ -1051,17 +1055,23 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 type: "statePopupGlobal",
                 payload: {
                     open: true,
+                    allowOutsideClick: false,
+                    allowEscape: false,
                     children: (
-                        // <PopupRequestUpdateVersion>
-                        //     <p className="text-start xlg:text-2xl text-xl leading-[32px] font-semibold text-[#141522]">
-                        //         Theo dõi chặt{" "}
-                        //         <span className="text-[#0375F3]">
-                        //             từng bước – từ bán thành phẩm
-                        //         </span>{" "}
-                        //         đến thành phẩm cuối cùng
-                        //     </p>
-                        // </PopupRequestUpdateVersion>
-                        <PopupUpdateNewVersion />
+                        <PopupRequestUpdateVersion>
+                            <p className="text-start xlg:text-2xl text-xl leading-[32px] font-semibold text-[#141522]">
+                                Theo dõi chặt{" "}
+                                <span className="text-[#0375F3]">
+                                    từng bước – từ bán thành phẩm
+                                </span>{" "}
+                                đến thành phẩm cuối cùng
+                            </p>
+                        </PopupRequestUpdateVersion>
+                        // <>
+                        //     {!isLoadingVersion && <>
+                        //         <PopupUpdateNewVersion version={version} />
+                        //     </>}
+                        // </>
                     ),
                 },
             });
@@ -1106,7 +1116,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     };
 
-    // console.log('isStateProvider: ', isStateProvider);
+
+
 
     return (
         <React.Fragment>

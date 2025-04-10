@@ -18,7 +18,9 @@ const PopupGlobal = ({ ...props }) => {
     <Popup
       modPopupal
       open={statePopupGlobal.open}
-      closeOnDocumentClick
+      // closeOnDocumentClick
+      closeOnDocumentClick={statePopupGlobal.allowOutsideClick ?? true} // ❌ Ngăn click ra ngoài
+      closeOnEscape={statePopupGlobal.allowEscape ?? true} // ❌ Ngăn nhấn ESC để đóng
       onClose={handleClose}
       // contentStyle={{ borderRadius: '8px', width: '350px', padding: '20px' }}
       className={`${props.className} border-gradient`}
@@ -28,6 +30,7 @@ const PopupGlobal = ({ ...props }) => {
         backdropFilter: "blur(1.5px)", // Hiệu ứng blur cho nền overlay
         WebkitBackdropFilter: "blur(1.5px)", // Hỗ trợ cho trình duyệt Webkit (Safari)
       }}
+
     >
       <AnimatePresence mode="wait">
         {statePopupGlobal.open && (
