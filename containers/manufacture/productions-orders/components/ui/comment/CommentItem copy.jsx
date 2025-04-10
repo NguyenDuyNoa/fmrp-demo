@@ -37,8 +37,7 @@ const parseCommentContent = (text) => {
         const index = match.index;
 
         if (lastIndex < index) {
-            const before = text.slice(lastIndex, index);
-            parts.push(...splitTextWithBreaks(before));
+            parts.push(text.slice(lastIndex, index));
         }
 
         parts.push({
@@ -51,56 +50,31 @@ const parseCommentContent = (text) => {
     }
 
     if (lastIndex < text.length) {
-        const rest = text.slice(lastIndex);
-        parts.push(...splitTextWithBreaks(rest));
+        parts.push(text.slice(lastIndex));
     }
 
     return parts;
 };
 
-const splitTextWithBreaks = (text) => {
-    const segments = text.split(/<br\s*\/?>|\n/g);
-    const result = [];
-    segments.forEach((segment, index) => {
-        if (segment) result.push(segment);
-        if (index < segments.length - 1) result.push({ type: 'br' });
-    });
-    return result;
-};
-
 const RenderedComment = ({ content }) => {
-    const containsMention = /@\{\d+:[^\}]+\}/.test(content || '');
-
-    if (!containsMention) {
-        return (
-            <div
-                className='text-sm-default duration-500 transition ease-in-out line-clamp-2 whitespace-pre-wrap'
-                dangerouslySetInnerHTML={{ __html: content ?? '' }}
-            />
-        );
-    }
-
     const parts = parseCommentContent(content || '');
 
     return (
-        <div className="text-sm-default duration-500 transition ease-in-out whitespace-pre-wrap">
-            {parts.map((part, index) => {
-                if (typeof part === 'string') return <span key={index}>{part}</span>;
-                if (part.type === 'mention') {
-                    return (
-                        <span
-                            key={index}
-                            className="text-[#0F4F9E] px-1 rounded font-medium cursor-pointer hover:underline custom-transition"
-                            onClick={() => console.log("Tag user ID:", part.userId)}
-                        >
-                            @{part.userName}
-                        </span>
-                    );
-                }
-                if (part.type === 'br') return <br key={index} />;
-                return null;
-            })}
-        </div>
+        <span className="flex flex-wrap gap-x-1 gap-y-0.5">
+            {parts.map((part, index) =>
+                typeof part === "string" ? (
+                    <span key={index}>{part}</span>
+                ) : (
+                    <span
+                        key={index}
+                        className="bg-blue-100 text-blue-700 px-1 rounded font-medium cursor-pointer hover:underline"
+                        onClick={() => console.log("Tag user ID:", part.userId)}
+                    >
+                        @{part.userName}
+                    </span>
+                )
+            )}
+        </span>
     );
 };
 
@@ -178,15 +152,17 @@ const CommentItem = ({ item, currentUser }) => {
                     </div>
 
                     {/* Content */}
-                    {item.content && (
-                        <div className="text-sm-default mt-1">
-                            {/* <div
+                    {
+                        item.content && (
+                            <div className="text-sm-default mt-1">
+                                {/* <div
                                 className='text-sm-default duration-500 transition ease-in-out line-clamp-2'
                                 dangerouslySetInnerHTML={{ __html: `${item?.content ?? ''}` }}
                             /> */}
-                            <RenderedComment content={item.content} />
-                        </div>
-                    )}
+                                <RenderedComment content={item.content} />
+                            </div>
+                        )
+                    }
 
                     {/* Image */}
                     {
@@ -201,11 +177,9 @@ const CommentItem = ({ item, currentUser }) => {
                                                 className="relative cursor-pointer"
                                                 onClick={() => handleClickImage(index)}
                                             >
-                                                <Image
+                                                <img
                                                     src={file.file_path || '/icon/default/default.png'}
                                                     alt={file.file_name}
-                                                    width={300}
-                                                    height={200}
                                                     className="w-full 3xl:h-[200px] h-[180px] object-cover rounded"
                                                 />
                                                 {
@@ -225,6 +199,13 @@ const CommentItem = ({ item, currentUser }) => {
 
                     {/* Nút like và danh sách người like */}
                     <div className="flex items-center gap-0.5 mt-2">
+                        {/* <button
+                            onClick={handleToggleLike}
+                            className={`flex items-center gap-1 3xl:size-6 size-5 font-medium transition-all duration-150 ${hasLiked ? "text-[#0375F3]" : "text-[#52575E]"}`}
+                        >
+                            {hasLiked ? <PiThumbsUpFill className="text-[#0375F3]" /> : <PiThumbsUp />}
+                        </button> */}
+
                         <motion.button
                             onClick={handleToggleLike}
                             whileTap={{ scale: 0.9 }}
@@ -236,11 +217,10 @@ const CommentItem = ({ item, currentUser }) => {
                                         (
                                             <motion.div
                                                 key="liked"
-                                                variants={likeVariants}
-                                                initial="initial"
-                                                animate="animate"
-                                                exit="exit"
-                                                transition={likeVariants.transition}
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: [1.2, 0.9, 1.1, 1], rotate: [0, -10, 10, 0] }}
+                                                exit={{ scale: 0 }}
+                                                transition={{ type: "spring", stiffness: 500, damping: 15, duration: 0.4 }}
                                             >
                                                 <PiThumbsUpFill className="text-[#0375F3]" />
                                             </motion.div>

@@ -12,9 +12,10 @@ import PopupRecommendation from '../UI/popup/PopupRecommendation';
 import PopupUpdateVersion from '../UI/popup/PopupUpdateVersion';
 import ImagesModal from '../UI/images/ImagesModal';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import PopupGlobal from '../common/popup/PopupGlobal';
 import { useSheet } from '@/context/ui/SheetContext';
+import { StateContext } from '@/context/_state/productions-orders/StateContext';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -30,6 +31,7 @@ const Index = ({ children, ...props }) => {
 
     const { closeSheet } = useSheet()
 
+    const { queryStateProvider } = useContext(StateContext);
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
     const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
@@ -43,6 +45,14 @@ const Index = ({ children, ...props }) => {
     useEffect(() => {
         if (!router?.route?.startsWith("/manufacture/productions-orders")) {
             closeSheet("manufacture-productions-orders")
+            queryStateProvider((prev) => ({
+                productionsOrders: {
+                    ...prev.productionsOrders,
+                    selectedImages: [],
+                    uploadProgress: {},
+                    inputCommentText:""
+                }
+            }))
         }
     }, [router.isReady, router?.route])
 
