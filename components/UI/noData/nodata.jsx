@@ -22,7 +22,7 @@ const NoData = ({
         ("Chưa có dữ liệu")
         :
         (
-            isComment ? "Chưa có bình luận. Hãy thảo luận trao đổi tình hình sản xuất ngay!" : "Không tìm thấy các mục"
+            isComment ? "Hãy thảo luận trao đổi tình hình sản xuất ngay!" : "Không tìm thấy các mục"
         )
 
     return (

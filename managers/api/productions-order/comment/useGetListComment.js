@@ -2,7 +2,7 @@ import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-qu
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { optionsQuery } from "@/configs/optionsQuery";
 
-export const useFetchListComment = ({
+export const useGetListComment = ({
     limit = 10,
     poiId,
     enabled,
@@ -24,8 +24,10 @@ export const useFetchListComment = ({
         enabled: enabled,
         placeholderData: keepPreviousData,
         getNextPageParam: (lastPage, pages) => {
+            console.log('lastPage', lastPage);
+
             // Kiểm tra nếu còn trang kế tiếp
-            if (lastPage?.output?.next === 1) {
+            if (lastPage?.next === 1) {
                 return pages.length + 1; // Trang tiếp theo
             }
             return undefined;

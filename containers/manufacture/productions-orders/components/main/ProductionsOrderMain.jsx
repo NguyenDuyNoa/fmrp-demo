@@ -358,105 +358,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     }, [router.isReady, router.pathname, router.query]);
 
-    // useEffect(() => {
-    //     if (!poiId) {
-    //         closeSheet(false);
-    //         return;
-    //     }
-
-    //     //   Chờ có data thì mới mở sheet
-    //     if (dataProductionOrderDetail) {
-    //         openSheet({
-    //             content: <SheetProductionsOrderDetail {...shareProps} />,
-    //             className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
-    //         });
-    //     }
-    // }, [poiId, dataProductionOrderDetail]);
-
-    // useEffect(() => {
-    //     const cookieLsxActive = CookieCore.get("lsx_active") || "{}"
-    //     const parseCookieLsxActive = JSON?.parse(cookieLsxActive)
-
-    //     console.log('parseCookieLsxActive', parseCookieLsxActive);
-
-    //     if (flagProductionOrders?.length > 0) {
-    //         if (flagProductionOrders?.find((item) => item?.id === parseCookieLsxActive?.id)) {
-    //             if (dataProductionOrderDetail?.listPOItems?.length > 0 && poiId) {
-    //                 openSheet({
-    //                     content: <SheetProductionsOrderDetail {...shareProps} />,
-    //                     className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
-    //                 });
-    //                 queryStateProvider({
-    //                     productionsOrders: {
-    //                         ...isStateProvider?.productionsOrders,
-    //                         idDetailProductionOrder: parseCookieLsxActive?.id
-    //                     }
-    //                 })
-    //             } else {
-    //                 closeSheet(false);
-    //                 queryStateProvider({
-    //                     productionsOrders: {
-    //                         ...isStateProvider?.productionsOrders,
-    //                         idDetailProductionOrder: flagProductionOrders[0]?.id
-    //                     }
-    //                 })
-    //                 return;
-    //             }
-
-    //             return
-    //         }
-    //         if (!isStateProvider?.productionsOrders?.idDetailProductionOrder) {
-    //             closeSheet()
-
-    //             queryStateProvider({
-    //                 productionsOrders: {
-    //                     ...isStateProvider?.productionsOrders,
-    //                     idDetailProductionOrder: flagProductionOrders[0]?.id
-    //                 }
-    //             })
-    //         }
-
-    //         return
-    //     }
-
-    // }, [flagProductionOrders, dataProductionOrderDetail])
-
-    // useEffect(() => {
-    //     if (!isInitialRun.current) return;
-    //     if (!flagProductionOrders?.length) return;
-
-    //     isInitialRun.current = false; // Đánh dấu đã chạy lần đầu
-
-    //     const cookieLsxActive = CookieCore.get("lsx_active") || "{}";
-    //     const parseCookieLsxActive = JSON?.parse(cookieLsxActive);
-
-    //     const foundFlag = flagProductionOrders.find((item) => item?.id === parseCookieLsxActive?.id);
-
-    //     if (isStateProvider?.productionsOrders?.poiId && foundFlag) {
-    //         queryStateProvider({
-    //             productionsOrders: {
-    //                 ...isStateProvider?.productionsOrders,
-    //                 idDetailProductionOrder: parseCookieLsxActive?.id
-    //             }
-    //         });
-
-    //         openSheet({
-    //             content: <SheetProductionsOrderDetail {...shareProps} />,
-    //             className: 'w-[90vw] md:w-[700px] xl:w-[70%]',
-    //         });
-
-    //     } else {
-    //         queryStateProvider({
-    //             productionsOrders: {
-    //                 ...isStateProvider?.productionsOrders,
-    //                 idDetailProductionOrder: flagProductionOrders[0]?.id
-    //             }
-    //         });
-
-    //         closeSheet(false);
-    //     }
-    // }, [flagProductionOrders,dataProductionOrderDetail]);
-
     useEffect(() => {
         if (!isInitialRun.current || !router.isReady) return;
         if (!flagProductionOrders?.length) return;
@@ -495,6 +396,14 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             });
 
             closeSheet("manufacture-productions-orders");
+            queryStateProvider((prev) => ({
+                productionsOrders: {
+                    ...prev.productionsOrders,
+                    selectedImages: [],
+                    uploadProgress: {},
+                    inputCommentText:""
+                }
+            }))
         }
     }, [flagProductionOrders, router.isReady]);
 
@@ -715,6 +624,16 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         });
 
         closeSheet("manufacture-productions-orders");
+
+        queryStateProvider((prev) => ({
+            productionsOrders: {
+                ...prev.productionsOrders,
+                selectedImages: [],
+                uploadProgress: {},
+                inputCommentText:""
+            }
+        }))
+
         router.push("/manufacture/productions-orders");
     };
 
@@ -805,12 +724,14 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return;
 
         // Cập nhật state trước để Sheet có đủ thông tin
-        queryStateProvider({
+        queryStateProvider((prev) => ({
             productionsOrders: {
-                ...isStateProvider?.productionsOrders,
+                ...prev.productionsOrders,
                 itemDetailPoi: item,
+                selectedImages: [],
+                uploadProgress: {}
             },
-        });
+        }));
 
         // Đợi router.push xong thì mới mở Sheet
         await router.push(

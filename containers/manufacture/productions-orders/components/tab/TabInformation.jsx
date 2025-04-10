@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import ProductionSteps from '../ui/ProductionStep'
 import { useSheet } from '@/context/ui/SheetContext'
 import { useRouter } from 'next/router'
@@ -18,9 +18,12 @@ import ProductionStepsSkeleton from '@/containers/manufacture/productions-orders
 import { PiCaretDownBold, PiChatsTeardropFill } from 'react-icons/pi'
 import { useItemOrderDetail } from '@/managers/api/productions-order/useItemOrderDetail'
 import { StateContext } from '@/context/_state/productions-orders/StateContext'
-import { useFetchListComment } from '@/managers/api/productions-order/useFetchListComment'
 import CommentList from '../ui/comment/CommentList'
-
+import { useInView } from 'react-intersection-observer'
+import LoadingComponent from '@/components/common/loading/loading/LoadingComponent'
+import { useSelector } from 'react-redux'
+import { useGetListComment } from '@/managers/api/productions-order/comment/useGetListComment'
+import CommentSkeleton from '../skeleton/CommentSkeleton'
 
 const dataFakeItem = [
     {
@@ -549,7 +552,13 @@ const TabInformation = () => {
     const poiId = useMemo(() => router.query.poi_id, [router.query])
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
+    const auth = useSelector((state) => state.auth);
+
+    // api dữ liệu user
+    // const { data: dataAuth, isLoading } = useAuththentication(auth)
+
     const [limit, setLimit] = useState(5);
+    const { ref: refInviewListComment, inView: inViewListComment } = useInView();
 
     const queryClient = useQueryClient()
 
@@ -559,13 +568,18 @@ const TabInformation = () => {
     const {
         data: dataItemOrderDetail,
         isLoading: isLoadingItemOrderDetail,
-        isFetching: isFetchingItemOrderDetail
+        isFetching: isFetchingItemOrderDetail,
     } = useItemOrderDetail({
         poi_id: isStateProvider?.productionsOrders?.poiId,
         enabled: isOpenSheet && !!isStateProvider?.productionsOrders?.poiId
     })
 
-    const { data: dataListComment } = useFetchListComment({
+    const {
+        data: dataListComment,
+        fetchNextPage: fetchNextPageListComment,
+        hasNextPage: hasNextPageListComment,
+        refetch: refetchListComment,
+    } = useGetListComment({
         poiId: isStateProvider?.productionsOrders?.poiId,
         type: 1,
         enabled: isOpenSheet && !!isStateProvider?.productionsOrders?.poiId && isStateProvider?.productionsOrders?.isTabSheet?.id == 1
@@ -576,10 +590,15 @@ const TabInformation = () => {
         [dataListComment]
     );
 
-    console.log('dataItemOrderDetail sheet', dataItemOrderDetail);
-    console.log('dataListComment', dataListComment);
     console.log('flagListComment', flagListComment);
+    console.log('auth', auth);
 
+    // loadmore list LSX
+    useEffect(() => {
+        if (inViewListComment && hasNextPageListComment) {
+            fetchNextPageListComment();
+        }
+    }, [inViewListComment, fetchNextPageListComment]);
 
     const dataSeting = useSetingServer();
     const formatNumber = useCallback((num) => formatNumberConfig(+num, dataSeting), [dataSeting]);
@@ -809,15 +828,22 @@ const TabInformation = () => {
                 <div className=''>
                     {
                         flagListComment && flagListComment?.length > 0 ?
-                            <CommentList data={flagListComment} />
+                            <CommentList
+                                data={flagListComment}
+                                currentUser={{ id: auth?.staff_id, name: auth?.user_full_name }}
+                            />
                             :
-
                             <NoData
                                 className="mt-0 col-span-16"
                                 type="comment"
                                 classNameTitle='3xl:text-2xl xl:text-xl text-lg !text-[#11315B]'
                             />
                     }
+
+                    {hasNextPageListComment && (
+                        // <LoadingComponent ref={refInviewListComment} />
+                        <CommentSkeleton ref={refInviewListComment} />
+                    )}
                 </div>
             </div>
         </div>
