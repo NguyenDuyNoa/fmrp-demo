@@ -135,7 +135,8 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                 ...prev.productionsOrders,
                 selectedImages: [],
                 uploadProgress: {},
-                inputCommentText:""
+                inputCommentText:"",
+                taggedUsers: []
             }
         }))
 

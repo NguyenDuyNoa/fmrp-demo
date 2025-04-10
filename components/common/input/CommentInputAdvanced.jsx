@@ -11,12 +11,6 @@ import { useGetListStaffs } from "@/managers/api/productions-order/comment/useGe
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 
-const mockUsers = [
-    { id: 1, full_name: "Nguyễn Văn A" },
-    { id: 2, full_name: "Trần Thị B" },
-    { id: 3, full_name: "Lê Văn C" },
-];
-
 const CommentInputAdvanced = () => {
     const fileInputRef = useRef();
     const contentRef = useRef();
@@ -193,7 +187,7 @@ const CommentInputAdvanced = () => {
         }
 
         const span = document.createElement("span");
-        span.className = "text-[#0F4F9E] px-1 rounded font-medium cursor-pointer custom-transition";
+        span.className = "mention text-[#0F4F9E] px-1 rounded font-medium cursor-pointer custom-transition";
         span.textContent = `@${user.full_name}`;
         span.contentEditable = "false";
         range.insertNode(span);

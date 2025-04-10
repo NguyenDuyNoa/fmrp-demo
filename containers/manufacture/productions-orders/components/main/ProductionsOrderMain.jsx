@@ -401,7 +401,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                     ...prev.productionsOrders,
                     selectedImages: [],
                     uploadProgress: {},
-                    inputCommentText:""
+                    inputCommentText:"",
+                    taggedUsers: []
                 }
             }))
         }
@@ -630,7 +631,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 ...prev.productionsOrders,
                 selectedImages: [],
                 uploadProgress: {},
-                inputCommentText:""
+                inputCommentText:"",
+                taggedUsers: []
             }
         }))
 

@@ -50,7 +50,8 @@ const Index = ({ children, ...props }) => {
                     ...prev.productionsOrders,
                     selectedImages: [],
                     uploadProgress: {},
-                    inputCommentText:""
+                    inputCommentText: "",
+                    taggedUsers: []
                 }
             }))
         }
