@@ -14,6 +14,9 @@ import { StateContext } from "@/context/_state/productions-orders/StateContext";
 import { useListBomProductPlan } from "@/managers/api/productions-order/useListBomProductPlan";
 import NoData from "@/components/UI/noData/nodata";
 import ProgressBar from "@/components/common/progress/ProgressBar";
+import useSetingServer from "@/hooks/useConfigNumber";
+
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const CardProductionOrder = ({
   imageURL,
@@ -69,33 +72,22 @@ const CardProductionOrder = ({
 
 const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
   const [limit, setLimit] = useState(5);
-  const formatNumber = (value) => {
-    const number = Number(value);
-    if (number < 0) return 0
-    return isNaN(number)
-      ? "-"
-      : number.toLocaleString("en-US", {
-        maximumFractionDigits: 2,
-        minimumFractionDigits: 0,
-      });
-  };
-
-  const formatTwoNumber = (value) => {
-    if (value < 0) return 0
-    const number = Math.floor(value * 100) / 100;
-    return number;
-  };
-
+  const dataSeting = useSetingServer();
   const dataFormat = data?.map((item) => {
     return {
       ...item,
-      total_quota: formatTwoNumber(+item.total_quota),
-      quota_primary: formatTwoNumber(+item.quota_primary),
-      quantity_keep: formatTwoNumber(+item.quantity_keep),
-      quantity_rest: formatTwoNumber(+item.quantity_rest),
-      quantity_import: formatTwoNumber(+item.quantity_import),
+      total_quota: +item.total_quota < 0 ? 0 : +item.total_quota,
+      quota_primary: +item.quota_primary < 0 ? 0 : +item.quota_primary,
+      quantity_keep: +item.quantity_keep < 0 ? 0 : +item.quantity_keep,
+      quantity_rest: +item.quantity_rest < 0 ? 0 : +item.quantity_rest,
+      quantity_import: +item.quantity_import < 0 ? 0 : +item.quantity_import,
     }
   })
+
+
+  const formatNumber = (number) => {
+    return formatNumberConfig(+number, dataSeting);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -351,8 +343,8 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                           }
                         >
                           <ProgressBar
-                            current={item.quantity_import}
-                            total={item.quantity_rest}
+                            current={formatNumber(item.quantity_import)}
+                            total={formatNumber(item.quantity_rest)}
                             name={item.unit_name_primary}
                             typeProgress="tablePlaning"
                           />
