@@ -6,44 +6,46 @@ import { useSelector } from "react-redux";
 export const VersionContext = createContext();
 
 export const VersionProvider = ({ children }) => {
-    const [hasNewVersion, setHasNewVersion] = useState(false);
+  const [hasNewVersion, setHasNewVersion] = useState(false);
 
-    // lấy phân quyền
-    const auth = useSelector((state) => state.auth);
-    const tokenFMRP = CookieCore.get("tokenFMRP");
-    const databaseappFMRP = CookieCore.get("databaseappFMRP");
+  // lấy phân quyền
+  const auth = useSelector((state) => state.auth);
+  const tokenFMRP = CookieCore.get("tokenFMRP");
+  const databaseappFMRP = CookieCore.get("databaseappFMRP");
+  const statePopupGlobal = useSelector((state) => state.statePopupGlobal);
 
-    const {
-        data: version,
-        isLoading: isLoadingVersion,
-        refetch,
-    } = useVersionApplication({
-        enabled: !!auth && !!tokenFMRP && !!databaseappFMRP,
-    });
+  const {
+    data: version,
+    isLoading: isLoadingVersion,
+    refetch,
+  } = useVersionApplication({
+    enabled: !!auth && !!tokenFMRP && !!databaseappFMRP && statePopupGlobal,
+    stateOpenUpdatePopUp: statePopupGlobal,
+  });
 
-    useEffect(() => {
-        if (!isLoadingVersion && auth && tokenFMRP && databaseappFMRP) {
-            const { version_current, version_new } = version ?? {};
+  useEffect(() => {
+    if (!isLoadingVersion && auth && tokenFMRP && databaseappFMRP) {
+      const { version_current, version_new } = version ?? {};
 
-            if (version_current.version !== version_new.version) {
-                setHasNewVersion(true);
-            }
-        }
-    }, [version]);
+      if (version_current?.version !== version_new?.version) {
+        setHasNewVersion(true);
+      }
+    }
+  }, [version]);
 
-    return (
-        <VersionContext.Provider
-        value={{ hasNewVersion, setHasNewVersion, version }}
-        >
-            {children}
-        </VersionContext.Provider>
-    );
+  return (
+    <VersionContext.Provider
+      value={{ hasNewVersion, setHasNewVersion, version }}
+    >
+      {children}
+    </VersionContext.Provider>
+  );
 };
 
 export const useAppContext = () => {
-    const context = useContext(VersionContext);
-    if (!context) {
-        throw new Error("useAppContext phải được dùng bên trong AppProvider");
-    }
-    return context;
+  const context = useContext(VersionContext);
+  if (!context) {
+    throw new Error("useAppContext phải được dùng bên trong AppProvider");
+  }
+  return context;
 };

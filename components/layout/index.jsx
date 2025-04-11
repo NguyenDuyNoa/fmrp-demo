@@ -3,23 +3,27 @@ import SimpleBar from "simplebar-react";
 import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
 import Header from "./header";
-import { Customscrollbar } from '../UI/common/Customscrollbar';
-import { useSelector } from 'react-redux';
-import ChatBubbleAI from '../UI/chat/ChatAiBubble';
-import PopupAccountInformation from '../UI/popup/PopupAccountInformation';
-import PopupChangePassword from '../UI/popup/PopupChangePassword';
-import PopupRecommendation from '../UI/popup/PopupRecommendation';
-import PopupUpdateVersion from '../UI/popup/PopupUpdateVersion';
-import ImagesModal from '../UI/images/ImagesModal';
-import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useRef } from 'react';
-import PopupGlobal from '../common/popup/PopupGlobal';
-import { useSheet } from '@/context/ui/SheetContext';
-import { StateContext } from '@/context/_state/productions-orders/StateContext';
-import useSocket from '@/hooks/socket/useSocket';
+import { Customscrollbar } from "../UI/common/Customscrollbar";
+import { useSelector } from "react-redux";
+import ChatBubbleAI from "../UI/chat/ChatAiBubble";
+import PopupAccountInformation from "../UI/popup/PopupAccountInformation";
+import PopupChangePassword from "../UI/popup/PopupChangePassword";
+import PopupRecommendation from "../UI/popup/PopupRecommendation";
+import PopupUpdateVersion from "../UI/popup/PopupUpdateVersion";
+import ImagesModal from "../UI/images/ImagesModal";
+import { useRouter } from "next/router";
+import React, { useContext, useEffect, useRef } from "react";
+import PopupGlobal from "../common/popup/PopupGlobal";
+import { useSheet } from "@/context/ui/SheetContext";
+import { StateContext } from "@/context/_state/productions-orders/StateContext";
+import useSocket from "@/hooks/socket/useSocket";
 
-import { v4 as uuidv4 } from 'uuid';
-import { useSocketWithToken } from '@/hooks/socket/useSocketWithToken';
+import { v4 as uuidv4 } from "uuid";
+import { useSocketWithToken } from "@/hooks/socket/useSocketWithToken";
+import { useAppContext } from "@/context/_state/version-application/VersionContext";
+import { useDispatch } from "react-redux";
+import PopupUpdateNewVersion from "../common/popup/PopupUpdateNewVersion";
+import { useSocketContext } from "@/context/socket/SocketContext";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -30,10 +34,10 @@ const queryClient = new QueryClient({
 });
 
 const Index = ({ children, ...props }) => {
-    const router = useRouter()
-    
+    const router = useRouter();
+
     // lấy phân quyền
-    const { closeSheet } = useSheet()
+    const { closeSheet } = useSheet();
 
     const { queryStateProvider } = useContext(StateContext);
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
@@ -75,6 +79,7 @@ const Index = ({ children, ...props }) => {
 
     const { hasNewVersion, version } = useAppContext();
     const dispatch = useDispatch();
+    const { socket } = useSocketContext();
 
     useEffect(() => {
         if (hasNewVersion) {
@@ -89,6 +94,31 @@ const Index = ({ children, ...props }) => {
             });
         }
     }, [hasNewVersion]);
+
+
+    useEffect(() => {
+        if (!socket) return;
+        const topic = `update_version`;
+
+        socket.on(topic, (data) => {
+            if (data && data.data) {
+                dispatch({
+                    type: "statePopupGlobal",
+                    payload: {
+                        open: true,
+                        allowOutsideClick: false,
+                        allowEscape: false,
+                        children: <PopupUpdateNewVersion version={version} />,
+                    },
+                });
+            }
+            console.log("🚀 ~ socket.on ~ data:", data);
+        });
+
+        return () => {
+            socket.off(topic);
+        };
+    }, [socket]);
 
     return (
         <QueryClientProvider client={queryClient}>
