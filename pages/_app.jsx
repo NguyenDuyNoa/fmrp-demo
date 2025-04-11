@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import 'simplebar-react/dist/simplebar.min.css';
+import "simplebar-react/dist/simplebar.min.css";
 import "sweetalert2/src/sweetalert2.scss";
 import "../styles/globals.scss";
 import Login from "./auth/login";
@@ -20,6 +20,7 @@ import { SheetProvider, useSheet } from "@/context/ui/SheetContext";
 import ReusableSheet from "@/components/common/sheet/ReusableSheet";
 import { StateContext, StateProvider } from "@/context/_state/productions-orders/StateContext";
 import { SocketProvider } from "@/context/socket/SocketContext";
+import { VersionProvider } from "@/context/_state/version-application/VersionContext";
 
 // const t = Lark
 const deca = Lexend_Deca({
@@ -48,14 +49,16 @@ const Index = (props) => {
                 <Suspense fallback={<LoadingPage />}>
                     <Provider store={store}>
                         <SocketProvider>
-                            {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
                             <main className={` border-gradient ${deca.className}`}>
-                                <StateProvider>
-                                    <SheetProvider {...props}>
-                                        {/* <main className={deca.className}> */}
-                                        <MainPage {...props} />
-                                    </SheetProvider>
-                                </StateProvider>
+                                {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
+                                <VersionProvider>
+                                    <StateProvider>
+                                        <SheetProvider {...props}>
+                                            {/* <main className={deca.className}> */}
+                                            <MainPage {...props} />
+                                        </SheetProvider>
+                                    </StateProvider>
+                                </VersionProvider>
                             </main>
                         </SocketProvider>
                     </Provider>
@@ -66,22 +69,21 @@ const Index = (props) => {
 };
 
 function MainPage({ Component, pageProps }) {
-    const router = useRouter()
+    const router = useRouter();
 
     const dispatch = useDispatch();
 
-    const { isOpen: isOpenSheet, closeSheet: closeSheet } = useSheet()
+    const { isOpen: isOpenSheet, closeSheet: closeSheet } = useSheet();
 
-    const tokenFMRP = CookieCore.get('tokenFMRP')
-
-    const databaseappFMRP = CookieCore.get('databaseappFMRP')
+    const tokenFMRP = CookieCore.get("tokenFMRP");
+    const databaseappFMRP = CookieCore.get("databaseappFMRP");
     // gọi api seting để lấy data seting theo server config
-    const { data: dataSeting } = useSetings()
+    const { data: dataSeting } = useSetings();
     // lấy phân quyền
     const auth = useSelector((state) => state.auth);
 
     // api dữ liệu user
-    const { data: dataAuth, isLoading } = useAuththentication(auth)
+    const { data: dataAuth, isLoading } = useAuththentication(auth);
     // state để quản lý popup ai trong danh sách thành phẩm
     const stateBoxChatAi = useSelector((state) => state?.stateBoxChatAi);
 
@@ -89,13 +91,14 @@ function MainPage({ Component, pageProps }) {
     // lấy data lang mặc định
     const langDefault = useSelector((state) => state.lang);
     // lấy dữ liệu data lang của sserver
-    const { data } = useLanguage(langDefault)
+    const { data } = useLanguage(langDefault);
     // state quản lý popup perview image
-    const statePopupPreviewImage = useSelector((state) => state?.statePopupPreviewImage);
+    const statePopupPreviewImage = useSelector(
+        (state) => state?.statePopupPreviewImage
+    );
 
     // xử lý các dom dựa theo  statePopupPreviewImage.open
     useEffect(() => {
-
         const parentDatepicker = document.querySelector(".parentDatepicker");
         const parentSelect = document.querySelector(".parentSelect");
 
@@ -123,7 +126,6 @@ function MainPage({ Component, pageProps }) {
         // Kiểm tra ngay khi component mount
         updateZIndex();
 
-
         return () => {
             observer.disconnect(); // Dừng theo dõi khi component bị unmount
         };
@@ -137,41 +139,48 @@ function MainPage({ Component, pageProps }) {
 
     // bỏ scoroll của thư viện khi mở popup chat ai
     useEffect(() => {
-        const scroll = document.querySelector('.simplebar-mask')
+        const scroll = document.querySelector(".simplebar-mask");
         if (stateBoxChatAi.open && scroll) {
-            scroll.style.zIndex = 'unset'
-            return
+            scroll.style.zIndex = "unset";
+            return;
         }
-    }, [stateBoxChatAi.open, statePopupPreviewImage.open])
+    }, [stateBoxChatAi.open, statePopupPreviewImage.open]);
 
     if (isLoading || auth == null) {
         return <LoadingPage />;
     }
 
-    // 2 page này code cho moblie 
-    if (router.pathname == '/manufacture/productions-orders-mobile' || router.pathname == '/manufacture/production-plan-mobile') {
-
-        return <Customscrollbar className="relative max-h-screen ">
-            <Layout dataLang={data}>
-                <Component dataLang={data} {...pageProps} />
-            </Layout>
-        </Customscrollbar>
+    // 2 page này code cho moblie
+    if (
+        router.pathname == "/manufacture/productions-orders-mobile" ||
+        router.pathname == "/manufacture/production-plan-mobile"
+    ) {
+        return (
+            <Customscrollbar className="relative max-h-screen ">
+                <Layout dataLang={data}>
+                    <Component dataLang={data} {...pageProps} />
+                </Layout>
+            </Customscrollbar>
+        );
     }
 
     // kiểm tra login
-    if (!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) {
-        if (router.pathname == '/auth/register') {
-
+    if (
+        !isLoading &&
+        (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)
+    ) {
+        if (router.pathname == "/auth/register") {
             return <Register dataLang={data} />;
         }
-        if ((!isLoading && (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false) || router.pathname == '/auth/login')) {
-
+        if (
+            (!isLoading &&
+                (!dataAuth || !(tokenFMRP && databaseappFMRP) || auth == false)) ||
+            router.pathname == "/auth/login"
+        ) {
             return <Login dataLang={data} />;
         }
         router.replace("/dashboard");
         return <LoadingPage />;
-
-
     }
     // Nếu đã đăng nhập mà đang ở login hoặc register, chuyển hướng dashboard
     if (router.pathname.startsWith("/auth")) {

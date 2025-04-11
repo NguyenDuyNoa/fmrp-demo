@@ -9,8 +9,6 @@ const apiVersionApplication = {
   //cập nhật phiên bản
   async apiPostUpdateNewVersion() {
     const response = await axiosCustom("POST", `/api_web/Api_Versions/update`);
-
-    console.log("🚀 ~ apiPostUpdateNewVersion ~ response:", response);
     return response.data;
   },
 };
