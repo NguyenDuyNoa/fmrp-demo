@@ -99,6 +99,7 @@ import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
+
     const statusExprired = useStatusExprired();
 
     const dispatch = useDispatch();
@@ -1133,10 +1134,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                             }}
                             isClearable
                             placeholderText={
-                                `${dataLang?.productions_orders_select_day}` ||
-                                "productions_orders_select_day"
+                                "dd/mm/yyyy - dd/mm/yyyy" || `${dataLang?.productions_orders_select_day}`
+
                             }
-                            className="pl-8 pr-2 3xl:h-10 h-9 text-base-default w-[250px] outline-none cursor-pointer focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
+                            className="pl-8 pr-2 3xl:h-10 h-9 text-base-default w-[290px] outline-none cursor-pointer focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
                             onKeyDown={(e) => e.preventDefault()} // 👈 chặn gõ bàn phím
                         />
 
