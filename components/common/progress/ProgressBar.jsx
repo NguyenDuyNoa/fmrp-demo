@@ -26,14 +26,17 @@ const ProgressBar = ({
     percent = percentUpdateVersion;
   }
 
-  const formatNumber = (value) => {
+  const formatNumberToString = (value) => {
     const number = Number(value);
-
-    if (isNaN(number)) return "0"; // fallback nếu không phải số
-
-    const fixed = number.toFixed(1); // giữ 1 số thập phân
-    return fixed.endsWith(".0") ? fixed.slice(0, -2) : fixed;
+    if (number < 0) return 0
+    return isNaN(number)
+      ? "-"
+      : number.toLocaleString("en-US", {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+      });
   };
+
 
   return (
     <div className="w-full max-w-md mx-auto text-center px-2">
@@ -49,9 +52,9 @@ const ProgressBar = ({
         />
       </div>
       {typeTable[typeProgress] === "text" && (
-        <p className="mt-2 xl:text-[10px] text-[8px] font-normal text-typo-gray-3">{`${formatNumber(
+        <p className="mt-2 xl:text-[10px] text-[8px] font-normal text-typo-gray-3">{`${formatNumberToString(
           current
-        )}/${formatNumber(total)} ${name}`}</p>
+        )}/${formatNumberToString(total)} ${name}`}</p>
       )}
       {typeTable[typeProgress] === "percent" && (
         <p className="font-medium text-sm text-typo-black-3 text-end">
