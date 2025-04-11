@@ -35,21 +35,22 @@ const PopupUpdateNewVersion = ({ version }) => {
         retryDelay: 1000,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["versionApplication"] });
-            // isPausedRef.current = false;
-
-            //test trường hợp fail người dùng cập nhật lại
-            isPausedRef.current = true;
-            setCanRetry(true); // cho phép hiện nút retry
+            isPausedRef.current = false;
         },
         onError: () => {
             isPausedRef.current = true;
             showToat("error", "Vui lòng thử cập nhật lại");
+            setCanRetry(true); // cho phép hiện nút retry
         },
     });
 
     const handleUpdateNewVersion = () => {
         setIsUpdate(true);
     };
+
+    useEffect(() => {
+        setIsUpdate(false);
+    }, [canRetry]);
 
     useEffect(() => {
         if (!isUpdate) return;
@@ -104,14 +105,14 @@ const PopupUpdateNewVersion = ({ version }) => {
                     <h3 className="font-semibold text-[28px] text-typo-black-2 leading-9 text-center">
                         Cập nhật phiên bản mới{" "}
                         <span className="font-bold text-typo-blue-3">
-                            {version_new.version ?? "1.0"}
+                            {version_new?.version ?? "1.0"}
                         </span>{" "}
                         - Trải nghiệm mượt hơn!
                     </h3>
                     <p className="font-medium text-base text-typo-gray-1 w-[70%] text-center">
                         Chúng tôi vừa phát hành Phiên bản{" "}
                         <span className="font-semibold text-typo-gray-2">
-                            {version_new.version ?? "1.0"}
+                            {version_new?.version ?? "1.0"}
                         </span>{" "}
                         với nhiều cải tiến quan trọng:
                     </p>
@@ -122,7 +123,7 @@ const PopupUpdateNewVersion = ({ version }) => {
                     {/* {children} */}
                     {version_new &&
                         version_new?.description.length > 0 &&
-                        version_new.description.map((item, index) => (
+                        version_new?.description.map((item, index) => (
                             <div
                                 className="flex flex-row gap-x-2 items-center justify-center"
                                 key={index}
@@ -151,26 +152,24 @@ const PopupUpdateNewVersion = ({ version }) => {
                 <button
                     className={twMerge(
                         "rounded-lg text-white bg-background-blue-4 py-[10px] px-[18px] w-fit border border-transparent transition-all duration-200 text-base font-normal",
-                        isUpdate && !canRetry
+                        isUpdate
                             ? "cursor-not-allowed disabled:hover:opacity-100 disabled:bg-gray-500/20 disabled:text-white disabled:border-transparent disabled:cursor-not-allowed disabled:pointer-events-auto"
                             : "hover:bg-white hover:text-background-blue-4 hover:border-background-blue-4 "
                     )}
                     onClick={() => {
-
-                        // handleUpdateNewVersion()
-                        if (canRetry) {
-                            // Retry cập nhật
-                            setCanRetry(false);
-                            updateNewVersion.mutate();
-                        } else {
-                            handleUpdateNewVersion();
-                        }
-
+                        handleUpdateNewVersion();
+                        // if (canRetry) {
+                        //     // Retry cập nhật
+                        //     setCanRetry(false);
+                        //     updateNewVersion.mutate();
+                        // } else {
+                        //     handleUpdateNewVersion();
+                        // }
                     }}
                     // disabled={isUpdate}
-                    disabled={isUpdate && !canRetry}
+                    disabled={isUpdate}
                 >
-                    Cập nhật ngay
+                    {canRetry ? "Cập nhật lại" : "Cập nhật ngay"}
                 </button>
 
                 <div className="absolute top-0  -translate-y-1/2 select-none">
