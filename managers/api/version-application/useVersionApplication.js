@@ -1,7 +1,7 @@
 import apiVersionApplication from "@/Api/apiVersion/apiNewVersion";
 import { useQuery } from "@tanstack/react-query";
 
-export const useVersionApplication = ({ enabled }) => {
+export const useVersionApplication = ({ stateOpenUpdatePopUp, enabled }) => {
   const fetchNewVersion = async () => {
     try {
       const response = await apiVersionApplication.apiGetNewVersion();
@@ -12,7 +12,7 @@ export const useVersionApplication = ({ enabled }) => {
   };
 
   return useQuery({
-    queryKey: ["versionApplication"],
+    queryKey: ["versionApplication", stateOpenUpdatePopUp],
     queryFn: fetchNewVersion,
     enabled: enabled
   });
