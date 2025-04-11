@@ -33,7 +33,7 @@ export const VersionProvider = ({ children }) => {
 
     return (
         <VersionContext.Provider
-            value={{ hasNewVersion, setHasNewVersion, version }}
+        value={{ hasNewVersion, setHasNewVersion, version }}
         >
             {children}
         </VersionContext.Provider>

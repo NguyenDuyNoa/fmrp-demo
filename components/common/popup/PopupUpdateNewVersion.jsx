@@ -105,14 +105,14 @@ const PopupUpdateNewVersion = ({ version }) => {
                     <h3 className="font-semibold text-[28px] text-typo-black-2 leading-9 text-center">
                         Cập nhật phiên bản mới{" "}
                         <span className="font-bold text-typo-blue-3">
-                            {version_new?.version ?? "1.0"}
+                            v{version_new?.version ?? "1.0"}
                         </span>{" "}
                         - Trải nghiệm mượt hơn!
                     </h3>
                     <p className="font-medium text-base text-typo-gray-1 w-[70%] text-center">
                         Chúng tôi vừa phát hành Phiên bản{" "}
                         <span className="font-semibold text-typo-gray-2">
-                            {version_new?.version ?? "1.0"}
+                            v{version_new?.version ?? "1.0"}
                         </span>{" "}
                         với nhiều cải tiến quan trọng:
                     </p>
