@@ -12,9 +12,6 @@ export const useGetListComment = ({
     const fetchListComment = async ({ pageParam = 1 }) => {
         const { data } = await apiProductionsOrders.apiGetListComment({ page: pageParam, limit: limit, post_id: poiId, type: "1" })
 
-        console.log('data data data: ', data);
-
-
         return data.data
     };
 
@@ -24,8 +21,6 @@ export const useGetListComment = ({
         enabled: enabled,
         placeholderData: keepPreviousData,
         getNextPageParam: (lastPage, pages) => {
-            console.log('lastPage', lastPage);
-
             // Kiểm tra nếu còn trang kế tiếp
             if (lastPage?.next === 1) {
                 return pages.length + 1; // Trang tiếp theo

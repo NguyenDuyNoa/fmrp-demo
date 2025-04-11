@@ -12,10 +12,14 @@ import PopupRecommendation from '../UI/popup/PopupRecommendation';
 import PopupUpdateVersion from '../UI/popup/PopupUpdateVersion';
 import ImagesModal from '../UI/images/ImagesModal';
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import PopupGlobal from '../common/popup/PopupGlobal';
 import { useSheet } from '@/context/ui/SheetContext';
 import { StateContext } from '@/context/_state/productions-orders/StateContext';
+import useSocket from '@/hooks/socket/useSocket';
+
+import { v4 as uuidv4 } from 'uuid';
+import { useSocketWithToken } from '@/hooks/socket/useSocketWithToken';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -27,8 +31,8 @@ const queryClient = new QueryClient({
 
 const Index = ({ children, ...props }) => {
     const router = useRouter()
-
-
+    
+    // lấy phân quyền
     const { closeSheet } = useSheet()
 
     const { queryStateProvider } = useContext(StateContext);
@@ -56,9 +60,6 @@ const Index = ({ children, ...props }) => {
             }))
         }
     }, [router.isReady, router?.route])
-
-    console.log('router', router);
-
 
     return (
         <QueryClientProvider client={queryClient}>

@@ -110,7 +110,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
     }, [isOpenSheet, isStateProvider?.productionsOrders?.poiId]);
 
     const components = {
-        1: <TabInformation dataLang={dataLang} {...props} />,
+        1: <TabInformation dataLang={dataLang} scrollRef={scrollRef} {...props} />,
         2: <TabMaterialOutputTab dataLang={dataLang} {...props} />,
         3: <TabMaterialIssueHistory dataLang={dataLang} {...props} />,
         4: <TabFGReceiptHistory dataLang={dataLang} {...props} />,
@@ -168,13 +168,11 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
         navigator?.clipboard?.writeText(currentUrl)
             .then(() => {
                 // Có thể dùng toast hoặc alert thông báo
-                // ToatstNotifi.success("Đã sao chép liên kết!");
                 ToatstNotifi("success", `Đã sao chép liên kết!`);
             })
             .catch((err) => {
                 console.error("Lỗi khi sao chép URL:", err);
                 ToatstNotifi("error", `Không thể sao chép liên kết!`);
-                // toast.error("Không thể sao chép liên kết.");
             })
     }
 

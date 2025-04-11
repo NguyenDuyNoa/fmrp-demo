@@ -1,13 +1,24 @@
-import { useRef } from "react";
+import AvatarText from "@/components/UI/common/user/AvatarText";
+import { useRef, useState } from "react";
 
-const ImageAvatar = ({ src, alt = "avatar", className = "" }) => {
+const ImageAvatar = ({ src, alt = "avatar", className = "", fullName = "" }) => {
     const imgRef = useRef(null);
 
+    const [hasError, setHasError] = useState(false);
+
     const handleError = () => {
-        if (imgRef.current) {
-            imgRef.current.src = "/icon/default/default.png";
-        }
+        setHasError(true);
     };
+
+    if (hasError || !src) {
+        return (
+            <AvatarText
+                fullName={fullName}
+                className={className}
+            />
+        );
+    }
+
 
     return (
         <img

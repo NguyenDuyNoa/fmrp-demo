@@ -19,6 +19,7 @@ import Register from "./auth/register";
 import { SheetProvider, useSheet } from "@/context/ui/SheetContext";
 import ReusableSheet from "@/components/common/sheet/ReusableSheet";
 import { StateContext, StateProvider } from "@/context/_state/productions-orders/StateContext";
+import { SocketProvider } from "@/context/socket/SocketContext";
 
 // const t = Lark
 const deca = Lexend_Deca({
@@ -46,15 +47,17 @@ const Index = (props) => {
                 </Head>
                 <Suspense fallback={<LoadingPage />}>
                     <Provider store={store}>
-                        {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
-                        <main className={` border-gradient ${deca.className}`}>
-                            <StateProvider>
-                                <SheetProvider {...props}>
-                                    {/* <main className={deca.className}> */}
-                                    <MainPage {...props} />
-                                </SheetProvider>
-                            </StateProvider>
-                        </main>
+                        <SocketProvider>
+                            {/* <main style={{ fontFamily: "LarkHackSafariFont, LarkEmojiFont, LarkChineseQuote, -apple-system, BlinkMacSystemFont, Helvetica Neue, Tahoma, PingFang SC, Microsoft Yahei, Arial, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji" }}> */}
+                            <main className={` border-gradient ${deca.className}`}>
+                                <StateProvider>
+                                    <SheetProvider {...props}>
+                                        {/* <main className={deca.className}> */}
+                                        <MainPage {...props} />
+                                    </SheetProvider>
+                                </StateProvider>
+                            </main>
+                        </SocketProvider>
                     </Provider>
                 </Suspense>
             </QueryClientProvider>

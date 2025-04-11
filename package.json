@@ -3,9 +3,9 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev -p 3005",
+        "dev": "next dev -p 3010",
         "build": "next build",
-        "start": "next start -p 3005",
+        "start": "next start -p 3010",
         "lint": "next lint"
     },
     "dependencies": {
@@ -58,6 +58,7 @@
         "redux": "^4.2.1",
         "sass": "^1.58.3",
         "simplebar-react": "^3.3.0",
+        "socket.io-client": "^4.8.1",
         "sweetalert2": "^11.7.3",
         "tailwind-merge": "^3.2.0",
         "use-debounce": "^10.0.4",

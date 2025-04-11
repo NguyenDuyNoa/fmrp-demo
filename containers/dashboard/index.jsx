@@ -25,8 +25,6 @@ const Dashboard = (props) => {
         });
     };
 
-    console.log("ok 1");
-
     return (
         <React.Fragment>
             <Head>

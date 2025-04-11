@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import ProductionSteps from '../ui/ProductionStep'
 import { useSheet } from '@/context/ui/SheetContext'
 import { useRouter } from 'next/router'
@@ -24,6 +24,7 @@ import LoadingComponent from '@/components/common/loading/loading/LoadingCompone
 import { useSelector } from 'react-redux'
 import { useGetListComment } from '@/managers/api/productions-order/comment/useGetListComment'
 import CommentSkeleton from '../skeleton/CommentSkeleton'
+import { useSocketContext } from '@/context/socket/SocketContext'
 
 const dataFakeItem = [
     {
@@ -546,24 +547,51 @@ const dataFakeItem = [
     },
 ]
 
-const TabInformation = () => {
+
+function smoothScrollTo(container, targetY, duration = 500) {
+    const startY = container.scrollTop;
+    const change = targetY - startY;
+    const startTime = performance.now();
+
+    function animateScroll(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = easeInOutCubic(progress);
+
+        container.scrollTop = startY + change * ease;
+
+        if (progress < 1) {
+            requestAnimationFrame(animateScroll);
+        }
+    }
+
+    requestAnimationFrame(animateScroll);
+}
+
+function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+const TabInformation = ({ scrollRef }) => {
     const router = useRouter()
     const { isOpen: isOpenSheet, ...props } = useSheet()
     const poiId = useMemo(() => router.query.poi_id, [router.query])
     const { isStateProvider, queryStateProvider } = useContext(StateContext);
 
     const auth = useSelector((state) => state.auth);
+    const dataSetting = useSelector((state) => state.setings);
+
+    const { socket } = useSocketContext();
+
+    const commentTopRef = useRef(null);
+
+    const [selectedIdSection, setSelectedIdSection] = useState("section-list-comment")
 
     // api dữ liệu user
     // const { data: dataAuth, isLoading } = useAuththentication(auth)
 
     const [limit, setLimit] = useState(5);
     const { ref: refInviewListComment, inView: inViewListComment } = useInView();
-
-    const queryClient = useQueryClient()
-
-    // const dataItemOrderDetail = queryClient?.getQueryData(["apiItemOrdersDetail", poiId])
-    // const isFetchingItemOrderDetail = useIsFetching({ queryKey: ['apiItemOrdersDetail', poiId] }) > 0;
 
     const {
         data: dataItemOrderDetail,
@@ -590,9 +618,6 @@ const TabInformation = () => {
         [dataListComment]
     );
 
-    console.log('flagListComment', flagListComment);
-    console.log('auth', auth);
-
     // loadmore list LSX
     useEffect(() => {
         if (inViewListComment && hasNextPageListComment) {
@@ -604,6 +629,53 @@ const TabInformation = () => {
     const formatNumber = useCallback((num) => formatNumberConfig(+num, dataSeting), [dataSeting]);
 
     const stages = ['Cắt vải', 'May', 'Vắt sổ']
+
+
+    const handleClickSection = (id) => {
+        // isScrollingByClick.current = true; // Chặn Observer
+        setSelectedIdSection(id);
+
+        // setTimeout(() => {
+        //     isScrollingByClick.current = false; // Cho phép Observer chạy lại sau khi cuộn hoàn tất
+        // }, 1000);
+    };
+
+    useEffect(() => {
+        if (!socket || !isStateProvider?.productionsOrders?.poiId) return;
+
+        console.log(`comment_pod_${isStateProvider?.productionsOrders?.poiId}:`, isStateProvider?.productionsOrders?.poiId);
+
+        const topic = `comment_pod_${isStateProvider.productionsOrders.poiId}`;
+
+        socket.on(topic, (data) => {
+            if (data && data.data) {
+                if (data.data === "1") {
+                    refetchListComment()
+                    return
+                } else {
+                    refetchListComment().then(() => {
+                        if (scrollRef?.current && commentTopRef?.current) {
+                            const containerTop = scrollRef.current.getBoundingClientRect().top;
+                            const elementTop = commentTopRef.current.getBoundingClientRect().top;
+                            const offset = 16;
+
+                            const targetY = scrollRef.current.scrollTop + (elementTop - containerTop) - offset;
+
+                            smoothScrollTo(scrollRef.current, targetY, 600); // mượt hơn
+                        }
+                    });
+                }
+            }
+            console.log("New comment:", data);
+        });
+
+        return () => {
+            socket.off(topic);
+        };
+    }, [socket, isStateProvider?.productionsOrders?.poiId, auth, dataSetting]);
+
+    console.log('socket', socket);
+
 
     return (
         <div className='space-y-4'>
@@ -816,7 +888,7 @@ const TabInformation = () => {
                 </div>
             </div>
 
-            <div className='flex flex-col gap-4'>
+            <section id="section-list-comment" ref={commentTopRef} className='flex flex-col gap-4'>
                 <div className='flex items-center gap-2'>
                     <PiChatsTeardropFill className='3xl:size-6 size-5 shrink-0 text-[#003DA0]' />
 
@@ -825,7 +897,7 @@ const TabInformation = () => {
                     </p>
                 </div>
 
-                <div className=''>
+                <div className='flex flex-col gap-4'>
                     {
                         flagListComment && flagListComment?.length > 0 ?
                             <CommentList
@@ -841,11 +913,10 @@ const TabInformation = () => {
                     }
 
                     {hasNextPageListComment && (
-                        // <LoadingComponent ref={refInviewListComment} />
                         <CommentSkeleton ref={refInviewListComment} />
                     )}
                 </div>
-            </div>
+            </section>
         </div>
     )
 }

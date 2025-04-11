@@ -12,16 +12,17 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { usePostLikeComment } from "@/managers/api/productions-order/comment/usePostLikeComment";
 import { usePostUnlikeComment } from "@/managers/api/productions-order/comment/usePostUnlikeComment";
 import SparklesBurst from "@/components/animations/animation/SparklesBurst";
+import AvatarText from "@/components/UI/common/user/AvatarText";
 
 const likeVariants = {
-    initial: { scale: 0, rotate: 0 },
-    animate: { scale: [1.2, 0.9, 1.1, 1], rotate: [0, -10, 10, 0] },
-    exit: { scale: 0 },
+    initial: { scale: 0.8, rotate: 0 },
+    animate: { scale: [1.1, 0.95, 1.03, 1], rotate: [0, -5, 5, 0] },
+    exit: { scale: 0.8 },
     transition: {
         type: "spring",
-        stiffness: 500,
+        stiffness: 200,
         damping: 15,
-        duration: 0.4
+        duration: 0.5
     }
 };
 
@@ -165,8 +166,11 @@ const CommentItem = ({ item, currentUser }) => {
             <div className="flex items-start gap-3 mb-4">
                 <ImageAvatar
                     src={item?.created_by_profile_image}
-                    className="w-10 h-10 rounded-full object-cover"
+                    fullName={item?.created_by_full_name}
+                    className="w-10 h-10 !min-w-10 !max-w-10 !max-h-10 !min-h-10 rounded-full object-cover shrink-0"
                 />
+
+
                 <div className='flex-1'>
                     {/* Tên + Time */}
                     <div className="">
@@ -227,40 +231,26 @@ const CommentItem = ({ item, currentUser }) => {
                     <div className="flex items-center gap-0.5 mt-2">
                         <motion.button
                             onClick={handleToggleLike}
-                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ rotate: [0, -20, 20, -14, 14, 0], transition: { duration: 0.1 } }}
                             className={`relative flex items-center justify-center 3xl:size-6 size-5 font-medium transition-all duration-150 ${hasLiked ? "text-[#0375F3]" : "text-[#52575E]"}`}
                         >
-                            <AnimatePresence mode="wait">
-                                {
-                                    hasLiked ?
-                                        (
-                                            <motion.div
-                                                key="liked"
-                                                variants={likeVariants}
-                                                initial="initial"
-                                                animate="animate"
-                                                exit="exit"
-                                                transition={likeVariants.transition}
-                                            >
-                                                <PiThumbsUpFill className="text-[#0375F3]" />
-                                            </motion.div>
-                                        )
-                                        :
-                                        (
-                                            <motion.div
-                                                key="unliked"
-                                                initial={{ scale: 0 }}
-                                                animate={{ scale: 1 }}
-                                                exit={{ scale: 0 }}
-                                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                            >
-                                                <PiThumbsUp />
-                                            </motion.div>
-                                        )
-                                }
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.div
+                                    key={hasLiked.toString()}
+                                    initial={{ scale: 0.5 }}
+                                    animate={{ scale: 1 }}
+                                    exit={{ scale: 0.5 }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                    className="absolute"
+                                >
+                                    {hasLiked ? (
+                                        <PiThumbsUpFill className="text-[#0375F3]" />
+                                    ) : (
+                                        <PiThumbsUp />
+                                    )}
+                                </motion.div>
                             </AnimatePresence>
 
-                            {/* Sparkles xuất hiện khi like */}
                             {showSparkles && <SparklesBurst />}
                         </motion.button>
 
