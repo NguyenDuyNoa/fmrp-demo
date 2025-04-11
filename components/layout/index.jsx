@@ -20,6 +20,8 @@ import useSocket from '@/hooks/socket/useSocket';
 
 import { v4 as uuidv4 } from 'uuid';
 import { useSocketWithToken } from '@/hooks/socket/useSocketWithToken';
+import { useDispatch } from "react-redux";
+import { useAppContext } from "@/context/_state/version-application/VersionContext";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -31,7 +33,7 @@ const queryClient = new QueryClient({
 
 const Index = ({ children, ...props }) => {
     const router = useRouter()
-    
+
     // lấy phân quyền
     const { closeSheet } = useSheet()
 

@@ -642,9 +642,6 @@ const TabInformation = ({ scrollRef }) => {
 
     useEffect(() => {
         if (!socket || !isStateProvider?.productionsOrders?.poiId) return;
-
-        console.log(`comment_pod_${isStateProvider?.productionsOrders?.poiId}:`, isStateProvider?.productionsOrders?.poiId);
-
         const topic = `comment_pod_${isStateProvider.productionsOrders.poiId}`;
 
         socket.on(topic, (data) => {
@@ -666,13 +663,12 @@ const TabInformation = ({ scrollRef }) => {
                     });
                 }
             }
-            console.log("New comment:", data);
         });
 
         return () => {
             socket.off(topic);
         };
-    }, [socket, isStateProvider?.productionsOrders?.poiId, auth, dataSetting]);
+    }, [socket, isStateProvider?.productionsOrders?.poiId]);
 
     console.log('socket', socket);
 
