@@ -15,7 +15,7 @@ const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
-const PopupUpdateNewVersion = ({ version }) => {
+const PopupUpdateNewVersion = ({ version, setHasNewVersion }) => {
     const { version_current, version_new } = version ?? {};
     const [percentUpdate, setPercentUpdate] = useState(0);
     const [isUpdate, setIsUpdate] = useState(false);
@@ -73,6 +73,7 @@ const PopupUpdateNewVersion = ({ version }) => {
             if (percentUpdateTemp >= 100) {
                 clearInterval(interval);
                 setIsComplete(true);
+                setHasNewVersion(false)
             }
         }, 400);
 
@@ -158,15 +159,7 @@ const PopupUpdateNewVersion = ({ version }) => {
                     )}
                     onClick={() => {
                         handleUpdateNewVersion();
-                        // if (canRetry) {
-                        //     // Retry cập nhật
-                        //     setCanRetry(false);
-                        //     updateNewVersion.mutate();
-                        // } else {
-                        //     handleUpdateNewVersion();
-                        // }
                     }}
-                    // disabled={isUpdate}
                     disabled={isUpdate}
                 >
                     {canRetry ? "Cập nhật lại" : "Cập nhật ngay"}
