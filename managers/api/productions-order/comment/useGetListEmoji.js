@@ -2,19 +2,21 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { optionsQuery } from "@/configs/optionsQuery";
 
-export const useGetListStaffs = ({
-    limit = 500,
+export const useGetListEmoji = ({
     enabled,
 }) => {
-    const fetchListStaffs = async ({ pageParam = 1 }) => {
-        const { data } = await apiProductionsOrders.apiGetListStaffs({ limit: limit })
+    const fetchListEmoji = async () => {
+        const { data } = await apiProductionsOrders.apiGetListEmoji()
 
-        return data.staffs
+        console.log('data data emoji: ', data);
+
+
+        return data?.emoji
     };
 
     return useQuery({
-        queryKey: ['apiGetListStaffs', limit],
-        queryFn: fetchListStaffs,
+        queryKey: ['apiGetListEmoji'],
+        queryFn: fetchListEmoji,
         enabled: enabled,
         placeholderData: keepPreviousData,
         staleTime: 2 * 60 * 1000, // ← không refetch trong vòng 5 phút (tuỳ chọn)

@@ -675,8 +675,8 @@ const TabInformation = ({ scrollRef }) => {
 
     return (
         <div className='space-y-4'>
-            <div className='flex items-start gap-4 border-b border-[#D0D5DD]'>
-                <div className='flex flex-col gap-4 3xl:w-[25%] xxl:w-[30%] w-[28%]'>
+            <div className='flex items-start xl:gap-4 gap-2 border-b border-[#D0D5DD]'>
+                <div className='flex flex-col xl:gap-4 gap-2 3xl:w-[25%] xxl:w-[30%] w-[28%]'>
                     <h4 className="text-[#344054] font-normal flex items-center py-2 3xl:px-4 px-2 gap-2">
                         {
                             isFetchingItemOrderDetail
@@ -884,7 +884,7 @@ const TabInformation = ({ scrollRef }) => {
                 </div>
             </div>
 
-            <section id="section-list-comment" ref={commentTopRef} className='flex flex-col gap-4'>
+            <section id="section-list-comment" ref={commentTopRef} className='flex flex-col xl:gap-4 gap-2'>
                 <div className='flex items-center gap-2'>
                     <PiChatsTeardropFill className='3xl:size-6 size-5 shrink-0 text-[#003DA0]' />
 
@@ -893,7 +893,7 @@ const TabInformation = ({ scrollRef }) => {
                     </p>
                 </div>
 
-                <div className='flex flex-col gap-4'>
+                <div className='flex flex-col xl:gap-4 gap-2'>
                     {
                         flagListComment && flagListComment?.length > 0 ?
                             <CommentList

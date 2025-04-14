@@ -1,12 +1,8 @@
-import React, { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useContext, useEffect, useRef } from "react";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { useSheet } from "@/context/ui/SheetContext";
 import CloseXIcon from "@/components/icons/common/CloseXIcon";
 import ButtonAnimationNew from "@/components/common/button/ButtonAnimationNew";
-import CheckThinIcon from "@/components/icons/common/CheckThinIcon";
-import FileIcon from "@/components/icons/common/FileIcon";
-import ArrowBendUpRightIcon from "@/components/icons/common/ArrowBendUpRightIcon";
-import { useMultiAvailableHeightRef } from "@/hooks/custom/availableHeight/useMultiAvailableHeightRef";
 import { useItemOrderDetail } from "@/managers/api/productions-order/useItemOrderDetail";
 
 import { motion } from 'framer-motion'
@@ -18,8 +14,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import TabSwitcherWithUnderline from "@/components/common/tab/TabSwitcherWithUnderline";
 
-import { PiImage, PiLinkBold, PiPaperclip, PiPaperPlaneRightFill, PiSmiley, PiTextAa } from "react-icons/pi";
-import { variantButtonScaleZoom } from "@/utils/animations/variantsAnimation";
+import { PiLinkBold } from "react-icons/pi"
 import TabInformation from "../tab/TabInformation";
 import TabMaterialIssueHistory from "../tab/TabMaterialIssueHistory";
 import TabFGReceiptHistory from "../tab/TabFGReceiptHistory";
@@ -30,7 +25,6 @@ import Skeleton from "@/components/common/skeleton/Skeleton";
 import CostCardSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/CostCardSkeleton";
 import TabSwitcherWithUnderlineSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/TabSwitcherWithUnderlineSkeleton";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
-import Loading from "@/components/UI/loading/loading";
 import CommentInputAdvanced from "@/components/common/input/CommentInputAdvanced";
 
 const initialState = {
@@ -135,7 +129,7 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
                 ...prev.productionsOrders,
                 selectedImages: [],
                 uploadProgress: {},
-                inputCommentText:"",
+                inputCommentText: "",
                 taggedUsers: []
             }
         }))
