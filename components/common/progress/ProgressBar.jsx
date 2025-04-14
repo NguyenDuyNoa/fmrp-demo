@@ -12,10 +12,15 @@ const ProgressBar = ({
   typeProgress,
   percentUpdateVersion,
 }) => {
+
   let percent = 0;
   let isFull = false;
-  const formatCurrent = +current
-  const formatTotal = +total
+
+  const parseStringToNumber = (value) => +String(value).replace(/,/g, ""); // parse string 1,000 -> 1000 number 
+
+  const formatCurrent = parseStringToNumber(current)
+  const formatTotal = parseStringToNumber(total)
+
 
   if (formatTotal && formatCurrent) {
     isFull = formatCurrent >= formatTotal;
