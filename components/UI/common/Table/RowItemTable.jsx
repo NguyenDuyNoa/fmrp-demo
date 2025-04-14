@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 export const RowItemTable = ({
   children,
   className,
@@ -14,13 +16,17 @@ export const RowItemTable = ({
         textAlign: textAlign,
         color: `${textColor ? textColor : "#52525b"}`,
         backgroundColor: backgroundColor || "",
-
       }}
-      className={`xl:px-[2px] px-0 ${className} 
-            ${textSize
-          ? textSize
-          : "3xl:text-base 2xl:text-[14px] xl:text-[13.5px]  text-[11.5px]  font-medium  text-wrap"
-        } `}
+      // className={`xl:px-[2px] px-0 ${className}
+      //       ${textSize
+      //     ? textSize
+      //     : "3xl:text-base 2xl:text-[14px] xl:text-[13.5px]  text-[11.5px]  font-medium  text-wrap"
+      //   } `}
+      className={twMerge(
+        "3xl:text-base 2xl:text-[14px] xl:text-[13.5px]  text-[11.5px]  font-medium  text-wrap xl:px-[2px] px-0 ",
+        textSize,
+        className
+      )}
     >
       {children}
     </h6>

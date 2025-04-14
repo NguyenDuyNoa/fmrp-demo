@@ -14,6 +14,9 @@ import { StateContext } from "@/context/_state/productions-orders/StateContext";
 import { useListBomProductPlan } from "@/managers/api/productions-order/useListBomProductPlan";
 import NoData from "@/components/UI/noData/nodata";
 import ProgressBar from "@/components/common/progress/ProgressBar";
+import useSetingServer from "@/hooks/useConfigNumber";
+
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const CardProductionOrder = ({
   imageURL,
@@ -26,13 +29,14 @@ const CardProductionOrder = ({
 }) => {
   return (
     <div className=" w-full h-full flex flex-row items-start gap-x-2">
-      <div className="rounded bg-background-gray-1 xlg:px-2 xlg:py-[6px] xl:px-1 xl:py-[3px] shrink-0">
+      <div className="rounded bg-gray-100 2xl:size-14 size-10 shrink-0 overflow-hidden">
         <Image
           alt="default"
-          src={imageURL || "/productionPlan/default-product.svg"}
-          width={22}
-          height={17}
+          src={imageURL || "/icon/default/default.png"}
+          width={200}
+          height={200}
           quality={100}
+          className="size-full object-cover"
         />
       </div>
       <div className="flex flex-col items-start justify-start gap-y-1 w-full">
@@ -42,7 +46,7 @@ const CardProductionOrder = ({
         <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-gray-2">
           {variation || "(none)"}
         </p>
-        <p className="xlg:text-[10px] text-[8px] font-normal text-typo-blue-2">
+        <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
           {code}
         </p>
         {typeTable === "products" && (
@@ -54,7 +58,7 @@ const CardProductionOrder = ({
                 : "bg-background-blue-1/20 text-typo-blue-3 "
             )}
           >
-            <p className="xl:text-[8px] font-medium leading-4 text-[6px]">
+            <p className="xl:text-[6px] font-medium xlg:leading-4 leading-2 text-[4px]">
               {typeProduct === "semi_products"
                 ? dataLang?.semi_products
                 : dataLang?.semi_products_outside}
@@ -67,12 +71,23 @@ const CardProductionOrder = ({
 };
 
 const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
-  const formatNumber = (value) => {
-    const number = Number(value);
-    return isNaN(number) ? "-" : number.toLocaleString("vi-VN");
-  };
-
   const [limit, setLimit] = useState(5);
+  const dataSeting = useSetingServer();
+  const dataFormat = data?.map((item) => {
+    return {
+      ...item,
+      total_quota: +item.total_quota < 0 ? 0 : +item.total_quota,
+      quota_primary: +item.quota_primary < 0 ? 0 : +item.quota_primary,
+      quantity_keep: +item.quantity_keep < 0 ? 0 : +item.quantity_keep,
+      quantity_rest: +item.quantity_rest < 0 ? 0 : +item.quantity_rest,
+      quantity_import: +item.quantity_import < 0 ? 0 : +item.quantity_import,
+    }
+  })
+
+
+  const formatNumber = (number) => {
+    return formatNumberConfig(+number, dataSeting);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -87,11 +102,15 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
           className={`min-h-0 h-full w-full overflow-x-auto bg-white`}
         >
           <div>
-            <HeaderTable gridCols={12} display={"grid"}>
+            <HeaderTable
+              gridCols={12}
+              display={"grid"}
+              className="pt-0 px-1 pb-1"
+            >
               <ColumnTable
                 colSpan={1}
                 textAlign={"center"}
-                className={`normal-case leading-5 text-typo-gray-1 !text-[14px] 
+                className={`normal-case leading-2 text-typo-gray-1 3xl:!text-[14px] xl:text-[11px]
                                     }`}
               >
                 STT
@@ -99,7 +118,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
               <ColumnTable
                 colSpan={3}
                 textAlign={"left"}
-                className={`border-none normal-case leading-5 text-typo-gray-1 px-3 !text-[14px] 
+                className={`border-none normal-case leading-2 text-typo-gray-1 3xl:px-3 px-1 std:!text-[13px] xl:text-[11px]
                                     }`}
               >
                 {typeTable === "products"
@@ -110,7 +129,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                 <ColumnTable
                   colSpan={2}
                   textAlign={"center"}
-                  className={`border-none  normal-case leading-5 text-typo-gray-1 !text-[14px] 
+                  className={`border-none  normal-case leading-2 text-typo-gray-1 std:!text-[13px] xl:text-[11px]
                                         }`}
                 >
                   {dataLang?.category_unit || "Đơn vị tính"}
@@ -119,16 +138,17 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
               <ColumnTable
                 colSpan={1}
                 textAlign={"center"}
-                className={`px-0 border-none  normal-case leading-5 text-typo-gray-1 !text-[14px] 
+                className={`px-0 border-none normal-case leading-2 text-typo-gray-1 std:!text-[13px] xl:text-[11px]
                                     }`}
               >
-                {dataLang?.materials_planning_use || "Sử dụng"}
+                {/* {dataLang?.materials_planning_use || "Sử dụng"} */}
+                SL
               </ColumnTable>
               {typeTable === "materials" && (
                 <ColumnTable
                   colSpan={2}
                   textAlign={"center"}
-                  className={`border-none  normal-case leading-5 text-typo-gray-1 !text-[14px] 
+                  className={`border-none normal-case leading-2 text-typo-gray-1 std:!text-[13px] xl:text-[11px]
                                         }`}
                 >
                   {dataLang?.materials_planning_change || "Quy đổi"}
@@ -137,7 +157,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
               <ColumnTable
                 colSpan={1}
                 textAlign={"center"}
-                className={`border-none  normal-case leading-5 text-typo-gray-1  !text-[14px] 
+                className={`border-none  normal-case  px-0  leading-2 text-typo-gray-1 std:!text-[13px] xl:text-[11px]
                                     }`}
               >
                 {dataLang?.materials_planning_held || " Đã giữ"}
@@ -145,7 +165,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
               <ColumnTable
                 colSpan={1}
                 textAlign={"center"}
-                className={`border-none normal-case leading-5 text-typo-gray-1 !text-[14px] 
+                className={`border-none normal-case leading-2 text-typo-gray-1 px-0 std:!text-[13px] xl:text-[11px]
                                     }`}
               >
                 {dataLang?.materials_planning_lack || " Thiếu"}
@@ -153,15 +173,15 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
               <ColumnTable
                 colSpan={3}
                 textAlign={"center"}
-                className={`border-none normal-case leading-5 text-typo-gray-1  !text-[14px] 
+                className={`border-none normal-case leading-2 text-typo-gray-1 std:!text-[12px] xl:text-[11px]
                                     }`}
               >
                 Tiến độ mua hàng
               </ColumnTable>
             </HeaderTable>
-            {data && data?.length > 0 ? (
+            {dataFormat && dataFormat?.length > 0 ? (
               <>
-                {data?.slice(0, limit).map((item, index) => (
+                {dataFormat?.slice(0, limit).map((item, index) => (
                   <div
                     className="divide-y divide-slate-200 h-[100%] "
                     key={item.item_id}
@@ -173,7 +193,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                           colSpan={1}
                           textAlign={"center"}
                           // textSize={`"!text-sm"`}
-                          className="font-semibold xlg:text-sm leading-6 text-typo-black-1 "
+                          className="font-semibold xlg:text-sm leading-6 text-typo-black-1  std:!text-[12px] xl:text-[11px]"
                         >
                           {index + 1}
                         </RowItemTable>
@@ -198,7 +218,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                             colSpan={2}
                             textAlign={"center"}
                             // textSize={`"!text-sm"`}
-                            className="font-semibold xlg:text-sm leading-6 text-typo-black-1 xl:text-xs"
+                            className="font-semibold  leading-2 text-typo-black-1 std:text-[12px] xl:text-[11px]"
                           >
                             {/* Đơn vị tính */}
                             {item.unit_name}
@@ -209,17 +229,17 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                           colSpan={1}
                           textAlign={"center"}
                           // textSize={`"!text-sm"`}
-                          className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
+                          className="font-semibold  leading-2 text-typo-black-1 std:text-[12px] xl:text-[11px]"
                         >
                           {/* sử dụng  */}
                           {typeTable === "materials" ? (
-                            <p>
-                              {item.total_quota === "0" ? (
+                            <p className="std:text-[12px] xl:text-[11px]">
+                              {item.total_quota <= 0 ? (
                                 " - "
                               ) : (
-                                <span>
+                                <span className="std:text-[12px] xl:text-[11px]">
                                   {formatNumber(item.total_quota)}/ <br />{" "}
-                                  <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                  <span className="font-normal std:text-[11px] xl:text-[9px] text-typo-black-1">
                                     {" "}
                                     {item.unit_name}
                                   </span>
@@ -227,8 +247,8 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                               )}
                             </p>
                           ) : (
-                            <p>
-                              {item.total_quota === "0"
+                            <p className="std:text-[12px] xl:text-[11px]">
+                              {item.total_quota <= 0
                                 ? " - "
                                 : formatNumber(item.total_quota)}
                             </p>
@@ -239,15 +259,15 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                             colSpan={2}
                             textAlign={"center"}
                             // textSize={`"!text-sm"`}
-                            className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
+                            className="font-semibold  leading-2 text-typo-black-1 std:text-[12px] xl:text-[11px]"
                           >
                             {/* quy đổi  */}
-                            {item.quota_primary === "0" ? (
+                            {item.quota_primary <= 0 ? (
                               " - "
                             ) : (
-                              <span>
+                              <span className="std:text-[12px] xl:text-[11px]">
                                 {formatNumber(item.quota_primary)}/ <br />{" "}
-                                <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                <span className="font-normal std:text-[11px] xl:text-[9px] text-typo-black-1">
                                   {" "}
                                   {item.unit_name_primary}
                                 </span>
@@ -259,18 +279,18 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                           colSpan={1}
                           textAlign={"center"}
                           textSize={`"!text-sm"`}
-                          className="font-semibold xlg:text-sm leading-6 text-typo-black-1"
+                          className="font-semibold  leading-2 text-typo-black-1 std:text-[12px] xl:text-[11px]"
                         >
                           {/* Đã giữ */}
 
                           {typeTable === "materials" ? (
-                            <p>
-                              {item.quantity_keep === "0" ? (
+                            <p className="std:text-[12px] xl:text-[11px]">
+                              {item.quantity_keep <= 0 ? (
                                 " - "
                               ) : (
-                                <span>
+                                <span className="std:text-[12px] xl:text-[11px]">
                                   {formatNumber(item.quantity_keep)}/ <br />{" "}
-                                  <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                  <span className="font-normal std:text-[11px] xl:text-[9px] text-typo-black-1">
                                     {" "}
                                     {item.unit_name_primary}
                                   </span>
@@ -278,8 +298,8 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                               )}
                             </p>
                           ) : (
-                            <p>
-                              {item.quantity_keep === "0"
+                            <p className="std:text-[12px] xl:text-[11px]">
+                              {item.quantity_keep <= 0
                                 ? " - "
                                 : formatNumber(item.quantity_keep)}
                             </p>
@@ -289,17 +309,17 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                           colSpan={1}
                           textAlign={"center"}
                           // textSize={`"!text-sm"`}
-                          className="font-semibold xlg:text-sm  leading-6 text-typo-black-1"
+                          className="font-semibold  leading-2 text-typo-black-1 std:text-[12px] xl:text-[11px]"
                         >
                           {/* Thiếu */}
                           {typeTable === "materials" ? (
-                            <p>
-                              {item.quantity_rest === "0" ? (
+                            <p className="std:text-[12px] xl:text-[11px]">
+                              {item.quantity_rest <= 0 ? (
                                 " - "
                               ) : (
-                                <span>
+                                <span className="std:text-[12px] xl:text-[11px]">
                                   {formatNumber(item.quantity_rest)}/ <br />{" "}
-                                  <span className="font-normal xlg:text-xs xl:text-[10px] text-typo-black-1">
+                                  <span className="font-normal std:text-[11px] xl:text-[9px] text-typo-black-1">
                                     {" "}
                                     {item.unit_name_primary}
                                   </span>
@@ -307,8 +327,8 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                               )}
                             </p>
                           ) : (
-                            <p>
-                              {item.quantity_rest === "0"
+                            <p className="std:text-[12px] xl:text-[11px]">
+                              {item.quantity_rest <= 0
                                 ? " - "
                                 : formatNumber(item.quantity_rest)}
                             </p>
@@ -318,11 +338,13 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                           colSpan={3}
                           textAlign={"start"}
                           // textSize={`"!text-sm"`}
-                          className={"font-semibold xlg:text-sm"}
+                          className={
+                            "font-semibold std:text-[11px] xl:text-[9px]"
+                          }
                         >
                           <ProgressBar
-                            current={+item.quantity_import}
-                            total={+item.quantity_rest}
+                            current={formatNumber(item.quantity_import)}
+                            total={formatNumber(item.quantity_rest)}
                             name={item.unit_name_primary}
                             typeProgress="tablePlaning"
                           />
@@ -372,12 +394,10 @@ const PlaningProductionOrder = memo(({ dataLang }) => {
       id: isStateProvider?.productionsOrders?.dataProductionOrderDetail?.pp_id,
     });
 
-  // console.log("🚀 ~ PlaningProductionOrder ~ dataListBom:", dataListBom)
-
   return (
     <div className="flex flex-row w-full h-full items-start justify-between">
       {/* bảng nguyên liêu */}
-      <div className=" w-[50%] h-full pl-4">
+      <div className=" w-[50%] h-full  border-r border-border-gray-1 pr-4">
         {isLoadingDataListBom ? (
           <Loading className="h-80" color="#0f4f9e" />
         ) : (
@@ -391,7 +411,7 @@ const PlaningProductionOrder = memo(({ dataLang }) => {
       </div>
 
       {/* bảng bán thành phẩm  */}
-      <div className="w-[50%] border-r border-border-gray-1 h-full pr-4">
+      <div className="w-[50%] h-full  pl-4">
         {isLoadingDataListBom ? (
           <Loading className="h-80" color="#0f4f9e" />
         ) : (

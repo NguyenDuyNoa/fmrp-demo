@@ -18,14 +18,14 @@ const CommentSkeleton = forwardRef(({ className, ...props }, ref) => {
 
                 {/* Nội dung comment */}
                 <div className="space-y-2">
-                    <Skeleton className="h-4 w-full rounded" />
-                    <Skeleton className="h-4 w-2/3 rounded" />
+                    <Skeleton className="h-5 w-full rounded" />
+                    <Skeleton className="h-5 w-2/3 rounded" />
                 </div>
 
                 {/* Hình ảnh (3 ảnh giả) */}
                 <div className="grid grid-cols-3 gap-2 mt-2">
                     {[1, 2, 3].map((_, i) => (
-                        <Skeleton key={i} className="h-[100px] rounded" />
+                        <Skeleton key={i} className="3xl:h-[200px] h-[180px] rounded" />
                     ))}
                 </div>
 
