@@ -19,7 +19,7 @@ export const VersionProvider = ({ children }) => {
     isLoading: isLoadingVersion,
     refetch,
   } = useVersionApplication({
-    enabled: !!auth && !!tokenFMRP && !!databaseappFMRP && statePopupGlobal?.open,
+    enabled: !!auth && !!tokenFMRP && !!databaseappFMRP,
     stateOpenUpdatePopUp: statePopupGlobal?.open,
   });
 
