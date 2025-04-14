@@ -1,4 +1,9 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+    QueryClient,
+    QueryClientProvider,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
 import SimpleBar from "simplebar-react";
 import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
@@ -34,7 +39,7 @@ const queryClient = new QueryClient({
 });
 
 const Index = ({ children, ...props }) => {
-    const router = useRouter()
+    const router = useRouter();
 
     // lấy phân quyền
     const { closeSheet } = useSheet();
@@ -77,7 +82,7 @@ const Index = ({ children, ...props }) => {
 
     console.log("router", router);
 
-    const { hasNewVersion, version } = useAppContext();
+    const { hasNewVersion, version, setHasNewVersion, refetchVersion } = useAppContext();
     const dispatch = useDispatch();
     const { socket } = useSocketContext();
 
@@ -89,30 +94,22 @@ const Index = ({ children, ...props }) => {
                     open: true,
                     allowOutsideClick: false,
                     allowEscape: false,
-                    children: <PopupUpdateNewVersion version={version} />,
+                    children: <PopupUpdateNewVersion version={version} setHasNewVersion={setHasNewVersion} />,
                 },
             });
         }
-    }, [hasNewVersion]);
-
+    }, [hasNewVersion, version]);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (!socket) return;
         const topic = `update_version`;
 
-        socket.on(topic, (data) => {
+        socket.on(topic, async (data) => {
             if (data && data.data) {
-                dispatch({
-                    type: "statePopupGlobal",
-                    payload: {
-                        open: true,
-                        allowOutsideClick: false,
-                        allowEscape: false,
-                        children: <PopupUpdateNewVersion version={version} />,
-                    },
-                });
+                await queryClient.invalidateQueries(["versionApplication"]);
+                await refetchVersion() //check nếu có 2 version cùng lúc lấy bản mới nhất
             }
-            console.log("🚀 ~ socket.on ~ data:", data);
         });
 
         return () => {
