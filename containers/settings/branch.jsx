@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import "react-phone-input-2/lib/style.css";
 import PopupBranch from "./components/popupBranch";
-import { useBranchPageList } from "./hooks/usseBranch";
+import { useBranchPageList, useWarehousesList } from "./hooks/usseBranch";
 import { ListBtn_Setting } from "./information";
 const Branch = (props) => {
     const router = useRouter();
@@ -35,6 +35,10 @@ const Branch = (props) => {
     const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
     const { data, isFetching, refetch } = useBranchPageList({ search: keySearch, limit: limit, page: router.query?.page || 1, })
+
+    //data warehouse
+    const { data: ListWarehouse, isLoading: isLoadingListWarehouse } =
+        useWarehousesList();
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
@@ -66,13 +70,13 @@ const Branch = (props) => {
                                 <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.branch_title}
                                 </h2>
-                                <div className="flex justify-end items-center gap-2">
-                                    <PopupBranch
-                                        onRefresh={refetch.bind(this)}
-                                        dataLang={dataLang}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
-                                    />
-                                </div>
+                                <PopupBranch
+                                    ListWarehouse={ListWarehouse}
+                                    onRefresh={refetch.bind(this)}
+                                    dataLang={dataLang}
+                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                />
+
                             </div>
                             <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
@@ -89,34 +93,40 @@ const Branch = (props) => {
                                 <Customscrollbar className="min:h-[200px] h-[83%] max:h-[500px] overflow-auto pb-2">
                                     <div className="w-full">
                                         <HeaderTable gridCols={12}>
-                                            <ColumnTable colSpan={4} textAlign={"left"}>
+                                            <ColumnTable colSpan={3} textAlign={"left"}>
                                                 {dataLang?.branch_popup_name}
                                             </ColumnTable>
                                             <ColumnTable colSpan={3} textAlign={"left"}>
                                                 {dataLang?.branch_popup_address}
                                             </ColumnTable>
-                                            <ColumnTable colSpan={3} textAlign={"left"}>
+                                            <ColumnTable colSpan={2} textAlign={"left"}>
                                                 {dataLang?.branch_popup_phone}
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={2} textAlign={"left"}>
+                                                {dataLang?.Warehouse_poppup_name}
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
                                                 {dataLang?.branch_popup_properties}
                                             </ColumnTable>
                                         </HeaderTable>
-                                        {isFetching ? (
+                                        {isFetching && isLoadingListWarehouse ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.rResult?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
                                                     {data?.rResult?.map((e) => (
                                                         <RowTable gridCols={12} key={e.id.toString()}>
-                                                            <RowItemTable colSpan={4} textAlign={"left"}>
+                                                            <RowItemTable colSpan={3} textAlign={"left"}>
                                                                 {e.name}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={3} textAlign={"left"}>
                                                                 {e.address}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={3} textAlign={"left"}>
+                                                            <RowItemTable colSpan={2} textAlign={"left"}>
                                                                 {e.number_phone}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={2} textAlign={"left"}>
+                                                                {e.name_warehouse}
                                                             </RowItemTable>
                                                             <RowItemTable
                                                                 colSpan={2}
@@ -130,6 +140,8 @@ const Branch = (props) => {
                                                                     phone={e.number_phone}
                                                                     address={e.address}
                                                                     id={e.id}
+                                                                    warehouse={e.name_warehouse}
+                                                                    ListWarehouse={ListWarehouse}
                                                                 />
                                                                 <BtnAction
                                                                     onRefresh={refetch.bind(this)}

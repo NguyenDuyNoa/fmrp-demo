@@ -8,5 +8,10 @@ const apiBranch = {
         const response = await axiosCustom('POST', id ? `/api_web/Api_Branch/branch/${id}?csrf_protection=true` : "/api_web/Api_Branch/branch?csrf_protection=true", data);
         return response.data
     },
+
+    async apiGetListWarehouses() {
+        const response = await axiosCustom('GET', `/api_web/Api_warehouse/selectWarehouses`);
+        return response.data
+    }
 }
 export default apiBranch
