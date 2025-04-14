@@ -144,5 +144,11 @@ const apiProductionsOrders = {
         const response = await axiosCustom('GET', `/api_web/Api_staff/searchStaffs?limit=${limit}`, data);
         return response.data
     },
+
+    // GET danh sách Emoji
+    async apiGetListEmoji() {
+        const response = await axiosCustom('GET', `/api_web/Api_Emoji/getEmoji`);
+        return response.data
+    },
 }
 export default apiProductionsOrders

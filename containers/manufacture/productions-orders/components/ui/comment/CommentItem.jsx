@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ImageAvatar from "./ImageAvatar";
 import moment from "moment";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -25,6 +25,8 @@ const likeVariants = {
         duration: 0.5
     }
 };
+
+const MAX_WORDS = 60;
 
 // 👉 Hàm xử lý nội dung tag
 const parseCommentContent = (text) => {
@@ -70,37 +72,76 @@ const splitTextWithBreaks = (text) => {
 };
 
 const RenderedComment = ({ content }) => {
+    const [showFull, setShowFull] = useState(false);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+    const [collapsedHeight, setCollapsedHeight] = useState(0);
+    const contentRef = useRef(null);
+
     const containsMention = /@\{\d+:[^\}]+\}/.test(content || '');
+    const parts = containsMention
+        ? parseCommentContent(content || '')
+        : splitTextWithBreaks(content || '');
 
-    if (!containsMention) {
-        return (
-            <div
-                className='text-sm-default duration-500 transition ease-in-out line-clamp-2 whitespace-pre-wrap'
-                dangerouslySetInnerHTML={{ __html: content ?? '' }}
-            />
-        );
-    }
+    const renderParts = (list) =>
+        list.map((part, index) => {
+            if (typeof part === 'string') return <span key={index}>{part}</span>;
+            if (part.type === 'mention') {
+                return (
+                    <span
+                        key={index}
+                        className="text-[#0F4F9E] px-1 rounded font-medium cursor-pointer hover:underline custom-transition"
+                        onClick={() => console.log("Tag user ID:", part.userId)}
+                    >
+                        @{part.userName}
+                    </span>
+                );
+            }
+            if (part.type === 'br') return <br key={index} />;
+            return null;
+        });
 
-    const parts = parseCommentContent(content || '');
+    useEffect(() => {
+        if (!contentRef.current) return;
+        const computed = window.getComputedStyle(contentRef.current);
+        const lineHeight = parseFloat(computed.lineHeight || "20");
+        const maxHeight = lineHeight * 3;
+        setCollapsedHeight(maxHeight);
+
+        if (contentRef.current.scrollHeight > maxHeight) {
+            setIsOverflowing(true);
+        } else {
+            setIsOverflowing(false);
+        }
+    }, [content]);
 
     return (
-        <div className="text-sm-default duration-500 transition ease-in-out whitespace-pre-wrap">
-            {parts.map((part, index) => {
-                if (typeof part === 'string') return <span key={index}>{part}</span>;
-                if (part.type === 'mention') {
-                    return (
-                        <span
-                            key={index}
-                            className="text-[#0F4F9E] px-1 rounded font-medium cursor-pointer hover:underline custom-transition"
-                            onClick={() => console.log("Tag user ID:", part.userId)}
-                        >
-                            @{part.userName}
-                        </span>
-                    );
-                }
-                if (part.type === 'br') return <br key={index} />;
-                return null;
-            })}
+        <div className="relative text-sm-default whitespace-pre-wrap">
+            {isOverflowing ? (
+                <motion.div
+                    animate={{ height: showFull ? "auto" : collapsedHeight, opacity: 1 }}
+                    initial={false}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                >
+                    <div ref={contentRef}>
+                        {renderParts(parts)}
+                    </div>
+                </motion.div>
+            ) : (
+                <div ref={contentRef}>
+                    {renderParts(parts)}
+                </div>
+            )}
+
+
+            {isOverflowing && (
+                <button
+                    onClick={() => setShowFull(prev => !prev)}
+                    className="text-sm-default text-[#0F4F9E] mt-1 font-medium hover:underline"
+                >
+                    {showFull ? "Ẩn bớt" : "Xem thêm"}
+                </button>
+            )}
         </div>
     );
 };
@@ -111,6 +152,8 @@ const CommentItem = ({ item, currentUser }) => {
 
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [startIndex, setStartIndex] = useState(0);
+
+    const [loadingImages, setLoadingImages] = useState({});
 
     const { onSubmit: onSubmitLikeComment, isLoading: isLoadingLikeComment } = usePostLikeComment()
     const { onSubmit: onSubmitUnlikeComment, isLoading: isLoadingUnlikeComment } = usePostUnlikeComment()
@@ -135,7 +178,7 @@ const CommentItem = ({ item, currentUser }) => {
 
         if (likes.length <= 2) {
             return (
-                <div className="text-[#0375F3] text-xs-default font-medium">
+                <div className="text-[#0375F3] text-sm-default font-medium">
                     {likes.map((like, i) => (
                         <span key={like.id}>
                             {like.full_name}
@@ -167,7 +210,7 @@ const CommentItem = ({ item, currentUser }) => {
                 <ImageAvatar
                     src={item?.created_by_profile_image}
                     fullName={item?.created_by_full_name}
-                    className="w-10 h-10 !min-w-10 !max-w-10 !max-h-10 !min-h-10 rounded-full object-cover shrink-0"
+                    className="3xl:w-10 3xl:h-10 3xl:!min-w-10 3xl:!max-w-10 3xl:!max-h-10 3xl:!min-h-10 w-8 h-8 !min-w-8 !max-w-8 !max-h-8 !min-h-8 rounded-full object-cover shrink-0"
                 />
 
 
@@ -199,18 +242,29 @@ const CommentItem = ({ item, currentUser }) => {
                                 {
                                     files?.slice(0, 3).map((file, index) => {
                                         const isLast = index === 2 && files.length > 3;
+                                        const isImageLoading = loadingImages[index] !== false;
+
                                         return (
                                             <div
                                                 key={index}
-                                                className="relative cursor-pointer"
+                                                className="relative cursor-pointer group"
                                                 onClick={() => handleClickImage(index)}
                                             >
+                                                {/* Layer blur overlay khi đang loading */}
+                                                {isImageLoading && (
+                                                    <div className="absolute inset-0 bg-[#f2f2f2] animate-pulse rounded z-10" />
+                                                )}
+
                                                 <Image
                                                     src={file.file_path || '/icon/default/default.png'}
                                                     alt={file.file_name}
                                                     width={300}
                                                     height={200}
-                                                    className="w-full 3xl:h-[200px] h-[180px] object-cover rounded"
+                                                    // className="w-full 3xl:h-[200px] h-[180px] object-cover rounded"
+                                                    className={`w-full 3xl:h-[200px] h-[180px] object-cover rounded transition-opacity duration-300 ${isImageLoading ? 'opacity-0' : 'opacity-100'}`}
+                                                    onLoadingComplete={() =>
+                                                        setLoadingImages((prev) => ({ ...prev, [index]: false }))
+                                                    }
                                                 />
                                                 {
                                                     isLast && (
@@ -238,7 +292,7 @@ const CommentItem = ({ item, currentUser }) => {
                             className={`relative flex items-center justify-center 3xl:size-6 size-5 font-medium ${hasLiked ? "text-[#0375F3]" : "text-[#52575E]"}`}
                         >
                             <div className="relative w-full h-full">
-                                <AnimatePresence mode="wait" initial={false}>
+                                <AnimatePresence initial={false}>
                                     <motion.div
                                         key={hasLiked.toString()}
                                         initial={{ scale: 0.3, opacity: 0 }}

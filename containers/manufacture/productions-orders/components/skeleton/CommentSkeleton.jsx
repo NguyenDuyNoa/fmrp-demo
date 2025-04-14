@@ -6,7 +6,7 @@ const CommentSkeleton = forwardRef(({ className, ...props }, ref) => {
     return (
         <div ref={ref} className={`${className} flex items-start gap-3 mb-4`}>
             {/* Avatar */}
-            <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+            <Skeleton className="3xl:size-10 size-8 rounded-full shrink-0" />
 
             {/* Nội dung */}
             <div className="flex-1 space-y-2">

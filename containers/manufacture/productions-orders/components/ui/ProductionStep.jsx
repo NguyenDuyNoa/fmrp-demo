@@ -166,15 +166,15 @@ const ProductionSteps = ({ stages }) => {
                                     {step.active == "1" ?
                                         (
                                             <div className='flex flex-col'>
-                                                <span className="text-xs-default font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.DD_MM)}</span>
-                                                <span className="3xl:text-[10px] text-[9px] font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.TIME_SHORT)}</span>
+                                                <span className="3xl:text-xs xl:text-[10px] lg:text-[8px] text-[8px] font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.DD_MM)}</span>
+                                                <span className="3xl:text-[10px] xl:text-[9px] text-[7px] font-medium text-[#141522] !leading-2">{moment(step.date_active).format(FORMAT_MOMENT.TIME_SHORT)}</span>
                                             </div>
                                         )
                                         :
                                         (
                                             step.begin_production == "1"
                                                 ?
-                                                <span className="text-xs-default font-medium text-[#667085]">{moment(step.date_production).format(FORMAT_MOMENT.DD_MM)}</span>
+                                                <span className="3xl:text-xs xl:text-[10px] lg:text-[8px] text-[8px] font-medium text-[#667085]">{moment(step.date_production).format(FORMAT_MOMENT.DD_MM)}</span>
                                                 :
                                                 null
                                         )
