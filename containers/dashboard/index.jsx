@@ -12,40 +12,64 @@ import PieChart from "./components/PieChart";
 import ProductionProgressTracker from "./components/ProductionProgressTracker";
 import TableChart from "./components/TableChart";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TopProducts from "./components/newCharts/TopProducts";
+import BarChartVertical from "./components/newCharts/BarChartVertical";
+import BarChartHorizontal from "./components/newCharts/BarChartHorizontal";
+import PieChartNew from "./components/newCharts/PieChartNew";
+import ListProgress from "./components/newCharts/ListProgress";
+import ListMaterial from "./components/newCharts/ListMaterial";
 
 const Dashboard = (props) => {
-    const dispatch = useDispatch();
-    const dataPstWH = useSelector((state) => state.statusUser);
-    const statusExprired = useStatusExprired();
+  const dispatch = useDispatch();
+  const dataPstWH = useSelector((state) => state.statusUser);
+  const statusExprired = useStatusExprired();
 
-    const _HandleExample = () => {
-        dispatch({
-            type: "status/user",
-            payload: !dataPstWH,
-        });
-    };
+  const _HandleExample = () => {
+    dispatch({
+      type: "status/user",
+      payload: !dataPstWH,
+    });
+  };
 
-    return (
-        <React.Fragment>
-            <Head>
-                <title>Tổng quan</title>
-            </Head>
+  return (
+    <React.Fragment>
+      <Head>
+        <title>Tổng quan</title>
+      </Head>
 
-            <Customscrollbar className="px-10 py-8 pt-24 space-y-5 overflow-x-auto overflow-y-auto text">
-                {dataPstWH && (
-                    <div
-                        style={{
-                            position: "fixed",
-                            top: "7.65%",
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            backgroundColor: "rgba(0, 0, 0, 0.5)", // Đặt màu nền mờ ở đây
-                            zIndex: 9999, // Đảm bảo lớp phủ nằm trên các phần tử khác trên trang
-                        }}
-                    />
-                )}
-                {/* <div className={`${statusExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
+      <div className="py-6 flex flex-col gap-6 bg-[#FDFDFE] min-h-screen pt-[96px]">
+        <TopProducts />
+        <div className="flex flex-col md:flex-row gap-6 px-4 md:px-12">
+          <BarChartVertical />
+          <BarChartHorizontal />
+        </div>
+        <div className="grid grid-cols-1 std:grid-cols-3 gap-6 px-4 md:px-12">
+          <div className="col-span-1 std:col-span-1">
+            <PieChartNew />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 std:col-span-2">
+            <ListProgress />
+            <ListMaterial />
+          </div>
+        </div>
+      </div>
+
+      {/* <Customscrollbar className="px-10 py-8 pt-24 space-y-5 overflow-x-auto overflow-y-auto text">
+        {dataPstWH && (
+          <div
+            style={{
+              position: "fixed",
+              top: "7.65%",
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.5)", // Đặt màu nền mờ ở đây
+              zIndex: 9999, // Đảm bảo lớp phủ nằm trên các phần tử khác trên trang
+            }}
+          />
+        )} */}
+
+      {/* <div className={`${statusExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
                     <h3 className="text-[#11315B] text-lg font-medium not-italic	leading-6">Lệnh sản xuất</h3>
                     <button
                         style={{
@@ -61,7 +85,7 @@ const Dashboard = (props) => {
                         </span>
                     </button>
                 </div> */}
-                <div className="flex flex-col gap-3">
+      {/* <div className="flex flex-col gap-3">
                     <ListTask {...props} />
                     <div className="grid grid-cols-2 gap-5">
                         <PieChart {...props} />
@@ -69,14 +93,16 @@ const Dashboard = (props) => {
                         <LineChart {...props} />
                         <ColumnChart {...props} />
                         <TableChart {...props} />
-                        {/* <ManufacturingStatusMonitor {...props} /> */}
-                        {/* <AreaChart {...props} /> */}
+                        <ManufacturingStatusMonitor {...props} />
+                        <AreaChart {...props} />
                         <BarChart {...props} />
                     </div>
-                </div>
-            </Customscrollbar>
-        </React.Fragment>
-    );
+                </div> */}
+      {/* </Customscrollbar> */}
+
+      {/* new Dashboard */}
+    </React.Fragment>
+  );
 };
 
 export default Dashboard;
