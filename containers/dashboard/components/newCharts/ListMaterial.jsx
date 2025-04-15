@@ -1,5 +1,5 @@
 import Cardtable from "@/components/common/card/Cardtable";
-import CalendarDropdown from "@/components/common/dropdown/CalendarDropdown";
+import CalendarDropdown, { timeRanges } from "@/components/common/dropdown/CalendarDropdown";
 import NoData from "@/components/UI/noData/nodata";
 import React, { useState } from "react";
 
@@ -25,6 +25,7 @@ const materialsData = [
 
 const ListMaterial = () => {
   const [materials, setMaterials] = useState(materialsData);
+  const [date, setDate] = useState(timeRanges[4]);
 
   return (
     <div className="rounded-2xl bg-white w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
@@ -32,7 +33,7 @@ const ListMaterial = () => {
         <h2 className="flex-1 capitalize text-lg font-medium text-typo-black-1">
           Nguyên Vật Liệu Cần Mua
         </h2>
-        <CalendarDropdown />
+        <CalendarDropdown setState={setDate} />
       </div>
 
       <div className="overflow-x-auto">

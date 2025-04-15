@@ -1,4 +1,4 @@
-import CalendarDropdown from "@/components/common/dropdown/CalendarDropdown";
+import CalendarDropdown, { timeRanges } from "@/components/common/dropdown/CalendarDropdown";
 import { handleTicksBarChart } from "@/utils/helpers/deviceTicksChart";
 import React, { useEffect, useState } from "react";
 import {
@@ -37,7 +37,7 @@ const top5CustomersData = [
 const BarChartHorizontal = () => {
     const [top5Customers, setTop5Customers] = useState();
     const [ticks, setTicks] = useState([]);
-
+    const [date, setDate] = useState(timeRanges[4]);
     useEffect(() => {
         const processedData = top5CustomersData.map((customer) => ({
             ...customer,
@@ -58,7 +58,7 @@ const BarChartHorizontal = () => {
                 <h2 className="flex-1 capitalize text-lg font-medium  text-typo-black-1">
                     Top 5 Khách Hàng Có Sản Lượng Nhiều Nhất
                 </h2>
-                <CalendarDropdown />
+                <CalendarDropdown setState={setDate} />
             </div>
 
             <ResponsiveContainer width="100%" height={316}>

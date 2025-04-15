@@ -21,21 +21,6 @@ export const useGetProductionPlan = ({ limited = 5, dateStart = "", dateEnd = ""
                     quantity_plan: +e.quantity_plan
                 }))
             };
-
-
-            // return {
-            //     ...res,
-            //     data: {
-            //         ...res.data,
-            //         items: res?.data?.items?.map(e => {
-            //             return {
-            //                 ...e,
-            //                 quantity: +e?.quantity,
-            //                 quantity_plan: +e?.quantity_plan
-            //             }
-            //         })
-            //     }
-            // }
         },
         placeholderData: keepPreviousData,
         enabled: !!dateEnd && !!dateStart,

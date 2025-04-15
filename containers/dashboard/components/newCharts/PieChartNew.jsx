@@ -1,4 +1,4 @@
-import CalendarDropdown from '@/components/common/dropdown/CalendarDropdown';
+import CalendarDropdown, { timeRanges } from '@/components/common/dropdown/CalendarDropdown';
 import React, { useEffect, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 const situationData = [
@@ -38,7 +38,7 @@ const defaultData = [
 const PieChartNew = () => {
     const [currentData, setCurrentData] = useState(situationData);
     const [isLoading, setIsLoading] = useState(true);
-
+    const [date, setDate] = useState(timeRanges[4]);
     const {
         total = 0,
         notCompleted = 0,
@@ -149,7 +149,7 @@ const PieChartNew = () => {
                     Tình hình sản xuất
                 </h2>
                 <div className="flex items-center gap-2">
-                    <CalendarDropdown />
+                    <CalendarDropdown setState={setDate} />
                 </div>
             </div>
             <div className="relative h-full xl:min-h-[322px] min-h-[350px]">

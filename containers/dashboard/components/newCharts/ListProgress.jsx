@@ -40,6 +40,7 @@ const progressData = [
 
 const ListProgress = () => {
   const [data, setData] = useState([]);
+  const [status, setStatus] = useState(productionStatuses[2]);
   const dataRange = productionStatuses
   useEffect(() => {
     setData(progressData);
@@ -54,6 +55,7 @@ const ListProgress = () => {
         <div className="flex justify-end w-full sm:w-fit">
           <CalendarDropdown
             dataRanges={dataRange}
+            setState={setStatus}
           />
         </div>
       </div>
