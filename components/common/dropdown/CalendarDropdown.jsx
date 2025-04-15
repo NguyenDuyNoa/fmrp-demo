@@ -1,3 +1,4 @@
+import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -17,9 +18,9 @@ export const productionStatuses = [
     { label: "Chậm tiến độ", value: "delayed" }
 ];
 
-const CalendarDropdown = ({ onRangeChange, dataRanges = timeRanges }) => {
+const CalendarDropdown = ({ sate, setState, dataRanges = timeRanges }) => {
 
-    const [selectedRange, setSelectedRange] = useState(dataRanges[2]);
+    const [selectedRange, setSelectedRange] = useState(dataRanges[4]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -28,10 +29,10 @@ const CalendarDropdown = ({ onRangeChange, dataRanges = timeRanges }) => {
     const handleRangeSelect = (range) => {
         setSelectedRange(range);
         setIsOpen(false);
-        if (onRangeChange) {
-            onRangeChange(range);
-        }
+        setState(range)
     };
+
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {

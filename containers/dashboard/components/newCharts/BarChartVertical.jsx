@@ -1,5 +1,11 @@
-import CalendarDropdown from "@/components/common/dropdown/CalendarDropdown";
+import CalendarDropdown, {
+  timeRanges,
+} from "@/components/common/dropdown/CalendarDropdown";
+import Loading from "@/components/UI/loading/loading";
+import NoData from "@/components/UI/noData/nodata";
+import { useGetProductionPlan } from "@/hooks/dashboard/useGetProductionPlan";
 import { handleTicksBarChart } from "@/utils/helpers/deviceTicksChart";
+import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
 import React, { useEffect, useState } from "react";
 import {
   Bar,
@@ -14,7 +20,7 @@ import {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-dark-primary text-neutral-00 px-3 py-2 rounded-lg text-sm font-medium">
+      <div className="bg-white text-typo-black-1 px-3 py-2 rounded-lg text-sm font-medium shadow-md">
         <p className="mb-1">{`${label}`}</p>
         {payload.map((entry, index) => (
           <p key={`item-${index}`} style={{ color: entry.color }}>
@@ -27,66 +33,58 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const topProductsData = [
-  {
-    id: 1,
-    name: "Áo sơ mi dài tay",
-    quantity: 109,
-    percentageChange: 8.2,
-    plan: 10,
-  },
-  {
-    id: 2,
-    name: "Quần tây",
-    quantity: 50,
-    percentageChange: -5,
-    plan: 25,
-  },
-  {
-    id: 3,
-    name: "Áo hoodie",
-    quantity: 60,
-    percentageChange: 12,
-    plan: 30,
-  },
-  {
-    id: 4,
-    name: "Đầm maxi",
-    quantity: 33,
-    percentageChange: 3.5,
-    plan: 20,
-  },
-  {
-    id: 5,
-    name: "Áo thun cổ tròn",
-    quantity: 80,
-    percentageChange: 4.7,
-    plan: 40,
-  },
-];
-
 const BarChartVertical = () => {
-  const [loading, setLoading] = useState(true);
   const [productPlan, setProductPlan] = useState();
+  const [dateStart, setDateStart] = useState("");
+  const [dateEnd, setDateEnd] = useState("");
+  const [date, setDate] = useState(timeRanges[4]);
   const [ticks, setTicks] = useState([0, 25, 50, 75, 100]);
 
-  useEffect(() => {
-    setLoading(false);
-    const transformedData = topProductsData.map((item) => ({
-      name: item.name,
-      keHoach: item.plan,
-      thucHien: item.quantity,
-    }));
-    setProductPlan(transformedData);
+  const wrapText = ({ text, maxCharsPerLine = 10, maxLines = 2 }) => {
+    let lines = [];
+    for (let i = 0; i < maxLines; i++) {
+      const start = i * maxCharsPerLine;
+      const end = start + maxCharsPerLine;
 
-    // Tìm giá trị lớn nhất giữa keHoach và thucHien
-    const allValues = transformedData.flatMap((item) => [
-      item.keHoach,
-      item.thucHien,
-    ]);
-    const dynamicTicks = handleTicksBarChart(allValues)
-    setTicks(dynamicTicks);
-  }, []);
+      if (i === maxLines - 1 && text.length > end) {
+        // Dòng cuối: thêm dấu "…" nếu còn dư
+        lines.push(text.slice(start, end) + "…");
+      } else {
+        lines.push(text.slice(start, end));
+      }
+
+      if (end >= text.length) break;
+    }
+    return lines;
+  };
+
+  const { data, isLoading } = useGetProductionPlan({
+    limited: 5,
+    dateEnd: dateEnd,
+    dateStart: dateStart,
+  });
+
+  useEffect(() => {
+    if (date) {
+      const range = getDateRangeFromValue(date.value);
+      setDateStart(range ? range.startDate : "");
+      setDateEnd(range ? range.endDate : "");
+    }
+  }, [date]);
+
+  useEffect(() => {
+    if (!isLoading && data) {
+      setProductPlan(data?.items);
+
+      const allValues = data?.items?.flatMap((item) => [
+        item.quantity,
+        item.quantity_plan,
+      ]);
+
+      const dynamicTicks = allValues.length > 0 ? handleTicksBarChart(allValues) : [0, 25, 50, 75, 100];
+      setTicks(dynamicTicks);
+    }
+  }, [isLoading, data]);
 
   return (
     <div className="xlg:p-6 p-3 rounded-2xl bg-neutral-00 w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
@@ -94,7 +92,7 @@ const BarChartVertical = () => {
         <h2 className="capitalize text-lg font-medium text-typo-black-1">
           Kế Hoạch Sản Xuất
         </h2>
-        <CalendarDropdown />
+        <CalendarDropdown setState={setDate} />
       </div>
 
       <div className="flex items-center justify-end gap-4 mb-4 px-4">
@@ -109,89 +107,105 @@ const BarChartVertical = () => {
           </span>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart
-          data={productPlan}
-          margin={{ top: 40, right: 0, left: 10, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis
-            dataKey="name"
-            axisLine={false}
-            tickLine={false}
-            dy={10}
-            tick={(props) => {
-              const { x, y, payload } = props;
-              return (
-                <g transform={`translate(${x},${y})`}>
-                  <text
-                    x={0}
-                    y={10}
-                    dy={4}
-                    textAnchor="middle"
-                    fill="#9295A4"
-                    fontSize={12}
-                  >
-                    {payload.value}
-                  </text>
-                </g>
-              );
-            }}
-            label={{
-              value: "Mặt hàng",
-              position: "insideLeft",
-              offset: -40,
-              style: { textAnchor: "middle", fill: "#667085", fontSize: 12 },
-            }}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            ticks={ticks}
-            domain={[0, ticks[ticks.length - 1]]}
-            tick={(props) => {
-              const { x, y, payload } = props;
-              return (
-                <g transform={`translate(${x - 10},${y})`}>
-                  <text
-                    x={0}
-                    y={0}
-                    dy={4}
-                    textAnchor="end"
-                    fill="#9295A4"
-                    fontSize={12}
-                  >
-                    {payload.value}
-                  </text>
-                </g>
-              );
-            }}
-            width={60}
-            dy={30}
-            label={{
-              value: loading ? "Đơn vị" : "Cái",
-              position: "top",
-              offset: 30,
-              style: { textAnchor: "", fill: "#9295A4", fontSize: 12 },
-            }}
-          />
-          <Tooltip content={<CustomTooltip />} cursor={false} />
-          <Bar
-            dataKey="keHoach"
-            fill="#0375F3"
-            barSize={20}
-            radius={[4, 4, 0, 0]}
-            name="Kế hoạch"
-          ></Bar>
-          <Bar
-            dataKey="thucHien"
-            fill="#1FC583"
-            barSize={20}
-            radius={[4, 4, 0, 0]}
-            name="Thực hiện"
-          ></Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      {isLoading ? (
+        <Loading className="h-80" color="#0f4f9e" />
+      ) : (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={productPlan}
+            margin={{ top: 40, right: 0, left: 10, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="item_name"
+              axisLine={false}
+              tickLine={false}
+              dy={10}
+              tick={(props) => {
+                const { x, y, payload } = props;
+                const lines = wrapText({ text: payload.value });
+
+                return (
+                  <g transform={`translate(${x},${y})`}>
+                    {lines.map((line, index) => (
+                      <text
+                        key={index}
+                        x={0}
+                        y={10 + index * 12} // khoảng cách dòng
+                        dy={5}
+                        textAnchor="middle"
+                        fill="#9295A4"
+                        fontSize={12}
+                      >
+                        {line}
+                      </text>
+                    ))}
+                  </g>
+                );
+              }}
+              interval={0}
+              label={{
+                value: "Mặt hàng",
+                position: "insideLeft",
+                offset: -40,
+                style: {
+                  textAnchor: "middle",
+                  fill: "#667085",
+                  fontSize: 12,
+                },
+              }}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              ticks={ticks}
+              domain={[0, ticks[ticks.length - 1]]}
+              tick={(props) => {
+                const { x, y, payload } = props;
+                return (
+                  <g transform={`translate(${x - 10},${y})`}>
+                    <text
+                      x={0}
+                      y={0}
+                      dy={4}
+                      textAnchor="end"
+                      fill="#9295A4"
+                      fontSize={12}
+                    >
+                      {payload.value}
+                    </text>
+                  </g>
+                );
+              }}
+              width={60}
+              dy={30}
+              label={{
+                value: isLoading ? "Đơn vị" : "Cái",
+                position: "top",
+                offset: 30,
+                style: { textAnchor: "", fill: "#9295A4", fontSize: 12 },
+              }}
+            />
+            <Tooltip content={<CustomTooltip />} cursor={false} />
+            <Bar
+              dataKey="quantity_plan"
+              fill="#0375F3"
+              barSize={20}
+              radius={[4, 4, 0, 0]}
+              name="Kế hoạch"
+              minPointSize={1}
+            ></Bar>
+            <Bar
+              dataKey="quantity"
+              fill="#1FC583"
+              barSize={20}
+              radius={[4, 4, 0, 0]}
+              name="Thực hiện"
+              minPointSize={1}
+            ></Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 };
