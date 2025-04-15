@@ -1,4 +1,5 @@
 import CalendarDropdown from "@/components/common/dropdown/CalendarDropdown";
+import { handleTicksBarChart } from "@/utils/helpers/deviceTicksChart";
 import React, { useEffect, useState } from "react";
 import {
   Bar,
@@ -30,7 +31,7 @@ const topProductsData = [
   {
     id: 1,
     name: "Áo sơ mi dài tay",
-    quantity: 100,
+    quantity: 109,
     percentageChange: 8.2,
     plan: 10,
   },
@@ -69,32 +70,6 @@ const BarChartVertical = () => {
   const [productPlan, setProductPlan] = useState();
   const [ticks, setTicks] = useState([0, 25, 50, 75, 100]);
 
-  const handleTicksBarChart = (value) => {
-    //gom value của keHoach và thucHien vao 1 bảng -> tìm giá trị lớn nhất
-    const allValues = value?.flatMap((item) => [
-      item.keHoach,
-      item.thucHien,
-    ]);
-    const maxValue = Math.max(...allValues);
-
-    // Làm tròn lên số chia hết cho 4 (tối ưu cho step tròn)
-    const roundUpToNearestDivisibleBy4 = (value) => {
-      // Làm tròn lên số gần nhất chia hết cho 4
-      const remainder = value % 4;
-      if (remainder === 0) return value;
-
-      const next = value + (4 - remainder);
-      // Nếu next không tròn đẹp (ví dụ 157 + 3 = 160, thì giữ), còn nếu là số xấu thì làm tròn lên bước 10 gần nhất
-      const rounded = Math.ceil(next / 10) * 10;
-      return rounded % 4 === 0 ? rounded : rounded + (4 - (rounded % 4));
-    };
-    const newMaxValue = roundUpToNearestDivisibleBy4(maxValue);
-    const step = newMaxValue / 4;
-    const dynamicTicks = Array.from({ length: 5 }, (_, i) => i * step);
-
-    return dynamicTicks
-  }
-
   useEffect(() => {
     setLoading(false);
     const transformedData = topProductsData.map((item) => ({
@@ -105,7 +80,11 @@ const BarChartVertical = () => {
     setProductPlan(transformedData);
 
     // Tìm giá trị lớn nhất giữa keHoach và thucHien
-    const dynamicTicks = handleTicksBarChart(transformedData)
+    const allValues = transformedData.flatMap((item) => [
+      item.keHoach,
+      item.thucHien,
+    ]);
+    const dynamicTicks = handleTicksBarChart(allValues)
     setTicks(dynamicTicks);
   }, []);
 
@@ -171,7 +150,7 @@ const BarChartVertical = () => {
             axisLine={false}
             tickLine={false}
             ticks={ticks}
-            // domain={[0, ticks[ticks.length - 1]]}
+            domain={[0, ticks[ticks.length - 1]]}
             tick={(props) => {
               const { x, y, payload } = props;
               return (
