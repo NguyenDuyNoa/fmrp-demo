@@ -12,12 +12,12 @@ import PieChart from "./components/PieChart";
 import ProductionProgressTracker from "./components/ProductionProgressTracker";
 import TableChart from "./components/TableChart";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TopProducts from "./components/TopProducts";
-import BarChartVertical from "./components/BarChartVertical";
-import BarChartHorizontal from "./components/BarChartHorizontal";
-import PieChartNew from "./components/PieChartNew";
-import ListProgress from "./components/ListProgress";
-import ListMaterial from "./components/ListMaterial";
+import TopProducts from "./components/newCharts/TopProducts";
+import BarChartVertical from "./components/newCharts/BarChartVertical";
+import BarChartHorizontal from "./components/newCharts/BarChartHorizontal";
+import PieChartNew from "./components/newCharts/PieChartNew";
+import ListProgress from "./components/newCharts/ListProgress";
+import ListMaterial from "./components/newCharts/ListMaterial";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -37,7 +37,25 @@ const Dashboard = (props) => {
         <title>Tổng quan</title>
       </Head>
 
-      <Customscrollbar className="px-10 py-8 pt-24 space-y-5 overflow-x-auto overflow-y-auto text">
+
+      <div className="py-6 flex flex-col gap-6 bg-[#FDFDFE] min-h-screen">
+        <TopProducts />
+        <div className="flex flex-col md:flex-row gap-6 px-4 md:px-12">
+          <BarChartVertical />
+          <BarChartHorizontal />
+        </div>
+        <div className="grid grid-cols-1 std:grid-cols-3 gap-6 px-4 md:px-12">
+          <div className="col-span-1 std:col-span-1">
+            <PieChartNew />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 std:col-span-2">
+            <ListProgress />
+            <ListMaterial />
+          </div>
+        </div>
+      </div>
+
+      {/* <Customscrollbar className="px-10 py-8 pt-24 space-y-5 overflow-x-auto overflow-y-auto text">
         {dataPstWH && (
           <div
             style={{
@@ -50,24 +68,9 @@ const Dashboard = (props) => {
               zIndex: 9999, // Đảm bảo lớp phủ nằm trên các phần tử khác trên trang
             }}
           />
-        )}
+        )} */}
 
-        {/* new Dashboard */}
-        <div className="py-6 flex flex-col gap-6 bg-[#FDFDFE] min-h-screen">
-          <TopProducts />
-
-          <div className="flex flex-col md:flex-row gap-6 px-4 md:px-12">
-            <BarChartVertical />
-            <BarChartHorizontal />
-          </div>
-          <div className="grid grid-cols-1 std:grid-cols-3 gap-6 px-4 md:px-12">
-            <PieChartNew />
-            <ListProgress />
-            <ListMaterial />
-          </div>
-        </div>
-
-        {/* <div className={`${statusExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
+      {/* <div className={`${statusExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
                     <h3 className="text-[#11315B] text-lg font-medium not-italic	leading-6">Lệnh sản xuất</h3>
                     <button
                         style={{
@@ -83,7 +86,7 @@ const Dashboard = (props) => {
                         </span>
                     </button>
                 </div> */}
-        {/* <div className="flex flex-col gap-3">
+      {/* <div className="flex flex-col gap-3">
                     <ListTask {...props} />
                     <div className="grid grid-cols-2 gap-5">
                         <PieChart {...props} />
@@ -96,7 +99,10 @@ const Dashboard = (props) => {
                         <BarChart {...props} />
                     </div>
                 </div> */}
-      </Customscrollbar>
+      {/* </Customscrollbar> */}
+
+      {/* new Dashboard */}
+
     </React.Fragment>
   );
 };

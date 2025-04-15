@@ -89,14 +89,12 @@ const BarChartVertical = () => {
   }, []);
 
   return (
-    <div className="p-6 rounded-2xl bg-neutral-00 w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
+    <div className="xlg:p-6 p-3 rounded-2xl bg-neutral-00 w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
       <div className="flex justify-between items-center mb-6">
         <h2 className="capitalize text-lg font-medium text-typo-black-1">
           Kế Hoạch Sản Xuất
         </h2>
-        <CalendarDropdown
-          defaultRange={{ label: "Quý này", value: "thisQuarter" }}
-        />
+        <CalendarDropdown />
       </div>
 
       <div className="flex items-center justify-end gap-4 mb-4 px-4">

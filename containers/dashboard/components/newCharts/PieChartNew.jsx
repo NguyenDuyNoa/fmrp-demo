@@ -102,6 +102,7 @@ const PieChartNew = () => {
                     endAngle={endAngle}
                     fill={color}
                     cornerRadius={15}
+                // cornerRadius={5}
                 />
                 <path
                     d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
@@ -142,18 +143,16 @@ const PieChartNew = () => {
     }, []);
 
     return (
-        <div className="flex flex-col gap-5 w-full p-6 rounded-2xl bg-white shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
+        <div className="flex flex-col gap-5 w-full xlg:p-6 p-3 rounded-2xl bg-white shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="truncate capitalize text-lg font-medium text-typo-gray-3">
                     Tình hình sản xuất
                 </h2>
                 <div className="flex items-center gap-2">
-                    <CalendarDropdown
-                        defaultRange={{ label: "Hôm nay", value: "today" }}
-                    />
+                    <CalendarDropdown />
                 </div>
             </div>
-            <div className="relative h-full std:min-h-[322px] min-h-[350px]">
+            <div className="relative h-[350px] xl:min-h-[322px] min-h-[350px]">
                 <ResponsiveContainer width="100%" height="100%" >
                     <PieChart>
                         <Pie
@@ -169,10 +168,10 @@ const PieChartNew = () => {
                             activeShape={isLoading ? undefined : renderActiveShape}
                             activeIndex={[0, 1, 2]}
                             cornerRadius={15}
-                            className='bg-red-400'
+                            minAngle={2}
                         >
                             {data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} className='bg-red-900' />
+                                <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
                         </Pie>
                     </PieChart>

@@ -53,14 +53,12 @@ const BarChartHorizontal = () => {
     }, []);
 
     return (
-        <div className="p-6 rounded-2xl bg-neutral-00 w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
+        <div className="xlg:p-6 p-3  rounded-2xl bg-neutral-00 w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-6">
-                <h2 className="truncate capitalize text-lg font-medium  text-typo-black-1">
+                <h2 className="flex-1 capitalize text-lg font-medium  text-typo-black-1">
                     Top 5 Khách Hàng Có Sản Lượng Nhiều Nhất
                 </h2>
-                <CalendarDropdown
-                    defaultRange={{ label: "Năm này", value: "thisYear" }}
-                />
+                <CalendarDropdown />
             </div>
 
             <ResponsiveContainer width="100%" height={316}>

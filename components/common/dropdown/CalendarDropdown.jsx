@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 
-const timeRanges = [
+export const timeRanges = [
     { label: "Hôm nay", value: "today" },
     { label: "Tuần này", value: "thisWeek" },
     { label: "Tháng này", value: "thisMonth" },
@@ -9,8 +9,17 @@ const timeRanges = [
     { label: "Năm này", value: "thisYear" },
 ];
 
-const CalendarDropdown = ({ onRangeChange, defaultRange = timeRanges[2] }) => {
-    const [selectedRange, setSelectedRange] = useState(defaultRange);
+export const productionStatuses = [
+    { label: "Chưa bắt đầu", value: "notStarted" },
+    { label: "Đang chờ", value: "pending" },
+    { label: "Đang sản xuất", value: "inProgress" },
+    { label: "Hoàn thành", value: "completed" },
+    { label: "Chậm tiến độ", value: "delayed" }
+];
+
+const CalendarDropdown = ({ onRangeChange, dataRanges = timeRanges }) => {
+
+    const [selectedRange, setSelectedRange] = useState(dataRanges[2]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -41,7 +50,7 @@ const CalendarDropdown = ({ onRangeChange, defaultRange = timeRanges[2] }) => {
         <div className="relative w-fit" ref={dropdownRef}>
             <div
                 onClick={toggleDropdown}
-                className="h-10 w-fit flex items-center gap-2 px-3 py-2 bg-neutral-00 rounded-lg border border-neutral-02 cursor-pointer"
+                className="h-10 w-fit flex items-center gap-2 std:px-3 std:py-2 px-2 py-2 bg-white rounded-lg border border-border-gray-2 cursor-pointer"
             >
                 <div className="flex items-center gap-2">
                     <Image
@@ -50,7 +59,7 @@ const CalendarDropdown = ({ onRangeChange, defaultRange = timeRanges[2] }) => {
                         width={24}
                         height={24}
                     />
-                    <p className="text-sm font-normal text-neutral-07">
+                    <p className="std:text-sm  text-xs font-normal text-typo-gray-3">
                         {selectedRange.label}
                     </p>
                 </div>
@@ -66,13 +75,13 @@ const CalendarDropdown = ({ onRangeChange, defaultRange = timeRanges[2] }) => {
             {isOpen && (
                 <div
                     className="absolute z-50 mt-1 w-full bg-white border border-neutral-02 rounded-lg shadow-lg animate-dropdown-enter
-                     transform origin-top"
+                     transform origin-top overflow-hidden"
                 >
-                    {timeRanges.map((range) => (
+                    {dataRanges.map((range) => (
                         <div
                             key={range.value}
                             onClick={() => handleRangeSelect(range)}
-                            className="px-3 py-2 hover:bg-neutral-01 cursor-pointer text-sm font-normal text-neutral-07 
+                            className="px-3 py-2 hover:bg-background-gray-3 cursor-pointer text-sm font-normal text-neutral-07 
                          transition-colors duration-200 ease-in-out"
                         >
                             {range.label}
