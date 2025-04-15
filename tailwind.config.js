@@ -25,6 +25,7 @@ module.exports = {
             1: "#9295A4",
             2: "#667085",
             3: "#3A3E4C"
+            
           },
           black: {
             1: '#141522',
@@ -34,11 +35,15 @@ module.exports = {
           green: {
             1: "#1A7526",
             2: "#1FC583"
+          },
+          orange: {
+            1: "#FF8F0D"
           }
         },
         border: {
           gray: {
             1: "#D0D5DD",
+            2: "#DDDDE2"
           },
         },
         background: {

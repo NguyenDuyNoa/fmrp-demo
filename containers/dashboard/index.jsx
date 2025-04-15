@@ -60,7 +60,7 @@ const Dashboard = (props) => {
             <BarChartVertical />
             <BarChartHorizontal />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 md:px-12">
+          <div className="grid grid-cols-1 std:grid-cols-3 gap-6 px-4 md:px-12">
             <PieChartNew />
             <ListProgress />
             <ListMaterial />
