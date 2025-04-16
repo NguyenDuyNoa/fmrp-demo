@@ -24,6 +24,7 @@ import React, { useEffect, useState } from "react";
 import PopupCategory from "./components/popupCategory";
 import { useCategoryList } from "./hooks/useCategory";
 import { ListBtn_Setting } from "./information";
+import { useSelector } from "react-redux";
 
 const Category = (props) => {
     const dataLang = props.dataLang;
@@ -53,7 +54,7 @@ const Category = (props) => {
             query: { tab: router.query?.tab, }
         });
     }, 500)
-
+    const dataSetting = useSelector((state) => state.setings);
 
     return (
         <React.Fragment>
@@ -81,8 +82,11 @@ const Category = (props) => {
                     </div>
                 )}
                 <div className="grid grid-cols-9 gap-5 h-[99%]">
-                    <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
-                        <ListBtn_Setting dataLang={dataLang} />
+                    <div className="col-span-2 sticky ">
+                        <div className="h-fit p-5 rounded bg-[#E2F0FE] space-y-3 mb-3">
+                            <ListBtn_Setting dataLang={dataLang} />
+                        </div>
+                        <p className="w-full text-center text-[#667085] font-normal text-sm">Phiên bản V{dataSetting?.versions}</p>
                     </div>
                     <ContainerBody>
                         <div className="space-y-3 h-[96%] overflow-hidden">

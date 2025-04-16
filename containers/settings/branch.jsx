@@ -21,6 +21,7 @@ import "react-phone-input-2/lib/style.css";
 import PopupBranch from "./components/popupBranch";
 import { useBranchPageList, useWarehousesList } from "./hooks/usseBranch";
 import { ListBtn_Setting } from "./information";
+import { useSelector } from "react-redux";
 const Branch = (props) => {
     const router = useRouter();
 
@@ -44,7 +45,7 @@ const Branch = (props) => {
         sKeySearch(value);
         router.replace("/settings/branch");
     }, 500);
-
+    const dataSetting = useSelector((state) => state.setings);
     return (
         <React.Fragment>
             <Head>
@@ -61,8 +62,11 @@ const Branch = (props) => {
                     </div>
                 )}
                 <div className="grid grid-cols-9 gap-5 h-[99%] overflow-hidden">
-                    <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
-                        <ListBtn_Setting dataLang={dataLang} />
+                    <div className="col-span-2 sticky ">
+                        <div className="h-fit p-5 rounded bg-[#E2F0FE] space-y-3 mb-3">
+                            <ListBtn_Setting dataLang={dataLang} />
+                        </div>
+                        <p className="w-full text-center text-[#667085] font-normal text-sm">Phiên bản V{dataSetting?.versions}</p>
                     </div>
                     <ContainerBody>
                         <div className="space-y-3 h-[96%] overflow-hidden">
@@ -70,12 +74,12 @@ const Branch = (props) => {
                                 <h2 className=" 2xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.branch_title}
                                 </h2>
-                                <PopupBranch
+                                {/* <PopupBranch
                                     ListWarehouse={ListWarehouse}
                                     onRefresh={refetch.bind(this)}
                                     dataLang={dataLang}
                                     className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
-                                />
+                                /> */}
 
                             </div>
                             <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
@@ -103,7 +107,7 @@ const Branch = (props) => {
                                                 {dataLang?.branch_popup_phone}
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"left"}>
-                                                {dataLang?.Warehouse_poppup_name}
+                                                Kho thành phẩm
                                             </ColumnTable>
                                             <ColumnTable colSpan={2} textAlign={"center"}>
                                                 {dataLang?.branch_popup_properties}
@@ -143,13 +147,13 @@ const Branch = (props) => {
                                                                     warehouse={e.name_warehouse}
                                                                     ListWarehouse={ListWarehouse}
                                                                 />
-                                                                <BtnAction
+                                                                {/* <BtnAction
                                                                     onRefresh={refetch.bind(this)}
                                                                     onRefreshGroup={() => { }}
                                                                     dataLang={dataLang}
                                                                     id={e?.id}
                                                                     type="settings_branch"
-                                                                />
+                                                                /> */}
                                                             </RowItemTable>
                                                         </RowTable>
                                                     ))}

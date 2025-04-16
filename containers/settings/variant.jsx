@@ -21,6 +21,7 @@ import React, { useState } from "react";
 import PopupVariant from "./components/popupVariant";
 import { useVariantList } from "./hooks/useVariant";
 import { ListBtn_Setting } from "./information";
+import { useSelector } from "react-redux";
 
 const Variant = (props) => {
     const router = useRouter();
@@ -41,7 +42,7 @@ const Variant = (props) => {
         sKeySearch(value);
         router.replace("/settings/variant");
     }, 500);
-
+    const dataSetting = useSelector((state) => state.setings);
     return (
         <React.Fragment>
             <Head>
@@ -58,8 +59,11 @@ const Variant = (props) => {
                     </div>
                 )}
                 <div className="grid grid-cols-9 gap-5 h-[99%]">
-                    <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
-                        <ListBtn_Setting dataLang={dataLang} />
+                    <div className="col-span-2 sticky ">
+                        <div className="h-fit p-5 rounded bg-[#E2F0FE] space-y-3 mb-3">
+                            <ListBtn_Setting dataLang={dataLang} />
+                        </div>
+                        <p className="w-full text-center text-[#667085] font-normal text-sm">Phiên bản V{dataSetting?.versions}</p>
                     </div>
                     <ContainerBody>
                         <div className="space-y-3 h-[96%] overflow-hidden">
