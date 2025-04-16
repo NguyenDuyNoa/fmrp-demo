@@ -6,32 +6,40 @@ import { useGetTopProducedProducts } from "@/hooks/dashboard/useGetTopProducedPr
 import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
-const CardProduct = ({ name, quantity, percentageChange }) => {
+const CardProduct = ({ name, quantity, percentageChange, className }) => {
   return (
-    <div className="flex-1 rounded-2xl p-6 flex justify-between items-start shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
-      <div className="flex flex-col">
-        <h3 className="text-3xl font-bold text-typo-blue-4">{quantity}</h3>
-        <p className="text-sm font-normal text-typo-black-1">{name}</p>
-      </div>
-      {percentageChange !== undefined && percentageChange !== 0 && (
-        <div className="flex items-center gap-1">
-          <Image
-            src={
-              percentageChange >= 0
-                ? "/dashboard/upGreen.svg"
-                : "/dashboard/downRed.svg"
-            }
-            alt={percentageChange >= 0 ? "upGreen" : "downRed"}
-            width={24}
-            height={24}
-          />
-          <p className="text-sm font-medium text-typo-gray-3">
-            {Math.abs(percentageChange)}%
-          </p>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.8 }}
+      className={`w-full h-full flex items-center justify-center ${className}`}
+    >
+      <div className="flex-1 rounded-2xl p-6 flex justify-between items-start shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
+        <div className="flex flex-col">
+          <h3 className="text-3xl font-bold text-typo-blue-4">{quantity?.toLocaleString()}</h3>
+          <p className="text-sm font-normal text-typo-black-1">{name}</p>
         </div>
-      )}
-    </div>
+        {percentageChange !== undefined && percentageChange !== 0 && (
+          <div className="flex items-center gap-1">
+            <Image
+              src={
+                percentageChange >= 0
+                  ? "/dashboard/upGreen.svg"
+                  : "/dashboard/downRed.svg"
+              }
+              alt={percentageChange >= 0 ? "upGreen" : "downRed"}
+              width={24}
+              height={24}
+            />
+            <p className="text-sm font-medium text-typo-gray-3">
+              {Math.abs(percentageChange)}%
+            </p>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 };
 

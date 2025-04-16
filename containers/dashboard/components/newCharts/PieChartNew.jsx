@@ -5,7 +5,7 @@ import { useGetProductStatus } from "@/hooks/dashboard/useGetProductStatus";
 import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
 import React, { useEffect, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
-
+import { motion } from "framer-motion";
 const defaultData = [
     {
         name: "Chưa hoàn thành",
@@ -40,7 +40,6 @@ const PieChartNew = () => {
             dateStart: dateStart,
         });
 
-
     useEffect(() => {
         if (date) {
             const range = getDateRangeFromValue(date.value);
@@ -73,7 +72,6 @@ const PieChartNew = () => {
         }
     }, [isLoadingProductStatus, dataProductStatus]);
 
-
     const {
         total = 0,
         notCompleted = 0,
@@ -84,26 +82,38 @@ const PieChartNew = () => {
         percentCompleted,
     } = currentData[0] || {};
 
-    const data = total === 0 ? defaultData : [
-        {
-            name: "Chưa hoàn thành",
-            value: notCompleted,
-            color: "#FF8F0D",
-            percent: percentNotCompleted,
-        },
-        {
-            name: "Đang sản xuất",
-            value: inProduction,
-            color: "#0375F3",
-            percent: percentInProduction,
-        },
-        {
-            name: "Hoàn thành",
-            value: completed,
-            color: "#1FC583",
-            percent: percentCompleted,
-        },
-    ];
+    const data =
+        total === 0
+            ? defaultData
+            : [
+                {
+                    name: "Chưa hoàn thành",
+                    value: notCompleted,
+                    color: "#FF8F0D",
+                    percent: percentNotCompleted,
+                },
+                {
+                    name: "Đang sản xuất",
+                    value: inProduction,
+                    color: "#0375F3",
+                    percent: percentInProduction,
+                },
+                {
+                    name: "Hoàn thành",
+                    value: completed,
+                    color: "#1FC583",
+                    percent: percentCompleted,
+                },
+            ];
+
+    const [showShape, setShowShape] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowShape(true);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, []);
 
     const renderActiveShape = (props) => {
         const RADIAN = Math.PI / 180;
@@ -140,37 +150,40 @@ const PieChartNew = () => {
                     endAngle={endAngle}
                     fill={color}
                     cornerRadius={15}
-                // cornerRadius={5}
                 />
-                <path
-                    d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
-                    stroke={color}
-                    fill="none"
-                />
-                <circle cx={ex} cy={ey} r={2} fill={color} stroke="none" />
-                <g>
-                    <rect
-                        x={ex + (cos >= 0 ? 1 : -1) * 12 - 20}
-                        y={ey - 10}
-                        width={40}
-                        height={20}
-                        fill={color}
-                        rx={10}
-                        ry={10}
-                    />
-                    <text
-                        x={ex + (cos >= 0 ? 1 : -1) * 12}
-                        y={ey}
-                        dy={5}
-                        textAnchor="middle"
-                        fill="white"
-                        fontWeight="normal"
-                        fontSize={16}
-                        style={{ padding: 20 }}
-                    >
-                        {`${payload.percent}%`}
-                    </text>
-                </g>
+                {payload.percent !== 0 && (
+                    <>
+                        <path
+                            d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+                            stroke={color}
+                            fill="none"
+                        />
+                        <circle cx={ex} cy={ey} r={2} fill={color} stroke="none" />
+                        <g>
+                            <rect
+                                x={ex + (cos >= 0 ? 1 : -1) * 12 - 20}
+                                y={ey - 10}
+                                width={40}
+                                height={20}
+                                fill={color}
+                                rx={10}
+                                ry={10}
+                            />
+                            <text
+                                x={ex + (cos >= 0 ? 1 : -1) * 12}
+                                y={ey}
+                                dy={5}
+                                textAnchor="middle"
+                                fill="white"
+                                fontWeight="normal"
+                                fontSize={16}
+                                style={{ padding: 20 }}
+                            >
+                                {`${payload.percent}%`}
+                            </text>
+                        </g>
+                    </>
+                )}
             </g>
         );
     };
@@ -211,35 +224,49 @@ const PieChartNew = () => {
                 </ResponsiveContainer>
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                     <div className="text-4xl font-semibold text-typo-black-1 mb-[2px]">
-                        {total || 0}
+                        {total?.toLocaleString() || 0}
                     </div>
                     <div className="text-base font-normal text-typo-gray-2 ">
                         Lệnh sản xuất
                     </div>
                 </div>
             </div>
-
-            <div className="flex justify-between gap-2">
-                <div className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1">
+            <div className="flex justify-between gap-2 ">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8 }}
+                    className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1"
+                >
                     <h3 className="text-2xl font-semibold text-typo-orange-1">
-                        {notCompleted}
+                        {notCompleted?.toLocaleString()}
                     </h3>
                     <p className="text-sm font-normal text-typo-black-1">
                         Chưa hoàn thành
                     </p>
-                </div>
-                <div className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1">
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8 }}
+                    className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1"
+                >
                     <h3 className="text-2xl font-semibold text-typo-blue-4">
-                        {inProduction}
+                        {inProduction?.toLocaleString()}
                     </h3>
                     <p className="text-sm font-normal text-typo-black-1">Đang sản xuất</p>
-                </div>
-                <div className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1">
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8 }}
+                    className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1"
+                >
                     <h3 className="text-2xl font-semibold text-typo-green-2">
-                        {completed}
+                        {completed?.toLocaleString()}
                     </h3>
                     <p className="text-sm font-normal text-typo-black-1">Hoàn thành</p>
-                </div>
+                </motion.div>
             </div>
         </div>
     );

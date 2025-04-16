@@ -81,6 +81,7 @@ const BarChartHorizontal = () => {
                             offset: -40,
                             style: { textAnchor: "middle", fill: "#667085", fontSize: 12 },
                         }}
+                        tickFormatter={(value) => value.toLocaleString()}
                     />
                     <YAxis
                         type="category"
@@ -92,7 +93,7 @@ const BarChartHorizontal = () => {
                             fontSize: 11,
                             fill: "#9295A4",
                         }}
-                        tickFormatter={(value) => value}
+                        tickFormatter={(value) => value.toString()}
                         label={{
                             value: "Khách hàng",
                             position: "top",
@@ -102,6 +103,7 @@ const BarChartHorizontal = () => {
                         }}
                     />
                     <Tooltip
+                        formatter={(value) => value.toLocaleString()}
                         cursor={false}
                         content={({ active, payload, coordinate }) => {
                             if (active && payload && payload.length) {
@@ -117,7 +119,7 @@ const BarChartHorizontal = () => {
                                         >
                                             <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-r-[8px] border-r-neutral-900 border-b-[6px] border-b-transparent" />
 
-                                            <p className="text-sm font-medium">{payload[0].value}</p>
+                                            <p className="text-sm font-medium">{payload[0].value.toLocaleString()}</p>
                                         </div>
                                     </div>
                                 );

@@ -1,95 +1,181 @@
 import Cardtable from "@/components/common/card/Cardtable";
-import CalendarDropdown, { timeRanges } from "@/components/common/dropdown/CalendarDropdown";
+import CalendarDropdown, {
+  timeRanges,
+} from "@/components/common/dropdown/CalendarDropdown";
 import NoData from "@/components/UI/noData/nodata";
-import React, { useState } from "react";
-
-const materialsData = [
-  {
-    id: 1,
-    name: "Chỉ cotton",
-    code: "NVL_000014",
-    unit: "Cuộn",
-    quantity: 8,
-  },
-  { id: 2, name: "Vải lụa", code: "NVL_000024", unit: "Mét", quantity: 8 },
-  { id: 3, name: "Vải lót", code: "NVL_000024", unit: "Mét", quantity: 8 },
-  {
-    id: 4,
-    name: "Vải chống thấm",
-    code: "NVL_000024",
-    unit: "Mét",
-    quantity: 8,
-  },
-  { id: 5, name: "Vải nỉ", code: "NVL_000024", unit: "Mét", quantity: 8 },
-];
-
+import { useGetMaterialsToPurchase } from "@/hooks/dashboard/useGetMaterialsToPurchase";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
+import React, { useEffect, useState } from "react";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import Loading from "@/components/UI/loading/loading";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import {
+  ColumnTable,
+  HeaderTable,
+  RowItemTable,
+  RowTable,
+} from "@/components/UI/common/Table";
 const ListMaterial = () => {
-  const [materials, setMaterials] = useState(materialsData);
+  const [materials, setMaterials] = useState([]);
+  const [limit, setLimit] = useState(5);
+  const [dateStart, setDateStart] = useState("");
+  const [dateEnd, setDateEnd] = useState("");
   const [date, setDate] = useState(timeRanges[4]);
+  const { data, isLoading } = useGetMaterialsToPurchase({
+    dateEnd: dateEnd,
+    dateStart: dateStart,
+  });
+  const dataSeting = useSetingServer();
+  const formatNumber = (number) => {
+    return formatNumberConfig(+number, dataSeting);
+  };
+
+  useEffect(() => {
+    if (date) {
+      const range = getDateRangeFromValue(date.value);
+      setDateStart(range ? range.startDate : "");
+      setDateEnd(range ? range.endDate : "");
+    }
+  }, [date]);
+
+  useEffect(() => {
+    if (!isLoading && data) {
+      setMaterials(data?.items);
+    }
+  }, [isLoading, data]);
 
   return (
-    <div className="rounded-2xl bg-white w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
+    <div className="max-h-[600px] rounded-2xl h-full flex flex-col overflow-hidden bg-white w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
       <div className="py-6 px-4 flex justify-between items-center">
         <h2 className="flex-1 capitalize text-lg font-medium text-typo-black-1">
           Nguyên Vật Liệu Cần Mua
         </h2>
         <CalendarDropdown setState={setDate} />
       </div>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full">
-          <thead className="bg-[#F3F4F6] h-12  border-[#F3F3F4]">
-            <tr>
-              <th className="p-2 text-center font-semibold text-xs text-typo-gray-5">
+      <div className="flex-1 min-h-0 h-full">
+        <Customscrollbar
+          className={`min-h-0 h-full w-full overflow-x-auto bg-white`}
+        >
+          <div>
+            <HeaderTable
+              gridCols={12}
+              display={"grid"}
+              className="pt-0 px-1 pb-1"
+            >
+              <ColumnTable
+                colSpan={1}
+                textAlign={"center"}
+                className={`normal-case leading-2 text-typo-gray-5 3xl:!text-[14px] xl:text-[11px]
+                                          }`}
+              >
                 STT
-              </th>
-              <th className="p-2 text-left font-semibold text-xs text-typo-gray-5">
+              </ColumnTable>
+              <ColumnTable
+                colSpan={5}
+                textAlign={"left"}
+                className={`border-none normal-case leading-2 text-typo-gray-5 3xl:px-3 px-1 std:!text-[13px] xl:text-[11px]
+                                          }`}
+              >
                 Nguyên vật liệu
-              </th>
-              <th className="p-2 text-left font-semibold text-xs text-typo-gray-5">
+              </ColumnTable>
+              <ColumnTable
+                colSpan={3}
+                textAlign={"center"}
+                className={`border-none  normal-case leading-2 text-typo-gray-5 std:!text-[13px] xl:text-[11px]
+                                              }`}
+              >
                 Đơn vị tính
-              </th>
-              <th className="p-2 text-center font-semibold text-xs text-typo-gray-5">
+              </ColumnTable>
+              <ColumnTable
+                colSpan={3}
+                textAlign={"center"}
+                className={`px-0 border-none normal-case leading-2 text-typo-gray-5 std:!text-[13px] xl:text-[11px]
+                                          }`}
+              >
                 Số lượng
-              </th>
-            </tr>
-          </thead>
-          {materials.length === 0 ? (
-            <tbody>
-              <tr>
-                <td colSpan={4} className="text-center py-4">
-                  <div className="flex flex-col items-center justify-center">
-                    <NoData className="mt-0" type="table" />
+              </ColumnTable>
+            </HeaderTable>
+            {materials && materials?.length > 0 ? (
+              <>
+                {materials?.slice(0, limit).map((item, index) => (
+                  <div
+                    className="divide-y divide-slate-200 h-[100%] "
+                    key={item.item_id}
+                  >
+                    {
+                      <RowTable gridCols={12}>
+                        {/* stt */}
+                        <RowItemTable
+                          colSpan={1}
+                          textAlign={"center"}
+                          // textSize={`"!text-sm"`}
+                          className="font-semibold xlg:text-sm leading-2 text-typo-black-1  std:!text-[12px] xl:text-[11px]"
+                        >
+                          {index + 1}
+                        </RowItemTable>
+                        <RowItemTable
+                          colSpan={5}
+                          textAlign={"start"}
+                        // textSize={`"!text-xs"`}
+                        >
+                          {/* card */}
+                          <Cardtable
+                            code={item.item_code}
+                            name={item.item_name}
+                            typeTable="materials"
+                            classNameImage="2xl:size-10 size-8"
+                            variation={item?.item_variation}
+                            imageURL={item?.images}
+                          />
+                        </RowItemTable>
+                        <RowItemTable
+                          colSpan={3}
+                          textAlign={"center"}
+                          // textSize={`"!text-sm"`}
+                          className="font-semibold  leading-2 text-typo-black-1 std:text-[12px] xl:text-[11px]"
+                        >
+                          {/* Đơn vị tính */}
+                          {item.unit_name}
+                        </RowItemTable>
+
+                        <RowItemTable
+                          colSpan={3}
+                          textAlign={"center"}
+                          // textSize={`"!text-sm"`}
+                          className="font-semibold  leading-2 text-typo-black-1 std:text-[12px] xl:text-[11px]"
+                        >
+                          {formatNumber(+item.quantity)}
+                        </RowItemTable>
+                      </RowTable>
+                    }
                   </div>
-                </td>
-              </tr>
-            </tbody>
-          ) : (
-            <tbody>
-              {materials.map((material) => (
-                <tr key={material.id} className="border-t border-[#F3F3F4]">
-                  <td className="p-2 text-center font-semibold text-sm text-typo-black-1">
-                    {material.id}
-                  </td>
-                  <td className="py-4 px-2">
-                    <Cardtable
-                      code={material.code}
-                      name={material.name}
-                      typeTable="materials"
-                      classNameImage="2xl:size-10 size-8"
-                    />
-                  </td>
-                  <td className="p-2 font-semibold text-sm text-typo-black-1">
-                    {material.unit}
-                  </td>
-                  <td className="p-2 text-center font-semibold text-sm text-typo-black-1">
-                    {material.quantity}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </table>
+                ))}
+              </>
+            ) : (
+              <>
+                <NoData className="mt-0 col-span-16" type="table" />
+              </>
+            )}
+          </div>
+          <div className="w-full">
+            {materials?.length > 0 && (
+              <div className="flex items-center w-full justify-center h-fit">
+                <div />
+                {limit < materials.length && (
+                  <div className=" flex justify-center py-2">
+                    <button
+                      onClick={() => setLimit(materials.length)}
+                      className="text-[#667085] 3xl:text-base xl:text-sm text-xs hover:underline font-semibold"
+                    >
+                      Xem thêm ({materials.length - limit}){" "}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </Customscrollbar>
       </div>
     </div>
   );
