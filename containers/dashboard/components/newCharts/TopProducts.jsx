@@ -1,4 +1,6 @@
-import CalendarDropdown, { timeRanges } from "@/components/common/dropdown/CalendarDropdown";
+import CalendarDropdown, {
+  timeRanges,
+} from "@/components/common/dropdown/CalendarDropdown";
 import Loading from "@/components/UI/loading/loading";
 import { useGetTopProducedProducts } from "@/hooks/dashboard/useGetTopProducedProducts";
 import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
@@ -32,8 +34,6 @@ const CardProduct = ({ name, quantity, percentageChange }) => {
     </div>
   );
 };
-
-
 
 const NoDataTopProduct = () => {
   const topProductsNoData = [
@@ -84,6 +84,7 @@ const NoDataTopProduct = () => {
 };
 
 const TopProducts = () => {
+  const [topProducts, setTopProducts] = useState([]);
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
   const [date, setDate] = useState(timeRanges[4]);
@@ -100,6 +101,10 @@ const TopProducts = () => {
     }
   }, [date]);
 
+  useEffect(() => {
+    if (!isLoading && data) setTopProducts(data?.items);
+  }, [isLoading, data]);
+
   return (
     <div className="px-4 md:px-8 lg:px-12 flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
@@ -111,9 +116,9 @@ const TopProducts = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-4 md:gap-6">
         {isLoading ? (
           <Loading className="h-80" color="#0f4f9e" />
-        ) : data && data?.items.length > 0 ? (
+        ) : data && topProducts.length > 0 ? (
           <>
-            {data?.items.map((product, index) => (
+            {topProducts.map((product, index) => (
               <CardProduct
                 key={index}
                 name={product.item_name}

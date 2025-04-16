@@ -1,5 +1,7 @@
 import CalendarDropdown, { timeRanges } from "@/components/common/dropdown/CalendarDropdown";
+import { useGetTop5Customers } from "@/hooks/dashboard/useGetTop5Customers";
 import { handleTicksBarChart } from "@/utils/helpers/deviceTicksChart";
+import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
 import React, { useEffect, useState } from "react";
 import {
     Bar,
@@ -11,46 +13,38 @@ import {
     YAxis,
 } from "recharts";
 
-const top5CustomersData = [
-    {
-        name: "Công ty Dệt may Happy Polla",
-        volume: 3100,
-    },
-    {
-        name: "Công ty May mặc Saigon trendy",
-        volume: 2900,
-    },
-    {
-        name: "Outlet Lemon squeeze",
-        volume: 3300,
-    },
-    {
-        name: "Shop quần áo streetwear New Era",
-        volume: 2700,
-    },
-    {
-        name: "Shop thời trang công sở Basic Office",
-        volume: 2600,
-    },
-];
-
 const BarChartHorizontal = () => {
-    const [top5Customers, setTop5Customers] = useState();
-    const [ticks, setTicks] = useState([]);
+    const [ticks, setTicks] = useState([0, 800, 1600, 2400, 3200]);
+    const [customers, setCustomers] = useState();
+    const [dateStart, setDateStart] = useState("");
+    const [dateEnd, setDateEnd] = useState("");
     const [date, setDate] = useState(timeRanges[4]);
-    useEffect(() => {
-        const processedData = top5CustomersData.map((customer) => ({
-            ...customer,
-            name: customer.name || "-",
-        }));
-        setTop5Customers(processedData);
 
-        const allValues = processedData.flatMap((item) => {
-            return [item.volume];
-        });
-        const dynamicTicks = handleTicksBarChart(allValues);
-        setTicks(dynamicTicks);
-    }, []);
+    const { data, isLoading } = useGetTop5Customers({
+        limited: 5,
+        dateEnd: dateEnd,
+        dateStart: dateStart,
+
+    });
+
+    useEffect(() => {
+        if (date) {
+            const range = getDateRangeFromValue(date.value);
+            setDateStart(range ? range.startDate : "");
+            setDateEnd(range ? range.endDate : "");
+        }
+    }, [date]);
+
+    useEffect(() => {
+        if (!isLoading && data) {
+            setCustomers(data?.items);
+            const allValues = data?.items?.flatMap((item) => [
+                item.total_quantity
+            ]);
+            const dynamicTicks = allValues.length > 0 ? handleTicksBarChart(allValues) : [0, 800, 1600, 2400, 3200];
+            setTicks(dynamicTicks);
+        }
+    }, [isLoading, data]);
 
     return (
         <div className="xlg:p-6 p-3  rounded-2xl bg-neutral-00 w-full shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
@@ -63,7 +57,7 @@ const BarChartHorizontal = () => {
 
             <ResponsiveContainer width="100%" height={316}>
                 <BarChart
-                    data={top5Customers}
+                    data={customers}
                     layout="vertical"
                     margin={{ top: 30, right: 40, left: 0, bottom: 0 }}
                 >
@@ -95,7 +89,7 @@ const BarChartHorizontal = () => {
                         tickLine={false}
                         width={120}
                         tick={{
-                            fontSize: 12,
+                            fontSize: 11,
                             fill: "#9295A4",
                         }}
                         tickFormatter={(value) => value}
@@ -132,7 +126,7 @@ const BarChartHorizontal = () => {
                         }}
                     />
                     <Bar
-                        dataKey="volume"
+                        dataKey="total_quantity"
                         fill="#1E88E5"
                         barSize={8}
                         radius={[0, 4, 4, 0]}

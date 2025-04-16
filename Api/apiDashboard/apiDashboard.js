@@ -36,6 +36,12 @@ const apiDashboard = {
         const response = await axiosCustom('GET', `/api_web/Api_Dashboard/dashboardTop5Customers`, params);
         return response.data
     },
+    // Tình hình sản xuất
+    async apiGetDashboardStatusProduct(params) {
+        const response = await axiosCustom('GET', `/api_web/Api_Dashboard/dashboardProductionStatus`, params);
+        return response.data
+    },
+
     async apiLang(langDefault) {
         const response = await axiosCustom('GET', `/api_web/Api_Lang/language/${langDefault}`);
         return response.data
