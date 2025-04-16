@@ -13,8 +13,6 @@ export const useGetTopProducedProducts = ({ limited = 5, dateStart = "", dateEnd
                     date_end: dateEnd
                 }
             });
-            console.log("🚀 ~ queryFn: ~ res:", res)
-
 
             return {
                 ...res.data,
@@ -26,21 +24,9 @@ export const useGetTopProducedProducts = ({ limited = 5, dateStart = "", dateEnd
                     }
                 })
             }
-            // return {
-            //     ...res,
-            //     data: {
-            //         ...res.data,
-            //         items: res?.data?.items?.map(e => {
-            //             return {
-            //                 ...e,
-            //                 type: e?.item_name,
-            //                 value: +e?.quantity,
-            //             }
-            //         })
-            //     }
-            // }
         },
         placeholderData: keepPreviousData,
+        enabled: !!dateStart && !!dateEnd,
         ...optionsQuery
     })
 

@@ -2,32 +2,33 @@ import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
-export const useGetProductionProgressByGroup = () => {
+export const useGetProductionProgressByGroup = ({ limited = 7, dateStart = "", dateEnd = "" }) => {
     return useQuery({
-        queryKey: ["api_getproduction_progress_by_group"],
+        queryKey: ["api_getproduction_progress_by_group", { limited, dateStart, dateEnd }],
         queryFn: async () => {
             const res = await apiDashboard.apiGetDashboardProductionProgressByGroup({
                 params: {
-                    limit: 8
+                    limit: limited,
+                    date_start: dateStart,
+                    date_end: dateEnd
                 }
             });
-            return res
+            // return res.data
+
+            return {
+                ...res.data,
+                items: res?.data?.items?.map(e => {
+                    return {
+                        ...e,
+                        quantity: +e?.quantity,
+                        quantity_enter: +e?.quantity_enter
+                    }
+                })
+            }
+
         },
-        //     return {
-        //         ...res,
-        //         data: {
-        //             ...res.data,
-        //             items: res?.data?.items?.map(e => {
-        //                 return {
-        //                     ...e,
-        //                     type: e?.item_name,
-        //                     value: +e?.quantity,
-        //                 }
-        //             })
-        //         }
-        //     }
-        // },
         placeholderData: keepPreviousData,
+        enabled: !!dateStart && !!dateEnd,
         ...optionsQuery
     })
 
