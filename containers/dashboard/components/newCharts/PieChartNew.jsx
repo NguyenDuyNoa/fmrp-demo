@@ -1,71 +1,119 @@
-import CalendarDropdown, { timeRanges } from '@/components/common/dropdown/CalendarDropdown';
-import React, { useEffect, useState } from 'react'
+import CalendarDropdown, {
+    timeRanges,
+} from "@/components/common/dropdown/CalendarDropdown";
+import { useGetProductStatus } from "@/hooks/dashboard/useGetProductStatus";
+import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
+import React, { useEffect, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
-const situationData = [
-    {
-        id: 1,
-        total: 16,
-        notCompleted: 5,
-        inProduction: 6,
-        completed: 5,
-    },
-];
-
+import { motion } from "framer-motion";
 const defaultData = [
     {
         name: "Chưa hoàn thành",
         value: 33,
         color: "#CCCCCC",
-        percent: 33,
+        percent: 0,
     },
     {
         name: "Đang sản xuất",
         value: 33,
         color: "#CCCCCC",
-        percent: 33,
+        percent: 0,
     },
     {
         name: "Hoàn thành",
         value: 34,
         color: "#CCCCCC",
-        percent: 34,
+        percent: 0,
     },
 ];
 
-
-
-
 const PieChartNew = () => {
-    const [currentData, setCurrentData] = useState(situationData);
+    const [currentData, setCurrentData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [date, setDate] = useState(timeRanges[4]);
+    const [dateStart, setDateStart] = useState("");
+    const [dateEnd, setDateEnd] = useState("");
+
+    const { data: dataProductStatus, isLoading: isLoadingProductStatus } =
+        useGetProductStatus({
+            dateEnd: dateEnd,
+            dateStart: dateStart,
+        });
+
+    useEffect(() => {
+        if (date) {
+            const range = getDateRangeFromValue(date.value);
+            setDateStart(range ? range.startDate : "");
+            setDateEnd(range ? range.endDate : "");
+        }
+    }, [date]);
+
+    useEffect(() => {
+        setIsLoading(false);
+        if (!isLoadingProductStatus && dataProductStatus) {
+            const status = dataProductStatus.status || [];
+            const total = status.find((item) => item.id === -1)?.count || 0;
+            const notCompleted = status.find((item) => item.id === 0);
+            const inProduction = status.find((item) => item.id === 1);
+            const completed = status.find((item) => item.id === 2);
+            const mappedData = [
+                {
+                    id: 1,
+                    total,
+                    notCompleted: notCompleted?.count,
+                    inProduction: inProduction?.count,
+                    completed: completed?.count,
+                    percentNotCompleted: notCompleted?.percent,
+                    percentInProduction: inProduction?.percent,
+                    percentCompleted: completed?.percent,
+                },
+            ];
+            setCurrentData(mappedData);
+        }
+    }, [isLoadingProductStatus, dataProductStatus]);
+
     const {
         total = 0,
         notCompleted = 0,
         inProduction = 0,
         completed = 0,
+        percentNotCompleted,
+        percentInProduction,
+        percentCompleted,
     } = currentData[0] || {};
 
-    const data = currentData.length === 0 ? defaultData : [
-        {
-            name: "Chưa hoàn thành",
-            value: notCompleted,
-            color: "#FF8F0D",
-            percent: Math.round((notCompleted / total) * 100),
-        },
-        {
-            name: "Đang sản xuất",
-            value: inProduction,
-            color: "#0375F3",
-            percent: Math.round((inProduction / total) * 100),
-        },
-        {
-            name: "Hoàn thành",
-            value: completed,
-            color: "#1FC583",
-            percent: Math.round((completed / total) * 100),
-        },
-    ];
+    const data =
+        total === 0
+            ? defaultData
+            : [
+                {
+                    name: "Chưa hoàn thành",
+                    value: notCompleted,
+                    color: "#FF8F0D",
+                    percent: percentNotCompleted,
+                },
+                {
+                    name: "Đang sản xuất",
+                    value: inProduction,
+                    color: "#0375F3",
+                    percent: percentInProduction,
+                },
+                {
+                    name: "Hoàn thành",
+                    value: completed,
+                    color: "#1FC583",
+                    percent: percentCompleted,
+                },
+            ];
+
+    const [showShape, setShowShape] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowShape(true);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, []);
 
     const renderActiveShape = (props) => {
         const RADIAN = Math.PI / 180;
@@ -102,45 +150,43 @@ const PieChartNew = () => {
                     endAngle={endAngle}
                     fill={color}
                     cornerRadius={15}
-                // cornerRadius={5}
                 />
-                <path
-                    d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
-                    stroke={color}
-                    fill="none"
-                />
-                <circle cx={ex} cy={ey} r={2} fill={color} stroke="none" />
-                <g>
-                    <rect
-                        x={ex + (cos >= 0 ? 1 : -1) * 12 - 20}
-                        y={ey - 10}
-                        width={40}
-                        height={20}
-                        fill={color}
-                        rx={10}
-                        ry={10}
-                    />
-                    <text
-                        x={ex + (cos >= 0 ? 1 : -1) * 12}
-                        y={ey}
-                        dy={5}
-                        textAnchor="middle"
-                        fill="white"
-                        fontWeight="normal"
-                        fontSize={16}
-                        style={{ padding: 20 }}
-                    >
-                        {`${payload.percent}%`}
-                    </text>
-                </g>
+                {payload.percent !== 0 && (
+                    <>
+                        <path
+                            d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+                            stroke={color}
+                            fill="none"
+                        />
+                        <circle cx={ex} cy={ey} r={2} fill={color} stroke="none" />
+                        <g>
+                            <rect
+                                x={ex + (cos >= 0 ? 1 : -1) * 12 - 20}
+                                y={ey - 10}
+                                width={40}
+                                height={20}
+                                fill={color}
+                                rx={10}
+                                ry={10}
+                            />
+                            <text
+                                x={ex + (cos >= 0 ? 1 : -1) * 12}
+                                y={ey}
+                                dy={5}
+                                textAnchor="middle"
+                                fill="white"
+                                fontWeight="normal"
+                                fontSize={16}
+                                style={{ padding: 20 }}
+                            >
+                                {`${payload.percent}%`}
+                            </text>
+                        </g>
+                    </>
+                )}
             </g>
         );
     };
-
-
-    useEffect(() => {
-        setIsLoading(false);
-    }, []);
 
     return (
         <div className="flex h-full flex-col gap-5 w-full xlg:p-6 p-3 rounded-2xl bg-white shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12),0px_0px_2px_0px_rgba(145,158,171,0.20)]">
@@ -153,7 +199,7 @@ const PieChartNew = () => {
                 </div>
             </div>
             <div className="relative h-full xl:min-h-[322px] min-h-[350px]">
-                <ResponsiveContainer width="100%" height="100%" >
+                <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
                             data={data}
@@ -178,34 +224,52 @@ const PieChartNew = () => {
                 </ResponsiveContainer>
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                     <div className="text-4xl font-semibold text-typo-black-1 mb-[2px]">
-                        {total || 0}
+                        {total?.toLocaleString() || 0}
                     </div>
                     <div className="text-base font-normal text-typo-gray-2 ">
                         Lệnh sản xuất
                     </div>
                 </div>
             </div>
-
-            <div className="flex justify-between gap-2">
-                <div className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1">
+            <div className="flex justify-between gap-2 ">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8 }}
+                    className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1"
+                >
                     <h3 className="text-2xl font-semibold text-typo-orange-1">
-                        {notCompleted}
+                        {notCompleted?.toLocaleString()}
                     </h3>
-                    <p className="text-sm font-normal text-typo-black-1">Chưa hoàn thành</p>
-                </div>
-                <div className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1">
+                    <p className="text-sm font-normal text-typo-black-1">
+                        Chưa hoàn thành
+                    </p>
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8 }}
+                    className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1"
+                >
                     <h3 className="text-2xl font-semibold text-typo-blue-4">
-                        {inProduction}
+                        {inProduction?.toLocaleString()}
                     </h3>
                     <p className="text-sm font-normal text-typo-black-1">Đang sản xuất</p>
-                </div>
-                <div className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1">
-                    <h3 className="text-2xl font-semibold text-typo-green-2">{completed}</h3>
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8 }}
+                    className="flex-1 border border-border-gray-2 rounded-lg p-2 flex flex-col gap-1"
+                >
+                    <h3 className="text-2xl font-semibold text-typo-green-2">
+                        {completed?.toLocaleString()}
+                    </h3>
                     <p className="text-sm font-normal text-typo-black-1">Hoàn thành</p>
-                </div>
+                </motion.div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default PieChartNew
+export default PieChartNew;

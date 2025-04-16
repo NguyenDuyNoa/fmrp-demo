@@ -24,7 +24,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         <p className="mb-1">{`${label}`}</p>
         {payload.map((entry, index) => (
           <p key={`item-${index}`} style={{ color: entry.color }}>
-            {`${entry.name}: ${entry.value} cái`}
+            {`${entry.name}: ${entry.value.toLocaleString()} cái`}
           </p>
         ))}
       </div>
@@ -81,7 +81,10 @@ const BarChartVertical = () => {
         item.quantity_plan,
       ]);
 
-      const dynamicTicks = allValues.length > 0 ? handleTicksBarChart(allValues) : [0, 25, 50, 75, 100];
+      const dynamicTicks =
+        allValues.length > 0
+          ? handleTicksBarChart(allValues)
+          : [0, 25, 50, 75, 100];
       setTicks(dynamicTicks);
     }
   }, [isLoading, data]);
@@ -97,7 +100,7 @@ const BarChartVertical = () => {
 
       <div className="flex items-center justify-end gap-4 mb-4 px-4">
         <div className="flex items-center gap-[10px]">
-          <div className="w-[27px] h-[13px] rounded-full bg-typo-blue-4"></div>
+          <div className="w-[27px] h-[13px] rounded-full bg-typo-orange-1"></div>
           <span className="text-sm font-medium text-typo-gray-3">Kế hoạch</span>
         </div>
         <div className="flex items-center gap-[10px]">
@@ -151,7 +154,7 @@ const BarChartVertical = () => {
                 style: {
                   textAnchor: "middle",
                   fill: "#667085",
-                  fontSize: 12,
+                  fontSize: 11,
                 },
               }}
             />
@@ -170,13 +173,14 @@ const BarChartVertical = () => {
                       dy={4}
                       textAnchor="end"
                       fill="#9295A4"
-                      fontSize={12}
+                      fontSize={11}
                     >
-                      {payload.value}
+                      {payload.value.toLocaleString()}
                     </text>
                   </g>
                 );
               }}
+
               width={60}
               dy={30}
               label={{
@@ -186,10 +190,14 @@ const BarChartVertical = () => {
                 style: { textAnchor: "", fill: "#9295A4", fontSize: 12 },
               }}
             />
-            <Tooltip content={<CustomTooltip />} cursor={false} />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={false}
+              formatter={(value) => value.toLocaleString('en-US')}
+            />
             <Bar
               dataKey="quantity_plan"
-              fill="#0375F3"
+              fill="#FF8F0D"
               barSize={20}
               radius={[4, 4, 0, 0]}
               name="Kế hoạch"
