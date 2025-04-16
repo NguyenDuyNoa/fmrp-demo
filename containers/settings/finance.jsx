@@ -23,6 +23,7 @@ import React, { useState } from "react";
 import PopupFinance from "./components/popupFinance";
 import { useFinanceList } from "./hooks/useFinance";
 import { ListBtn_Setting } from "./information";
+import { useSelector } from "react-redux";
 
 const Finance = (props) => {
     const dataLang = props.dataLang;
@@ -56,7 +57,7 @@ const Finance = (props) => {
             query: { tab: router.query?.tab, }
         });
     }, 500);
-
+    const dataSetting = useSelector((state) => state.setings);
     return (
         <React.Fragment>
             <Head>
@@ -73,8 +74,11 @@ const Finance = (props) => {
                     </div>
                 )}
                 <div className="grid grid-cols-9 gap-5 h-[99%]">
-                    <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
-                        <ListBtn_Setting dataLang={dataLang} />
+                    <div className="col-span-2 sticky ">
+                        <div className="h-fit p-5 rounded bg-[#E2F0FE] space-y-3 mb-3">
+                            <ListBtn_Setting dataLang={dataLang} />
+                        </div>
+                        <p className="w-full text-center text-[#667085] font-normal text-sm">Phiên bản V{dataSetting?.versions}</p>
                     </div>
                     <ContainerBody>
                         <div className="space-y-3 h-[96%] overflow-hidden">

@@ -1242,7 +1242,7 @@ const Header = () => {
                         blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                     />
 
-                    <div
+                    {/* <div
                         style={{
                             background: `radial-gradient(45.83% 94.64% at 93.75% 3.57%, #1FC583 0%, #1F9285 100%)`,
                             boxShadow: `1px 1px 2px 0px #00000040`
@@ -1250,7 +1250,7 @@ const Header = () => {
                         className="px-1.5 py-0.5 text-[8px] font-semibold text-white rounded-sm w-fit absolute top-0 right-0 translate-x-[110%]"
                     >
                         Beta
-                    </div>
+                    </div> */}
                 </Link>
 
                 <div className='flex flex-row items-center xl:gap-1 gap-0.5'>

@@ -10,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 
 const Information = (props) => {
     const dataLang = props.dataLang;
@@ -120,6 +121,7 @@ const Information = (props) => {
     const _HandleSubmit = () => {
         sOnSending(true);
     };
+    const dataSetting = useSelector((state) => state.setings);
     return (
         <React.Fragment>
             <Head>
@@ -136,8 +138,11 @@ const Information = (props) => {
                     </div>
                 )}
                 <div className="grid grid-cols-9 gap-5">
-                    <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky top-11">
-                        <ListBtn_Setting dataLang={dataLang} />
+                    <div className="col-span-2 sticky ">
+                        <div className="h-fit p-5 rounded bg-[#E2F0FE] space-y-3 mb-3">
+                            <ListBtn_Setting dataLang={dataLang} />
+                        </div>
+                        <p className="w-full text-center text-[#667085] font-normal text-sm">Phiên bản V{dataSetting?.versions}</p>
                     </div>
                     <div className="col-span-7 space-y-3">
                         <h2 className="text-2xl text-[#52575E]">Thông Tin Doanh Nghiệp</h2>
@@ -412,8 +417,8 @@ const ListBtn_Setting = React.memo((props) => {
                 <Btn_Setting url={`/settings/finance?tab=taxes`} isActive="/settings/finance">
                     {props.dataLang?.list_btn_seting_finance}
                 </Btn_Setting>
-                <Btn_Setting>{props.dataLang?.list_btn_seting_qt}</Btn_Setting>
-                <Btn_Setting>{props.dataLang?.list_btn_seting_order}</Btn_Setting>
+                {/* <Btn_Setting>{props.dataLang?.list_btn_seting_qt}</Btn_Setting>
+                <Btn_Setting>{props.dataLang?.list_btn_seting_order}</Btn_Setting> */}
                 <Btn_Setting url={`/settings/category?tab=units`} isActive="/settings/category">
                     {props.dataLang?.list_btn_seting_category}
                 </Btn_Setting>
