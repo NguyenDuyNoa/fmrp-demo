@@ -387,7 +387,7 @@ const Popup_dspt = (props) => {
                             if (role || checkEdit) {
                                 sOpen(true);
                             } else {
-                                isShow("warning", WARNING_STATUS_ROLE);
+                                isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
                         className={"group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}
@@ -405,7 +405,7 @@ const Popup_dspt = (props) => {
                         if (role || checkAdd) {
                             sOpen(true);
                         } else {
-                            isShow("warning", WARNING_STATUS_ROLE);
+                            isShow("error", WARNING_STATUS_ROLE);
                         }
                     }}
                     >

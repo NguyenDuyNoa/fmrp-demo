@@ -50,7 +50,7 @@ const isAllowedNumberThanWarning = (values, dataLang) => {
         return true;
     }
     if (floatValue < 0) {
-        isShow('warning', dataLang?.productions_orders_popup_please_enter_greater || 'productions_orders_popup_please_enter_greater');
+        isShow('error', dataLang?.productions_orders_popup_please_enter_greater || 'productions_orders_popup_please_enter_greater');
         return false
     }
     return true

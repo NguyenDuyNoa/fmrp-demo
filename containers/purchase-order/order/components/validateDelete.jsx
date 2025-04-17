@@ -46,7 +46,7 @@ const PopupTableValidateDelete = (props) => {
                             if (role || checkDelete) {
                                 _ToggleModal(true)
                             } else {
-                                isShow("warning", WARNING_STATUS_ROLE);
+                                isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
                         className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">

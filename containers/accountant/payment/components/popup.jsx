@@ -600,7 +600,7 @@ const Popup_dspc = (props) => {
                             if (role || checkEdit) {
                                 sOpen(true);
                             } else {
-                                isShow("warning", WARNING_STATUS_ROLE);
+                                isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
                         className={
@@ -621,7 +621,7 @@ const Popup_dspc = (props) => {
                             if (role || checkAdd) {
                                 sOpen(true);
                             } else {
-                                isShow("warning", WARNING_STATUS_ROLE);
+                                isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
                     >

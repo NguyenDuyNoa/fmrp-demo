@@ -116,7 +116,7 @@ const PopupServieVoucher = (props) => {
                     sOpen(true);
                 }
             } else {
-                isShow("warning", WARNING_STATUS_ROLE);
+                isShow("error", WARNING_STATUS_ROLE);
             }
         } else {
             sOpen(true);

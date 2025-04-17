@@ -804,11 +804,11 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                                     return true;
                                                                                                 }
                                                                                                 // if (floatValue > parseFloat(x.value.replace(/,/g, '') - e?.quantityKeepp)) {
-                                                                                                //     isShow("warning", `${dataLang?.materials_planning_llease_enter || "materials_planning_llease_enter"} ${formatNumber(parseFloat(x.value.replace(/,/g, '')))}`);
+                                                                                                //     isShow("error", `${dataLang?.materials_planning_llease_enter || "materials_planning_llease_enter"} ${formatNumber(parseFloat(x.value.replace(/,/g, '')))}`);
                                                                                                 //     return false;
                                                                                                 // }
                                                                                                 if (floatValue < 0) {
-                                                                                                    isShow("warning", dataLang?.materials_planning_please_enter_greater || "materials_planning_please_enter_greater");
+                                                                                                    isShow("error", dataLang?.materials_planning_please_enter_greater || "materials_planning_please_enter_greater");
                                                                                                     return false;
                                                                                                 }
                                                                                                 return true;

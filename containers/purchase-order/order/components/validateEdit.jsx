@@ -29,7 +29,7 @@ const Popup_TableValidateEdit = (props) => {
                 router.push(`${routerOrder.form}?id=${props.id}`);
             }
         } else {
-            isShow('warning', WARNING_STATUS_ROLE)
+            isShow('error', WARNING_STATUS_ROLE)
         }
     };
 

@@ -179,7 +179,7 @@ const SuppliersGroups = (props) => {
               <button
                 type="button"
                 onClick={() => {
-                  isShow("warning", WARNING_STATUS_ROLE);
+                  isShow("error", WARNING_STATUS_ROLE);
                 }}
                 className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
               >
@@ -240,7 +240,7 @@ const SuppliersGroups = (props) => {
                   </div>
                 ) : (
                   <button
-                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                   >
                     <Grid6
@@ -310,7 +310,7 @@ const SuppliersGroups = (props) => {
                           <IconEdit
                             className="cursor-pointer"
                             onClick={() =>
-                              isShow("warning", WARNING_STATUS_ROLE)
+                              isShow("error", WARNING_STATUS_ROLE)
                             }
                           />
                         )}

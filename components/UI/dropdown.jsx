@@ -22,7 +22,7 @@ const deca = Lexend_Deca({
 const inter = Inter({ subsets: ["latin"] });
 
 export const Dropdown = (props) => {
-  console.log("🚀 ~ Dropdown ~ props:", props)
+  
   const dispatch = useDispatch();
 
   const router = useRouter();

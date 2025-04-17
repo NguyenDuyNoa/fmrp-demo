@@ -1338,7 +1338,7 @@ const Header = () => {
                                 if (role) {
                                     router.push("/settings");
                                 } else {
-                                    isShow("warning", WARNING_STATUS_ROLE_ADMIN);
+                                    isShow("error", WARNING_STATUS_ROLE_ADMIN);
                                 }
                             }}
                             src="/icon/header/right/seting.png"

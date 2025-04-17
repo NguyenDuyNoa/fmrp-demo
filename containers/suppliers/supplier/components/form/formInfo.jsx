@@ -193,7 +193,7 @@ const FormInfo = ({ isState, dataGroup, dataDitrict, dataWar, queryState, dataLa
                 return true;
               }
               if (floatValue < 0) {
-                isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                isShow('error', 'Vui lòng nhập lớn hơn 0');
                 return false
               }
               return true
