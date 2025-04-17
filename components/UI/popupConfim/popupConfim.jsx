@@ -51,14 +51,14 @@ const PopupConfim = (props) => {
                 if (role) {
                     props.save();
                 } else {
-                    showToat('warning', 'Bạn không phải admin không thể xóa người dùng')
+                    showToat('error', 'Bạn không phải admin không thể xóa người dùng')
                 }
                 break
             default:
                 if (role || checkDelete) {
                     props.save();
                 } else {
-                    showToat('warning', 'Bạn không có quyền truy cập');
+                    showToat('error', 'Bạn không có quyền truy cập');
                 }
                 break;
         }
@@ -122,7 +122,7 @@ const PopupConfim = (props) => {
                                             else if (auth?.quotes?.is_agree == 1) {
                                                 return props.save()
                                             } else {
-                                                showToat('warning', 'Bạn không có quyền thay đổi trạng thái')
+                                                showToat('error', 'Bạn không có quyền thay đổi trạng thái')
                                             }
                                         }}
                                         className="text-base hover:text-white hover:bg-[#003DA0] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
@@ -139,7 +139,7 @@ const PopupConfim = (props) => {
                                             else if (auth?.quotes?.is_agree == 1) {
                                                 return props.handleNoconfim()
                                             } else {
-                                                showToat('warning', 'Bạn không có quyền thay đổi trạng thái')
+                                                showToat('error', 'Bạn không có quyền thay đổi trạng thái')
                                             }
                                         }}
                                         className="text-base hover:text-white hover:bg-[#003DA0] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
@@ -168,7 +168,7 @@ const PopupConfim = (props) => {
                                                 return props.save()
                                             }
                                             else {
-                                                showToat('warning', 'Bạn không có quyền thay đổi trạng thái')
+                                                showToat('error', 'Bạn không có quyền thay đổi trạng thái')
                                             }
                                         }}
                                         className="text-base hover:text-white hover:bg-[#003DA0] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
@@ -267,7 +267,7 @@ const PopupConfim = (props) => {
                                                     props.save()
                                                 }
                                                 else {
-                                                    showToat('warning', 'Bạn không có quyền thay đổi trạng thái')
+                                                    showToat('error', 'Bạn không có quyền thay đổi trạng thái')
                                                 }
                                             }}
                                             className="text-base hover:text-white hover:bg-[#003DA0] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"

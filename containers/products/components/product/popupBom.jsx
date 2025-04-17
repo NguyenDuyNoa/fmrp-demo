@@ -763,7 +763,7 @@ const Popup_Bom = React.memo((props) => {
                                 }
                             })
                         } else {
-                            isShow("warning", WARNING_STATUS_ROLE);
+                            isShow("error", WARNING_STATUS_ROLE);
                         }
                     }}
                     className={

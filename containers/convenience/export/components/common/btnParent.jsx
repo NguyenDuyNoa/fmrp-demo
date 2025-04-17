@@ -306,7 +306,7 @@ const BtnParent = ({
                         if (role || checkExport) {
                             _HandleSubmit(e);
                         } else {
-                            isShowToat("warning", WARNING_STATUS_ROLE);
+                            isShowToat("error", WARNING_STATUS_ROLE);
                         }
                     }}
                     type="button"

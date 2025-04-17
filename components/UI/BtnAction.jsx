@@ -491,7 +491,7 @@ export const BtnAction = React.memo((props) => {
                                                 } else if (checkEdit) {
                                                     handleClick();
                                                 } else {
-                                                    isShow("warning", WARNING_STATUS_ROLE);
+                                                    isShow("error", WARNING_STATUS_ROLE);
                                                 }
                                             }}
                                             className={` group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
@@ -533,7 +533,7 @@ export const BtnAction = React.memo((props) => {
                                                 <PopupKeepStock {...props} {...shareProps} />
                                             ) :
                                                 <button
-                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
                                                     type="button"
                                                     className={`${props.type == "sales_product" ? "" : "justify-center"} group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                                 >
@@ -558,7 +558,7 @@ export const BtnAction = React.memo((props) => {
                                             ) : (
                                                 <button
                                                     type="button"
-                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
                                                     className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                                                 >
                                                     <BoxSearch
@@ -592,7 +592,7 @@ export const BtnAction = React.memo((props) => {
                                                 } else if (checkDelete) {
                                                     handleQueryId({ id: props?.id, status: true });
                                                 } else {
-                                                    isShow("warning", WARNING_STATUS_ROLE);
+                                                    isShow("error", WARNING_STATUS_ROLE);
                                                 }
                                             }}
                                             className={` group transition-all ease-in-out flex items-center   ${(props.type == "products" && "justify-start") || props.type == "sales_product" ? "" : "justify-center"} 

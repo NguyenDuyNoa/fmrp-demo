@@ -372,7 +372,7 @@ const Popup_dsnd = (props) => {
                             if (role) {
                                 queryState({ tab: 1 });
                             } else {
-                                isShow("warning", WARNING_STATUS_ROLE_ADMIN);
+                                isShow("error", WARNING_STATUS_ROLE_ADMIN);
                             }
                         }}
                         className={`${isState.tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
@@ -517,7 +517,7 @@ const Popup_dsnd = (props) => {
                                                             if (role) {
                                                                 queryState({ admin: e.target?.checked ? "1" : "0" });
                                                             } else {
-                                                                isShow("warning", WARNING_STATUS_ROLE_ADMIN);
+                                                                isShow("error", WARNING_STATUS_ROLE_ADMIN);
                                                             }
                                                         }}
                                                     />

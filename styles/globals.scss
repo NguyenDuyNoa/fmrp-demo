@@ -786,3 +786,125 @@ body {
     @apply max-h-[150px] w-auto;
   }
 }
+
+//custom Toast alter
+.custom-toast-popup {
+  background-color: white !important; /* xanh đậm */
+  color: white !important;
+  // border: none !important; /* xanh lá mỏng */
+  border-radius: 10px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.custom-toast-title-success {
+  color: #065e49 !important;
+}
+
+.custom-toast-title-error {
+  color: #7a0916 !important;
+}
+
+.custom-toast-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-left: 1px;
+  padding: 3px !important;
+}
+
+.custom-toast-icon {
+  margin: 0;
+}
+.custom-check-icon-success {
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.custom-check-icon-error {
+  background-color: #ff5630;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  padding-bottom: 2px;
+}
+
+.swal2-success {
+  border-color: transparent !important;
+}
+
+.swal2-success-ring {
+  display: none !important;
+}
+.swal2-error {
+  border-color: transparent !important;
+}
+
+.swal2-error-ring {
+  display: none !important;
+}
+
+.swal2-success-line-tip,
+.swal2-success-line-long {
+  background-color: white !important;
+}
+
+.swal2-error-line-tip,
+.swal2-error-line-long {
+  background-color: white !important;
+}
+.swal2-popup.swal2-toast,
+.swal2-title {
+  margin: 0px;
+}
+
+.swal2-popup.swal2-toast .swal2-title {
+  margin: 0.5em 0px !important;
+}
+
+.swal2-popup,
+.swal2-toast {
+  padding: 0px 4px 0px 0px !important;
+}
+
+.custom-popup-left-success {
+  border-left: 2px solid #00a76f !important;
+  border-radius: 0% !important;
+  padding: 2px 8px !important;
+}
+.custom-popup-left-error {
+  border-left: 2px solid #ff5630 !important;
+  border-radius: 0% !important;
+  padding: 2px 8px !important;
+}
+
+.custom-toast-close-button-success {
+  color: #065e49 !important;
+}
+
+.custom-toast-close-button-error {
+  color: #7a0916 !important;
+}
+.custom-toast-close-button {
+  font-size: 24px !important;
+  font-weight: 400 !important;
+}
+.swal2-popup,
+.swal2-toast,
+.swal2-icon {
+  margin: 0px !important;
+}
+.swal2-toast-shown .swal2-container.swal2-top {
+  top: 70px !important;
+  margin-right: 2px !important;
+}

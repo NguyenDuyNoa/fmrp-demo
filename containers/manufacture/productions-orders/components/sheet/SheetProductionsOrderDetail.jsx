@@ -26,6 +26,7 @@ import CostCardSkeleton from "@/containers/manufacture/productions-orders/compon
 import TabSwitcherWithUnderlineSkeleton from "@/containers/manufacture/productions-orders/components/skeleton/TabSwitcherWithUnderlineSkeleton";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import CommentInputAdvanced from "@/components/common/input/CommentInputAdvanced";
+import useToast from "@/hooks/useToast";
 
 const initialState = {
     isTab: 1,
@@ -156,17 +157,17 @@ const SheetProductionsOrderDetail = memo(({ dataLang, ...props }) => {
             }
         });
     };
-
+    const showToat = useToast();
     const handleCopyLink = () => {
         const currentUrl = window.location.href;
         navigator?.clipboard?.writeText(currentUrl)
             .then(() => {
                 // Có thể dùng toast hoặc alert thông báo
-                ToatstNotifi("success", `Đã sao chép liên kết!`);
+                showToat("success", `Đã sao chép liên kết!`);
             })
             .catch((err) => {
                 console.error("Lỗi khi sao chép URL:", err);
-                ToatstNotifi("error", `Không thể sao chép liên kết!`);
+                showToat("error", `Không thể sao chép liên kết!`);
             })
     }
 

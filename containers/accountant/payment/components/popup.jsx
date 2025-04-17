@@ -269,7 +269,7 @@ const Popup_dspc = (props) => {
 
         }
     };
-
+    const showToat = useToast();
     const _HandleChangeInput = (type, value) => {
         if (type == "date") {
             sDate(value);
@@ -348,7 +348,7 @@ const Popup_dspc = (props) => {
                 if (listTypeOfDocument?.length > 0) {
                     if (priceChange > totalMoney) {
                         // Giá nhập vượt quá tổng số tiền, trả về tổng ban đầu
-                        ToatstNotifi("error", `${dataLang?.payment_err_aler || "payment_err_aler"}`);
+                        showToat("error", `${dataLang?.payment_err_aler || "payment_err_aler"}`);
                         sPrice(totalMoney);
                         isExceedTotal = true; // Đánh dấu trạng thái vượt quá giá trị
                     } else {
@@ -600,7 +600,7 @@ const Popup_dspc = (props) => {
                             if (role || checkEdit) {
                                 sOpen(true);
                             } else {
-                                isShow("warning", WARNING_STATUS_ROLE);
+                                isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
                         className={
@@ -621,7 +621,7 @@ const Popup_dspc = (props) => {
                             if (role || checkAdd) {
                                 sOpen(true);
                             } else {
-                                isShow("warning", WARNING_STATUS_ROLE);
+                                isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
                     >

@@ -1876,7 +1876,7 @@ const Import = (props) => {
                                             _HandleSubmit(e);
                                             return;
                                         } else {
-                                            return isShow("warning", WARNING_STATUS_ROLE);
+                                            return isShow("error", WARNING_STATUS_ROLE);
                                         }
                                     }}
                                     type="button"

@@ -1224,10 +1224,10 @@ const Header = () => {
     return (
         <header className="fixed z-40 w-full bg-[#003DA0] top-0 xl:h-[72px] h-[62px] flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 py-4">
             {/* <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center flex-row gap-x-4">
                 <Link
                     href="/"
-                    className="relative xl:mr-8 mr-7"
+                    className="relative "
                 >
                     <Image
                         alt=""
@@ -1290,6 +1290,7 @@ const Header = () => {
                                             className={dropdown.className}
                                             link={dropdown.link}
                                             style={dataPstWH}
+                                            icon={true}
                                         >
                                             {dropdown.title}
                                         </Dropdown>
@@ -1303,7 +1304,7 @@ const Header = () => {
             </div>
 
             <div className="flex items-center gap-2 3xl:gap-4 xl:gap-3">
-                <form className="relative flex items-center">
+                {/* <form className="relative flex items-center">
                     <div className="2xl:size-5 xl:size-4 size-3 absolute xl:left-3 left-1.5">
                         <Image
                             alt=""
@@ -1322,7 +1323,7 @@ const Header = () => {
                         type="text"
                         placeholder="Tìm kiếm"
                     />
-                </form>
+                </form> */}
 
                 <Tooltip
                     title={"Cài đặt"}
@@ -1338,7 +1339,7 @@ const Header = () => {
                                 if (role) {
                                     router.push("/settings");
                                 } else {
-                                    isShow("warning", WARNING_STATUS_ROLE_ADMIN);
+                                    isShow("error", WARNING_STATUS_ROLE_ADMIN);
                                 }
                             }}
                             src="/icon/header/right/seting.png"
@@ -1464,7 +1465,7 @@ const Header = () => {
             {/* <div className="px-10 py-0 pt-1 overflow-x-auto">
                 <Expirred />
             </div> */}
-        </header >
+        </header>
     );
 };
 

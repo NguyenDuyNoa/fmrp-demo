@@ -568,7 +568,7 @@ const Popup_Products = React.memo((props) => {
                             if (role || checkEdit) {
                                 sIsOpen(true)
                             } else {
-                                isShow("warning", WARNING_STATUS_ROLE)
+                                isShow("error", WARNING_STATUS_ROLE)
                             }
                         }}
                         className={props.type == 'add' && "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}>

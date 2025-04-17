@@ -68,7 +68,7 @@ const Header = (props) => {
                                             );
                                         }
                                     } else {
-                                        showToat('warning', WARNING_STATUS_ROLE);
+                                        showToat('error', WARNING_STATUS_ROLE);
                                     }
                                 }}
                                 className="bg-[#003DA0] rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"

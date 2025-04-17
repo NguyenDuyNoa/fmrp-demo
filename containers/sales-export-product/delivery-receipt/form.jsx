@@ -527,14 +527,14 @@ const DeliveryReceiptForm = (props) => {
         });
         sListData(newData);
     };
-
+    const showToat = useToast();
     const _HandleAddParent = (value) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
             const { parent } = _DataValueItem(value);
             sListData([parent, ...listData]);
         } else {
-            ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            showToat("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 

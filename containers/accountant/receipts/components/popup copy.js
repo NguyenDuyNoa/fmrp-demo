@@ -23,6 +23,7 @@ import { Controller, useForm } from "react-hook-form";
 import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import PopupCustom from "/components/UI/popup";
+import useToast from "@/hooks/useToast";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -376,7 +377,7 @@ const Popup_dspt = (props) => {
         );
         updateFetch({ onFetching_ListCost: false });
     };
-
+    const showToat = useToast();
     const _ServerFetching_ListTable = () => {
         let db = new FormData();
         listValue.listTypeOfDocument.forEach((e, index) => {
@@ -520,7 +521,7 @@ const Popup_dspt = (props) => {
                 const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
                 if (!isNaN(priceChange)) {
                     if (listValue.listTypeOfDocument.length > 0 && priceChange > totalMoney) {
-                        ToatstNotifi("error", dataLang?.payment_err_aler || "payment_err_aler");
+                        showToat("error", dataLang?.payment_err_aler || "payment_err_aler");
                         updateListValue({ price: totalMoney });
                         isExceedTotal = true;
                     } else {
@@ -562,7 +563,7 @@ const Popup_dspt = (props) => {
                 errMethod: !listValue.method,
                 errListTypeDoc: listValue.typeOfDocument != null && listValue.listTypeOfDocument?.length == 0,
             });
-            ToatstNotifi("error", `${props.dataLang?.required_field_null || "required_field_null"}`);
+            showToat("error", `${props.dataLang?.required_field_null || "required_field_null"}`);
         } else {
             updateFetch({ onSending: true });
         }
@@ -675,13 +676,13 @@ const Popup_dspt = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        ToatstNotifi("success", `${dataLang[message]}`);
+                        showToat("success", `${dataLang[message]}`);
                         initstialState();
                         sError(inistError);
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                     } else {
-                        ToatstNotifi("error", `${dataLang[message]}`);
+                        showToat("error", `${dataLang[message]}`);
                     }
                 }
                 updateFetch({ onSending: false });

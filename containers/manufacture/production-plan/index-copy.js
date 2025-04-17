@@ -11,6 +11,7 @@ import { useToggle } from "@/hooks/useToggle";
 import { useSetData } from "@/hooks/useSetData";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 
 const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 
@@ -2147,7 +2148,7 @@ const Index = (props) => {
     const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
 
     const [data, sData] = useState(updatedListOrder);
-
+    const showToat = useToast();
     const _ServerFetching = () => {
         Axios(
             "GET",
@@ -2227,7 +2228,7 @@ const Index = (props) => {
                 }
             });
 
-            ToatstNotifi("success", "Sắp xếp đơn hàng thành công");
+            showToat("success", "Sắp xếp đơn hàng thành công");
 
             sData(updatedData);
 

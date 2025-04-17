@@ -580,11 +580,11 @@ const PopupPurchaseBeta = ({
                                     //     return true;
                                     // }
                                     // if (floatValue > x.value) {
-                                    //     isShow('warning', `Vui lòng nhập số nhỏ hơn hoặc bằng ${formatNumber(x.value)}`);
+                                    //     isShow('error', `Vui lòng nhập số nhỏ hơn hoặc bằng ${formatNumber(x.value)}`);
                                     //     return false
                                     // }
                                     // if (floatValue < 0) {
-                                    //     isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                    //     isShow('error', 'Vui lòng nhập lớn hơn 0');
                                     //     return false
                                     // }
                                     return true;

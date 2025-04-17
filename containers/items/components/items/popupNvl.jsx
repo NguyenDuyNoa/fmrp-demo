@@ -786,7 +786,7 @@ const Popup_NVL = React.memo((props) => {
                                                         return true;
                                                     }
                                                     if (floatValue < 0) {
-                                                        isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                        isShow('error', 'Vui lòng nhập lớn hơn 0');
                                                         return false
                                                     }
                                                     return true
@@ -807,7 +807,7 @@ const Popup_NVL = React.memo((props) => {
                                                         return true;
                                                     }
                                                     if (floatValue < 0) {
-                                                        isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                        isShow('error', 'Vui lòng nhập lớn hơn 0');
                                                         return false
                                                     }
                                                     return true
@@ -829,7 +829,7 @@ const Popup_NVL = React.memo((props) => {
                                                                 return true;
                                                             }
                                                             if (floatValue < 0) {
-                                                                isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                isShow('error', 'Vui lòng nhập lớn hơn 0');
                                                                 return false
                                                             }
                                                             return true
@@ -966,7 +966,7 @@ const Popup_NVL = React.memo((props) => {
                                                                 return true;
                                                             }
                                                             if (floatValue < 0) {
-                                                                isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                isShow('error', 'Vui lòng nhập lớn hơn 0');
                                                                 return false
                                                             }
                                                             return true

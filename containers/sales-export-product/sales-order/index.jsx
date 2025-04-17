@@ -426,7 +426,7 @@ const SalesOrder = (props) => {
                   } else if (checkAdd) {
                     router.push(routerSalesOrder.form);
                   } else {
-                    isShow("warning", WARNING_STATUS_ROLE);
+                    isShow("error", WARNING_STATUS_ROLE);
                   }
                 }}
                 dataLang={dataLang}
@@ -561,7 +561,7 @@ const SalesOrder = (props) => {
                     </div>
                   ) : (
                     <button
-                      onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                      onClick={() => isShow("error", WARNING_STATUS_ROLE)}
                       className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                     >
                       <Grid6
