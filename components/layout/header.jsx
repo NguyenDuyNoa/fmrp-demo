@@ -1304,7 +1304,7 @@ const Header = () => {
             </div>
 
             <div className="flex items-center gap-2 3xl:gap-4 xl:gap-3">
-                <form className="relative flex items-center">
+                {/* <form className="relative flex items-center">
                     <div className="2xl:size-5 xl:size-4 size-3 absolute xl:left-3 left-1.5">
                         <Image
                             alt=""
@@ -1323,7 +1323,7 @@ const Header = () => {
                         type="text"
                         placeholder="Tìm kiếm"
                     />
-                </form>
+                </form> */}
 
                 <Tooltip
                     title={"Cài đặt"}
