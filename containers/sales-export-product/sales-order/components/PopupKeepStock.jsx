@@ -55,11 +55,11 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const [errorQuantity, sErrorQuantity] = useState(false);
 
     const [isFetching, sIsFetching] = useState(initialFetch);
-
+    const showToat = useToast();
     const _ToggleModal = (e) => {
         status == "approved"
             ? sOpen(e)
-            : ToatstNotifi("error", "Trạng thái đơn hàng chưa được duyệt, vui lòng duyệt để giữ kho !");
+            : showToat("error", "Trạng thái đơn hàng chưa được duyệt, vui lòng duyệt để giữ kho !");
     };
 
     const setIsFetch = (e) => sIsFetching((prev) => ({ ...prev, ...e }));

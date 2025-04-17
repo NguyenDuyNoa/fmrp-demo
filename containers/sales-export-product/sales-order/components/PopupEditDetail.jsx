@@ -29,7 +29,7 @@ const initialFetch = {
 };
 const PopupEditDetail = (props) => {
     const { dataLang, id, dataClone, sIsFetchingParent } = props;
-
+    const showToat = useToast();
     const dataSeting = useSetingServer()
 
     const formatNumber = (number) => {
@@ -335,11 +335,11 @@ const PopupEditDetail = (props) => {
                                                             const { value, formattedValue, floatValue } = values;
                                                             const newValue = +value;
                                                             if (newValue == 0) {
-                                                                ToatstNotifi("error", "Số lượng không được bằng 0.");
+                                                                showToat("error", "Số lượng không được bằng 0.");
                                                                 return;
                                                             }
                                                             if (newValue > +e.quantity_net) {
-                                                                ToatstNotifi(
+                                                                showToat(
                                                                     "error",
                                                                     `Số lượng không lớn hơn ${formatNumber(
                                                                         e?.quantity_net
@@ -348,7 +348,7 @@ const PopupEditDetail = (props) => {
                                                                 return;
                                                             }
                                                             if (newValue < +e?.quantity_delivery) {
-                                                                ToatstNotifi(
+                                                                showToat(
                                                                     "error",
                                                                     `Số lượng không được bé hơn ${formatNumber(e?.quantity_delivery)} số lượng đã giao`
                                                                 );

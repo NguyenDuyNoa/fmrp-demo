@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import ImageAvatar from "@/containers/manufacture/productions-orders/components/ui/comment/ImageAvatar";
 import { useGetListEmoji } from "@/managers/api/productions-order/comment/useGetListEmoji";
+import useToast from "@/hooks/useToast";
 
 const CommentInputAdvanced = () => {
     const fileInputRef = useRef();
@@ -61,7 +62,7 @@ const CommentInputAdvanced = () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
     }, []);
-
+    const showToat = useToast();
     // Handle Add & Change Image
     const handleImageChange = async (e) => {
         const files = Array.from(e.target.files);
@@ -71,7 +72,7 @@ const CommentInputAdvanced = () => {
         const remaining = Math.max(10 - currentImages, 0);
 
         if (files.length > remaining) {
-            ToatstNotifi("warning", `Bạn chỉ được chọn tối đa 10 ảnh. Bạn đã chọn ${files.length} ảnh nhưng chỉ còn ${remaining} ảnh được thêm.`);
+            showToat("error", `Bạn chỉ được chọn tối đa 10 ảnh. Bạn đã chọn ${files.length} ảnh nhưng chỉ còn ${remaining} ảnh được thêm.`);
         }
 
         const filesToProcess = files.slice(0, remaining);

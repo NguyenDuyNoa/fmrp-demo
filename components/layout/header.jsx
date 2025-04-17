@@ -1224,10 +1224,10 @@ const Header = () => {
     return (
         <header className="fixed z-40 w-full bg-[#003DA0] top-0 xl:h-[72px] h-[62px] flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 py-4">
             {/* <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center flex-row gap-x-4">
                 <Link
                     href="/"
-                    className="relative xl:mr-8 mr-7"
+                    className="relative "
                 >
                     <Image
                         alt=""
@@ -1290,6 +1290,7 @@ const Header = () => {
                                             className={dropdown.className}
                                             link={dropdown.link}
                                             style={dataPstWH}
+                                            icon={true}
                                         >
                                             {dropdown.title}
                                         </Dropdown>
@@ -1464,7 +1465,7 @@ const Header = () => {
             {/* <div className="px-10 py-0 pt-1 overflow-x-auto">
                 <Expirred />
             </div> */}
-        </header >
+        </header>
     );
 };
 

@@ -19,6 +19,7 @@ import Products from "./components/products/products";
 import Supplier from "./components/supplier/supplier";
 import TabClient from "./components/tabExport";
 import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import useToast from "@/hooks/useToast";
 
 const Export = (props) => {
     const initsArr = {
@@ -65,7 +66,7 @@ const Export = (props) => {
     const [sampleImport, sSampleImport] = useState(null);
 
     const [onFetchTemple, sOnFetchTemple] = useState(false);
-
+    const showToat = useToast();
     const dataTab = [
         {
             id: 1,
@@ -329,12 +330,12 @@ const Export = (props) => {
                     if (success) {
                         sIsShow(true);
                         sDataServer(data);
-                        ToatstNotifi("success", "Export dữ liệu thành công");
+                        showToat("success", "Export dữ liệu thành công");
                     } else {
                         setTimeout(() => {
                             sMultipleProgress(0);
                         }, 3000);
-                        ToatstNotifi("error", dataLang[message] || message);
+                        showToat("error", dataLang[message] || message);
                     }
                 }
             }

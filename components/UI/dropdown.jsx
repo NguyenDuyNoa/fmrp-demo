@@ -13,6 +13,7 @@ import NoData from "./noData/nodata";
 import { useRouter } from "next/router";
 import HoverEffectButton from "../animations/button/HoverEffectButton";
 import PopupRequestUpdateVersion from "../common/popup/PopupRequestUpdateVersion";
+import DropdownIcon from "../icons/common/DropdownIcon";
 
 const deca = Lexend_Deca({
   subsets: ["latin"],
@@ -22,7 +23,7 @@ const deca = Lexend_Deca({
 const inter = Inter({ subsets: ["latin"] });
 
 export const Dropdown = (props) => {
-  
+
   const dispatch = useDispatch();
 
   const router = useRouter();
@@ -57,7 +58,10 @@ export const Dropdown = (props) => {
                 </Tooltip>
               )
             ) : (
-              props.children
+              <div className="flex flex-row items-center justify-center gap-x-2">
+                {props.children} {props.icon && <DropdownIcon />}
+              </div>
+
             )}
           </button>
           // <div className='overflow-hidden cursor-pointer'>

@@ -103,7 +103,7 @@ const Popup_dspt = (props) => {
     const { data: dataObjectList = [] } = useObjectListPaySlipCombobox({ type: listValue.object?.value, "filter[branch_id]": listValue.branch?.value }, dataLang)
 
     const { data: dataTypeofDoc = [] } = useVoucherPayTypePaySlip({ type: listValue.object?.value, branch: listValue.branch, typeOfDocument: listValue.typeOfDocument }, dataLang)
-
+    const showToat = useToast();
     let param = {
         type: listValue.object?.value,
         voucher_type: listValue.typeOfDocument?.value,
@@ -223,7 +223,7 @@ const Popup_dspt = (props) => {
                 const priceChange = value?.target.value;
                 if (priceChange) {
                     if (listValue.listTypeOfDocument.length > 0 && priceChange > totalMoney) {
-                        ToatstNotifi("error", dataLang?.payment_err_aler || "payment_err_aler");
+                        showToat("error", dataLang?.payment_err_aler || "payment_err_aler");
                         updateListValue({ price: totalMoney });
                         isExceedTotal = true;
                     } else {
@@ -265,7 +265,7 @@ const Popup_dspt = (props) => {
                     : listValue.price == 0 || listValue.price == null || listValue.price == "",
                 errListTypeDoc: listValue.typeOfDocument != null && listValue.listTypeOfDocument?.length == 0,
             });
-            ToatstNotifi("error", `${props.dataLang?.required_field_null || "required_field_null"}`);
+            showToat("error", `${props.dataLang?.required_field_null || "required_field_null"}`);
         } else {
             updateFetch({ onSending: true });
         }

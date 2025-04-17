@@ -18,6 +18,7 @@ import TitleHeader from "./components/common/titleHeader";
 import Materials from "./components/materials/materials";
 import Products from "./components/products/products";
 import Supplier from "./components/supplier/supplier";
+import useToast from "@/hooks/useToast";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -245,7 +246,7 @@ const Index = (props) => {
             }
         }
     };
-
+    const showToat = useToast();
     const checkLoadingTemplate = () => {
         sOnFetchTemple(true);
         setTimeout(() => {
@@ -331,12 +332,12 @@ const Index = (props) => {
                     if (success) {
                         sIsShow(true);
                         sDataServer(data);
-                        ToatstNotifi("success", "Export dữ liệu thành công");
+                        showToat("success", "Export dữ liệu thành công");
                     } else {
                         setTimeout(() => {
                             sMultipleProgress(0);
                         }, 3000);
-                        ToatstNotifi("error", dataLang[message] || message);
+                        showToat("error", dataLang[message] || message);
                     }
                 }
             }
