@@ -1,5 +1,8 @@
 import Swal from "sweetalert2";
-import 'animate.css';
+import "animate.css";
+import SuccessAlertIcon from "@/components/icons/common/SuccessAlertIcon";
+import ErrorAlertIcon from "@/components/icons/common/ErrorAlertIcon";
+import ReactDOMServer from "react-dom/server";
 
 const useToast = () => {
     const Toast = Swal.mixin({
@@ -9,10 +12,10 @@ const useToast = () => {
         // timer: 1000,
         // timerProgressBar: true,
         showClass: {
-            popup: 'animate__zoomIn faster',
+            popup: "animate__zoomIn faster",
         },
         hideClass: {
-            popup: 'animate__zoomOut faster',
+            popup: "animate__zoomOut faster",
         },
     });
 
@@ -21,14 +24,19 @@ const useToast = () => {
             icon: type,
             title: message,
             timer: time || 100000,
-            iconHtml: type === "success" ? `<div class="custom-check-icon-success">✓</div>` : `<div class="custom-check-icon-error">x</div>`,
+            // iconHtml: type === "success" ? `<div class="custom-check-icon-success">✓</div>` : `<div class="custom-check-icon-error">x</div>`,
+            iconHtml:
+                type === "success"
+                    ? ReactDOMServer.renderToStaticMarkup(<SuccessAlertIcon />)
+                    : ReactDOMServer.renderToStaticMarkup(<ErrorAlertIcon />),
             customClass: {
                 popup: `custom-toast-popup custom-toast-popup-${type}`,
                 title: `custom-toast-title-${type} custom-toast-title`,
-                icon: "custom-toast-icon",
-                closeButton: `custom-toast-close-button-${type} .custom-toast-close-button`
+                // icon: "custom-toast-icon",
+                icon: `custom-popup-left-${type}`,
+                closeButton: `custom-toast-close-button-${type} custom-toast-close-button`,
             },
-            showCloseButton: true
+            showCloseButton: true,
         });
     };
 
