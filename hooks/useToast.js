@@ -23,7 +23,7 @@ const useToast = () => {
         Toast.fire({
             icon: type,
             title: message,
-            timer: time || 100000,
+            timer: time || 1500,
             // iconHtml: type === "success" ? `<div class="custom-check-icon-success">✓</div>` : `<div class="custom-check-icon-error">x</div>`,
             iconHtml:
                 type === "success"
