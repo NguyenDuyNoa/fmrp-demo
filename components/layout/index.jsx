@@ -127,6 +127,7 @@ const Index = ({ children, ...props }) => {
                     <Header />
                     {children}
                     {stateBoxChatAi.isShowAi && <ChatBubbleAI {...props} />}
+                    {/* {stateBoxChatAi.isShowAi} */}
                     {statePopupPreviewImage.open && <ImagesModal {...props} />}
                     {statePopupGlobal.open && <PopupGlobal {...props} />}
 
