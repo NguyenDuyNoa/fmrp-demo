@@ -89,7 +89,7 @@ export const Dropdown = (props) => {
           <div
             className={twMerge(
               " xl:py-6 2xl:pr-6 2xl:pl-5  py-4 pr-4 pl-2 justify-between grid ",
-              props.data.length > 1 ? "grid-cols-2 gap-12" : "grid-cols-1"
+              props.data.length > 1 ? "grid-cols-2 gap-8" : "grid-cols-1"
             )}
           >
             {props.data?.map((e, i) => (
@@ -103,7 +103,7 @@ export const Dropdown = (props) => {
                 {e.title && (
                   <h3 className="px-3 text-[14.5px] uppercase">{e.title}</h3>
                 )}
-                <div className="flex flex-col gap-12">
+                <div className="flex flex-col gap-8">
                   {e.sub?.map((ce, ci) => (
                     <div className="space-y-0 " key={ci}>
                       {ce.link ? (

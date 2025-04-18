@@ -187,7 +187,7 @@ const General = (props) => {
                             </h2>
                             <Customscrollbar className="max-h-[600px] min:h-[500px] h-[90%] max:h-[800px]">
                                 <div className="space-y-4">
-                                    <div className="space-y-1 gap-y-4 pb-12">
+                                    <div className="space-y-1 gap-y-4 pb-4">
                                         <h1 className="text-sm uppercase w-full py-3 px-4 rounded bg-[#ECF0F4] font-medium">
                                             nguyên vật liệu
                                         </h1>
