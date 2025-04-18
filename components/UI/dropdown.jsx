@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import HoverEffectButton from "../animations/button/HoverEffectButton";
 import PopupRequestUpdateVersion from "../common/popup/PopupRequestUpdateVersion";
 import DropdownIcon from "../icons/common/DropdownIcon";
+import { twMerge } from "tailwind-merge";
 
 const deca = Lexend_Deca({
   subsets: ["latin"],
@@ -23,7 +24,6 @@ const deca = Lexend_Deca({
 const inter = Inter({ subsets: ["latin"] });
 
 export const Dropdown = (props) => {
-
   const dispatch = useDispatch();
 
   const router = useRouter();
@@ -34,8 +34,9 @@ export const Dropdown = (props) => {
 
   const showToat = useToast();
 
+
   return (
-    <div >
+    <div>
       <Popup
         trigger={
           <button
@@ -61,7 +62,6 @@ export const Dropdown = (props) => {
               <div className="flex flex-row items-center justify-center gap-x-2">
                 {props.children} {props.icon && <DropdownIcon />}
               </div>
-
             )}
           </button>
           // <div className='overflow-hidden cursor-pointer'>
@@ -83,22 +83,29 @@ export const Dropdown = (props) => {
         position={props.position}
       // className={`popover-edit -translate-y-10 rounded-lg ` + props.className}
       >
-        <div className={`w-auto ${deca.className} bg-white  rounded-lg shadow-lg`}>
-          <div className=" xl:py-6 2xl:pr-6 2xl:pl-5  py-4 pr-4 pl-2 justify-between flex flex-row ">
+        <div
+          className={`w-auto ${deca.className} bg-white  rounded-2xl shadow-lg`}
+        >
+          <div
+            className={twMerge(
+              " xl:py-6 2xl:pr-6 2xl:pl-5  py-4 pr-4 pl-2 justify-between grid ",
+              props.data.length > 1 ? "grid-cols-2 gap-12" : "grid-cols-1"
+            )}
+          >
             {props.data?.map((e, i) => (
               <div
                 key={i}
                 className={`${e.title
                   ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5"
                   : "px-1"
-                  } space-y-1 w-fit`}
+                  } space-y-1 w-full `}
               >
                 {e.title && (
                   <h3 className="px-3 text-[14.5px] uppercase">{e.title}</h3>
                 )}
-                <div className="flex flex-row gap-x-1">
+                <div className="flex flex-col gap-12">
                   {e.sub?.map((ce, ci) => (
-                    <div className="space-y-0  " key={ci}>
+                    <div className="space-y-0 " key={ci}>
                       {ce.link ? (
                         <>
                           {is_admin ? (
@@ -165,10 +172,7 @@ export const Dropdown = (props) => {
                             <button
                               type="button"
                               onClick={() =>
-                                showToat(
-                                  "error",
-                                  "Bạn không có quyền truy cập"
-                                )
+                                showToat("error", "Bạn không có quyền truy cập")
                               }
                               className="flex text-left text-gray-400 w-full opacity-60 cursor-not-allowed  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1  xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded"
                             >
@@ -226,7 +230,7 @@ export const Dropdown = (props) => {
                       <div className="flex flex-col gap-y-4">
                         {ce.items?.map((e, i) => {
                           return (
-                            <div key={i} >
+                            <div key={i}>
                               {e?.role == "1" ? (
                                 <Link
                                   href={"#"}
@@ -241,8 +245,8 @@ export const Dropdown = (props) => {
                                         children: (
                                           <PopupRequestUpdateVersion>
                                             <p className="text-start xlg:text-2xl text-xl leading-[32px] font-semibold text-[#141522]">
-                                              Theo dõi đơn hàng theo nhà cung cấp để
-                                              nguyên vật liệu luôn{" "}
+                                              Theo dõi đơn hàng theo nhà cung
+                                              cấp để nguyên vật liệu luôn{" "}
                                               <span className="text-[#0375F3]">
                                                 đúng và đủ
                                               </span>
@@ -311,7 +315,6 @@ export const Dropdown = (props) => {
                           );
                         })}
                       </div>
-
                     </div>
                   ))}
                 </div>
