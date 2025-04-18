@@ -1,3 +1,4 @@
+'use client'
 import apiLogin from "@/Api/apiLogin/apiLogin";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import LoadingButton from "@/components/UI/loading/loadingButton";
@@ -214,6 +215,13 @@ const Register = React.memo((props) => {
 
                 const res = await submitOtp.mutateAsync(dataSubmit);
                 if (res?.isSuccess) {
+                    //google ads 
+                    window.dataLayer = window.dataLayer || []
+                    window.dataLayer.push({
+                        event: "enhanced_conversion",
+                        email: data?.email,
+                        phone: data?.phone,
+                    })
                     queryState({ name: res?.email, code: res?.code, isRegister: false, isLogin: true, countOtp: 0 });
                     fnSetDataAuth(data, res)
                     return
