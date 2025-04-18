@@ -18,20 +18,28 @@ import {
 } from "recharts";
 
 const CustomTooltip = ({ active, payload, label }) => {
+
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white text-typo-black-1 px-3 py-2 rounded-lg text-sm font-medium shadow-md">
-        <p className="mb-1">{`${label}`}</p>
-        {payload.map((entry, index) => (
-          <p key={`item-${index}`} style={{ color: entry.color }}>
-            {`${entry.name}: ${entry.value.toLocaleString()} cái`}
-          </p>
-        ))}
+      <div className="bg-white text-typo-black-1 px-3 py-2 rounded-lg text-sm font-medium shadow-md min-w-[200px]">
+        <p className="mb-3">{`${label}`}</p>
+        <div className="flex flex-col gap-y-2" >
+          {payload.map((entry, index) => (
+            <div className="flex items-center flex-row justify-between w-full" key={index}>
+              <div className="flex items-center flex-row gap-x-2">
+                <div className="w-[23px] h-[10px] rounded-full " style={{ backgroundColor: entry.color }}></div>
+                <span className="text-sm font-medium text-typo-gray-3">{entry.name}</span>
+              </div>
+              <p className="font-medium text-sm text-typo-gray-2">{entry.value.toLocaleString()}</p>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
   return null;
 };
+
 
 const BarChartVertical = () => {
   const [productPlan, setProductPlan] = useState();

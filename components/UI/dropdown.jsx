@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import HoverEffectButton from "../animations/button/HoverEffectButton";
 import PopupRequestUpdateVersion from "../common/popup/PopupRequestUpdateVersion";
 import DropdownIcon from "../icons/common/DropdownIcon";
+import { twMerge } from "tailwind-merge";
 
 const deca = Lexend_Deca({
   subsets: ["latin"],
@@ -23,7 +24,6 @@ const deca = Lexend_Deca({
 const inter = Inter({ subsets: ["latin"] });
 
 export const Dropdown = (props) => {
-
   const dispatch = useDispatch();
 
   const router = useRouter();
@@ -34,8 +34,9 @@ export const Dropdown = (props) => {
 
   const showToat = useToast();
 
+
   return (
-    <div >
+    <div>
       <Popup
         trigger={
           <button
@@ -61,7 +62,6 @@ export const Dropdown = (props) => {
               <div className="flex flex-row items-center justify-center gap-x-2">
                 {props.children} {props.icon && <DropdownIcon />}
               </div>
-
             )}
           </button>
           // <div className='overflow-hidden cursor-pointer'>
@@ -83,29 +83,36 @@ export const Dropdown = (props) => {
         position={props.position}
       // className={`popover-edit -translate-y-10 rounded-lg ` + props.className}
       >
-        <div className={`w-auto ${deca.className} bg-white  rounded-lg shadow-lg`}>
-          <div className=" xl:py-6 2xl:pr-6 2xl:pl-5  py-4 pr-4 pl-2 justify-between flex flex-row ">
+        <div
+          className={`w-auto ${deca.className} bg-white  rounded-2xl shadow-lg`}
+        >
+          <div
+            className={twMerge(
+              " xl:py-6 2xl:pr-6 2xl:pl-5  py-4 pr-4 pl-2 justify-between grid ",
+              props.data.length > 1 ? "grid-cols-2 gap-8" : "grid-cols-1"
+            )}
+          >
             {props.data?.map((e, i) => (
               <div
                 key={i}
                 className={`${e.title
                   ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5"
                   : "px-1"
-                  } space-y-1 w-fit`}
+                  } space-y-1 w-full `}
               >
                 {e.title && (
                   <h3 className="px-3 text-[14.5px] uppercase">{e.title}</h3>
                 )}
-                <div className="flex flex-row gap-x-1">
+                <div className="flex flex-col gap-8">
                   {e.sub?.map((ce, ci) => (
-                    <div className="space-y-0  " key={ci}>
+                    <div className="space-y-0 " key={ci}>
                       {ce.link ? (
                         <>
                           {is_admin ? (
                             <Link
                               title={ce.title}
                               href={`${ce.link}`}
-                              className="flex items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1"
+                              className="flex items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1"
                             >
                               {ce?.img ? (
                                 <React.Fragment>
@@ -126,7 +133,7 @@ export const Dropdown = (props) => {
                                   </h5>
                                 </React.Fragment>
                               ) : (
-                                <li className=" 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1  outline-none">
+                                <li className=" 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1  outline-none">
                                   {ce.title}
                                 </li>
                               )}
@@ -135,7 +142,7 @@ export const Dropdown = (props) => {
                             <Link
                               title={ce.title}
                               href={`${ce.link}`}
-                              className="flex  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1"
+                              className="flex  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1"
                             >
                               {ce?.img ? (
                                 <React.Fragment>
@@ -156,7 +163,7 @@ export const Dropdown = (props) => {
                                   </h5>
                                 </React.Fragment>
                               ) : (
-                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1  outline-none">
+                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1  outline-none">
                                   {ce.title}
                                 </li>
                               )}
@@ -165,10 +172,7 @@ export const Dropdown = (props) => {
                             <button
                               type="button"
                               onClick={() =>
-                                showToat(
-                                  "error",
-                                  "Bạn không có quyền truy cập"
-                                )
+                                showToat("error", "Bạn không có quyền truy cập")
                               }
                               className="flex text-left text-gray-400 w-full opacity-60 cursor-not-allowed  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1  xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded"
                             >
@@ -191,7 +195,7 @@ export const Dropdown = (props) => {
                                   </h5>
                                 </React.Fragment>
                               ) : (
-                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1  outline-none">
+                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1  outline-none">
                                   {ce.title}
                                 </li>
                               )}
@@ -226,7 +230,7 @@ export const Dropdown = (props) => {
                       <div className="flex flex-col gap-y-4">
                         {ce.items?.map((e, i) => {
                           return (
-                            <div key={i} >
+                            <div key={i}>
                               {e?.role == "1" ? (
                                 <Link
                                   href={"#"}
@@ -241,8 +245,8 @@ export const Dropdown = (props) => {
                                         children: (
                                           <PopupRequestUpdateVersion>
                                             <p className="text-start xlg:text-2xl text-xl leading-[32px] font-semibold text-[#141522]">
-                                              Theo dõi đơn hàng theo nhà cung cấp để
-                                              nguyên vật liệu luôn{" "}
+                                              Theo dõi đơn hàng theo nhà cung
+                                              cấp để nguyên vật liệu luôn{" "}
                                               <span className="text-[#0375F3]">
                                                 đúng và đủ
                                               </span>
@@ -254,8 +258,13 @@ export const Dropdown = (props) => {
                                     });
                                   }}
                                 >
-                                  <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1 focus:transform-gpu  px-3 py-2 rounded">
+                                  {/* <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1 focus:transform-gpu  px-3 py-2 rounded">
                                     {e?.name}
+                                  </li> */}
+                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#0375F3]">
+                                    <span className="before:content-['•'] before:absolute before:left-0 before:text-blue-600 before:opacity-0 group-hover:before:opacity-100">
+                                      {e?.name}
+                                    </span>
                                   </li>
                                 </Link>
                               ) : is_admin ? (
@@ -265,10 +274,7 @@ export const Dropdown = (props) => {
                                   className="outline-none "
                                   key={i}
                                 >
-                                  {/* <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1 focus:transform-gpu  px-2 py-1 rounded">
-                                  {e?.name}
-                                </li> */}
-                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#1C252E]">
+                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#0375F3]">
                                     <span className="before:content-['•'] before:absolute before:left-0 before:text-blue-600 before:opacity-0 group-hover:before:opacity-100">
                                       {e?.name}
                                     </span>
@@ -281,10 +287,7 @@ export const Dropdown = (props) => {
                                   className="outline-none"
                                   key={i}
                                 >
-                                  {/* <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1 focus:transform-gpu  px-2 py-1 rounded">
-                                  {e?.name}
-                                </li> */}
-                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#1C252E]">
+                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#0375F3]">
                                     <span className="before:content-['•'] before:absolute before:left-0 before:text-blue-600 before:opacity-0 group-hover:before:opacity-100">
                                       {e?.name}
                                     </span>
@@ -301,10 +304,7 @@ export const Dropdown = (props) => {
                                   }
                                   className="w-full text-left text-gray-100 outline-none cursor-not-allowed opacity-60"
                                 >
-                                  {/* <li className="cursor-not-allowed text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1 focus:transform-gpu  px-3 py-2 rounded">
-                                  {e?.name}
-                                </li> */}
-                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#1C252E] mb-1">
+                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#0375F3] mb-1">
                                     <span className="before:content-['•'] before:absolute before:left-0 before:text-blue-600 before:opacity-0 group-hover:before:opacity-100">
                                       {e?.name}
                                     </span>
@@ -315,7 +315,6 @@ export const Dropdown = (props) => {
                           );
                         })}
                       </div>
-
                     </div>
                   ))}
                 </div>
@@ -428,7 +427,7 @@ export const DropdownThongBao = (props) => {
                     0 && (
                       <Link href={`${props.data?.tab[tab]?.link}`}>
                         <Zoom className="items-center text-center ">
-                          <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1">
+                          <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1">
                             {props.data?.tab[tab]?.more}
                           </h5>
                         </Zoom>
@@ -468,7 +467,7 @@ const TabContent = ({ subItems, checkStt }) => {
           {subItems?.map((ce, index) => (
             <div key={index}>
               <Link title={ce.title} href={`${ce?.link}`}>
-                <div className="border-b  w-full items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1">
+                <div className="border-b  w-full items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1">
                   <div className="flex items-center gap-2">
                     <div className="relative ">
                       <Image

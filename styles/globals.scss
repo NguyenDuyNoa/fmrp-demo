@@ -368,12 +368,12 @@ body {
 }
 
 //alert
-.swal2-popup.swal2-toast {
-  .swal2-html-container {
-    font-size: 14px !important;
-    margin: 0em 1em !important;
-  }
-}
+// .swal2-popup.swal2-toast {
+//   .swal2-html-container {
+//     font-size: 14px !important;
+//     margin: 0em 1em !important;
+//   }
+// }
 
 /// .Select__single-value,
 .Select__custom .Select__single-value {
@@ -787,15 +787,19 @@ body {
   }
 }
 
-//custom Toast alter
 .custom-toast-popup {
-  background-color: white !important; /* xanh đậm */
+  background-color: #d3fcd2 !important; /* xanh đậm */
   color: white !important;
   // border: none !important; /* xanh lá mỏng */
   border-radius: 10px !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
+.custom-toast-popup-success {
+  background-color: #d3fcd2 !important; /* xanh đậm */
+}
+.custom-toast-popup-error {
+  background-color: #ffe9d5 !important; /* xanh đậm */
+}
 
 .custom-toast-title-success {
   color: #065e49 !important;
@@ -809,7 +813,6 @@ body {
   font-weight: 600;
   font-size: 16px;
   margin-left: 1px;
-  padding: 3px !important;
 }
 
 .custom-toast-icon {
@@ -856,12 +859,12 @@ body {
 
 .swal2-success-line-tip,
 .swal2-success-line-long {
-  background-color: white !important;
+  background-color: white !important; /* Hoặc màu bạn thích */
 }
 
 .swal2-error-line-tip,
 .swal2-error-line-long {
-  background-color: white !important;
+  background-color: white !important; /* Hoặc màu bạn thích */
 }
 .swal2-popup.swal2-toast,
 .swal2-title {
@@ -874,18 +877,7 @@ body {
 
 .swal2-popup,
 .swal2-toast {
-  padding: 0px 4px 0px 0px !important;
-}
-
-.custom-popup-left-success {
-  border-left: 2px solid #00a76f !important;
-  border-radius: 0% !important;
-  padding: 2px 8px !important;
-}
-.custom-popup-left-error {
-  border-left: 2px solid #ff5630 !important;
-  border-radius: 0% !important;
-  padding: 2px 8px !important;
+  padding: 4px 8px !important;
 }
 
 .custom-toast-close-button-success {
@@ -896,9 +888,15 @@ body {
   color: #7a0916 !important;
 }
 .custom-toast-close-button {
-  font-size: 24px !important;
-  font-weight: 400 !important;
+  font-size: 20 !important;
+  font-weight: 200 !important;
 }
+
+// .swal2-popup.swal2-toast .swal2-close {
+//   font-size: 20 !important;
+//   font-weight: 200 !important;
+// }
+
 .swal2-popup,
 .swal2-toast,
 .swal2-icon {
@@ -906,5 +904,4 @@ body {
 }
 .swal2-toast-shown .swal2-container.swal2-top {
   top: 70px !important;
-  margin-right: 2px !important;
 }
