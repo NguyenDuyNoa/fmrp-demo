@@ -50,19 +50,19 @@ const Popup_Bom = React.memo((props) => {
         if (!e) {
             sTab(null);
         }
-        dispatch({
-            type: "stateBoxChatAi", payload: {
-                ...stateBoxChatAi,
-                isShowAi: false,
-                typeData: "",
-                openViewModal: false,
-                isShowAi: false,
-                dataReview: null,
-                messenger: [
-                    { text: "Chào bạn! Tôi có thể giúp gì?", sender: "ai" },
-                ],
-            }
-        })
+        // dispatch({
+        //     type: "stateBoxChatAi", payload: {
+        //         ...stateBoxChatAi,
+        //         isShowAi: false,
+        //         typeData: "",
+        //         openViewModal: false,
+        //         isShowAi: false,
+        //         dataReview: null,
+        //         messenger: [
+        //             { text: "Chào bạn! Tôi có thể giúp gì?", sender: "ai" },
+        //         ],
+        //     }
+        // })
     };
 
     const [onSending, sOnSending] = useState(false);
@@ -113,16 +113,16 @@ const Popup_Bom = React.memo((props) => {
         isOpen && sErrValue(false);
         sDataSelectedVariant([]);
         sSelectedList({});
-        if (isOpen) {
-            setTimeout(() => {
-                dispatch({
-                    type: "stateBoxChatAi", payload: {
-                        ...stateBoxChatAi,
-                        open: true
-                    }
-                })
-            }, 500);
-        }
+        // if (isOpen) {
+        //     setTimeout(() => {
+        //         dispatch({
+        //             type: "stateBoxChatAi", payload: {
+        //                 ...stateBoxChatAi,
+        //                 open: true
+        //             }
+        //         })
+        //     }, 500);
+        // }
 
     }, [isOpen]);
 
@@ -285,29 +285,29 @@ const Popup_Bom = React.memo((props) => {
             }
         }
 
-        if (stateBoxChatAi.typeData == "newBom") {
-            const { arrParent } = convertArrayBom(dataSelectedVariant, stateBoxChatAi?.dataReview?.items)
+        // if (stateBoxChatAi.typeData == "newBom") {
+        //     const { arrParent } = convertArrayBom(dataSelectedVariant, stateBoxChatAi?.dataReview?.items)
 
-            sDataSelectedVariant(arrParent);
+        //     sDataSelectedVariant(arrParent);
 
-            sCurrentData(arrParent);
+        //     sCurrentData(arrParent);
 
-            return
-        }
+        //     return
+        // }
 
-        if (stateBoxChatAi.typeData == "presentBom") {
-            const { child } = convertArrayBom(dataSelectedVariant, stateBoxChatAi?.dataReview?.items)
+        // if (stateBoxChatAi.typeData == "presentBom") {
+        //     const { child } = convertArrayBom(dataSelectedVariant, stateBoxChatAi?.dataReview?.items)
 
-            const newData = dataSelectedVariant?.map((e) => {
-                return {
-                    ...e,
-                    child: [...e?.child, ...child]
-                }
-            })
-            sDataSelectedVariant(newData);
+        //     const newData = dataSelectedVariant?.map((e) => {
+        //         return {
+        //             ...e,
+        //             child: [...e?.child, ...child]
+        //         }
+        //     })
+        //     sDataSelectedVariant(newData);
 
-            sCurrentData(newData);
-        }
+        //     sCurrentData(newData);
+        // }
     }, [stateBoxChatAi?.isShowAi, stateBoxChatAi.typeData])
 
     /// xử lý khi chọn biến thể
@@ -756,12 +756,12 @@ const Popup_Bom = React.memo((props) => {
                             return;
                         } else if ((role || checkEdit || checkAdd) && !props.bom) {
                             sIsOpen(true);
-                            dispatch({
-                                type: "stateBoxChatAi", payload: {
-                                    ...stateBoxChatAi,
-                                    isShowAi: !stateBoxChatAi.isShowAi,
-                                }
-                            })
+                            // dispatch({
+                            //     type: "stateBoxChatAi", payload: {
+                            //         ...stateBoxChatAi,
+                            //         isShowAi: !stateBoxChatAi.isShowAi,
+                            //     }
+                            // })
                         } else {
                             isShow("error", WARNING_STATUS_ROLE);
                         }
