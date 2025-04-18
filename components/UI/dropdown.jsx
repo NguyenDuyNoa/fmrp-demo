@@ -105,7 +105,7 @@ export const Dropdown = (props) => {
                             <Link
                               title={ce.title}
                               href={`${ce.link}`}
-                              className="flex items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1"
+                              className="flex items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1"
                             >
                               {ce?.img ? (
                                 <React.Fragment>
@@ -126,7 +126,7 @@ export const Dropdown = (props) => {
                                   </h5>
                                 </React.Fragment>
                               ) : (
-                                <li className=" 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1  outline-none">
+                                <li className=" 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1  outline-none">
                                   {ce.title}
                                 </li>
                               )}
@@ -135,7 +135,7 @@ export const Dropdown = (props) => {
                             <Link
                               title={ce.title}
                               href={`${ce.link}`}
-                              className="flex  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1"
+                              className="flex  items-center 2xl:space-x-2 2xl:mb-0 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-0 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-0 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1"
                             >
                               {ce?.img ? (
                                 <React.Fragment>
@@ -156,7 +156,7 @@ export const Dropdown = (props) => {
                                   </h5>
                                 </React.Fragment>
                               ) : (
-                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1  outline-none">
+                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1  outline-none">
                                   {ce.title}
                                 </li>
                               )}
@@ -191,7 +191,7 @@ export const Dropdown = (props) => {
                                   </h5>
                                 </React.Fragment>
                               ) : (
-                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1  outline-none">
+                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1  outline-none">
                                   {ce.title}
                                 </li>
                               )}
@@ -254,8 +254,13 @@ export const Dropdown = (props) => {
                                     });
                                   }}
                                 >
-                                  <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1 focus:transform-gpu  px-3 py-2 rounded">
+                                  {/* <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1 focus:transform-gpu  px-3 py-2 rounded">
                                     {e?.name}
+                                  </li> */}
+                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#0375F3]">
+                                    <span className="before:content-['•'] before:absolute before:left-0 before:text-blue-600 before:opacity-0 group-hover:before:opacity-100">
+                                      {e?.name}
+                                    </span>
                                   </li>
                                 </Link>
                               ) : is_admin ? (
@@ -265,10 +270,7 @@ export const Dropdown = (props) => {
                                   className="outline-none "
                                   key={i}
                                 >
-                                  {/* <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1 focus:transform-gpu  px-2 py-1 rounded">
-                                  {e?.name}
-                                </li> */}
-                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#1C252E]">
+                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#0375F3]">
                                     <span className="before:content-['•'] before:absolute before:left-0 before:text-blue-600 before:opacity-0 group-hover:before:opacity-100">
                                       {e?.name}
                                     </span>
@@ -281,10 +283,7 @@ export const Dropdown = (props) => {
                                   className="outline-none"
                                   key={i}
                                 >
-                                  {/* <li className="text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1 focus:transform-gpu  px-2 py-1 rounded">
-                                  {e?.name}
-                                </li> */}
-                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#1C252E]">
+                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#0375F3]">
                                     <span className="before:content-['•'] before:absolute before:left-0 before:text-blue-600 before:opacity-0 group-hover:before:opacity-100">
                                       {e?.name}
                                     </span>
@@ -301,10 +300,7 @@ export const Dropdown = (props) => {
                                   }
                                   className="w-full text-left text-gray-100 outline-none cursor-not-allowed opacity-60"
                                 >
-                                  {/* <li className="cursor-not-allowed text-left 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1 focus:transform-gpu  px-3 py-2 rounded">
-                                  {e?.name}
-                                </li> */}
-                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#1C252E] mb-1">
+                                  <li className="relative pl-4 text-[#637381] std:text-base 3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] outline-none list-none group hover:text-[#0375F3] mb-1">
                                     <span className="before:content-['•'] before:absolute before:left-0 before:text-blue-600 before:opacity-0 group-hover:before:opacity-100">
                                       {e?.name}
                                     </span>
@@ -428,7 +424,7 @@ export const DropdownThongBao = (props) => {
                     0 && (
                       <Link href={`${props.data?.tab[tab]?.link}`}>
                         <Zoom className="items-center text-center ">
-                          <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1">
+                          <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1">
                             {props.data?.tab[tab]?.more}
                           </h5>
                         </Zoom>
@@ -468,7 +464,7 @@ const TabContent = ({ subItems, checkStt }) => {
           {subItems?.map((ce, index) => (
             <div key={index}>
               <Link title={ce.title} href={`${ce?.link}`}>
-                <div className="border-b  w-full items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#1C252E] mb-1">
+                <div className="border-b  w-full items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded text-[#637381] list-none hover:list-disc std:text-base hover:text-[#0375F3] mb-1">
                   <div className="flex items-center gap-2">
                     <div className="relative ">
                       <Image

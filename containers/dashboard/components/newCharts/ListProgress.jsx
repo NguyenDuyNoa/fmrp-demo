@@ -1,6 +1,7 @@
 import CalendarDropdown, {
   productionStatuses,
 } from "@/components/common/dropdown/CalendarDropdown";
+import Loading from "@/components/UI/loading/loading";
 import { useGetProductionProgressByGroup } from "@/hooks/dashboard/useGetProductionProgressByGroup";
 import { getDateRangeFromValue } from "@/utils/helpers/getDateRange";
 import React, { useEffect, useState } from "react";
@@ -38,15 +39,18 @@ const progressData = [
 ];
 
 const ListProgress = () => {
-  const [data, setData] = useState([]);
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
   const [productProgress, setProductProgress] = useState([]);
-  console.log("🚀 ~ ListProgress ~ productProgress:", productProgress)
+
   // const [status, setStatus] = useState(productionStatuses[2]);
   // const dataRange = productionStatuses
   const { data: ProductionProgress, isLoading: isLoadingProductionProgress } =
-    useGetProductionProgressByGroup({ dateEnd: dateEnd, dateStart: dateStart, limited: 7 });
+    useGetProductionProgressByGroup({
+      dateEnd: dateEnd,
+      dateStart: dateStart,
+      limited: 7,
+    });
 
   useEffect(() => {
     const range = getDateRangeFromValue("thisYear");
@@ -55,9 +59,8 @@ const ListProgress = () => {
   }, []);
 
   useEffect(() => {
-    setData(progressData);
     if (!isLoadingProductionProgress && ProductionProgress) {
-      setProductProgress(ProductionProgress.items)
+      setProductProgress(ProductionProgress.items);
     }
   }, [isLoadingProductionProgress, ProductionProgress]);
 
@@ -75,7 +78,9 @@ const ListProgress = () => {
         </div> */}
       </div>
 
-      {productProgress.length === 0 ? (
+      {isLoadingProductionProgress ? (
+        <Loading className="h-80" color="#0f4f9e" />
+      ) : productProgress?.length === 0 ? (
         <div className="flex flex-col gap-8">
           {[...Array(7)].map((_, index) => (
             <div key={index} className="flex flex-col gap-2">

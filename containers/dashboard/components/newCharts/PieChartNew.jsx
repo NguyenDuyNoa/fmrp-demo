@@ -139,6 +139,12 @@ const PieChartNew = () => {
         const ey = my;
         const color = data[index]?.color || fill;
 
+        const percentText = `${payload.percent}%`;
+        const charWidth = 8; // Ước lượng mỗi ký tự chiếm khoảng 8px
+        const padding = 32;
+        const rectWidth = percentText.length * charWidth + padding;
+        const rectHeight = 26;
+
         return (
             <g>
                 <Sector
@@ -160,7 +166,7 @@ const PieChartNew = () => {
                         />
                         <circle cx={ex} cy={ey} r={2} fill={color} stroke="none" />
                         <g>
-                            <rect
+                            {/* <rect
                                 x={ex + (cos >= 0 ? 1 : -1) * 12 - 20}
                                 y={ey - 10}
                                 width={40}
@@ -168,6 +174,15 @@ const PieChartNew = () => {
                                 fill={color}
                                 rx={10}
                                 ry={10}
+                            /> */}
+                            <rect
+                                x={ex + (cos >= 0 ? 1 : -1) * 12 - rectWidth / 2}
+                                y={ey - rectHeight / 2}
+                                width={rectWidth}
+                                height={rectHeight}
+                                fill={color}
+                                rx={14}
+                                ry={14}
                             />
                             <text
                                 x={ex + (cos >= 0 ? 1 : -1) * 12}
@@ -177,7 +192,6 @@ const PieChartNew = () => {
                                 fill="white"
                                 fontWeight="normal"
                                 fontSize={16}
-                                style={{ padding: 20 }}
                             >
                                 {`${payload.percent}%`}
                             </text>
