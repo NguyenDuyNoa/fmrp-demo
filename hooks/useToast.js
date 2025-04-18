@@ -24,7 +24,6 @@ const useToast = () => {
             icon: type,
             title: message,
             timer: time || 1500,
-            // iconHtml: type === "success" ? `<div class="custom-check-icon-success">✓</div>` : `<div class="custom-check-icon-error">x</div>`,
             iconHtml:
                 type === "success"
                     ? ReactDOMServer.renderToStaticMarkup(<SuccessAlertIcon />)
@@ -32,9 +31,8 @@ const useToast = () => {
             customClass: {
                 popup: `custom-toast-popup custom-toast-popup-${type}`,
                 title: `custom-toast-title-${type} custom-toast-title`,
-                // icon: "custom-toast-icon",
-                icon: `custom-popup-left-${type}`,
-                closeButton: `custom-toast-close-button-${type} custom-toast-close-button`,
+                icon: "custom-toast-icon",
+                closeButton: `custom-toast-close-button-${type} custom-toast-close-button`
             },
             showCloseButton: true,
         });
