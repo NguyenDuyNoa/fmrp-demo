@@ -97,6 +97,7 @@ import {
 import TabSemi from "../table/tabSemi";
 import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
+import PopupPrintTemProduct from "../popup/PopupPrintTemProduct";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
@@ -1033,6 +1034,19 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         }
     };
 
+    //in tem Thành phẩm 
+    const handOpentPrintTemProduct = () => {
+        dispatch({
+            type: "statePopupGlobal",
+            payload: {
+                open: true,
+                children: (
+                    <PopupPrintTemProduct />
+                ),
+            },
+        });
+    }
+
     return (
         <React.Fragment>
             <div ref={breadcrumbRef}>
@@ -1718,15 +1732,16 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                     disabled={loadingButton}
                                 />
 
-                                {/* <ButtonAnimationNew
+                                <ButtonAnimationNew
                                     icon={
                                         <div className="size-4">
                                             <StickerIcon className="size-full" />
                                         </div>
                                     }
+                                    onClick={() => handOpentPrintTemProduct()}
                                     title="In tem thành phẩm"
                                     className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
-                                /> */}
+                                />
 
                                 <ButtonAnimationNew
                                     icon={

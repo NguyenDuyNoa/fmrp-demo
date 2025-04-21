@@ -1,0 +1,282 @@
+"use client";
+import { StateContext } from "@/context/_state/productions-orders/StateContext";
+import { Lexend_Deca } from "@next/font/google";
+import React, { useContext, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Add as IconClose } from "iconsax-react";
+import PrinterIcon2 from "@/components/icons/common/PrinterIcon2";
+import CheckboxDefault from "@/components/common/checkbox/CheckboxDefault";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import InputNumberCustom from "@/components/common/input/InputNumberCustom";
+import Cardtable from "@/components/common/card/Cardtable";
+import {
+    ColumnTable,
+    HeaderTable,
+    RowItemTable,
+    RowTable,
+} from "@/components/UI/common/Table";
+import BackIcon from "@/components/icons/common/BackIcon";
+import { twMerge } from "tailwind-merge";
+import Carousel from "@/components/common/carousel/Carousel";
+
+
+const deca = Lexend_Deca({
+    subsets: ["latin"],
+    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
+const dataFake = [
+    {
+        id: 1,
+        name: "1",
+        item: 2,
+    },
+    {
+        id: 2,
+        name: "3",
+        item: 4,
+    },
+    {
+        id: 3,
+        name: "4",
+        item: 7,
+    },
+    {
+        id: 4,
+        name: "5",
+        item: 0,
+    },
+    {
+        id: 5,
+        name: "6",
+        item: 9,
+    },
+];
+
+const PopupPrintTemProduct = () => {
+    const dispatch = useDispatch();
+    const [listItem, setListItem] = useState(dataFake);
+    const [selectItems, setSelectItems] = useState([]);
+    const [isPrintTem, setIsPrintTem] = useState(false);
+
+    const isAllSelected = selectItems.length === dataFake.length;
+
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            setSelectItems(dataFake); // chọn tất cả
+        } else {
+            setSelectItems([]); // bỏ chọn tất cả
+        }
+    };
+
+    const handleSelectItem = (item, checked) => {
+        if (checked) {
+            setSelectItems((prev) => [...prev, item]);
+        } else {
+            setSelectItems((prev) => prev.filter((i) => i.id !== item.id));
+        }
+    };
+
+    const handleTemTotal = (id, value) => {
+        //set lại list item
+        setListItem((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, item: value } : item))
+        );
+
+        //set lại list item được chọn
+        setSelectItems((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, item: value } : item))
+        );
+    };
+
+    const handlePrint = (type) => {
+        // const typeButton = ["showTem", "printTem"];
+        if (type === "showTem") {
+            setIsPrintTem(true);
+        } else {
+            console.log("1312");
+        }
+    };
+
+    return (
+        <div
+            style={{
+                boxShadow: `0px 20px 40px -8px rgba(16, 24, 40, 0.1)`,
+            }}
+            className={` bg-[#ffffff] xlg:p-9 p-8 lg:p-7 rounded-[24px] min-w-[600px] max-w-[700px] h-fit relative flex flex-col justify-center items-center ${deca.className} gap-y-6`}
+        >
+            <div className="flex flex-row justify-between items-center w-full ">
+                <div className="flex flex-row justify-start items-center flex-1 gap-x-6">
+                    {isPrintTem && (
+                        <div
+                            className="w-fit text-[#9295A4]"
+                            onClick={() => setIsPrintTem(false)}
+                        >
+                            <BackIcon />
+                        </div>
+                    )}
+                    <div className="flex flex-col items-start">
+                        <p className="text-typo-black-1 font-bold text-2xl capitalize">
+                            {isPrintTem ? "Mẫu tem in của bạn" : "In tem thành phẩm"}
+                        </p>
+                        {isPrintTem && (
+                            <p className="text-typo-blue-4 text-base font-medium">
+                                {`(${selectItems?.length} sản phẩm)`}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex flex-row justify-between items-center gap-x-2">
+                    <button
+                        className={twMerge(
+                            "flex flex-row gap-x-2 px-3 py-[10px] justify-center items-center text-white font-medium text-sm  rounded-lg",
+                            selectItems.length <= 0
+                                ? "bg-gray-200 cursor-not-allowed"
+                                : "bg-background-blue-2  cursor-pointer"
+                        )}
+                        onClick={() => handlePrint(isPrintTem ? "printTem" : "showTem")}
+                        disabled={selectItems.length <= 0}
+                    >
+                        <PrinterIcon2 /> In tem
+                    </button>
+                    <button
+                        onClick={() => {
+                            dispatch({
+                                type: "statePopupGlobal",
+                                payload: {
+                                    open: false,
+                                },
+                            });
+                        }}
+                        className="flex flex-col items-center justify-center transition rounded-full outline-none hover:opacity-80 hover:scale-105 mb-2"
+                    >
+                        <IconClose className="rotate-45" color="#9295A4" size={34} />
+                    </button>
+                </div>
+            </div>
+
+            <div className="flex-1 min-h-0 h-full w-full">
+                {isPrintTem ? (
+                    <div className="relative w-full">
+                        <Carousel />
+                    </div>
+                ) : (
+                    <Customscrollbar
+                        className={`min-h-0 h-full w-full overflow-x-auto bg-white`}
+                    >
+                        <div>
+                            <HeaderTable
+                                gridCols={12}
+                                display={"grid"}
+                                className="pt-0 px-2 pb-1"
+                            >
+                                <ColumnTable
+                                    colSpan={1}
+                                    textAlign={"center"}
+                                    className={`normal-case leading-2 text-typo-gray-5 3xl:!text-[14px] xl:text-[11px] px-0`}
+                                >
+                                    <div className="w-full flex justify-center items-center">
+                                        <CheckboxDefault
+                                            checked={isAllSelected}
+                                            onChange={handleSelectAll}
+                                        />
+                                    </div>
+                                </ColumnTable>
+                                <ColumnTable
+                                    colSpan={1}
+                                    textAlign={"center"}
+                                    className={`border-none normal-case leading-2 text-typo-gray-1 3xl:px-3 px-1 std:!text-[13px] xl:text-[11px]`}
+                                >
+                                    STT
+                                </ColumnTable>
+                                <ColumnTable
+                                    colSpan={5}
+                                    textAlign={"start"}
+                                    className={`border-none  normal-case leading-2 text-typo-gray-1 std:!text-[13px] xl:text-[11px]`}
+                                >
+                                    Thành Phẩm
+                                </ColumnTable>
+                                <ColumnTable
+                                    colSpan={5}
+                                    textAlign={"center"}
+                                    className={`px-0 border-none normal-case leading-2 text-typo-gray-1 std:!text-[13px] xl:text-[11px]`}
+                                >
+                                    SL tem in
+                                </ColumnTable>
+                            </HeaderTable>
+                            <div className="divide-y divide-slate-200 h-[100%] ">
+                                {listItem.map((item, index) => (
+                                    <RowTable gridCols={12} key={item.id}>
+                                        <RowItemTable
+                                            colSpan={1}
+                                            textAlign={"center"}
+                                            // textSize={`"!text-sm"`}
+                                            className="font-semibold xlg:text-sm leading-2 text-typo-black-1  std:!text-[12px] xl:text-[11px]"
+                                        >
+                                            <div className="w-full flex justify-center items-center">
+                                                <CheckboxDefault
+                                                    checked={selectItems.some((i) => i.id === item.id)}
+                                                    onChange={(checked) =>
+                                                        handleSelectItem(item, checked)
+                                                    }
+                                                />
+                                            </div>
+                                        </RowItemTable>
+
+                                        {/* stt */}
+                                        <RowItemTable
+                                            colSpan={1}
+                                            textAlign={"center"}
+                                            // textSize={`"!text-sm"`}
+                                            className="font-semibold xlg:text-sm leading-2 text-typo-black-1  std:!text-[12px] xl:text-[11px] pr-3"
+                                        >
+                                            {index + 1}
+                                        </RowItemTable>
+                                        <RowItemTable
+                                            colSpan={5}
+                                            textAlign={"start"}
+                                        // textSize={`"!text-xs"`}
+                                        >
+                                            {/* card */}
+                                            <Cardtable
+                                                code="LOT: 987456321ZYX"
+                                                name={item.name}
+                                                typeTable="temProducts"
+                                                // classNameImage="2xl:size-10 size-8"
+                                                // imageURL={item?.images}
+                                                classNameContent="gap-y-0"
+                                                date="30/03/2025"
+                                            />
+                                        </RowItemTable>
+
+                                        <RowItemTable
+                                            colSpan={5}
+                                            textAlign={"center"}
+                                        // textSize={`"!text-sm"`}
+                                        // className="font-semibold  leading-2 text-typo-black-1 std:text-[12px] xl:text-[11px]"
+                                        >
+                                            <div className="w-full items-center flex justify-center">
+                                                <InputNumberCustom
+                                                    state={item.item}
+                                                    setState={(value) => handleTemTotal(item.id, value)}
+                                                    classNameButton="rounded-full bg-[#EBF5FF] hover:bg-[#C7DFFB]"
+                                                    className="p-[4px]"
+                                                    disabled={!selectItems.some((i) => i.id === item.id)}
+                                                />
+                                            </div>
+                                        </RowItemTable>
+                                    </RowTable>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* showmore */}
+                    </Customscrollbar>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default PopupPrintTemProduct;

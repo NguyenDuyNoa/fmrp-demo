@@ -10,7 +10,9 @@ const Cardtable = ({
     typeProduct,
     typeTable,
     dataLang,
-    classNameImage = ""
+    date,
+    classNameImage = "",
+    classNameContent = ""
 }) => {
     return (
         <div className=" w-full h-full flex flex-row items-start gap-x-2">
@@ -24,16 +26,19 @@ const Cardtable = ({
                     className="size-full object-cover"
                 />
             </div>
-            <div className="flex flex-col items-start justify-start gap-y-1 w-full">
+            <div className={twMerge("flex flex-col items-start justify-start gap-y-1 w-full", classNameContent)}>
                 <h3 className="font-semibold text-[10px] xl:text-[12px] text-typo-black-1 xlg:text-sm">
                     {name}
                 </h3>
                 <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-gray-2">
                     {variation || "(none)"}
                 </p>
-                <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
-                    {code}
-                </p>
+                {code && <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
+                    {typeTable === "temProducts" && 'LOT'} {code}
+                </p>}
+                {date && typeTable === "temProducts" && <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
+                    Date: {date}
+                </p>}
                 {typeTable === "products" && (
                     <div
                         className={twMerge(

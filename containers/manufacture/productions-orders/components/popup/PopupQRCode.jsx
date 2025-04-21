@@ -25,7 +25,7 @@ const PopupQRCode = () => {
       style={{
         boxShadow: `0px 20px 40px -8px rgba(16, 24, 40, 0.1)`,
       }}
-      className={` bg-[#ffffff] xlg:p-9 p-8 lg:p-7 rounded-[24px] min-w-[478] h-fit relative flex flex-col justify-center items-center ${deca.className}`}
+      className={` bg-[#ffffff] xlg:p-9 p-8 lg:p-7 rounded-[24px]  h-fit relative flex flex-col justify-center items-center ${deca.className}`}
     >
       <div className="flex items-start justify-between relative w-full xlg:mb-5 mb-4">
         <div className="flex items-center justify-center flex-1 px-5">
