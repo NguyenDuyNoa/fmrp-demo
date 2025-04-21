@@ -1,7 +1,6 @@
 "use client";
-import { StateContext } from "@/context/_state/productions-orders/StateContext";
 import { Lexend_Deca } from "@next/font/google";
-import React, { useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Add as IconClose } from "iconsax-react";
 import PrinterIcon2 from "@/components/icons/common/PrinterIcon2";
@@ -18,52 +17,29 @@ import {
 import BackIcon from "@/components/icons/common/BackIcon";
 import { twMerge } from "tailwind-merge";
 import Carousel from "@/components/common/carousel/Carousel";
-
+import NoData from "@/components/UI/noData/nodata";
+import { useSetings } from "@/hooks/useAuth";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-const dataFake = [
-    {
-        id: 1,
-        name: "1",
-        item: 2,
-    },
-    {
-        id: 2,
-        name: "3",
-        item: 4,
-    },
-    {
-        id: 3,
-        name: "4",
-        item: 7,
-    },
-    {
-        id: 4,
-        name: "5",
-        item: 0,
-    },
-    {
-        id: 5,
-        name: "6",
-        item: 9,
-    },
-];
+const PopupPrintTemProduct = ({ dataItem }) => {
 
-const PopupPrintTemProduct = () => {
     const dispatch = useDispatch();
-    const [listItem, setListItem] = useState(dataFake);
+    const [listItem, setListItem] = useState(dataItem ?? []);
     const [selectItems, setSelectItems] = useState([]);
     const [isPrintTem, setIsPrintTem] = useState(false);
 
-    const isAllSelected = selectItems.length === dataFake.length;
+    let isAllSelected = false
+    if (dataItem.length > 0) {
+        isAllSelected = selectItems.length === dataItem.length;
+    }
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            setSelectItems(dataFake); // chọn tất cả
+            setSelectItems(dataItem); // chọn tất cả
         } else {
             setSelectItems([]); // bỏ chọn tất cả
         }
@@ -73,19 +49,19 @@ const PopupPrintTemProduct = () => {
         if (checked) {
             setSelectItems((prev) => [...prev, item]);
         } else {
-            setSelectItems((prev) => prev.filter((i) => i.id !== item.id));
+            setSelectItems((prev) => prev.filter((i) => i.idItem !== item.idItem));
         }
     };
 
     const handleTemTotal = (id, value) => {
         //set lại list item
         setListItem((prev) =>
-            prev.map((item) => (item.id === id ? { ...item, item: value } : item))
+            prev.map((item) => (item.idItem === id ? { ...item, temTotal: value } : item))
         );
 
         //set lại list item được chọn
         setSelectItems((prev) =>
-            prev.map((item) => (item.id === id ? { ...item, item: value } : item))
+            prev.map((item) => (item.idItem === id ? { ...item, temTotal: value } : item))
         );
     };
 
@@ -103,7 +79,7 @@ const PopupPrintTemProduct = () => {
             style={{
                 boxShadow: `0px 20px 40px -8px rgba(16, 24, 40, 0.1)`,
             }}
-            className={` bg-[#ffffff] xlg:p-9 p-8 lg:p-7 rounded-[24px] min-w-[600px] max-w-[700px] h-fit relative flex flex-col justify-center items-center ${deca.className} gap-y-6`}
+            className={` bg-[#ffffff] xlg:p-9 p-8 lg:p-7 rounded-[24px] min-w-[700px] max-w-[700px] h-fit relative flex flex-col justify-center items-center ${deca.className} gap-y-6`}
         >
             <div className="flex flex-row justify-between items-center w-full ">
                 <div className="flex flex-row justify-start items-center flex-1 gap-x-6">
@@ -206,8 +182,8 @@ const PopupPrintTemProduct = () => {
                                 </ColumnTable>
                             </HeaderTable>
                             <div className="divide-y divide-slate-200 h-[100%] ">
-                                {listItem.map((item, index) => (
-                                    <RowTable gridCols={12} key={item.id}>
+                                {listItem.length > 0 ? listItem.map((item, index) => (
+                                    <RowTable gridCols={12} key={item.idItem}>
                                         <RowItemTable
                                             colSpan={1}
                                             textAlign={"center"}
@@ -216,7 +192,7 @@ const PopupPrintTemProduct = () => {
                                         >
                                             <div className="w-full flex justify-center items-center">
                                                 <CheckboxDefault
-                                                    checked={selectItems.some((i) => i.id === item.id)}
+                                                    checked={selectItems.some((i) => i.idItem === item.idItem)}
                                                     onChange={(checked) =>
                                                         handleSelectItem(item, checked)
                                                     }
@@ -240,13 +216,16 @@ const PopupPrintTemProduct = () => {
                                         >
                                             {/* card */}
                                             <Cardtable
-                                                code="LOT: 987456321ZYX"
-                                                name={item.name}
+                                                lot={item?.lot}
+                                                name={item?.item_name}
                                                 typeTable="temProducts"
                                                 // classNameImage="2xl:size-10 size-8"
-                                                // imageURL={item?.images}
+                                                imageURL={item?.images}
                                                 classNameContent="gap-y-0"
-                                                date="30/03/2025"
+                                                date={item?.expiration_date}
+                                                variation={item?.item_variation}
+                                                serial={item?.serial}
+
                                             />
                                         </RowItemTable>
 
@@ -258,20 +237,21 @@ const PopupPrintTemProduct = () => {
                                         >
                                             <div className="w-full items-center flex justify-center">
                                                 <InputNumberCustom
-                                                    state={item.item}
-                                                    setState={(value) => handleTemTotal(item.id, value)}
+                                                    state={item?.temTotal}
+                                                    setState={(value) => handleTemTotal(item.idItem, value)}
                                                     classNameButton="rounded-full bg-[#EBF5FF] hover:bg-[#C7DFFB]"
                                                     className="p-[4px]"
-                                                    disabled={!selectItems.some((i) => i.id === item.id)}
+                                                    disabled={!selectItems.some((i) => i.idItem === item.idItem)}
                                                 />
                                             </div>
                                         </RowItemTable>
                                     </RowTable>
-                                ))}
+                                )) : <>
+                                    <NoData className="mt-0 col-span-16" type="table" />
+                                </>}
                             </div>
                         </div>
 
-                        {/* showmore */}
                     </Customscrollbar>
                 )}
             </div>

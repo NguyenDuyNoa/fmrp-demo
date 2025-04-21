@@ -20,3 +20,13 @@ export const fetchPDFPlanManufactures = async ({ idManufacture }) => {
 
     return pdf_url;
 };
+
+export const fetchItemsManufactures = async ({ idManufacture }) => {
+    const res = await apiProducts.apiGetItemsManufactures({
+        data: {
+            id: idManufacture,
+        },
+    });
+
+    return res;
+};
