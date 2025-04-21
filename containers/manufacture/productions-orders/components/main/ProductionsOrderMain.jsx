@@ -99,6 +99,7 @@ import TabSemi from "../table/tabSemi";
 import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
 import PopupPrintTemProduct from "../popup/PopupPrintTemProduct";
+import dayjs from "dayjs";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const statusExprired = useStatusExprired();
@@ -107,10 +108,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
   const breadcrumbItems = [
     {
-      label: `${
-        dataLang?.materials_planning_manufacture ||
+      label: `${dataLang?.materials_planning_manufacture ||
         "materials_planning_manufacture"
-      }`,
+        }`,
       href: "/",
     },
     {
@@ -222,14 +222,14 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       orders_id:
         [isStateProvider?.productionsOrders.valueOrders?.value]?.length > 0
           ? [isStateProvider?.productionsOrders.valueOrders?.value].map(
-              (e) => e
-            )
+            (e) => e
+          )
           : "",
       date_end: isStateProvider?.productionsOrders.date.dateEnd
         ? formatMoment(
-            isStateProvider?.productionsOrders.date.dateEnd,
-            FORMAT_MOMENT.DATE_SLASH_LONG
-          )
+          isStateProvider?.productionsOrders.date.dateEnd,
+          FORMAT_MOMENT.DATE_SLASH_LONG
+        )
         : "",
       internal_plans_id:
         [isStateProvider?.productionsOrders.valuePlan?.value]?.length > 0
@@ -237,15 +237,15 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           : "",
       date_start: isStateProvider?.productionsOrders.date.dateStart
         ? formatMoment(
-            isStateProvider?.productionsOrders.date.dateStart,
-            FORMAT_MOMENT.DATE_SLASH_LONG
-          )
+          isStateProvider?.productionsOrders.date.dateStart,
+          FORMAT_MOMENT.DATE_SLASH_LONG
+        )
         : "",
       item_variation_id:
         isStateProvider?.productionsOrders.valueProducts?.length > 0
           ? isStateProvider?.productionsOrders.valueProducts.map(
-              (e) => e?.e?.item_variation_id
-            )
+            (e) => e?.e?.item_variation_id
+          )
           : null,
       ...(isStateProvider?.productionsOrders?.selectStatusFilter?.length >
         0 && { status: isStateProvider?.productionsOrders.selectStatusFilter }),
@@ -456,7 +456,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                   title: e?.reference_no,
                   showChild:
                     dataProductionOrderDetail?.listPOItems?.length > 0 &&
-                    index == 0
+                      index == 0
                       ? true
                       : false,
                   arrListData: e?.items_products?.map((i) => {
@@ -499,7 +499,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                   title: e?.reference_no,
                   showChild:
                     dataProductionOrderDetail?.listSemiItems?.length > 0 &&
-                    index == 0
+                      index == 0
                       ? true
                       : false,
                   arrListData: e?.semi_products?.map((i) => {
@@ -557,7 +557,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           searchProductionOrders: value,
         },
       }));
-    } catch (error) {}
+    } catch (error) { }
   }, 500);
 
   // onchange search combobox new
@@ -569,7 +569,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           searchItemsVariant: value,
         },
       }));
-    } catch (error) {}
+    } catch (error) { }
   }, 500);
 
   // onchange search combobox new
@@ -581,7 +581,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           searchOrders: value,
         },
       }));
-    } catch (error) {}
+    } catch (error) { }
   }, 500);
 
   // onchange search combobox new
@@ -593,7 +593,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           searchPODetail: value,
         },
       }));
-    } catch (error) {}
+    } catch (error) { }
   }, 500);
 
   // onchange search combobox new
@@ -605,7 +605,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           searchPlan: value,
         },
       }));
-    } catch (error) {}
+    } catch (error) { }
   }, 500);
 
   // Hàm mở danh sách công đoạn khi click vào lệnh sản xuất
@@ -669,7 +669,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         isShow("error", `${dataLang[res?.message] || res?.message}`);
       }
       handleQueryId({ status: false });
-    } catch (error) {}
+    } catch (error) { }
   };
 
   // Hàm mở accordion trong danh sách công đoạn
@@ -803,21 +803,19 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   // trigger của bộ lọc tổng của tất cả
   const triggerFilterAll = (
     <button
-      className={`${
-        stateFilterDropdown?.open || activeFilterCount > 0
-          ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
-          : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
-      } flex items-center space-x-2 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition`}
+      className={`${stateFilterDropdown?.open || activeFilterCount > 0
+        ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
+        : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
+        } flex items-center space-x-2 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition`}
     >
       <span className="3xl:size-5 size-4 shrink-0">
         <FunnelIcon className="w-full h-full " />
       </span>
       <span
-        className={`${
-          stateFilterDropdown?.open || activeFilterCount > 0
-            ? "text-[#0F4F9E]"
-            : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
-        } text-nowrap 3xl:text-base text-sm custom-transition`}
+        className={`${stateFilterDropdown?.open || activeFilterCount > 0
+          ? "text-[#0F4F9E]"
+          : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
+          } text-nowrap 3xl:text-base text-sm custom-transition`}
       >
         {dataLang?.productions_orders_filter || "productions_orders_filter"}
       </span>
@@ -832,11 +830,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       }
       <span className="3xl:size-4 size-3.5 shrink-0">
         <CaretDownIcon
-          className={`${
-            stateFilterDropdown?.open || activeFilterCount > 0
-              ? "rotate-180"
-              : "rotate-0"
-          } w-full h-full custom-transition`}
+          className={`${stateFilterDropdown?.open || activeFilterCount > 0
+            ? "rotate-180"
+            : "rotate-0"
+            } w-full h-full custom-transition`}
         />
       </span>
     </button>
@@ -845,34 +842,31 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   // trigger của bộ lọc trạng thái
   const triggerFilterStatus = (
     <button
-      className={`${
-        stateFilterDropdown?.open ||
+      className={`${stateFilterDropdown?.open ||
         isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-          ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
-          : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
-      } relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}
+        ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
+        : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
+        } relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}
     >
       <ChartDonutIcon className="absolute -translate-y-1/2 top-1/2 3xl:size-5 size-4" />
 
       <span
-        className={`${
-          stateFilterDropdown?.open ||
+        className={`${stateFilterDropdown?.open ||
           isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-            ? "text-[#0F4F9E]"
-            : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
-        } xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}
+          ? "text-[#0F4F9E]"
+          : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
+          } xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}
       >
         {dataLang?.purchase_status || "purchase_status"}
       </span>
 
       <span className="3xl:size-4 size-3.5 shrink-0">
         <CaretDownIcon
-          className={`${
-            stateFilterDropdown?.open ||
+          className={`${stateFilterDropdown?.open ||
             isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-              ? "rotate-180"
-              : "rotate-0"
-          } w-full h-full custom-transition`}
+            ? "rotate-180"
+            : "rotate-0"
+            } w-full h-full custom-transition`}
         />
       </span>
     </button>
@@ -1048,9 +1042,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         const formatData = response?.data?.map((item, index) => {
           return {
             ...item,
-            temTotal: 1,
+            quality: 1,
             expiration_date: item.expiration_date
-              ? new Date(item.expiration_date).toLocaleDateString("vi-VN") // 👉 Format theo dd/mm/yyyy
+              // ? new Date(item.expiration_date).toLocaleDateString("vi-VN") // 👉 Format theo dd/mm/yyyy
+              ? dayjs(item.expiration_date).format("DD/MM/YYYY")
               : null,
             idItem: index + 1,
           };
@@ -1104,11 +1099,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                     <input
                       onChange={(e) => onChangeSearch(e)}
                       className={`
-                                               ${
-                                                 isOpenSearch
-                                                   ? "rounded-l-lg border-r-0 border-[#D0D5DD] focus:border-[#3276FA]"
-                                                   : "rounded-lg border-[#D0D5DD]"
-                                               }
+                                               ${isOpenSearch
+                          ? "rounded-l-lg border-r-0 border-[#D0D5DD] focus:border-[#3276FA]"
+                          : "rounded-lg border-[#D0D5DD]"
+                        }
                                                 relative border  bg-white pl-2 3xl:h-10 h-9 text-base-default 3xl:w-[300px] w-[280px] focus:outline-none placeholder:text-[#3A3E4C] 3xl:placeholder:text-base placeholder:text-sm placeholder:font-normal`}
                       type="text"
                       // value={isStateProvider?.productionsOrders.search}
@@ -1133,11 +1127,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                   </div>
                 }
                 hideTitle={true}
-                className={`${
-                  isOpenSearch
-                    ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]"
-                    : "rounded-lg text-[#9295A4] border-[#D0D5DD]"
-                } flex items-center justify-center 3xl:w-12 w-10 3xl:h-10 h-9 shrink-0 border`}
+                className={`${isOpenSearch
+                  ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]"
+                  : "rounded-lg text-[#9295A4] border-[#D0D5DD]"
+                  } flex items-center justify-center 3xl:w-12 w-10 3xl:h-10 h-9 shrink-0 border`}
                 onClick={toggleSearch}
               />
             </motion.div>
@@ -1462,11 +1455,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           onChange={(tab) => handleActiveTab(tab, "list")}
           renderLabel={(tab, activeTab) => (
             <h3
-              className={`${
-                isStateProvider?.productionsOrders?.isTabList?.id === tab.id
-                  ? "text-[#0375F3] scale-[1.02]"
-                  : "text-[#9295A4] scale-[1]"
-              } font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}
+              className={`${isStateProvider?.productionsOrders?.isTabList?.id === tab.id
+                ? "text-[#0375F3] scale-[1.02]"
+                : "text-[#9295A4] scale-[1]"
+                } font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}
             >
               <span>{tab.name}</span>
               {tab.count > 0 && (
@@ -1518,31 +1510,28 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                     key={item?.id}
                     onClick={() => handleShowListDetail(item)}
                     className={`
-                                                        ${
-                                                          typePageMoblie
-                                                            ? "px-px"
-                                                            : "pl-1 pr-3"
-                                                        }
-                                                        ${
-                                                          item?.id ==
-                                                            isStateProvider
-                                                              ?.productionsOrders
-                                                              .idDetailProductionOrder &&
-                                                          "bg-[#F0F7FF]"
-                                                        }
-                                                        ${
-                                                          flagProductionOrders?.length -
-                                                            1 ==
-                                                          eIndex
-                                                            ? "border-b-none"
-                                                            : "border-b"
-                                                        }
+                                                        ${typePageMoblie
+                        ? "px-px"
+                        : "pl-1 pr-3"
+                      }
+                                                        ${item?.id ==
+                      isStateProvider
+                        ?.productionsOrders
+                        .idDetailProductionOrder &&
+                      "bg-[#F0F7FF]"
+                      }
+                                                        ${flagProductionOrders?.length -
+                        1 ==
+                        eIndex
+                        ? "border-b-none"
+                        : "border-b"
+                      }
                                                         py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
                     style={{
                       background:
                         item?.id ===
-                        isStateProvider?.productionsOrders
-                          .idDetailProductionOrder
+                          isStateProvider?.productionsOrders
+                            .idDetailProductionOrder
                           ? "linear-gradient(90.1deg, rgba(199, 223, 251, 0.21) 0.07%, rgba(226, 240, 254, 0) 94.35%)"
                           : "",
                     }}
@@ -1552,19 +1541,18 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                       {item?.id ===
                         isStateProvider?.productionsOrders
                           .idDetailProductionOrder && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
-                      )}
+                          <div className="absolute left-0 top-0 bottom-0 w-1 h-full bg-[#0375F3] rounded-l-lg" />
+                        )}
 
                       {isStateProvider?.productionsOrders
                         .dataProductionOrderDetail?.title && (
-                        <span
-                          className={`${
-                            color[item?.status_manufacture]?.color
-                          } xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}
-                        >
-                          {color[item?.status_manufacture]?.title}
-                        </span>
-                      )}
+                          <span
+                            className={`${color[item?.status_manufacture]?.color
+                              } xl:text-sm text-xs px-2 py-1 rounded font-normal w-fit h-fit`}
+                          >
+                            {color[item?.status_manufacture]?.title}
+                          </span>
+                        )}
                       <h1 className="3xl:text-2xl xl:text-xl text-lg font-semibold text-[#003DA0]">
                         {item?.reference_no}
                       </h1>
@@ -1607,25 +1595,25 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                           {item?.id ===
                             isStateProvider?.productionsOrders
                               .idDetailProductionOrder && (
-                            <motion.div
-                              key="extra-info"
-                              layout
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.3, ease: "easeInOut" }}
-                              className="flex flex-col w-full overflow-hidden gap-0.5"
-                            >
-                              <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
-                                <span>
-                                  {dataLang?.client_list_brand ||
-                                    "client_list_brand"}
-                                  :{" "}
-                                </span>
-                                <span>{item?.name_branch}</span>
-                              </h3>
-                            </motion.div>
-                          )}
+                              <motion.div
+                                key="extra-info"
+                                layout
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                className="flex flex-col w-full overflow-hidden gap-0.5"
+                              >
+                                <h3 className="text-[#667085] font-normal 3xl:text-base xl:text-sm text-xs">
+                                  <span>
+                                    {dataLang?.client_list_brand ||
+                                      "client_list_brand"}
+                                    :{" "}
+                                  </span>
+                                  <span>{item?.name_branch}</span>
+                                </h3>
+                              </motion.div>
+                            )}
                         </AnimatePresence>
                       </div>
                     </div>
@@ -1663,7 +1651,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           {!isLoadingProductionOrderDetail &&
             dataProductionOrderDetail?.listPOItems?.length > 0 &&
             isStateProvider?.productionsOrders?.isTabList?.type ==
-              "products" && (
+            "products" && (
               <div
                 ref={groupButtonRef}
                 className="flex items-center justify-end gap-2 p-0.5 mb-2"
@@ -1699,8 +1687,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                       const borderClass = isLast
                         ? "border-transparent rounded-b-lg border-t-transparent"
                         : isFirst
-                        ? "rounded-t-lg border-t-transparent"
-                        : "border-t-transparent";
+                          ? "rounded-t-lg border-t-transparent"
+                          : "border-t-transparent";
 
                       return (
                         <div
@@ -1712,7 +1700,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                         >
                           {/* nút 'hoàn thành chi tiết' có modal riêng khi là gói pro*/}
                           {tab.type === "complete_stage" &&
-                          dataSeting?.package === "2" ? (
+                            dataSeting?.package === "2" ? (
                             <PopupConfimStage
                               dataLang={dataLang}
                               dataRight={isStateProvider?.productionsOrders}
@@ -1843,9 +1831,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             }}
           >
             {isLoadingProductionOrderDetail ||
-            isRefetchingProductionOrderDetail ||
-            isRefetchingProductionOrderList ||
-            isLoadingProductionOrderList ? (
+              isRefetchingProductionOrderDetail ||
+              isRefetchingProductionOrderList ||
+              isLoadingProductionOrderList ? (
               <Loading className="3xl:h-full 2xl:h-full xl:h-full h-full" />
             ) : dataProductionOrderDetail?.listPOItems?.length > 0 ? (
               <React.Fragment>

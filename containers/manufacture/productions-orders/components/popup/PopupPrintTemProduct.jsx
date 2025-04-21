@@ -18,7 +18,10 @@ import BackIcon from "@/components/icons/common/BackIcon";
 import { twMerge } from "tailwind-merge";
 import Carousel from "@/components/common/carousel/Carousel";
 import NoData from "@/components/UI/noData/nodata";
-import { useSetings } from "@/hooks/useAuth";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import apiProducts from "@/Api/apiProducts/products/apiProducts";
+dayjs.extend(customParseFormat);
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -30,7 +33,9 @@ const PopupPrintTemProduct = ({ dataItem }) => {
     const dispatch = useDispatch();
     const [listItem, setListItem] = useState(dataItem ?? []);
     const [selectItems, setSelectItems] = useState([]);
+    // console.log("🚀 ~ PopupPrintTemProduct ~ selectItems:", selectItems)
     const [isPrintTem, setIsPrintTem] = useState(false);
+    const [lisTemItem, setLisTemItem] = useState();
 
     let isAllSelected = false
     if (dataItem.length > 0) {
@@ -56,23 +61,60 @@ const PopupPrintTemProduct = ({ dataItem }) => {
     const handleTemTotal = (id, value) => {
         //set lại list item
         setListItem((prev) =>
-            prev.map((item) => (item.idItem === id ? { ...item, temTotal: value } : item))
+            prev.map((item) => (item.idItem === id ? { ...item, quality: value } : item))
         );
 
         //set lại list item được chọn
         setSelectItems((prev) =>
-            prev.map((item) => (item.idItem === id ? { ...item, temTotal: value } : item))
+            prev.map((item) => (item.idItem === id ? { ...item, quality: value } : item))
         );
     };
 
-    const handlePrint = (type) => {
-        // const typeButton = ["showTem", "printTem"];
+    const handlePrint = async (type) => {
         if (type === "showTem") {
-            setIsPrintTem(true);
+            let formData = new FormData();
+            const parseDate = (dateStr) => {
+                const [day, month, year] = dateStr.split("/");
+                return `${year}-${month}-${day}`;
+            };
+            const formatData = selectItems.map((item, index) => {
+                return {
+                    ...item,
+                    expiration_date: item.expiration_date
+                        ? parseDate(item.expiration_date)
+                        : null,
+                };
+            });
+            formatData.forEach((item, index) => {
+                formData.append(`data[${index}][id]`, item.id)
+                formData.append(`data[${index}][code]`, item.item_code)
+                formData.append(`data[${index}][name]`, item.item_name)
+                formData.append(`data[${index}][variant_main]`, item.item_variation)
+                formData.append(`data[${index}][lot]`, item.lot)
+                formData.append(`data[${index}][date]`, item.expiration_date)
+                formData.append(`data[${index}][serial]:data[${index}][id]:`, item.id)
+                formData.append(`data[${index}][quality]:`, item.quality)
+            })
+
+            // // 👉 Log FormData
+            // for (let pair of formData.entries()) {
+            //     console.log(pair[0] + ": " + pair[1]);
+            // }
+            try {
+                const response = await apiProducts.apiPrintItemsManufactures(formData)
+                console.log("🚀 ~ handlePrint ~ response:", response)
+                if (response.isSuccess === 1) {
+                    setLisTemItem(response)
+                    setIsPrintTem(true);
+                }
+            } catch (error) {
+                throw new Error(error);
+            }
         } else {
-            console.log("1312");
+            window.open(lisTemItem?.pdf_url, "_blank");
         }
-    };
+    }
+
 
     return (
         <div
@@ -135,7 +177,7 @@ const PopupPrintTemProduct = ({ dataItem }) => {
             <div className="flex-1 min-h-0 h-full w-full">
                 {isPrintTem ? (
                     <div className="relative w-full">
-                        <Carousel />
+                        <Carousel lisTemItem={lisTemItem} />
                     </div>
                 ) : (
                     <Customscrollbar
@@ -237,7 +279,7 @@ const PopupPrintTemProduct = ({ dataItem }) => {
                                         >
                                             <div className="w-full items-center flex justify-center">
                                                 <InputNumberCustom
-                                                    state={item?.temTotal}
+                                                    state={item?.quality}
                                                     setState={(value) => handleTemTotal(item.idItem, value)}
                                                     classNameButton="rounded-full bg-[#EBF5FF] hover:bg-[#C7DFFB]"
                                                     className="p-[4px]"

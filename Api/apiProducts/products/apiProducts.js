@@ -77,6 +77,13 @@ const apiProducts = {
     async apiGetItemsManufactures(data) {
         const response = await axiosCustom('POST', `/api_web/api_print/GetItemsManufactures?csrf_protection=true`, data)
         return response.data
+    },
+
+    async apiPrintItemsManufactures(data) {
+        console.log("🚀 ~ apiPrintItemsManufactures ~ data:", data)
+
+        const response = await axiosCustom('POST', `/api_web/api_print/Print_tem_manufacturesWeb?csrf_protection=true`, data)
+        return response.data
     }
 }
 
