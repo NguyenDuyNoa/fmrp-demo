@@ -37,7 +37,9 @@ const FilePDF = ({
     dataProductSerial,
     dataSeting,
 }) => {
+    // console.log("🚀 ~ props:", props?.type)
     const [url, setUrl] = useState(null);
+
 
     const [dataCompany, setDataCompany] = useState(dataSeting);
     // uppercase text header table
