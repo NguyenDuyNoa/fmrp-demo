@@ -150,5 +150,17 @@ const apiProductionsOrders = {
         const response = await axiosCustom('GET', `/api_web/Api_Emoji/getEmoji`);
         return response.data
     },
+
+    // lấy danh sách mặt hàng hoàn thành
+    async apiGetListProductCompleted(id) {
+        const response = await axiosCustom('GET', `/api_web/Api_Production_orders/getProductCompleted?po_id=${id}`);
+        return response.data
+    },
+
+    // xử lý sản phẩm hoàn thành
+    async apiHandlingProductCompleted(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Production_orders/handlingProductCompleted`, data);
+        return response.data
+    },
 }
 export default apiProductionsOrders

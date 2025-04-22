@@ -97,6 +97,7 @@ import {
 import TabSemi from "../table/tabSemi";
 import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
+import PopupCompleteCommand from "../popup/PopupCompleteCommand";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
@@ -962,9 +963,15 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 payload: {
                     open: true,
                     children: (
-                        <PopupQRCode
-                        // urlQR={QRCode?.data.qr}
+                        <PopupCompleteCommand 
+                            onClose={() => dispatch({
+                                type: "statePopupGlobal",
+                                payload: { open: false },
+                            })}
                         />
+                        // <PopupQRCode
+                        // urlQR={QRCode?.data.qr}
+                        // />
                     ),
                 },
             });
@@ -1254,7 +1261,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                                 <SelectComponentNew
                                     isClearable={true}
                                     value={
-                                        isStateProvider?.productionsOrders.valueProductionOrders
+                                        isStateProvider?.productionsOrders
+                                            .valueProductionOrders
                                     }
                                     onInputChange={(e) => {
                                         handleSearchProductionOrders(e);
