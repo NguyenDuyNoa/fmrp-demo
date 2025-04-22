@@ -263,7 +263,8 @@ const General = (props) => {
                                                         Quản lý thời hạn sử dụng
                                                     </p>
                                                     <p className="font-normal text-sm text-typo-gray-2">
-                                                        Theo dõi hạn sử dụng Nguyện Liệu, cảnh báo, tối ưu
+                                                        Theo dõi hạn sử dụng Thành phẩm, cảnh báo, tối ưu
+                                                        Theo dõi hạn sử dụng Thành phẩm, cảnh báo, tối ưu
                                                         kho, giảm lãng phí.
                                                     </p>
                                                 </div>
@@ -293,10 +294,10 @@ const General = (props) => {
                                                     </label>
                                                     <div className="flex flex-col gap-y-1">
                                                         <p className="font-medium text-base text-typo-black-1">
-                                                            Quản lý thời hạn sử dụng
+                                                            Quản lý Serial
                                                         </p>
                                                         <p className="font-normal text-sm text-typo-gray-2">
-                                                            Theo dõi hạn sử dụng Nguyện Liệu, cảnh báo, tối ưu
+                                                            Theo dõi hạn sử dụng Thành phẩm, cảnh báo, tối ưu
                                                             kho, giảm lãng phí.
                                                         </p>
                                                     </div>

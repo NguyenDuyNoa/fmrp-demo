@@ -37,5 +37,15 @@ const apiOrder = {
         const response = await axiosCustom('POST', id ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true` : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true", data);
         return response.data
     },
+
+    async apiPrintPurchaseOrder(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_print/Print_PurchaseOrderWeb?csrf_protection=true`, data)
+        return response.data
+    },
+
+    async apiPrintPurchaseImport(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_print/Print_ImportWeb?csrf_protection=true`, data)
+        return response.data
+    },
 }
 export default apiOrder
