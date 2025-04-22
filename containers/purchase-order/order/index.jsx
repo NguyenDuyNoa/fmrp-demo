@@ -55,7 +55,6 @@ const initalState = {
 
 const Order = (props) => {
     const dataLang = props.dataLang;
-    console.log("🚀 ~ Order ~ dataLang:", dataLang)
 
     const router = useRouter();
 
