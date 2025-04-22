@@ -264,7 +264,6 @@ const General = (props) => {
                                                     </p>
                                                     <p className="font-normal text-sm text-typo-gray-2">
                                                         Theo dõi hạn sử dụng Thành phẩm, cảnh báo, tối ưu
-                                                        Theo dõi hạn sử dụng Thành phẩm, cảnh báo, tối ưu
                                                         kho, giảm lãng phí.
                                                     </p>
                                                 </div>
@@ -297,7 +296,7 @@ const General = (props) => {
                                                             Quản lý Serial
                                                         </p>
                                                         <p className="font-normal text-sm text-typo-gray-2">
-                                                            Theo dõi hạn sử dụng Thành phẩm, cảnh báo, tối ưu
+                                                            Theo dõi Serial Thành phẩm, cảnh báo, tối ưu
                                                             kho, giảm lãng phí.
                                                         </p>
                                                     </div>
