@@ -73,8 +73,8 @@ const Carousel = ({ lisTemItem }) => {
                     updateNavState(swiper);
                 }}
             >
-                {lisTemItem.image_url.map((item, index) => (
-                    <SwiperSlide>
+                {lisTemItem?.image_url?.map((item, index) => (
+                    <SwiperSlide key={index}>
                         <div className="w-full flex flex-row justify-center">
                             <div className="flex flex-row justify-center gap-x-3 rounded-lg border border-[#DDDDE2] max-w-[500px] overflow-hidden">
                                 <div className="">

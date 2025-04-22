@@ -1054,6 +1054,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           type: "statePopupGlobal",
           payload: {
             open: true,
+            allowOutsideClick: false,
             children: <PopupPrintTemProduct dataItem={formatData} />,
           },
         });
