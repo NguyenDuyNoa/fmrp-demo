@@ -1,6 +1,7 @@
-import Image from 'next/image';
-import React from 'react'
-import { twMerge } from 'tailwind-merge';
+import { useSetings } from "@/hooks/useAuth";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 const Cardtable = ({
     imageURL,
@@ -10,11 +11,35 @@ const Cardtable = ({
     typeProduct,
     typeTable,
     dataLang,
-    classNameImage = ""
+    date,
+    classNameImage = "",
+    classNameContent = "",
+    serial,
+    lot,
 }) => {
+
+    //xứ lý cho card table print tem 
+    const [dataMaterialExpiry, setDataMaterialExpiry] = useState({});
+    const [dataProductExpiry, setDataProductExpiry] = useState({});
+    const [dataProductSerial, setDataProductSerial] = useState({});
+    const { data: dataSetting, isLoading } = useSetings();
+    useEffect(() => {
+        if (!isLoading && dataSetting) {
+            setDataMaterialExpiry(dataSetting.dataMaterialExpiry);
+            setDataProductExpiry(dataSetting.dataProductExpiry);
+            setDataProductSerial(dataSetting.dataProductSerial);
+        }
+    }, [isLoading, dataSetting]);
+    //---
+
     return (
         <div className=" w-full h-full flex flex-row items-start gap-x-2">
-            <div className={twMerge("rounded bg-gray-100 2xl:size-14 size-10 shrink-0 overflow-hidden", classNameImage)}>
+            <div
+                className={twMerge(
+                    "rounded bg-gray-100 2xl:size-14 size-10 shrink-0 overflow-hidden",
+                    classNameImage
+                )}
+            >
                 <Image
                     alt="default"
                     src={imageURL || "/icon/default/default.png"}
@@ -24,16 +49,46 @@ const Cardtable = ({
                     className="size-full object-cover"
                 />
             </div>
-            <div className="flex flex-col items-start justify-start gap-y-1 w-full">
+            <div
+                className={twMerge(
+                    "flex flex-col items-start justify-start gap-y-1 w-full",
+                    classNameContent
+                )}
+            >
                 <h3 className="font-semibold text-[10px] xl:text-[12px] text-typo-black-1 xlg:text-sm">
                     {name}
                 </h3>
                 <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-gray-2">
                     {variation || "(none)"}
                 </p>
-                <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
-                    {code}
-                </p>
+                {code && (
+                    <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
+                        {code}
+                    </p>
+                )}
+
+                {typeTable === "temProducts" && (
+                    <>
+                        {dataMaterialExpiry?.is_enable === "1" &&
+                            dataProductExpiry?.is_enable === "1" && (
+                                <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
+                                    LOT: {lot ?? " - "}
+                                </p>
+                            )}
+                        {dataMaterialExpiry?.is_enable === "1" &&
+                            dataProductExpiry?.is_enable === "1" && (
+                                <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
+                                    Date: {date ?? " - "}
+                                </p>
+                            )}
+                        {dataProductSerial?.is_enable === "1" && (
+                            <p className="xlg:text-[10px] xl:text-[8px] text-[6px] font-normal text-typo-blue-2">
+                                Serial: {serial ?? " - "}
+                            </p>
+                        )}
+                    </>
+                )}
+
                 {typeTable === "products" && (
                     <div
                         className={twMerge(
@@ -55,4 +110,4 @@ const Cardtable = ({
     );
 };
 
-export default Cardtable
+export default Cardtable;
