@@ -363,7 +363,6 @@ const PopupOrderCompleted = ({ onClose }) => {
 const PopupCompleteCommand = ({ onClose }) => {
   const [selectAll, setSelectAll] = useState(false);
   const { isStateProvider } = useContext(StateContext);
-  const dispatch = useDispatch();
   const { data: productCompleted, isLoading } = useProductCompleted(
     isStateProvider?.productionsOrders.idDetailProductionOrder
   );

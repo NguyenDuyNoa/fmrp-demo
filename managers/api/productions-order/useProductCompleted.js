@@ -47,9 +47,11 @@ export const useHandlingProductCompleted = () => {
       return response;
     },
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["api_product_completed", variables.po_id],
-      });
+      if (data && data.isSuccess === 1) {
+        queryClient.invalidateQueries({
+          queryKey: ["api_product_completed", variables.po_id],
+        });
+      }
       return data;
     },
     onError: (error) => {

@@ -100,6 +100,7 @@ import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import useSetingServer from "@/hooks/useConfigNumber";
 import PopupPrintTemProduct from "../popup/PopupPrintTemProduct";
 import dayjs from "dayjs";
+import PopupCompleteCommand from "../popup/PopupCompleteCommand";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const statusExprired = useStatusExprired();
@@ -962,8 +963,16 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         payload: {
           open: true,
           children: (
-            <PopupQRCode
+            // <PopupQRCode
             // urlQR={QRCode?.data.qr}
+            // />
+            <PopupCompleteCommand
+              onClose={() =>
+                dispatch({
+                  type: "statePopupGlobal",
+                  payload: { open: false },
+                })
+              }
             />
           ),
         },
