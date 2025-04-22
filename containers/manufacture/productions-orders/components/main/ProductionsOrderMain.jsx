@@ -1710,7 +1710,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                         >
                           {/* nút 'hoàn thành chi tiết' có modal riêng khi là gói pro*/}
                           {tab.type === "complete_stage" &&
-                            dataSeting?.package === "2" ? (
+                            dataSeting?.package !== "1" ? (
                             <PopupConfimStage
                               dataLang={dataLang}
                               dataRight={isStateProvider?.productionsOrders}
