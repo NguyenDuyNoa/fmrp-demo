@@ -18,6 +18,7 @@ import BarChartHorizontal from "./components/newCharts/BarChartHorizontal";
 import PieChartNew from "./components/newCharts/PieChartNew";
 import ListProgress from "./components/newCharts/ListProgress";
 import ListMaterial from "./components/newCharts/ListMaterial";
+import ToggleBotAI from "../botAI/components/ToggleBotAI";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -38,6 +39,9 @@ const Dashboard = (props) => {
       </Head>
 
       <div className="py-6 flex flex-col gap-6 bg-[#FDFDFE] min-h-screen pt-[96px]">
+        <div className="w-full flex items-center justify-center">
+          <ToggleBotAI />
+        </div>
         {/* <TopProducts /> */}
         <div className="flex flex-col md:flex-row gap-6 px-4 md:px-12">
           <BarChartVertical />

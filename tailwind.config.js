@@ -91,6 +91,7 @@ module.exports = {
       },
       boxShadow: {
         "hover-button": "0px 1px 2px 0px #1018280D",
+        'custom-blue': '4px 4px 8px 0 rgba(3, 117, 243, 0.25)',
       },
       screens: {
         "3xl": "1600px",
