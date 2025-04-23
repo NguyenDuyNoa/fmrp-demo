@@ -1,47 +1,37 @@
 "use client";
-import React, { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import React from "react";
+import { Tooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 import { twMerge } from "tailwind-merge";
-const TooltipDefault = ({ children, content, position = "top" }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    const tooltipPosition = {
-        top: 'bottom-full mb-2 left-1/2 -translate-x-1/2',
-        bottom: 'top-full mt-2 left-1/2 -translate-x-1/2',
-        left: 'right-full mr-2 top-1/2 -translate-y-1/2',
-        right: 'left-full ml-2 top-1/2 -translate-y-1/2',
-    };
 
-    const arrowPosition = {
-        top: 'top-full left-1/2 -translate-x-1/2',
-        bottom: 'bottom-full left-1/2 -translate-x-1/2',
-        left: 'right-full top-1/2 -translate-y-1/2',
-        right: 'left-full top-1/2 -translate-y-1/2',
-    };
+const TooltipDefault = ({
+    id,
+    children,
+    content,
+    place = "top",
+    className,
+    delayHide = 0,
+}) => {
     return (
-        <div
-            className="relative inline-block"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(true)}
-        >
-            {children}
-            <AnimatePresence>
-                {isHovered && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -5 }}
-                        transition={{ duration: 0.2 }}
-                        className={twMerge(
-                            'absolute z-50 px-3 py-1.5  text-sm font-medium text-white bg-black rounded-lg shadow-lg whitespace-nowrap',
-                            tooltipPosition[position]
-                        )}
-                    >
-                        {content}
-                        <div className={twMerge('absolute w-2 h-2 bg-black rotate-45', arrowPosition[position])} />
-                    </motion.div>
+        <>
+            <a
+                data-tooltip-id={id}
+                data-tooltip-content={content}
+            >
+                {children}
+            </a>
+            <Tooltip
+                id={id}
+                place={place}
+                className={twMerge(
+                    "!z-[9999] !bg-black !text-white !text-[13px] !font-medium !px-4 !py-2 !rounded-lg  after:!bg-black !opacity-100",
+                    className
                 )}
-            </AnimatePresence>
-        </div>
+                render={({ content }) => <div className="relative">{content}</div>}
+                classNameArrow="!rounded-[2px]"
+                delayHide={delayHide}
+            />
+        </>
     );
 };
 

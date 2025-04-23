@@ -55,6 +55,7 @@
         "react-select": "^5.7.0",
         "react-tailwindcss-datepicker": "^1.6.0",
         "react-tippy": "^1.4.0",
+        "react-tooltip": "^5.28.1",
         "reactjs-popup": "^2.0.5",
         "recharts": "^2.15.2",
         "redux": "^4.2.1",

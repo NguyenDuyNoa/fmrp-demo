@@ -1,5 +1,4 @@
 "use client";
-import SmartTooltip from "@/components/common/tooltip/SmartTooltip";
 import TooltipDefault from "@/components/common/tooltip/TooltipDefault";
 import { useAnimation, motion } from "framer-motion";
 import Image from "next/image";
@@ -14,14 +13,14 @@ const ToggleBotAI = () => {
                 rotate: [0, 5, -5, 5, -5, 0],
                 transition: { duration: 1.2, ease: "easeInOut" },
             });
-        }, 10000); // 10 giây
+        }, 2000); // 2 giây
 
         return () => clearInterval(interval);
     }, [controls]);
 
     return (
         <div className="size-20 aspect-1  relative ">
-            <TooltipDefault content="Trợ lý AI Fimo" position="top">
+            <TooltipDefault id="bot-ai" content="Trợ lý AI Fimo" place="top-end" delayHide={0}>
                 <motion.div
                     className="size-20 rounded-full bg-white shadow-custom-blue"
                     animate={controls}
@@ -39,7 +38,6 @@ const ToggleBotAI = () => {
                 <div className="bg-[#22C55E] w-[10px] h-[10px] border border-red-50 rounded-full absolute bottom-[2px] right-[11px] z-10 " />
             </TooltipDefault>
         </div>
-
     );
 };
 
