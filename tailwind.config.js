@@ -12,6 +12,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        deca: ["Lexend Deca", "sans-serif"],
+      },
       colors: {
         primary: {
           "05": "#C7DFFB",
@@ -27,18 +30,19 @@ module.exports = {
           "03": "#667085",
           "04": "",
           "05": "",
-          "06": '',
-          "07": '#141522',
-          "08": '',
-          "09": '',
-          "10": '',
+          "06": "",
+          "07": "#141522",
+          "08": "",
+          "09": "",
+          10: "",
         },
         typo: {
           blue: {
             1: "#11315B",
             2: "#3276FA",
-            3: '#4752E6',
-            4: '#0375F3'
+            3: "#4752E6",
+            4: "#0375F3",
+            5: "#25387A",
 
           },
           gray: {
@@ -46,52 +50,56 @@ module.exports = {
             2: "#667085",
             3: "#3A3E4C",
             4: "#637381",
-            5: "#52575E"
+            5: "#52575E",
+            6: "#8E8E93",
+            7: "#AEAEB2"
           },
           black: {
-            1: '#141522',
-            2: '#101828',
-            3: '#17181A',
+            1: "#141522",
+            2: "#101828",
+            3: "#17181A",
             4: "#1C252E",
-
+            5: "#1F2329"
           },
           green: {
             1: "#1A7526",
-            2: "#1FC583"
+            2: "#1FC583",
           },
           orange: {
-            1: "#FF8F0D"
-          }
+            1: "#FF8F0D",
+          },
         },
         border: {
           gray: {
             1: "#D0D5DD",
-            2: "#DDDDE2"
+            2: "#DDDDE2",
           },
         },
         background: {
           gray: {
             1: "#D0D5DD",
             2: "#9295A4",
-            3: "#F3F4F6"
+            3: "#F3F4F6",
+            4: "#D1D1D6"
           },
           green: {
-            1: "#35BD4B"
+            1: "#35BD4B",
           },
           blue: {
-            1: '#5B65F5',
-            2: '#0375F3',
-            3: '#EBF5FF',
-            4: '#0F4F9E'
-          }
-        }
+            1: "#5B65F5",
+            2: "#0375F3",
+            3: "#EBF5FF",
+            4: "#0F4F9E",
+          },
+        },
       },
       aspectRatio: {
-        '16/9': '16 / 9',
+        "16/9": "16 / 9",
       },
       boxShadow: {
         "hover-button": "0px 1px 2px 0px #1018280D",
-        'custom-blue': '4px 4px 8px 0 rgba(3, 117, 243, 0.25)',
+        "custom-blue": "4px 4px 8px 0 rgba(3, 117, 243, 0.25)",
+        "custom-inner-blue": "inset 0px -2px 0px 0px #12B0F8"
       },
       screens: {
         "3xl": "1600px",
@@ -134,6 +142,10 @@ module.exports = {
           "linear-gradient(to bottom right, #1FC583 0%, #1F9285 100%)",
         "linear-bg-progress-full":
           "linear-gradient(to bottom right, #1FBA83 0%, #1FA484 100%)",
+        "linear-background-chat":
+          "linear-gradient(to top left, #A0BEF8 0%, #B5F0F0 100%)",
+        "linear-background-button-send":
+          "linear-gradient(to bottom, #12B0F8 0%, #007AFF 100%)",
       },
     },
   },
