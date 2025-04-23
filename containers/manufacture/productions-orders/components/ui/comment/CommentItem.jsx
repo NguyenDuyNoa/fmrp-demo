@@ -1,18 +1,17 @@
-import Image from "next/image";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import ImageAvatar from "./ImageAvatar";
-import moment from "moment";
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import SparklesBurst from "@/components/animations/animation/SparklesBurst";
 import GalleryModal from "@/components/common/Image/GalleryModal";
-import { AiFillLike, AiOutlineLike } from "react-icons/ai";
-import { PiThumbsUp, PiThumbsUpFill } from "react-icons/pi";
-
-import { AnimatePresence, motion } from 'framer-motion'
-
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useToast from "@/hooks/useToast";
+import { useDeleteComment } from "@/managers/api/productions-order/comment/useDeleteComment";
 import { usePostLikeComment } from "@/managers/api/productions-order/comment/usePostLikeComment";
 import { usePostUnlikeComment } from "@/managers/api/productions-order/comment/usePostUnlikeComment";
-import SparklesBurst from "@/components/animations/animation/SparklesBurst";
-import AvatarText from "@/components/UI/common/user/AvatarText";
+import { AnimatePresence, motion } from 'framer-motion';
+import moment from "moment";
+import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+import { PiCopy, PiDotsThreeVerticalBold, PiThumbsUp, PiThumbsUpFill, PiTrash } from "react-icons/pi";
+import { useSelector } from "react-redux";
+import ImageAvatar from "./ImageAvatar";
 
 const likeVariants = {
     initial: { scale: 0.8, rotate: 0 },
@@ -146,7 +145,7 @@ const RenderedComment = ({ content }) => {
     );
 };
 
-const CommentItem = ({ item, currentUser }) => {
+const CommentItem = ({ item, currentUser, onCommentDeleted }) => {
     // Thêm state này trong component
     const [showSparkles, setShowSparkles] = useState(false);
 
@@ -157,6 +156,8 @@ const CommentItem = ({ item, currentUser }) => {
 
     const { onSubmit: onSubmitLikeComment, isLoading: isLoadingLikeComment } = usePostLikeComment()
     const { onSubmit: onSubmitUnlikeComment, isLoading: isLoadingUnlikeComment } = usePostUnlikeComment()
+    const { deleteComment, isLoading: isLoadingDeleteComment } = useDeleteComment();
+    const auth = useSelector((state) => state.auth);
 
     // files image or video
     const files = item?.files || [];
@@ -204,9 +205,47 @@ const CommentItem = ({ item, currentUser }) => {
         setGalleryOpen(true);
     };
 
+    const showToat = useToast();
+    const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef(null);
+    
+    // Đóng dropdown khi click bên ngoài
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const handleCopy = () => {
+        if (item.content) {
+            // Xóa hoàn toàn tất cả các tag người dùng @{id:name}
+            const cleanContent = item.content.replace(/@\{(\d+):([^\}]+)\}/g, '');
+            
+            navigator.clipboard.writeText(cleanContent);
+            setShowDropdown(false);
+            showToat("success", `Đã sao chép nội dung!`);
+        }
+    };
+
+    const handleDelete = () => {
+        if (item.id) {
+            deleteComment(item.id);
+            setShowDropdown(false);
+            if (typeof onCommentDeleted === 'function') {
+                onCommentDeleted(item.id);
+            }
+        }
+    };
+
     return (
         <React.Fragment>
-            <div className="flex items-start gap-3 mb-4">
+            <div className="flex items-start gap-3 group relative hover:bg-primary-07 p-3 rounded-xl">
                 <ImageAvatar
                     src={item?.created_by_profile_image}
                     fullName={item?.created_by_full_name}
@@ -216,12 +255,43 @@ const CommentItem = ({ item, currentUser }) => {
 
                 <div className='flex-1'>
                     {/* Tên + Time */}
-                    <div className="">
-                        <span className='text-sm-default text-[#141522] font-semibold'>{item.created_by_full_name} </span>
-                        <span className='space-x-1'>
-                            <span className="text-xs-default text-[#9295A4] font-normal">{moment(item.created_at).format(FORMAT_MOMENT.DD_MM)},</span>
-                            <span className="text-xs-default text-[#9295A4] ml-1 font-normal">{moment(item.created_at).format(FORMAT_MOMENT.TIME_24H_SHORT)}</span>
-                        </span>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <span className='text-sm-default text-[#141522] font-semibold'>{item.created_by_full_name} </span>
+                            <span className='space-x-1'>
+                                <span className="text-xs-default text-[#9295A4] font-normal">{moment(item.created_at).format(FORMAT_MOMENT.DD_MM)},</span>
+                                <span className="text-xs-default text-[#9295A4] ml-1 font-normal">{moment(item.created_at).format(FORMAT_MOMENT.TIME_24H_SHORT)}</span>
+                            </span>
+                        </div>
+                        <div className="relative" ref={dropdownRef}>
+                            <div 
+                                className={`p-1 cursor-pointer ${showDropdown ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300 ease-in-out`}
+                                onClick={() => setShowDropdown(!showDropdown)}
+                            >
+                                <PiDotsThreeVerticalBold />
+                            </div>
+
+                            {showDropdown && (
+                                <div className="absolute w-[170px] right-0 z-10 bg-white rounded-xl p-1 shadow-[0px_20px_40px_-4px_rgba(0,0,0,0.24),0px_0px_2px_0px_rgba(145,158,171,0.20)] flex flex-col gap-1">
+                                    <button 
+                                        className="flex w-full rounded-lg items-center gap-2 px-1.5 py-2 hover:bg-primary-05 transition-colors text-neutral-03 hover:text-neutral-07"
+                                        onClick={handleCopy}
+                                    >
+                                        <PiCopy className="size-5" />
+                                        <span className="text-sm font-normal">Sao chép</span>
+                                    </button>
+                                   {auth.staff_id === item.user_id && (
+                                        <button 
+                                            className="flex w-full rounded-lg items-center gap-2 px-1.5 py-2 hover:bg-primary-05 transition-colors text-neutral-03 hover:text-neutral-07"
+                                            onClick={handleDelete}
+                                        >
+                                            <PiTrash className="size-5" />
+                                            <span className="text-sm font-normal">Xóa bình luận</span>
+                                        </button>
+                                   )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Content */}
