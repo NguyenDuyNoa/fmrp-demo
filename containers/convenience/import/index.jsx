@@ -7,11 +7,14 @@ import Swal from "sweetalert2";
 
 import * as XLSX from "xlsx";
 
-import { ArrowRight, Trash as IconDelete, Notification, RefreshCircle } from "iconsax-react";
+import {
+    ArrowRight,
+    Trash as IconDelete,
+    Notification,
+    RefreshCircle,
+} from "iconsax-react";
 
 import Loading from "@/components/UI/loading/loading";
-
-
 
 import Select from "react-select";
 
@@ -107,6 +110,7 @@ const Import = (props) => {
     const [dataDelivery, sDataDelivery] = useState([]);
 
     const [dataColumn, sDataColumn] = useState([]);
+  
     const [dataConditionColumn, sDataConditionColumn] = useState([]);
     const [dataSampleImport, sDataSampleImport] = useState([]);
     const [save_template, sSave_template] = useState(null);
@@ -133,7 +137,9 @@ const Import = (props) => {
         extra: false,
     });
 
-    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    const { is_admin: role, permissions_current: auth } = useSelector(
+        (state) => state.auth
+    );
 
     const { checkAdd, checkEdit } = useActionRole(
         auth,
@@ -205,6 +211,7 @@ const Import = (props) => {
         Axios("GET", `${apiUrlComLumn}`, {}, (err, response) => {
             if (!err) {
                 var db = response.data;
+                
                 sDataColumn(db?.map((e) => ({ label: e, value: e })));
             }
             sOnLoading(false);
@@ -353,12 +360,15 @@ const Import = (props) => {
                 const parsedValue = JSON?.parse(value?.setup_colums);
                 const dataBackup = parsedValue?.data?.map((e) => JSON.parse(e)) || [];
                 if (tabPage == 1) {
-                    const dataBackupContact = parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
-                    const dataBackupDelivery = parsedValue?.dataSubDelivery?.map((e) => JSON.parse(e)) || [];
+                    const dataBackupContact =
+                        parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
+                    const dataBackupDelivery =
+                        parsedValue?.dataSubDelivery?.map((e) => JSON.parse(e)) || [];
                     sListDataContat(dataBackupContact);
                     sListDataDelivery(dataBackupDelivery);
                 } else if (tabPage == 2) {
-                    const dataBackupContact = parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
+                    const dataBackupContact =
+                        parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
                     sListDataContat(dataBackupContact);
                 }
                 sListData(dataBackup);
@@ -412,7 +422,9 @@ const Import = (props) => {
             const sheet = workbook.Sheets[sheetName];
 
             const startRows = parseInt(startRowIndex2) || 1; // Hàng bắt đầu, mặc định là 1
-            const endRows = parseInt(endRow) || XLSX.utils.sheet_to_json(sheet, { header: 1 }).length; // Hàng kết thúc, mặc định là số hàng cuối cùng trong sheet
+            const endRows =
+                parseInt(endRow) ||
+                XLSX.utils.sheet_to_json(sheet, { header: 1 }).length; // Hàng kết thúc, mặc định là số hàng cuối cùng trong sheet
             const jsonData = [];
 
             const sheetData = XLSX.utils.sheet_to_json(sheet, {
@@ -459,7 +471,12 @@ const Import = (props) => {
     const checkMain = listData?.some((e) => e?.dataFields?.value == "variation");
 
     const isDuplicateValue = (list, childId, type, value) => {
-        return value && list.some((data) => data[type]?.value === value?.value && data.id !== childId);
+        return (
+            value &&
+            list.some(
+                (data) => data[type]?.value === value?.value && data.id !== childId
+            )
+        );
     };
 
     const showToastError = (title) => {
@@ -470,16 +487,23 @@ const Import = (props) => {
     };
 
     const _HandleChangeChild = (childId, type, value) => {
+        
         const newData = listData.map((e) => {
+
             const checkMain2 = e?.dataFields?.value == "variation";
             if (e?.id == childId) {
                 if (type == "data_fields") {
                     const isDuplicate =
                         value &&
-                        listData.some((data) => data?.dataFields?.value === value?.value && data.id !== childId);
+                        listData.some(
+                            (data) =>
+                                data?.dataFields?.value === value?.value && data.id !== childId
+                        );
                     //Lỗi trùng nhau
                     if (isDuplicate && e?.dataFields?.value !== value?.value) {
-                        showToastError(dataLang?.import_ERR_selected || "import_ERR_selected");
+                        showToastError(
+                            dataLang?.import_ERR_selected || "import_ERR_selected"
+                        );
                         return { ...e, dataFields: null };
                     } else if (
                         //Lỗi trùng nhau phải có biến thể chính mới cho chọn phụ
@@ -491,7 +515,9 @@ const Import = (props) => {
                         return e;
                     } else if ((tabPage == 3 || tabPage == 4) && checkMain2) {
                         //Khi không có biến thể chính thì trường biến thể phụ thành null
-                        const checkEx = listData?.findIndex((e) => e?.dataFields?.value == "variation_option");
+                        const checkEx = listData?.findIndex(
+                            (e) => e?.dataFields?.value == "variation_option"
+                        );
                         if (checkEx >= 0) {
                             listData[checkEx].dataFields = null;
                         }
@@ -502,10 +528,16 @@ const Import = (props) => {
                 } else if (type == "column") {
                     //Trùng cột
                     const isDuplicate =
-                        value && listData.some((data) => data?.column?.value === value?.value && data.id !== childId);
+                        value &&
+                        listData.some(
+                            (data) =>
+                                data?.column?.value === value?.value && data.id !== childId
+                        );
 
                     if (isDuplicate && e?.column?.value !== value?.value) {
-                        showToastError(dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn");
+                        showToastError(
+                            dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn"
+                        );
                         return e; // Giữ nguyên phần tử cũ nếu trùng lặp
                     } else {
                         return { ...e, column: value };
@@ -515,6 +547,8 @@ const Import = (props) => {
                 return e;
             }
         });
+
+      
         sListData([...newData]);
     };
 
@@ -522,17 +556,31 @@ const Import = (props) => {
         const newData = listDataContact.map((e) => {
             if (e?.id === childId) {
                 if (type === "dataFieldsContact") {
-                    const isDuplicate = isDuplicateValue(listDataContact, childId, "dataFieldsContact", value);
+                    const isDuplicate = isDuplicateValue(
+                        listDataContact,
+                        childId,
+                        "dataFieldsContact",
+                        value
+                    );
                     //Kiểm tra trùng cột
                     if (isDuplicate && e?.dataFieldsContact?.value !== value?.value) {
-                        showToastError(dataLang?.import_ERR_selected || "import_ERR_selected");
+                        showToastError(
+                            dataLang?.import_ERR_selected || "import_ERR_selected"
+                        );
                         return { ...e, dataFieldsContact: null };
                     }
                     return { ...e, dataFieldsContact: value };
                 } else if (type === "columnContact") {
-                    const isDuplicate = isDuplicateValue(listDataContact, childId, "columnContact", value);
+                    const isDuplicate = isDuplicateValue(
+                        listDataContact,
+                        childId,
+                        "columnContact",
+                        value
+                    );
                     if (isDuplicate && e?.columnContact?.value !== value?.value) {
-                        showToastError(dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn");
+                        showToastError(
+                            dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn"
+                        );
                         return e;
                     } else {
                         return { ...e, columnContact: value };
@@ -548,19 +596,33 @@ const Import = (props) => {
         const newData = listDataDelivery.map((e) => {
             if (e?.id == childId) {
                 if (type == "dataFieldsDelivery") {
-                    const isDuplicate = isDuplicateValue(listDataDelivery, childId, "dataFieldsDelivery", value);
+                    const isDuplicate = isDuplicateValue(
+                        listDataDelivery,
+                        childId,
+                        "dataFieldsDelivery",
+                        value
+                    );
                     //Lỗi trùng nhau
                     if (isDuplicate && e?.dataFieldsDelivery?.value !== value?.value) {
-                        showToastError(dataLang?.import_ERR_selected || "import_ERR_selected");
+                        showToastError(
+                            dataLang?.import_ERR_selected || "import_ERR_selected"
+                        );
                         return { ...e, dataFieldsDelivery: null };
                     }
                     return { ...e, dataFieldsDelivery: value };
                 } else if (type == "columnDelivery") {
                     //Trùng cột
-                    const isDuplicate = isDuplicateValue(listDataDelivery, childId, "columnDelivery", value);
+                    const isDuplicate = isDuplicateValue(
+                        listDataDelivery,
+                        childId,
+                        "columnDelivery",
+                        value
+                    );
 
                     if (isDuplicate && e?.columnDelivery?.value !== value?.value) {
-                        showToastError(dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn");
+                        showToastError(
+                            dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn"
+                        );
                         return e;
                     } else {
                         return { ...e, columnDelivery: value };
@@ -635,7 +697,9 @@ const Import = (props) => {
         const newData = listData.filter((x) => x.id !== id); // loại bỏ phần tử cần xóa
         const newDatas = listData.filter((item) => {
             const value = item?.dataFields?.value;
-            return item.id !== id && value !== "variation" && value !== "variation_option";
+            return (
+                item.id !== id && value !== "variation" && value !== "variation_option"
+            );
         });
 
         sListData(newDatas); // cập nhật lại mảng
@@ -765,7 +829,9 @@ const Import = (props) => {
                 hasNullDataFiles && sErrFiles(true);
                 hasNullColumn && sErrColumn(true);
 
-                valueCheck == "edit" && condition_column == null && sErrValueCheck(true);
+                valueCheck == "edit" &&
+                    condition_column == null &&
+                    sErrValueCheck(true);
 
                 fileImport == null && sErrFileImport(true);
 
@@ -780,17 +846,26 @@ const Import = (props) => {
                 if (requiredColumn) {
                     Toast.fire({
                         icon: "error",
-                        title: `${dataLang?.import_ERR_add_column || "import_ERR_add_column"}`,
+                        title: `${dataLang?.import_ERR_add_column || "import_ERR_add_column"
+                            }`,
                     });
                 }
                 //KH - bắt buộc phải có cột tên khách hàng, NCC PHẢI CÓ TÊN NCC, nvl PHẢI CÓ TÊN nvl
                 else if (!ObError?.name) {
                     Toast.fire({
                         icon: "error",
-                        title: `${(tabPage == 1 && !ObError?.name && dataLang?.import_ERR_add_nameData) ||
-                            (tabPage == 2 && !ObError?.name && dataLang?.import_ERR_add_nameDataSuplier) ||
-                            (tabPage == 3 && !ObError?.name && dataLang?.import_ERR_add_nameMterial) ||
-                            (tabPage == 4 && !ObError?.name && dataLang?.import_ERR_add_nameProduct)
+                        title: `${(tabPage == 1 &&
+                            !ObError?.name &&
+                            dataLang?.import_ERR_add_nameData) ||
+                            (tabPage == 2 &&
+                                !ObError?.name &&
+                                dataLang?.import_ERR_add_nameDataSuplier) ||
+                            (tabPage == 3 &&
+                                !ObError?.name &&
+                                dataLang?.import_ERR_add_nameMterial) ||
+                            (tabPage == 4 &&
+                                !ObError?.name &&
+                                dataLang?.import_ERR_add_nameProduct)
                             }`,
                     });
                 }
@@ -798,18 +873,25 @@ const Import = (props) => {
                 else if (valueCheck == "add" && !ObError?.branch_id) {
                     Toast.fire({
                         icon: "error",
-                        title: `${dataLang?.import_ERR_add_branchData || "import_ERR_add_branchData"}`,
+                        title: `${dataLang?.import_ERR_add_branchData || "import_ERR_add_branchData"
+                            }`,
                     });
                 }
                 //nếu cập nhật thì phải có cột mã kh
                 else if (valueCheck == "edit" && tabPage == 1 && !ObError?.code) {
                     Toast.fire({
                         icon: "error",
-                        title: `${dataLang?.import_ERR_add_CodeData || "import_ERR_add_CodeData"}`,
+                        title: `${dataLang?.import_ERR_add_CodeData || "import_ERR_add_CodeData"
+                            }`,
                     });
                 }
                 //Hàng bắt đầu hàng kết thúc
-                else if (row_tarts == 0 || row_tarts == null || end_row == 0 || end_row == null) {
+                else if (
+                    row_tarts == 0 ||
+                    row_tarts == null ||
+                    end_row == 0 ||
+                    end_row == null
+                ) {
                     Toast.fire({
                         icon: "error",
                         title: `${"Hàng phải lớn hơn 0"}`,
@@ -817,12 +899,14 @@ const Import = (props) => {
                 } else if (errEnd) {
                     Toast.fire({
                         icon: "error",
-                        title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`,
+                        title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"
+                            }`,
                     });
                 } else if (errStart) {
                     Toast.fire({
                         icon: "error",
-                        title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`,
+                        title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"
+                            }`,
                     });
                 } else {
                     Toast.fire({
@@ -927,7 +1011,8 @@ const Import = (props) => {
         ...item,
         dataFieldsContact: listDataContact[index]?.dataFieldsContact,
         columnContact: listDataContact[index]?.columnContact,
-        dataFieldsDelivery: tabPage == 1 && listDataDelivery[index]?.dataFieldsDelivery,
+        dataFieldsDelivery:
+            tabPage == 1 && listDataDelivery[index]?.dataFieldsDelivery,
         columnDelivery: tabPage == 1 && listDataDelivery[index]?.columnDelivery,
     }));
 
@@ -969,25 +1054,41 @@ const Import = (props) => {
                             result[dataFieldsDeliveryValue] = item[columnDeliveryValue];
                         }
 
-                        if (dataFields?.label && dataFieldsValue && item[dataFields.label]) {
+                        if (
+                            dataFields?.label &&
+                            dataFieldsValue &&
+                            item[dataFields.label]
+                        ) {
                             const fieldKey = dataFieldsValue;
                             const fieldValue = item[dataFields.label];
                             result[fieldKey] = fieldValue;
                         }
 
-                        if (dataFieldsContact?.label && dataFieldsContactValue && item[dataFieldsContact.label]) {
+                        if (
+                            dataFieldsContact?.label &&
+                            dataFieldsContactValue &&
+                            item[dataFieldsContact.label]
+                        ) {
                             const fieldKey = dataFieldsContactValue;
                             const fieldValue = item[dataFieldsContact.label];
                             result[fieldKey] = fieldValue;
                         }
-                        if (dataFieldsDelivery?.label && dataFieldsDeliveryValue && item[dataFieldsDelivery.label]) {
+                        if (
+                            dataFieldsDelivery?.label &&
+                            dataFieldsDeliveryValue &&
+                            item[dataFieldsDelivery.label]
+                        ) {
                             const fieldKey = dataFieldsDeliveryValue;
                             const fieldValue = item[dataFieldsDelivery.label];
                             result[fieldKey] = fieldValue;
                         }
                     }
                     if (Object.keys(result).length > 0) {
-                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
+                        result["rowIndex"] = item.rowIndex
+                            ? Number(item.rowIndex) + 1
+                            : item.rowIndex == 0
+                                ? 1
+                                : null;
                         return result;
                     }
 
@@ -1004,7 +1105,8 @@ const Import = (props) => {
                 .map((item, index) => {
                     const result = {};
                     for (const listDataItem of mergedListData) {
-                        const { column, dataFields, columnContact, dataFieldsContact } = listDataItem;
+                        const { column, dataFields, columnContact, dataFieldsContact } =
+                            listDataItem;
                         const columnValue = column?.value;
                         const dataFieldsValue = dataFields?.value;
                         const columnContactValue = columnContact?.value;
@@ -1017,20 +1119,32 @@ const Import = (props) => {
                         if (columnContactValue && item[columnContactValue]) {
                             result[dataFieldsContactValue] = item[columnContactValue];
                         }
-                        if (dataFields?.label && dataFieldsValue && item[dataFields.label]) {
+                        if (
+                            dataFields?.label &&
+                            dataFieldsValue &&
+                            item[dataFields.label]
+                        ) {
                             const fieldKey = dataFieldsValue;
                             const fieldValue = item[dataFields.label];
                             result[fieldKey] = fieldValue;
                         }
 
-                        if (dataFieldsContact?.label && dataFieldsContactValue && item[dataFieldsContact.label]) {
+                        if (
+                            dataFieldsContact?.label &&
+                            dataFieldsContactValue &&
+                            item[dataFieldsContact.label]
+                        ) {
                             const fieldKey = dataFieldsContactValue;
                             const fieldValue = item[dataFieldsContact.label];
                             result[fieldKey] = fieldValue;
                         }
                     }
                     if (Object.keys(result).length > 0) {
-                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
+                        result["rowIndex"] = item.rowIndex
+                            ? Number(item.rowIndex) + 1
+                            : item.rowIndex == 0
+                                ? 1
+                                : null;
                         return result;
                     }
 
@@ -1065,7 +1179,11 @@ const Import = (props) => {
                         }
                     }
                     if (Object.keys(result).length > 0) {
-                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
+                        result["rowIndex"] = item.rowIndex
+                            ? Number(item.rowIndex) + 1
+                            : item.rowIndex == 0
+                                ? 1
+                                : null;
                         return result;
                     }
 
@@ -1139,7 +1257,9 @@ const Import = (props) => {
                         headers: { "Content-Type": "multipart/form-data" },
                         onUploadProgress: (progressEvent) => {
                             const { loaded, total } = progressEvent;
-                            const percentage = Math.floor(((loaded / 1000) * 100) / (total / 1000));
+                            const percentage = Math.floor(
+                                ((loaded / 1000) * 100) / (total / 1000)
+                            );
                             sMultipleProgress(percentage);
                         },
                     },
@@ -1191,7 +1311,10 @@ const Import = (props) => {
                 formData.append(`setup_colums[dataSub][${index}]`, JSON.stringify(e));
             });
             listDataDelivery.forEach((e, index) => {
-                formData.append(`setup_colums[dataSubDelivery][${index}]`, JSON.stringify(e));
+                formData.append(
+                    `setup_colums[dataSubDelivery][${index}]`,
+                    JSON.stringify(e)
+                );
             });
         } else if (tabPage == 2) {
             listDataContact.forEach((e, index) => {
@@ -1221,7 +1344,11 @@ const Import = (props) => {
     };
 
     useEffect(() => {
-        tabPage != 5 && tabPage != 6 && onSending && save_template && _ServerSendingImporTemplate();
+        tabPage != 5 &&
+            tabPage != 6 &&
+            onSending &&
+            save_template &&
+            _ServerSendingImporTemplate();
     }, [onSending]);
 
     useEffect(() => {
@@ -1273,22 +1400,22 @@ const Import = (props) => {
                             <div className="col-span-2"></div>
                             <Customscrollbar className="col-span-8 overflow-auto">
                                 <div className="flex items-center gap-4 flex-nowrap">
-                                    {dataTab && dataTab.map((e) => {
-                                        return (
-                                            <div key={e?.id}>
-                                                <TabClient
-                                                    key={e.id}
-                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                    active={e.id}
-                                                    className="text-[#0F4F9E] my-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear"
-                                                >
-                                                    {e?.name}
-                                                </TabClient>
-                                            </div>
-                                        );
-                                    })}
+                                    {dataTab &&
+                                        dataTab.map((e) => {
+                                            return (
+                                                <div key={e?.id}>
+                                                    <TabClient
+                                                        key={e.id}
+                                                        onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                                        active={e.id}
+                                                        className="text-[#0F4F9E] my-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear"
+                                                    >
+                                                        {e?.name}
+                                                    </TabClient>
+                                                </div>
+                                            );
+                                        })}
                                 </div>
-
                             </Customscrollbar>
                             <div className="col-span-2"></div>
                             <div className="col-span-2"></div>
@@ -1298,8 +1425,12 @@ const Import = (props) => {
                             <div className="col-span-2"></div>
                             <div className="col-span-2"></div>
                             <div className="col-span-4 mt-2 mb-2">
-                                {(tabPage == 5 && <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} />) ||
-                                    (tabPage == 6 && <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} />) ||
+                                {(tabPage == 5 && (
+                                    <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} />
+                                )) ||
+                                    (tabPage == 6 && (
+                                        <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} />
+                                    )) ||
                                     (tabPage != 5 && tabPage != 6 && (
                                         <React.Fragment>
                                             <h5 className="block mb-1 text-sm font-medium text-gray-700">
@@ -1322,7 +1453,9 @@ const Import = (props) => {
                                                 onChange={_HandleChange.bind(this, "sampleImport")}
                                                 value={sampleImport}
                                                 LoadingIndicator
-                                                noOptionsMessage={() => dataLang?.import_no_data || "import_no_data"}
+                                                noOptionsMessage={() =>
+                                                    dataLang?.import_no_data || "import_no_data"
+                                                }
                                                 maxMenuHeight="200px"
                                                 isClearable={true}
                                                 menuPortalTarget={document.body}
@@ -1366,19 +1499,25 @@ const Import = (props) => {
                                 {tabPage != 5 && tabPage != 6 && valueCheck === "edit" ? (
                                     <>
                                         <h5 className="block mb-1 text-sm font-medium text-gray-700">
-                                            {dataLang?.import_condition_column || "import_condition_column"}
+                                            {dataLang?.import_condition_column ||
+                                                "import_condition_column"}
                                             <span className="text-red-500">*</span>
                                         </h5>
                                         <Select
                                             closeMenuOnSelect={true}
-                                            placeholder={dataLang?.import_condition_column || "import_condition_column"}
+                                            placeholder={
+                                                dataLang?.import_condition_column ||
+                                                "import_condition_column"
+                                            }
                                             isLoading={onLoading}
                                             options={dataConditionColumn}
                                             isSearchable={true}
                                             onChange={_HandleChange.bind(this, "condition_column")}
                                             value={condition_column}
                                             LoadingIndicator
-                                            noOptionsMessage={() => dataLang?.import_no_data || "import_no_data"}
+                                            noOptionsMessage={() =>
+                                                dataLang?.import_no_data || "import_no_data"
+                                            }
                                             maxMenuHeight="200px"
                                             isClearable={true}
                                             menuPortalTarget={document.body}
@@ -1408,7 +1547,8 @@ const Import = (props) => {
                                         />
                                         {errValueCheck && (
                                             <label className="text-sm text-red-500">
-                                                {dataLang?.import_ERR_condition_column || "import_ERR_condition_column"}
+                                                {dataLang?.import_ERR_condition_column ||
+                                                    "import_ERR_condition_column"}
                                             </label>
                                         )}
                                     </>
@@ -1421,8 +1561,14 @@ const Import = (props) => {
                             <div className="col-span-2"></div>
                             <div className="col-span-4 ">
                                 <div className="grid items-center grid-cols-12 gap-1">
-                                    <div className={`${!showDeleteButton ? "col-span-12" : "col-span-11"}`}>
-                                        <label for="importFile" className="block mb-2 text-sm font-medium ">
+                                    <div
+                                        className={`${!showDeleteButton ? "col-span-12" : "col-span-11"
+                                            }`}
+                                    >
+                                        <label
+                                            for="importFile"
+                                            className="block mb-2 text-sm font-medium "
+                                        >
                                             {dataLang?.import_file || "import_file"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
@@ -1495,7 +1641,9 @@ const Import = (props) => {
                             </div>
                             <div className="relative col-span-4 -mt-2">
                                 {save_template && onLoadingDataBack && (
-                                    <div className={`b  flex items-center justify-center w-full  pt-5`}>
+                                    <div
+                                        className={`b  flex items-center justify-center w-full  pt-5`}
+                                    >
                                         <button
                                             onClick={_HandleLoadDataBackup.bind(this)}
                                             className="i flex justify-center gap-2 bg-green-600 w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
@@ -1514,7 +1662,9 @@ const Import = (props) => {
                                 )}
                                 {(tabPage == 3 || tabPage == 4) && listData.length > 0 && (
                                     <div
-                                        className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                        className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack
+                                            ? "absolute w-[100%] top-[66%]"
+                                            : ""
                                             }`}
                                     >
                                         <Stepper
@@ -1522,21 +1672,30 @@ const Import = (props) => {
                                             dataLang={dataLang}
                                             label1={dataLang?.import_variation || "import_variation"}
                                             tabPage={tabPage}
-                                            label2={dataLang?.import_subvariant || "import_subvariant"}
+                                            label2={
+                                                dataLang?.import_subvariant || "import_subvariant"
+                                            }
                                         />
                                     </div>
                                 )}
                                 {(tabPage == 1 || tabPage == 2) && (
                                     <div
-                                        className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                        className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack
+                                            ? "absolute w-[100%] top-[66%]"
+                                            : ""
                                             }`}
                                     >
                                         <Stepper
                                             stepper={stepper}
                                             dataLang={dataLang}
-                                            label1={dataLang?.import_contactInfo || "import_contactInfo"}
+                                            label1={
+                                                dataLang?.import_contactInfo || "import_contactInfo"
+                                            }
                                             tabPage={tabPage}
-                                            label2={dataLang?.import_deliveryAdress || "import_deliveryAdress"}
+                                            label2={
+                                                dataLang?.import_deliveryAdress ||
+                                                "import_deliveryAdress"
+                                            }
                                         />
                                     </div>
                                 )}
@@ -1550,186 +1709,204 @@ const Import = (props) => {
                                 {onLoadingListData ? (
                                     <Loading className="h-2" color="#0f4f9e" />
                                 ) : (
-                                    listData?.map((e, index) => (
-                                        <div className="grid grid-cols-6 gap-2.5 mb-2" key={e?.id}>
-                                            <div className="col-span-4">
-                                                <div className="grid-cols-13 grid items-end justify-center gap-2.5">
-                                                    <div className="col-span-6">
-                                                        {index == 0 && (
-                                                            <h5 className="block mb-1 text-sm font-medium text-gray-700">
-                                                                {dataLang?.import_data_fields || "import_data_fields"}{" "}
-                                                                <span className="text-red-500">*</span>
-                                                            </h5>
-                                                        )}
-                                                        <Select
-                                                            closeMenuOnSelect={true}
-                                                            placeholder={
-                                                                dataLang?.import_data_fields || "import_data_fields"
-                                                            }
-                                                            options={dataClient}
-                                                            isSearchable={true}
-                                                            onChange={_HandleChangeChild.bind(
-                                                                this,
-                                                                e?.id,
-                                                                "data_fields"
+                                    listData?.map((e, index) => {
+                                       
+                                        return (
+                                            <div
+                                                className="grid grid-cols-6 gap-2.5 mb-2"
+                                                key={e?.id}
+                                            >
+                                                <div className="col-span-4">
+                                                    <div className="grid-cols-13 grid items-end justify-center gap-2.5">
+                                                        <div className="col-span-6">
+                                                            {index == 0 && (
+                                                                <h5 className="block mb-1 text-sm font-medium text-gray-700">
+                                                                    {dataLang?.import_data_fields ||
+                                                                        "import_data_fields"}{" "}
+                                                                    <span className="text-red-500">*</span>
+                                                                </h5>
                                                             )}
-                                                            value={e?.dataFields}
-                                                            LoadingIndicator
-                                                            noOptionsMessage={() =>
-                                                                dataLang?.import_no_data || "import_no_data"
-                                                            }
-                                                            maxMenuHeight="200px"
-                                                            isClearable={true}
-                                                            menuPortalTarget={document.body}
-                                                            onMenuOpen={handleMenuOpen}
-                                                            theme={(theme) => ({
-                                                                ...theme,
-                                                                colors: {
-                                                                    ...theme.colors,
-                                                                    primary25: "#EBF5FF",
-                                                                    primary50: "#92BFF7",
-                                                                    primary: "#0F4F9E",
-                                                                },
-                                                            })}
-                                                            styles={{
-                                                                placeholder: (base) => ({
-                                                                    ...base,
-                                                                    color: "#cbd5e1",
-                                                                }),
-                                                                menuPortal: (base) => ({
-                                                                    ...base,
-                                                                    zIndex: 9999,
-                                                                    position: "absolute",
-                                                                }),
-                                                            }}
-                                                            className={`${errFiles && e.dataFields == null
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
-                                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
-                                                        />
-                                                    </div>
-                                                    <div className="col-span-6">
-                                                        {index == 0 && (
-                                                            <h5 className="block mb-1 text-sm font-medium text-gray-700">
-                                                                {dataLang?.import_data_column || "import_data_column"}
-                                                                <span className="text-red-500">*</span>
-                                                            </h5>
-                                                        )}
-                                                        <Select
-                                                            closeMenuOnSelect={true}
-                                                            placeholder={
-                                                                dataLang?.import_data_column || "import_data_column"
-                                                            }
-                                                            options={dataColumn}
-                                                            isSearchable={true}
-                                                            onChange={_HandleChangeChild.bind(this, e?.id, "column")}
-                                                            value={e?.column}
-                                                            LoadingIndicator
-                                                            noOptionsMessage={() =>
-                                                                dataLang?.import_no_data || "import_no_data"
-                                                            }
-                                                            maxMenuHeight="200px"
-                                                            isClearable={true}
-                                                            menuPortalTarget={document.body}
-                                                            onMenuOpen={handleMenuOpen}
-                                                            theme={(theme) => ({
-                                                                ...theme,
-                                                                colors: {
-                                                                    ...theme.colors,
-                                                                    primary25: "#EBF5FF",
-                                                                    primary50: "#92BFF7",
-                                                                    primary: "#0F4F9E",
-                                                                },
-                                                            })}
-                                                            styles={{
-                                                                placeholder: (base) => ({
-                                                                    ...base,
-                                                                    color: "#cbd5e1",
-                                                                }),
-                                                                menuPortal: (base) => ({
-                                                                    ...base,
-                                                                    zIndex: 9999,
-                                                                    position: "absolute",
-                                                                }),
-
-                                                            }}
-                                                            className={`${errColumn && e?.column == null
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
-                                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
-                                                        />
-                                                    </div>
-                                                    <div className="col-span-1 mx-auto">
-                                                        <DeleteButton onClick={_HandleDelete.bind(this, e?.id)} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="col-span-2 ">
-                                                {index == 0 && (
-                                                    <h5 className="block mb-1 text-sm font-medium text-gray-700 opacity-0">
-                                                        {dataLang?.import_operation || "import_operation"}
-                                                    </h5>
-                                                )}
-                                                {e?.dataFields?.value == "group_id" ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "category_id") ||
-                                                    ((tabPage == 3 || tabPage == 4) && e?.dataFields?.value == "unit_id") ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "unit_convert_id") ? (
-                                                    <div className="flex items-center p-2 space-x-2 rounded ">
-                                                        <TiTick color="green" />
-                                                        <label
-                                                            for="example11"
-                                                            className="flex w-full space-x-2 text-sm"
-                                                        >
-                                                            {dataLang?.import_add || "import_add"}
-                                                        </label>
-                                                    </div>
-                                                ) : (
-                                                    ""
-                                                )}
-                                                {e?.dataFields?.value == "type_products" && (
-                                                    <div className={` shadow-2xl rounded-xl  bg-slate-700 relative`}>
-                                                        <div className="absolute top-0 right-0 translate-x-1/2 rounded-lg bg-rose-50">
-                                                            <Notification
-                                                                size="22"
-                                                                color="red"
-                                                                className=" animate-bounce"
+                                                            <Select
+                                                                closeMenuOnSelect={true}
+                                                                placeholder={
+                                                                    dataLang?.import_data_fields ||
+                                                                    "import_data_fields"
+                                                                }
+                                                                options={dataClient}
+                                                                isSearchable={true}
+                                                                onChange={_HandleChangeChild.bind(
+                                                                    this,
+                                                                    e?.id,
+                                                                    "data_fields"
+                                                                )}
+                                                                value={e?.dataFields}
+                                                                LoadingIndicator
+                                                                noOptionsMessage={() =>
+                                                                    dataLang?.import_no_data || "import_no_data"
+                                                                }
+                                                                maxMenuHeight="200px"
+                                                                isClearable={true}
+                                                                menuPortalTarget={document.body}
+                                                                onMenuOpen={handleMenuOpen}
+                                                                theme={(theme) => ({
+                                                                    ...theme,
+                                                                    colors: {
+                                                                        ...theme.colors,
+                                                                        primary25: "#EBF5FF",
+                                                                        primary50: "#92BFF7",
+                                                                        primary: "#0F4F9E",
+                                                                    },
+                                                                })}
+                                                                styles={{
+                                                                    placeholder: (base) => ({
+                                                                        ...base,
+                                                                        color: "#cbd5e1",
+                                                                    }),
+                                                                    menuPortal: (base) => ({
+                                                                        ...base,
+                                                                        zIndex: 9999,
+                                                                        position: "absolute",
+                                                                    }),
+                                                                }}
+                                                                className={`${errFiles && e.dataFields == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                                    }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                             />
                                                         </div>
+                                                        <div className="col-span-6">
+                                                            {index == 0 && (
+                                                                <h5 className="block mb-1 text-sm font-medium text-gray-700">
+                                                                    {dataLang?.import_data_column ||
+                                                                        "import_data_column"}
+                                                                    <span className="text-red-500">*</span>
+                                                                </h5>
+                                                            )}
+                                                            <Select
+                                                                closeMenuOnSelect={true}
+                                                                placeholder={
+                                                                    dataLang?.import_data_column ||
+                                                                    "import_data_column"
+                                                                }
+                                                                options={dataColumn}
+                                                                isSearchable={true}
+                                                                onChange={_HandleChangeChild.bind(
+                                                                    this,
+                                                                    e?.id,
+                                                                    "column"
+                                                                )}
+                                                                value={e?.column}
+                                                                LoadingIndicator
+                                                                noOptionsMessage={() =>
+                                                                    dataLang?.import_no_data || "import_no_data"
+                                                                }
+                                                                maxMenuHeight="200px"
+                                                                isClearable={true}
+                                                                menuPortalTarget={document.body}
+                                                                onMenuOpen={handleMenuOpen}
+                                                                theme={(theme) => ({
+                                                                    ...theme,
+                                                                    colors: {
+                                                                        ...theme.colors,
+                                                                        primary25: "#EBF5FF",
+                                                                        primary50: "#92BFF7",
+                                                                        primary: "#0F4F9E",
+                                                                    },
+                                                                })}
+                                                                styles={{
+                                                                    placeholder: (base) => ({
+                                                                        ...base,
+                                                                        color: "#cbd5e1",
+                                                                    }),
+                                                                    menuPortal: (base) => ({
+                                                                        ...base,
+                                                                        zIndex: 9999,
+                                                                        position: "absolute",
+                                                                    }),
+                                                                }}
+                                                                className={`${errColumn && e?.column == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                                    } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                            />
+                                                        </div>
+                                                        <div className="col-span-1 mx-auto">
+                                                            <DeleteButton
+                                                                onClick={_HandleDelete.bind(this, e?.id)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-2 ">
+                                                    {index == 0 && (
+                                                        <h5 className="block mb-1 text-sm font-medium text-gray-700 opacity-0">
+                                                            {dataLang?.import_operation || "import_operation"}
+                                                        </h5>
+                                                    )}
+                                                    {e?.dataFields?.value == "group_id" ||
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "category_id") ||
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "unit_id") ||
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "unit_convert_id") ? (
+                                                        <div className="flex items-center p-2 space-x-2 rounded ">
+                                                            <TiTick color="green" />
+                                                            <label
+                                                                for="example11"
+                                                                className="flex w-full space-x-2 text-sm"
+                                                            >
+                                                                {dataLang?.import_add || "import_add"}
+                                                            </label>
+                                                        </div>
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                    {e?.dataFields?.value == "type_products" && (
+                                                        <div
+                                                            className={` shadow-2xl rounded-xl  bg-slate-700 relative`}
+                                                        >
+                                                            <div className="absolute top-0 right-0 translate-x-1/2 rounded-lg bg-rose-50">
+                                                                <Notification
+                                                                    size="22"
+                                                                    color="red"
+                                                                    className=" animate-bounce"
+                                                                />
+                                                            </div>
 
-                                                        <div className="grid items-center grid-cols-2 gap-2 p-1 ">
-                                                            <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white font-medium col-span-2">
-                                                                {dataLang?.import_ERR_format || "import_ERR_format"}
-                                                            </h2>
-                                                            <div className="col-span-2">
-                                                                <div className="flex items-center gap-1">
-                                                                    <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
-                                                                        <ArrowRight
-                                                                            size="16"
-                                                                            color="white"
-                                                                            className="animate-bounce 3xl:scale-100 2xl:scale-95"
-                                                                        />
-                                                                        products:
-                                                                    </p>
-                                                                    <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
-                                                                        {e?.dataFields?.note?.products}
-                                                                    </h2>
-                                                                </div>
-                                                                <div className="flex items-center gap-1">
-                                                                    <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
-                                                                        <ArrowRight
-                                                                            size="16"
-                                                                            color="white"
-                                                                            className="animate-bounce 3xl:scale-100 2xl:scale-95"
-                                                                        />{" "}
-                                                                        semi_products:
-                                                                    </p>
-                                                                    <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
-                                                                        {e?.dataFields?.note?.semi_products}
-                                                                    </h2>
-                                                                </div>
-                                                                <div className="flex items-center gap-1">
+                                                            <div className="grid items-center grid-cols-2 gap-2 p-1 ">
+                                                                <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white font-medium col-span-2">
+                                                                    {dataLang?.import_ERR_format ||
+                                                                        "import_ERR_format"}
+                                                                </h2>
+                                                                <div className="col-span-2">
+                                                                    <div className="flex items-center gap-1">
+                                                                        <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
+                                                                            <ArrowRight
+                                                                                size="16"
+                                                                                color="white"
+                                                                                className="animate-bounce 3xl:scale-100 2xl:scale-95"
+                                                                            />
+                                                                            products:
+                                                                        </p>
+                                                                        <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
+                                                                            {e?.dataFields?.note?.products}
+                                                                        </h2>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
+                                                                            <ArrowRight
+                                                                                size="16"
+                                                                                color="white"
+                                                                                className="animate-bounce 3xl:scale-100 2xl:scale-95"
+                                                                            />{" "}
+                                                                            semi_products:
+                                                                        </p>
+                                                                        <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
+                                                                            {e?.dataFields?.note?.semi_products}
+                                                                        </h2>
+                                                                    </div>
+                                                                    {/* <div className="flex items-center gap-1">
                                                                     <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
                                                                         <ArrowRight
                                                                             size="16"
@@ -1741,14 +1918,15 @@ const Import = (props) => {
                                                                     <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
                                                                         {e?.dataFields?.note?.semi_products_outside}
                                                                     </h2>
+                                                                </div> */}
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 )}
                             </div>
                             {!onLoadingListData && (
@@ -1783,7 +1961,8 @@ const Import = (props) => {
                                         )}
                                         {tabPage == 1 && (
                                             <h2 className="w-1/2 py-2 text-right">
-                                                {dataLang?.import_deliveryAdress || "import_deliveryAdress"}
+                                                {dataLang?.import_deliveryAdress ||
+                                                    "import_deliveryAdress"}
                                             </h2>
                                         )}
                                     </div>
@@ -1797,7 +1976,10 @@ const Import = (props) => {
                                                 onLoadingListData={onLoadingListData}
                                                 dataLang={dataLang}
                                                 _HandleAddParent={_HandleAddContact.bind(this)}
-                                                _HandleDeleteParent={_HandleDeleteParent.bind(this, "contact")}
+                                                _HandleDeleteParent={_HandleDeleteParent.bind(
+                                                    this,
+                                                    "contact"
+                                                )}
                                                 color="bg-green-600"
                                                 colorIcon="green"
                                             />
@@ -1810,7 +1992,10 @@ const Import = (props) => {
                                                 onLoadingListData={onLoadingListData}
                                                 dataLang={dataLang}
                                                 _HandleAddParent={_HandleAddDelivery.bind(this)}
-                                                _HandleDeleteParent={_HandleDeleteParent.bind(this, "delivery")}
+                                                _HandleDeleteParent={_HandleDeleteParent.bind(
+                                                    this,
+                                                    "delivery"
+                                                )}
                                                 color="bg-orange-600"
                                                 colorIcon="red"
                                             />
@@ -1829,8 +2014,12 @@ const Import = (props) => {
                                             listDataDelivery={listDataDelivery}
                                             dataLang={dataLang}
                                             handleMenuOpen={handleMenuOpen.bind(this)}
-                                            _HandleChangeChildContact={_HandleChangeChildContact.bind(this)}
-                                            _HandleChangeChildDelivery={_HandleChangeChildDelivery.bind(this)}
+                                            _HandleChangeChildContact={_HandleChangeChildContact.bind(
+                                                this
+                                            )}
+                                            _HandleChangeChildDelivery={_HandleChangeChildDelivery.bind(
+                                                this
+                                            )}
                                             _HandleDeleteContact={_HandleDeleteContact.bind(this)}
                                             _HandleDeleteDelivery={_HandleDeleteDelivery.bind(this)}
                                         />
@@ -1843,7 +2032,9 @@ const Import = (props) => {
                                             listDataContact={listDataContact}
                                             dataLang={dataLang}
                                             handleMenuOpen={handleMenuOpen.bind(this)}
-                                            _HandleChangeChildContact={_HandleChangeChildContact.bind(this)}
+                                            _HandleChangeChildContact={_HandleChangeChildContact.bind(
+                                                this
+                                            )}
                                             _HandleDeleteContact={_HandleDeleteContact.bind(this)}
                                         />
                                     )}
@@ -1863,7 +2054,10 @@ const Import = (props) => {
                                             name="checkGroup1"
                                             className="w-4 h-4 border-gray-300 rounded shadow-sm text-primary-600 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400"
                                         />
-                                        <label htmlFor="example12" className="space-x-2 text-sm cursor-pointer ">
+                                        <label
+                                            htmlFor="example12"
+                                            className="space-x-2 text-sm cursor-pointer "
+                                        >
                                             {dataLang?.import_save_template || "import_save_template"}
                                         </label>
                                     </div>
@@ -1909,9 +2103,19 @@ const Import = (props) => {
                 />
             )) ||
                 (tabPage == 5 && (
-                    <Popup_stages dataLang={dataLang} router={router.query?.tab} data={dataFailStages} />
+                    <Popup_stages
+                        dataLang={dataLang}
+                        router={router.query?.tab}
+                        data={dataFailStages}
+                    />
                 )) ||
-                (tabPage == 6 && <Popup_bom dataLang={dataLang} router={router.query?.tab} data={dataFailBom} />)}
+                (tabPage == 6 && (
+                    <Popup_bom
+                        dataLang={dataLang}
+                        router={router.query?.tab}
+                        data={dataFailBom}
+                    />
+                ))}
         </React.Fragment>
     );
 };

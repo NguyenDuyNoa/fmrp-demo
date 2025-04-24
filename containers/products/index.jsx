@@ -338,7 +338,7 @@ const Products = (props) => {
                             >
                                 {dataLang?.catagory_finishedProduct_type_semi_products}
                             </button>
-                            <button
+                            {/* <button
                                 onClick={_HandleSelectTab.bind(this, "semi_products_outside")}
                                 className={`${router.query?.tab === "semi_products_outside"
                                     ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
@@ -346,7 +346,7 @@ const Products = (props) => {
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {dataLang?.catagory_finishedProduct_type_semi_products_outside}
-                            </button>
+                            </button> */}
                         </div>
                     </>
                 }
