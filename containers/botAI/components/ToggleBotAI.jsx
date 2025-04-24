@@ -16,6 +16,7 @@ import AvatarBotAI from "./AvatarBotAI";
 import Messenger from "./Messenger";
 import SelectAnswer from "./SelectAnswer";
 import { useSettingApp } from "@/hooks/useAuth";
+import { useStartMessageAI } from "@/managers/api/bot-AI/useMessageAI";
 const { TextArea } = Input;
 
 const DataAIAnswer = [
@@ -46,6 +47,11 @@ const ToggleBotAI = () => {
     };
 
     const { data: dataSetting, isLoading } = useSettingApp();
+    const { data: dataNewChatAI, isLoadingNewChatAi } = useStartMessageAI({
+        type: "PRODUCT_ANALYSIS",
+        openAI: openDrawer,
+    });
+    console.log("🚀 ~ ToggleBotAI ~ dataNewChatAI:", dataNewChatAI);
 
     useEffect(() => {
         const interval = setInterval(() => {
