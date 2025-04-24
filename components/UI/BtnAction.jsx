@@ -58,18 +58,36 @@ import {
 import PopupPrintItem from "../common/popup/PopupPrintItem";
 import StickerIcon from "../icons/common/StickerIcon";
 import PopupPrintTemNVL from "@/containers/purchase-order/import/components/PopupPrintTemNVL";
+import { fetchPDFDelivery, fetchPDFSaleOrder } from "@/managers/api/sales-order/useLinkFilePDF";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const Popup_Pdf = (props) => {
+
     const { isOpen, handleOpen } = useToggle(false);
     const [isLoadingPrint, setIsLoadingPrint] = useState(false);
 
-    const handlePrintTem = async ({ typePrint, id }) => {
+    //kiếm hàm theo page 
+    const fetchPDFMultiplePageByPrice = {
+        import: fetchPDFPurchaseOrderImport,
+        deliveryReceipt: fetchPDFDelivery
+    }
+
+    //xử lý hàm in tem PDF
+    const handlePrintTem = async ({ typePrint, id, typePage }) => {
         setIsLoadingPrint(true);
+
+
+        const fetchPDFhandle = fetchPDFMultiplePageByPrice[typePage]
+        if (!fetchPDFhandle) {
+            console.warn(`Không tìm thấy hàm fetchPDFhandle cho typePage: ${typePage}`);
+            setIsLoadingPrint(false);
+            return;
+        }
+
         const typeNumber = typePrint === "notPrice" ? 1 : 2;
         try {
-            const response = await fetchPDFPurchaseOrderImport({
+            const response = await fetchPDFhandle({
                 id: id,
                 type: typeNumber,
             });
@@ -83,6 +101,9 @@ const Popup_Pdf = (props) => {
             setIsLoadingPrint(false);
         }
     };
+
+
+
 
     const shareProps = {
         dataMaterialExpiry: props?.dataMaterialExpiry,
@@ -113,12 +134,12 @@ const Popup_Pdf = (props) => {
             <div className="space-x-5 w-[400px] h-auto">
                 <div>
                     <div className="w-[400px]">
-                        {props.props?.type === "import" ? (
+                        {props.props?.type === "import" || props.props?.type === "deliveryReceipt" ? (
                             <PopupPrintItem
                                 dataLang={props.dataLang}
                                 type={props.props?.type}
                                 onCLick={(type) =>
-                                    handlePrintTem({ typePrint: type, id: props.props?.id })
+                                    handlePrintTem({ typePrint: type, id: props.props?.id, typePage: props.props?.type })
                                 }
                                 isLoading={isLoadingPrint}
                             />
@@ -141,10 +162,26 @@ const Popup_Pdf = (props) => {
 export const BtnAction = React.memo((props) => {
     const dispatch = useDispatch();
     const [loadingButtonPrint, setLoadingButtonPrint] = useState(false);
-    const handlePrintTem = async ({ idTem }) => {
+    //kiếm hàm fetchPDF theo page 
+    const fetchPDFMultiplePage = {
+        order: fetchPDFPurchaseOrder,
+        sales_product: fetchPDFSaleOrder,
+
+    };
+    //Xử lý in tem PDF
+    const handlePrintTem = async ({ idTem, typePage }) => {
         setLoadingButtonPrint(true);
+
+        //kiếm hàm theo page 
+        const fetchPDFhandle = fetchPDFMultiplePage[typePage];
+        if (!fetchPDFhandle) {
+            console.warn(`Không tìm thấy hàm fetchPDFhandle cho typePage: ${typePage}`);
+            setLoadingButtonPrint(false);
+            return;
+        }
+
         try {
-            const response = await fetchPDFPurchaseOrder({
+            const response = await fetchPDFhandle({
                 id: idTem,
             });
             console.log("🚀 ~ handlePrintTem ~ response:", response);
@@ -157,6 +194,8 @@ export const BtnAction = React.memo((props) => {
             setLoadingButtonPrint(false);
         }
     };
+
+
     const router = useRouter();
 
     const isShow = useToast();
@@ -704,9 +743,11 @@ export const BtnAction = React.memo((props) => {
                                     setOpenAction={setOpenAction}
                                     {...shareProps}
                                 />
-                            ) : props?.type === "order" ? (
+                            ) : props?.type === "order" || props?.type === "sales_product" ? (
                                 <ButtonPrintItem
-                                    onCLick={() => handlePrintTem({ idTem: props?.id })}
+                                    onCLick={() =>
+                                        handlePrintTem({ idTem: props?.id, typePage: props?.type })
+                                    }
                                     dataLang={props?.dataLang}
                                     isLoading={loadingButtonPrint}
                                 />

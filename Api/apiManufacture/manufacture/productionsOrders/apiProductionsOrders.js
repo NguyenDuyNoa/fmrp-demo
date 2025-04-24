@@ -133,6 +133,12 @@ const apiProductionsOrders = {
         return response.data
     },
 
+    //DETETE comment
+    async apiDeleteComment(idComment) {
+        const response = await axiosCustom('DELETE', `/api_web/Api_Comments_Chat/delete_comment/${idComment}`);
+        return response.data
+    },
+
     // POST unlike comment
     async apiPostUnlikeComment({ idComment }) {
         const response = await axiosCustom('GET', `/api_web/Api_Comments_Chat/unlike_comment/${idComment}`);

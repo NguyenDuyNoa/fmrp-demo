@@ -899,6 +899,7 @@ const TabInformation = ({ scrollRef }) => {
                             <CommentList
                                 data={flagListComment}
                                 currentUser={{ id: auth?.staff_id, name: auth?.user_full_name }}
+                                onRefresh={refetchListComment}
                             />
                             :
                             <NoData
