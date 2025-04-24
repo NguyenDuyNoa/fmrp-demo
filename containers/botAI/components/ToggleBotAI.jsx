@@ -3,7 +3,7 @@ import TooltipDefault from "@/components/common/tooltip/TooltipDefault";
 import { useAnimation, motion } from "framer-motion";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import {  Drawer,  } from "antd";
+import { Drawer } from "antd";
 import { IoClose } from "react-icons/io5";
 import { twMerge } from "tailwind-merge";
 import { PiSparkleBold } from "react-icons/pi";
@@ -12,142 +12,31 @@ import { Input } from "antd";
 import CheckIconMessenger from "@/components/icons/common/CheckIconMessenger";
 import SendMessengerIcon from "@/components/icons/common/SendMessengerIcon";
 import ErrorIconMessenger from "@/components/icons/common/ErrorIconMessenger";
+import AvatarBotAI from "./AvatarBotAI";
+import Messenger from "./Messenger";
+import SelectAnswer from "./SelectAnswer";
+import { useSettingApp } from "@/hooks/useAuth";
 const { TextArea } = Input;
 
-const SelectAnswer = ({ className, children }) => {
-    return (
-        <div
-            className={twMerge(
-                "rounded-xl border border-[#919EAB] border-opacity-20 py-4 px-3 flex flex-row justify-between min-w-[370px]",
-                className
-            )}
-        >
-            {children}
-            <div className="text-[#25387A]">
-                <SendMessengerIcon />
-            </div>
-        </div>
-    );
-};
-
-const AvatarBotAI = ({ className, classNameDot }) => {
-    return (
-        <div className="relative w-fit">
-            <div
-                className={twMerge(
-                    "relative size-12 aspect-1 rounded-full bg-white shrink-0 overflow-hidden",
-                    className
-                )}
-            >
-                <Image
-                    src="/bot-ai/bot.png"
-                    alt="Fimo"
-                    width={80}
-                    height={80}
-                    className="size-full object-cover"
-                // quality={100}
-                />
-            </div>
-            <div
-                className={twMerge(
-                    "bg-[#22C55E] w-[10px] h-[10px] border border-white rounded-full absolute bottom-[1px] right-[1px] z-10 ",
-                    classNameDot
-                )}
-            />
-        </div>
-    );
-};
-
-const LoadingThreeDotsJumping = () => {
-    const dotVariants = {
-        jump: {
-            y: -5,
-            transition: {
-                duration: 0.8,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: "easeInOut",
-            },
-        },
-    };
-
-    return (
-        <motion.div
-            animate="jump"
-            transition={{ staggerChildren: -0.2, staggerDirection: -1 }}
-            className="flex justify-center gap-x-[2px] w-fit"
-        >
-            <motion.div
-                className="size-1 rounded-full will-change-transform bg-[#919EAB]"
-                variants={dotVariants}
-            />
-            <motion.div
-                className="size-1 rounded-full will-change-transform bg-[#637381]"
-                variants={dotVariants}
-            />
-            <motion.div
-                className="size-1 rounded-full will-change-transform bg-[#1C252E]"
-                variants={dotVariants}
-            />
-            {/* <StyleSheet /> */}
-        </motion.div>
-    );
-};
-
-const Messenger = ({
-    className,
-    children,
-    isMe = false,
-    isLoading = false,
-}) => {
-    return (
-        <div
-            className={twMerge(
-                "flex items-start gap-2 w-full flex-row ",
-                isMe ? "justify-end" : "justify-start"
-            )}
-        >
-            {!isMe && (
-                <AvatarBotAI
-                    className="size-6"
-                    classNameDot="w-[8px] h-[8px] bottom-0 right-0"
-                />
-            )}
-
-            <div
-                className={twMerge(
-                    "max-w-[80%] flex flex-col gap-y-1 justify-start",
-                    className
-                )}
-            >
-                {!isMe && (
-                    <div className="flex flex-row items-center gap-x-[6px]">
-                        <span className="font-semibold font-deca text-typo-black-5 text-sm">
-                            Fimo
-                        </span>
-                        <div className="h-[10px] w-[1px] bg-[#E5E5EA]" />
-                        <span className="text-sm font-deca font-normal text-typo-gray-7">
-                            Trợ lý AI
-                        </span>
-                    </div>
-                )}
-                <div
-                    className={twMerge(
-                        "p-3 font-deca text-base font-normal w-fit",
-                        isMe
-                            ? "rounded-l-xl rounded-br-xl bg-[#0375F3] text-white"
-                            : "text-typo-black-4  bg-[#F2F2F7] border-2 rounded-r-xl rounded-bl-xl border-[#919EAB] border-opacity-20"
-                    )}
-                >
-                    {isLoading ? <LoadingThreeDotsJumping /> : <p>{children}</p>}
-                </div>
-            </div>
-        </div>
-    );
-};
+const DataAIAnswer = [
+    {
+        id: 1,
+        type: "yes",
+        content: "Có, tôi muốn quản lý bán thành phẩm!",
+        icon: <CheckIconMessenger />,
+    },
+    {
+        id: 2,
+        type: "no",
+        content: "Không, tạm thời tôi chưa cần đến.",
+        icon: <ErrorIconMessenger />,
+    },
+];
 
 const ToggleBotAI = () => {
     const [openDrawer, setOpenDrawer] = useState(false);
+    const [isLoadingGeneraAnswer, setIsLoadingGeneraAnswer] = useState(false);
+    const [selectAnswer, setSelectAnswer] = useState("");
     const controls = useAnimation();
     const [value, setValue] = useState("");
     const drawerStyles = {
@@ -156,16 +45,28 @@ const ToggleBotAI = () => {
         },
     };
 
+    const { data: dataSetting, isLoading } = useSettingApp();
+
     useEffect(() => {
         const interval = setInterval(() => {
             controls.start({
                 rotate: [0, 5, -5, 5, -5, 0],
                 transition: { duration: 1.2, ease: "easeInOut" },
             });
-        }, 2000); // 2 giây
+        }, 3000); // 2 giây
 
         return () => clearInterval(interval);
     }, [controls]);
+
+    const handleSelectAnswer = ({ answer }) => {
+        setIsLoadingGeneraAnswer(true);
+        setTimeout(() => {
+            setIsLoadingGeneraAnswer(false);
+            setSelectAnswer(answer.content);
+        }, 2000);
+    };
+
+    useEffect(() => { }, []);
 
     return (
         <>
@@ -175,7 +76,7 @@ const ToggleBotAI = () => {
             >
                 <TooltipDefault
                     id="bot-ai"
-                    content="Trợ lý AI Fimo"
+                    content={dataSetting?.assistant_fmrp || "Trợ lý AI Fimo"}
                     place="top-end"
                     delayHide={0}
                     autoOpen={true}
@@ -252,10 +153,10 @@ const ToggleBotAI = () => {
                                 <div className="absolute bottom-2 right-2 w-fit z-10">
                                     <button
                                         className={twMerge(
-                                            " rounded-lg p-[10px] text-lg transition-all duration-500 ease-in-out",
+                                            " rounded-lg p-[10px] text-lg transition-all duration-1000 ease-in-out",
                                             value
                                                 ? "bg-linear-background-button-send text-white shadow-custom-inner-blue"
-                                                : "bg-background-gray-4 text-typo-gray-6"
+                                                : "bg-background-gray-4 text-typo-gray-6 shadow-none"
                                         )}
                                     >
                                         <FaArrowUp />
@@ -266,30 +167,45 @@ const ToggleBotAI = () => {
                     </div>
                 }
             >
-                <div className="space-y-6 overflow-y-auto w-full h-full flex flex-col items-start justify-end">
+                <div className="space-y-6 overflow-y-auto w-full h-full flex flex-col items-start justify-end pb-3">
                     <Messenger isMe={false}>
-                        Xin chào <b>An Nguyễn</b>, mình là Fimo - Trợ lý AI tại FMRP. Bạn có
-                        muốn Fimo phân tích sản phẩm của nhà xưởng mình chứ? Hãy cho Fimo
-                        biết tên sản phẩm của bạn nhé!
+                        Xin chào An Nguyễn, mình là Fimo - Trợ lý AI tại FMRP. Bạn có muốn
+                        Fimo phân tích sản phẩm của nhà xưởng mình chứ? Hãy cho Fimo biết
+                        tên sản phẩm của bạn nhé!
                     </Messenger>
                     <Messenger isMe={true}>Áo sơ mi tay dài size L</Messenger>
-                    <Messenger isLoading={true} />
-                    <SelectAnswer>
-                        <div className="flex items-center flex-row gap-x-2">
-                            <CheckIconMessenger />{" "}
-                            <p className="font-deca text-sm text-[#141522] font-normal">
-                                Có, tôi muốn quản lý bán thành phẩm!
-                            </p>
-                        </div>
-                    </SelectAnswer>
-                    <SelectAnswer>
-                        <div className="flex items-center flex-row gap-x-2">
-                            <ErrorIconMessenger />{" "}
-                            <p className="font-deca text-sm text-[#141522] font-normal">
-                                Không, tạm thời tôi chưa cần đến.
-                            </p>
-                        </div>
-                    </SelectAnswer>
+                    {isLoadingGeneraAnswer && (
+                        <Messenger isLoading={isLoadingGeneraAnswer} />
+                    )}
+                    {selectAnswer && <Messenger isMe={true}>{selectAnswer}</Messenger>}
+
+                    {DataAIAnswer.map((answer, index) => (
+                        <SelectAnswer
+                            className={twMerge(
+                                "group   hover:bg-background-gray-3  ",
+                                answer.type === "yes"
+                                    ? "hover:border-typo-green-3 hover:text-typo-green-3 "
+                                    : "hover:border-typo-red-1 hover:text-typo-red-1"
+                            )}
+                            typeAnswer={answer.type}
+                            onClick={() => handleSelectAnswer({ answer: answer })}
+                            key={answer.id}
+                        >
+                            <div
+                                className={twMerge(
+                                    "flex items-center flex-row gap-x-2 text-[#141522] ",
+                                    answer.type === "yes"
+                                        ? "group-hover:text-typo-green-3"
+                                        : "group-hover:text-typo-red-1"
+                                )}
+                            >
+                                {answer.icon}
+                                <p className="font-deca text-sm  font-normal">
+                                    {answer.content}
+                                </p>
+                            </div>
+                        </SelectAnswer>
+                    ))}
                 </div>
             </Drawer>
         </>
