@@ -18,7 +18,7 @@ module.exports = {
       colors: {
         primary: {
           "05": "#C7DFFB",
-          "07":"#EBF5FF",
+          "07": "#EBF5FF",
         },
         secondary: {
           "09": "#1B1A18",
@@ -43,7 +43,6 @@ module.exports = {
             3: "#4752E6",
             4: "#0375F3",
             5: "#25387A",
-
           },
           gray: {
             1: "#9295A4",
@@ -52,21 +51,25 @@ module.exports = {
             4: "#637381",
             5: "#52575E",
             6: "#8E8E93",
-            7: "#AEAEB2"
+            7: "#AEAEB2",
           },
           black: {
             1: "#141522",
             2: "#101828",
             3: "#17181A",
             4: "#1C252E",
-            5: "#1F2329"
+            5: "#1F2329",
           },
           green: {
             1: "#1A7526",
             2: "#1FC583",
+            3: "#118D57",
           },
           orange: {
             1: "#FF8F0D",
+          },
+          red: {
+            1: "#B71D18",
           },
         },
         border: {
@@ -80,7 +83,8 @@ module.exports = {
             1: "#D0D5DD",
             2: "#9295A4",
             3: "#F3F4F6",
-            4: "#D1D1D6"
+            4: "#D1D1D6",
+            5: "#E5E5EA",
           },
           green: {
             1: "#35BD4B",
@@ -99,7 +103,7 @@ module.exports = {
       boxShadow: {
         "hover-button": "0px 1px 2px 0px #1018280D",
         "custom-blue": "4px 4px 8px 0 rgba(3, 117, 243, 0.25)",
-        "custom-inner-blue": "inset 0px -2px 0px 0px #12B0F8"
+        "custom-inner-blue": "inset 0px -2px 0px 0px #12B0F8",
       },
       screens: {
         "3xl": "1600px",
