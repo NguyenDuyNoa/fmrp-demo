@@ -70,6 +70,14 @@ const apiSalesOrder = {
         const response = await axiosCustom('POST', id ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true` : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true", data);
         return response.data
     },
+    async apiPrintSaleOrder(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_print/Print_SalesOrderWeb?csrf_protection=true`, data)
+        return response.data
+    },
 
+    async apiPrintDelivery(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_print/Print_DeliverytWeb?csrf_protection=true`, data)
+        return response.data
+    },
 }
 export default apiSalesOrder

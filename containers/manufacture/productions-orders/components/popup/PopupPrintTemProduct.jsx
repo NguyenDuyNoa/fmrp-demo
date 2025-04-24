@@ -33,23 +33,23 @@ const PopupPrintTemProduct = ({ dataItem }) => {
     const dispatch = useDispatch();
     const [listItem, setListItem] = useState(dataItem ?? []);
     const [selectItems, setSelectItems] = useState([]);
-  
+
     const [isPrintTem, setIsPrintTem] = useState(false);
     const [lisTemItem, setLisTemItem] = useState();
     const [loadingButton, setLoading] = useState(false);
-    //kiểm tra chọn tất cả 
+    //kiểm tra chọn tất cả
     let isAllSelected = false;
     if (dataItem.length > 0) {
         isAllSelected = selectItems.length === listItem.length;
     }
 
-    //kiểm nếu có 1 tem có quality < 0 thì ko cho chọn tất cả 
-    let disableSelectAll = false
+    //kiểm nếu có 1 tem có quality < 0 thì ko cho chọn tất cả
+    let disableSelectAll = false;
     const isNotSelected = listItem.some((item) => item.quality === 0);
     if (isNotSelected) {
-        disableSelectAll = true
+        disableSelectAll = true;
     } else {
-        disableSelectAll = false
+        disableSelectAll = false;
     }
 
     const handleSelectAll = (checked) => {
@@ -80,14 +80,12 @@ const PopupPrintTemProduct = ({ dataItem }) => {
         // Trường hợp value <= 0 → bỏ chọn nếu đang chọn
         if (value <= 0) {
             if (isSelected) {
-                setSelectItems((prev) =>
-                    prev.filter((item) => item.idItem !== id)
-                );
+                setSelectItems((prev) => prev.filter((item) => item.idItem !== id));
             }
             return;
         }
 
-        // Trường hợp value > 0  và đã được tích chọn 
+        // Trường hợp value > 0  và đã được tích chọn
         if (isSelected) {
             setSelectItems((prev) =>
                 prev.map((item) =>
@@ -101,7 +99,6 @@ const PopupPrintTemProduct = ({ dataItem }) => {
                 setSelectItems((prev) => [...prev, { ...itemToAdd, quality: value }]);
             }
         }
-
     };
 
     const handlePrint = async (type) => {
@@ -121,14 +118,15 @@ const PopupPrintTemProduct = ({ dataItem }) => {
                 };
             });
             formatData.forEach((item, index) => {
+                formData.append(`id`, item.id);
                 formData.append(`data[${index}][id]`, item.id);
                 formData.append(`data[${index}][code]`, item.item_code);
                 formData.append(`data[${index}][name]`, item.item_name);
                 formData.append(`data[${index}][variant_main]`, item.item_variation);
-                formData.append(`data[${index}][lot]`, item.lot);
-                formData.append(`data[${index}][date]`, item.expiration_date);
-                formData.append(`data[${index}][serial]:data[${index}][id]:`, item.id);
-                formData.append(`data[${index}][quality]:`, item.quality);
+                formData.append(`data[${index}][lot]`, item.lot || "");
+                formData.append(`data[${index}][date]`, item.expiration_date || "");
+                formData.append(`data[${index}][serial]`, item.serial || "");
+                formData.append(`data[${index}][quality]`, item.quality);
             });
 
             // // 👉 Log FormData
@@ -202,8 +200,11 @@ const PopupPrintTemProduct = ({ dataItem }) => {
                             </div>
                         }
                         title="In tem"
-                        className={twMerge("3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-white font-medium text-sm  rounded-lg bg-background-blue-2 border ",
-                            selectItems.length <= 0 || loadingButton ? "border-transparent" : "hover:bg-[#F7F8F9] hover:shadow-hover-button hover:border-[#25387A] hover:text-[#25387A] "
+                        className={twMerge(
+                            "3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-white font-medium text-sm  rounded-lg bg-background-blue-2 border ",
+                            selectItems.length <= 0 || loadingButton
+                                ? "border-transparent"
+                                : "hover:bg-[#F7F8F9] hover:shadow-hover-button hover:border-[#25387A] hover:text-[#25387A] "
                         )}
                         onClick={() => handlePrint(isPrintTem ? "printTem" : "showTem")}
                         isLoading={loadingButton}
