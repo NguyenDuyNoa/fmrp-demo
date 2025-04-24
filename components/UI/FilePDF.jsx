@@ -37,7 +37,7 @@ const FilePDF = ({
     dataProductSerial,
     dataSeting,
 }) => {
-    // console.log("🚀 ~ props:", props?.type)
+    // console.log("🚀 ~ FilePDF.props:", props?.type)
     const [url, setUrl] = useState(null);
 
 
