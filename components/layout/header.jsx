@@ -1,25 +1,21 @@
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
+import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useToast from "@/hooks/useToast";
+import { getColorByParam } from "@/utils/helpers/radomcolor";
+import { CookieCore } from "@/utils/lib/cookie";
+import { motion } from 'framer-motion';
+import { ArrowUp } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-import { Dropdown, DropdownThongBao } from "../UI/dropdown";
-
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
-import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
-import useToast from "@/hooks/useToast";
-import { CookieCore } from "@/utils/lib/cookie";
-import Expirred from "components/UI/expired";
-import { ArrowUp, ArrowDown2 as IconDown } from "iconsax-react";
 import { Tooltip } from "react-tippy";
 import "react-tippy/dist/tippy.css";
 import Popup from "reactjs-popup";
-import { getColorByParam } from "@/utils/helpers/radomcolor";
 import AvatarText from "../UI/common/user/AvatarText";
-
-import { motion } from 'framer-motion'
-import useSetingServer from "@/hooks/useConfigNumber";
+import { Dropdown, DropdownThongBao } from "../UI/dropdown";
 
 const Header = () => {
     const router = useRouter();
@@ -927,27 +923,6 @@ const Header = () => {
                         link: "#",
                         time: "01/08/2023",
                     },
-                    {
-                        title: "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
-                        img: "/user-placeholder.jpg",
-                        class: "rounded-full",
-                        link: "#",
-                        time: "01/08/2023",
-                    },
-                    {
-                        title: "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
-                        img: "/user-placeholder.jpg",
-                        class: "rounded-full",
-                        link: "#",
-                        time: "01/08/2023",
-                    },
-                    {
-                        title: "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
-                        img: "/user-placeholder.jpg",
-                        class: "rounded-full",
-                        link: "#",
-                        time: "01/08/2023",
-                    },
                 ],
                 link: "#",
                 more: "Xem tất cả thông báo",
@@ -1515,6 +1490,71 @@ const DropdownAvatar = React.memo(() => {
         localStorage.setItem("LanguagesFMRP", lang);
     }, [lang]);
 
+    // Mảng dữ liệu cho menu người dùng
+    const userMenuItems = [
+        // Nhóm 1
+        {
+            name: "Thông tin tài khoản",
+            icon: "/icon/header/avatar/UserCircle.png",
+            group: 1,
+            onClick: () => {
+                dispatch({
+                    type: "statePopupAccountInformation",
+                    payload: {
+                        open: true
+                    }
+                })
+            }
+        },
+        {
+            name: "Đổi mật khẩu",
+            icon: "/icon/header/avatar/Password.png",
+            group: 1,
+            onClick: () => {
+                dispatch({
+                    type: "statePopupChangePassword",
+                    payload: {
+                        open: true
+                    }
+                })
+            }
+        },
+        {
+            name: "Góp ý",
+            icon: "/icon/header/avatar/ChatTeardropDots.png",
+            group: 1,
+            onClick: () => {
+                dispatch({
+                    type: "statePopupChangePassword",
+                    payload: {
+                        open: true
+                    }
+                })
+            }
+        },
+        // Nhóm 2
+        {
+            name: "Nâng cấp Professional",
+            icon: "/icon/header/avatar/Sparkle.png",
+            group: 2,
+            color: "#003DA0",
+            onClick: () => {
+                dispatch({
+                    type: "statePopupChangePassword",
+                    payload: {
+                        open: true
+                    }
+                })
+            }
+        },
+        {
+            name: "Đăng xuất",
+            icon: "/icon/header/avatar/SignOut.png",
+            group: 2,
+            onClick: _HandleLogout
+        }
+    ];
+
     return (
         <React.Fragment>
             <Popup
@@ -1539,17 +1579,6 @@ const DropdownAvatar = React.memo(() => {
                                     fullName={auth?.user_full_name}
                                     className={'xl:!min-w-[30px] xl:!min-h-[30px] xl:!w-[30px] xl:!h-[30px] xl:!max-w-[30px] xl:!max-h-[30px] size-7 shrink-0'}
                                 />
-                                // <Image
-                                //     alt=""
-                                //     src={"/avatar_null.png"}
-                                //     width={40}
-                                //     height={40}
-                                //     quality={100}
-                                //     className="object-cover min-w-[30px] w-[30px] min-h-[30px] h-[30px] rounded-full"
-                                //     loading="lazy"
-                                //     crossOrigin="anonymous"
-                                //     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                // />
                             )}
                             <Image
                                 alt=""
@@ -1566,110 +1595,112 @@ const DropdownAvatar = React.memo(() => {
                     </button>
                 }
                 closeOnDocumentClick
-                // arrow={props.position}
-                on={["hover"]}
                 position="bottom right"
                 className={`popover-edit `}
             >
-                <div className="w-[300px]">
-                    <div className="justify-between bg-white rounded">
-                        <div className="flex space-x-3 px-3 py-3.5 border-b border-[#F2F4F7]">
-                            <div className="h-fit min-w-[40px] relative border border-gray-300 rounded-full">
-                                {
-                                    auth?.user_avatar !== null ?
-                                        (
-                                            <Image
-                                                alt=""
-                                                src={auth?.user_avatar}
-                                                width={40}
-                                                height={40}
-                                                quality={100}
-                                                className="object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
-                                                loading="lazy"
-                                                crossOrigin="anonymous"
-                                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                            />
-                                        )
-                                        :
-                                        (
-                                            // <Image
-                                            //     alt=""
-                                            //     src={"/avatar_null.png"}
-                                            //     width={40}
-                                            //     height={40}
-                                            //     quality={100}
-                                            //     className="object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
-                                            //     loading="lazy"
-                                            //     crossOrigin="anonymous"
-                                            //     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                            // />
-                                            <AvatarText
-                                                fullName={auth?.user_full_name}
-                                                className={'!min-w-[40px] !min-h-[40px] !w-[40px] !h-[40px] !max-w-[40px] !max-h-[40px]'}
-                                            />
-
-                                        )
-                                }
-                                <div className="bg-green-500 w-2.5 h-2.5 rounded-full absolute bottom-0 right-1" />
-                            </div>
-                            <div>
+                <div className="w-[300px] bg-white rounded-lg border border-[#F2F4F7] shadow-[0px_4px_40px_0px_#2F416E1F]">
+                    <div className="flex space-x-3 p-4 border-b border-[#F2F4F7]">
+                        <div className="h-fit w-fit relative border border-[#1FC583] rounded-full">
+                            {
+                                auth?.user_avatar !== null ?
+                                    (
+                                        <Image
+                                            alt=""
+                                            src={auth?.user_avatar}
+                                            width={40}
+                                            height={40}
+                                            quality={100}
+                                            className="flex-shrink-0 object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
+                                            loading="lazy"
+                                            crossOrigin="anonymous"
+                                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                        />
+                                    )
+                                    :
+                                    (
+                                        <AvatarText
+                                            fullName={auth?.user_full_name}
+                                            className={'!min-w-[40px] !min-h-[40px] !w-[40px] !h-[40px] !max-w-[40px] !max-h-[40px]'}
+                                        />
+                                    )
+                            }
+                            <div className="bg-green-500 w-2.5 h-2.5 rounded-full absolute bottom-0 right-1" />
+                        </div>
+                        <div>
+                            <div className="flex gap-2">
                                 <h5 className="font-semibold text-sm text-[#141522]">{auth?.user_full_name}</h5>
-                                <h6 className="text-[#9295A4] font-normal text-sm ">{auth?.user_email}</h6>
+                                <div 
+                                    style={{
+                                        background: "radial-gradient(circle at top right, #1FC583, #1F9285)",
+                                        boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.1)"
+                                    }}
+                                    className="w-fit h-fit py-0.5 px-2 text-xs font-medium text-white rounded-lg rounded-bl-none"
+                                >
+                                    Pro
+                                </div>
                             </div>
+                            <h6 className="text-[#9295A4] font-normal text-sm ">{auth?.user_email}</h6>
                         </div>
-                        <div className="">
+                    </div>
+                    <div className="">
+                        {/* Nhóm 1 */}
+                        {userMenuItems.filter(item => item.group === 1).map((item, index) => (
                             <button
-                                onClick={() => {
-                                    dispatch({
-                                        type: "statePopupAccountInformation",
-                                        payload: {
-                                            open: true
-                                        }
-                                    })
-                                }}
-                                className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none"
+                                key={`group1-${index}`}
+                                onClick={item.onClick}
+                                className="w-full text-left px-4 py-2.5 group hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none"
                             >
                                 <Image
                                     alt=""
-                                    src="/icon/header/avatar/user.png"
-                                    width={20}
-                                    height={20}
+                                    src={item.icon}
+                                    width={100}
+                                    height={100}
                                     quality={100}
-                                    className="object-cover"
+                                    className="object-cover size-5"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
-                                <span>Thông tin tài khoản</span>
+                                <span className="text-base font-normal text-neutral-03 group-hover:text-neutral-07">{item.name}</span>
                             </button>
+                        ))}
+                        
+                        {/* Border phân cách giữa 2 nhóm */}
+                        <div className="border-t border-[#F2F4F7]"></div>
+                        
+                        {/* Nhóm 2 */}
+                        {userMenuItems.filter(item => item.group === 2).map((item, index) => (
                             <button
-                                onClick={() => {
-                                    dispatch({
-                                        type: "statePopupChangePassword",
-                                        payload: {
-                                            open: true
-                                        }
-                                    })
-                                }}
-                                className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2"
+                                key={`group2-${index}`}
+                                onClick={item.onClick}
+                                className="w-full text-left px-4 py-2.5 group hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none"
                             >
                                 <Image
                                     alt=""
-                                    src="/icon/header/avatar/pas.png"
-                                    width={20}
-                                    height={20}
+                                    src={item.icon}
+                                    width={100}
+                                    height={100}
                                     quality={100}
-                                    className="object-cover"
+                                    className="object-cover size-5"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
-                                <span>Đổi mật khẩu</span>
+                                <span 
+                                    className="text-base font-normal text-neutral-03 group-hover:text-neutral-07"
+                                    style={item.color ? { color: item.color } : {}}
+                                >
+                                    {item.name}
+                                </span>
                             </button>
-                            {/* <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2">
+                        ))}
+                        
+                        {/* Code đã được comment từ trước */}
+                        {/* <div className="flex px-4 py-2.5 justify-between items-center">
+                            <div className="flex items-center space-x-2">
                                 <Image
                                     alt=""
-                                    src="/icon/header/avatar/inbox.png"
+                                    src="/icon/header/avatar/lang.png"
                                     width={20}
                                     height={20}
                                     quality={100}
@@ -1678,73 +1709,25 @@ const DropdownAvatar = React.memo(() => {
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
-                                <span>Góp ý</span>
-                            </button> */}
-                            {/* <button className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2">
-                                <Image
-                                    alt=""
-                                    src="/icon/header/avatar/usermore.png"
-                                    width={20}
-                                    height={20}
-                                    quality={100}
-                                    className="object-cover"
-                                    loading="lazy"
-                                    crossOrigin="anonymous"
-                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                />
-                                <span>Giới thiệu - Tích điểm</span>
-                            </button>
-                             */}
-                            {/* <div className="flex px-4 py-2.5 justify-between items-center">
-                                <div className="flex items-center space-x-2">
-                                    <Image
-                                        alt=""
-                                        src="/icon/header/avatar/lang.png"
-                                        width={20}
-                                        height={20}
-                                        quality={100}
-                                        className="object-cover"
-                                        loading="lazy"
-                                        crossOrigin="anonymous"
-                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                    />
-                                    <h6>Ngôn ngữ</h6>
+                                <h6>Ngôn ngữ</h6>
+                            </div>
+                            <div className="relative flex items-center bg-[#F7F8F9]">
+                                <select
+                                    onChange={_HandleChangeLang.bind(this)}
+                                    value={lang}
+                                    className="z-[2] text-[#141522] appearance-none inline-block rounded leading-tight pl-4 pr-8 py-2.5 text-sm w-fit outline-none bg-transparent"
+                                >
+                                    {data.map((e, i) => (
+                                        <option key={i} value={e.code}>
+                                            {e.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-2 z-[1]">
+                                    <IconDown size={15} />
                                 </div>
-                                <div className="relative flex items-center bg-[#F7F8F9]">
-                                    <select
-                                        onChange={_HandleChangeLang.bind(this)}
-                                        value={lang}
-                                        className="z-[2] text-[#141522] appearance-none inline-block rounded leading-tight pl-4 pr-8 py-2.5 text-sm w-fit outline-none bg-transparent"
-                                    >
-                                        {data.map((e, i) => (
-                                            <option key={i} value={e.code}>
-                                                {e.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-2 z-[1]">
-                                        <IconDown size={15} />
-                                    </div>
-                                </div>
-                            </div> */}
-                            <button
-                                onClick={_HandleLogout.bind(this)}
-                                className="w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2"
-                            >
-                                <Image
-                                    alt=""
-                                    src="/icon/header/avatar/out.png"
-                                    width={20}
-                                    height={20}
-                                    quality={100}
-                                    className="object-cover"
-                                    loading="lazy"
-                                    crossOrigin="anonymous"
-                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                />
-                                <span>Đăng xuất</span>
-                            </button>
-                        </div>
+                            </div>
+                        </div> */}
                     </div>
                 </div>
             </Popup>
