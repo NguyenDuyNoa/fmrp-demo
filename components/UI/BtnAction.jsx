@@ -45,7 +45,7 @@ import React, { useEffect, useState } from "react";
 import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { VscFilePdf } from "react-icons/vsc";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Popup from "reactjs-popup";
 import { _ServerInstance as Axios } from "services/axios";
 import FilePDF from "./FilePDF";
@@ -56,6 +56,8 @@ import {
     fetchPDFPurchaseOrderImport,
 } from "@/managers/api/purchase-order/useLinkFilePDF";
 import PopupPrintItem from "../common/popup/PopupPrintItem";
+import StickerIcon from "../icons/common/StickerIcon";
+import PopupPrintTemNVL from "@/containers/purchase-order/import/components/PopupPrintTemNVL";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -137,7 +139,7 @@ const Popup_Pdf = (props) => {
 };
 
 export const BtnAction = React.memo((props) => {
-   
+    const dispatch = useDispatch();
     const [loadingButtonPrint, setLoadingButtonPrint] = useState(false);
     const handlePrintTem = async ({ idTem }) => {
         setLoadingButtonPrint(true);
@@ -767,7 +769,34 @@ export const BtnAction = React.memo((props) => {
                                     )}
                                 </>
                             )}
-
+                            {props.type == "import" && (
+                                <button
+                                    onClick={() => {
+                                        dispatch({
+                                            type: "statePopupGlobal",
+                                            payload: {
+                                                open: true,
+                                                children: (
+                                                    <PopupPrintTemNVL
+                                                        id={props?.id}
+                                                    />
+                                                ),
+                                            },
+                                        });
+                                    }}
+                                    className={` group transition-all ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                    >
+                                        <StickerIcon
+                                        size={20}
+                                        className="size-5  group-hover:text-[#0375F3] group-hover:scale-110 group-hover:shadow-md "
+                                    />
+                                    <p className="group-hover:text-[#0375F3] font-sans">
+                                        {props.dataLang?.stamp_printing ||
+                                            "stamp_printing"}
+                                    </p>
+                                </button>
+                            )}
+                            
                             {props.type == "order" ? (
                                 <Popup_TableValidateDelete
                                     {...shareProps}
