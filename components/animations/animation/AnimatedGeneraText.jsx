@@ -1,9 +1,13 @@
 "use client";
-
 import { motion } from "framer-motion";
 import React from "react";
-
-const AnimatedGeneraText = ({ heroPerTitle, className, delay = 0, style }) => {
+const AnimatedGeneraText = ({
+    heroPerTitle,
+    className,
+    delay = 0,
+    style,
+    children,
+}) => {
     const container = {
         hidden: { opacity: 0 },
         visible: {
@@ -36,6 +40,25 @@ const AnimatedGeneraText = ({ heroPerTitle, className, delay = 0, style }) => {
         },
     };
 
+    const wrapWords = (node, keyPrefix = "") => {
+        if (typeof node === "string") {
+            return node.split(" ").map((word, i) => (
+                <motion.span key={`${keyPrefix}-${i}`} variants={child}>
+                    {word}{" "}
+                </motion.span>
+            ));
+        }
+
+        if (React.isValidElement(node)) {
+            const children = React.Children.map(node.props.children, (child, i) =>
+                wrapWords(child, `${keyPrefix}-${i}`)
+            );
+            return React.cloneElement(node, { key: keyPrefix }, children);
+        }
+
+        return null;
+    };
+
     return (
         <motion.span
             className={className}
@@ -44,11 +67,9 @@ const AnimatedGeneraText = ({ heroPerTitle, className, delay = 0, style }) => {
             animate="visible"
             style={{ ...style }}
         >
-            {heroPerTitle.map((e) => (
-                <motion.span key={e.id.toString()} variants={child}>
-                    {e.letter}{" "}
-                </motion.span>
-            ))}
+            {React.Children.map(children, (child, i) =>
+                wrapWords(child, `text-${i}`)
+            )}
         </motion.span>
     );
 };

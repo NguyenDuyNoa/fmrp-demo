@@ -3,6 +3,8 @@ import { twMerge } from "tailwind-merge";
 import LoadingThreeDotsJumping from "./LoadingThreeDotsJumping";
 import AvatarBotAI from "./AvatarBotAI";
 import AnimatedGeneraText from "@/components/animations/animation/AnimatedGeneraText";
+import parse from "html-react-parser";
+import { useDispatch } from "react-redux";
 
 const Messenger = ({
     className,
@@ -10,11 +12,12 @@ const Messenger = ({
     isMe = false,
     isLoading = false,
 }) => {
-    const heroPerMessage = useMemo(() => {
-        if (!children) return [];
-        return children.split(" ").map((letter, index) => ({ id: index, letter }));
-    }, []);
 
+
+    const parsedMessage = useMemo(() => {
+        if (!children) return null;
+        return parse(children);
+    }, [children]);
 
     return (
         <div
@@ -60,10 +63,7 @@ const Messenger = ({
                     ) : isMe ? (
                         <p>{children}</p>
                     ) : (
-                        <AnimatedGeneraText
-                            heroPerTitle={heroPerMessage}
-                            delay={1} // ⏱ delay trước khi bắt đầu animation (giây)
-                        />
+                        <AnimatedGeneraText>{parsedMessage}</AnimatedGeneraText>
                     )}
                 </div>
             </div>

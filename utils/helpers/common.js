@@ -56,7 +56,14 @@ const isAllowedNumberThanWarning = (values, dataLang) => {
     return true
 }
 
+export const handleDelay = ({ actionFn, delay = 2000, setIsLoading }) => {
+    if (typeof setIsLoading === "function") setIsLoading(true);
 
+    setTimeout(() => {
+        if (typeof setIsLoading === "function") setIsLoading(false);
+        if (typeof actionFn === "function") actionFn();
+    }, delay);
+};
 
 export {
     isAllowedDiscount,
