@@ -12,6 +12,7 @@ const TooltipDefault = ({
     className,
     delayHide = 0,
     autoOpen = false,
+    classNameArrow,
 }) => {
     const [isVisible, setIsVisible] = useState(false);
 
@@ -44,7 +45,7 @@ const TooltipDefault = ({
                     className
                 )}
                 render={({ content }) => <div className="relative">{content}</div>}
-                classNameArrow="!rounded-[2px]"
+                classNameArrow={twMerge("!rounded-[2px]", classNameArrow)}
                 delayHide={delayHide}
             />
         </>

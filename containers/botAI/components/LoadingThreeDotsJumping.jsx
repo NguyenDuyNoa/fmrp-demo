@@ -1,6 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
-const LoadingThreeDotsJumping = () => {
+import { twMerge } from "tailwind-merge";
+const LoadingThreeDotsJumping = ({
+    classNameDot1,
+    classNameDot2,
+    classNameDot3,
+}) => {
     const dotVariants = {
         jump: {
             y: -5,
@@ -20,15 +25,15 @@ const LoadingThreeDotsJumping = () => {
             className="flex justify-center gap-x-[2px] w-fit"
         >
             <motion.div
-                className="size-1 rounded-full will-change-transform bg-[#919EAB]"
+                className={twMerge("size-1 rounded-full will-change-transform bg-[#919EAB]", classNameDot1)}
                 variants={dotVariants}
             />
             <motion.div
-                className="size-1 rounded-full will-change-transform bg-[#637381]"
+                className={twMerge("size-1 rounded-full will-change-transform bg-[#637381]",classNameDot2 )}
                 variants={dotVariants}
             />
             <motion.div
-                className="size-1 rounded-full will-change-transform bg-[#1C252E]"
+                className={twMerge("size-1 rounded-full will-change-transform bg-[#1C252E]", classNameDot3)}
                 variants={dotVariants}
             />
             {/* <StyleSheet /> */}

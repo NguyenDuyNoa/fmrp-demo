@@ -150,6 +150,10 @@ module.exports = {
           "linear-gradient(to top left, #A0BEF8 0%, #B5F0F0 100%)",
         "linear-background-button-send":
           "linear-gradient(to bottom, #12B0F8 0%, #007AFF 100%)",
+        "linear-border-toggle-bot":
+          "linear-gradient(49.59deg, #E0FFCC 0%, #CCFFEC 100%)",
+        "linear-background-toggle-bot":
+          "linear-gradient(155.11deg, #1FC583 0%, #1F9285 100%)",
       },
     },
   },
