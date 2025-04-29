@@ -19,53 +19,64 @@ const adminState = {
     stage_finishedProduct: null,
     location_inventory: null,
     setings: {},
-    stateBoxChatAi: {
-        open: false,
-        typeChat: null,
-        contentChat: "",
-        messenger: [
-            { text: "Chào bạn! Tôi có thể giúp gì?", sender: "ai" },
-        ],
-        openViewModal: false,
-        isShowAi: false,
-        dataReview: null,
-        typeData: "",
-        // generateContentClient: {
-        //     content: "",
-        //     textDataRequest: "",
-        // },
-        // chat: {
-        //     content: "",
-        //     quantityWord: {}
-        // },
-        // dataTableShowBom: [],
-    },
+
     statePopupAccountInformation: {
         open: false,
     },
     statePopupChangePassword: {
-        open: false
+        open: false,
     },
     statePopupRecommendation: {
-        open: false
+        open: false,
     },
     statePopupUpdateVersion: {
-        open: false
+        open: false,
     },
     statePopupParent: {
-        open: false
+        open: false,
     },
     statePopupPreviewImage: {
         open: false,
-        data: {}
+        data: {},
     },
     stateFilterDropdown: {
         openDropdownId: null, // ← thêm vào đây thay vì open
     },
     statePopupGlobal: {
         open: false,
-        children: null
-    }
+        children: null,
+    },
+
+    stateBoxChatAi: {
+        open: false,
+        typeChat: null,
+        contentChat: "",
+        openViewModal: false,
+        isShowAi: false,
+        dataReview: null,
+        typeData: "",
+
+        //new
+        messenger: [],
+        chatScenariosId: 0,
+        sessionId: "",
+        step: 0,
+        isPending: false,
+        options: {
+            required: false,
+            type: "text",
+            value: [],
+            valueProduct: false,
+            stepNext: 1,
+            keyValue: "",
+        },
+        response: {
+            materialsPrimary: [],
+            product: {},
+            semiProducts: [],
+            stages: [],
+        },
+    },
 };
 
 function adminReducer(state = adminState, action) {
@@ -122,9 +133,85 @@ function adminReducer(state = adminState, action) {
             return {
                 ...state,
                 stateFilterDropdown: {
-                    openDropdownId: action.payload.openDropdownId
-                }
+                    openDropdownId: action.payload.openDropdownId,
+                },
             };
+        //chat bot
+        case "chatbot/addInitialBotMessage":
+            return {
+                ...state,
+                stateBoxChatAi: {
+                    ...state.stateBoxChatAi,
+                    chatScenariosId: action.payload.chat_scenarios_id,
+                    sessionId: action.payload.session_id,
+                    step: action.payload.step,
+                    messenger: [
+                        ...state.stateBoxChatAi.messenger,
+                        { text: action.payload.message, sender: "ai", hasResponse: false },
+                    ],
+                    options: {
+                        required: action.payload.options?.required || false,
+                        value: action.payload.options?.value || "",
+                        valueProduct: action.payload.options?.value_product || false,
+                        type: action.payload.options?.type,
+                        stepNext: action.payload.options?.step_next,
+                    },
+                },
+            };
+
+        case "chatbot/addUserMessage":
+            return {
+                ...state,
+                stateBoxChatAi: {
+                    ...state.stateBoxChatAi,
+                    messenger: [
+                        ...state.stateBoxChatAi.messenger,
+                        { text: action.payload, sender: "user" },
+                    ],
+                },
+            };
+
+        case "chatbot/addAiMessageOnly":
+            return {
+                ...state,
+                stateBoxChatAi: {
+                    ...state.stateBoxChatAi,
+                    messenger: [
+                        ...state.stateBoxChatAi.messenger,
+                        {
+                            text: action.payload.text,
+                            sender: "ai",
+                            hasResponse: action.payload.hasResponse,
+                        },
+                    ],
+                },
+            };
+
+        case "chatbot/updateScenarioMeta":
+            return {
+                ...state,
+                stateBoxChatAi: {
+                    ...state.stateBoxChatAi,
+                    chatScenariosId: action.payload.chat_scenarios_id,
+                    sessionId: action.payload.session_id,
+                    step: action.payload.step,
+                    options: {
+                        required: action.payload.options?.required || false,
+                        value: action.payload.options?.value || "",
+                        valueProduct: action.payload.options?.value_product || false,
+                        type: action.payload.options?.type,
+                        stepNext: action.payload.options?.step_next,
+                        keyValue: action.payload.options?.key_value,
+                    },
+                    response: {
+                        materialsPrimary: action.payload.response?.materials_primary || [],
+                        product: action.payload.response?.product || {},
+                        semiProducts: action.payload.response?.semi_products || [],
+                        stages: action.payload.response?.stages || [],
+                    },
+                },
+            };
+
         default:
             return state;
     }
