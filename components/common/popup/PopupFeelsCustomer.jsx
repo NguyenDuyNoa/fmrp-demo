@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux'
 import EmojiItem from './ui/EmojiItem'
 import { usePostRecommendation } from '@/managers/api/recommen/usePostRecommendation'
 import TextareaControlled from './ui/TextareaControlled'
+import useToast from '@/hooks/useToast'
 
 const PopupFeelsCustomer = ({ onClose }) => {
     const [activeEmoji, setActiveEmoji] = useState(undefined)
@@ -21,6 +22,8 @@ const PopupFeelsCustomer = ({ onClose }) => {
     const [files, setFiles] = useState([])
     const [previewUrls, setPreviewUrls] = useState([]);
     const [content, setContent] = useState('');
+
+    const toast = useToast()
 
     const statePopupGlobal = useSelector((state) => state.statePopupGlobal);
 
@@ -55,6 +58,14 @@ const PopupFeelsCustomer = ({ onClose }) => {
     }
 
     const onSubmit = async () => {
+        if (!activeEmoji?.id) {
+            toast('error', "Vui lòng chọn biểu cảm!", 1500, "bottom-right")
+            return;
+        } else if (activeImproves?.length === 0) {
+            toast('error', "Vui lòng chọn cải thiện!", 1500, "bottom-right")
+            return;
+        }
+
         const payload = {
             feeling_id: activeEmoji?.id,
             improve_id: activeImproves,
@@ -127,7 +138,7 @@ const PopupFeelsCustomer = ({ onClose }) => {
             <div className='flex-1 min-h-0 h-full space-y-4 px-6 pt-2 pb-4 overflow-y-auto'>
                 <div className='space-y-3'>
                     <p className='text-[#1C252E] 2xl:text-lg text-base font-semibold'>
-                        Trải nghiệm của bạn với FMRP như thế nào?
+                        Trải nghiệm của bạn với FMRP như thế nào? <span className="text-[#FA3434]">*</span>
                     </p>
 
                     <div className='flex flex-col gap-2'>
@@ -178,7 +189,7 @@ const PopupFeelsCustomer = ({ onClose }) => {
 
                 <div className='space-y-3'>
                     <p className='text-[#1C252E] 2xl:text-lg text-base font-semibold'>
-                        FMRP nên cải thiện điều gì?
+                        FMRP nên cải thiện điều gì? <span className="text-[#FA3434]">*</span>
                     </p>
 
                     <div className='flex flex-col gap-2'>
@@ -219,10 +230,6 @@ const PopupFeelsCustomer = ({ onClose }) => {
                         <div className='w-full border rounded-xl p-3 space-y-2'>
                             <TextareaControlled
                                 placeholder="💬 Bạn thấy điều gì tốt? Điều gì cần cải thiện? Cứ nói thật lòng nha!"
-                                // onChange={(val) => {
-                                //     // nếu cần lưu value ra ngoài, ví dụ set vào state khác, làm sau này
-                                //     console.log('Textarea nội dung:', val)
-                                // }}
                                 value={content}
                                 onChange={setContent}
                             />
