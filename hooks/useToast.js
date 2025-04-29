@@ -19,9 +19,10 @@ const useToast = () => {
         },
     });
 
-    const showToast = (type, message, time) => {
+    const showToast = (type, message, time, position = "top") => {
         Toast.fire({
             icon: type,
+            position: position,
             title: message,
             timer: time || 1500,
             iconHtml:

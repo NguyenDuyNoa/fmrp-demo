@@ -51,6 +51,7 @@ const PopupRecommendation = (props) => {
             type={isSubmitted ? 'popupRecommendationSubmitted' : ''}
             lockScroll={true}
             closeOnDocumentClick={true}
+            classNameTittle="!text-[#25387A] font-semibold"
         >
             {
                 !isSubmitted && <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />

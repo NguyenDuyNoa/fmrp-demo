@@ -25,6 +25,8 @@ import { Dropdown, DropdownThongBao } from "../UI/dropdown";
 import SparkleOutlineIcon from "../icons/common/SparkleOutlineIcon";
 import PopupUpgradeProfessional from "../UI/popup/PopupUpgradeProfessional";
 import { useGetUpgradePackage } from "@/hooks/useAuth";
+import PopupCompleteCommand from "@/containers/manufacture/productions-orders/components/popup/PopupCompleteCommand";
+import PopupFeelsCustomer from "../common/popup/PopupFeelsCustomer";
 
 const Header = () => {
     const router = useRouter();
@@ -1711,10 +1713,10 @@ const DropdownAvatar = React.memo(() => {
                                 <span className="font-deca text-base font-normal text-neutral-03 group-hover:text-neutral-07">{item.name}</span>
                             </button>
                         ))}
-                        
+
                         {/* Border phân cách giữa 2 nhóm */}
                         <div className="border-t border-[#F2F4F7]"></div>
-                        
+
                         {/* Nhóm 2 */}
                         {userMenuItems.filter(item => item.group === 2).map((item, index, array) => (
                             <button
@@ -1731,7 +1733,7 @@ const DropdownAvatar = React.memo(() => {
                                 </span>
                             </button>
                         ))}
-                        
+
                         {/* Code đã được comment từ trước */}
                         {/* <div className="flex px-4 py-2.5 justify-between items-center">
                             <div className="flex items-center space-x-2">

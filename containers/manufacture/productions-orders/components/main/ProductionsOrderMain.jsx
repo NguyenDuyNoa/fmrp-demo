@@ -103,6 +103,7 @@ import dayjs from "dayjs";
 import PopupCompleteCommand from "../popup/PopupCompleteCommand";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
+  console.log("🚀 ~ ProductionsOrderMain ~ dataLang:", dataLang)
   const statusExprired = useStatusExprired();
 
   const dispatch = useDispatch();
@@ -168,7 +169,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const listDropdownCompleteStage = [
     {
       id: 1,
-      label: "Tổng toàn lệnh",
+      label: dataLang?.S_total_product_order || "S_total_product_order",
       icon: <ListChecksIcon className="size-full" />, // bạn thay bằng icon tương ứng
       isPremium: false,
       type: "normal",
@@ -963,9 +964,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         payload: {
           open: true,
           children: (
-            // <PopupQRCode
-            // urlQR={QRCode?.data.qr}
-            // />
             <PopupCompleteCommand
               onClose={() =>
                 dispatch({

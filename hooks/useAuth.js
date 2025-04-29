@@ -1,26 +1,26 @@
 import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { optionsQuery } from "@/configs/optionsQuery";
 import { CookieCore } from "@/utils/lib/cookie";
-import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import apiUpgradePackage from "@/Api/apiUpgradePackage/apiUpgradePackage";
 
 export const useAuththentication = (auth) => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     return useQuery({
         
         queryKey: ["api_authentication"],
         queryFn: async () => {
             const { isSuccess, info } = await apiDashboard.apiAuthentication();
             dispatch({ type: "auth/update", payload: isSuccess ? info : false });
-            return info || false
+            return info || false;
         },
         placeholderData: keepPreviousData,
         enabled: auth == null,
-        ...optionsQuery
-    })
-}
+        ...optionsQuery,
+    });
+};
 
 // thông tin tài khoản
 export const useGetInfo = ({ open }) => {
@@ -28,49 +28,49 @@ export const useGetInfo = ({ open }) => {
         queryKey: ["api_get_info", open],
         queryFn: async () => {
             const res = await apiDashboard.apiGetInfo();
-            return res
+            return res;
         },
         placeholderData: keepPreviousData,
         enabled: open,
-        ...optionsQuery
-    })
-}
+        ...optionsQuery,
+    });
+};
 
 // đổi ảnh tài khoản
 export const useUpdateAvatar = () => {
     const submitMutation = useMutation({
         mutationFn: (data) => {
-            return apiDashboard.apiUpdateAvatarInfo(data)
+            return apiDashboard.apiUpdateAvatarInfo(data);
         },
         retry: 5,
-        retryDelay: 5000
-    })
+        retryDelay: 5000,
+    });
     const onSubmit = async (image) => {
         let formtData = new FormData();
-        formtData.append('profile_image', image)
-        const r = await submitMutation.mutateAsync(formtData)
-        return r
-    }
-    return { onSubmit, isLoading: submitMutation.isPending }
-}
+        formtData.append("profile_image", image);
+        const r = await submitMutation.mutateAsync(formtData);
+        return r;
+    };
+    return { onSubmit, isLoading: submitMutation.isPending };
+};
 // đổi mk
 export const useChangePassword = () => {
     const submitMutation = useMutation({
         mutationFn: (data) => {
-            return apiDashboard.apiChangePassword(data)
+            return apiDashboard.apiChangePassword(data);
         },
         retry: 5,
-        retryDelay: 5000
-    })
+        retryDelay: 5000,
+    });
     const onSubmit = async (data) => {
         let formtData = new FormData();
-        formtData.append('password', data?.newPassword)
-        formtData.append('password_confirm', data?.confirmPassword)
-        const r = await submitMutation.mutateAsync(formtData)
-        return r
-    }
-    return { onSubmit, isLoading: submitMutation.isPending }
-}
+        formtData.append("password", data?.newPassword);
+        formtData.append("password_confirm", data?.confirmPassword);
+        const r = await submitMutation.mutateAsync(formtData);
+        return r;
+    };
+    return { onSubmit, isLoading: submitMutation.isPending };
+};
 
 export const useLanguage = (lang) => {
     return useQuery({
@@ -79,19 +79,19 @@ export const useLanguage = (lang) => {
             const res = await apiDashboard.apiLang(lang);
 
             if (typeof res.isSuccess == "boolean" && !res.isSuccess) {
-                CookieCore.remove('tokenFMRP')
-                CookieCore.remove('databaseappFMRP')
+                CookieCore.remove("tokenFMRP");
+                CookieCore.remove("databaseappFMRP");
             }
-            return res
+            return res;
         },
         placeholderData: keepPreviousData,
-        ...optionsQuery
-    })
-}
+        ...optionsQuery,
+    });
+};
 
 export const useSetings = () => {
-    const router = useRouter()
-    const dispatch = useDispatch()
+    const router = useRouter();
+    const dispatch = useDispatch();
     return useQuery({
         queryKey: ["api_settings", router.pathname],
         queryFn: async () => {
@@ -104,7 +104,7 @@ export const useSetings = () => {
                 dataProductSerial: fature.find((x) => x.code == "product_serial"),
             };
             dispatch({ type: "setings/feature", payload: newData });
-            return newData
+            return newData;
         },
         placeholderData: keepPreviousData,
         ...optionsQuery
@@ -245,3 +245,15 @@ export const useGetPackageDetail = (id) => {
 //     useSettings();
 //     return null; // Không render UI, chỉ chạy hook
 // };
+
+export const useSettingApp = () => {
+    return useQuery({
+        queryKey: ["api_setting_app"],
+        queryFn: async () => {
+            const { settings } = await apiDashboard.apiSettings();
+            return settings;
+        },
+        placeholderData: keepPreviousData,
+        ...optionsQuery,
+    });
+};
