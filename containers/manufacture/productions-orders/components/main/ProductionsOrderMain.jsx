@@ -963,9 +963,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         payload: {
           open: true,
           children: (
-            // <PopupQRCode
-            // urlQR={QRCode?.data.qr}
-            // />
             <PopupCompleteCommand
               onClose={() =>
                 dispatch({

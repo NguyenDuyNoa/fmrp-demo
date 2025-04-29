@@ -34,7 +34,7 @@ const Popup = (props) => {
             >
                 <div className={`${inter.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl w-full`}>
                     <div className={`${props.classNameTittle ? props.classNameTittle : "items-center"} flex justify-between`}>
-                        <h1 className="text-[#101828] font-medium !text-base !capitalize">
+                        <h1 className="font-medium !text-base !capitalize">
                             {props.title}
                         </h1>
 

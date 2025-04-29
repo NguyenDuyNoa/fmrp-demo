@@ -16,6 +16,8 @@ import "react-tippy/dist/tippy.css";
 import Popup from "reactjs-popup";
 import AvatarText from "../UI/common/user/AvatarText";
 import { Dropdown, DropdownThongBao } from "../UI/dropdown";
+import PopupCompleteCommand from "@/containers/manufacture/productions-orders/components/popup/PopupCompleteCommand";
+import PopupFeelsCustomer from "../common/popup/PopupFeelsCustomer";
 
 const Header = () => {
     const router = useRouter();
@@ -1351,7 +1353,7 @@ const Header = () => {
                     </div>
                 </Dropdown>
 
-                <Tooltip
+                {/* <Tooltip
                     title={"Góp ý"}
                     arrow
                     theme="dark"
@@ -1378,7 +1380,7 @@ const Header = () => {
                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                         />
                     </div>
-                </Tooltip>
+                </Tooltip> */}
 
                 <DropdownThongBao
                     data={[] || ListThongBao}
@@ -1525,11 +1527,21 @@ const DropdownAvatar = React.memo(() => {
             group: 1,
             onClick: () => {
                 dispatch({
-                    type: "statePopupChangePassword",
+                    type: "statePopupGlobal",
                     payload: {
-                        open: true
-                    }
-                })
+                        open: true,
+                        allowOutsideClick: false,
+                        allowEscape: false,
+                        children: <PopupFeelsCustomer
+                            onClose={() =>
+                                dispatch({
+                                    type: "statePopupGlobal",
+                                    payload: { open: false },
+                                })
+                            }
+                        />,
+                    },
+                });
             }
         },
         // Nhóm 2
@@ -1629,7 +1641,7 @@ const DropdownAvatar = React.memo(() => {
                         <div>
                             <div className="flex gap-2">
                                 <h5 className="font-semibold text-sm text-[#141522]">{auth?.user_full_name}</h5>
-                                <div 
+                                <div
                                     style={{
                                         background: "radial-gradient(circle at top right, #1FC583, #1F9285)",
                                         boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.1)"
@@ -1664,10 +1676,10 @@ const DropdownAvatar = React.memo(() => {
                                 <span className="text-base font-normal text-neutral-03 group-hover:text-neutral-07">{item.name}</span>
                             </button>
                         ))}
-                        
+
                         {/* Border phân cách giữa 2 nhóm */}
                         <div className="border-t border-[#F2F4F7]"></div>
-                        
+
                         {/* Nhóm 2 */}
                         {userMenuItems.filter(item => item.group === 2).map((item, index) => (
                             <button
@@ -1686,7 +1698,7 @@ const DropdownAvatar = React.memo(() => {
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
-                                <span 
+                                <span
                                     className="text-base font-normal text-neutral-03 group-hover:text-neutral-07"
                                     style={item.color ? { color: item.color } : {}}
                                 >
@@ -1694,7 +1706,7 @@ const DropdownAvatar = React.memo(() => {
                                 </span>
                             </button>
                         ))}
-                        
+
                         {/* Code đã được comment từ trước */}
                         {/* <div className="flex px-4 py-2.5 justify-between items-center">
                             <div className="flex items-center space-x-2">
