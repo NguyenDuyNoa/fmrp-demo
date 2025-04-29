@@ -44,10 +44,10 @@ const PopupGlobal = ({ ...props }) => {
       onClose={handleClose}
       className={`${props.className} border-gradient`}
       overlayStyle={{
-        background: "#25387A40",
+        background: "#25387A50",
         zIndex: 1000,
-        backdropFilter: "blur(1.5px)", // Hiệu ứng blur cho nền overlay
-        WebkitBackdropFilter: "blur(1.5px)", // Hỗ trợ cho trình duyệt Webkit (Safari)
+        backdropFilter: "blur(2.5px)", // Hiệu ứng blur cho nền overlay
+        WebkitBackdropFilter: "blur(2.5px)", // Hỗ trợ cho trình duyệt Webkit (Safari)
       }}
     >
       <AnimatePresence mode="wait">

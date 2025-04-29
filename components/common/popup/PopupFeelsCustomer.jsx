@@ -25,15 +25,7 @@ const PopupFeelsCustomer = ({ onClose }) => {
     const statePopupGlobal = useSelector((state) => state.statePopupGlobal);
 
     const { data: dataEmojiAndImprove, isLoading: isLoadingEmojiAndImprove } = useGetEmojiAndImprove({ enabled: statePopupGlobal?.open })
-    const { onSubmit: onSubmitRecommendation, isLoading } = usePostRecommendation()
-
-    // useEffect(() => {
-    //     return () => {
-    //         previewUrls.forEach((item) => {
-    //             URL.revokeObjectURL(item.url)
-    //         });
-    //     };
-    // }, [previewUrls]);
+    const { onSubmit: onSubmitRecommendation, isLoading: isLoadingRecommendation } = usePostRecommendation()
 
     const handleActiveEmoji = (value) => {
         setActiveEmoji(value)
@@ -69,28 +61,9 @@ const PopupFeelsCustomer = ({ onClose }) => {
             note: content,
             ...(files.length > 0 && { files: files }) // ✅ chỉ add nếu có file
         };
-
-        console.log('payload', payload);
-
-        const data = await onSubmitRecommendation(payload);
-        console.log('data đã nhận', data);
-
-        // if (r?.isSuccess == 1) {
-        //     isShow('success', r?.message)
-        //     setIsSubmitted(true);
-        //     reset()
-        //     setTimeout(() => {
-        //         dispatch({ type: "statePopupRecommendation", payload: { open: false } });
-        //         setIsSubmitted(false);
-        //     }, 4000);
-        //     return
-        // }
-        // isShow('error', r?.message)
-
+        await onSubmitRecommendation(payload);
     };
 
-    console.log('files', files);
-    console.log('previewUrls', previewUrls);
 
     const getFileIcon = (file) => {
         console.log('file', file);
@@ -332,9 +305,11 @@ const PopupFeelsCustomer = ({ onClose }) => {
                         <PiArrowRightBold className='3xl:size-5 size-4' />
                     }
                     reverse
+                    isLoading={isLoadingRecommendation}
+                    disabled={isLoadingRecommendation}
                     className='flex items-center justify-center gap-2 py-3 px-1.5 2xl:text-lg text-base text-white font-medium w-full rounded-xl'
                     style={{
-                        background: "linear-gradient(170.14deg, #1FC583 5.11%, #1F9285 95.28%)"
+                        background: isLoadingRecommendation ? "" : "linear-gradient(170.14deg, #1FC583 5.11%, #1F9285 95.28%)"
                     }}
                     onClick={() => onSubmit()}
                 />

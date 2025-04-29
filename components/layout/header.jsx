@@ -1353,7 +1353,7 @@ const Header = () => {
                     </div>
                 </Dropdown>
 
-                <Tooltip
+                {/* <Tooltip
                     title={"Góp ý"}
                     arrow
                     theme="dark"
@@ -1380,7 +1380,7 @@ const Header = () => {
                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                         />
                     </div>
-                </Tooltip>
+                </Tooltip> */}
 
                 <DropdownThongBao
                     data={[] || ListThongBao}
@@ -1526,13 +1526,6 @@ const DropdownAvatar = React.memo(() => {
             icon: "/icon/header/avatar/ChatTeardropDots.png",
             group: 1,
             onClick: () => {
-                // dispatch({
-                //     type: "statePopupRecommendation",
-                //     payload: {
-                //         open: true
-                //     }
-                // })
-
                 dispatch({
                     type: "statePopupGlobal",
                     payload: {
@@ -1549,23 +1542,6 @@ const DropdownAvatar = React.memo(() => {
                         />,
                     },
                 });
-
-                // dispatch({
-                //     type: "statePopupGlobal",
-                //     payload: {
-                //         open: true,
-                //         children: (
-                //             <PopupCompleteCommand
-                //                 onClose={() =>
-                //                     dispatch({
-                //                         type: "statePopupGlobal",
-                //                         payload: { open: false },
-                //                     })
-                //                 }
-                //             />
-                //         ),
-                //     },
-                // });
             }
         },
         // Nhóm 2
