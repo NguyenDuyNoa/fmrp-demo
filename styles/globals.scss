@@ -19,6 +19,17 @@ body {
   background-color: white;
 }
 
+/* Track */
+::-webkit-scrollbar-track {
+  background: #DDDDE2 !important;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #DDDDE2 !important;
+  border-radius: 40px !important;
+}
+
 .tippy-tooltip {
   border-radius: 6px;
   background-color: #555f6d;
@@ -56,6 +67,7 @@ body {
 
 .simplebar-content {
   height: 100%;
+  position: relative;
 }
 
 /* Ngăn focus trên toàn bộ SimpleBar */

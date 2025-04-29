@@ -1,17 +1,58 @@
-import { forwardRef } from "react";
+import { forwardRef, createContext, useContext, useState, useEffect, useRef } from "react";
 import { Customscrollbar } from "./Customscrollbar";
+import { motion } from "framer-motion";
+
+// Tạo context để lưu trữ thông tin active tab
+export const TabContext = createContext(null);
+
+export const useTabContext = () => useContext(TabContext);
+
+// Component tạo hiệu ứng gạch chân cho tab active
+export const AnimatedTabUnderline = () => {
+  const { activeTabInfo } = useTabContext() || {};
+  const prevPositionRef = useRef(null);
+
+  if (!activeTabInfo || activeTabInfo.left === undefined || activeTabInfo.width === undefined) {
+    return null;
+  }
+
+  // Lưu vị trí trước đó để animation có thể chạy từ vị trí cũ đến vị trí mới
+  const from = prevPositionRef.current || { left: activeTabInfo.left, width: 0 };
+  prevPositionRef.current = { left: activeTabInfo.left, width: activeTabInfo.width };
+
+  return (
+    <motion.div
+      className="absolute bottom-0 h-[2px] bg-typo-blue-4 z-10"
+      initial={{ left: from.left, width: from.width }}
+      animate={{ left: activeTabInfo.left, width: activeTabInfo.width }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 500, 
+        damping: 30,
+      }}
+    />
+  );
+};
 
 export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
+  // Lưu trữ thông tin active tab
+  const [activeTabInfo, setActiveTabInfo] = useState(null);
+
   return (
-    <Customscrollbar
-      forceVisible="x"
-      ref={ref}
-      className={`${className} overflow-x-auto h-fit demo4 simplebar-scrollable-x`}
-      scrollableNodePropsClassName="[&>div]:flex [&>div]:items-center [&>div]:justify-start [&>div]:space-x-3 h-fit"
-    // className="flex items-center justify-start overflow-hidden overflow-y-hidden 2xl:space-x-3 lg:space-x-3 h-fit scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
-    >
-      {children}
-    </Customscrollbar>
+    <TabContext.Provider value={{ activeTabInfo, setActiveTabInfo }}>
+      <div className="relative">
+        <Customscrollbar
+          forceVisible="x"
+          ref={ref}
+          className={`${className} overflow-x-auto h-fit demo4 simplebar-scrollable-x relative`}
+          scrollableNodePropsClassName="[&>div]:flex [&>div]:items-center [&>div]:justify-start [&>div]:space-x-4 [&>div]:xl:space-x-10 h-fit"
+        >
+          {children}
+          <hr className="!ml-0 absolute bottom-0 left-0 right-0 border-b border-t-0 border-border-gray-1 z-[-1]" />
+        </Customscrollbar>
+        <AnimatedTabUnderline />
+      </div>
+    </TabContext.Provider>
   );
 });
 

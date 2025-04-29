@@ -1,17 +1,67 @@
 // SearchComponent.jsx
-import React from "react";
-import { SearchNormal1 } from "iconsax-react";
-const SearchComponent = ({ onChange, dataLang, colSpan, classInput, classNameBox, classNameIcon, sizeIcon = 20 }) => {
+import React, { useState } from "react";
+import SearchIcon from "@/components/icons/common/SearchIcon";
+import CloseXIcon from "@/components/icons/common/CloseXIcon";
+import { motion, AnimatePresence } from "framer-motion";
+
+const SearchComponent = ({ placeholder, onChange, dataLang, colSpan, classInput, classNameBox, classNameIcon, sizeIcon = 24 }) => {
+    const [isActive, setIsActive] = useState(false);
+    const [inputValue, setInputValue] = useState("");
+    
+    const handleBoxClick = () => {
+        setIsActive(true);
+    };
+    
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+        onChange && onChange(e);
+    };
+    
+    const handleClearInput = () => {
+        setInputValue("");
+        onChange && onChange({ target: { value: "" } });
+    };
+    
     return (
-        <div className={`${classNameBox}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
-            <form className="relative flex items-center">
-                <SearchNormal1 size={sizeIcon} className={`${classNameIcon} absolute 2xl:left-3 z-50 text-[#cccccc] xl:left-[4%] left-[1%]`} />
-                <input
-                    className={`${classInput} relative placeholder:text-[#cbd5e1] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 p-0 2xl:py-1.5 py-2.5 rounded 2xl:text-base text-xs  text-start 2xl:w-full xl:w-full w-[100%]`}
-                    type="text"
-                    onChange={onChange}
-                    placeholder={dataLang?.branch_search}
-                />
+        <div 
+            className={`${classNameBox} py-2 px-3 border bg-white border-border-gray-1 rounded-lg cursor-pointer`} 
+            style={{ gridColumn: `span ${colSpan || 1}` }}
+            onClick={handleBoxClick}
+        >
+            <form className="flex items-center gap-2">
+                <AnimatePresence>
+                    {isActive && (
+                        <motion.div className="relative flex items-center">
+                            <motion.input
+                                initial={{ width: 0, opacity: 0 }}
+                                animate={{ width: "auto", opacity: 1 }}
+                                exit={{ width: 0, opacity: 0 }}
+                                transition={{ duration: 0.5, ease: "easeInOut" }}
+                                className={`${classInput} min-w-[200px] relative placeholder:text-neutral-05 bg-transparent border-none outline-none focus:outline-none focus:ring-0 2xl:text-base text-xs`}
+                                type="text"
+                                onChange={handleInputChange}
+                                value={inputValue}
+                                placeholder={placeholder || "Tìm kiếm..."}
+                                autoFocus={isActive}
+                            />
+                            {inputValue && (
+                                <button
+                                    type="button"
+                                    onClick={handleClearInput}
+                                    className="size-4 text-[#9295A4] hover:text-[#344054] focus:outline-none"
+                                >
+                                    <CloseXIcon className="size-full" />
+                                </button>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <motion.div
+                    whileTap={{ scale: 0.9 }}
+                    className={`${isActive ? 'p-1 rounded-lg bg-[#003DA0]' : ''}`}
+                >
+                    <SearchIcon size={isActive ? sizeIcon - 8 : sizeIcon} color={`${isActive ? 'white' : '#9295A4'}`} className={`${classNameIcon} flex-shrink-0`} />
+                </motion.div>
             </form>
         </div>
     );

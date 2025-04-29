@@ -1,16 +1,15 @@
-import React, { useEffect } from "react";
 import { PopupParent } from "@/utils/lib/Popup";
+import { Lexend_Deca } from "@next/font/google";
 import { Add as IconClose } from "iconsax-react";
-import { Inter, Lexend_Deca } from "@next/font/google";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import 'simplebar-react/dist/simplebar.min.css';
+
 const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
 });
-const inter = Inter({ subsets: ["latin"] });
-
-import 'simplebar-react/dist/simplebar.min.css';
-import { Customscrollbar } from "./common/Customscrollbar";
-import { useDispatch, useSelector } from "react-redux";
+// const inter = Inter({ subsets: ["latin"] });
 
 const Popup = (props) => {
     const dispatch = useDispatch();
@@ -32,11 +31,13 @@ const Popup = (props) => {
                 // repositionOnResiz={props.repositionOnResiz}
                 className={`${props.className} popup-edit`}
             >
-                <div className={`${inter.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl w-full`}>
+                <div className={`${deca.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl w-full`}>
                     <div className={`${props.classNameTittle ? props.classNameTittle : "items-center"} flex justify-between`}>
-                        <h1 className="font-medium !text-base !capitalize">
-                            {props.title}
-                        </h1>
+                        <div className={`flex items-center gap-4 w-full ${props?.classNameTittle}`}>
+                            <h1 className="text-[#101828] font-medium !text-base !capitalize">
+                                {props.title}
+                            </h1>
+                        </div>
 
                         {
                             (props?.type || !props.onClose)

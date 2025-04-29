@@ -4,6 +4,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import { getColorByParam } from "@/utils/helpers/radomcolor";
 import { CookieCore } from "@/utils/lib/cookie";
+import { Lexend_Deca } from "@next/font/google";
 import { motion } from 'framer-motion';
 import { ArrowUp } from "iconsax-react";
 import Image from "next/image";
@@ -14,8 +15,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "react-tippy";
 import "react-tippy/dist/tippy.css";
 import Popup from "reactjs-popup";
+import ChatIcon from "../icons/common/ChatIcon";
+import PasswordIcon from "../icons/common/PasswordIcon";
+import SignOutIcon from "../icons/common/SignOutIcon";
+import SparkleIcon from "../icons/common/SparkleIcon";
+import UserCircleIcon from "../icons/common/UserCircleIcon";
 import AvatarText from "../UI/common/user/AvatarText";
 import { Dropdown, DropdownThongBao } from "../UI/dropdown";
+import SparkleOutlineIcon from "../icons/common/SparkleOutlineIcon";
+import PopupUpgradeProfessional from "../UI/popup/PopupUpgradeProfessional";
+import { useGetUpgradePackage } from "@/hooks/useAuth";
 import PopupCompleteCommand from "@/containers/manufacture/productions-orders/components/popup/PopupCompleteCommand";
 import PopupFeelsCustomer from "../common/popup/PopupFeelsCustomer";
 
@@ -27,6 +36,8 @@ const Header = () => {
     const dispatch = useDispatch()
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    const { data: upgradePackageData, isLoading, error } = useGetUpgradePackage();
+    const authState = useSelector((state) => state.auth);
 
     const dataPstWH = useSelector((state) => state.statusUser);
 
@@ -1280,7 +1291,7 @@ const Header = () => {
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 3xl:gap-4 xl:gap-3">
+            <div className="flex items-center gap-2 xl:gap-4 2xl:gap-6">
                 {/* <form className="relative flex items-center">
                     <div className="2xl:size-5 xl:size-4 size-3 absolute xl:left-3 left-1.5">
                         <Image
@@ -1301,7 +1312,32 @@ const Header = () => {
                         placeholder="Tìm kiếm"
                     />
                 </form> */}
-
+                {authState?.id_package_service === "1" && (
+                    <button className="py-1 px-2 rounded-full bg-typo-blue-4 flex items-center gap-2" 
+                    onClick={() => {
+                        dispatch({
+                            type: "statePopupGlobal",
+                            payload: {
+                            open: true,
+                            children: (
+                                <PopupUpgradeProfessional
+                                    upgradePackageData={upgradePackageData}
+                                    onClose={() =>
+                                        dispatch({
+                                        type: "statePopupUpgradeProfessional",
+                                        payload: { open: false },
+                                        })
+                                    }
+                                />
+                            ),
+                            },
+                        });
+                    }}>
+                        <SparkleIcon className="text-white" size={16} />
+                        <span className="3xl:text-base xxl:text-sm xl:text-xs text-[11px] font-normal text-white whitespace-nowrap">Nâng cấp Pro</span>
+                    </button>
+                )}
+                <div className="flex items-center gap-3">
                 <Tooltip
                     title={"Cài đặt"}
                     arrow
@@ -1309,7 +1345,7 @@ const Header = () => {
                     theme="dark"
 
                 >
-                    <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
+                    <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
                         <Image
                             alt=""
                             onClick={() => {
@@ -1338,8 +1374,8 @@ const Header = () => {
                     position={"bottom right"}
                     classNameTrigger={"2xl:!p-0 !p-0"}
                 >
-                    <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
-                        <Image
+                    <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
+                    <Image
                             alt=""
                             src="/icon/header/right/quytrinh.png"
                             width={18}
@@ -1387,8 +1423,8 @@ const Header = () => {
                     className="popover-thongbao"
                     position={"bottom right"}
                 >
-                    <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
-                        <Image
+                    <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
+                    <Image
                             alt=""
                             src="/icon/header/right/thongbao.png"
                             width={18}
@@ -1412,7 +1448,7 @@ const Header = () => {
                     theme="dark"
                 >
                     <motion.div
-                        className='cursor-pointer 2xl:size-5 xl:size-4 size-3 shink-0'
+                        className='cursor-pointer 2xl:size-6 xl:size-5 size-4 shink-0'
                         onClick={() => window.open("https://help.fmrp.vn")}
                         initial={{ rotate: 0 }}
                         animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
@@ -1436,6 +1472,7 @@ const Header = () => {
                         />
                     </motion.div>
                 </Tooltip>
+                </div>
 
                 <DropdownAvatar />
             </div>
@@ -1446,10 +1483,16 @@ const Header = () => {
     );
 };
 
+const deca = Lexend_Deca({
+    subsets: ["latin"],
+    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
 const DropdownAvatar = React.memo(() => {
     const auth = useSelector((state) => state.auth);
-
+    const dataSetting = useSelector((state) => state.setings);
     const randomColors = getColorByParam(auth?.user_full_name)
+    const { data: upgradePackageData, isLoading, error } = useGetUpgradePackage();
 
     const router = useRouter();
 
@@ -1496,79 +1539,80 @@ const DropdownAvatar = React.memo(() => {
     const userMenuItems = [
         // Nhóm 1
         {
-            name: "Thông tin tài khoản",
-            icon: "/icon/header/avatar/UserCircle.png",
+        name: "Thông tin tài khoản",
+        icon: <UserCircleIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07"/>,
             group: 1,
             onClick: () => {
-                dispatch({
-                    type: "statePopupAccountInformation",
-                    payload: {
-                        open: true
-                    }
-                })
-            }
+            dispatch({
+                type: "statePopupAccountInformation",
+                payload: {
+                open: true,
+              },
+            });
+          },
         },
         {
-            name: "Đổi mật khẩu",
-            icon: "/icon/header/avatar/Password.png",
-            group: 1,
-            onClick: () => {
-                dispatch({
-                    type: "statePopupChangePassword",
-                    payload: {
-                        open: true
-                    }
-                })
-            }
+          name: "Đổi mật khẩu",
+          icon: <PasswordIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07"/>,
+          group: 1,
+          onClick: () => {
+            dispatch({
+              type: "statePopupChangePassword",
+              payload: {
+                open: true,
+              },
+            });
+          },
         },
         {
-            name: "Góp ý",
-            icon: "/icon/header/avatar/ChatTeardropDots.png",
-            group: 1,
+          name: "Góp ý",
+          icon: <ChatIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07"/>,
+          group: 1,
+          onClick: () => {
+            dispatch({
+              type: "statePopupRecommendation",
+              payload: {
+                open: true,
+              },
+            });
+          },
+        },
+        // Nhóm 2
+        ...(auth?.id_package_service === "1" ? [{
+            name: "Nâng cấp Professional",
+            icon: <SparkleOutlineIcon size={16} />,
+            group: 2,
+            color: "#003DA0",
+            hover: "hover:bg-[#EBF5FF]",
             onClick: () => {
                 dispatch({
                     type: "statePopupGlobal",
                     payload: {
-                        open: true,
-                        allowOutsideClick: false,
-                        allowEscape: false,
-                        children: <PopupFeelsCustomer
+                    open: true,
+                    children: (
+                        <PopupUpgradeProfessional
+                            upgradePackageData={upgradePackageData}
                             onClose={() =>
                                 dispatch({
-                                    type: "statePopupGlobal",
-                                    payload: { open: false },
+                                type: "statePopupUpgradeProfessional",
+                                payload: { open: false },
                                 })
                             }
-                        />,
+                        />
+                    ),
                     },
                 });
-            }
+            },
+         }] : []),
+         {
+          name: "Đăng xuất",
+          icon: <SignOutIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07"/>,
+          group: 2,
+          onClick: _HandleLogout,
         },
-        // Nhóm 2
-        {
-            name: "Nâng cấp Professional",
-            icon: "/icon/header/avatar/Sparkle.png",
-            group: 2,
-            color: "#003DA0",
-            onClick: () => {
-                dispatch({
-                    type: "statePopupChangePassword",
-                    payload: {
-                        open: true
-                    }
-                })
-            }
-        },
-        {
-            name: "Đăng xuất",
-            icon: "/icon/header/avatar/SignOut.png",
-            group: 2,
-            onClick: _HandleLogout
-        }
     ];
 
     return (
-        <React.Fragment>
             <Popup
                 trigger={
                     <button className={`hover:drop-shadow-[0_0_5px_#eabd7a99]`}>
@@ -1608,9 +1652,10 @@ const DropdownAvatar = React.memo(() => {
                 }
                 closeOnDocumentClick
                 position="bottom right"
-                className={`popover-edit `}
+                className={`popover-edit`}
+                data-popup="true"
             >
-                <div className="w-[300px] bg-white rounded-lg border border-[#F2F4F7] shadow-[0px_4px_40px_0px_#2F416E1F]">
+                <div className={`w-[300px] bg-white rounded-lg border border-[#F2F4F7] shadow-[0px_4px_40px_0px_#2F416E1F] ${deca.className}`}>
                     <div className="flex space-x-3 p-4 border-b border-[#F2F4F7]">
                         <div className="h-fit w-fit relative border border-[#1FC583] rounded-full">
                             {
@@ -1636,22 +1681,24 @@ const DropdownAvatar = React.memo(() => {
                                         />
                                     )
                             }
-                            <div className="bg-green-500 w-2.5 h-2.5 rounded-full absolute bottom-0 right-1" />
                         </div>
-                        <div>
+                        <div className="flex flex-col gap-1">
                             <div className="flex gap-2">
                                 <h5 className="font-semibold text-sm text-[#141522]">{auth?.user_full_name}</h5>
-                                <div
+                                {auth?.id_package_service !== "1" && (
+                                    <div 
                                     style={{
                                         background: "radial-gradient(circle at top right, #1FC583, #1F9285)",
-                                        boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.1)"
+                                        boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.1)",
+                                        fontFamily: "var(--font-lexend-deca)"
                                     }}
                                     className="w-fit h-fit py-0.5 px-2 text-xs font-medium text-white rounded-lg rounded-bl-none"
                                 >
                                     Pro
                                 </div>
+                                )}
                             </div>
-                            <h6 className="text-[#9295A4] font-normal text-sm ">{auth?.user_email}</h6>
+                            <h6 className="text-[#9295A4] font-normal text-sm ">{dataSetting?.company_name}</h6>
                         </div>
                     </div>
                     <div className="">
@@ -1662,18 +1709,8 @@ const DropdownAvatar = React.memo(() => {
                                 onClick={item.onClick}
                                 className="w-full text-left px-4 py-2.5 group hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none"
                             >
-                                <Image
-                                    alt=""
-                                    src={item.icon}
-                                    width={100}
-                                    height={100}
-                                    quality={100}
-                                    className="object-cover size-5"
-                                    loading="lazy"
-                                    crossOrigin="anonymous"
-                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                />
-                                <span className="text-base font-normal text-neutral-03 group-hover:text-neutral-07">{item.name}</span>
+                                {item.icon}
+                                <span className="font-deca text-base font-normal text-neutral-03 group-hover:text-neutral-07">{item.name}</span>
                             </button>
                         ))}
 
@@ -1681,24 +1718,14 @@ const DropdownAvatar = React.memo(() => {
                         <div className="border-t border-[#F2F4F7]"></div>
 
                         {/* Nhóm 2 */}
-                        {userMenuItems.filter(item => item.group === 2).map((item, index) => (
+                        {userMenuItems.filter(item => item.group === 2).map((item, index, array) => (
                             <button
                                 key={`group2-${index}`}
                                 onClick={item.onClick}
-                                className="w-full text-left px-4 py-2.5 group hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none"
+                                className={`w-full text-left px-4 py-2.5 group flex items-center space-x-2 outline-none ${item.hover ? item.hover : "hover:bg-[#F7F8F9]"} ${index === array.length - 1 ? "rounded-b-lg" : ""}`}
                             >
-                                <Image
-                                    alt=""
-                                    src={item.icon}
-                                    width={100}
-                                    height={100}
-                                    quality={100}
-                                    className="object-cover size-5"
-                                    loading="lazy"
-                                    crossOrigin="anonymous"
-                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                />
-                                <span
+                                {item.icon}
+                                <span 
                                     className="text-base font-normal text-neutral-03 group-hover:text-neutral-07"
                                     style={item.color ? { color: item.color } : {}}
                                 >
@@ -1743,7 +1770,6 @@ const DropdownAvatar = React.memo(() => {
                     </div>
                 </div>
             </Popup>
-        </React.Fragment>
     );
 });
 
