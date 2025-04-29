@@ -17,6 +17,7 @@ const ToggleBotAI = () => {
   const timeoutRef = useRef(null);
 
   const { data: dataSetting, isLoading } = useSettingApp();
+
   useEffect(() => {
     let interval;
     let timeoutText;
@@ -34,9 +35,9 @@ const ToggleBotAI = () => {
         setShowBubble(false);
       }, 8000);
     };
-
+    // chỉ chạy nếu không hover
     if (!isHovering) {
-      runCycle(); // chỉ chạy nếu không hover
+      runCycle();
       interval = setInterval(runCycle, 15000);
     }
 
@@ -56,13 +57,19 @@ const ToggleBotAI = () => {
         className="fixed bottom-6 right-6 z-50 cursor-pointer"
         onClick={() => setOpenDrawer(true)}
         onMouseEnter={() => {
+
+          // xử lý hover toggle
           setIsHovering(true);
           setShowBubble(true);
           setShowText(true);
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
         }}
         onMouseLeave={() => {
+          //xử lý khi không hover
+          setShowText(false);
           setShowBubble(false);
-          // Clear timeout cũ nếu có
           if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
           }
@@ -91,7 +98,9 @@ const ToggleBotAI = () => {
                       classNameWrapper="rounded-l-xl rounded-tr-xl"
                     >
                       <p className="font-deca text-xs font-normal text-[#064E3B] whitespace-nowrap">
-                        Xin chào,<b>Fimo</b> có thể hỗ trợ gì cho bạn?
+                        Xin chào,
+                        <b>{dataSetting?.assistant_fmrp_short ?? "Fimo"}</b> có
+                        thể hỗ trợ gì cho bạn?
                       </p>
                     </AnimatedGeneraDiv>
                   ) : (
@@ -137,7 +146,7 @@ const ToggleBotAI = () => {
           <div className="relative rounded-2xl bg-linear-border-toggle-bot p-[2px]  h-fit w-fit">
             <div className="bg-linear-background-toggle-bot rounded-2xl size-full py-[6px] px-2 w-fit">
               <p className="text-white font-normal font-deca text-xs whitespace-nowrap">
-                Trợ lý AI Fimo
+                {dataSetting?.assistant_fmrp ?? "Trợ lý AI Fimo"}
               </p>
             </div>
           </div>

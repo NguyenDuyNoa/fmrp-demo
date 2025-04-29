@@ -20,6 +20,7 @@ import { useSelector } from "react-redux";
 import { PRODUCT_ANALYSIS } from "@/constants/TypeChatBot/typeChatBot";
 import { handleDelay } from "@/utils/helpers/common";
 const { TextArea } = Input;
+import { AnimatePresence, motion, useAnimation } from "framer-motion";
 
 const drawerStyles = {
     mask: {
@@ -28,20 +29,21 @@ const drawerStyles = {
 };
 
 const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
-    const hasFetchedFirstMessage = useRef(false);
     const dispatch = useDispatch();
+    const hasFetchedFirstMessage = useRef(false);
+    const [isAnimationCompleted, setAnimationCompleted] = useState(false);
     const [isLoadingGeneraAnswer, setIsLoadingGeneraAnswer] = useState(false);
     const [optionSelectAnswer, setOptionSelectAnswer] = useState([]);
     const [selectAnswer, setSelectAnswer] = useState("");
+
     const [textUser, setTextUser] = useState("");
     const { data: dataNewChatAI, isLoadingNewChatAi } = useStartMessageAI({
         type: PRODUCT_ANALYSIS,
         enable: openChatBox && !hasFetchedFirstMessage.current,
     });
 
-    const { messenger, options, chatScenariosId, sessionId, step } = useSelector(
-        (state) => state.stateBoxChatAi
-    );
+    const { messenger, options, chatScenariosId, sessionId, step, response } =
+        useSelector((state) => state.stateBoxChatAi);
 
     const handleMessageUser = async () => {
         if (!textUser.trim()) return;
@@ -54,6 +56,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
 
         // 2. Gửi tin nhắn lên API và chờ phản hồi AI
         try {
+            setIsLoadingGeneraAnswer(true);
             const res = await fetchNewMessageAI({
                 type: PRODUCT_ANALYSIS, // hoặc truyền cố định nếu bạn cần
                 nextStep: options.stepNext,
@@ -61,8 +64,9 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                 message: userText,
                 chatScenariosId: chatScenariosId,
                 step: step,
+                params: selectAnswer ?? null,
             });
-            console.log("🚀 ~ handleMessageUser ~ res:", res);
+            // console.log("🚀 ~ handleMessageUser ~ res :", res);
 
             const scenario = res?.chat_scenarios;
             if (scenario) {
@@ -72,7 +76,10 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                     actionFn: () => {
                         dispatch({
                             type: "chatbot/addAiMessageOnly",
-                            payload: scenario.message,
+                            payload: {
+                                text: scenario.message,
+                                hasResponse: scenario.response ? true : false,
+                            },
                         });
 
                         dispatch({
@@ -82,6 +89,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                                 session_id: scenario.session_id,
                                 step: scenario.step,
                                 options: scenario.options,
+                                response: scenario.response,
                             },
                         });
                     },
@@ -89,8 +97,34 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
             }
         } catch (err) {
             console.error("Lỗi khi gọi AI:", err);
+            setIsLoadingGeneraAnswer(false);
         }
     };
+
+    const handleSelectAnswer = (value) => {
+        const findValueProductUser = messenger
+            .slice()
+            .reverse()
+            .find((item, index) => item.sender === "user");
+        const valueProduct = findValueProductUser?.text ?? 0;
+        const { idSemiProduct, message } = value;
+        setTextUser(message);
+        setSelectAnswer({
+            idSemiProduct,
+            valueProduct,
+        });
+    };
+
+    useEffect(() => {
+        if (selectAnswer && textUser) {
+            handleMessageUser();
+        }
+    }, [selectAnswer, textUser]);
+
+    // Reset trạng thái khi messenger thay đổi
+    useEffect(() => {
+        setAnimationCompleted(false);
+    }, [messenger]);
 
     useEffect(() => {
         if (options?.value) {
@@ -106,6 +140,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
             setOptionSelectAnswer(mapOptions);
         }
     }, [options?.value]);
+
     // fetch lời chào đầu tiên
     useEffect(() => {
         if (
@@ -205,31 +240,48 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                 </div>
             }
         >
-            <div className="space-y-6 overflow-y-auto w-full h-full flex flex-col items-start justify-end pb-3">
-                {messenger.map((msg, index) => (
-                    <Messenger
-                        key={index}
-                        isMe={msg.sender === "user"}
-                        isLoading={msg.isPending}
-                    >
-                        {msg.text}
-                    </Messenger>
-                ))}
-                {optionSelectAnswer.length > 0 &&
-                    !isLoadingGeneraAnswer &&
-                    optionSelectAnswer.map((item, index) => {
-                        return (
-                            <SelectAnswer
-                                key={item.id}
-                                icon={item.icon}
-                                typeAnswer={item.value}
-                            >
-                                {item.content}
-                            </SelectAnswer>
-                        );
-                    })}
+            <div className="space-y-6 min-h-full  w-full flex flex-col items-start justify-end pb-3">
+                <AnimatePresence mode="sync">
+                    {messenger.map((msg, index) => (
+                        <Messenger
+                            key={index}
+                            isMe={msg.sender === "user"}
+                            isLoading={msg.isPending}
+                            onAnimationComplete={() => {
+                                if (
+                                    index === messenger.length - 1 &&
+                                    options?.type === "radio"
+                                ) {
+                                    setAnimationCompleted(true);
+                                }
+                            }}
+                            ResponseAI={msg?.hasResponse ? response : null}
+                        // hasResponseAI={msg?.hasResponse ? response : null}
+                        >
+                            {msg.text}
+                        </Messenger>
+                    ))}
+                    {optionSelectAnswer.length > 0 &&
+                        !isLoadingGeneraAnswer &&
+                        isAnimationCompleted && (
+                            <div className="flex flex-col gap-y-3">
+                                {optionSelectAnswer.map((item, index) => {
+                                    return (
+                                        <SelectAnswer
+                                            key={item.id}
+                                            icon={item.icon}
+                                            typeAnswer={item.value}
+                                            onClick={(value) => handleSelectAnswer(value)}
+                                        >
+                                            {item.content}
+                                        </SelectAnswer>
+                                    );
+                                })}
+                            </div>
+                        )}
 
-                {isLoadingGeneraAnswer && <Messenger isLoading={true} />}
+                    {isLoadingGeneraAnswer && <Messenger isLoading={true} />}
+                </AnimatePresence>
             </div>
         </Drawer>
     );

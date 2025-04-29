@@ -29,6 +29,7 @@ export const fetchNewMessageAI = async ({
     message,
     chatScenariosId,
     step,
+    params,
 }) => {
     try {
         const response = await apiChatAI.apiChatTextBotAI({
@@ -38,9 +39,16 @@ export const fetchNewMessageAI = async ({
                 session_id: sessionId,
                 message,
                 chat_scenarios_id: chatScenariosId,
-                step,
+                step: params ? null : step,
+                params: params
+                    ? {
+                        value_product: params.valueProduct,
+                        is_semi_product: params.idSemiProduct,
+                    }
+                    : null,
             },
         });
+
         return response.data;
     } catch (error) {
         throw new Error(error);

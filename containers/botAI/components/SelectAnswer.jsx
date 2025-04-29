@@ -13,7 +13,7 @@ const SelectAnswer = ({ className, children, typeAnswer, onClick, icon }) => {
                     : "hover:border-typo-red-1 hover:text-typo-red-1",
                 className
             )}
-            onClick={onClick}
+            onClick={() => onClick({ idSemiProduct: typeAnswer, message: children })}
         >
             <div
                 className={twMerge(

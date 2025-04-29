@@ -70,6 +70,12 @@ const adminState = {
             stepNext: 1,
             keyValue: "",
         },
+        response: {
+            materialsPrimary: [],
+            product: {},
+            semiProducts: [],
+            stages: [],
+        },
     },
 };
 
@@ -141,15 +147,14 @@ function adminReducer(state = adminState, action) {
                     step: action.payload.step,
                     messenger: [
                         ...state.stateBoxChatAi.messenger,
-
-                        { text: action.payload.message, sender: "ai" },
+                        { text: action.payload.message, sender: "ai", hasResponse: false },
                     ],
                     options: {
                         required: action.payload.options?.required || false,
                         value: action.payload.options?.value || "",
                         valueProduct: action.payload.options?.value_product || false,
                         type: action.payload.options?.type,
-                        stepNext: action.payload.options?.step_next
+                        stepNext: action.payload.options?.step_next,
                     },
                 },
             };
@@ -173,7 +178,11 @@ function adminReducer(state = adminState, action) {
                     ...state.stateBoxChatAi,
                     messenger: [
                         ...state.stateBoxChatAi.messenger,
-                        { text: action.payload, sender: "ai" },
+                        {
+                            text: action.payload.text,
+                            sender: "ai",
+                            hasResponse: action.payload.hasResponse,
+                        },
                     ],
                 },
             };
@@ -192,7 +201,13 @@ function adminReducer(state = adminState, action) {
                         valueProduct: action.payload.options?.value_product || false,
                         type: action.payload.options?.type,
                         stepNext: action.payload.options?.step_next,
-                        keyValue: action.payload.options?.key_value
+                        keyValue: action.payload.options?.key_value,
+                    },
+                    response: {
+                        materialsPrimary: action.payload.response?.materials_primary || [],
+                        product: action.payload.response?.product || {},
+                        semiProducts: action.payload.response?.semi_products || [],
+                        stages: action.payload.response?.stages || [],
                     },
                 },
             };

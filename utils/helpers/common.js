@@ -1,6 +1,6 @@
 import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
 import useToast from "@/hooks/useToast";
-const isShow = useToast()
+const isShow = useToast();
 const convertArrayToObject = (array, key) => {
     const initialValue = {};
     return array.reduce((obj, item) => {
@@ -23,7 +23,6 @@ const parseStringToObject = (str) => {
     }, {});
 };
 
-
 const isAllowedDiscount = (values) => {
     const { floatValue } = values;
     if (floatValue === 0) {
@@ -34,7 +33,7 @@ const isAllowedDiscount = (values) => {
         return false;
     }
     return true;
-}
+};
 
 const isAllowedNumber = (values) => {
     const { floatValue } = values;
@@ -43,18 +42,22 @@ const isAllowedNumber = (values) => {
     } else {
         return true;
     }
-}
+};
 const isAllowedNumberThanWarning = (values, dataLang) => {
     const { floatValue, value } = values;
     if (floatValue == 0) {
         return true;
     }
     if (floatValue < 0) {
-        isShow('error', dataLang?.productions_orders_popup_please_enter_greater || 'productions_orders_popup_please_enter_greater');
-        return false
+        isShow(
+            "error",
+            dataLang?.productions_orders_popup_please_enter_greater ||
+            "productions_orders_popup_please_enter_greater"
+        );
+        return false;
     }
-    return true
-}
+    return true;
+};
 
 export const handleDelay = ({ actionFn, delay = 2000, setIsLoading }) => {
     if (typeof setIsLoading === "function") setIsLoading(true);
@@ -72,5 +75,5 @@ export {
     convertArrayToObject,
     parseStringToArray,
     parseStringToObject,
-    parseArrayToString
+    parseArrayToString,
 };

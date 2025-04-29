@@ -5,15 +5,17 @@ import AvatarBotAI from "./AvatarBotAI";
 import AnimatedGeneraText from "@/components/animations/animation/AnimatedGeneraText";
 import parse from "html-react-parser";
 import { useDispatch } from "react-redux";
+import TableBOM from "./TableBOM";
 
 const Messenger = ({
     className,
     children,
     isMe = false,
     isLoading = false,
+    onAnimationComplete,
+    ResponseAI,
 }) => {
-
-
+    console.log("🚀 ~ ResponseAI:", ResponseAI);
     const parsedMessage = useMemo(() => {
         if (!children) return null;
         return parse(children);
@@ -22,7 +24,7 @@ const Messenger = ({
     return (
         <div
             className={twMerge(
-                "flex items-start gap-2 w-full flex-row ",
+                "flex items-start gap-2 w-full flex-row max-w-full",
                 isMe ? "justify-end" : "justify-start"
             )}
         >
@@ -35,7 +37,7 @@ const Messenger = ({
 
             <div
                 className={twMerge(
-                    "max-w-[80%] flex flex-col gap-y-1 justify-start",
+                    "max-w-full flex flex-col gap-y-1 justify-start",
                     className
                 )}
             >
@@ -63,7 +65,38 @@ const Messenger = ({
                     ) : isMe ? (
                         <p>{children}</p>
                     ) : (
-                        <AnimatedGeneraText>{parsedMessage}</AnimatedGeneraText>
+                        <>
+                            <AnimatedGeneraText onAnimationComplete={onAnimationComplete}>
+                                {parsedMessage}
+                            </AnimatedGeneraText>
+
+                            {ResponseAI && (
+                                <div className="mt-4 w-full">
+                                    {ResponseAI?.stages.length > 0 && (
+                                        <div className="flex flex-col gap-y-2">
+                                            <p className="font-deca text-base  font-normal text-typo-black-6">
+                                                🔁 Công đoạn sản xuất
+                                            </p>
+
+                                            {ResponseAI?.stages.map((item, index) => (
+                                                <div className="flex flex-row gap-x-[10px] justify-start items-center">
+                                                    <div className="bg-[#637381]  rounded-[3px] py-[4px] px-[8px]">
+                                                        <p className="font-deca font-normal text-xs text-white">
+                                                            {index + 1}
+                                                        </p>
+                                                    </div>
+                                                    <p className="font-deca font-normal text-sm  text-typo-black-4">
+                                                        {item.name}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <TableBOM/>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
