@@ -1570,10 +1570,20 @@ const DropdownAvatar = React.memo(() => {
           group: 1,
           onClick: () => {
             dispatch({
-              type: "statePopupRecommendation",
-              payload: {
-                open: true,
-              },
+                type: "statePopupGlobal",
+                payload: {
+                    open: true,
+                    allowOutsideClick: false,
+                    allowEscape: false,
+                    children: <PopupFeelsCustomer
+                        onClose={() =>
+                            dispatch({
+                                type: "statePopupGlobal",
+                                payload: { open: false },
+                            })
+                        }
+                    />,
+                },
             });
           },
         },
