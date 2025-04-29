@@ -1,34 +1,30 @@
+import { StateContext } from "@/context/_state/productions-orders/StateContext";
+import { useSheet } from "@/context/ui/SheetContext";
 import {
     QueryClient,
     QueryClientProvider,
-    useQuery,
-    useQueryClient,
+    useQueryClient
 } from "@tanstack/react-query";
-import SimpleBar from "simplebar-react";
+import { useRouter } from "next/router";
+import React, { useContext, useEffect } from "react";
+import { useSelector } from "react-redux";
+import PopupGlobal from "../common/popup/PopupGlobal";
+import ChatBubbleAI from "../UI/chat/ChatAiBubble";
+import ImagesModal from "../UI/images/ImagesModal";
+import PopupAccountInformation from "../UI/popup/PopupAccountInformation";
 import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
-import Header from "./header";
-import { Customscrollbar } from "../UI/common/Customscrollbar";
-import { useSelector } from "react-redux";
-import ChatBubbleAI from "../UI/chat/ChatAiBubble";
-import PopupAccountInformation from "../UI/popup/PopupAccountInformation";
 import PopupChangePassword from "../UI/popup/PopupChangePassword";
 import PopupRecommendation from "../UI/popup/PopupRecommendation";
 import PopupUpdateVersion from "../UI/popup/PopupUpdateVersion";
-import ImagesModal from "../UI/images/ImagesModal";
-import { useRouter } from "next/router";
-import React, { useContext, useEffect, useRef } from "react";
-import PopupGlobal from "../common/popup/PopupGlobal";
-import { useSheet } from "@/context/ui/SheetContext";
-import { StateContext } from "@/context/_state/productions-orders/StateContext";
-import useSocket from "@/hooks/socket/useSocket";
+import PopupUpgradeProfessional from "../UI/popup/PopupUpgradeProfessional";
+import Header from "./header";
 
-import { v4 as uuidv4 } from "uuid";
-import { useSocketWithToken } from "@/hooks/socket/useSocketWithToken";
 import { useAppContext } from "@/context/_state/version-application/VersionContext";
+import { useSocketContext } from "@/context/socket/SocketContext";
 import { useDispatch } from "react-redux";
 import PopupUpdateNewVersion from "../common/popup/PopupUpdateNewVersion";
-import { useSocketContext } from "@/context/socket/SocketContext";
+import PopupSuccessfulPayment from "../UI/popup/PopupSuccessfulPayment";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -63,6 +59,12 @@ const Index = ({ children, ...props }) => {
     const statePopupUpdateVersion = useSelector(
         (state) => state.statePopupUpdateVersion
     );
+    const statePopupUpgradeProfessional = useSelector(
+        (state) => state.statePopupUpgradeProfessional
+    );
+    const statePopupSuccessfulPayment = useSelector(
+        (state) => state.statePopupSuccessfulPayment
+    );
     const statePopupGlobal = useSelector((state) => state.statePopupGlobal);
 
     useEffect(() => {
@@ -80,7 +82,7 @@ const Index = ({ children, ...props }) => {
         }
     }, [router.isReady, router?.route]);
 
-    console.log("router", router);
+    // console.log("router", router);
 
     const { hasNewVersion, version, setHasNewVersion, refetchVersion } = useAppContext();
     const dispatch = useDispatch();
@@ -139,6 +141,8 @@ const Index = ({ children, ...props }) => {
                     )}
                     {statePopupChangePassword?.open && <PopupChangePassword {...props} />}
                     {statePopupRecommendation?.open && <PopupRecommendation {...props} />}
+                    {statePopupUpgradeProfessional?.open && <PopupUpgradeProfessional {...props} />}
+                    {statePopupSuccessfulPayment?.open && <PopupSuccessfulPayment {...props} />}
                 </React.Fragment>
             )}
 

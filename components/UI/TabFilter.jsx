@@ -1,35 +1,147 @@
 import { useRouter } from "next/dist/client/router";
-import React from "react";
-import { ArrowCircleDown } from "iconsax-react";
+import React, { useRef, useEffect, useLayoutEffect } from "react";
+import { useTabContext } from "./common/layout";
 
 const TabFilter = React.memo((props) => {
-    const router = useRouter();
+  const router = useRouter();
+  const tabRef = useRef(null);
+  const containerRef = useRef(null);
+  const { setActiveTabInfo } = useTabContext() || {};
+  const isActive =
+    router.query?.tab === `${props.active}` ||
+    (!router.query?.tab && props.active === "all");
 
-    return (
-        // <button style={props.style} onClick={props.onClick} className={`${props.className} justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:text-[16px] 2xl:text-[16.5px] xl:text-[12px] lg:text-[13px] flex gap-2 items-center rounded-md px-2 py-2 outline-none relative`}>
-        <button
-            style={{
-                backgroundColor: props.backgroundColor ? props.backgroundColor : "#e2f0fe",
-            }}
-            onClick={props.onClick}
-            className={`${props.className} mt-3 mb-1 whitespace-nowrap text-[#0F4F9E] justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:text-[17px] 2xl:text-[15px] xl:text-[12px] lg:text-[11px] flex gap-2 items-center rounded-md px-2 py-2 outline-none relative`}
-        // className={`${props.className} text-[#0F4F9E] justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:h-10 2xl:h-8 xl:h-8 lg:h-7 3xl:text-[17px] 2xl:text-[15px] xl:text-[12px] lg:text-[11px] flex gap-2 items-center rounded-md px-2 py-2 outline-none relative`}
+  // Hàm tính toán vị trí chính xác của tab so với container cha
+  const calculateTabPosition = (tabElement) => {
+    // Tìm container cha - simplebar-content
+    const simplebarContent = tabElement.closest(".simplebar-content");
+
+    if (simplebarContent) {
+      // Tính toán vị trí tương đối so với container
+      const containerRect = simplebarContent.getBoundingClientRect();
+      const tabRect = tabElement.getBoundingClientRect();
+
+      // Tính toán left tương đối so với container
+      const relativeLeft =
+        tabRect.left - containerRect.left + simplebarContent.scrollLeft;
+
+      return {
+        left: relativeLeft,
+        width: tabRect.width,
+      };
+    }
+
+    // Fallback nếu không tìm thấy container
+    return {
+      left: tabElement.offsetLeft,
+      width: tabElement.offsetWidth,
+    };
+  };
+
+  // Sử dụng useLayoutEffect để cập nhật vị trí trước khi render
+  useLayoutEffect(() => {
+    if (tabRef.current && isActive && setActiveTabInfo) {
+      const tabElement = tabRef.current;
+      if (tabElement) {
+        const position = calculateTabPosition(tabElement);
+
+        setActiveTabInfo({
+          id: props.active,
+          left: position.left,
+          width: position.width,
+        });
+      }
+    }
+  }, [router.query?.tab, props.active, setActiveTabInfo, isActive]);
+
+  // Cập nhật vị trí tab khi tab active hoặc khi component mount
+  useEffect(() => {
+    const updateTabPosition = () => {
+      if (tabRef.current && isActive && setActiveTabInfo) {
+        const tabElement = tabRef.current;
+        if (tabElement) {
+          const position = calculateTabPosition(tabElement);
+
+          setActiveTabInfo({
+            id: props.active,
+            left: position.left,
+            width: position.width,
+          });
+        }
+      }
+    };
+
+    // Cập nhật khi cửa sổ resize
+    window.addEventListener("resize", updateTabPosition);
+
+    // Cập nhật khi scroll trên container
+    const simplebarContent = tabRef.current?.closest(".simplebar-content");
+    if (simplebarContent) {
+      simplebarContent.addEventListener("scroll", updateTabPosition);
+    }
+
+    // Cập nhật sau khi component mount hoàn chỉnh
+    const timer = setTimeout(updateTabPosition, 100);
+
+    return () => {
+      window.removeEventListener("resize", updateTabPosition);
+      clearTimeout(timer);
+
+      if (simplebarContent) {
+        simplebarContent.removeEventListener("scroll", updateTabPosition);
+      }
+    };
+  }, [router.query?.tab, props.active, setActiveTabInfo, isActive]);
+
+  const handleClick = (e) => {
+    if (props.onClick) {
+      props.onClick(e);
+
+      // Cập nhật lại vị trí tab sau khi click để đảm bảo chính xác
+      setTimeout(() => {
+        if (tabRef.current && setActiveTabInfo) {
+          const tabElement = tabRef.current;
+          const position = calculateTabPosition(tabElement);
+
+          setActiveTabInfo({
+            id: props.active,
+            left: position.left,
+            width: position.width,
+          });
+        }
+      }, 50);
+    }
+  };
+
+  return (
+    <div className="relative group" ref={containerRef}>
+      <button
+        ref={tabRef}
+        onClick={handleClick}
+        className={`${
+          props.className
+        } whitespace-nowrap font-medium justify-center 3xl:text-[17px] 2xl:text-[15px] xl:text-[12px] lg:text-[11px] flex gap-2 items-center px-4 py-2.5 outline-none transition-colors duration-200
+        ${
+          isActive
+            ? "text-typo-blue-4"
+            : "text-neutral-02 group-hover:text-typo-blue-4/80"
+        }
+        `}
+      >
+        {props.children}
+        <span
+          className={`${
+            props?.total > 0 &&
+            "py-1 px-2 rounded-full text-white text-xs font-semibold transition-colors duration-200"
+          } 
+        ${isActive ? "bg-background-blue-2 " : "bg-neutral-02 group-hover:bg-background-blue-2"}
+          
+          `}
         >
-            {router.query?.tab === `${props.active}` && (
-                <ArrowCircleDown
-                    className="3xl:w-[18px] 2xl:w-[16px] xl:w-[15px] lg:w-[15px] 3xl:h-[18px] 2xl:h-[16px] xl:h-[15px] lg:h-[15px]"
-                    color="#0F4F9E"
-                />
-            )}
-            {props.children}
-            <span
-                className={`${props?.total > 0 &&
-                    "absolute 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-xs xl:text-[11px] lg:text-[11px] top-0 right-0 bg-[#ff6f00]  3xl:translate-x-[30%] 2xl:translate-x-2.5 xl:translate-x-2 lg:translate-x-[40%] 3xl:-translate-y-[50%] 2xl:-translate-y-2  xl:-translate-y-[40%] lg:-translate-y-[40%] text-white rounded-full text-center items-center flex justify-center"
-                    } `}
-            >
-                {props?.total > 0 && props?.total}
-            </span>
-        </button>
-    );
+          {props?.total > 0 && props?.total}
+        </span>
+      </button>
+    </div>
+  );
 });
 export default TabFilter;

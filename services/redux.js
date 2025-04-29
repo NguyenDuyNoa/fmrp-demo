@@ -46,6 +46,12 @@ const adminState = {
     statePopupChangePassword: {
         open: false
     },
+    statePopupUpgradeProfessional: {
+        open: false
+    },
+    statePopupSuccessfulPayment: {
+        open: false
+    },
     statePopupRecommendation: {
         open: false
     },
@@ -108,6 +114,10 @@ function adminReducer(state = adminState, action) {
             return { ...state, statePopupAccountInformation: action.payload };
         case "statePopupChangePassword":
             return { ...state, statePopupChangePassword: action.payload };
+        case "statePopupUpgradeProfessional":
+            return { ...state, statePopupUpgradeProfessional: action.payload };
+        case "statePopupSuccessfulPayment":
+            return { ...state, statePopupSuccessfulPayment: action.payload };
         case "statePopupRecommendation":
             return { ...state, statePopupRecommendation: action.payload };
         case "statePopupUpdateVersion":

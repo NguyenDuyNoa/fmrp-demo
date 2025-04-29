@@ -75,7 +75,7 @@ const initalState = {
 };
 const PurchaseImport = (props) => {
     const dataLang = props.dataLang;
-    console.log("🚀 ~ PurchaseImport ~ dataLang:", dataLang)
+    // console.log("🚀 ~ PurchaseImport ~ dataLang:", dataLang)
 
     const router = useRouter();
 
@@ -429,14 +429,19 @@ const PurchaseImport = (props) => {
                     </>
                 }
                 table={<div className="flex flex-col h-full">
-                    <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                    <div className="w-full items-center flex justify-between">
                         <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                            <div className="grid grid-cols-5">
+                            <div className="flex gap-3 items-center">
                                 <SearchComponent
                                     colSpan={1}
                                     dataLang={dataLang}
-                                    placeholder={dataLang?.branch_search}
+                                    placeholder={dataLang?.search_production_order_code}
                                     onChange={_HandleOnChangeKeySearch.bind(this)}
+                                />
+                                <DateToDateComponent
+                                    colSpan={1}
+                                    value={isState.valueDate}
+                                    onChange={(e) => queryState({ valueDate: e })}
                                 />
                                 <SelectComponent
                                     options={[
@@ -488,11 +493,6 @@ const PurchaseImport = (props) => {
                                     isClearable={true}
                                     className="rounded-md bg-white   2xl:text-base xl:text-xs text-[10px]  z-20"
                                     isSearchable={true}
-                                />
-                                <DateToDateComponent
-                                    colSpan={1}
-                                    value={isState.valueDate}
-                                    onChange={(e) => queryState({ valueDate: e })}
                                 />
                             </div>
                         </div>
