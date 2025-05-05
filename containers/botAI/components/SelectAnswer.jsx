@@ -3,17 +3,17 @@ import React from "react";
 import { twMerge } from "tailwind-merge";
 import { motion } from "framer-motion";
 
-const SelectAnswer = ({ className, children, typeAnswer, onClick, icon }) => {
+const SelectAnswer = ({ className, children, typeAnswer, onClick, icon, stepNext }) => {
     return (
         <div
             className={twMerge(
-                "group  rounded-xl border border-[#919EAB] border-opacity-20 py-4 px-3 flex flex-row justify-between min-w-[370px] shadow-md cursor-pointer",
+                "group  rounded-xl border border-[#919EAB] border-opacity-20 py-4 px-3 flex flex-row justify-between min-w-[370px] cursor-pointer",
                 typeAnswer === 1
                     ? "hover:border-typo-green-3 hover:text-typo-green-3 "
                     : "hover:border-typo-red-1 hover:text-typo-red-1",
                 className
             )}
-            onClick={() => onClick({ idSemiProduct: typeAnswer, message: children })}
+            onClick={() => onClick({ idSemiProduct: typeAnswer, message: children, stepNext: stepNext })}
         >
             <div
                 className={twMerge(

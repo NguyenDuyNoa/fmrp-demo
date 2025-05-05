@@ -6,7 +6,7 @@ import AnimatedGeneraText from "@/components/animations/animation/AnimatedGenera
 import parse from "html-react-parser";
 import { useDispatch } from "react-redux";
 import TableBOM from "./TableBOM";
-
+import { motion } from "framer-motion";
 const Messenger = ({
     className,
     children,
@@ -14,8 +14,11 @@ const Messenger = ({
     isLoading = false,
     onAnimationComplete,
     ResponseAI,
+    options,
+    icon,
+    nextText = false
 }) => {
-    console.log("🚀 ~ ResponseAI:", ResponseAI);
+    // console.log("🚀 ~ ResponseAI:", ResponseAI);
     const parsedMessage = useMemo(() => {
         if (!children) return null;
         return parse(children);
@@ -66,10 +69,23 @@ const Messenger = ({
                         <p>{children}</p>
                     ) : (
                         <>
-                            <AnimatedGeneraText onAnimationComplete={onAnimationComplete}>
-                                {parsedMessage}
-                            </AnimatedGeneraText>
-
+                            <div className="w-full flex items-center justify-start gap-x-1">
+                                <motion.div
+                                    animate={{
+                                        rotate: [0, 180, 0],
+                                    }}
+                                    transition={{
+                                        duration: 2,
+                                        repeat: Infinity,
+                                        ease: "easeInOut",
+                                    }}
+                                >
+                                    {icon}
+                                </motion.div>
+                                <AnimatedGeneraText onAnimationComplete={onAnimationComplete}>
+                                    {parsedMessage}
+                                </AnimatedGeneraText>
+                            </div>
                             {ResponseAI && (
                                 <div className="mt-4 w-full">
                                     {ResponseAI?.stages.length > 0 && (
@@ -79,7 +95,10 @@ const Messenger = ({
                                             </p>
 
                                             {ResponseAI?.stages.map((item, index) => (
-                                                <div className="flex flex-row gap-x-[10px] justify-start items-center">
+                                                <div
+                                                    className="flex flex-row gap-x-[10px] justify-start items-center"
+                                                    key={index}
+                                                >
                                                     <div className="bg-[#637381]  rounded-[3px] py-[4px] px-[8px]">
                                                         <p className="font-deca font-normal text-xs text-white">
                                                             {index + 1}
@@ -93,7 +112,17 @@ const Messenger = ({
                                         </div>
                                     )}
 
-                                    <TableBOM/>
+                                    <TableBOM
+                                        materialsPrimary={ResponseAI.materialsPrimary ?? []}
+                                        semiProducts={ResponseAI.semiProducts ?? []}
+                                        stages={ResponseAI.stages}
+                                    />
+
+                                    {options.messageOptions && (
+                                        <p className="font-deca font-normal text-base text-[#303030] mt-6">
+                                            {options.messageOptions}
+                                        </p>
+                                    )}
                                 </div>
                             )}
                         </>

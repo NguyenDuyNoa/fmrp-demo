@@ -21,6 +21,7 @@ import { PRODUCT_ANALYSIS } from "@/constants/TypeChatBot/typeChatBot";
 import { handleDelay } from "@/utils/helpers/common";
 const { TextArea } = Input;
 import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import LoadingDataChatBot from "@/components/icons/common/LoadingDataChatBot";
 
 const drawerStyles = {
     mask: {
@@ -34,7 +35,6 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
     const [isAnimationCompleted, setAnimationCompleted] = useState(false);
     const [isLoadingGeneraAnswer, setIsLoadingGeneraAnswer] = useState(false);
     const [optionSelectAnswer, setOptionSelectAnswer] = useState([]);
-    const [selectAnswer, setSelectAnswer] = useState("");
 
     const [textUser, setTextUser] = useState("");
     const { data: dataNewChatAI, isLoadingNewChatAi } = useStartMessageAI({
@@ -44,6 +44,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
 
     const { messenger, options, chatScenariosId, sessionId, step, response } =
         useSelector((state) => state.stateBoxChatAi);
+    console.log("🚀 ~ BoxChatAI ~ messenger:", messenger);
 
     const handleMessageUser = async () => {
         if (!textUser.trim()) return;
@@ -53,6 +54,19 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
             payload: userText,
         });
         setTextUser("");
+
+        // ✅ Nếu yêu cầu chọn option và user cố gõ tay => chặn & cảnh báo
+        if (options.required && options.type === "radio") {
+            dispatch({
+                type: "chatbot/addAiMessageOnly",
+                payload: {
+                    text: "Vui lòng chọn một trong các lựa chọn bên dưới để tiếp tục.",
+                    hasResponse: false,
+                },
+            });
+            setTextUser("");
+            return;
+        }
 
         // 2. Gửi tin nhắn lên API và chờ phản hồi AI
         try {
@@ -64,9 +78,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                 message: userText,
                 chatScenariosId: chatScenariosId,
                 step: step,
-                params: selectAnswer ?? null,
             });
-            // console.log("🚀 ~ handleMessageUser ~ res :", res);
 
             const scenario = res?.chat_scenarios;
             if (scenario) {
@@ -101,25 +113,81 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
         }
     };
 
-    const handleSelectAnswer = (value) => {
+    const handleSelectAnswer = async (value) => {
+        console.log("🚀 ~ handleSelectAnswer ~ value:", value);
         const findValueProductUser = messenger
             .slice()
             .reverse()
             .find((item, index) => item.sender === "user");
         const valueProduct = findValueProductUser?.text ?? 0;
-        const { idSemiProduct, message } = value;
-        setTextUser(message);
-        setSelectAnswer({
-            idSemiProduct,
-            valueProduct,
-        });
-    };
+        const { idSemiProduct, message, stepNext } = value;
 
-    useEffect(() => {
-        if (selectAnswer && textUser) {
-            handleMessageUser();
+        dispatch({
+            type: "chatbot/addUserMessage",
+            payload: message,
+        });
+
+        let dynamicParams = null;
+
+        if (step === "2") {
+            dynamicParams = {
+                [options.keyValue]: idSemiProduct,
+                value_product: valueProduct,
+            };
         }
-    }, [selectAnswer, textUser]);
+
+        if (step === "3") {
+            dynamicParams = {
+                [options.keyValue]: idSemiProduct,
+            };
+        }
+        // 2. Gửi tin nhắn lên API và chờ phản hồi AI
+        try {
+            setIsLoadingGeneraAnswer(true);
+            const res = await fetchNewMessageAI({
+                type: PRODUCT_ANALYSIS, // hoặc truyền cố định nếu bạn cần
+                nextStep: stepNext ? stepNext : options.stepNext,
+                sessionId: sessionId,
+                message: message,
+                chatScenariosId: chatScenariosId,
+                step: step === "3" ? "4" : step,
+                params: dynamicParams,
+            });
+
+            console.log("🚀 ~ handleMessageUser ~ res :", res);
+
+            const scenario = res?.chat_scenarios;
+            if (scenario) {
+                handleDelay({
+                    delay: 3000,
+                    setIsLoading: setIsLoadingGeneraAnswer,
+                    actionFn: () => {
+                        dispatch({
+                            type: "chatbot/addAiMessageOnly",
+                            payload: {
+                                text: scenario.message,
+                                hasResponse: scenario.response ? true : false,
+                            },
+                        });
+
+                        dispatch({
+                            type: "chatbot/updateScenarioMeta",
+                            payload: {
+                                chat_scenarios_id: scenario.chat_scenarios_id,
+                                session_id: scenario.session_id,
+                                step: scenario.step,
+                                options: scenario.options,
+                                response: scenario.response,
+                            },
+                        });
+                    },
+                });
+            }
+        } catch (err) {
+            console.error("Lỗi khi gọi AI:", err);
+            setIsLoadingGeneraAnswer(false);
+        }
+    };
 
     // Reset trạng thái khi messenger thay đổi
     useEffect(() => {
@@ -135,6 +203,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                     content: item.label,
                     icon:
                         item.value === 1 ? <CheckIconMessenger /> : <ErrorIconMessenger />,
+                    stepNext: item?.step_next ?? null,
                 };
             });
             setOptionSelectAnswer(mapOptions);
@@ -210,7 +279,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                     <div className="rounded-xl p-5 bg-linear-background-chat space-y-3">
                         <div className="text-typo-blue-5 font-medium text-base flex flex-row items-center gap-x-2">
                             <PiSparkleBold />
-                            <p className="text-typo-black-4 font-deca">
+                            <p className="text-typo-black-4 font-deca text-base">
                                 Xây dựng nhà xưởng xịn hơn cùng Fimo
                             </p>
                         </div>
@@ -221,9 +290,11 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                                 placeholder="VD: Tàu hủ tươi 500g, Áo sơ mi tay dài size S,…"
                                 autoSize={{ minRows: 5, maxRows: 6 }}
                                 className="w-full placeholder:font-deca font-deca font-normal text-sm text-[#1C252E]"
+                            // disabled={options.required && options.type === "radio"}
                             />
                             <div className="absolute bottom-2 right-2 w-fit z-10">
                                 <button
+                                    // disabled={options.required && options.type === "radio"}
                                     className={twMerge(
                                         " rounded-lg p-[10px] text-lg transition-all duration-1000 ease-in-out",
                                         textUser
@@ -256,7 +327,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                                 }
                             }}
                             ResponseAI={msg?.hasResponse ? response : null}
-                        // hasResponseAI={msg?.hasResponse ? response : null}
+                            options={options}
                         >
                             {msg.text}
                         </Messenger>
@@ -264,7 +335,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                     {optionSelectAnswer.length > 0 &&
                         !isLoadingGeneraAnswer &&
                         isAnimationCompleted && (
-                            <div className="flex flex-col gap-y-3">
+                            <div className="flex flex-col gap-y-3 pl-[30px]">
                                 {optionSelectAnswer.map((item, index) => {
                                     return (
                                         <SelectAnswer
@@ -272,6 +343,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                                             icon={item.icon}
                                             typeAnswer={item.value}
                                             onClick={(value) => handleSelectAnswer(value)}
+                                            stepNext={item?.stepNext ?? null}
                                         >
                                             {item.content}
                                         </SelectAnswer>
@@ -279,7 +351,14 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                                 })}
                             </div>
                         )}
-
+                    {/* <Messenger
+                        isMe={false}
+                        isLoading={false}
+                        icon={<LoadingDataChatBot />}
+                        nextText={true}
+                    >
+                        Dữ liệu đang được khởi tạo, vui lòng không tắt pop-up...
+                    </Messenger> */}
                     {isLoadingGeneraAnswer && <Messenger isLoading={true} />}
                 </AnimatePresence>
             </div>
