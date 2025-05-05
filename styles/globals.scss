@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+// @tailwind base;
+// @tailwind components;
+// @tailwind utilities;
 
 //input eye password
 input::-ms-reveal,
@@ -21,12 +22,12 @@ body {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #DDDDE2 !important;
+  background: #dddde2 !important;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #DDDDE2 !important;
+  background: #dddde2 !important;
   border-radius: 40px !important;
 }
 
@@ -81,41 +82,41 @@ body {
   box-shadow: none !important;
 }
 
-@layer utilities {
-  .hide-scrollbar .simplebar-track {
-    display: none !important;
-  }
+// @layer utilities {
+//   .hide-scrollbar .simplebar-track {
+//     display: none !important;
+//   }
 
-  @keyframes dropdown-enter {
-    0% {
-      opacity: 0;
-      transform: scaleY(0.9);
-    }
-    100% {
-      opacity: 1;
-      transform: scaleY(1);
-    }
-  }
+//   @keyframes dropdown-enter {
+//     0% {
+//       opacity: 0;
+//       transform: scaleY(0.9);
+//     }
+//     100% {
+//       opacity: 1;
+//       transform: scaleY(1);
+//     }
+//   }
 
-  .animate-dropdown-enter {
-    animation: dropdown-enter 0.3s ease-out forwards;
-  }
+//   .animate-dropdown-enter {
+//     animation: dropdown-enter 0.3s ease-out forwards;
+//   }
 
-  .animate-slide-down-enter {
-    animation: slide-down-enter 0.3s ease-out;
-  }
+//   .animate-slide-down-enter {
+//     animation: slide-down-enter 0.3s ease-out;
+//   }
 
-  @keyframes slide-down-enter {
-    0% {
-      opacity: 0;
-      transform: translateY(-100%);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
+//   @keyframes slide-down-enter {
+//     0% {
+//       opacity: 0;
+//       transform: translateY(-100%);
+//     }
+//     100% {
+//       opacity: 1;
+//       transform: translateY(0);
+//     }
+//   }
+// }
 
 /// cuộn dọc
 .simplebar-track.simplebar-vertical .simplebar-scrollbar:before {
@@ -342,16 +343,17 @@ body {
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: radial-gradient(50% 93.75% at 50% 6.25%, #a3eed6 0%, rgba(255, 255, 255, 0) 100%);
+    background: radial-gradient(
+      50% 93.75% at 50% 6.25%,
+      #a3eed6 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
     pointer-events: none;
     z-index: 1;
 
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
     mask-composite: exclude;
     -webkit-mask-composite: xor; /* hoặc destination-out */
@@ -359,7 +361,12 @@ body {
   }
 
   &:hover::before {
-    background: conic-gradient(from var(--angle), #a3eed6, rgba(255, 255, 255, 0), #a3eed6);
+    background: conic-gradient(
+      from var(--angle),
+      #a3eed6,
+      rgba(255, 255, 255, 0),
+      #a3eed6
+    );
     padding: 2px;
     animation: borderMove 1.5s linear infinite;
   }
@@ -512,7 +519,8 @@ body {
 .CircularProgressbar .CircularProgressbar-background {
   fill: #d6d6d6;
 }
-.CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-background {
+.CircularProgressbar.CircularProgressbar-inverted
+  .CircularProgressbar-background {
   fill: #3e98c7;
 }
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-text {

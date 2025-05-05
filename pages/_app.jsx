@@ -14,6 +14,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import "simplebar-react/dist/simplebar.min.css";
 import "sweetalert2/src/sweetalert2.scss";
 import "../styles/globals.scss";
+import '../styles/tailwind.css';
 import Login from "./auth/login";
 import Register from "./auth/register";
 import { SheetProvider, useSheet } from "@/context/ui/SheetContext";
