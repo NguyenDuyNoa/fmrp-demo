@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { IoCopyOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "react-tippy";
+import PopupSuccessfulPayment from "./PopupSuccessfulPayment";
 
 const deca = Lexend_Deca({
   subsets: ["latin"],
@@ -28,19 +29,20 @@ const deca = Lexend_Deca({
 
 // Thêm biến prices với thuế VAT 10%
 const prices = {
-  vatRate: 0.1
+  vatRate: 0.1,
 };
 
 const PopupUpgradeProfessional = (props) => {
   const { dataLang, upgradePackageData } = props;
   const isShow = useToast();
   const dispatch = useDispatch();
+  const showToat = useToast();
 
   // Sử dụng custom hook để lấy dữ liệu và cập nhật
-  const { 
-    refetch: refetchUpgradePackage, 
+  const {
+    refetch: refetchUpgradePackage,
     data: upgradePackageApiData,
-    getUpgradePackageWithRefresh 
+    getUpgradePackageWithRefresh,
   } = useGetUpgradePackage();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -62,21 +64,51 @@ const PopupUpgradeProfessional = (props) => {
     packageData?.data?.[0]?.default_user || 5
   );
 
-  const [selectedPackages, setSelectedPackages] = useState({
-    id_package_detail: packageData?.data?.[0]?.id_detail,
-    number_of_users: packageData?.data?.[0]?.default_user || 5,
-    id_service_add: [],
-    selectedServices: [],
-    selectedPackage: packageData?.data?.[0]
-      ? {
-          id: packageData?.data?.[0]?.id,
-          id_detail: packageData?.data?.[0]?.id_detail,
-          name: packageData?.data?.[0]?.name,
-          price: packageData?.data?.[0]?.price,
-          fullname: packageData?.data?.[0]?.fullname,
-        }
-      : null,
-  });
+  // const [selectedPackages, setSelectedPackages] = useState({
+  //   id_package_detail: packageData?.data?.[0]?.id_detail,
+  //   number_of_users: packageData?.data?.[0]?.default_user || 5,
+  //   id_service_add: [],
+  //   selectedServices: [],
+  //   selectedPackage: packageData?.data?.[0]
+  //     ? {
+  //         id: packageData?.data?.[0]?.id,
+  //         id_detail: packageData?.data?.[0]?.id_detail,
+  //         name: packageData?.data?.[0]?.name,
+  //         price: packageData?.data?.[0]?.price,
+  //         fullname: packageData?.data?.[0]?.fullname,
+  //       }
+  //     : null,
+  // });
+
+  const [selectedPackages, setSelectedPackages] = useState(null);
+
+useEffect(() => {
+  if (
+    packageData?.data?.length &&
+    upgradePackageApiData?.data?.id_package_detail
+  ) {
+    const matchedPackage = packageData.data.find(
+      (pkg) => pkg.id_detail === upgradePackageApiData.data.id_package_detail
+    );
+    if (matchedPackage) {
+      setSelectedPackages({
+        id_package_detail: matchedPackage.id_detail,
+        number_of_users: matchedPackage.default_user || 5,
+        id_service_add: [],
+        selectedServices: [],
+        selectedPackage: {
+          id: matchedPackage.id,
+          id_detail: matchedPackage.id_detail,
+          name: matchedPackage.name,
+          price: matchedPackage.price,
+          fullname: matchedPackage.fullname,
+          month: matchedPackage.month,
+        },
+      });
+      setUserCount(matchedPackage.default_user || 5);
+    }
+  }
+}, [packageData?.data, upgradePackageApiData?.data?.id_package_detail]);
 
   const [bankData, setBankData] = useState({
     accountNumber: "881688",
@@ -95,26 +127,30 @@ const PopupUpgradeProfessional = (props) => {
   );
 
   // Tạo mutation để cập nhật thông tin QR
-  const refreshPackageMutation = useMutation({
-    mutationFn: async () => {
-      setIsQrUpdating(true);
-      return await getUpgradePackageWithRefresh(upgradePackageData, setBankData, isShow);
-    },
-    onSuccess: () => {
-      setIsQrUpdating(false);
-    },
-    onError: () => {
-      setIsQrUpdating(false);
-      isShow("error", "Không thể cập nhật thông tin gói. Vui lòng thử lại.");
-    },
-  });
+  // const refreshPackageMutation = useMutation({
+  //   mutationFn: async () => {
+  //     setIsQrUpdating(true);
+  //     return await getUpgradePackageWithRefresh(
+  //       upgradePackageData,
+  //       setBankData,
+  //       isShow
+  //     );
+  //   },
+  //   onSuccess: () => {
+  //     setIsQrUpdating(false);
+  //   },
+  //   onError: () => {
+  //     setIsQrUpdating(false);
+  //     isShow("error", "Không thể cập nhật thông tin gói. Vui lòng thử lại.");
+  //   },
+  // });
 
   // Render QR code với trạng thái loading
   const renderQRCode = () => {
     return (
       <div className="relative w-full flex justify-center items-center">
         <Image
-          src={upgradePackageData?.dataQR.qr.data}
+          src={upgradePackageData?.dataQR?.qr?.data}
           alt="qr-code"
           width={850}
           height={1100}
@@ -130,15 +166,6 @@ const PopupUpgradeProfessional = (props) => {
             <div className="animate-spin h-8 w-8 border-4 border-[#25387A] border-t-transparent rounded-full"></div>
           </div>
         )}
-        <button
-          onClick={() => refreshPackageMutation.mutate()}
-          className="absolute bottom-2 right-[32%] p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
-          title="Làm mới mã QR"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-          </svg>
-        </button>
       </div>
     );
   };
@@ -175,46 +202,8 @@ const PopupUpgradeProfessional = (props) => {
         transferContent: "Sao chép",
       });
       setIsDetailsOpen(false);
-      // Mặc định chọn gói Professional
-      setSelectedPackages({
-        id_package_detail: packageData?.data?.[0]?.id_detail,
-        number_of_users: packageData?.data?.[0]?.default_user,
-        id_service_add: [],
-        selectedServices: [],
-        selectedPackage: packageData?.data?.[0]
-          ? {
-              id: packageData?.data?.[0]?.id,
-              id_detail: packageData?.data?.[0]?.id_detail,
-              name: packageData?.data?.[0]?.name,
-              price: packageData?.data?.[0]?.price,
-              fullname: packageData?.data?.[0]?.fullname,
-            }
-          : null,
-      });
     }
   }, [statePopupUpgradeProfessional.open, packageData]);
-
-  // useEffect để kiểm tra và chọn gói thành viên có id khớp với id_package
-  useEffect(() => {
-    if (upgradePackageData?.data?.id_package && packageData?.data) {
-      const matchingPackage = packageData.data.find(
-        (pkg) => pkg.id === upgradePackageData.data.id_package
-      );
-      if (matchingPackage) {
-        setSelectedPackages((prev) => ({
-          ...prev,
-          id_package_detail: matchingPackage.id_detail,
-          selectedPackage: {
-            id: matchingPackage.id,
-            id_detail: matchingPackage.id_detail,
-            name: matchingPackage.name,
-            price: matchingPackage.price,
-            fullname: matchingPackage.fullname,
-          },
-        }));
-      }
-    }
-  }, [upgradePackageData?.data?.id_package, packageData?.data]);
 
   // Cập nhật selectedPackages khi có thay đổi về userCount
   useEffect(() => {
@@ -231,6 +220,10 @@ const PopupUpgradeProfessional = (props) => {
         upgradePackageData?.data?.id,
         formData
       );
+      console.log(response)
+      if(response.result === false){
+        showToat('error', response.message)
+      }
       return response;
     },
     onSuccess: async (response) => {
@@ -239,7 +232,11 @@ const PopupUpgradeProfessional = (props) => {
         try {
           // Thử cập nhật thông qua getUpgradePackageWithRefresh
           setIsQrUpdating(true);
-          await getUpgradePackageWithRefresh(upgradePackageData, setBankData, isShow);
+          await getUpgradePackageWithRefresh(
+            upgradePackageData,
+            setBankData,
+            isShow
+          );
           setIsQrUpdating(false);
         } catch (error) {
           setIsQrUpdating(false);
@@ -260,7 +257,7 @@ const PopupUpgradeProfessional = (props) => {
   // Tự động gọi API khi có thay đổi trong việc chọn gói hoặc dịch vụ
   useEffect(() => {
     // Đảm bảo rằng đã có dữ liệu hợp lệ trước khi gọi API
-    if (!selectedPackages.id_package_detail || !upgradePackageData?.data?.id) {
+    if (!selectedPackages?.id_package_detail || !upgradePackageData?.data?.id) {
       return;
     }
 
@@ -269,14 +266,14 @@ const PopupUpgradeProfessional = (props) => {
       try {
         // Tạo formData để gửi API
         let formData = new FormData();
-        formData.append(`number_of_users`, selectedPackages.number_of_users);
+        formData.append(`number_of_users`, selectedPackages?.number_of_users);
 
         // Thêm các dịch vụ add-on vào formData
         if (
-          selectedPackages.id_service_add &&
-          selectedPackages.id_service_add.length > 0
+          selectedPackages?.id_service_add &&
+          selectedPackages?.id_service_add?.length > 0
         ) {
-          selectedPackages.id_service_add.forEach((serviceId, index) => {
+          selectedPackages?.id_service_add?.forEach((serviceId, index) => {
             formData.append(`id_service_add[${index}]`, serviceId);
           });
         }
@@ -284,7 +281,7 @@ const PopupUpgradeProfessional = (props) => {
         // Thêm chi tiết gói vào formData
         formData.append(
           `id_package_detail`,
-          selectedPackages.id_package_detail
+          selectedPackages?.id_package_detail
         );
 
         // Gọi API để cập nhật gói
@@ -296,9 +293,9 @@ const PopupUpgradeProfessional = (props) => {
 
     return () => clearTimeout(timer);
   }, [
-    selectedPackages.id_package_detail,
-    selectedPackages.number_of_users,
-    selectedPackages.id_service_add,
+    selectedPackages?.id_package_detail,
+    selectedPackages?.number_of_users,
+    selectedPackages?.id_service_add,
     upgradePackageData?.data?.id,
   ]);
 
@@ -322,27 +319,27 @@ const PopupUpgradeProfessional = (props) => {
     setIsDetailsOpen(!isDetailsOpen);
 
     // Thêm hiệu ứng cuộn xuống khi mở chi tiết
-    if (!isDetailsOpen) {
-      setTimeout(() => {
-        const detailSection = document.getElementById("price-details");
-        if (detailSection) {
-          detailSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 300); // Đợi animation mở hoàn tất
-    }
+    // if (!isDetailsOpen) {
+    //   setTimeout(() => {
+    //     const detailSection = document.getElementById("price-details");
+    //     if (detailSection) {
+    //       detailSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    //     }
+    //   }, 300); // Đợi animation mở hoàn tất
+    // }
   };
 
   // Tính toán giá tiền
   const calculatePrices = () => {
     // Tính giá gói Professional
-    const professionalPrice = selectedPackages.selectedPackage
-      ? parseInt(selectedPackages.selectedPackage.price) *
-        selectedPackages.number_of_users *
-        12
+    const professionalPrice = selectedPackages?.selectedPackage
+      ? parseInt(selectedPackages?.selectedPackage?.price) *
+        selectedPackages?.number_of_users *
+        selectedPackages?.selectedPackage?.month
       : 0;
 
     // Tính tổng giá các dịch vụ add-on được chọn
-    const selectedServicesPrice = selectedPackages.selectedServices.reduce(
+    const selectedServicesPrice = selectedPackages?.selectedServices?.reduce(
       (total, service) => {
         return total + (parseInt(service.price) || 0);
       },
@@ -374,7 +371,7 @@ const PopupUpgradeProfessional = (props) => {
   const formatMoney = (number) => {
     return formatMoneyConfig(+number, dataSeting);
   };
-  
+
   return (
     <div className={`${deca.className} bg-[#F9FAFC] rounded-3xl p-6 2xl:p-9`}>
       <div className="flex items-center justify-between">
@@ -398,7 +395,7 @@ const PopupUpgradeProfessional = (props) => {
       </div>
 
       <div className="border-t border-[#919EAB3D] mt-2 2xl:mt-3">
-        <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 pt-4 2xl:pt-6 -mr-6 2xl:-mr-9 pr-8 max-h-[76vh] overflow-y-auto">
+        <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 pt-4 2xl:pt-6 -mr-6 2xl:-mr-9 pr-4 2xl:pr-6 h-[76vh] max-h-[76vh] 2xl:h-[72vh] 2xl:max-h-[72vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
           <div className="flex flex-col gap-3 2xl:gap-9 lg:w-[505px]">
             <h3 className="text-xl font-semibold text-typo-black-4">
               Thông tin chuyển khoản
@@ -406,11 +403,11 @@ const PopupUpgradeProfessional = (props) => {
             <div className="flex items-center justify-center">
               {renderQRCode()}
             </div>
-            <div className="flex flex-col gap-3 2xl:gap-4">
+            <div className="flex flex-col gap-2 2xl:gap-4">
               <div className="flex items-center gap-3">
                 <div className="p-[10px] rounded-[10px] bg-white border border-[#919EAB33]">
                   <Image
-                    src={upgradePackageData?.dataQR.bank.logo_bank}
+                    src={upgradePackageData?.dataQR?.bank?.logo_bank}
                     alt="logo"
                     width={29}
                     height={29}
@@ -419,10 +416,10 @@ const PopupUpgradeProfessional = (props) => {
                 </div>
                 <div className="flex flex-col gap-1 2xl:gap-2">
                   <h3 className="text-lg font-semibold text-typo-black-4">
-                    {upgradePackageData?.dataQR.bank.account_bank}
+                    {upgradePackageData?.dataQR?.bank?.account_bank}
                   </h3>
                   <p className="text-sm text-typo-gray-4">
-                    {upgradePackageData?.dataQR.bank.account_name_long}
+                    {upgradePackageData?.dataQR?.bank?.account_name_long}
                   </p>
                 </div>
               </div>
@@ -432,7 +429,7 @@ const PopupUpgradeProfessional = (props) => {
                 </h3>
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-lg font-semibold text-typo-black-4">
-                    {upgradePackageData?.dataQR.bank.account_number}
+                    {upgradePackageData?.dataQR?.bank?.account_number}
                   </p>
                   <Tooltip
                     title={tooltipTexts.accountNumber}
@@ -455,7 +452,7 @@ const PopupUpgradeProfessional = (props) => {
                 </h3>
                 <div className="flex items-center justify-between gap-2">
                   <p className="uppercase text-lg font-semibold text-typo-black-4">
-                    {upgradePackageData?.dataQR.bank.account_name}
+                    {upgradePackageData?.dataQR?.bank?.account_name}
                   </p>
                   <Tooltip
                     title={tooltipTexts.accountName}
@@ -478,7 +475,7 @@ const PopupUpgradeProfessional = (props) => {
                 </h3>
                 <div className="flex items-center justify-between gap-2">
                   <p className="uppercase text-lg font-semibold text-typo-black-4">
-                    {upgradePackageData?.dataQR.bank.note}
+                    {upgradePackageData?.dataQR?.bank?.note}
                   </p>
                   <Tooltip
                     title={tooltipTexts.transferContent}
@@ -500,8 +497,8 @@ const PopupUpgradeProfessional = (props) => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 mb-5">
-              <div className="flex gap-2 mb-3">
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
                 <Image
                   src="/icon/Info.png"
                   alt="qr-code"
@@ -515,233 +512,261 @@ const PopupUpgradeProfessional = (props) => {
                 </p>
               </div>
             </div>
-
-            {/* <div className="flex gap-3 items-center">
-              <ButtonSubmit
-                onClick={onSubmit}
-                title="Xác nhận thanh toán"
-                className="ml-0 text-base font-normal w-fit rounded-[8px]"
-              />
-            </div> */}
           </div>
 
-          <div className="flex flex-col gap-3 2xl:gap-9 lg:w-[505px]">
-            <div className="flex flex-col gap-2 2xl:gap-3">
-              <h3 className="text-xl font-semibold text-typo-black-4">
-                Gói thành viên
-              </h3>
-              {isLoadingPackage ? (
-                <Skeleton className="h-20 w-full rounded-2xl" />
-              ) : (
-                packageData?.data?.map((pkg) => (
-                  <div
-                    key={pkg.id}
-                    className="py-3 2xl:py-5 px-6 bg-white border border-[#919EAB3D] rounded-2xl flex gap-4 cursor-pointer hover:bg-[#F4F6F8] transition-colors"
-                    onClick={() => {
-                      setSelectedPackages((prev) => ({
-                        ...prev,
-                        id_package_detail: pkg.id_detail,
-                        selectedPackage: {
-                          id: pkg.id,
-                          id_detail: pkg.id_detail,
-                          name: pkg.name,
-                          price: pkg.price,
-                          fullname: pkg.fullname,
-                        },
-                      }));
-                    }}
-                  >
+          <div className="flex flex-col gap-3 2xl:gap-9 lg:w-[505px] h-full flex-1 flex-shrink-0">
+            <div
+              className="pr-2 2xl:pr-2.5 flex flex-col gap-3 2xl:gap-9 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
+              style={{ maxHeight: "calc(76vh - 70px)" }}
+            >
+              <div className="flex flex-col gap-2 2xl:gap-3">
+                <h3 className="text-xl font-semibold text-typo-black-4">
+                  Gói thành viên
+                </h3>
+                {isLoadingPackage ? (
+                  <Skeleton className="h-20 w-full rounded-2xl" />
+                ) : (
+                  packageData?.data?.map((pkg, index) => (
                     <div
-                      className="checkbox-wrapper flex items-center justify-center"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      key={`package-${pkg.id}-${index}`}
+                      className="py-3 2xl:py-5 px-6 bg-white border border-[#919EAB3D] rounded-2xl flex gap-4 cursor-pointer hover:bg-[#F4F6F8] transition-colors"
+                      onClick={() => {
+                        // Bắt buộc phải có một gói được chọn, không thể bỏ chọn
+                        setSelectedPackages((prev) => ({
+                          ...prev,
+                          id_package_detail: pkg.id_detail,
+                          selectedPackage: {
+                            id: pkg.id,
+                            id_detail: pkg.id_detail,
+                            name: pkg.name,
+                            price: pkg.price,
+                            fullname: pkg.fullname,
+                            month: pkg.month,
+                          },
+                        }));
                       }}
                     >
-                      <CheckboxDefault
-                        checked={
-                          selectedPackages.id_package_detail ===
-                            pkg.id_detail ||
-                          upgradePackageData?.data?.id_package === pkg.id
-                        }
-                        onChange={(checked) => {
-                          setSelectedPackages((prev) => ({
-                            ...prev,
-                            id_package_detail: checked ? pkg.id_detail : null,
-                            selectedPackage: checked
-                              ? {
-                                  id: pkg.id,
-                                  id_detail: pkg.id_detail,
-                                  name: pkg.name,
-                                  price: pkg.price,
-                                  fullname: pkg.fullname,
-                                }
-                              : null,
-                          }));
+                      <div
+                        className="checkbox-wrapper flex items-center justify-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
                         }}
-                      />
+                      >
+                        <CheckboxDefault
+                          checked={
+                            selectedPackages?.id_package_detail === pkg.id_detail
+                          }
+                          onChange={() => {
+                            // Luôn chọn gói được click, không thể bỏ chọn
+                            setSelectedPackages((prev) => ({
+                              ...prev,
+                              id_package_detail: pkg.id_detail,
+                              selectedPackage: {
+                                id: pkg.id,
+                                id_detail: pkg.id_detail,
+                                name: pkg.name,
+                                price: pkg.price,
+                                fullname: pkg.fullname,
+                                month: pkg.month,
+                              },
+                            }));
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1 cursor-pointer w-full">
+                        <h4 className="text-xl font-bold text-typo-black-4">
+                          {pkg.fullname}
+                        </h4>
+                        <p className="text-base font-normal text-typo-gray-4">
+                          {pkg.full_note_price}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-1 cursor-pointer w-full">
-                      <h4 className="text-xl font-bold text-typo-black-4">
-                        {pkg.fullname}
-                      </h4>
-                      <p className="text-base font-normal text-typo-gray-4">
-                        {pkg.full_note_price}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-normal text-typo-gray-4">
-                  Số user
-                </span>
-                <InputNumberCustom
-                  classNameButton="rounded-full bg-[#EBF5FF] hover:bg-[#C7DFFB] cursor-pointer"
-                  className="p-[4px]"
-                  state={userCount}
-                  setState={(value) => {
-                    console.log("Đã thay đổi số user:", value);
-                    setUserCount(value);
-                  }}
-                  min={packageData?.data?.[0]?.default_user || 5}
-                />
+                  ))
+                )}
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-normal text-typo-gray-4">
+                    Số user
+                  </span>
+                  <InputNumberCustom
+                    classNameButton="rounded-full bg-[#EBF5FF] hover:bg-[#C7DFFB] cursor-pointer"
+                    className="p-[4px]"
+                    state={userCount}
+                    setState={(value) => {
+                      console.log("Đã thay đổi số user:", value);
+                      setUserCount(value);
+                    }}
+                    min={packageData?.data?.[0]?.default_user || 5}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="flex flex-col gap-2 2xl:gap-3">
-              <hr className="border-[#919EAB3D] mb-3" />
-              <h3 className="text-xl font-semibold text-typo-black-4">
-                Dịch vụ Add-on
-              </h3>
-              {isLoadingServiceAdd ? (
-                <>
-                  <Skeleton className="h-20 w-full rounded-2xl" />
-                  <Skeleton className="h-20 w-full rounded-2xl" />
-                  <Skeleton className="h-20 w-full rounded-2xl" />
-                </>
-              ) : (
-                serviceAddData?.data?.map((service) => (
-                  <div
-                    key={service.id}
-                    className="py-3 2xl:py-5 px-6 bg-white border border-[#919EAB3D] rounded-2xl flex gap-4 cursor-pointer hover:bg-[#F4F6F8] transition-colors"
-                    onClick={(e) => {
-                      // Ngăn sự kiện click lan truyền nếu click vào checkbox
-                      if (e.target.closest(".checkbox-wrapper")) {
-                        return;
-                      }
-                      if (service.type === "radio") {
-                        // Với service loại radio, cập nhật id_service_add
-                        const newId =
-                          selectedPackages.selectedServiceId === service.id
-                            ? null
-                            : service.id;
-                        setSelectedPackages((prev) => {
-                          // Xóa service radio cũ khỏi id_service_add (nếu có)
-                          const filteredServiceAdd = prev.selectedServiceId
-                            ? prev.id_service_add.filter(
-                                (id) => id !== prev.selectedServiceId
-                              )
-                            : [...prev.id_service_add];
+              <div className="flex flex-col gap-2 2xl:gap-3">
+                <hr className="border-[#919EAB3D] mb-3" />
+                <h3 className="text-xl font-semibold text-typo-black-4">
+                  Dịch vụ Add-on
+                </h3>
+                {isLoadingServiceAdd ? (
+                  <>
+                    <Skeleton className="h-20 w-full rounded-2xl" />
+                    <Skeleton className="h-20 w-full rounded-2xl" />
+                    <Skeleton className="h-20 w-full rounded-2xl" />
+                  </>
+                ) : (
+                  serviceAddData?.data?.map((service, index) => (
+                    <div
+                      key={`service-${service.id}-${index}`}
+                      className="py-3 2xl:py-5 px-6 bg-white border border-[#919EAB3D] rounded-2xl flex gap-4 cursor-pointer hover:bg-[#F4F6F8] transition-colors"
+                      onClick={(e) => {
+                        // Ngăn sự kiện click lan truyền nếu click vào checkbox
+                        if (e.target.closest(".checkbox-wrapper")) {
+                          return;
+                        }
+                        if (service.type === "radio") {
+                          // Với service loại radio, cập nhật id_service_add
+                          const newId =
+                            selectedPackages?.selectedServiceId === service.id
+                              ? null
+                              : service.id;
+                          setSelectedPackages((prev) => {
+                            // Xóa service radio cũ khỏi id_service_add (nếu có)
+                            const filteredServiceAdd = prev.selectedServiceId
+                              ? prev.id_service_add.filter(
+                                  (id) => id !== prev.selectedServiceId
+                                )
+                              : [...prev.id_service_add];
 
-                          // Thêm service radio mới vào id_service_add (nếu có chọn)
-                          const newServiceAdd = newId
-                            ? [...filteredServiceAdd, newId]
-                            : filteredServiceAdd;
+                            // Thêm service radio mới vào id_service_add (nếu có chọn)
+                            const newServiceAdd = newId
+                              ? [...filteredServiceAdd, newId]
+                              : filteredServiceAdd;
 
-                          return {
-                            ...prev,
-                            selectedServiceId: newId,
-                            id_service_add: newServiceAdd,
-                            // Thêm thông tin tên và giá của service được chọn
-                            selectedServices: newId
-                              ? [
-                                  ...(prev.selectedServices || []).filter(
+                            return {
+                              ...prev,
+                              selectedServiceId: newId,
+                              id_service_add: newServiceAdd,
+                              // Thêm thông tin tên và giá của service được chọn
+                              selectedServices: newId
+                                ? [
+                                    ...(prev.selectedServices || []).filter(
+                                      (item) =>
+                                        item.id !== prev.selectedServiceId
+                                    ),
+                                    {
+                                      id: newId,
+                                      name: service.name,
+                                      price: service.price,
+                                    },
+                                  ]
+                                : (prev.selectedServices || []).filter(
                                     (item) => item.id !== prev.selectedServiceId
                                   ),
-                                  {
-                                    id: newId,
-                                    name: service.name,
-                                    price: service.price,
-                                  },
-                                ]
-                              : (prev.selectedServices || []).filter(
-                                  (item) => item.id !== prev.selectedServiceId
-                                ),
-                          };
-                        });
-                      } else {
-                        // Với service loại checkbox, cập nhật id_service_add
-                        const isSelected =
-                          selectedPackages.id_service_add.includes(service.id);
-                        setSelectedPackages((prev) => {
-                          const newServiceAdd = isSelected
-                            ? prev.id_service_add.filter(
-                                (id) => id !== service.id
-                              )
-                            : [...prev.id_service_add, service.id];
-
-                          return {
-                            ...prev,
-                            id_service_add: newServiceAdd,
-                            // Thêm thông tin tên và giá của service được chọn
-                            selectedServices: isSelected
-                              ? (prev.selectedServices || []).filter(
-                                  (item) => item.id !== service.id
+                            };
+                          });
+                        } else {
+                          // Với service loại checkbox, cập nhật id_service_add
+                          const isSelected =
+                            selectedPackages?.id_service_add?.includes(
+                              service.id
+                            );
+                          setSelectedPackages((prev) => {
+                            const newServiceAdd = isSelected
+                              ? prev.id_service_add.filter(
+                                  (id) => id !== service.id
                                 )
-                              : [
-                                  ...(prev.selectedServices || []),
-                                  {
-                                    id: service.id,
-                                    name: service.name,
-                                    price: service.price,
-                                  },
-                                ],
-                          };
-                        });
-                      }
-                    }}
-                  >
-                    <div
-                      className="checkbox-wrapper flex items-center justify-center"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                              : [...prev.id_service_add, service.id];
+
+                            return {
+                              ...prev,
+                              id_service_add: newServiceAdd,
+                              // Thêm thông tin tên và giá của service được chọn
+                              selectedServices: isSelected
+                                ? (prev.selectedServices || []).filter(
+                                    (item) => item.id !== service.id
+                                  )
+                                : [
+                                    ...(prev.selectedServices || []),
+                                    {
+                                      id: service.id,
+                                      name: service.name,
+                                      price: service.price,
+                                    },
+                                  ],
+                            };
+                          });
+                        }
                       }}
                     >
-                      <CheckboxDefault
-                        checked={
-                          service.type === "radio"
-                            ? selectedPackages.selectedServiceId === service.id
-                            : selectedPackages.id_service_add.includes(
+                      <div
+                        className="checkbox-wrapper flex items-center justify-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        <CheckboxDefault
+                          checked={
+                            service.type === "radio"
+                              ? selectedPackages?.selectedServiceId ===
                                 service.id
-                              )
-                        }
-                        onChange={(checked) => {
-                          if (service.type === "radio") {
-                            // Với service loại radio, cập nhật id_service_add và selectedServiceId
-                            setSelectedPackages((prev) => {
-                              // Xóa service radio cũ khỏi id_service_add (nếu có)
-                              const filteredServiceAdd = prev.selectedServiceId
-                                ? prev.id_service_add.filter(
-                                    (id) => id !== prev.selectedServiceId
-                                  )
-                                : [...prev.id_service_add];
+                              : selectedPackages?.id_service_add?.includes(
+                                  service.id
+                                )
+                          }
+                          onChange={(checked) => {
+                            if (service.type === "radio") {
+                              // Với service loại radio, cập nhật id_service_add và selectedServiceId
+                              setSelectedPackages((prev) => {
+                                // Xóa service radio cũ khỏi id_service_add (nếu có)
+                                const filteredServiceAdd =
+                                  prev.selectedServiceId
+                                    ? prev.id_service_add.filter(
+                                        (id) => id !== prev.selectedServiceId
+                                      )
+                                    : [...prev.id_service_add];
 
-                              // Thêm service radio mới vào id_service_add (nếu có chọn)
-                              const newServiceAdd = checked
-                                ? [...filteredServiceAdd, service.id]
-                                : filteredServiceAdd;
+                                // Thêm service radio mới vào id_service_add (nếu có chọn)
+                                const newServiceAdd = checked
+                                  ? [...filteredServiceAdd, service.id]
+                                  : filteredServiceAdd;
 
-                              return {
-                                ...prev,
-                                selectedServiceId: checked ? service.id : null,
-                                id_service_add: newServiceAdd,
-                                // Thêm thông tin tên và giá của service được chọn
-                                selectedServices: checked
-                                  ? [
-                                      ...(prev.selectedServices || []).filter(
+                                return {
+                                  ...prev,
+                                  selectedServiceId: checked
+                                    ? service.id
+                                    : null,
+                                  id_service_add: newServiceAdd,
+                                  // Thêm thông tin tên và giá của service được chọn
+                                  selectedServices: checked
+                                    ? [
+                                        ...(prev.selectedServices || []).filter(
+                                          (item) =>
+                                            item.id !== prev.selectedServiceId
+                                        ),
+                                        {
+                                          id: service.id,
+                                          name: service.name,
+                                          price: service.price,
+                                        },
+                                      ]
+                                    : (prev.selectedServices || []).filter(
                                         (item) =>
                                           item.id !== prev.selectedServiceId
                                       ),
+                                };
+                              });
+                            } else {
+                              // Với service loại checkbox, cập nhật id_service_add
+                              setSelectedPackages((prev) => ({
+                                ...prev,
+                                id_service_add: checked
+                                  ? [...prev.id_service_add, service.id]
+                                  : prev.id_service_add.filter(
+                                      (id) => id !== service.id
+                                    ),
+                                // Thêm thông tin tên và giá của service được chọn
+                                selectedServices: checked
+                                  ? [
+                                      ...(prev.selectedServices || []),
                                       {
                                         id: service.id,
                                         name: service.name,
@@ -749,68 +774,54 @@ const PopupUpgradeProfessional = (props) => {
                                       },
                                     ]
                                   : (prev.selectedServices || []).filter(
-                                      (item) =>
-                                        item.id !== prev.selectedServiceId
+                                      (item) => item.id !== service.id
                                     ),
-                              };
-                            });
-                          } else {
-                            // Với service loại checkbox, cập nhật id_service_add
-                            setSelectedPackages((prev) => ({
-                              ...prev,
-                              id_service_add: checked
-                                ? [...prev.id_service_add, service.id]
-                                : prev.id_service_add.filter(
-                                    (id) => id !== service.id
-                                  ),
-                              // Thêm thông tin tên và giá của service được chọn
-                              selectedServices: checked
-                                ? [
-                                    ...(prev.selectedServices || []),
-                                    {
-                                      id: service.id,
-                                      name: service.name,
-                                      price: service.price,
-                                    },
-                                  ]
-                                : (prev.selectedServices || []).filter(
-                                    (item) => item.id !== service.id
-                                  ),
-                            }));
-                          }
-                        }}
-                      />
+                              }));
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1 cursor-pointer w-full">
+                        <h4 className="text-xl font-bold text-typo-black-4 truncate">
+                          {service.name}
+                        </h4>
+                        <p className="text-base font-normal text-typo-gray-4 truncate">
+                          {service.full_note_price}
+                        </p>
+                      </div>
+                      {service.img && (
+                        <Image
+                          src={service.img}
+                          alt={service.name}
+                          width={58}
+                          height={58}
+                          className="size-[58px] object-cover"
+                        />
+                      )}
                     </div>
-                    <div className="flex flex-col gap-1 cursor-pointer w-full">
-                      <h4 className="text-xl font-bold text-typo-black-4 truncate">
-                        {service.name}
-                      </h4>
-                      <p className="text-base font-normal text-typo-gray-4 truncate">
-                        {service.full_note_price}
-                      </p>
-                    </div>
-                    {service.img && (
-                      <Image
-                        src={service.img}
-                        alt={service.name}
-                        width={58}
-                        height={58}
-                        className="size-[58px] object-cover"
-                      />
-                    )}
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
-            <div className="flex flex-col gap-2 2xl:gap-6">
+
+            <div className="pr-2 2xl:pr-2.5 flex flex-col gap-2 2xl:gap-6 bg-[#F9FAFC]">
               <hr className="border-[#919EAB3D]" />
               <div className="flex items-center justify-between">
                 <p className="text-2xl font-bold text-typo-blue-4">
                   {formatMoney(priceCalculation.total)}{" "}
-                  <span className="underline">đ</span>/năm/{userCount} user
+                  <span className="underline">đ</span>/
+                  {selectedPackages?.selectedPackage &&
+                  selectedPackages?.selectedPackage?.month % 12 === 0
+                    ? selectedPackages?.selectedPackage?.month / 12 === 1
+                      ? "năm"
+                      : `${selectedPackages?.selectedPackage?.month / 12} năm`
+                    : selectedPackages?.selectedPackage?.month === 1
+                    ? "tháng"
+                    : `${selectedPackages?.selectedPackage?.month} tháng`}
+                  /{userCount} user
                 </p>
                 <button
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-typo-gray-6"
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200"
                   onClick={toggleDetails}
                 >
                   <p className="text-sm font-medium text-typo-gray-4">
@@ -846,10 +857,10 @@ const PopupUpgradeProfessional = (props) => {
                           <span className="underline">đ</span>
                         </p>
                       </div>
-                      {selectedPackages.selectedServices.map(
+                      {selectedPackages?.selectedServices.map(
                         (service, index) => (
                           <div
-                            key={service.id}
+                            key={`service2-${service.id}-${index}`}
                             className="flex justify-between items-center"
                           >
                             <p className="text-typo-gray-4 text-base font-normal">
