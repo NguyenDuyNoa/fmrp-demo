@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import useSocket from "./useSocket"; // 🔁 Import lại hook đã có
 import { useDispatch } from "react-redux";
+import PopupSuccessfulPayment from "@/components/UI/popup/PopupSuccessfulPayment";
+import { useSelector } from "react-redux";
+import { useAuththentication } from "../useAuth";
 
 export const useSocketWithToken = ({ auth, dataSetting }) => {
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const dispatch = useDispatch();
-
+    const globalAuth = useSelector((state) => state.auth);
+    const { data: dataAuth, isLoading, refetch } = useAuththentication(globalAuth);
+    
     const hasFetched = useRef(false); // Đảm bảo chỉ fetch 1 lần
 
     useEffect(() => {
@@ -86,24 +91,40 @@ export const useSocketWithToken = ({ auth, dataSetting }) => {
         };
 
         socket.on('upgrade_package', (data) => {
-            console.log('upgrade_package', data);
-            
+            if(data.data.status == 'success'){
+                refetch();
+            }
         });
 
         socket.on("upgrade_package_success", (data) => {
+            // console.log('upgrade_package_success', data)
             if(data.data.status == 'success'){
-                dispatch({
-                    type: "statePopupSuccessfulPayment",
-                    payload: {
-                      open: true,
-                    },
-                  });
                 dispatch({
                     type: "statePopupGlobal",
                         payload: {
                             open: false,
                         },
                     });
+                setTimeout(() => {
+                    dispatch({
+                        type: "statePopupGlobal",
+                        payload: {
+                        open: true,
+                        children: (
+                            <PopupSuccessfulPayment
+                                data={data.data}
+                                onClose={() =>
+                                    dispatch({
+                                    type: "statePopupSuccessfulPayment",
+                                    payload: { open: false },
+                                    })
+                                }
+                            />
+                        ),
+                        },
+                    });
+                }, 1000);
+                refetch();
             }
         });
 

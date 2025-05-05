@@ -4,40 +4,49 @@ import SearchIcon from "@/components/icons/common/SearchIcon";
 import CloseXIcon from "@/components/icons/common/CloseXIcon";
 import { motion, AnimatePresence } from "framer-motion";
 
-const SearchComponent = ({ placeholder, onChange, dataLang, colSpan, classInput, classNameBox, classNameIcon, sizeIcon = 24 }) => {
-    const [isActive, setIsActive] = useState(false);
-    const [inputValue, setInputValue] = useState("");
-    
-    const handleBoxClick = () => {
-        setIsActive(true);
-    };
-    
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value);
-        onChange && onChange(e);
-    };
-    
-    const handleClearInput = () => {
-        setInputValue("");
-        onChange && onChange({ target: { value: "" } });
-    };
-    
-    return (
-        <div 
-            className={`${classNameBox} py-2 px-3 border bg-white border-border-gray-1 rounded-lg cursor-pointer`} 
-            style={{ gridColumn: `span ${colSpan || 1}` }}
-            onClick={handleBoxClick}
-        >
-            <form className="flex items-center gap-2">
+const SearchComponent = ({
+  placeholder,
+  onChange,
+  dataLang,
+  colSpan,
+  classInput,
+  classNameBox,
+  classNameIcon,
+  sizeIcon = 24,
+}) => {
+  const [isActive, setIsActive] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
+  const handleBoxClick = () => {
+    setIsActive(true);
+  };
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+    onChange && onChange(e);
+  };
+
+  const handleClearInput = () => {
+    setInputValue("");
+    onChange && onChange({ target: { value: "" } });
+  };
+
+  return (
+    <div
+      className={`${classNameBox} py-2 px-3 border bg-white border-border-gray-1 rounded-lg cursor-pointer flex-shrink-0`}
+    //   style={{ gridColumn: `span ${colSpan || 1}` }}
+      onClick={handleBoxClick}
+    >
+      <form className="flex items-center gap-2">
                 <AnimatePresence>
                     {isActive && (
-                        <motion.div className="relative flex items-center">
+                        <motion.div className="flex items-center">
                             <motion.input
                                 initial={{ width: 0, opacity: 0 }}
                                 animate={{ width: "auto", opacity: 1 }}
                                 exit={{ width: 0, opacity: 0 }}
                                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className={`${classInput} min-w-[200px] relative placeholder:text-neutral-05 bg-transparent border-none outline-none focus:outline-none focus:ring-0 2xl:text-base text-xs`}
+                                className={`${classInput} min-w-[160px] relative placeholder:text-neutral-05 bg-transparent border-none outline-none focus:outline-none focus:ring-0 2xl:text-base text-xs`}
                                 type="text"
                                 onChange={handleInputChange}
                                 value={inputValue}
@@ -63,8 +72,8 @@ const SearchComponent = ({ placeholder, onChange, dataLang, colSpan, classInput,
                     <SearchIcon size={isActive ? sizeIcon - 8 : sizeIcon} color={`${isActive ? 'white' : '#9295A4'}`} className={`${classNameIcon} flex-shrink-0`} />
                 </motion.div>
             </form>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default SearchComponent;

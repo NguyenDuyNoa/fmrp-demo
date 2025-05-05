@@ -358,7 +358,6 @@ const PurchaseImportForm = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
 
-
         const hasNullWarehouse = listData.some((item) => item.child?.some((childItem) => childItem?.id_plan == 0 && (childItem.warehouse === null || (id && (childItem.warehouse?.label === null || childItem.warehouse?.warehouse_name === null)))));
 
         const hasNullSerial = listData.some((item) => item?.item.e?.text_type === "products" && item.child?.some((childItem) => childItem.serial === "" || childItem.serial == null));
@@ -374,16 +373,17 @@ const PurchaseImportForm = (props) => {
             // idTheOrder == null ||
             hasNullWarehouse ||
             (dataProductSerial?.is_enable == "1" && hasNullSerial) ||
-            ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullLot) ||
-            ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullDate) || checkNumber
+            // ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullLot) ||
+            // ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullDate) || 
+            checkNumber
         ) {
             idSupplier == null && sErrSupplier(true);
             idBranch == null && sErrBranch(true);
             // idTheOrder == null && sErrTheOrder(true);
             hasNullWarehouse && sErrWarehouse(true);
-            hasNullLot && sErrLot(true);
+            // hasNullLot && sErrLot(true);
             hasNullSerial && sErrSerial(true);
-            hasNullDate && sErrDateList(true);
+            // hasNullDate && sErrDateList(true);
             isShow("error", `${dataLang?.required_field_null}`);
         } else {
             sErrWarehouse(false);
@@ -1362,7 +1362,7 @@ const PurchaseImportForm = (props) => {
                                             {"Lot"}
                                         </h4>
                                         <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
-                                            {props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}
+                                            {props.dataLang?.warehouses_detail_date || "Date"}
                                         </h4>
                                     </>
                                 ) : ""}
@@ -1739,6 +1739,8 @@ const PurchaseImportForm = (props) => {
 
                                                                                 // className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded w-[100%] "appearance-none focus:outline-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal    focus:outline-none"`}
                                                                                 onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
+                                                                                placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
+
                                                                             />
                                                                         </div>
                                                                     </div>
@@ -1766,7 +1768,8 @@ const PurchaseImportForm = (props) => {
                                                                                                 date
                                                                                             )
                                                                                         }
-                                                                                        placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                                                                        placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
+                                                                                        // placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
                                                                                         className={`border ${ce?.disabledDate ? "bg-gray-50" : errDateList && ce?.date == null ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                                                             //  && !ce?.disabledDate
                                                                                             //   ? ""

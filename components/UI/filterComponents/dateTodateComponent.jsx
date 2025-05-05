@@ -8,7 +8,7 @@ const DateToDateComponent = ({ value, onChange, colSpan, className }) => {
   return (
     <div
       id="parentDatepicker"
-      className={`z-20 min-w-[250px] w-auto flex items-center cursor-pointer parentDatepicker rounded-lg bg-white border border-border-gray-1 ${className} relative`}
+      className={`z-20 min-w-[250px] 2xl:min-w-[310px] w-auto flex items-center cursor-pointer parentDatepicker rounded-lg bg-white border border-border-gray-1 ${className} relative`}
       style={{ gridColumn: `span ${colSpan || 1}` }}
     >
       <CalendarBlankIcon

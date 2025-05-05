@@ -1312,7 +1312,8 @@ const Header = () => {
                         placeholder="Tìm kiếm"
                     />
                 </form> */}
-                {authState?.id_package_service === "1" && (
+                {/* {authState?.id_package_service === "1" && ( */}
+                {authState?.is_upgrade && (
                     <button className="py-1 px-2 rounded-full bg-typo-blue-4 flex items-center gap-2" 
                     onClick={() => {
                         dispatch({
@@ -1588,7 +1589,8 @@ const DropdownAvatar = React.memo(() => {
           },
         },
         // Nhóm 2
-        ...(auth?.id_package_service === "1" ? [{
+        // ...(auth?.is_upgrade === false ? [{
+        ...(auth?.is_upgrade ? [{
             name: "Nâng cấp Professional",
             icon: <SparkleOutlineIcon size={16} />,
             group: 2,
@@ -1695,7 +1697,7 @@ const DropdownAvatar = React.memo(() => {
                         <div className="flex flex-col gap-1">
                             <div className="flex gap-2">
                                 <h5 className="font-semibold text-sm text-[#141522]">{auth?.user_full_name}</h5>
-                                {auth?.id_package_service !== "1" && (
+                                {auth?.is_upgrade === false && (
                                     <div 
                                     style={{
                                         background: "radial-gradient(circle at top right, #1FC583, #1F9285)",

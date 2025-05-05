@@ -6,6 +6,7 @@ import PopupCustom from "@/components/UI/popup";
 import { Lexend_Deca } from "@next/font/google";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
+import { Add as IconClose } from "iconsax-react";
 
 const deca = Lexend_Deca({
   subsets: ["latin"],
@@ -13,7 +14,7 @@ const deca = Lexend_Deca({
 });
 
 const PopupSuccessfulPayment = (props) => {
-  const { dataLang } = props;
+  const { dataLang, data } = props;
   const dispatch = useDispatch();
   const statePopupSuccessfulPayment = useSelector(
     (state) => state.statePopupSuccessfulPayment
@@ -29,26 +30,47 @@ const PopupSuccessfulPayment = (props) => {
   };
 
   return (
-    <PopupCustom
-      title={
-        <div className="flex items-center gap-4">
-          <CheckIcon className="size-8 text-[#1FC583]" />
-          <p className="text-2xl font-semibold text-[#25387A] normal-case">
-            {dataLang?.successful_payment ?? "Thanh toán thành công!"}
-          </p>
+    // <PopupCustom
+    //   title={
+    //     <div className="flex items-center gap-4">
+    //       <CheckIcon className="size-8 text-[#1FC583]" />
+    //       <p className="text-2xl font-semibold text-[#25387A] normal-case">
+    //         {dataLang?.successful_payment ?? "Thanh toán thành công!"}
+    //       </p>
+    //     </div>
+    //   }
+    //   classNameTittle="!justify-center"
+    //   onClickOpen={() => {}}
+    //   open={statePopupSuccessfulPayment.open}
+    //   onClose={handleClose}
+    //   lockScroll={true}
+    //   closeOnDocumentClick={true}
+    //   classNameBtn={props?.className + "relative"}
+    //   classNameModeltime="p-2 lg:p-9"
+    // >
+    <div className={`${deca.className} bg-[#F9FAFC] rounded-3xl p-6 2xl:p-9`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4 w-full">
+          <Image src="/icon/Sparkle.png" alt="logo" width={32} height={32} />
+          <h2 className="text-2xl font-semibold text-[#25387A]">
+            {dataLang?.upgrade_professional ?? "Nâng cấp gói thành viên"}
+          </h2>
         </div>
-      }
-      classNameTittle="!justify-center"
-      onClickOpen={() => {}}
-      open={statePopupSuccessfulPayment.open}
-      onClose={handleClose}
-      lockScroll={true}
-      closeOnDocumentClick={true}
-      classNameBtn={props?.className + "relative"}
-      classNameModeltime="p-2 lg:p-9"
-    >
+        <button
+          onClick={() => {
+            dispatch({
+              type: "statePopupGlobal",
+              payload: { open: false },
+            });
+            window.location.reload();
+          }}
+          className="cursor-pointer bg-white rounded-full p-1.5"
+        >
+          <IconClose className="rotate-45" />
+        </button>
+      </div>
       <div
-        className={`w-[750px] max-h-[75vh] flex flex-col items-center justify-center gap-3 2xl:gap-9 pt-4 2xl:pt-9 ${deca.className}`}
+        className={`w-[750px] max-h-[75vh] flex flex-col items-center justify-center gap-3 2xl:gap-6 pt-4 2xl:pt-9 ${deca.className}`}
       >
         <div className="">
           <Image
@@ -56,7 +78,7 @@ const PopupSuccessfulPayment = (props) => {
             height={250}
             src={"/popup/commandCompleted.webp"}
             alt="commandCompleted"
-            className="object-cover w-[270px] 2xl:w-[323px] 2xl:h-[250px]"
+            className="object-cover w-[270px] 2xl:w-[323px] "
             priority
             // unoptimized
           />
@@ -67,7 +89,8 @@ const PopupSuccessfulPayment = (props) => {
               Ngày mua hàng:
             </h3>
             <p className="text-lg font-medium text-typo-black-4">
-              24/04/2025 - 16:48:55
+              {/* 24/04/2025 - 16:48:55 */}
+              {data?.content_success?.date}
             </p>
           </div>
           <div className="p-3 py-2 2xl:py-3 rounded-xl border border-[#919EAB3D] w-full">
@@ -75,21 +98,27 @@ const PopupSuccessfulPayment = (props) => {
               Mã đơn hàng:
             </h3>
             <p className="text-lg font-medium text-[#003DA0]">
-              01dc1370-3df6-11eb-b378
+              {data?.content_success?.code_upgrade_package}
             </p>
           </div>
         </div>
         <p className="text-base 2xl:text-lg font-normal text-typo-gray-4">
           🎉 Cảm ơn bạn đã tin tưởng và nâng cấp lên gói{" "}
-          <span className="text-[#003DA0]">Professional</span>.
+          <span className="text-[#003DA0]">
+            {data?.content_success?.name_package}
+          </span>
+          .
           <br /> Gói của bạn sẽ có hiệu lực đến{" "}
-          <span className="text-[#EE1E1E]">24/04/2026</span>.
+          <span className="text-[#EE1E1E]">
+            {data?.content_success?.expiration_date}
+          </span>
+          .
           <br />
           Bạn có thể tải về hóa đơn ngay tại đây hoặc kiểm tra email đã đăng ký
           tài khoản để xem chi tiết.
           <br /> Nếu cần hỗ trợ thêm trong quá trình sử dụng, đừng ngần ngại
           liên hệ{" "}
-          <span className="text-typo-blue-2 underline">bộ phận CSKH</span> của
+          <a href="https://zalo.me/fososoft" target="_blank" className="text-typo-blue-2 underline">bộ phận CSKH</a> của
           chúng tôi. Đội ngũ FMRP luôn sẵn sàng đồng hành cùng bạn!
         </p>
         <div className="w-full">
@@ -98,7 +127,7 @@ const PopupSuccessfulPayment = (props) => {
             Đội ngũ FMRP <br /> Quản lý xưởng dễ dàng hơn bao giờ hết.
           </p>
         </div>
-        <ButtonAnimationNew
+        {/* <ButtonAnimationNew
           icon={<DownloadIcon className="text-white text-[15px]" size={15} />}
           classNameWithIcon="space-x-2"
           reverse={true}
@@ -126,9 +155,9 @@ const PopupSuccessfulPayment = (props) => {
               "inset -2px -2px 5px rgba(255,255,255,0.5), inset 2px 2px 4px rgba(0,0,0,0.3)",
             ],
           }}
-        />
+        /> */}
       </div>
-    </PopupCustom>
+    </div>
   );
 };
 

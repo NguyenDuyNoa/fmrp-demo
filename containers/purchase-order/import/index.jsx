@@ -430,8 +430,8 @@ const PurchaseImport = (props) => {
                 }
                 table={<div className="flex flex-col h-full">
                     <div className="w-full items-center flex justify-between">
-                        <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                            <div className="flex gap-3 items-center">
+                        {/* <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5"> */}
+                            <div className="flex gap-3 items-center w-full">
                                 <SearchComponent
                                     colSpan={1}
                                     dataLang={dataLang}
@@ -495,9 +495,9 @@ const PurchaseImport = (props) => {
                                     isSearchable={true}
                                 />
                             </div>
-                        </div>
-                        <div className="col-span-2">
-                            <div className="flex items-center justify-end gap-2">
+                        {/* </div> */}
+                        {/* <div className="col-span-2"> */}
+                            <div className="flex items-center gap-2">
                                 <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
                                 {role == true || checkExport ? (
                                     <div className={``}>
@@ -523,7 +523,7 @@ const PurchaseImport = (props) => {
                                     <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                 </div>
                             </div>
-                        </div>
+                        {/* </div> */}
                     </div>
 
                     <Customscrollbar className='h-full overflow-y-auto'>
