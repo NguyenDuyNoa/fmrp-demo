@@ -57,7 +57,6 @@ const ToggleBotAI = () => {
         className="fixed bottom-6 right-6 z-50 cursor-pointer"
         onClick={() => setOpenDrawer(true)}
         onMouseEnter={() => {
-
           // xử lý hover toggle
           setIsHovering(true);
           setShowBubble(true);
@@ -84,7 +83,7 @@ const ToggleBotAI = () => {
           {/* ✅ BUBBLE */}
           <AnimatePresence>
             {showBubble && (
-              <div className="absolute top-[-5px] left-0 -translate-x-[calc(100%-50px)] w-fit h-fit bg-transparent">
+              <div className="absolute top-[-5px] left-0 -translate-x-[calc(100%-20px)] w-fit h-fit bg-transparent">
                 <motion.div
                   initial={{ opacity: 0.3 }}
                   animate={{ opacity: 1 }}
