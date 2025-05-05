@@ -27,10 +27,10 @@ const adminState = {
         open: false,
     },
     statePopupUpgradeProfessional: {
-        open: false
+        open: false,
     },
     statePopupSuccessfulPayment: {
-        open: false
+        open: false,
     },
     statePopupRecommendation: {
         open: false,
@@ -75,6 +75,9 @@ const adminState = {
             valueProduct: false,
             stepNext: 1,
             keyValue: "",
+            messageOptions: "",
+            isFinished: false,
+            api: "",
         },
         response: {
             materialsPrimary: [],
@@ -212,6 +215,9 @@ function adminReducer(state = adminState, action) {
                         type: action.payload.options?.type,
                         stepNext: action.payload.options?.step_next,
                         keyValue: action.payload.options?.key_value,
+                        messageOptions: action.payload.options?.message_1 || "",
+                        isFinished: action.payload.options?.is_finished || false,
+                        api: action.payload.options?.api || "",
                     },
                     response: {
                         materialsPrimary: action.payload.response?.materials_primary || [],

@@ -31,6 +31,7 @@ export const fetchNewMessageAI = async ({
     step,
     params,
 }) => {
+    console.log("🚀 ~ params:", params)
     try {
         const response = await apiChatAI.apiChatTextBotAI({
             data: {
@@ -39,13 +40,14 @@ export const fetchNewMessageAI = async ({
                 session_id: sessionId,
                 message,
                 chat_scenarios_id: chatScenariosId,
-                step: params ? null : step,
-                params: params
-                    ? {
-                        value_product: params.valueProduct,
-                        is_semi_product: params.idSemiProduct,
-                    }
-                    : null,
+                step: step,
+                // params: params
+                //     ? {
+                //         value_product: params.valueProduct,
+                //         is_semi_product: params.idSemiProduct,
+                //     }
+                //     : null,
+                params: params ?? null,
             },
         });
 
