@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { twMerge } from "tailwind-merge";
 import { IoIosCalculator } from "react-icons/io";
 
@@ -44,11 +44,11 @@ const TableBOM = ({ materialsPrimary, semiProducts, stages = [] }) => {
                         <>
                             {semiProducts.length > 0 &&
                                 semiProducts.map((item, index) => (
-                                    <>
+                                    <Fragment key={index}>
                                         {/* thằng cha  */}
                                         <tr
                                             className="bg-white border-t text-[10px] border-collapse relative z-[2] "
-                                            key={index}
+                                        // key={index}
                                         >
                                             <td className="px-1 text-center py-2 font-normal font-deca text-[10px] text-[#637381]">
                                                 {index + 1}
@@ -159,7 +159,7 @@ const TableBOM = ({ materialsPrimary, semiProducts, stages = [] }) => {
                                                 </td>
                                             </tr>
                                         )}
-                                    </>
+                                    </Fragment>
                                 ))}
                         </>
                         <>
