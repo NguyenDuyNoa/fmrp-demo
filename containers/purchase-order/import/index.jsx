@@ -520,7 +520,7 @@ const PurchaseImport = (props) => {
                                     </button>
                                 )}
                                 <div>
-                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                    {/* <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} /> */}
                                 </div>
                             </div>
                         {/* </div> */}
@@ -529,37 +529,40 @@ const PurchaseImport = (props) => {
                     <Customscrollbar className='h-full overflow-y-auto'>
                         <div className="w-full">
                             <HeaderTable gridCols={13}>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                    {/* {dataLang?. || "stt"} */}STT
+                                </ColumnTable>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={2} textAlign={"center"}>
+                                <ColumnTable colSpan={2.5} textAlign={"left"}>
                                     {dataLang?.import_supplier || "import_supplier"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_the_order || "import_the_order"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_total_amount || "import_total_amount"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_tax_money || "import_tax_money"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_into_money || "import_into_money"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={2} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"center"}>
                                     {dataLang?.import_payment_status || "import_payment_status"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_branch || "import_branch"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"center"}>
+                                <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_action || "import_action"}
                                 </ColumnTable>
                             </HeaderTable>
@@ -568,51 +571,54 @@ const PurchaseImport = (props) => {
                             ) : data?.rResult?.length > 0 ? (
                                 <>
                                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                        {data?.rResult?.map((e) => (
+                                        {data?.rResult?.map((e, index) => (
                                             <RowTable gridCols={13} key={e.id.toString()}>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                                <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                    {index + 1}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     <PopupDetail
                                                         dataLang={dataLang}
-                                                        className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 font-medium text-center text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear cursor-pointer "
+                                                        className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                         name={e?.code}
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2} textAlign={"left"}>
+                                                <RowItemTable colSpan={2.5} textAlign={"left"}>
                                                     {e.supplier_name}
                                                 </RowItemTable>
                                                 <RowItemTable
                                                     colSpan={1}
-                                                    className="flex items-center mx-auto w-fit"
+                                                    textAlign={"left"}
                                                 >
                                                     {
                                                         e?.purchase_order_code && (
-                                                            <div className="mx-auto">
-                                                                <PopupDetailThere
-                                                                    className="3xl:py-0 py-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] px-2 bg-gradient-to-br font-normal text-orange-500 bg-orange-200 items-center rounded-full shadow-2xl cursor-pointer hover:scale-105 transition duration-300 ease-out hover:bg-orange-500 hover:text-white"
-                                                                    name={e?.purchase_order_code}
-                                                                    dataLang={dataLang}
-                                                                    id={e?.purchase_order_id}
-                                                                    type={"typePo"}
-                                                                ></PopupDetailThere>
-                                                            </div>
+                                                            <PopupDetailThere
+                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
+                                                                name={e?.purchase_order_code}
+                                                                dataLang={dataLang}
+                                                                id={e?.purchase_order_id}
+                                                                type={"typePo"}
+                                                            ></PopupDetailThere>
                                                         )
                                                     }
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
-                                                    {formatMoney(e.total_price)}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    {formatMoney(e.total_price)} <span className="underline">đ</span>
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
-                                                    {formatMoney(e.total_tax_price)}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    {e.total_tax_price == 0 ? "-" : (
+                                                        <>{formatMoney(e.total_tax_price)} <span className="underline">đ</span></>
+                                                    )}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
-                                                    {formatMoney(e.total_amount)}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    {formatMoney(e.total_amount)} <span className="underline">đ</span>
                                                 </RowItemTable>
                                                 <RowItemTable
-                                                    colSpan={2}
+                                                    colSpan={1}
                                                     className="flex items-center mx-auto w-fit"
                                                 >
                                                     {(e?.status_pay === "not_spent" && (
@@ -632,10 +638,12 @@ const PurchaseImport = (props) => {
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className="mx-auto">
-                                                    <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                <RowItemTable colSpan={1} >
+                                                    {/* <TagBranch className="w-fit"> */}
+                                                        {e?.branch_name}
+                                                        {/* </TagBranch> */}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className="flex justify-center">
+                                                <RowItemTable colSpan={1} className="flex">
                                                     <BtnAction
                                                         onRefresh={refetch.bind(this)}
                                                         onRefreshGroup={refetchFilterBar.bind(this)}
@@ -662,39 +670,39 @@ const PurchaseImport = (props) => {
                 total={
                     <>
                         <ContainerTotal className={"!grid-cols-13"}>
-                            <RowItemTable colSpan={5} textAlign={"center"} className="p-2">
+                            <RowItemTable colSpan={3} textAlign={"end"} className="px-5">
                                 {dataLang?.import_total || "import_total"}
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={1}
-                                textAlign={"right"}
-                                className="flex flex-wrap justify-end gap-2 p-2 mr-1"
+                                colSpan={0.5}
+                                textAlign={"left"}
+                                className="flex gap-1 px-3"
                             >
-                                {formatNumber(data?.rTotal?.total_price)}
+                                {formatNumber(data?.rTotal?.total_price)} <span className="underline">đ</span>
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={1}
-                                textAlign={"right"}
-                                className="flex flex-wrap justify-end gap-2 p-2 mr-1 "
+                                colSpan={0.5}
+                                textAlign={"left"}
+                                className="flex gap-1 px-3"
                             >
-                                {formatNumber(data?.rTotal?.total_tax_price)}
+                                {formatNumber(data?.rTotal?.total_tax_price)} <span className="underline">đ</span>
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={1}
-                                textAlign={"right"}
-                                className="flex flex-wrap justify-end gap-2 p-2 mr-1 "
+                                colSpan={0.5}
+                                textAlign={"left"}
+                                className="flex gap-1 px-3"
                             >
-                                {formatNumber(data?.rTotal?.total_amount)}
+                                {formatNumber(data?.rTotal?.total_amount)} <span className="underline">đ</span>
                             </RowItemTable>
                         </ContainerTotal>
                     </>
                 }
 
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
+                                {/* <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} /> */}
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -703,7 +711,9 @@ const PurchaseImport = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
             <PopupConfim
