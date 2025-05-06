@@ -17,7 +17,8 @@ const configSelectFillter = {
             ...theme.colors,
             primary25: "#EBF5FF",
             primary50: "#92BFF7",
-            primary: "#3276FA",
+            // primary: "#3276FA",
+            primary: "#003DA0",
         },
     }),
     styles: {
@@ -36,7 +37,13 @@ const configSelectFillter = {
             cursor: state.isDisabled ? "not-allowed" : "pointer",
             opacity: state.isDisabled ? 0.7 : 1,
             zIndex: 1, // thấp hơn dropdown khác
-
+            borderRadius: '8px',
+            minWidth: '100px',
+            borderColor: state.isFocused ? "#003DA0" : base.borderColor,
+            '&:hover': {
+                borderColor: "#003DA0"
+            },
+            boxShadow: state.isFocused ? "0 0 0 1px #003DA0" : "none",
         }),
         option: (provided, state) => ({
             ...provided,
@@ -50,6 +57,7 @@ const configSelectFillter = {
          menu: (provided) => ({
                 ...provided,
                 zIndex: 999999999999999, // Giá trị z-index tùy chỉnh
+                borderRadius: '8px',
             }),
         menuPortal: base => ({
             ...base,

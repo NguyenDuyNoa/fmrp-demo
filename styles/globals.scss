@@ -707,20 +707,20 @@ body {
 }
 
 .page-item.active a {
-  color: white;
-  background-color: #0f4f9e;
-  padding: 6px 12px;
-  font-size: 13px;
+  color: #11315B;
+  background-color: #E2F0FE;
+  padding: 8px 14px;
+  font-size: 14px;
   border-radius: 8px;
   font-weight: 600;
 }
 .page-item a {
-  background-color: #e2e8f0;
-  color: black;
-  padding: 6px 12px;
-  font-size: 13px;
+  // background-color: #e2e8f0;
+  color: #667085;
+  padding: 8px 14px;
+  font-size: 14px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 400;
   transition: all 0.2s ease-in-out;
   display: block;
 }

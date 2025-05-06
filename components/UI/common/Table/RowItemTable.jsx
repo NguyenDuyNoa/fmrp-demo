@@ -9,12 +9,15 @@ export const RowItemTable = ({
   textSize,
   backgroundColor,
 }) => {
+  //Mỗi cột đầy đủ chiếm 2 cột nhỏ, cột 0.5 chiếm 1 cột nhỏ
+  const adjustedColSpan = colSpan === 0.5 ? 1 : (colSpan ? colSpan * 2 : 2);
+
   return (
     <h6
       style={{
-        gridColumn: `span ${colSpan ? colSpan : 1}`,
+        gridColumn: `span ${adjustedColSpan}`,
         textAlign: textAlign,
-        color: `${textColor ? textColor : "#52525b"}`,
+        color: `${textColor ? textColor : "#141522"}`,
         backgroundColor: backgroundColor || "",
       }}
       // className={`xl:px-[2px] px-0 ${className}
@@ -23,7 +26,7 @@ export const RowItemTable = ({
       //     : "3xl:text-base 2xl:text-[14px] xl:text-[13.5px]  text-[11.5px]  font-medium  text-wrap"
       //   } `}
       className={twMerge(
-        "3xl:text-base 2xl:text-[14px] xl:text-[13.5px]  text-[11.5px]  font-medium  text-wrap xl:px-[2px] px-0 ",
+        "2xl:text-[14px] xl:text-[13.5px] text-[11.5px] font-semibold text-wrap py-2 px-3",
         textSize,
         className
       )}

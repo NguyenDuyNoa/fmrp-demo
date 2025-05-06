@@ -1,12 +1,17 @@
 export const RowTable = ({ children, gridCols, className, display, ref }) => {
+    // Điều chỉnh gridTemplateColumns để hỗ trợ các cột có kích thước 0.5
+    const gridTemplateColumnsValue = gridCols 
+        ? `repeat(${gridCols * 2}, minmax(0, 0.5fr))` 
+        : `repeat(24, minmax(0, 0.5fr))`;
+
     return (
         <h6
             ref={ref || undefined}
             style={{
                 display: display ? display : "grid",
-                gridTemplateColumns: `repeat(${gridCols ? gridCols : 12}, minmax(0, 1fr))`,
+                gridTemplateColumns: gridTemplateColumnsValue,
             }}
-            className={`${className} relative grid grid-cols-12 items-center py-2.5 px-2 hover:bg-slate-100/40`}
+            className={`${className} relative grid items-center py-2.5 px-2 hover:bg-slate-100/40`}
         >
             {children}
         </h6>

@@ -4,7 +4,7 @@ import { FaCheck } from "react-icons/fa";
 import { components } from "react-select";
 import { Customscrollbar } from "../common/Customscrollbar";
 import { MenuListClickAll } from "./selectItemComponent";
-import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
+import DropdownFilledIcon from "@/components/icons/common/DropdownFilledIcon";
 import CloseXIcon from "@/components/icons/common/CloseXIcon";
 
 export const CustomOption = (props) => {
@@ -21,7 +21,9 @@ export const CustomOption = (props) => {
 // Custom Dropdown Indicator
 const DropdownIndicator = (props) => (
     <components.DropdownIndicator {...props}>
-        <CaretDropdownThinIcon className="w-4 h-4 text-[#9295A4]" />
+        <DropdownFilledIcon 
+            className={`w-3 h-3 transition-transform duration-500 ${props.selectProps.menuIsOpen ? 'rotate-180 text-[#003DA0]' : 'text-neutral-02'}`} 
+        />
     </components.DropdownIndicator>
 );
 
@@ -134,7 +136,9 @@ const SelectComponent = ({
         }
 
     return (
-        <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
+        <div className={`${classParent ? classParent : ""}`} 
+        // style={{ gridColumn: `span ${colSpan || 1}` }}
+        >
             <SelectCore
                 id={id ?? "parentSelect"}
 
@@ -153,6 +157,7 @@ const SelectComponent = ({
                     Option: CustomOption,
                     MenuList: CustomMenuList,
                     DropdownIndicator, // ← Custom arrow indicator
+                    IndicatorSeparator: () => null, // ← Bỏ đường thẳng
                 }}
                 maxShowMuti={maxShowMuti}
                 noOptionsMessage={noOptionsMessage ? noOptionsMessage : configSelectFillter.noOptionsMessage}

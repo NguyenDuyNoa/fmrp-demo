@@ -41,7 +41,7 @@ import { ArrowDown2, Box1, BoxSearch, Trash } from "iconsax-react";
 import { useRouter } from "next/router";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { VscFilePdf } from "react-icons/vsc";
@@ -59,6 +59,12 @@ import PopupPrintItem from "../common/popup/PopupPrintItem";
 import StickerIcon from "../icons/common/StickerIcon";
 import PopupPrintTemNVL from "@/containers/purchase-order/import/components/PopupPrintTemNVL";
 import { fetchPDFDelivery, fetchPDFSaleOrder } from "@/managers/api/sales-order/useLinkFilePDF";
+import EditIcon from "../icons/common/EditIcon";
+import TrashIcon from "../icons/common/TrashIcon";
+import PrinterIcon from "../icons/common/PrinterIcon";
+import { Tooltip } from "react-tooltip";
+import TooltipDefault from "../common/tooltip/TooltipDefault";
+import PrinterTem from "../icons/common/PrinterTem";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -115,12 +121,10 @@ const Popup_Pdf = (props) => {
         <PopupCustom
             title={props.dataLang?.option_prin || "option_prin"}
             button={
-                <button className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full">
-                    <VscFilePdf
-                        size={20}
-                        className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
-                    />
-                    <p className="group-hover:text-[#65a30d]">
+                <button className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap">
+                    {/* <VscFilePdf size={20}/> */}
+                    <PrinterTem className="size-5"/>
+                    <p className="whitespace-nowrap">
                         {props?.dataLang?.btn_table_print || "btn_table_print"}
                     </p>
                 </button>
@@ -162,6 +166,28 @@ const Popup_Pdf = (props) => {
 export const BtnAction = React.memo((props) => {
     const dispatch = useDispatch();
     const [loadingButtonPrint, setLoadingButtonPrint] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef(null);
+
+    // Xử lý đóng dropdown khi click ra ngoài
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+
+        // Thêm event listener khi dropdown đang mở
+        if (showDropdown) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        // Cleanup event listener
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showDropdown]);
+
     //kiếm hàm fetchPDF theo page 
     const fetchPDFMultiplePage = {
         order: fetchPDFPurchaseOrder,
@@ -548,7 +574,7 @@ export const BtnAction = React.memo((props) => {
     };
 
     return (
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center gap-1">
             {[
                 "client_customers",
                 "client_status",
@@ -583,31 +609,8 @@ export const BtnAction = React.memo((props) => {
                     <Trash color="red" />
                 </button>
             ) : (
-                <Popup
-                    trigger={
-                        <button
-                            className={
-                                ` flex space-x-1 items-center bg-slate-100 2xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-sm xxl:!text-[11px] xl:text-[9px] text-[9px] ` +
-                                props.className
-                            }
-                        >
-                            <span>{props.dataLang?.btn_action || "btn_action"}</span>
-                            <ArrowDown2 size={12} />
-                        </button>
-                    }
-                    arrow={false}
-                    position="left top"
-                    className={`dropdown-edit`}
-                    keepTooltipInside={props.keepTooltipInside}
-                    closeOnDocumentClick
-                    nested
-                    open={openAction || isOpenValidate}
-                    onOpen={_ToggleModal.bind(this, true)}
-                    onClose={_ToggleModal.bind(this, false)}
-                >
-                    <div className="w-auto rounded">
-                        <div className="flex flex-col overflow-hidden bg-white rounded-b-xl">
-                            {props.type == "order" && (
+                <>
+                   {props.type == "order" && (
                                 <Popup_TableValidateEdit
                                     {...props}
                                     {...shareProps}
@@ -620,9 +623,9 @@ export const BtnAction = React.memo((props) => {
 
                             {props.type == "servicev_voucher" && (
                                 <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full">
-                                    <BiEdit
-                                        size={20}
-                                        className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                                    <EditIcon
+                                        color="#064E3B"
+                                        className="group-hover:text-sky-500 group-hover:shadow-md "
                                     />
                                     <Popup_servie
                                         status_pay={props?.status_pay}
@@ -650,7 +653,7 @@ export const BtnAction = React.memo((props) => {
                                         type={props?.typeOpen}
                                         dataProduct={props?.dataProduct}
                                         onRefresh={props.onRefresh}
-                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
+                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
                                     />
                                     <Popup_Bom
                                         dataLang={props.dataLang}
@@ -661,7 +664,7 @@ export const BtnAction = React.memo((props) => {
                                         type={props?.typeOpen}
                                         dataProduct={props?.dataProduct}
                                         bom={props?.bom}
-                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
+                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
                                     />
                                     <Popup_Products
                                         onRefresh={props.onRefresh}
@@ -670,7 +673,7 @@ export const BtnAction = React.memo((props) => {
                                         id={props?.id}
                                         dataProduct={props?.dataProduct}
                                         type={props?.typeOpen}
-                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full whitespace-nowrap"
+                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
                                     />
                                 </>
                             )}
@@ -680,7 +683,7 @@ export const BtnAction = React.memo((props) => {
                                     onRefresh={props.onRefresh}
                                     dataLang={props.dataLang}
                                     id={props?.id}
-                                    className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                    className="text-sm hover:bg-slate-50 text-left cursor-pointer"
                                 >
                                     {props.dataLang?.purchase_order_table_edit ||
                                         "purchase_order_table_edit"}
@@ -692,7 +695,7 @@ export const BtnAction = React.memo((props) => {
                                     onRefresh={props.onRefresh}
                                     dataLang={props.dataLang}
                                     id={props?.id}
-                                    className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                    className="text-sm hover:bg-slate-50 text-left cursor-pointer"
                                 >
                                     {props.dataLang?.purchase_order_table_edit ||
                                         "purchase_order_table_edit"}
@@ -716,15 +719,15 @@ export const BtnAction = React.memo((props) => {
                                                 isShow("error", WARNING_STATUS_ROLE);
                                             }
                                         }}
-                                        className={` group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                        className={` group rounded-lg p-1 border border-transparent hover:border-[#064E3B] hover:bg-[#064E3B]/10 transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer`}
                                     >
-                                        <BiEdit
-                                            size={20}
-                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                                        <EditIcon
+                                            color="#064E3B"
+                                            className="size-5 transition-all duration-300"
                                         />
-                                        <p className="group-hover:text-sky-500">
+                                        {/* <p className="group-hover:text-sky-500">
                                             {props.dataLang?.btn_table_edit || "btn_table_edit"}
-                                        </p>
+                                        </p> */}
                                     </button>
                                 )}
 
@@ -736,13 +739,14 @@ export const BtnAction = React.memo((props) => {
                                 "receipts",
                                 "payment",
                             ].includes(props?.type) ? (
-                                <Popup_Pdf
-                                    dataLang={props.dataLang}
-                                    props={props}
-                                    openAction={openAction}
-                                    setOpenAction={setOpenAction}
-                                    {...shareProps}
-                                />
+                                // <Popup_Pdf
+                                //     dataLang={props.dataLang}
+                                //     props={props}
+                                //     openAction={openAction}
+                                //     setOpenAction={setOpenAction}
+                                //     {...shareProps}
+                                // />
+                                <></>
                             ) : props?.type === "order" || props?.type === "sales_product" ? (
                                 <ButtonPrintItem
                                     onCLick={() =>
@@ -771,11 +775,11 @@ export const BtnAction = React.memo((props) => {
                                             onClick={() => isShow("error", WARNING_STATUS_ROLE)}
                                             type="button"
                                             className={`${props.type == "sales_product" ? "" : "justify-center"
-                                                } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                                } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer`}
                                         >
                                             <Box1
                                                 size={20}
-                                                className="group-hover:text-orange-500 group-hover:scale-110 group-hover:shadow-md "
+                                                className="group-hover:text-orange-500 group-hover:shadow-md "
                                             />
                                             <p className="pr-4 group-hover:text-orange-500">
                                                 {props.dataLang?.salesOrder_keep_stock ||
@@ -796,11 +800,11 @@ export const BtnAction = React.memo((props) => {
                                         <button
                                             type="button"
                                             onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer"
                                         >
                                             <BoxSearch
                                                 size={20}
-                                                className="group-hover:text-amber-500 group-hover:scale-110 group-hover:shadow-md "
+                                                className="group-hover:text-amber-500 group-hover:shadow-md "
                                             />
                                             <p className="group-hover:text-amber-500 pr-2.5">
                                                 {props.dataLang?.salesOrder_see_stock_keeping ||
@@ -810,32 +814,56 @@ export const BtnAction = React.memo((props) => {
                                     )}
                                 </>
                             )}
+
                             {props.type == "import" && (
-                                <button
-                                    onClick={() => {
-                                        dispatch({
-                                            type: "statePopupGlobal",
-                                            payload: {
-                                                open: true,
-                                                children: (
-                                                    <PopupPrintTemNVL
-                                                        id={props?.id}
-                                                    />
-                                                ),
-                                            },
-                                        });
-                                    }}
-                                    className={` group transition-all ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                <div className="relative" ref={dropdownRef}>
+                                    <button
+                                        onClick={() => setShowDropdown(!showDropdown)}
+                                        className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                                     >
-                                        <StickerIcon
-                                        size={20}
-                                        className="size-5  group-hover:text-[#0375F3] group-hover:scale-110 group-hover:shadow-md "
-                                    />
-                                    <p className="group-hover:text-[#0375F3] font-sans">
-                                        {props.dataLang?.stamp_printing ||
-                                            "stamp_printing"}
-                                    </p>
-                                </button>
+                                        <PrinterIcon
+                                            color="#003DA0"
+                                            className="size-5"
+                                        />
+                                    </button>
+                                    {showDropdown && (
+                                        <div className="absolute top-full left-1/2 -translate-x-1/2 p-1 mt-1 w-fit bg-white rounded-xl z-[999] shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
+                                            <ul className="flex flex-col gap-1">
+                                            <li
+                                                onClick={() => {
+                                                    dispatch({
+                                                        type: "statePopupGlobal",
+                                                        payload: {
+                                                            open: true,
+                                                            children: (
+                                                                <PopupPrintTemNVL
+                                                                    id={props?.id}
+                                                                />
+                                                            ),
+                                                        },
+                                                    });
+                                                }}
+                                                className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+                                            >
+                                                <StickerIcon
+                                                    // size={20}
+                                                    className="size-5"
+                                                />
+                                                <p>In tem</p>
+                                            </li>
+                                            <li>
+                                            <Popup_Pdf
+                                                dataLang={props.dataLang}
+                                                props={props}
+                                                openAction={openAction}
+                                                setOpenAction={setOpenAction}
+                                                {...shareProps}
+                                            />
+                                            </li>
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
                             )}
                             
                             {props.type == "order" ? (
@@ -857,26 +885,22 @@ export const BtnAction = React.memo((props) => {
                                             isShow("error", WARNING_STATUS_ROLE);
                                         }
                                     }}
-                                    className={` group transition-all ease-in-out flex items-center   ${(props.type == "products" && "justify-start") ||
+                                    className={`group transition-all ease-in-out flex items-center ${(props.type == "products" && "justify-start") ||
                                         props.type == "sales_product"
                                         ? ""
                                         : "justify-center"
                                         } 
-                                            gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                    rounded-lg p-1 gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-red-02 text-left cursor-pointer border border-transparent hover:border-red-01`}
+                                    data-tooltip-id="delete-tooltip"
+                                    data-tooltip-content="Xóa phiếu"
                                 >
-                                    <RiDeleteBin6Line
-                                        size={20}
-                                        className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
+                                    <TrashIcon
+                                        color="#EE1E1E"
+                                        className="size-5 transition-all duration-300"
                                     />
-                                    <p className="group-hover:text-[#f87171]">
-                                        {props.dataLang?.purchase_order_table_delete ||
-                                            "purchase_order_table_delete"}
-                                    </p>
                                 </button>
                             )}
-                        </div>
-                    </div>
-                </Popup>
+                </>
             )}
             <PopupConfim
                 dataLang={props.dataLang}
@@ -888,6 +912,7 @@ export const BtnAction = React.memo((props) => {
                 save={() => handleDelete()}
                 cancel={() => handleQueryId({ status: false })}
             />
+            <Tooltip id="delete-tooltip" place="top" className="z-[999999]" style={{ borderRadius: '6px' }} />
         </div>
     );
 });
