@@ -16,9 +16,8 @@ const Messenger = ({
     ResponseAI,
     options,
     icon,
-    nextText = false
+    nextText = false,
 }) => {
-    // console.log("🚀 ~ ResponseAI:", ResponseAI);
     const parsedMessage = useMemo(() => {
         if (!children) return null;
         return parse(children);
@@ -33,8 +32,8 @@ const Messenger = ({
         >
             {!isMe && (
                 <AvatarBotAI
-                    className="size-6"
-                    classNameDot="w-[8px] h-[8px] bottom-0 right-0"
+                    className="size-9"
+                    classNameDot="w-[10px] h-[10px] bottom-0 right-0"
                 />
             )}
 
@@ -70,18 +69,20 @@ const Messenger = ({
                     ) : (
                         <>
                             <div className="w-full flex items-center justify-start gap-x-1">
-                                <motion.div
-                                    animate={{
-                                        rotate: [0, 180, 0],
-                                    }}
-                                    transition={{
-                                        duration: 2,
-                                        repeat: Infinity,
-                                        ease: "easeInOut",
-                                    }}
-                                >
-                                    {icon}
-                                </motion.div>
+                                {icon && (
+                                    <motion.div
+                                        animate={{
+                                            rotate: [0, 180, 0],
+                                        }}
+                                        transition={{
+                                            duration: 2,
+                                            repeat: Infinity,
+                                            ease: "easeInOut",
+                                        }}
+                                    >
+                                        {icon}
+                                    </motion.div>
+                                )}
                                 <AnimatedGeneraText onAnimationComplete={onAnimationComplete}>
                                     {parsedMessage}
                                 </AnimatedGeneraText>

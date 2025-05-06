@@ -12,8 +12,6 @@ const apiChatAI = {
   },
 
   async apiChatTextBotAI(data) {
-    console.log("🚀 ~ apiChatTextBotAI ~ data:", data);
-
     const response = await axiosCustom(
       "POST",
       `/api_web/Api_OpenAI/message`,
@@ -21,6 +19,13 @@ const apiChatAI = {
     );
 
     return response.data;
+  },
+
+  async apiCompleteChatBot({ data, api }) {
+    const response = await axiosCustom("POST", `${api}`, {
+      data: data,
+    });
+    return response;
   },
 };
 

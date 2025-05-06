@@ -1,5 +1,39 @@
 import { combineReducers, createStore } from "redux";
 
+const initialChatBotState = {
+    open: false,
+    typeChat: null,
+    contentChat: "",
+    openViewModal: false,
+    isShowAi: false,
+    dataReview: null,
+    typeData: "",
+
+    // new
+    messenger: [],
+    chatScenariosId: 0,
+    sessionId: "",
+    step: 0,
+    isPending: false,
+    options: {
+        required: false,
+        type: "text",
+        value: [],
+        valueProduct: false,
+        stepNext: 1,
+        keyValue: "",
+        messageOptions: "",
+        isFinished: false,
+        api: "",
+    },
+    response: {
+        materialsPrimary: [],
+        product: {},
+        semiProducts: [],
+        stages: [],
+    },
+};
+
 const adminState = {
     auth: null,
     availableLang: [
@@ -219,13 +253,33 @@ function adminReducer(state = adminState, action) {
                         isFinished: action.payload.options?.is_finished || false,
                         api: action.payload.options?.api || "",
                     },
-                    response: {
-                        materialsPrimary: action.payload.response?.materials_primary || [],
-                        product: action.payload.response?.product || {},
-                        semiProducts: action.payload.response?.semi_products || [],
-                        stages: action.payload.response?.stages || [],
-                    },
+                    response: action.payload.response
+                        ? {
+                            materialsPrimary:
+                                action.payload.response?.materials_primary || [],
+                            product: action.payload.response?.product || {},
+                            semiProducts: action.payload.response?.semi_products || [],
+                            stages: action.payload.response?.stages || [],
+                        }
+                        : state.stateBoxChatAi.response,
+                    // response: {
+                    //     ...state.stateBoxChatAi.response,
+                    //     ...action.payload.response,
+                    // }
                 },
+            };
+
+        case "chatbot/updateOptions":
+            return {
+                ...state,
+                options: action.payload,
+            };
+
+
+        case "chatbot/reset":
+            return {
+                ...state,
+                stateBoxChatAi: { ...initialChatBotState },
             };
 
         default:

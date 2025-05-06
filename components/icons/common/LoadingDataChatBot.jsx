@@ -31,8 +31,8 @@ const LoadingDataChatBot = ({ color = "currentColor", className = "" }) => {
                     y2="15.0755"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stop-color="#1556D9" />
-                    <stop offset="1" stop-color="#8FE8FA" />
+                    <stop stopColor="#1556D9" />
+                    <stop offset="1" stopColor="#8FE8FA" />
                 </linearGradient>
                 <linearGradient
                     id="paint1_linear_9622_3717"
@@ -42,8 +42,8 @@ const LoadingDataChatBot = ({ color = "currentColor", className = "" }) => {
                     y2="20.8755"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stop-color="#1556D9" />
-                    <stop offset="1" stop-color="#8FE8FA" />
+                    <stop stopColor="#1556D9" />
+                    <stop offset="1" stopColor="#8FE8FA" />
                 </linearGradient>
                 <linearGradient
                     id="paint2_linear_9622_3717"
@@ -53,8 +53,8 @@ const LoadingDataChatBot = ({ color = "currentColor", className = "" }) => {
                     y2="26.293"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stop-color="#1556D9" />
-                    <stop offset="1" stop-color="#8FE8FA" />
+                    <stop stopColor="#1556D9" />
+                    <stop offset="1" stopColor="#8FE8FA" />
                 </linearGradient>
             </defs>
         </svg>

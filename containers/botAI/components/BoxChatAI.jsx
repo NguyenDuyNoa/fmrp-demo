@@ -12,7 +12,9 @@ import AvatarBotAI from "./AvatarBotAI";
 import Messenger from "./Messenger";
 import SelectAnswer from "./SelectAnswer";
 import {
+    completeStepChatBot,
     fetchNewMessageAI,
+    fetchStartMessageAI,
     useStartMessageAI,
 } from "@/managers/api/bot-AI/useMessageAI";
 import { useDispatch } from "react-redux";
@@ -22,6 +24,8 @@ import { handleDelay } from "@/utils/helpers/common";
 const { TextArea } = Input;
 import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import LoadingDataChatBot from "@/components/icons/common/LoadingDataChatBot";
+import ResultChatBot from "./ResultChatBot";
+import { useRouter } from "next/router";
 
 const drawerStyles = {
     mask: {
@@ -30,13 +34,18 @@ const drawerStyles = {
 };
 
 const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
+    const endRef = useRef(null);
+    const router = useRouter();
     const dispatch = useDispatch();
     const hasFetchedFirstMessage = useRef(false);
     const [isAnimationCompleted, setAnimationCompleted] = useState(false);
     const [isLoadingGeneraAnswer, setIsLoadingGeneraAnswer] = useState(false);
     const [optionSelectAnswer, setOptionSelectAnswer] = useState([]);
-
+    const [resultDataChatBot, setResultDataChatBot] = useState(false);
     const [textUser, setTextUser] = useState("");
+    const [productAnalysis, setProductAnalysis] = useState({});
+    const [isLastMessageAnimationDone, setIsLastMessageAnimationDone] =
+        useState(false);
     const { data: dataNewChatAI, isLoadingNewChatAi } = useStartMessageAI({
         type: PRODUCT_ANALYSIS,
         enable: openChatBox && !hasFetchedFirstMessage.current,
@@ -44,7 +53,6 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
 
     const { messenger, options, chatScenariosId, sessionId, step, response } =
         useSelector((state) => state.stateBoxChatAi);
-    console.log("🚀 ~ BoxChatAI ~ messenger:", messenger);
 
     const handleMessageUser = async () => {
         if (!textUser.trim()) return;
@@ -61,6 +69,19 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                 type: "chatbot/addAiMessageOnly",
                 payload: {
                     text: "Vui lòng chọn một trong các lựa chọn bên dưới để tiếp tục.",
+                    hasResponse: false,
+                },
+            });
+            setTextUser("");
+            return;
+        }
+
+        // ✅ Nếu yêu cầu chọn option và user cố gõ tay => chặn & cảnh báo
+        if (options.isFinished) {
+            dispatch({
+                type: "chatbot/addAiMessageOnly",
+                payload: {
+                    text: "Vui lòng đợi AI khởi tạo dữ liệu",
                     hasResponse: false,
                 },
             });
@@ -114,7 +135,6 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
     };
 
     const handleSelectAnswer = async (value) => {
-        console.log("🚀 ~ handleSelectAnswer ~ value:", value);
         const findValueProductUser = messenger
             .slice()
             .reverse()
@@ -154,8 +174,6 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                 params: dynamicParams,
             });
 
-            console.log("🚀 ~ handleMessageUser ~ res :", res);
-
             const scenario = res?.chat_scenarios;
             if (scenario) {
                 handleDelay({
@@ -189,9 +207,52 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
         }
     };
 
+    const onRedirect = () => {
+        setOpenChatBox(false);
+        router.push("/products");
+    };
+
+    const onRetry = async () => {
+        setResultDataChatBot(false);
+        setTextUser("");
+        setOptionSelectAnswer([]);
+        setAnimationCompleted(false);
+        setProductAnalysis({});
+
+        // Reset Redux chatbot
+        dispatch({ type: "chatbot/reset" });
+
+        // Bắt đầu lại lời chào như lúc mở chat box
+        try {
+            const res = await fetchStartMessageAI(PRODUCT_ANALYSIS); // gọi API giống hook
+            const scenario = res?.chat_scenarios;
+
+            if (scenario) {
+                handleDelay({
+                    delay: 2000,
+                    setIsLoading: setIsLoadingGeneraAnswer,
+                    actionFn: () =>
+                        dispatch({
+                            type: "chatbot/addInitialBotMessage",
+                            payload: {
+                                message: scenario.message,
+                                options: scenario.options,
+                                chat_scenarios_id: scenario.chat_scenarios_id,
+                                session_id: scenario.session_id,
+                                step: scenario.step,
+                            },
+                        }),
+                });
+            }
+        } catch (err) {
+            console.error("Lỗi khi khởi tạo lại đoạn chat mới:", err);
+        }
+    };
+
     // Reset trạng thái khi messenger thay đổi
     useEffect(() => {
         setAnimationCompleted(false);
+        setIsLastMessageAnimationDone(false);
     }, [messenger]);
 
     useEffect(() => {
@@ -237,6 +298,54 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
             });
         }
     }, [openChatBox, dataNewChatAI, isLoadingNewChatAi, dispatch]);
+
+    useEffect(() => {
+        const handleCompleteStep = async () => {
+            if (options?.isFinished) {
+                setResultDataChatBot(false);
+                try {
+                    const payload = {
+                        data: {
+                            stages: response.stages,
+                            materials_primary: response.materialsPrimary,
+                            semi_products: response.semiProducts,
+                            product: response.product,
+                        },
+                        api: options.api,
+                    };
+                    const res = await completeStepChatBot(payload);
+
+                    if (res) {
+                        setProductAnalysis(res);
+                        setTimeout(() => {
+                            dispatch({ type: "chatbot/reset" });
+
+                            setResultDataChatBot(true);
+                        }, 6000);
+                    }
+                } catch (err) {
+                    setResultDataChatBot(false);
+                    console.error("Lỗi khi gọi completeStepChatBot:", err);
+                }
+            }
+        };
+
+        handleCompleteStep();
+    }, [options?.isFinished]);
+
+    useEffect(() => {
+        const lastMessage = messenger[messenger.length - 1];
+        if (lastMessage?.sender === "user" && endRef.current) {
+            endRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messenger]);
+
+    //scroll tới vị trí loading
+    useEffect(() => {
+        if (endRef.current) {
+            endRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messenger, isLoadingGeneraAnswer]);
 
     return (
         <Drawer
@@ -319,11 +428,13 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                             isMe={msg.sender === "user"}
                             isLoading={msg.isPending}
                             onAnimationComplete={() => {
-                                if (
-                                    index === messenger.length - 1 &&
-                                    options?.type === "radio"
-                                ) {
+                                const isLast = index === messenger.length - 1;
+                                if (isLast && options?.type === "radio") {
                                     setAnimationCompleted(true);
+                                }
+                                // ✅ kiểm tra khi message cuối là AI và KHÔNG có response
+                                if (isLast && msg.sender === "ai" && !msg.hasResponse) {
+                                    setIsLastMessageAnimationDone(true);
                                 }
                             }}
                             ResponseAI={msg?.hasResponse ? response : null}
@@ -332,14 +443,15 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                             {msg.text}
                         </Messenger>
                     ))}
+
                     {optionSelectAnswer.length > 0 &&
                         !isLoadingGeneraAnswer &&
                         isAnimationCompleted && (
-                            <div className="flex flex-col gap-y-3 pl-[30px]">
+                            <div className="flex flex-col gap-y-3 pl-[40px]">
                                 {optionSelectAnswer.map((item, index) => {
                                     return (
                                         <SelectAnswer
-                                            key={item.id}
+                                            key={index}
                                             icon={item.icon}
                                             typeAnswer={item.value}
                                             onClick={(value) => handleSelectAnswer(value)}
@@ -351,15 +463,31 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                                 })}
                             </div>
                         )}
-                    {/* <Messenger
-                        isMe={false}
-                        isLoading={false}
-                        icon={<LoadingDataChatBot />}
-                        nextText={true}
-                    >
-                        Dữ liệu đang được khởi tạo, vui lòng không tắt pop-up...
-                    </Messenger> */}
-                    {isLoadingGeneraAnswer && <Messenger isLoading={true} />}
+                    {options.isFinished &&
+                        !resultDataChatBot &&
+                        isLastMessageAnimationDone && (
+                            <Messenger
+                                isMe={false}
+                                isLoading={false}
+                                icon={<LoadingDataChatBot />}
+                                nextText={true}
+                            >
+                                Dữ liệu đang được khởi tạo, vui lòng không tắt pop-up...
+                            </Messenger>
+                        )}
+                    <div key="end-marker" ref={endRef} />
+                    {isLoadingGeneraAnswer && (
+                        <div>
+                            <Messenger isLoading={true} />
+                        </div>
+                    )}
+                    {resultDataChatBot && (
+                        <ResultChatBot
+                            productAnalysis={productAnalysis}
+                            onRedirect={onRedirect}
+                            onRetry={onRetry}
+                        />
+                    )}
                 </AnimatePresence>
             </div>
         </Drawer>
