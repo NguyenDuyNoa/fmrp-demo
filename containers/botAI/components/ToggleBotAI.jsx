@@ -6,8 +6,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSettingApp } from "@/hooks/useAuth";
 import BoxChatAI from "./BoxChatAI";
 import LoadingThreeDotsJumping from "./LoadingThreeDotsJumping";
+import AnimatedGeneraEachWord from "@/components/animations/animation/AnimatedGeneraEachWord";
 import AnimatedGeneraText from "@/components/animations/animation/AnimatedGeneraText";
-import AnimatedGeneraDiv from "@/components/animations/animation/AnimatiedGeneraDiv";
 
 const ToggleBotAI = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -15,7 +15,7 @@ const ToggleBotAI = () => {
   const [showText, setShowText] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const timeoutRef = useRef(null);
-
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const { data: dataSetting, isLoading } = useSettingApp();
 
   useEffect(() => {
@@ -53,104 +53,122 @@ const ToggleBotAI = () => {
 
   return (
     <>
-      <div
-        className="fixed bottom-6 right-6 z-50 cursor-pointer"
-        onClick={() => setOpenDrawer(true)}
-        onMouseEnter={() => {
-          // xử lý hover toggle
-          setIsHovering(true);
-          setShowBubble(true);
-          setShowText(true);
-          if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-          }
-        }}
-        onMouseLeave={() => {
-          //xử lý khi không hover
-          setShowText(false);
-          setShowBubble(false);
-          if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-          }
+      {isImageLoaded && (
+        <div
+          className="fixed bottom-6 right-6 z-50 cursor-pointer"
+          onClick={() => setOpenDrawer(true)}
+          onMouseEnter={() => {
+            // xử lý hover toggle
+            setIsHovering(true);
+            setShowBubble(true);
+            setShowText(true);
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current);
+            }
+          }}
+          onMouseLeave={() => {
+            //xử lý khi không hover
+            setShowText(false);
+            setShowBubble(false);
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current);
+            }
 
-          // Sau 3s mới set lại isHovering = false
-          timeoutRef.current = setTimeout(() => {
-            setIsHovering(false);
-          }, 3000);
-        }}
-      >
-        <div className="relative flex flex-col items-center w-fit justify-center">
-          {/* ✅ BUBBLE */}
-          <AnimatePresence>
-            {showBubble && (
-              <div className="absolute top-[-5px] left-0 -translate-x-[calc(100%-20px)] w-fit h-fit bg-transparent">
-                <motion.div
-                  initial={{ opacity: 0.3 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0.3 }}
-                  transition={{ duration: 0.5 }}
-                  className="relative"
-                >
-                  {showText ? (
-                    <AnimatedGeneraDiv
-                      className=" px-3 py-3 rounded-l-xl rounded-tr-xl bg-[#EBFEF2] border border-[#064E3B] shadow-md"
-                      classNameWrapper="rounded-l-xl rounded-tr-xl"
-                    >
-                      <p className="font-deca text-xs font-normal text-[#064E3B] whitespace-nowrap">
-                        Xin chào,
-                        <b>{dataSetting?.assistant_fmrp_short ?? "Fimo"}</b> có
-                        thể hỗ trợ gì cho bạn?
-                      </p>
-                    </AnimatedGeneraDiv>
-                  ) : (
+            // Sau 3s mới set lại isHovering = false
+            timeoutRef.current = setTimeout(() => {
+              setIsHovering(false);
+            }, 3000);
+          }}
+        >
+          <div className="relative flex flex-col items-center w-fit justify-center">
+            {/* ✅ BUBBLE */}
+
+            {/* background */}
+            <div className="absolute left-1/2 -translate-x-1/2  bottom-[10px] z-[-1]">
+              <div className="rounded-full bg-linear-border-toggle-bot p-[6px] w-[78px] h-[78px] aspect-1">
+                <div className="bg-linear-background-toggle-bot rounded-full size-full"></div>
+              </div>
+            </div>
+
+            {/* Bot Mascot */}
+            <div
+              className="relative z-10 w-[90px] h-[90px] rounded-full"
+              id="bot-anchor"
+            >
+              <AnimatePresence>
+                {showBubble && (
+                  <div className="absolute top-[-5px] left-0 -translate-x-[calc(100%-10px)] w-fit h-fit bg-transparent">
                     <motion.div
                       initial={{ opacity: 0.3 }}
                       animate={{ opacity: 1 }}
-                      exit={{ opacity: 0.9 }}
-                      transition={{ duration: 0.6 }}
-                      className=" px-3 py-3 rounded-l-xl rounded-tr-xl bg-[#EBFEF2] border border-[#064E3B]"
+                      exit={{ opacity: 0.3 }}
+                      transition={{ duration: 0.5 }}
+                      className="relative"
                     >
-                      <LoadingThreeDotsJumping
-                        classNameDot1="bg-[#54E79E]"
-                        classNameDot2="bg-[#21B972]"
-                        classNameDot3="bg-[#027A48]"
-                      />
+                      {showText ? (
+                        <AnimatedGeneraEachWord
+                          className="text-[#064E3B] px-3 py-3 rounded-l-xl rounded-tr-xl bg-[#EBFEF2] border border-[#064E3B] shadow-md"
+                          classNameWrapper="rounded-l-xl rounded-tr-xl"
+                        >
+                          Xin chào,{dataSetting?.assistant_fmrp_short ?? "Fimo"}
+                          có thể hỗ trợ gì cho bạn?
+                        </AnimatedGeneraEachWord>
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0.3 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0.9 }}
+                          transition={{ duration: 0.6 }}
+                          className=" px-3 py-3 rounded-l-xl rounded-tr-xl bg-[#EBFEF2] border border-[#064E3B]"
+                        >
+                          <LoadingThreeDotsJumping
+                            classNameDot1="bg-[#54E79E]"
+                            classNameDot2="bg-[#21B972]"
+                            classNameDot3="bg-[#027A48]"
+                          />
+                        </motion.div>
+                      )}
                     </motion.div>
-                  )}
-                </motion.div>
+                  </div>
+                )}
+              </AnimatePresence>
+
+              <div className="w-[90px] h-[90px] rounded-full ">
+                <Image
+                  alt="bot"
+                  src="/bot-ai/toggle.gif"
+                  width={900}
+                  height={680}
+                  className="w-[90px] h-[90px] bg-transparent rounded-full"
+                  // quality={100}
+                  loading="eager"
+                  // onLoad={() => setIsImageLoaded(true)}
+                  priority
+                />
               </div>
-            )}
-          </AnimatePresence>
-
-          {/* background */}
-          <div className="absolute left-1/2 -translate-x-1/2  bottom-[10px] z-[-1]">
-            <div className="rounded-full bg-linear-border-toggle-bot p-[6px] w-[78px] h-[78px] aspect-1">
-              <div className="bg-linear-background-toggle-bot rounded-full size-full"></div>
             </div>
-          </div>
-
-          {/* Bot Mascot */}
-          <div className="w-[90px] h-[90px] rounded-full ">
-            <Image
-              alt="bot"
-              src="/bot-ai/toggle.gif"
-              width={900}
-              height={680}
-              className="w-[90px] h-[90px] bg-transparent rounded-full"
-              quality={100}
-              loading="eager"
-            />
-          </div>
-          {/* Label Text */}
-          <div className="relative rounded-2xl bg-linear-border-toggle-bot p-[2px]  h-fit w-fit">
-            <div className="bg-linear-background-toggle-bot rounded-2xl size-full py-[6px] px-2 w-fit">
-              <p className="text-white font-normal font-deca text-xs whitespace-nowrap">
-                {dataSetting?.assistant_fmrp ?? "Trợ lý AI Fimo"}
-              </p>
+            {/* Label Text */}
+            <div className="relative rounded-2xl bg-linear-border-toggle-bot p-[2px]  h-fit w-fit">
+              <div className="bg-linear-background-toggle-bot rounded-2xl size-full py-[6px] px-2 w-fit">
+                <p className="text-white font-normal font-deca text-xs whitespace-nowrap">
+                  {dataSetting?.assistant_fmrp ?? "Trợ lý AI Fimo"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+      {/* Hidden preloader image */}
+      <Image
+        alt="preload"
+        src="/bot-ai/toggle.gif"
+        width={900}
+        height={680}
+        className="hidden"
+        loading="eager"
+        onLoad={() => setIsImageLoaded(true)}
+        priority // optional: ưu tiên tải ảnh
+      />
       <BoxChatAI openChatBox={openDrawer} setOpenChatBox={setOpenDrawer} />
     </>
   );
