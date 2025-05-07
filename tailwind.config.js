@@ -12,6 +12,20 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        '10': ['10px', {
+          lineHeight: '12px',
+        }],
+        '11': ['11px', {
+          lineHeight: '14px',
+        }],
+        '13': ['13px', {
+          lineHeight: '18px',
+        }],
+        '15': ['15px', {
+          lineHeight: '22px',
+        }],
+      },
       fontFamily: {
         deca: ["Lexend Deca", "sans-serif"],
       },

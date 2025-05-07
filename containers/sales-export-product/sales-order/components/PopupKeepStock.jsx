@@ -266,15 +266,17 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                 button={
                     <button
                         className={`${props.type == "sales_product" ? "" : "justify-center"
-                            } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                            } group transition-all duration-300 flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-orange-50 text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-orange-500`}
+                        data-tooltip-id="delete-tooltip"
+                        data-tooltip-content={dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
                     >
                         <Box1
                             size={20}
-                            className="group-hover:text-orange-500 group-hover:scale-110 group-hover:shadow-md "
+                            className="group-hover:text-orange-500 transition-all duration-300"
                         />
-                        <p className="pr-4 group-hover:text-orange-500">
+                        {/* <p className="pr-4 group-hover:text-orange-500">
                             {dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
-                        </p>
+                        </p> */}
                     </button>
                 }
             >

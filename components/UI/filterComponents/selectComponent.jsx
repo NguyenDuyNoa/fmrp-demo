@@ -1,11 +1,10 @@
+import CloseXIcon from "@/components/icons/common/CloseXIcon";
+import DropdownFilledIcon from "@/components/icons/common/DropdownFilledIcon";
 import configSelectFillter from "@/configs/configSelectFillter";
 import { SelectCore } from "@/utils/lib/Select";
 import { FaCheck } from "react-icons/fa";
 import { components } from "react-select";
 import { Customscrollbar } from "../common/Customscrollbar";
-import { MenuListClickAll } from "./selectItemComponent";
-import DropdownFilledIcon from "@/components/icons/common/DropdownFilledIcon";
-import CloseXIcon from "@/components/icons/common/CloseXIcon";
 
 export const CustomOption = (props) => {
     return (

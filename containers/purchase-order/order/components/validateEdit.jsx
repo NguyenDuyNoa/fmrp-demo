@@ -1,3 +1,4 @@
+import EditIcon from "@/components/icons/common/EditIcon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
@@ -38,14 +39,11 @@ const Popup_TableValidateEdit = (props) => {
             <PopupCustom
                 title={props.dataLang?.purchase_order_title || "purchase_order_title"}
                 button={
-                    <div onClick={handleClick.bind(this)} className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded">
-                        <BiEdit
-                            size={20}
-                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                    <div onClick={handleClick.bind(this)} className="group rounded-lg p-1 border border-transparent hover:border-[#064E3B] hover:bg-[#064E3B]/10 transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer">
+                        <EditIcon
+                            color="#064E3B"
+                            className="size-5 transition-all duration-300"
                         />
-                        <button type="button">
-                            {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                        </button>
                     </div>
                 }
                 onClickOpen={_ToggleModal.bind(this, true)}

@@ -1,6 +1,7 @@
 import apiDeliveryReceipt from "@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
@@ -10,13 +11,13 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
+import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
@@ -25,6 +26,7 @@ import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranch";
+import { useClientCombobox } from "@/hooks/common/useClients";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
@@ -41,7 +43,6 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import { routerDeliveryReceipt } from "routers/sellingGoods";
 import PopupDetailProduct from "../sales-order/components/PopupDetailProduct";
@@ -49,9 +50,6 @@ import PopupDetail from "./components/PopupDetail";
 import { useDeliveryReceipCombobox } from "./hooks/useDeliveryReceipCombobox";
 import { useDeliveryReceiptFilterbar } from "./hooks/useDeliveryReceiptFilterbar";
 import { useDeliveryReceiptList } from "./hooks/useDeliveryReceiptList";
-import { useClientCombobox } from "@/hooks/common/useClients";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initialState = {
     keySearch: "",
@@ -136,6 +134,13 @@ const DeliveryReceipt = (props) => {
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
     };
+
+    const renderMoneyOrDash = (value) => {
+        return Number(value) === 0
+            ? "-"
+            : <>{formatMoney(value)} <span className="underline">đ</span></>;
+    };  
+
     // excel
     const multiDataSet = [
         {
@@ -380,9 +385,8 @@ const DeliveryReceipt = (props) => {
 
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                <div className="grid grid-cols-5 gap-2">
+                        <div className="w-full items-center flex justify-between">
+                            <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
@@ -445,7 +449,6 @@ const DeliveryReceipt = (props) => {
                                         value={isState.valueDate}
                                         onChange={(e) => queryState({ valueDate: e })}
                                     />
-                                </div>
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex items-center justify-end gap-2">
@@ -470,9 +473,6 @@ const DeliveryReceipt = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -480,34 +480,37 @@ const DeliveryReceipt = (props) => {
                             {/* className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100" */}
                             <div className="w-full">
                                 <HeaderTable gridCols={12}>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "stt"}
+                                    </ColumnTable>
+                                    <ColumnTable textAlign="left">
                                         {dataLang?.delivery_receipt_date || "delivery_receipt_date"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable textAlign="left">
                                         {dataLang?.delivery_receipt_code || "delivery_receipt_code"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center" colSpan={2}>
+                                    <ColumnTable textAlign="left" colSpan={1}>
                                         {dataLang?.price_quote_customer || "price_quote_table_customer"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable textAlign="left" colSpan={1.5}>
                                         {dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable textAlign="left">
                                         {dataLang?.delivery_receipt_OrderNumber || "delivery_receipt_OrderNumber"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable textAlign="left">
                                         {dataLang?.price_quote_into_money || "price_quote_into_money"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable textAlign="left">
                                         {dataLang?.delivery_receipt_Creator || "delivery_receipt_Creator"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable textAlign="left">
                                         {dataLang?.delivery_receipt_BrowseStorekeepers || "delivery_receipt_BrowseStorekeepers"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable textAlign="left">
                                         {dataLang?.price_quote_note || "price_quote_note"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign="center">
+                                    <ColumnTable textAlign="left">
                                         {dataLang?.price_quote_branch || "price_quote_branch"}
                                     </ColumnTable>
                                     <ColumnTable textAlign="center">
@@ -519,9 +522,12 @@ const DeliveryReceipt = (props) => {
                                 ) : data?.rResult?.length > 0 ? (
                                     <>
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                            {data?.rResult?.map((e) => (
+                                            {data?.rResult?.map((e, index) => (
                                                 <RowTable key={e?.id} gridCols={12}>
-                                                    <RowItemTable colSpan={1} textAlign="center">
+                                                    <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                        {index + 1}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign="left">
                                                         {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1}>
@@ -532,25 +538,27 @@ const DeliveryReceipt = (props) => {
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={2} textAlign={"left"}>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         {e.name_client}
                                                     </RowItemTable>
 
-                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    <RowItemTable colSpan={1.5} textAlign={"left"}>
                                                         {e.name_address_delivery}
                                                     </RowItemTable>
-                                                    <PopupDetailProduct
-                                                        dataLang={dataLang}
-                                                        className="text-left"
-                                                        name={
-                                                            <h1 className="col-span-1 3xl:text-[14px] 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] text-[#0BAA2E] bg-[#EBFEF2] hover:bg-[#0BAA2E]/90 hover:text-[#EBFEF2] py-0.5 rounded-2xl border-[#0BAA2E]/5 border  cursor-pointer transition-all ease-in-out duration-200 text-center ">
-                                                                {e?.reference_no_order}
-                                                            </h1>
-                                                        }
-                                                        id={e?.order_id}
-                                                    />
-                                                    <RowItemTable colSpan={1} textAlign={"right"}>
-                                                        {formatMoney(e.grand_total)}
+                                                    <RowItemTable>
+                                                        <PopupDetailProduct
+                                                            dataLang={dataLang}
+                                                            className="text-left"
+                                                            name={
+                                                                <h1 className="col-span-1 3xl:text-[14px] 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] text-[#0BAA2E] bg-[#EBFEF2] hover:bg-[#0BAA2E]/90 hover:text-[#EBFEF2] py-0.5 rounded-2xl border-[#0BAA2E]/5 border  cursor-pointer transition-all ease-in-out duration-200 text-center ">
+                                                                    {e?.reference_no_order}
+                                                                </h1>
+                                                            }
+                                                            id={e?.order_id}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                        {renderMoneyOrDash(e.grand_total)}
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
@@ -599,8 +607,10 @@ const DeliveryReceipt = (props) => {
                                                     <RowItemTable colSpan={1} textAlign={"right"}>
                                                         {e?.note}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="mx-auto w-fit">
-                                                        <TagBranch>{e?.name_branch}</TagBranch>
+                                                    <RowItemTable colSpan={1}>
+                                                        {/* <TagBranch> */}
+                                                            {e?.name_branch}
+                                                            {/* </TagBranch> */}
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
@@ -630,23 +640,24 @@ const DeliveryReceipt = (props) => {
                 showTotal={true}
                 total={
                     <ContainerTotal>
-                        <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
+                        <RowItemTable colSpan={3} textAlign={"end"} className="px-5">
                             {dataLang?.total_outside || "total_outside"}
-                        </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={"right"} className="flex flex-wrap justify-end gap-2 pr-4 ">
-                            {formatMoney(data?.rTotal?.grand_total)}
-                        </ColumnTable>
-                        <div className="flex flex-wrap justify-end col-span-1 gap-2 p-2 text-right">
+                        </RowItemTable>
+                        <RowItemTable colSpan={0.5} textAlign={"left"} className="whitespace-nowrap">
+                            {/* {formatMoney(data?.rTotal?.grand_total)} */}
+                            {renderMoneyOrDash(data?.rTotal?.grand_total)}
+                        </RowItemTable>
+                        {/* <div className="flex flex-wrap justify-end col-span-1 gap-2 p-2 text-right">
                             <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
-                        </div>
+                        </div> */}
                     </ContainerTotal>
                 }
 
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
+                                {/* <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} /> */}
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -655,7 +666,8 @@ const DeliveryReceipt = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
             <PopupConfim

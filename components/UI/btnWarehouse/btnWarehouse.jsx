@@ -54,7 +54,7 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute p-1 mt-1 w-full bg-white rounded-xl z-[999] shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
+        <div className="absolute p-1 mt-1 min-w-[120px] w-fit bg-white rounded-xl z-[999] shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
           <ul className="flex flex-col gap-1">
             <li
               className={`px-1.5 py-2 rounded-lg hover:bg-primary-05 3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] lg:text-[8px] text-[8px] text-neutral-07 font-normal whitespace-nowrap cursor-pointer flex items-center 

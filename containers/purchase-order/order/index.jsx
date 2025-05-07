@@ -1,5 +1,6 @@
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -8,7 +9,7 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, LayOutTableDynamic, } from "@/components/UI/common/layout";
+import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -38,11 +39,10 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
-import PopupDetailThere from "../components/PopupDetailThere";
 import { useOrderFilterbar } from "./hooks/useOrderFilterbar";
 import { useOrderList, useOrderListCode } from "./hooks/useOrderList";
 import { useOrderTypeList } from "./hooks/useOrderTypeList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 
 const initalState = {
     keySearch: "",
@@ -116,6 +116,12 @@ const Order = (props) => {
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
     };
+
+    const renderMoneyOrDash = (value) => {
+        return Number(value) === 0
+            ? "-"
+            : <>{formatMoney(value)} <span className="underline">đ</span></>;
+    };  
 
     const statusMap = {
         "0": "Chưa nhập",
@@ -313,7 +319,7 @@ const Order = (props) => {
                         <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                             Đơn hàng mua (PO)
                         </h2>
-                        <button
+                        <ButtonAddNew
                             onClick={() => {
                                 if (role) {
                                     router.push(routerOrder.form);
@@ -323,11 +329,12 @@ const Order = (props) => {
                                     isShow("warning", WARNING_STATUS_ROLE);
                                 }
                             }}
+                            dataLang={dataLang}
                             type="button"
                             className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
                         >
-                            {dataLang?.btn_new || "btn_new"}
-                        </button>
+                            {/* {dataLang?.btn_new || "btn_new"} */}
+                        </ButtonAddNew>
                     </>
                 }
                 fillterTab={
@@ -352,9 +359,8 @@ const Order = (props) => {
 
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                <div className="grid grid-cols-6 gap-2">
+                        <div className="w-full items-center flex justify-between">
+                            <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
@@ -432,7 +438,6 @@ const Order = (props) => {
                                             onChange={(e) => queryState({ valueDate: e })}
                                         />
                                     </div>
-                                </div>
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex items-center justify-end gap-2">
@@ -457,50 +462,50 @@ const Order = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <Customscrollbar className="h-full overflow-y-auto">
                             <div className="w-full">
-                                <HeaderTable gridCols={12}>
-                                    <ColumnTable colSpan={1} textAlign="center">
+                                <HeaderTable gridCols={13}>
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "STT"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign="left">
                                         {dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.purchase_order_table_code || "purchase_order_table_code"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         Số Kế hoạch
                                         {/* {dataLang?.purchase_order_table_number || "purchase_order_table_number"} */}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.purchase_order_table_total || "purchase_order_table_total"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.purchase_order_note || "purchase_order_note"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}
                                     </ColumnTable>
                                 </HeaderTable>
@@ -508,20 +513,23 @@ const Order = (props) => {
                                     <Loading className="h-80" color="#0f4f9e" />
                                 ) : data?.rResult?.length > 0 ? (
                                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                        {data?.rResult?.map((e) => (
-                                            <RowTable key={e?.id} gridCols={12}>
-                                                <RowItemTable colSpan={1} textAlign="center">
+                                        {data?.rResult?.map((e, index) => (
+                                            <RowTable key={e?.id} gridCols={13}>
+                                                <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                    {index + 1}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={1} textAlign="left">
                                                     {(e?.date != null && e?.date != "0000-00-00") ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1}>
                                                     <PopupDetail
                                                         dataLang={dataLang}
-                                                        className="3xl:text-base 2xl:text-[12.5px] hover:text-blue-600 transition-all ease-in-out xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E]  cursor-pointer"
+                                                        className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                         name={e?.code}
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign="left">
+                                                <RowItemTable colSpan={1.5} textAlign="left">
                                                     {e.supplier_name}
                                                 </RowItemTable>
                                                 <RowItemTable
@@ -560,7 +568,7 @@ const Order = (props) => {
                                                         // : 
                                                         // "KHSX-22052437"
                                                         <React.Fragment key={purchase?.id_plan}>
-                                                            <div className="text-[10px] px-1 col-span-1 text-center items-center justify-center flex flex-wrap text-[#0F4F9E]  transition-all ease-in-out">
+                                                            <div className="3xl:text-sm 2xl:text-xs xl:text-10 text-[9px] px-1 col-span-1 text-center items-center justify-center flex flex-wrap text-[#0F4F9E]  transition-all ease-in-out">
                                                                 {purchase?.reference_no}
                                                             </div>
                                                         </React.Fragment>
@@ -577,14 +585,14 @@ const Order = (props) => {
                                                             </React.Fragment>
                                                         ))} */}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
-                                                    {formatMoney(e.total_price)}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    {renderMoneyOrDash(e.total_price)}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
-                                                    {formatMoney(e.total_tax_price)}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    {renderMoneyOrDash(e.total_tax_price)}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
-                                                    {formatMoney(e.total_amount)}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    {renderMoneyOrDash(e.total_amount)}
                                                 </RowItemTable>
                                                 <RowItemTable
                                                     colSpan={1}
@@ -607,8 +615,10 @@ const Order = (props) => {
                                                 >
                                                     {e.note}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className="mx-auto">
-                                                    <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                <RowItemTable colSpan={1}>
+                                                    {/* <TagBranch className="w-fit"> */}
+                                                        {e?.branch_name}
+                                                    {/* </TagBranch> */}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} className="flex justify-center ">
                                                     <BtnAction
@@ -635,39 +645,36 @@ const Order = (props) => {
 
                 showTotal={true}
                 total={<>
-                    <ContainerTotal>
-                        <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
+                    <ContainerTotal className="!grid-cols-13">
+                        <RowItemTable colSpan={3} textAlign={"end"} className="px-5">
                             {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
-                        </ColumnTable>
-                        <ColumnTable
-                            colSpan={1}
-                            textAlign={"right"}
-                            className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap"
+                        </RowItemTable>
+                        <RowItemTable
+                            colSpan={0.5}
+                            textAlign={"left"}
                         >
-                            {formatMoney(data?.rTotal?.total_price)}
-                        </ColumnTable>
-                        <ColumnTable
-                            colSpan={1}
-                            textAlign={"right"}
-                            className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap "
+                            {renderMoneyOrDash(data?.rTotal?.total_price)}
+                        </RowItemTable>
+                        <RowItemTable
+                            colSpan={0.5}
+                            textAlign={"left"}
                         >
-                            {formatMoney(data?.rTotal?.total_tax_price)}
-                        </ColumnTable>
-                        <ColumnTable
-                            colSpan={1}
-                            textAlign={"right"}
-                            className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap "
+                            {renderMoneyOrDash(data?.rTotal?.total_tax_price)}
+                        </RowItemTable>
+                        <RowItemTable
+                            colSpan={0.5}
+                            textAlign={"left"}
                         >
-                            {formatMoney(data?.rTotal?.total_amount)}
-                        </ColumnTable>
+                            {renderMoneyOrDash(data?.rTotal?.total_amount)}
+                        </RowItemTable>
                     </ContainerTotal>
                 </>}
 
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
+                                {/* <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} /> */}
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -676,7 +683,9 @@ const Order = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
         </React.Fragment>
