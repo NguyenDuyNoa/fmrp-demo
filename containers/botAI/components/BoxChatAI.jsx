@@ -39,6 +39,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
     const dispatch = useDispatch();
     const hasFetchedFirstMessage = useRef(false);
     const [isAnimationCompleted, setAnimationCompleted] = useState(false);
+    console.log("🚀 ~ BoxChatAI ~ isAnimationCompleted:", isAnimationCompleted);
     const [isLoadingGeneraAnswer, setIsLoadingGeneraAnswer] = useState(false);
     const [optionSelectAnswer, setOptionSelectAnswer] = useState([]);
     const [resultDataChatBot, setResultDataChatBot] = useState(false);
@@ -319,9 +320,8 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                         setProductAnalysis(res);
                         setTimeout(() => {
                             dispatch({ type: "chatbot/reset" });
-
                             setResultDataChatBot(true);
-                        }, 6000);
+                        }, 10000);
                     }
                 } catch (err) {
                     setResultDataChatBot(false);
@@ -370,7 +370,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
             onClose={() => setOpenChatBox(false)}
             open={openChatBox}
             styles={drawerStyles}
-            width={720}
+            width={820}
             closable={false}
             className="!bg-opacity-90 !bg-[#ffffff]"
             headerStyle={{
@@ -420,7 +420,12 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                 </div>
             }
         >
-            <div className="space-y-6 min-h-full  w-full flex flex-col items-start justify-end pb-3">
+            <div
+                className={twMerge(
+                    "space-y-6 min-h-full  w-full flex flex-col items-start",
+                    resultDataChatBot ? " justify-center" : "justify-end"
+                )}
+            >
                 <AnimatePresence mode="sync">
                     {messenger.map((msg, index) => (
                         <Messenger
@@ -429,6 +434,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                             isLoading={msg.isPending}
                             onAnimationComplete={() => {
                                 const isLast = index === messenger.length - 1;
+
                                 if (isLast && options?.type === "radio") {
                                     setAnimationCompleted(true);
                                 }
@@ -439,6 +445,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                             }}
                             ResponseAI={msg?.hasResponse ? response : null}
                             options={options}
+                            isAnimationCompleted={isAnimationCompleted}
                         >
                             {msg.text}
                         </Messenger>
@@ -481,14 +488,14 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                             <Messenger isLoading={true} />
                         </div>
                     )}
-                    {resultDataChatBot && (
-                        <ResultChatBot
-                            productAnalysis={productAnalysis}
-                            onRedirect={onRedirect}
-                            onRetry={onRetry}
-                        />
-                    )}
                 </AnimatePresence>
+                {resultDataChatBot && (
+                    <ResultChatBot
+                        productAnalysis={productAnalysis}
+                        onRedirect={onRedirect}
+                        onRetry={onRetry}
+                    />
+                )}
             </div>
         </Drawer>
     );

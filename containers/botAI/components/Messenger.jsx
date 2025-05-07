@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import LoadingThreeDotsJumping from "./LoadingThreeDotsJumping";
 import AvatarBotAI from "./AvatarBotAI";
@@ -17,11 +17,20 @@ const Messenger = ({
     options,
     icon,
     nextText = false,
+    isAnimationCompleted,
 }) => {
     const parsedMessage = useMemo(() => {
         if (!children) return null;
         return parse(children);
     }, [children]);
+
+    
+    const [showTable, setShowTable] = useState(false);
+    useEffect(() => {
+        if (isAnimationCompleted) {
+            setShowTable(true);
+        }
+    }, [isAnimationCompleted]);
 
     return (
         <div
@@ -87,10 +96,15 @@ const Messenger = ({
                                     {parsedMessage}
                                 </AnimatedGeneraText>
                             </div>
-                            {ResponseAI && (
+                            {ResponseAI && showTable && (
                                 <div className="mt-4 w-full">
                                     {ResponseAI?.stages.length > 0 && (
-                                        <div className="flex flex-col gap-y-2">
+                                        <motion.div
+                                            className="flex flex-col gap-y-2"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.5, ease: "easeOut" }}
+                                        >
                                             <p className="font-deca text-base  font-normal text-typo-black-6">
                                                 🔁 Công đoạn sản xuất
                                             </p>
@@ -110,14 +124,20 @@ const Messenger = ({
                                                     </p>
                                                 </div>
                                             ))}
-                                        </div>
+                                        </motion.div>
                                     )}
 
-                                    <TableBOM
-                                        materialsPrimary={ResponseAI.materialsPrimary ?? []}
-                                        semiProducts={ResponseAI.semiProducts ?? []}
-                                        stages={ResponseAI.stages}
-                                    />
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.5, ease: "easeOut" }}
+                                    >
+                                        <TableBOM
+                                            materialsPrimary={ResponseAI.materialsPrimary ?? []}
+                                            semiProducts={ResponseAI.semiProducts ?? []}
+                                            stages={ResponseAI.stages}
+                                        />
+                                    </motion.div>
 
                                     {options.messageOptions && (
                                         <p className="font-deca font-normal text-base text-[#303030] mt-6">

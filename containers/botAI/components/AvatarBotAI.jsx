@@ -7,7 +7,7 @@ const AvatarBotAI = ({ className, classNameDot }) => {
         <div className="relative w-fit">
             <div
                 className={twMerge(
-                    "relative size-12 aspect-1 rounded-full bg-white shrink-0 overflow-hidden",
+                    "relative size-12 aspect-1 rounded-full bg-transparent shrink-0 overflow-hidden",
                     className
                 )}
             >
@@ -17,7 +17,8 @@ const AvatarBotAI = ({ className, classNameDot }) => {
                     width={80}
                     height={80}
                     className="size-full object-cover"
-                // quality={100}
+                    // quality={100}
+                    priority
                 />
             </div>
             <div

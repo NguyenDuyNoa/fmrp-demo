@@ -17,7 +17,7 @@ const TableBOM = ({ materialsPrimary, semiProducts, stages = [] }) => {
 
             <div className="overflow-x-auto rounded-xl border">
                 <table className="min-w-full text-sm text-left border-collapse bg-[#919EAB] bg-opacity-10">
-                    <thead className="bg-[#EBF5FF] text-[#141522]  text-[10px]">
+                    <thead className="bg-[#EBF5FF] text-[#141522]  xs:text-xs text-[8px]">
                         <tr>
                             <th className="px-1 py-2 text-center w-[5%] font-deca font-medium">
                                 STT
@@ -94,11 +94,11 @@ const TableBOM = ({ materialsPrimary, semiProducts, stages = [] }) => {
                                                                     : "h-[80%]"
                                                             )}
                                                         />
-                                                        <table className="min-w-full text-[10px] border-separate border-spacing-y-[2px] pr-2">
+                                                        <table className="min-w-full text-[10px] border-separate border-spacing-y-[2px] xs:pr-2">
                                                             <tbody>
                                                                 {item.materials.map((materialItem, index) => (
                                                                     <tr className="relative" key={index}>
-                                                                        <td className="w-[5%] relative z-0">
+                                                                        <td className="xs:w-[5%] relative z-0 w-[12%]">
                                                                             {item.materials.length - 1 !== index && (
                                                                                 <div className="absolute left-3 bottom-5 h-full w-full border-l-2 border-b-2 rounded-bl-lg border-[#C7C7CC]" />
                                                                             )}

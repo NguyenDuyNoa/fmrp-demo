@@ -14,7 +14,7 @@ const SelectAnswer = ({
     return (
         <div
             className={twMerge(
-                "group  rounded-xl border border-[#919EAB] border-opacity-20 py-4 px-3 flex flex-row justify-between min-w-[370px] cursor-pointer bg-[#FFFFFF] text-[#25387A]",
+                "group  rounded-xl border border-[#919EAB] border-opacity-20 py-4 px-3 flex flex-row justify-between xs:min-w-[370px] min-w-full w-full cursor-pointer bg-[#FFFFFF] text-[#25387A]",
                 typeAnswer === 1
                     ? "hover:border-typo-green-3 hover:text-typo-green-3 "
                     : "hover:border-typo-red-1 hover:text-typo-red-1",
@@ -39,7 +39,7 @@ const SelectAnswer = ({
                 {icon}
                 <p
                     className={twMerge(
-                        "font-deca text-sm  font-normal ",
+                        "font-deca xs:text-sm font-normal text-xs",
                         typeAnswer === 1
                             ? "group-hover:text-typo-green-3"
                             : "group-hover:text-typo-red-1"
