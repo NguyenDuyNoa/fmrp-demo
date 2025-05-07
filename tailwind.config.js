@@ -179,6 +179,8 @@ module.exports = {
           "linear-gradient(49.59deg, #E0FFCC 0%, #CCFFEC 100%)",
         "linear-background-toggle-bot":
           "linear-gradient(155.11deg, #1FC583 0%, #1F9285 100%)",
+        "linear-background-button-chat":
+          "linear-gradient(170.14deg, #1FC583 5.11%, #1F9285 95.28%)",
       },
     },
   },
