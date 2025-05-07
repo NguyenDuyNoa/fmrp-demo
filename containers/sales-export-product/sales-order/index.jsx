@@ -1,6 +1,7 @@
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { BtnStatusApproved } from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
@@ -14,19 +15,14 @@ import {
   RowItemTable,
   RowTable,
 } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
   TagColorLime,
   TagColorOrange,
   TagColorSky,
 } from "@/components/UI/common/Tag/TagStatus";
 import {
-  Container,
-  ContainerBody,
-  ContainerFilterTab,
-  ContainerTable,
   ContainerTotal,
-  LayOutTableDynamic,
+  LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -72,7 +68,6 @@ import PopupDetailProduct from "./components/PopupDetailProduct";
 import { useSalesOrderCombobox } from "./hooks/useSalesOrderCombobox";
 import { useSalesOrderFilterbar } from "./hooks/useSalesOrderFilterbar";
 import { useSalesOrderList } from "./hooks/useSalesOrderList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 registerLocale("vi", vi);
 
 const initialValue = {
@@ -458,88 +453,84 @@ const SalesOrder = (props) => {
         }
         table={
           <div className="flex flex-col h-full">
-            <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-              <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                <div className="grid grid-cols-5 gap-2">
-                  <div className="col-span-1">
-                    <SearchComponent
-                      dataLang={dataLang}
-                      onChange={handleOnChangeKeySearch}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <SelectComponent
-                      options={[
-                        {
-                          value: "",
-                          label:
-                            dataLang?.price_quote_branch ||
-                            "price_quote_branch",
-                          isDisabled: true,
-                        },
-                        ...dataBranch,
-                      ]}
-                      onChange={onChangeFilter("idBranch")}
-                      value={valueChange.idBranch}
-                      placeholder={
-                        dataLang?.price_quote_branch || "price_quote_branch"
-                      }
-                      isClearable={true}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <SelectComponent
-                      isLoading={dataCode == [] ? true : false}
-                      options={[
-                        {
-                          value: "",
-                          label:
-                            dataLang?.sales_product_code ||
-                            "sales_product_code",
-                          isDisabled: true,
-                        },
-                        ...dataCode,
-                      ]}
-                      onChange={onChangeFilter("idQuoteCode")}
-                      onInputChange={(e) => {
-                        handleSearchApiOrders(e);
-                      }}
-                      value={valueChange.idQuoteCode}
-                      placeholder={
-                        dataLang?.sales_product_code || "sales_product_code"
-                      }
-                      isClearable={true}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <SelectComponent
-                      options={[
-                        {
-                          value: "",
-                          label:
-                            dataLang?.price_quote_customer ||
-                            "price_quote_customer",
-                          isDisabled: true,
-                        },
-                        ...dataClient,
-                      ]}
-                      onInputChange={(e) => {
-                        handleSearchApi(e);
-                      }}
-                      onChange={onChangeFilter("idCustomer")}
-                      value={valueChange.idCustomer}
-                      placeholder={
-                        dataLang?.price_quote_customer || "price_quote_customer"
-                      }
-                      isClearable={true}
-                    />
-                  </div>
-                  <div className="z-20 col-span-1">
-                    <DateToDateComponent
-                      value={valueChange.valueDate}
-                      onChange={onChangeFilter("valueDate")}
-                    />
-                  </div>
+            <div className="w-full items-center flex justify-between">
+              <div className="flex gap-3 items-center w-full">
+                <div className="col-span-1">
+                  <SearchComponent
+                    dataLang={dataLang}
+                    onChange={handleOnChangeKeySearch}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <SelectComponent
+                    options={[
+                      {
+                        value: "",
+                        label:
+                          dataLang?.price_quote_branch || "price_quote_branch",
+                        isDisabled: true,
+                      },
+                      ...dataBranch,
+                    ]}
+                    onChange={onChangeFilter("idBranch")}
+                    value={valueChange.idBranch}
+                    placeholder={
+                      dataLang?.price_quote_branch || "price_quote_branch"
+                    }
+                    isClearable={true}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <SelectComponent
+                    isLoading={dataCode == [] ? true : false}
+                    options={[
+                      {
+                        value: "",
+                        label:
+                          dataLang?.sales_product_code || "sales_product_code",
+                        isDisabled: true,
+                      },
+                      ...dataCode,
+                    ]}
+                    onChange={onChangeFilter("idQuoteCode")}
+                    onInputChange={(e) => {
+                      handleSearchApiOrders(e);
+                    }}
+                    value={valueChange.idQuoteCode}
+                    placeholder={
+                      dataLang?.sales_product_code || "sales_product_code"
+                    }
+                    isClearable={true}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <SelectComponent
+                    options={[
+                      {
+                        value: "",
+                        label:
+                          dataLang?.price_quote_customer ||
+                          "price_quote_customer",
+                        isDisabled: true,
+                      },
+                      ...dataClient,
+                    ]}
+                    onInputChange={(e) => {
+                      handleSearchApi(e);
+                    }}
+                    onChange={onChangeFilter("idCustomer")}
+                    value={valueChange.idCustomer}
+                    placeholder={
+                      dataLang?.price_quote_customer || "price_quote_customer"
+                    }
+                    isClearable={true}
+                  />
+                </div>
+                <div className="z-20 col-span-1">
+                  <DateToDateComponent
+                    value={valueChange.valueDate}
+                    onChange={onChangeFilter("valueDate")}
+                  />
                 </div>
               </div>
               <div className="col-span-1 xl:col-span-2 lg:col-span-2">
@@ -571,33 +562,30 @@ const SalesOrder = (props) => {
                       <span>{dataLang?.client_list_exportexcel}</span>
                     </button>
                   )}
-                  <div>
-                    <DropdowLimit
-                      sLimit={sLimit}
-                      limit={limit}
-                      dataLang={dataLang}
-                    />
-                  </div>
+                  <div></div>
                 </div>
               </div>
             </div>
             <Customscrollbar className="h-full overflow-y-auto ">
               <div className="w-full">
                 <HeaderTable gridCols={13}>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={0.5} textAlign={"center"}>
+                    {dataLang?.stt || "STT"}
+                  </ColumnTable>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.sales_product_date || "sales_product_date"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.sales_product_code || "sales_product_code"}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"left"}>
+                  <ColumnTable colSpan={1.5} textAlign={"left"}>
                     {dataLang?.customer || "customer"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
                     {dataLang?.sales_product_type_order ||
                       "sales_product_type_order"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.sales_product_total_into_money ||
                       "sales_product_total_into_money"}
                   </ColumnTable>
@@ -608,7 +596,7 @@ const SalesOrder = (props) => {
                     {dataLang?.sales_product_statusTT ||
                       "sales_product_statusTT"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.branch || "branch"}
                   </ColumnTable>
                   <ColumnTable colSpan={3} textAlign={"center"}>
@@ -625,10 +613,13 @@ const SalesOrder = (props) => {
                 ) : data?.rResult?.length > 0 ? (
                   <>
                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                      {data?.rResult?.map((e) => (
+                      {data?.rResult?.map((e, index) => (
                         <>
                           <RowTable gridCols={13} key={e.id.toString()}>
-                            <RowItemTable colSpan={1} textAlign="center">
+                            <RowItemTable colSpan={0.5} textAlign={"center"}>
+                              {index + 1}
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign="left">
                               {e?.date != null
                                 ? formatMoment(
                                     e?.date,
@@ -636,7 +627,7 @@ const SalesOrder = (props) => {
                                   )
                                 : ""}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} textAlign={"center"}>
+                            <RowItemTable colSpan={1} textAlign={"left"}>
                               <PopupDetailProduct
                                 dataLang={dataLang}
                                 className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
@@ -644,7 +635,7 @@ const SalesOrder = (props) => {
                                 id={e?.id}
                               />
                             </RowItemTable>
-                            <RowItemTable colSpan={2} textAlign="left">
+                            <RowItemTable colSpan={1.5} textAlign="left">
                               {e?.client_name}
                             </RowItemTable>
                             {/* fix */}
@@ -669,8 +660,8 @@ const SalesOrder = (props) => {
                                 </div>
                               )}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} textAlign={"right"}>
-                              {formatNumber(e.total_amount)}
+                            <RowItemTable colSpan={1} textAlign={"left"}>
+                              {formatNumber(e.total_amount)} <span className="underline">đ</span>
                             </RowItemTable>
 
                             <RowItemTable colSpan={1} textAlign={"center"}>
@@ -740,8 +731,10 @@ const SalesOrder = (props) => {
                                   />
                                 ))}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} className="mx-auto w-fit">
-                              <TagBranch>{e?.branch_name}</TagBranch>
+                            <RowItemTable colSpan={1}>
+                              {/* <TagBranch> */}
+                                {e?.branch_name}
+                                {/* </TagBranch> */}
                             </RowItemTable>
 
                             <RowItemTable colSpan={3}>
@@ -882,13 +875,13 @@ const SalesOrder = (props) => {
           </div>
         }
         pagination={
-          <>
+          <div className="flex items-center justify-between gap-2">
             {data?.rResult?.length != 0 && (
               <ContainerPagination>
-                <TitlePagination
+                {/* <TitlePagination
                   dataLang={dataLang}
                   totalItems={data?.output?.iTotalDisplayRecords}
-                />
+                /> */}
                 <Pagination
                   postsPerPage={limit}
                   totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -897,16 +890,17 @@ const SalesOrder = (props) => {
                 />
               </ContainerPagination>
             )}
-          </>
+            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+          </div>
         }
         total={
           <>
             <ContainerTotal className={"grid-cols-13"}>
-              <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
+              <ColumnTable colSpan={2.5} textAlign={"end"} className="p-2">
                 {dataLang?.total_outside || "total_outside"}
               </ColumnTable>
-              <ColumnTable colSpan={1} textAlign={"right"} className="">
-                {formatNumber(data?.rTotal?.total_amount)}
+              <ColumnTable colSpan={0.5} textAlign={"left"} className="whitespace-nowrap">
+                {formatNumber(data?.rTotal?.total_amount)} <span className="underline">đ</span>
               </ColumnTable>
             </ContainerTotal>
           </>

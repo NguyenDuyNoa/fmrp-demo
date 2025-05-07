@@ -28,30 +28,30 @@ const TagColorProduct = ({ dataLang, dataKey, name, className, lang = true, text
 }
 
 const TagColorSky = ({ name, className }) => {
-    return <span className={`${className} font-normal 3xl:text-sm 2xl:text-xs xl:text-[10px] text-[8px] text-[#C25705] bg-[#FF811A26] rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit`}>
+    return <span className={`${className} font-normal 3xl:text-sm 2xl:text-13 xl:text-xs text-11 text-[#C25705] bg-[#FF811A26] rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit`}>
         {name}
     </span>
 }
 
 const TagColorOrange = ({ name, className, ...props }) => {
-    return <span {...props} className={`${className} text-center font-normal 3xl:text-[11px] 2xl:text-[9px] xl:text-[7.5px] text-[7px] text-[#1A7526] bg-[#35BD4B33] rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit`}>
+    return <span {...props} className={`${className} text-center font-normal 3xl:text-sm 2xl:text-13 xl:text-xs text-11 text-[#1A7526] bg-[#35BD4B33] rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit`}>
         {name}
     </span>
 }
 
 const TagColorLime = ({ name, className }) => {
-    return <span className={`${className} flex 3xl:text-[11px] 2xl:text-[9px] xl:text-[7.5px] text-[7px] items-center gap-1 font-normal text-[#1A7526] bg-[#35BD4B33] rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit`}>
-        <TickCircle
+    return <span className={`${className} flex 3xl:text-sm 2xl:text-13 xl:text-xs text-11 items-center gap-1 font-normal text-[#1A7526] bg-[#35BD4B33] rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit`}>
+        {/* <TickCircle
             className="rounded-full bg-lime-500"
             color="white"
             size={15}
-        />
+        /> */}
         {name}
     </span>
 }
 
 const TagColorRed = ({ name, className }) => {
-    return <span className={`${className} font-normal 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] text-[7px] text-red-500 rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit bg-red-200`}>
+    return <span className={`${className} font-normal 3xl:text-sm 2xl:text-13 xl:text-xs text-11 text-red-500 rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit bg-red-200`}>
         {name}
     </span>
 }
@@ -62,7 +62,7 @@ const TagColorMore = ({ name, className, backgroundColor, color }) => {
             backgroundColor: backgroundColor,
             color: color
         }}
-        className={`${className} font-normal 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] text-[7px] rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit `}>
+        className={`${className} font-normal 3xl:text-sm 2xl:text-13 xl:text-xs text-11 rounded py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit `}>
         {name}
     </span>
 }

@@ -229,10 +229,13 @@ const PopupDetailKeepStock = (props) => {
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={""}
                 button={
-                    <button className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                    <button className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-amber-50 text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-amber-500"
+                        data-tooltip-id="delete-tooltip"
+                        data-tooltip-content={dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
+                    >
                         <BoxSearch
                             size={20}
-                            className="group-hover:text-amber-500 group-hover:scale-110 group-hover:shadow-md "
+                            className="group-hover:text-amber-500 transition-all duration-300"
                         />
                         <p className="group-hover:text-amber-500 pr-2.5">
                             {dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}

@@ -26,7 +26,7 @@ export const RowItemTable = ({
       //     : "3xl:text-base 2xl:text-[14px] xl:text-[13.5px]  text-[11.5px]  font-medium  text-wrap"
       //   } `}
       className={twMerge(
-        "2xl:text-[14px] xl:text-[13.5px] text-[11.5px] font-semibold text-wrap py-2 px-3",
+        "3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-semibold text-wrap py-2 px-3",
         textSize,
         className
       )}
