@@ -9,7 +9,7 @@ import LoadingThreeDotsJumping from "./LoadingThreeDotsJumping";
 import AnimatedGeneraEachWord from "@/components/animations/animation/AnimatedGeneraEachWord";
 import AnimatedGeneraText from "@/components/animations/animation/AnimatedGeneraText";
 
-const ToggleBotAI = () => {
+const ToggleBotAI = ({ dataLang }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [showText, setShowText] = useState(false);
@@ -110,8 +110,11 @@ const ToggleBotAI = () => {
                           className="text-[#064E3B] px-3 py-3 rounded-l-xl rounded-tr-xl bg-[#EBFEF2] border border-[#064E3B] shadow-md"
                           classNameWrapper="rounded-l-xl rounded-tr-xl"
                         >
-                          Xin chào,{dataSetting?.assistant_fmrp_short ?? "Fimo"}
-                          có thể hỗ trợ gì cho bạn?
+                          {dataLang?.S_message_chat_bot_hello ||
+                            "S_message_chat_bot_hello"}
+                          ,{dataSetting?.assistant_fmrp_short ?? "Fimo"}
+                          {dataLang?.S_message_chat_bot_quest ||
+                            "S_message_chat_bot_quest"}
                         </AnimatedGeneraEachWord>
                       ) : (
                         <motion.div
@@ -169,7 +172,12 @@ const ToggleBotAI = () => {
         onLoad={() => setIsImageLoaded(true)}
         priority // optional: ưu tiên tải ảnh
       />
-      <BoxChatAI openChatBox={openDrawer} setOpenChatBox={setOpenDrawer} />
+      <BoxChatAI
+        openChatBox={openDrawer}
+        setOpenChatBox={setOpenDrawer}
+        dataLang={dataLang}
+        dataSetting={dataSetting}
+      />
     </>
   );
 };
