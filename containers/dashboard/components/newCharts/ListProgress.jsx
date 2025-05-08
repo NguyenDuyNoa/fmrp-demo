@@ -101,7 +101,7 @@ const ListProgress = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-8">
-          {productProgress.map((item, index) => (
+          {productProgress?.map((item, index) => (
             <ProgressItem
               key={index}
               name={item.name_category}

@@ -18,13 +18,14 @@ const Messenger = ({
     icon,
     nextText = false,
     isAnimationCompleted,
+    botName,
+    dataLang,
 }) => {
     const parsedMessage = useMemo(() => {
         if (!children) return null;
         return parse(children);
     }, [children]);
 
-    
     const [showTable, setShowTable] = useState(false);
     useEffect(() => {
         if (isAnimationCompleted) {
@@ -55,11 +56,11 @@ const Messenger = ({
                 {!isMe && (
                     <div className="flex flex-row items-center gap-x-[6px]">
                         <span className="font-semibold font-deca text-typo-black-5 text-sm">
-                            Fimo
+                            {botName ?? "Fimo"}
                         </span>
                         <div className="h-[10px] w-[1px] bg-[#E5E5EA]" />
                         <span className="text-sm font-deca font-normal text-typo-gray-7">
-                            Trợ lý AI
+                            {dataLang?.S_bot_chat ?? "Trợ lý AI"}
                         </span>
                     </div>
                 )}

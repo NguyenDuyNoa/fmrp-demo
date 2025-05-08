@@ -33,13 +33,12 @@ const drawerStyles = {
     },
 };
 
-const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
+const BoxChatAI = ({ openChatBox, setOpenChatBox, dataLang, dataSetting }) => {
     const endRef = useRef(null);
     const router = useRouter();
     const dispatch = useDispatch();
     const hasFetchedFirstMessage = useRef(false);
     const [isAnimationCompleted, setAnimationCompleted] = useState(false);
-    console.log("🚀 ~ BoxChatAI ~ isAnimationCompleted:", isAnimationCompleted);
     const [isLoadingGeneraAnswer, setIsLoadingGeneraAnswer] = useState(false);
     const [optionSelectAnswer, setOptionSelectAnswer] = useState([]);
     const [resultDataChatBot, setResultDataChatBot] = useState(false);
@@ -69,7 +68,9 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
             dispatch({
                 type: "chatbot/addAiMessageOnly",
                 payload: {
-                    text: "Vui lòng chọn một trong các lựa chọn bên dưới để tiếp tục.",
+                    text:
+                        dataLang?.S_message_warning_select_option_bot ||
+                        "S_message_warning_select_option_bot",
                     hasResponse: false,
                 },
             });
@@ -82,7 +83,9 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
             dispatch({
                 type: "chatbot/addAiMessageOnly",
                 payload: {
-                    text: "Vui lòng đợi AI khởi tạo dữ liệu",
+                    text:
+                        dataLang?.S_message_waiting_genera_data_bot ||
+                        "S_message_waiting_genera_data_bot",
                     hasResponse: false,
                 },
             });
@@ -209,7 +212,8 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
     };
 
     const onRedirect = () => {
-        setOpenChatBox(false);
+        // setOpenChatBox(false);
+        dispatch({ type: "chatbot/openBoxChatAi", payload: false });
         router.push("/products");
     };
 
@@ -354,20 +358,26 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                     <div className="flex items-center gap-3 ">
                         <AvatarBotAI />
                         <p className="text-xl font-semibold text-typo-blue-5 font-deca">
-                            Trợ lý AI Fimo
+                            {dataSetting?.assistant_fmrp ?? "Trợ lý AI Fimo"}
                         </p>
                     </div>
 
                     <button
                         className="!bg-white p-1 rounded-full shadow hover:bg-gray-100"
-                        onClick={() => setOpenChatBox(false)}
+                        // onClick={() => setOpenChatBox(false)}
+                        onClick={() =>
+                            dispatch({ type: "chatbot/openBoxChatAi", payload: false })
+                        }
                     >
                         <IoClose />
                     </button>
                 </div>
             }
             placement="right"
-            onClose={() => setOpenChatBox(false)}
+            // onClose={() => setOpenChatBox(false)}
+            onClose={() =>
+                dispatch({ type: "chatbot/openBoxChatAi", payload: false })
+            }
             open={openChatBox}
             styles={drawerStyles}
             width={820}
@@ -383,20 +393,21 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                 borderTop: "none",
                 padding: "0px 0px",
             }}
+            zIndex={9999}
             footer={
                 <div className="px-6 pb-6 pt-2">
                     <div className="rounded-xl p-5 bg-linear-background-chat space-y-3">
                         <div className="text-typo-blue-5 font-medium text-base flex flex-row items-center gap-x-2">
                             <PiSparkleBold />
                             <p className="text-typo-black-4 font-deca text-base">
-                                Xây dựng nhà xưởng xịn hơn cùng Fimo
+                                {dataLang?.S_title_input_bot_chat || "S_title_input_bot_chat"}
                             </p>
                         </div>
                         <div className="relative w-full">
                             <TextArea
                                 value={textUser}
                                 onChange={(e) => setTextUser(e?.target?.value)}
-                                placeholder="VD: Tàu hủ tươi 500g, Áo sơ mi tay dài size S,…"
+                                placeholder={dataLang?.S_placehoder_input_bot_chat}
                                 autoSize={{ minRows: 5, maxRows: 6 }}
                                 className="w-full placeholder:font-deca font-deca font-normal text-sm text-[#1C252E]"
                             // disabled={options.required && options.type === "radio"}
@@ -446,6 +457,8 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                             ResponseAI={msg?.hasResponse ? response : null}
                             options={options}
                             isAnimationCompleted={isAnimationCompleted}
+                            botName={dataSetting?.assistant_fmrp_short ?? "Fimo"}
+                            dataLang={dataLang}
                         >
                             {msg.text}
                         </Messenger>
@@ -478,14 +491,21 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                                 isLoading={false}
                                 icon={<LoadingDataChatBot />}
                                 nextText={true}
+                                botName={dataSetting?.assistant_fmrp_short ?? "Fimo"}
+                                dataLang={dataLang}
                             >
-                                Dữ liệu đang được khởi tạo, vui lòng không tắt pop-up...
+                                {dataLang?.S_message_loading_import_data_bot ||
+                                    "S_message_loading_import_data_bot"}
                             </Messenger>
                         )}
                     <div key="end-marker" ref={endRef} />
                     {isLoadingGeneraAnswer && (
                         <div>
-                            <Messenger isLoading={true} />
+                            <Messenger
+                                isLoading={true}
+                                botName={dataSetting?.assistant_fmrp_short ?? "Fimo"}
+                                dataLang={dataLang}
+                            />
                         </div>
                     )}
                 </AnimatePresence>
@@ -494,6 +514,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox }) => {
                         productAnalysis={productAnalysis}
                         onRedirect={onRedirect}
                         onRetry={onRetry}
+                        dataLang={dataLang}
                     />
                 )}
             </div>

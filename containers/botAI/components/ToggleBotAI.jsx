@@ -8,15 +8,20 @@ import BoxChatAI from "./BoxChatAI";
 import LoadingThreeDotsJumping from "./LoadingThreeDotsJumping";
 import AnimatedGeneraEachWord from "@/components/animations/animation/AnimatedGeneraEachWord";
 import AnimatedGeneraText from "@/components/animations/animation/AnimatedGeneraText";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
-const ToggleBotAI = () => {
-  const [openDrawer, setOpenDrawer] = useState(false);
+const ToggleBotAI = ({ dataLang }) => {
+  // const [openDrawer, setOpenDrawer] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [showText, setShowText] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const timeoutRef = useRef(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const { data: dataSetting, isLoading } = useSettingApp();
+
+  const dispatch = useDispatch();
+  const openDrawer = useSelector((state) => state.stateBoxChatAi.open);
 
   useEffect(() => {
     let interval;
@@ -53,10 +58,14 @@ const ToggleBotAI = () => {
 
   return (
     <>
+    {/* toggle */}
       {isImageLoaded && (
         <div
           className="fixed bottom-6 right-6 z-50 cursor-pointer"
-          onClick={() => setOpenDrawer(true)}
+          // onClick={() => setOpenDrawer(true)}
+          onClick={() =>
+            dispatch({ type: "chatbot/openBoxChatAi", payload: true })
+          }
           onMouseEnter={() => {
             // xử lý hover toggle
             setIsHovering(true);
@@ -110,8 +119,11 @@ const ToggleBotAI = () => {
                           className="text-[#064E3B] px-3 py-3 rounded-l-xl rounded-tr-xl bg-[#EBFEF2] border border-[#064E3B] shadow-md"
                           classNameWrapper="rounded-l-xl rounded-tr-xl"
                         >
-                          Xin chào,{dataSetting?.assistant_fmrp_short ?? "Fimo"}
-                          có thể hỗ trợ gì cho bạn?
+                          {dataLang?.S_message_chat_bot_hello ||
+                            "S_message_chat_bot_hello"}
+                          ,{dataSetting?.assistant_fmrp_short ?? "Fimo"}
+                          {dataLang?.S_message_chat_bot_quest ||
+                            "S_message_chat_bot_quest"}
                         </AnimatedGeneraEachWord>
                       ) : (
                         <motion.div
@@ -169,7 +181,13 @@ const ToggleBotAI = () => {
         onLoad={() => setIsImageLoaded(true)}
         priority // optional: ưu tiên tải ảnh
       />
-      <BoxChatAI openChatBox={openDrawer} setOpenChatBox={setOpenDrawer} />
+      {/* drawer */}
+      <BoxChatAI
+        openChatBox={openDrawer}
+        // setOpenChatBox={setOpenDrawer}
+        dataLang={dataLang}
+        dataSetting={dataSetting}
+      />
     </>
   );
 };
