@@ -73,12 +73,12 @@ const TableBOM = ({ materialsPrimary, semiProducts, stages = [] }) => {
                                                     : " - "}
                                             </td>
                                             <td className="px-1  py-2 font-normal font-deca text-xs text-[#637381]">
-                                                {item.stages.length > 0
-                                                    ? item.stages[0].name
-                                                    : findNameStepSemiProducts({
+                                                {stages.length > 0
+                                                    ? findNameStepSemiProducts({
                                                         value: item.step,
                                                         stages,
-                                                    })}
+                                                    })
+                                                    : " "}
                                             </td>
                                         </tr>
                                         {/* bảng con */}

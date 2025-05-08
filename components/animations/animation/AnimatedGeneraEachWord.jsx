@@ -81,7 +81,7 @@ const AnimatedGeneraEachWord = ({
                     // animate="visible"
                     // custom={i}
                     >
-                        {word}
+                        {word === "Fimo" ? <b>{word}</b> : word}
                     </motion.span>
                 ))}
 

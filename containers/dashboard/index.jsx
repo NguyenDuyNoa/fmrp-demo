@@ -21,6 +21,7 @@ import ListMaterial from "./components/newCharts/ListMaterial";
 import ToggleBotAI from "../botAI/components/ToggleBotAI";
 
 const Dashboard = (props) => {
+  const { dataLang } = props
   const dispatch = useDispatch();
   const dataPstWH = useSelector((state) => state.statusUser);
   const statusExprired = useStatusExprired();
@@ -56,7 +57,7 @@ const Dashboard = (props) => {
         </div>
 
         <div className="fixed bottom-6 right-6 z-[9999]">
-          <ToggleBotAI />
+          <ToggleBotAI dataLang={dataLang} />
         </div>
       </div>
 
