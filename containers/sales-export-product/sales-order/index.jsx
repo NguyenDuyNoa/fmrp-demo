@@ -22,7 +22,7 @@ import {
 } from "@/components/UI/common/Tag/TagStatus";
 import {
   ContainerTotal,
-  LayOutTableDynamic
+  LayOutTableDynamic,
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -68,6 +68,7 @@ import PopupDetailProduct from "./components/PopupDetailProduct";
 import { useSalesOrderCombobox } from "./hooks/useSalesOrderCombobox";
 import { useSalesOrderFilterbar } from "./hooks/useSalesOrderFilterbar";
 import { useSalesOrderList } from "./hooks/useSalesOrderList";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 registerLocale("vi", vi);
 
 const initialValue = {
@@ -103,7 +104,7 @@ const SalesOrder = (props) => {
 
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-  const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
+  const { isOpen, isKeyState, isIdChild: status, handleQueryId } = useToggle();
 
   const { is_admin: role, permissions_current: auth } = useSelector(
     (state) => state.auth
@@ -111,7 +112,28 @@ const SalesOrder = (props) => {
 
   const { checkAdd, checkExport } = useActionRole(auth, "sales_product");
 
+  const [checkedWare, sCheckedWare] = useState({});
+
   const toggleShowAll = () => setIsExpanded(!isExpanded);
+
+  const _HandleChangeInput = (id, checkedUn, type, value) => {
+    handleQueryId({
+      status: true,
+      initialKey: { id, checkedUn, type, value },
+    });
+  };
+
+  const handleSaveStatus = () => {
+    if (isKeyState?.type === "browser") {
+      const checked = isKeyState.value.target.checked;
+      const warehousemanId = isKeyState.value.target.value;
+
+      // Xử lý thay đổi trạng thái đơn hàng
+      const newStatus = checked ? "approved" : "un_approved";
+      handlePostStatus(isKeyState?.id, newStatus);
+    }
+    handleQueryId({ status: false });
+  };
 
   const params = {
     search: keySearch,
@@ -321,7 +343,7 @@ const SalesOrder = (props) => {
   ];
 
   const toggleStatus = () => {
-    const index = data?.rResult.findIndex((x) => x.id == isId);
+    const index = data?.rResult.findIndex((x) => x.id == isKeyState);
 
     let newStatus = "";
 
@@ -331,7 +353,7 @@ const SalesOrder = (props) => {
       newStatus = "approved";
     }
 
-    handlePostStatus(isId, newStatus);
+    handlePostStatus(isKeyState, newStatus);
 
     handleQueryId({ status: false });
   };
@@ -453,12 +475,18 @@ const SalesOrder = (props) => {
         }
         table={
           <div className="flex flex-col h-full">
-            <div className="w-full items-center flex justify-between">
+            <div className="w-full items-center flex justify-between gap-2">
               <div className="flex gap-3 items-center w-full">
                 <div className="col-span-1">
                   <SearchComponent
                     dataLang={dataLang}
                     onChange={handleOnChangeKeySearch}
+                  />
+                </div>
+                <div className="z-20 col-span-1">
+                  <DateToDateComponent
+                    value={valueChange.valueDate}
+                    onChange={onChangeFilter("valueDate")}
                   />
                 </div>
                 <div className="col-span-1">
@@ -526,12 +554,6 @@ const SalesOrder = (props) => {
                     isClearable={true}
                   />
                 </div>
-                <div className="z-20 col-span-1">
-                  <DateToDateComponent
-                    value={valueChange.valueDate}
-                    onChange={onChangeFilter("valueDate")}
-                  />
-                </div>
               </div>
               <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                 <div className="flex items-center justify-end gap-2">
@@ -592,7 +614,7 @@ const SalesOrder = (props) => {
                   <ColumnTable colSpan={1} textAlign={"center"}>
                     {dataLang?.sales_product_status || "sales_product_status"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1.5} textAlign={"center"}>
                     {dataLang?.sales_product_statusTT ||
                       "sales_product_statusTT"}
                   </ColumnTable>
@@ -603,7 +625,7 @@ const SalesOrder = (props) => {
                     {dataLang?.sales_product_order_process ||
                       "sales_product_order_process"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={0.5} textAlign={"center"}>
                     {dataLang?.sales_product_action || "sales_product_action"}
                   </ColumnTable>
                 </HeaderTable>
@@ -630,7 +652,7 @@ const SalesOrder = (props) => {
                             <RowItemTable colSpan={1} textAlign={"left"}>
                               <PopupDetailProduct
                                 dataLang={dataLang}
-                                className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                                className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-medium col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                                 name={e?.code ? e?.code : ""}
                                 id={e?.id}
                               />
@@ -655,54 +677,34 @@ const SalesOrder = (props) => {
                                   </div>
                                 </Zoom>
                               ) : (
-                                <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] border font-medium flex justify-center items-center rounded-2xl mx-auto w-fit px-3 py-0 bg-red-200 border-red-200 text-red-500">
+                                <div className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 border font-medium flex justify-center items-center rounded-2xl w-fit px-3 py-0 bg-red-200 border-red-200 text-red-500">
                                   Tạo mới
                                 </div>
                               )}
                             </RowItemTable>
                             <RowItemTable colSpan={1} textAlign={"left"}>
-                              {formatNumber(e.total_amount)} <span className="underline">đ</span>
+                              {formatNumber(e.total_amount)}{" "}
+                              <span className="underline">đ</span>
                             </RowItemTable>
 
                             <RowItemTable colSpan={1} textAlign={"center"}>
-                              <h6 className="flex items-center justify-center text-center cursor-pointer">
-                                {(e?.status === "approved" && (
-                                  <BtnStatusApproved
-                                    onClick={() =>
-                                      handleQueryId({
-                                        id: e?.id,
-                                        status: true,
-                                        idChild: "approved",
-                                      })
-                                    }
-                                    type="1"
-                                  />
-                                )) ||
-                                  (e?.status === "un_approved" && (
-                                    <BtnStatusApproved
-                                      onClick={() =>
-                                        handleQueryId({
-                                          id: e?.id,
-                                          status: true,
-                                          idChild: "un_approved",
-                                        })
-                                      }
-                                      type="0"
-                                    />
-                                  ))}
-                              </h6>
+                              <ButtonWarehouse
+                                warehouseman_id={
+                                  e?.status === "approved" ? "1" : "0"
+                                }
+                                _HandleChangeInput={_HandleChangeInput}
+                                id={e?.id}
+                              />
                             </RowItemTable>
                             <RowItemTable
-                              colSpan={1}
+                              colSpan={1.5}
                               className={"flex items-center justify-center"}
                             >
                               {(["payment_unpaid"].includes(
                                 e?.status_payment
                               ) && (
                                 <TagColorSky
-                                  className={
-                                    "w-full text-xs font-bold text-center xxl:px-1 xxl:py-1 3xl:py-1"
-                                  }
+                                  className={"text-center"}
                                   name={
                                     dataLang[e?.status_payment] ||
                                     e?.status_payment
@@ -733,8 +735,8 @@ const SalesOrder = (props) => {
                             </RowItemTable>
                             <RowItemTable colSpan={1}>
                               {/* <TagBranch> */}
-                                {e?.branch_name}
-                                {/* </TagBranch> */}
+                              {e?.branch_name}
+                              {/* </TagBranch> */}
                             </RowItemTable>
 
                             <RowItemTable colSpan={3}>
@@ -787,7 +789,7 @@ const SalesOrder = (props) => {
                                                   : "text-slate-500"
                                               } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
                                             >
-                                              <div className="flex items-center justify-center w-full gap-1">
+                                              <div className="flex flex-col items-center justify-center w-full gap-1">
                                                 <h6>{dataLang[item?.name]}</h6>
                                                 {isValueDelivery && (
                                                   <h6
@@ -807,7 +809,7 @@ const SalesOrder = (props) => {
                                           </div>
                                         </>
                                       )}
-                                      <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
+                                      <p className={`${isValueDelivery ? 'mt-[18px]' : ''} text-blue-700 cursor-pointer 3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold`}>
                                         {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
 
                                         {item?.reference &&
@@ -853,7 +855,7 @@ const SalesOrder = (props) => {
                                 })}
                               </div>
                             </RowItemTable>
-                            <RowItemTable colSpan={1}>
+                            <RowItemTable colSpan={0.5}>
                               <BtnAction
                                 onRefresh={refetch.bind(this)}
                                 dataLang={dataLang}
@@ -899,8 +901,13 @@ const SalesOrder = (props) => {
               <ColumnTable colSpan={2.5} textAlign={"end"} className="p-2">
                 {dataLang?.total_outside || "total_outside"}
               </ColumnTable>
-              <ColumnTable colSpan={0.5} textAlign={"left"} className="whitespace-nowrap">
-                {formatNumber(data?.rTotal?.total_amount)} <span className="underline">đ</span>
+              <ColumnTable
+                colSpan={0.5}
+                textAlign={"left"}
+                className="whitespace-nowrap"
+              >
+                {formatNumber(data?.rTotal?.total_amount)}{" "}
+                <span className="underline">đ</span>
               </ColumnTable>
             </ContainerTotal>
           </>
@@ -910,12 +917,11 @@ const SalesOrder = (props) => {
       <PopupConfim
         dataLang={dataLang}
         type="warning"
-        nameModel={"sales_product_status"}
+        nameModel={"sales_product"}
         title={TITLE_STATUS}
         subtitle={CONFIRMATION_OF_CHANGES}
         isOpen={isOpen}
-        status={status}
-        save={toggleStatus}
+        save={() => handleSaveStatus()}
         cancel={() => handleQueryId({ status: false })}
       />
     </React.Fragment>

@@ -33,7 +33,7 @@ const SearchComponent = ({
 
   return (
     <div
-      className={`${classNameBox} py-2 px-3 border bg-white border-border-gray-1 rounded-lg cursor-pointer flex-shrink-0`}
+      className={`${classNameBox} py-1.5 px-2 3xl:py-1.5 3xl:px-2 border bg-white border-border-gray-1 rounded-lg cursor-pointer flex-shrink-0`}
     //   style={{ gridColumn: `span ${colSpan || 1}` }}
       onClick={handleBoxClick}
     >
@@ -46,7 +46,7 @@ const SearchComponent = ({
                                 animate={{ width: "auto", opacity: 1 }}
                                 exit={{ width: 0, opacity: 0 }}
                                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className={`${classInput} min-w-[160px] relative placeholder:text-neutral-05 bg-transparent border-none outline-none focus:outline-none focus:ring-0 2xl:text-base text-xs`}
+                                className={`${classInput} min-w-[180px] 2xl:min-w-[210px] relative placeholder:text-neutral-05 bg-transparent border-none outline-none focus:outline-none focus:ring-0 responsive-text-base`}
                                 type="text"
                                 onChange={handleInputChange}
                                 value={inputValue}

@@ -98,7 +98,7 @@ const PopupDetail = (props) => {
                                         </div>
                                         <div className="flex items-center">
                                             {(data?.import_status === "not_stocked" && (
-                                                <TagColorSky className={'!py-1'} name={props.dataLang?.stocked_part || "stocked_part"} />
+                                                <TagColorSky className={'!py-1'} name={props.dataLang?.not_stocked || "not_stocked"} />
                                             )) ||
                                                 (data?.import_status === "stocked_part" && (
                                                     <TagColorOrange className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />

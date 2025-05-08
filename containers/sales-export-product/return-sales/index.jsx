@@ -419,12 +419,18 @@ const ReturnSales = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="w-full items-center flex justify-between">
+                        <div className="w-full items-center flex justify-between gap-2">
                             <div className="flex gap-3 items-center w-full">
                                     <div className="col-span-1">
                                         <SearchComponent
                                             dataLang={dataLang}
                                             onChange={handleOnChangeKeySearch.bind(this)}
+                                        />
+                                    </div>
+                                    <div className="z-20 col-span-1">
+                                        <DateToDateComponent
+                                            value={isState.valueDate}
+                                            onChange={onChangeFilter.bind(this, "valueDate")}
                                         />
                                     </div>
                                     <div className="col-span-1">
@@ -497,12 +503,6 @@ const ReturnSales = (props) => {
                                             }
                                             isClearable={true}
                                             className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                        />
-                                    </div>
-                                    <div className="z-20 col-span-1">
-                                        <DateToDateComponent
-                                            value={isState.valueDate}
-                                            onChange={onChangeFilter.bind(this, "valueDate")}
                                         />
                                     </div>
                             </div>

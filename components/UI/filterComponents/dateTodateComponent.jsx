@@ -21,7 +21,7 @@ const DateToDateComponent = ({ value, onChange, colSpan, className }) => {
         value={value}
         onChange={onChange}
         placeholder="dd/mm/yyyy → dd/mm/yyyy"
-        inputClassName={`${styleDatePicker.inputClassName} px-8 w-full`}
+        inputClassName={`${styleDatePicker.inputClassName} px-8 w-full min-w-[280px]`}
         toggleClassName="hidden"
       />
       <DropdownFilledIcon className="absolute right-3 top-1/2 -translate-y-1/2 z-10" />

@@ -425,13 +425,18 @@ const PurchaseReturns = (props) => {
                 }
                 table={
                     <div className="flex flex-col gap-3 h-full">
-                        <div className="w-full items-center flex justify-between">
+                        <div className="w-full items-center flex justify-between gap-2">
                                 <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
                                         placeholder={dataLang?.branch_search}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    />
+                                    <DateToDateComponent
+                                        colSpan={1}
+                                        value={isState.valueDate}
+                                        onChange={(e) => queryState({ valueDate: e })}
                                     />
                                     <SelectComponent
                                         options={[
@@ -497,11 +502,6 @@ const PurchaseReturns = (props) => {
                                         isClearable={true}
                                         isSearchable={true}
                                         colSpan={1}
-                                    />
-                                    <DateToDateComponent
-                                        colSpan={1}
-                                        value={isState.valueDate}
-                                        onChange={(e) => queryState({ valueDate: e })}
                                     />
                                 </div>
                                 <div className="flex justify-end items-center gap-2">

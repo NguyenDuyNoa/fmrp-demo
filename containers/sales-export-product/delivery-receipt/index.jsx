@@ -385,13 +385,18 @@ const DeliveryReceipt = (props) => {
 
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="w-full items-center flex justify-between">
+                        <div className="w-full items-center flex justify-between gap-2">
                             <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
                                         placeholder={dataLang?.branch_search}
                                         onChange={handleOnChangeKeySearch.bind(this)}
+                                    />
+                                    <DateToDateComponent
+                                        colSpan={1}
+                                        value={isState.valueDate}
+                                        onChange={(e) => queryState({ valueDate: e })}
                                     />
                                     <SelectComponent
                                         options={[
@@ -443,11 +448,6 @@ const DeliveryReceipt = (props) => {
                                         placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
                                         isClearable={true}
                                         colSpan={1}
-                                    />
-                                    <DateToDateComponent
-                                        colSpan={1}
-                                        value={isState.valueDate}
-                                        onChange={(e) => queryState({ valueDate: e })}
                                     />
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
@@ -550,7 +550,7 @@ const DeliveryReceipt = (props) => {
                                                             dataLang={dataLang}
                                                             className="text-left"
                                                             name={
-                                                                <h1 className="col-span-1 3xl:text-[14px] 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] text-[#0BAA2E] bg-[#EBFEF2] hover:bg-[#0BAA2E]/90 hover:text-[#EBFEF2] py-0.5 rounded-2xl border-[#0BAA2E]/5 border  cursor-pointer transition-all ease-in-out duration-200 text-center ">
+                                                                <h1 className="px-1 col-span-1 3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-normal text-[9px] text-[#0BAA2E] bg-[#EBFEF2] hover:bg-[#0BAA2E]/90 hover:text-[#EBFEF2] py-0.5 rounded-2xl border-[#0BAA2E]/5 border  cursor-pointer transition-all ease-in-out duration-200 text-center ">
                                                                     {e?.reference_no_order}
                                                                 </h1>
                                                             }

@@ -543,7 +543,7 @@ const PriceQuote = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <PopupDetailQuote
                                                                 dataLang={dataLang}
-                                                                className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                                                                className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-medium px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                                                                 name={e?.reference_no}
                                                                 id={e?.id}
                                                             />

@@ -65,6 +65,7 @@ import PrinterIcon from "../icons/common/PrinterIcon";
 import { Tooltip } from "react-tooltip";
 import TooltipDefault from "../common/tooltip/TooltipDefault";
 import PrinterTem from "../icons/common/PrinterTem";
+import { createPortal } from 'react-dom';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -577,6 +578,36 @@ export const BtnAction = React.memo((props) => {
         dataSeting,
     };
 
+    const calculateTotalButtons = () => {
+        let count = 0;
+        // Count edit button
+        count++;
+        
+        // Count print button
+        if (!["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(props?.type)) {
+            if (props?.type === "order" || props?.type === "sales_product") {
+                count++;
+            } else {
+                count++;
+            }
+        }
+        
+        // Count keep stock and see stock buttons for sales_product
+        if (props.type === "sales_product") {
+            count += 2;
+        }
+        
+        // Count print tem button for import
+        if (props.type === "import") {
+            count++;
+        }
+        
+        // Count delete button
+        count++;
+        
+        return count;
+    };
+
     const renderActionButtons = () => {
         if ([
             "client_customers",
@@ -616,6 +647,7 @@ export const BtnAction = React.memo((props) => {
         }
         
         const allButtons = [];
+        const totalButtons = calculateTotalButtons();
         
         // Nút sửa - Edit
         if (props.type == "order") {
@@ -722,6 +754,8 @@ export const BtnAction = React.memo((props) => {
             "receipts",
             "payment",
         ].includes(props.type)) {
+            const totalButtons = calculateTotalButtons();
+            
             allButtons.push(
                 <button
                     key="edit"
@@ -734,12 +768,20 @@ export const BtnAction = React.memo((props) => {
                             isShow("error", WARNING_STATUS_ROLE);
                         }
                     }}
-                    className={`group rounded-lg p-1 border border-transparent hover:border-[#064E3B] hover:bg-[#064E3B]/10 transition-all ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer`}
+                    className={`group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
+                                ${totalButtons > 3 
+                                    ? 'hover:bg-primary-05' 
+                                    : 'hover:border-[#064E3B] hover:bg-[#064E3B]/10'
+                                }`
+                    }
                 >
                     <EditIcon
-                        color="#064E3B"
-                        className="size-5 transition-all duration-300"
+                        className={`size-5 transition-all duration-300 
+                            ${totalButtons > 3 ? "text-neutral-03 group-hover:text-neutral-07" : ""}`}
                     />
+                    {totalButtons > 3 && (
+                        <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">Sửa phiếu</p>
+                    )}
                 </button>
             );
         }
@@ -755,6 +797,7 @@ export const BtnAction = React.memo((props) => {
         ].includes(props?.type)) {
             // Không hiển thị nút in
         } else if (props?.type === "order" || props?.type === "sales_product") {
+            const totalButtons = calculateTotalButtons();
             allButtons.push(
                 <ButtonPrintItem
                     key="print"
@@ -763,6 +806,7 @@ export const BtnAction = React.memo((props) => {
                     }
                     dataLang={props?.dataLang}
                     isLoading={loadingButtonPrint}
+                    totalButtons={totalButtons}
                 />
             );
         } else {
@@ -780,7 +824,7 @@ export const BtnAction = React.memo((props) => {
         // Nút giữ hàng - Keep Stock (chỉ cho sales_product)
         if (props.type == "sales_product") {
             if (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) {
-                allButtons.push(<PopupKeepStock key="keep-stock" {...props} {...shareProps} />);
+                allButtons.push(<PopupKeepStock key="keep-stock" {...props} {...shareProps} totalButtons={totalButtons} />);
             } else {
                 allButtons.push(
                     <button
@@ -804,7 +848,7 @@ export const BtnAction = React.memo((props) => {
         // Nút xem tồn kho - See Stock (chỉ cho sales_product)
         if (props.type == "sales_product") {
             if (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) {
-                allButtons.push(<PopupDetailKeepStock key="detail-stock" {...props} {...shareProps} />);
+                allButtons.push(<PopupDetailKeepStock key="detail-stock" {...props} {...shareProps} totalButtons={totalButtons} />);
             } else {
                 allButtons.push(
                     <button
@@ -901,16 +945,25 @@ export const BtnAction = React.memo((props) => {
                             isShow("error", WARNING_STATUS_ROLE);
                         }
                     }}
-                    className={`group transition-all ease-in-out flex items-center ${(props.type == "products" && "justify-start") || 
-                        props.type == "sales_product" ? "" : "justify-center"} 
-                        rounded-lg p-1 gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-red-02 text-left cursor-pointer border border-transparent hover:border-red-01`}
-                    data-tooltip-id="delete-tooltip"
-                    data-tooltip-content="Xóa phiếu"
+                    className={`group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
+                        ${totalButtons > 3 
+                            ? 'hover:bg-primary-05' 
+                            : 'hover:border-red-01 hover:bg-red-02'
+                        }`}
+                    {...totalButtons <= 3 && {
+                        "data-tooltip-id": "delete-tooltip",
+                        "data-tooltip-content": props.dataLang?.btn_table_delete || "btn_table_delete"
+                    }}
                 >
                     <TrashIcon
-                        color="#EE1E1E"
-                        className="size-5 transition-all duration-300"
+                        className={`size-5 transition-all duration-300 
+                            ${totalButtons > 3 ? "text-neutral-03 group-hover:text-neutral-07" : "text-[#EE1E1E]"}`}
                     />
+                    {totalButtons > 3 && (
+                        <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">
+                            {props.dataLang?.btn_table_delete || "btn_table_delete"}
+                        </p>
+                    )}
                 </button>
             );
         }
@@ -923,6 +976,8 @@ export const BtnAction = React.memo((props) => {
                 <div key="more" className="relative" ref={moreIconsRef}>
                     <button
                         onClick={() => setShowMoreIcons(!showMoreIcons)}
+                        data-tooltip-id="more-actions-tooltip"
+                        data-tooltip-place="bottom-end"
                         className="group rounded-lg p-1 border border-transparent hover:border-[#555] hover:bg-gray-100 transition-all ease-in-out flex items-center justify-center text-left cursor-pointer"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 24 24" fill="#003DA0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -931,15 +986,33 @@ export const BtnAction = React.memo((props) => {
                             <circle cx="5" cy="12" r="1" />
                         </svg>
                     </button>
-                    {showMoreIcons && (
-                        <div className="absolute top-full right-0 p-1 mt-1 w-fit bg-white rounded-xl z-[999] shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
-                            <div className="flex flex-col gap-1 min-w-[150px]">
-                                {allButtons.map((button, index) => (
-                                    <div key={index} className="p-1">{button}</div>
-                                ))}
-                            </div>
+                    <Tooltip
+                        id="more-actions-tooltip"
+                        place="bottom-end"
+                        variant="light"
+                        clickable={true}
+                        isOpen={showMoreIcons}
+                        setIsOpen={setShowMoreIcons}
+                        className="z-[999999999] !border !border-gray-200 !rounded-xl !p-0 !bg-white opacity-100 overflow-hidden"
+                        style={{
+                            backgroundColor: 'white',
+                            opacity: '1 !important',
+                            borderRadius: '12px',
+                            overflow: 'hidden'
+                        }}
+                        noArrow={true}
+                        opacity={1}
+                        delayHide={500}
+                    >
+                        <div 
+                            className="flex flex-col gap-1 min-w-[120px] p-1 bg-white"
+                            style={{opacity: 1, borderRadius: '10px'}}
+                        >
+                            {allButtons.map((button, index) => (
+                                <div key={index} className="">{button}</div>
+                            ))}
                         </div>
-                    )}
+                    </Tooltip>
                 </div>
             ];
         }

@@ -16,7 +16,7 @@ const OnResetData = ({ sOnFetching, ...res }) => {
         {...res}
         onClick={_HandleFresh}
         type="button"
-        className="bg-white hover:bg-green-50 group py-3 px-4 rounded-md transition-all ease-in-out flex items-center gap-2 border border-green-01"
+        className="bg-white hover:bg-green-50 group 3xl:py-3 3xl:px-4 py-2 px-3 rounded-md transition-all ease-in-out flex items-center gap-2 border border-green-01"
       >
         <RefreshIcon
           className="transition-all ease-in-out group-hover:-rotate-45 size-5"

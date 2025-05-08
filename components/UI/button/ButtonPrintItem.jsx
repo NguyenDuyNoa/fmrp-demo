@@ -8,21 +8,23 @@ const ButtonPrintItem = ({
   disabled = false,
   isLoading = false,
   classLoading = "",
+  totalButtons = 0,
 }) => {
   const isDisabled = disabled || isLoading;
-
+console.log(totalButtons)
   return (
     <button
       onClick={isDisabled ? undefined : onCLick}
       disabled={isDisabled}
       className={twMerge(
-        `transition-all ease-in-out flex items-center gap-2 group
-        2xl:text-sm xl:text-sm text-[8px]
-        rounded-lg w-fit p-1  border border-transparent hover:border-[#003DA0] hover:bg-primary-05
-        ${
-          isDisabled
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "hover:bg-slate-50 cursor-pointer"
+        `group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
+        ${totalButtons > 3 
+          ? 'hover:bg-primary-05' 
+          : 'hover:border-[#003DA0] hover:bg-primary-05'
+        }
+        ${isDisabled
+          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+          : "cursor-pointer"
         }`,
         className
       )}
@@ -33,22 +35,16 @@ const ButtonPrintItem = ({
         />
       )}
       {!isLoading && (
-        <PrinterIcon color="#003DA0" className="size-5" />
-        // <VscFilePdf
-        //   size={20}
-        //   className={twMerge(
-        //     "transition-all",
-        //     isDisabled
-        //       ? "text-gray-400"
-        //       : "group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md"
-        //   )}
-        // />
+        <PrinterIcon 
+          className={`size-5 transition-all duration-300 
+            ${totalButtons > 3 ? "text-neutral-03 group-hover:text-neutral-07" : "text-[#003DA0]"}`}
+        />
       )}
-      {/* <p
-        className={isDisabled ? "text-gray-400" : "group-hover:text-[#65a30d]"}
-      >
-        {dataLang?.btn_table_print || "btn_table_print"}
-      </p> */}
+      {totalButtons > 3 && (
+        <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">
+          {dataLang?.btn_table_print || "In phiếu"}
+        </p>
+      )}
     </button>
   );
 };

@@ -195,5 +195,41 @@ module.exports = {
         },
       });
     },
+    function({ addComponents, theme }) {
+      addComponents({
+        '.responsive-text-sm': {
+          fontSize: '11px',
+          lineHeight: '14px',
+          '@screen xl': {
+            fontSize: '0.75rem', /* text-xs */
+            lineHeight: '1rem'
+          },
+          '@screen 2xl': {
+            fontSize: '13px', /* text-13 */
+            lineHeight: '18px'
+          },
+          '@screen 3xl': {
+            fontSize: '0.875rem', /* text-sm */
+            lineHeight: '1.25rem'
+          }
+        },
+        '.responsive-text-base': {
+          fontSize: '13px',
+          lineHeight: '18px',
+          '@screen xl': {
+            fontSize: '0.875rem', /* text-sm */
+            lineHeight: '1.25rem'
+          },
+          '@screen 2xl': {
+            fontSize: '15px', /* text-15 */
+            lineHeight: '22px'
+          },
+          '@screen 3xl': {
+            fontSize: '1rem', /* text-base */
+            lineHeight: '1.5rem'
+          }
+        }
+      })
+    }
   ],
 };
