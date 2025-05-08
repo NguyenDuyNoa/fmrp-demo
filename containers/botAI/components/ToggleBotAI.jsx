@@ -8,15 +8,20 @@ import BoxChatAI from "./BoxChatAI";
 import LoadingThreeDotsJumping from "./LoadingThreeDotsJumping";
 import AnimatedGeneraEachWord from "@/components/animations/animation/AnimatedGeneraEachWord";
 import AnimatedGeneraText from "@/components/animations/animation/AnimatedGeneraText";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 const ToggleBotAI = ({ dataLang }) => {
-  const [openDrawer, setOpenDrawer] = useState(false);
+  // const [openDrawer, setOpenDrawer] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [showText, setShowText] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const timeoutRef = useRef(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const { data: dataSetting, isLoading } = useSettingApp();
+
+  const dispatch = useDispatch();
+  const openDrawer = useSelector((state) => state.stateBoxChatAi.open);
 
   useEffect(() => {
     let interval;
@@ -53,10 +58,14 @@ const ToggleBotAI = ({ dataLang }) => {
 
   return (
     <>
+    {/* toggle */}
       {isImageLoaded && (
         <div
           className="fixed bottom-6 right-6 z-50 cursor-pointer"
-          onClick={() => setOpenDrawer(true)}
+          // onClick={() => setOpenDrawer(true)}
+          onClick={() =>
+            dispatch({ type: "chatbot/openBoxChatAi", payload: true })
+          }
           onMouseEnter={() => {
             // xử lý hover toggle
             setIsHovering(true);
@@ -172,9 +181,10 @@ const ToggleBotAI = ({ dataLang }) => {
         onLoad={() => setIsImageLoaded(true)}
         priority // optional: ưu tiên tải ảnh
       />
+      {/* drawer */}
       <BoxChatAI
         openChatBox={openDrawer}
-        setOpenChatBox={setOpenDrawer}
+        // setOpenChatBox={setOpenDrawer}
         dataLang={dataLang}
         dataSetting={dataSetting}
       />

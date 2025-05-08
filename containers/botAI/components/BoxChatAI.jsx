@@ -212,7 +212,8 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox, dataLang, dataSetting }) => {
     };
 
     const onRedirect = () => {
-        setOpenChatBox(false);
+        // setOpenChatBox(false);
+        dispatch({ type: "chatbot/openBoxChatAi", payload: false });
         router.push("/products");
     };
 
@@ -363,14 +364,20 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox, dataLang, dataSetting }) => {
 
                     <button
                         className="!bg-white p-1 rounded-full shadow hover:bg-gray-100"
-                        onClick={() => setOpenChatBox(false)}
+                        // onClick={() => setOpenChatBox(false)}
+                        onClick={() =>
+                            dispatch({ type: "chatbot/openBoxChatAi", payload: false })
+                        }
                     >
                         <IoClose />
                     </button>
                 </div>
             }
             placement="right"
-            onClose={() => setOpenChatBox(false)}
+            // onClose={() => setOpenChatBox(false)}
+            onClose={() =>
+                dispatch({ type: "chatbot/openBoxChatAi", payload: false })
+            }
             open={openChatBox}
             styles={drawerStyles}
             width={820}
@@ -386,6 +393,7 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox, dataLang, dataSetting }) => {
                 borderTop: "none",
                 padding: "0px 0px",
             }}
+            zIndex={9999}
             footer={
                 <div className="px-6 pb-6 pt-2">
                     <div className="rounded-xl p-5 bg-linear-background-chat space-y-3">
