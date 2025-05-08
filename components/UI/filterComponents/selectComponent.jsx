@@ -149,7 +149,7 @@ const SelectComponent = ({
                 onMenuOpen={onMenuOpen}
                 {...configSelectFillter}
                 defaultValue={defaultValue}
-                className={className ? className : configSelectFillter.className}
+                className={`${configSelectFillter.className} ${className || "min-w-[200px]"}`}
                 isMulti={isMulti ? isMulti : false}
                 components={{
                     ...components,

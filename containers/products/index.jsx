@@ -292,7 +292,7 @@ const Products = (props) => {
                                     setOpen={sOpenDetail}
                                     isOpen={openDetail}
                                     nameModel={"products"}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                                 />
                             ) : (
                                 <button
@@ -300,7 +300,7 @@ const Products = (props) => {
                                     onClick={() => {
                                         isShow("error", WARNING_STATUS_ROLE);
                                     }}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                                 >
                                     {dataLang?.branch_popup_create_new}
                                 </button>

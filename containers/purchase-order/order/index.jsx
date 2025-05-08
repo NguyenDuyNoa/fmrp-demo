@@ -331,7 +331,7 @@ const Order = (props) => {
                             }}
                             dataLang={dataLang}
                             type="button"
-                            className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                            className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                         >
                             {/* {dataLang?.btn_new || "btn_new"} */}
                         </ButtonAddNew>
@@ -359,7 +359,7 @@ const Order = (props) => {
 
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="w-full items-center flex justify-between">
+                        <div className="w-full items-center flex justify-between gap-2">
                             <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         colSpan={1}
@@ -367,6 +367,12 @@ const Order = (props) => {
                                         placeholder={dataLang?.branch_search}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
                                     />
+                                    <div className="z-20 col-span-1">
+                                        <DateToDateComponent
+                                            value={isState.valueDate}
+                                            onChange={(e) => queryState({ valueDate: e })}
+                                        />
+                                    </div>
                                     <SelectComponent
                                         options={[
                                             {
@@ -382,6 +388,7 @@ const Order = (props) => {
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         colSpan={1}
+                                        className={"w-[150px]"}
                                     />
                                     <SelectComponent
                                         options={[
@@ -398,6 +405,7 @@ const Order = (props) => {
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         colSpan={1}
+                                        className={"w-[150px]"}
                                     />
                                     <SelectComponent
                                         options={[
@@ -431,13 +439,8 @@ const Order = (props) => {
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         colSpan={1}
+                                        className={"w-[160px]"}
                                     />
-                                    <div className="z-20 col-span-1">
-                                        <DateToDateComponent
-                                            value={isState.valueDate}
-                                            onChange={(e) => queryState({ valueDate: e })}
-                                        />
-                                    </div>
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex items-center justify-end gap-2">

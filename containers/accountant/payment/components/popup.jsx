@@ -1,4 +1,5 @@
 import apiPayments from "@/Api/apiAccountant/apiPayments";
+import EditIcon from "@/components/icons/common/EditIcon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
@@ -603,17 +604,15 @@ const Popup_dspc = (props) => {
                                 isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
-                        className={
-                            "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"
-                        }
+                        className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10"
                     >
-                        <BiEdit
-                            size={20}
-                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                        <EditIcon
+                            color="#064E3B"
+                            className="size-5"
                         />
-                        <p className="group-hover:text-sky-500">
+                        {/* <p className="group-hover:text-sky-500">
                             {props.dataLang?.payment_editVotes || "payment_editVotes"}
-                        </p>
+                        </p> */}
                     </div>
                 ) : (
                     <div

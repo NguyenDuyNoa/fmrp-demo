@@ -30,7 +30,7 @@ const initialFetch = {
     onFetchingWarehouse: false,
     onFetchingCondition: false,
 };
-const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
+const PopupKeepStock = ({ dataLang, status, id, onRefresh, totalButtons = 0, ...props }) => {
     const dataSeting = useSetingServer()
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -262,21 +262,25 @@ const PopupKeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
-                classNameBtn={""}
+                classNameBtn={"w-full"}
                 button={
                     <button
-                        className={`${props.type == "sales_product" ? "" : "justify-center"
-                            } group transition-all duration-300 flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-orange-50 text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-orange-500`}
-                        data-tooltip-id="delete-tooltip"
-                        data-tooltip-content={dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
+                        className={`group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
+                            ${totalButtons > 3 
+                                ? 'hover:bg-primary-05' 
+                                : 'hover:border-orange-500 hover:bg-orange-50'
+                            }`}
                     >
                         <Box1
                             size={20}
-                            className="group-hover:text-orange-500 transition-all duration-300"
+                            className={`size-5 transition-all duration-300 
+                                ${totalButtons > 3 ? "text-neutral-03 group-hover:text-neutral-07" : "group-hover:text-orange-500"}`}
                         />
-                        {/* <p className="pr-4 group-hover:text-orange-500">
-                            {dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
-                        </p> */}
+                        {totalButtons > 3 && (
+                            <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">
+                                {dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
+                            </p>
+                        )}
                     </button>
                 }
             >

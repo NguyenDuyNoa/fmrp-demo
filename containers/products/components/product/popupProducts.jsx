@@ -576,9 +576,9 @@ const Popup_Products = React.memo((props) => {
                             size={20}
                             className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
                         />
-                        <p className="group-hover:text-sky-500">
+                        {/* <p className="group-hover:text-sky-500">
                             {props.dataLang?.btn_table_edit || "btn_table_edit"}
-                        </p>
+                        </p> */}
 
                     </div>
                     : props.dataLang?.branch_popup_create_new || 'branch_popup_create_new'

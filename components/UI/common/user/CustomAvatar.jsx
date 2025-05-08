@@ -8,7 +8,7 @@ const CustomAvatar = ({ profileImage, fullName, data, classNameAvatar }) => {
     const randomColors = getColorByParam(fullName)
 
     return (
-        <div className="flex items-center justify-start w-full gap-2">
+        <div className="flex items-center justify-center w-full gap-1">
             <div className={`relative ${classNameAvatar} ${profileImage ? "w-[32px] min-w-[32px] max-w-[32px]" : " w-[26px] min-w-[26px] max-w-[26px]"} `}>
                 {
                     profileImage ?
@@ -42,11 +42,11 @@ const CustomAvatar = ({ profileImage, fullName, data, classNameAvatar }) => {
                             </div>
                         </div>
                 }
-                <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                {/* <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
                     <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
                         <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
                     </span>
-                </span>
+                </span> */}
             </div>
             <h6 className="text-[13px] capitalize">
                 {fullName}
