@@ -509,7 +509,10 @@ const Client = (props) => {
                           className="flex flex-wrap items-center gap-1 justify-center"
                         >
                           {e.branch?.map((i, index) => (
-                            <TagBranch key={index}>{i.name}</TagBranch>
+                            <span className="flex flex-wrap items-center justify-center gap-2" key={index}>
+                              {/* <TagBranch key={index}>{i.name}</TagBranch> */}
+                              {i.name}
+                            </span>
                           ))}
                         </RowItemTable>
                         <RowItemTable
@@ -567,10 +570,10 @@ const Client = (props) => {
                 )}
               </div>
             </Customscrollbar>
-          </div>
+          </div >
         }
         pagination={
-          <div className="flex items-center justify-between gap-2">
+          <div div className="flex items-center justify-between gap-2" >
             {data?.rResult?.length != 0 && (
               <ContainerPagination>
                 <Pagination
@@ -585,7 +588,7 @@ const Client = (props) => {
           </div>
         }
       />
-    </React.Fragment>
+    </React.Fragment >
   );
 };
 export default Client;

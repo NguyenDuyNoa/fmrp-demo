@@ -22,6 +22,7 @@ import { useWardList } from "@/hooks/common/useAddress";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import ButtonCancel from "@/components/UI/button/buttonCancel";
 import PlusIcon from "@/components/icons/common/PlusIcon";
+import EditIcon from "@/components/icons/common/EditIcon";
 
 const initalState = {
     open: false,
@@ -363,7 +364,13 @@ const Popup_dskh = (props) => {
         <>
             <PopupCustom
                 title={props.id ? `${props.dataLang?.client_popup_edit}` : `${props.dataLang?.client_popup_add}`}
-                button={props.id ? <IconEdit /> :
+                button={props.id ?
+                    (
+                        // <IconEdit />
+                        <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+                            <EditIcon className={`size-5 transition-all duration-300 `} />
+                        </div>
+                    ) :
                     // `${props.dataLang?.branch_popup_create_new}`
                     (
                         <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">

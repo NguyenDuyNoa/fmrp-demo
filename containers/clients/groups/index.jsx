@@ -308,16 +308,17 @@ const GroupClient = (props) => {
                           {e.color}
                         </RowItemTable>
                         <RowItemTable colSpan={2}>
-                          <span className="flex flex-wrap items-center justify-center gap-2">
-                            {e?.branch?.map((e) => (
-                              <TagBranch
+                          {e?.branch?.map((e) => (
+                            <span className="flex flex-wrap items-center justify-center gap-2" key={e.id}>
+                              {/* <TagBranch
                                 key={e.id}
                                 className="py-0.5 px-1.5 2xl:py-1 2xl:px-2"
                               >
                                 {e.name}
-                              </TagBranch>
-                            ))}
-                          </span>
+                              </TagBranch> */}
+                              {e.name}
+                            </span>
+                          ))}
                         </RowItemTable>
                         <RowItemTable
                           colSpan={2}
