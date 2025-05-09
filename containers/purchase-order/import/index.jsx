@@ -429,7 +429,7 @@ const PurchaseImport = (props) => {
                 }
                 table={<div className="flex flex-col h-full">
                     <div className="w-full items-center flex justify-between gap-2">
-                        {/* <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5"> */}
+                        {/* <div className="flex gap-3 items-center w-full"> */}
                             <div className="flex gap-3 items-center w-full">
                                 <SearchComponent
                                     colSpan={1}
