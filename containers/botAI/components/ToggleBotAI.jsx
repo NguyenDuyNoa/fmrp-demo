@@ -58,7 +58,7 @@ const ToggleBotAI = ({ dataLang }) => {
 
   return (
     <>
-    {/* toggle */}
+      {/* toggle */}
       {isImageLoaded && (
         <div
           className="fixed bottom-6 right-6 z-50 cursor-pointer"
@@ -118,13 +118,12 @@ const ToggleBotAI = ({ dataLang }) => {
                         <AnimatedGeneraEachWord
                           className="text-[#064E3B] px-3 py-3 rounded-l-xl rounded-tr-xl bg-[#EBFEF2] border border-[#064E3B] shadow-md"
                           classNameWrapper="rounded-l-xl rounded-tr-xl"
-                        >
-                          {dataLang?.S_message_chat_bot_hello ||
-                            "S_message_chat_bot_hello"}
-                          ,{dataSetting?.assistant_fmrp_short ?? "Fimo"}
-                          {dataLang?.S_message_chat_bot_quest ||
-                            "S_message_chat_bot_quest"}
-                        </AnimatedGeneraEachWord>
+                          text={`${dataLang?.S_message_chat_bot_hello ||
+                            "S_message_chat_bot_hello"
+                            }, ${dataSetting?.assistant_fmrp_short || "Fimo"} ${dataLang?.S_message_chat_bot_quest ||
+                            "S_message_chat_bot_quest"
+                            }`}
+                        />
                       ) : (
                         <motion.div
                           initial={{ opacity: 0.3 }}
