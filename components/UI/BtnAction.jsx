@@ -603,7 +603,7 @@ console.log(idTem)
         let count = 0;
         // Count edit button
         count++;
-        
+
         // Count print button
         if (!["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(props?.type)) {
             if (props?.type === "order" || props?.type === "sales_product") {
@@ -612,20 +612,20 @@ console.log(idTem)
                 count++;
             }
         }
-        
+
         // Count keep stock and see stock buttons for sales_product
         if (props.type === "sales_product") {
             count += 2;
         }
-        
+
         // Count print tem button for import
         if (props.type === "import") {
             count++;
         }
-        
+
         // Count delete button
         count++;
-        
+
         return count;
     };
 
@@ -666,7 +666,7 @@ console.log(idTem)
                 </button>
             );
         }
-        
+
         const allButtons = [];
         const totalButtons = calculateTotalButtons();
 
@@ -776,7 +776,7 @@ console.log(idTem)
             "payment",
         ].includes(props.type)) {
             const totalButtons = calculateTotalButtons();
-            
+
             allButtons.push(
                 <button
                     key="edit"
@@ -790,10 +790,10 @@ console.log(idTem)
                         }
                     }}
                     className={`group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
-                                ${totalButtons > 3 
-                                    ? 'hover:bg-primary-05' 
-                                    : 'hover:border-[#064E3B] hover:bg-[#064E3B]/10'
-                                }`
+                                ${totalButtons > 3
+                            ? 'hover:bg-primary-05'
+                            : 'hover:border-[#064E3B] hover:bg-[#064E3B]/10'
+                        }`
                     }
                 >
                     <EditIcon
@@ -875,7 +875,7 @@ console.log(idTem)
                 );
             }
         }
-        
+
         // Nút xem tồn kho - See Stock (chỉ cho sales_product)
         if (props.type == "sales_product") {
             if (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) {
@@ -899,7 +899,7 @@ console.log(idTem)
                 );
             }
         }
-        
+
         // Nút in tem (chỉ cho import)
         if (props.type == "import") {
             allButtons.push(
@@ -950,7 +950,7 @@ console.log(idTem)
                 </div>
             );
         }
-        
+
         // Nút xóa - Delete
         if (props.type == "order") {
             allButtons.push(
@@ -977,8 +977,8 @@ console.log(idTem)
                         }
                     }}
                     className={`group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
-                        ${totalButtons > 3 
-                            ? 'hover:bg-primary-05' 
+                        ${totalButtons > 3
+                            ? 'hover:bg-primary-05'
                             : 'hover:border-red-01 hover:bg-red-02'
                         }`
                     }
@@ -1036,9 +1036,9 @@ console.log(idTem)
                         opacity={1}
                         delayHide={500}
                     >
-                        <div 
+                        <div
                             className="flex flex-col gap-1 min-w-[120px] p-1 bg-white"
-                            style={{opacity: 1, borderRadius: '10px'}}
+                            style={{ opacity: 1, borderRadius: '10px' }}
                         >
                             {allButtons.map((button, index) => (
                                 <div key={index} className="">{button}</div>
