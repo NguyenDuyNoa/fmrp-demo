@@ -369,8 +369,8 @@ const ExportToOther = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
                                 <div className="grid grid-cols-6 gap-2">
                                     <SearchComponent
                                         colSpan={1}

@@ -1,5 +1,6 @@
 import apiComons from "@/Api/apiComon/apiComon";
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
@@ -173,7 +174,10 @@ const PopupWarehouse = (props) => {
                     props.id ? (
                         <IconEdit size={21} className="transition-all ease-linear hover:scale-110" />
                     ) : (
-                        props.dataLang?.branch_popup_create_new || "branch_popup_create_new"
+                        <div className="flex items-center gap-2">
+                            <PlusIcon />
+                            {props.dataLang?.branch_popup_create_new || "branch_popup_create_new"}
+                        </div>
                     )
                 }
                 onClickOpen={_ToggleModal.bind(this, true)}
