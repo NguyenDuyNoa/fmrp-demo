@@ -533,9 +533,10 @@ const ItemsChild = React.memo((props) => {
         <RowItemTable colSpan={2} textAlign={"left"}>
           {props.data?.note}
         </RowItemTable>
-        <RowItemTable colSpan={2} className="flex flex-wrap justify-center gap-2 px-2">
+        <RowItemTable colSpan={2}
+        >
           {props.data?.branch.map((e) => (
-            <span className="flex flex-wrap items-center justify-center gap-2" key={e.id}>
+            <span className="flex flex-wrap items-center justify-start gap-2" key={e.id}>
               {e.name}
               {/* <TagBranch key={e?.id}>{e.name}</TagBranch> */}
             </span>

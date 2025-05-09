@@ -405,7 +405,7 @@ const Client = (props) => {
                   <ColumnTable colSpan={2} textAlign={"center"}>
                     {dataLang?.client_list_charge}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"center"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.client_list_group}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"left"}>
@@ -480,7 +480,7 @@ const Client = (props) => {
                         </RowItemTable>
                         <RowItemTable
                           colSpan={2}
-                          className="flex flex-wrap items-center justify-center"
+                          className="flex flex-col items-start justify-start gap-y-1"
                         >
                           {e.client_group?.map((h) => {
                             return (
