@@ -428,7 +428,7 @@ const Items = (props) => {
                     {dataLang?.category_material_list_variant ||
                       "category_material_list_variant"}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"center"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.client_list_brand || "client_list_brand"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -502,10 +502,10 @@ const Items = (props) => {
                           </RowItemTable>
                           <RowItemTable
                             colSpan={2}
-                            className="flex flex-wrap justify-center"
+                            className="flex flex-col justify-start"
                           >
                             {e.branch?.map((i, index) => (
-                              <span className="flex flex-wrap items-center justify-center gap-2" key={index}>
+                              <span className="flex flex-wrap items-center justify-start gap-2" key={index}>
                                 {/* <TagBranch key={i}>{i.name}</TagBranch> */}
                                 {i.name}
                               </span>

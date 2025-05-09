@@ -408,7 +408,7 @@ const Client = (props) => {
                   <ColumnTable colSpan={2} textAlign={"center"}>
                     {dataLang?.client_list_group}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.client_list_brand}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -506,10 +506,10 @@ const Client = (props) => {
                         </RowItemTable>
                         <RowItemTable
                           colSpan={1}
-                          className="flex flex-wrap items-center gap-1 justify-center"
+                          className="flex flex-wrap items-center gap-1 justify-start"
                         >
                           {e.branch?.map((i, index) => (
-                            <span className="flex flex-wrap items-center justify-center gap-2" key={index}>
+                            <span className="flex flex-wrap items-center justify-start gap-2" key={index}>
                               {/* <TagBranch key={index}>{i.name}</TagBranch> */}
                               {i.name}
                             </span>

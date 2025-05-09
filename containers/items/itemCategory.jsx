@@ -316,7 +316,7 @@ const ItemCategory = (props) => {
                   <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.client_popup_note || "client_popup_note"}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"center"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.price_quote_branch || "price_quote_branch"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -416,9 +416,9 @@ const Items = React.memo((props) => {
         <RowItemTable colSpan={2} textAlign={"left"}>
           {props.data?.note}
         </RowItemTable>
-        <RowItemTable colSpan={2} textAlign={"center"}>
+        <RowItemTable colSpan={2} textAlign={"left"}>
           {props.data?.branch?.map((e, index) => (
-            <span className="flex flex-wrap justify-center gap-2 " key={index}>
+            <span className="flex flex-wrap justify-start gap-2 " key={index}>
               {e.name}
             </span>
           ))}

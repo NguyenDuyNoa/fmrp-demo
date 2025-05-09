@@ -338,7 +338,7 @@ const PersonelStaff = (props) => {
                   listPosition={listPosition}
                   onRefresh={refetch.bind(this)}
                   dataLang={dataLang}
-                  className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
                 />
               ) : (
                 <button
@@ -346,7 +346,7 @@ const PersonelStaff = (props) => {
                   onClick={() => {
                     isShow("error", WARNING_STATUS_ROLE_ADMIN);
                   }}
-                  className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white  btn-animation hover:scale-105"
                 >
                   {dataLang?.branch_popup_create_new}
                 </button>
@@ -356,94 +356,84 @@ const PersonelStaff = (props) => {
         }
         table={
           <div className="flex flex-col h-full">
-            <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-              <div className="col-span-4">
-                <div className="grid grid-cols-9 gap-2">
-                  <SearchComponent
-                    dataLang={dataLang}
-                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                    colSpan={2}
-                  />
-                  <SelectComponent
-                    options={[
-                      {
-                        value: "",
-                        label:
-                          dataLang?.price_quote_branch || "price_quote_branch",
-                        isDisabled: true,
-                      },
-                      ...listBranch,
-                    ]}
-                    onChange={(e) => queryState({ valueBr: e })}
-                    value={isState.valueBr}
-                    placeholder={
-                      dataLang?.price_quote_branch || "price_quote_branch"
-                    }
-                    colSpan={3}
-                    components={{ MultiValue }}
-                    isMulti={true}
-                    closeMenuOnSelect={false}
-                  />
-                  <SelectComponent
-                    options={[
-                      {
-                        value: "",
-                        label:
-                          dataLang?.personnels_staff_position ||
-                          "personnels_staff_position",
-                        isDisabled: true,
-                      },
-                      ...listPosition,
-                    ]}
-                    isClearable={true}
-                    formatOptionLabel={SelectOptionLever}
-                    onChange={(e) => queryState({ idPos: e })}
-                    value={isState.idPos}
-                    placeholder={
-                      dataLang?.personnels_staff_position ||
-                      "personnels_staff_position"
-                    }
-                    colSpan={3}
-                  />
-                </div>
+            <div className="w-full items-center flex justify-between gap-2">
+              <div className="flex gap-3 items-center w-full">
+                <SearchComponent
+                  dataLang={dataLang}
+                  onChange={_HandleOnChangeKeySearch.bind(this)}
+                  colSpan={2}
+                />
+                <SelectComponent
+                  options={[
+                    {
+                      value: "",
+                      label:
+                        dataLang?.price_quote_branch || "price_quote_branch",
+                      isDisabled: true,
+                    },
+                    ...listBranch,
+                  ]}
+                  onChange={(e) => queryState({ valueBr: e })}
+                  value={isState.valueBr}
+                  placeholder={
+                    dataLang?.price_quote_branch || "price_quote_branch"
+                  }
+                  colSpan={3}
+                  components={{ MultiValue }}
+                  isMulti={true}
+                  closeMenuOnSelect={false}
+                />
+                <SelectComponent
+                  options={[
+                    {
+                      value: "",
+                      label:
+                        dataLang?.personnels_staff_position ||
+                        "personnels_staff_position",
+                      isDisabled: true,
+                    },
+                    ...listPosition,
+                  ]}
+                  isClearable={true}
+                  formatOptionLabel={SelectOptionLever}
+                  onChange={(e) => queryState({ idPos: e })}
+                  value={isState.idPos}
+                  placeholder={
+                    dataLang?.personnels_staff_position ||
+                    "personnels_staff_position"
+                  }
+                  colSpan={3}
+                />
               </div>
-              <div className="col-span-2">
-                <div className="flex items-center justify-end space-x-2">
-                  <OnResetData
-                    onClick={refetch.bind(this)}
-                    sOnFetching={(e) => { }}
-                  />
-                  {role ? (
-                    <div className={``}>
-                      {data?.rResult?.length > 0 && (
-                        <ExcelFileComponent
-                          multiDataSet={multiDataSet}
-                          filename="Danh sách người dùng"
-                          title="Dsnd"
-                          dataLang={dataLang}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                      className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                    >
-                      <Grid6
-                        className="scale-75 2xl:scale-100 xl:scale-100"
-                        size={18}
+              <div className="flex items-center justify-end space-x-2">
+                <OnResetData
+                  onClick={refetch.bind(this)}
+                  sOnFetching={(e) => { }}
+                />
+                {role ? (
+                  <div className={``}>
+                    {data?.rResult?.length > 0 && (
+                      <ExcelFileComponent
+                        multiDataSet={multiDataSet}
+                        filename="Danh sách người dùng"
+                        title="Dsnd"
+                        dataLang={dataLang}
                       />
-                      <span>{dataLang?.client_list_exportexcel}</span>
-                    </button>
-                  )}
-                  <div>
-                    <DropdowLimit
-                      sLimit={sLimit}
-                      limit={limit}
-                      dataLang={dataLang}
-                    />
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                  >
+                    <Grid6
+                      className="scale-75 2xl:scale-100 xl:scale-100"
+                      size={18}
+                    />
+                    <span>{dataLang?.client_list_exportexcel}</span>
+                  </button>
+                )}
+
               </div>
             </div>
 
@@ -462,7 +452,7 @@ const PersonelStaff = (props) => {
                     {dataLang?.personnels_staff_table_code ||
                       "personnels_staff_table_code"}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"center"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.personnels_staff_table_email ||
                       "personnels_staff_table_email"}
                   </ColumnTable>
@@ -482,7 +472,7 @@ const PersonelStaff = (props) => {
                     {dataLang?.personnels_staff_table_active ||
                       "personnels_staff_table_active"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.client_list_brand || "client_list_brand"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -597,10 +587,13 @@ const PersonelStaff = (props) => {
                             </RowItemTable>
                             <RowItemTable
                               colSpan={1}
-                              className="flex flex-wrap gap-1"
+                              className="flex flex-wrap gap-1 justify-start"
                             >
                               {e.branch?.map((i, indexB) => (
-                                <TagBranch key={indexB}>{i.name}</TagBranch>
+                                <span className="flex flex-wrap items-center justify-start gap-2" key={indexB}>
+                                  {i.name}
+                                  {/* <TagBranch key={indexB}>{i.name}</TagBranch> */}
+                                </span>
                               ))}
                             </RowItemTable>
 
@@ -645,13 +638,13 @@ const PersonelStaff = (props) => {
           </div>
         }
         pagination={
-          <>
+          <div className="flex items-center justify-between gap-2">
             {data?.rResult?.length != 0 && (
               <ContainerPagination>
-                <TitlePagination
+                {/* <TitlePagination
                   dataLang={dataLang}
                   totalItems={data?.output?.iTotalDisplayRecords}
-                />
+                /> */}
                 <Pagination
                   postsPerPage={limit}
                   totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -660,7 +653,12 @@ const PersonelStaff = (props) => {
                 />
               </ContainerPagination>
             )}
-          </>
+            <DropdowLimit
+              sLimit={sLimit}
+              limit={limit}
+              dataLang={dataLang}
+            />
+          </div>
         }
       />
       <PopupConfim

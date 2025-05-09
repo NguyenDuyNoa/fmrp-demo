@@ -378,7 +378,7 @@ const Supplier = (props) => {
                     {dataLang?.suppliers_supplier_phone ||
                       "suppliers_supplier_phone"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.suppliers_supplier_adress ||
                       "suppliers_supplier_adress"}
                   </ColumnTable>
@@ -386,7 +386,7 @@ const Supplier = (props) => {
                     {dataLang?.suppliers_supplier_group ||
                       "suppliers_supplier_group"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.client_list_brand || "client_list_brand"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -419,7 +419,7 @@ const Supplier = (props) => {
                             /> */}
                             {e.name}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={"left"}>
+                          <RowItemTable colSpan={1} textAlign={"center"}>
                             {e.tax_code}
                           </RowItemTable>
                           <RowItemTable colSpan={1} textAlign={"center"}>
@@ -446,11 +446,11 @@ const Supplier = (props) => {
                           </RowItemTable>
                           <RowItemTable
                             colSpan={1}
-                            className="flex flex-wrap items-center justify-center gap-1"
+                            className="items-center justify-start gap-1"
                           >
                             {e.branch?.map((i) => (
                               <span
-                                className="flex flex-wrap items-center justify-center gap-2"
+                                className="flex flex-wrap items-center justify-start gap-2"
                                 key={i}
                               >
                                 {/* <TagBranch key={i}>{i.name}</TagBranch> */}

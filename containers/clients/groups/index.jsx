@@ -268,7 +268,7 @@ const GroupClient = (props) => {
           <Customscrollbar className="h-full overflow-auto">
             <div className="w-full">
               <HeaderTable gridCols={12}>
-                <ColumnTable colSpan={4} textAlign={"center"}>
+                <ColumnTable colSpan={4} textAlign={"left"}>
                   {dataLang?.client_group_name}
                 </ColumnTable>
                 <ColumnTable colSpan={2} textAlign={"center"}>
@@ -277,7 +277,7 @@ const GroupClient = (props) => {
                 <ColumnTable colSpan={2} textAlign={"center"}>
                   {dataLang?.client_group_color}
                 </ColumnTable>
-                <ColumnTable colSpan={2} textAlign={"center"}>
+                <ColumnTable colSpan={2} textAlign={"left"}>
                   {dataLang?.client_list_brand}
                 </ColumnTable>
                 <ColumnTable colSpan={2} textAlign={"center"}>
@@ -292,7 +292,7 @@ const GroupClient = (props) => {
                   <div className="divide-y divide-slate-200 h-[100%] ">
                     {data?.rResult?.map((e) => (
                       <RowTable gridCols={12} key={e.id.toString()}>
-                        <RowItemTable colSpan={4} textAlign={"center"}>
+                        <RowItemTable colSpan={4} textAlign={"left"}>
                           {e.name}
                         </RowItemTable>
                         <RowItemTable colSpan={2} textAlign={"center"}>
@@ -302,14 +302,14 @@ const GroupClient = (props) => {
                           backgroundColor={e.color}
                           colSpan={2}
                           textAlign={"center"}
-                          className={"py-1 rounded-md"}
+                          className={"py-1 rounded-md "}
                         >
                           {" "}
                           {e.color}
                         </RowItemTable>
                         <RowItemTable colSpan={2}>
                           {e?.branch?.map((e) => (
-                            <span className="flex flex-wrap items-center justify-center gap-2" key={e.id}>
+                            <span className="flex flex-wrap items-center justify-start gap-2" key={e.id}>
                               {/* <TagBranch
                                 key={e.id}
                                 className="py-0.5 px-1.5 2xl:py-1 2xl:px-2"

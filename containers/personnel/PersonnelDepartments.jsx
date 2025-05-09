@@ -177,7 +177,7 @@ const PersonnelDepartments = (props) => {
                   dataLang={dataLang}
                   listBranch={listBranch}
                   nameModel={"client_contact"}
-                  className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
                 />
               ) : (
                 <button
@@ -185,7 +185,7 @@ const PersonnelDepartments = (props) => {
                   onClick={() => {
                     isShow("error", WARNING_STATUS_ROLE);
                   }}
-                  className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
                 >
                   {dataLang?.branch_popup_create_new}
                 </button>
@@ -195,87 +195,77 @@ const PersonnelDepartments = (props) => {
         }
         table={
           <div className="flex flex-col h-full">
-            <div className="grid items-center justify-between w-full grid-cols-6 p-2 rounded bg-slate-100 xl:p-3">
-              <div className="col-span-4">
-                <div className="grid grid-cols-9 gap-2">
-                  <SearchComponent
-                    dataLang={dataLang}
-                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                    colSpan={2}
-                  />
-                  <SelectComponent
-                    options={[
-                      {
-                        value: "",
-                        label:
-                          dataLang?.price_quote_branch || "price_quote_branch",
-                        isDisabled: true,
-                      },
-                      ...listBranch,
-                    ]}
-                    onChange={(e) => queryState({ valueBr: e })}
-                    value={isState.valueBr}
-                    placeholder={
-                      dataLang?.price_quote_branch || "price_quote_branch"
-                    }
-                    colSpan={3}
-                    components={{ MultiValue }}
-                    isMulti={true}
-                    closeMenuOnSelect={false}
-                  />
-                </div>
+            <div className="w-full items-center flex justify-between gap-2">
+              <div className="flex gap-3 items-center w-full">
+                <SearchComponent
+                  dataLang={dataLang}
+                  onChange={_HandleOnChangeKeySearch.bind(this)}
+                  colSpan={2}
+                />
+                <SelectComponent
+                  options={[
+                    {
+                      value: "",
+                      label:
+                        dataLang?.price_quote_branch || "price_quote_branch",
+                      isDisabled: true,
+                    },
+                    ...listBranch,
+                  ]}
+                  onChange={(e) => queryState({ valueBr: e })}
+                  value={isState.valueBr}
+                  placeholder={
+                    dataLang?.price_quote_branch || "price_quote_branch"
+                  }
+                  colSpan={3}
+                  components={{ MultiValue }}
+                  isMulti={true}
+                  closeMenuOnSelect={false}
+                />
               </div>
-              <div className="col-span-2">
-                <div className="flex items-center justify-end space-x-2">
-                  <OnResetData
-                    onClick={refetch.bind(this)}
-                    sOnFetching={(e) => { }}
-                  />
-                  {role == true || checkExport ? (
-                    <div className={``}>
-                      {data?.rResult?.length > 0 && (
-                        <ExcelFileComponent
-                          multiDataSet={multiDataSet}
-                          filename="Phòng ban"
-                          title="Pb"
-                          dataLang={dataLang}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                      className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                    >
-                      <Grid6
-                        className="scale-75 2xl:scale-100 xl:scale-100"
-                        size={18}
+              <div className="flex items-center justify-end space-x-2">
+                <OnResetData
+                  onClick={refetch.bind(this)}
+                  sOnFetching={(e) => { }}
+                />
+                {role == true || checkExport ? (
+                  <div className={``}>
+                    {data?.rResult?.length > 0 && (
+                      <ExcelFileComponent
+                        multiDataSet={multiDataSet}
+                        filename="Phòng ban"
+                        title="Pb"
+                        dataLang={dataLang}
                       />
-                      <span>{dataLang?.client_list_exportexcel}</span>
-                    </button>
-                  )}
-                  <div>
-                    <DropdowLimit
-                      sLimit={sLimit}
-                      limit={limit}
-                      dataLang={dataLang}
-                    />
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                  >
+                    <Grid6
+                      className="scale-75 2xl:scale-100 xl:scale-100"
+                      size={18}
+                    />
+                    <span>{dataLang?.client_list_exportexcel}</span>
+                  </button>
+                )}
+
               </div>
             </div>
             <Customscrollbar className="h-full overflow-auto">
               <div className="w-full">
                 <HeaderTable gridCols={12} display={"grid"}>
-                  <ColumnTable colSpan={3} textAlign={"center"}>
+                  <ColumnTable colSpan={3} textAlign={"left"}>
                     {dataLang?.personnels_deparrtments_name ||
                       "personnels_deparrtments_name"}
                   </ColumnTable>
-                  <ColumnTable colSpan={3} textAlign={"center"}>
+                  <ColumnTable colSpan={3} textAlign={"left"}>
                     {dataLang?.personnels_deparrtments_email ||
                       "personnels_deparrtments_email"}
                   </ColumnTable>
-                  <ColumnTable colSpan={4} textAlign={"center"}>
+                  <ColumnTable colSpan={4} textAlign={"left"}>
                     {dataLang?.client_list_brand || "client_list_brand"}
                   </ColumnTable>
                   <ColumnTable colSpan={2} textAlign={"center"}>
@@ -297,11 +287,12 @@ const PersonnelDepartments = (props) => {
                             {e.email}
                           </RowItemTable>
                           <RowItemTable colSpan={4}>
-                            <span className="flex flex-wrap space-x-2">
-                              {e.branch?.map((i) => (
-                                <TagBranch key={i}>{i.name}</TagBranch>
-                              ))}
-                            </span>
+                            {e.branch?.map((i, index) => (
+                              <span className="flex flex-wrap items-center justify-start gap-2" key={index}>
+                                {i.name}
+                                {/* <TagBranch key={i}>{i.name}</TagBranch> */}
+                              </span>
+                            ))}
                           </RowItemTable>
                           <RowItemTable
                             colSpan={2}
@@ -347,13 +338,13 @@ const PersonnelDepartments = (props) => {
           </div>
         }
         pagination={
-          <>
+          <div className="flex items-center justify-between gap-2">
             {data?.rResult?.length != 0 && (
               <ContainerPagination>
-                <TitlePagination
+                {/* <TitlePagination
                   dataLang={dataLang}
                   totalItems={data?.output?.iTotalDisplayRecords}
-                />
+                /> */}
                 <Pagination
                   postsPerPage={limit}
                   totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -362,7 +353,12 @@ const PersonnelDepartments = (props) => {
                 />
               </ContainerPagination>
             )}
-          </>
+            <DropdowLimit
+              sLimit={sLimit}
+              limit={limit}
+              dataLang={dataLang}
+            />
+          </div>
         }
       />
     </React.Fragment>
