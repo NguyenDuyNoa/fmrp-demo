@@ -1,13 +1,12 @@
 import { BtnAction } from "@/components/UI/BtnAction";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { Container, ContainerBody, ContainerTable, ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
+import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -41,7 +40,6 @@ import PopupDetailThere from "../components/detailThere";
 import PopupDetail from "./components/detail";
 import Popup_dspt from "./components/popup";
 import { useReceiptsList } from "./hooks/useReceiptsList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 
 const inistialValue = {
@@ -383,7 +381,7 @@ const Receipts = (props) => {
                         </div>
                         <Customscrollbar className="h-full overflow-y-auto">
                             <div className="w-full">
-                                <HeaderTable gridCols={12} display={"grid"}>
+                                <HeaderTable gridCols={13} display={"grid"}>
                                     <ColumnTable colSpan={0.5} textAlign={"center"}>
                                         {dataLang?.stt || "stt"}
                                     </ColumnTable>
@@ -417,10 +415,10 @@ const Receipts = (props) => {
                                     <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.payment_branch || "payment_branch"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"left"}>
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.payment_note || "payment_note"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.payment_action || "payment_action"}
                                     </ColumnTable>
                                 </HeaderTable>
@@ -429,7 +427,7 @@ const Receipts = (props) => {
                                 ) : data?.rResult?.length > 0 ? (
                                     <div className="h-full divide-y divide-slate-200">
                                         {data?.rResult?.map((e, index) => (
-                                            <RowTable gridCols={12} key={e.id.toString()}>
+                                            <RowTable gridCols={13} key={e.id.toString()}>
                                                 <RowItemTable colSpan={0.5} textAlign={"center"}>
                                                     {index + 1}
                                                 </RowItemTable>
@@ -524,13 +522,13 @@ const Receipts = (props) => {
                                                         {/* </TagBranch> */}
                                                 </RowItemTable>
                                                 <RowItemTable
-                                                    colSpan={1}
+                                                    colSpan={1.5}
                                                     textAlign={"left"}
                                                     className={"truncate"}
                                                 >
                                                     {e?.note}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={0.5} className="flex justify-center">
+                                                <RowItemTable colSpan={1} className="flex justify-center">
                                                     <BtnAction
                                                         onRefresh={refetch.bind(this)}
                                                         dataLang={dataLang}

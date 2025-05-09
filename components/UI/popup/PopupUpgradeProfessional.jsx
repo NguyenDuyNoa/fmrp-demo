@@ -524,8 +524,8 @@ const PopupUpgradeProfessional = (props) => {
             </Customscrollbar>
           </div>
           <div className="flex flex-col gap-3 2xl:gap-9 lg:w-[505px] flex-1">
-            <Customscrollbar className="max-h-[65vh] overflow-y-auto">
-              <div className="pr-2 2xl:pr-2.5 flex flex-col gap-3 2xl:gap-9">
+            <Customscrollbar className="pr-2 2xl:pr-2.5 flex flex-col gap-3 2xl:gap-9">
+              <div className="flex flex-col gap-3 2xl:gap-9">
                 <div className="flex flex-col gap-2 2xl:gap-3">
                   <h3 className="text-xl font-semibold text-typo-black-4">
                     Gói thành viên
@@ -608,7 +608,6 @@ const PopupUpgradeProfessional = (props) => {
                     />
                   </div>
                 </div>
-
                 <div className="flex flex-col gap-2 2xl:gap-3">
                   <hr className="border-[#919EAB3D] mb-3" />
                   <h3 className="text-xl font-semibold text-typo-black-4">

@@ -1,10 +1,12 @@
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { optionsQuery } from "@/configs/optionsQuery";
+import ButtonAnimationNew from "@/components/common/button/ButtonAnimationNew";
+import FilterDropdown from "@/components/common/dropdown/FilterDropdown";
+import CaretDownIcon from "@/components/icons/common/CaretDownIcon";
+import FunnelIcon from "@/components/icons/common/FunnelIcon";
 import {
   CONFIRM_DELETION,
   TITLE_DELETE_PRODUCTIONS_ORDER,
@@ -14,96 +16,72 @@ import { useBranchList } from "@/hooks/common/useBranch";
 import { useInternalPlansSearchCombobox } from "@/hooks/common/useInternalPlans";
 import { useItemsVariantSearchCombobox } from "@/hooks/common/useItems";
 import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
+import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { debounce } from "lodash";
-import dynamic from "next/dynamic";
 import React, {
-  memo,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
+import { useSelector } from "react-redux";
 import { v4 as uddid } from "uuid";
-import { ProductionsOrdersContext } from "../../context/productionsOrders";
 import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
 import { useProductionOrdersComboboxDetail } from "../../hooks/useProductionOrdersComboboxDetail";
-import FilterHeader from "../header/filterHeader";
 import ModalDetail from "../modal/modalDetail";
 import PopupConfimStage from "../popup/PopupConfimStage";
-import { RiDeleteBin5Line } from "react-icons/ri";
-import useToast from "@/hooks/useToast";
-import OnResetData from "@/components/UI/btnResetData/btnReset";
-import Zoom from "@/components/UI/zoomElement/zoomElement";
-import PopupRecallRawMaterials from "../popup/PopupRecallRawMaterials";
-import { useSelector } from "react-redux";
-import FunnelIcon from "@/components/icons/common/FunnelIcon";
-import CaretDownIcon from "@/components/icons/common/CaretDownIcon";
-import ButtonAnimationNew from "@/components/common/button/ButtonAnimationNew";
-import FilterDropdown from "@/components/common/dropdown/FilterDropdown";
 
-import DatePicker from "react-datepicker";
 import MagnifyingGlassIcon from "@/components/icons/common/MagnifyingGlassIcon";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
+import DatePicker from "react-datepicker";
 
 // const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
 import MultiValue from "@/components/UI/mutiValue/multiValue";
+import StatusCheckboxGroup from "@/components/common/checkbox/StatusCheckboxGroup";
 import RadioDropdown from "@/components/common/dropdown/RadioDropdown";
 import SelectComponentNew from "@/components/common/select/SelectComponentNew";
-import { ContainerFilterTab } from "@/components/UI/common/layout";
-import { useAutoActiveTabWithUnderline } from "@/hooks/custom/tab/useAutoActiveTabWithUnderline";
 import TabSwitcherWithUnderline from "@/components/common/tab/TabSwitcherWithUnderline";
 import CalendarBlankIcon from "@/components/icons/common/CalendarBlankIcon";
 import ChartDonutIcon from "@/components/icons/common/ChartDonutIcon";
-import CheckIcon from "@/components/icons/common/CheckIcon";
-import StatusCheckboxGroup from "@/components/common/checkbox/StatusCheckboxGroup";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import BreadcrumbCustom from "@/components/UI/breadcrumb/BreadcrumbCustom";
-import { useProductionOrdersList } from "@/managers/api/productions-order/useProductionOrdersList";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import LimitListDropdown from "@/components/common/dropdown/LimitListDropdown";
 import LoadingComponent from "@/components/common/loading/loading/LoadingComponent";
-import { useInView } from "react-intersection-observer";
-import { useProductionOrderDetail } from "@/managers/api/productions-order/useProductionOrderDetail";
-import PrinterIcon from "@/components/icons/common/PrinterIcon";
-import StickerIcon from "@/components/icons/common/StickerIcon";
+import PopupRequestUpdateVersion from "@/components/common/popup/PopupRequestUpdateVersion";
 import ArrowCounterClockwiseIcon from "@/components/icons/common/ArrowCounterClockwiseIcon";
-import TrashIcon from "@/components/icons/common/TrashIcon";
-import { FaCheck } from "react-icons/fa";
-import ListChecksIcon from "@/components/icons/common/ListChecksIcon";
-import KanbanIcon from "@/components/icons/common/KanbanIcon";
-import Image from "next/image";
 import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
 import CheckThinIcon from "@/components/icons/common/CheckThinIcon";
-import { useSheet } from "@/context/ui/SheetContext";
-import SheetProductionsOrderDetail from "../sheet/SheetProductionsOrderDetail";
-import DetailProductionOrderList from "../ui/DetailProductionOrderList";
+import KanbanIcon from "@/components/icons/common/KanbanIcon";
+import ListChecksIcon from "@/components/icons/common/ListChecksIcon";
+import PrinterIcon from "@/components/icons/common/PrinterIcon";
+import StickerIcon from "@/components/icons/common/StickerIcon";
+import TrashIcon from "@/components/icons/common/TrashIcon";
 import { StateContext } from "@/context/_state/productions-orders/StateContext";
-import { CookieCore } from "@/utils/lib/cookie";
-import PopupRequestUpdateVersion from "@/components/common/popup/PopupRequestUpdateVersion";
-import { useDispatch } from "react-redux";
-import PopupQRCode from "../popup/PopupQRCode";
-import { useQRCodProductCompleted } from "@/managers/api/productions-order/useQR";
-import apiProducts from "@/Api/apiProducts/products/apiProducts";
+import { useSheet } from "@/context/ui/SheetContext";
+import useSetingServer from "@/hooks/useConfigNumber";
 import {
   fetchItemsManufactures,
   fetchPDFManufactures,
   fetchPDFPlanManufactures,
 } from "@/managers/api/productions-order/useLinkFilePDF";
-import TabSemi from "../table/tabSemi";
-import PlaningProductionOrder from "../ui/PlaningProductionOrder";
-import useSetingServer from "@/hooks/useConfigNumber";
-import PopupPrintTemProduct from "../popup/PopupPrintTemProduct";
+import { useProductionOrderDetail } from "@/managers/api/productions-order/useProductionOrderDetail";
+import { useProductionOrdersList } from "@/managers/api/productions-order/useProductionOrdersList";
+import { CookieCore } from "@/utils/lib/cookie";
 import dayjs from "dayjs";
+import { useInView } from "react-intersection-observer";
+import { useDispatch } from "react-redux";
 import PopupCompleteCommand from "../popup/PopupCompleteCommand";
+import PopupPrintTemProduct from "../popup/PopupPrintTemProduct";
+import SheetProductionsOrderDetail from "../sheet/SheetProductionsOrderDetail";
+import DetailProductionOrderList from "../ui/DetailProductionOrderList";
+import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
-  console.log("🚀 ~ ProductionsOrderMain ~ dataLang:", dataLang)
   const statusExprired = useStatusExprired();
 
   const dispatch = useDispatch();
@@ -953,6 +931,20 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     }
   };
 
+  // Hàm làm mới dữ liệu
+  const refreshData = async () => {
+    try {
+      await refetchProductionOrderList();
+      if (isStateProvider?.productionsOrders?.idDetailProductionOrder) {
+        await refetchProductionOrderDetail();
+      }
+      isShow("success", `${dataLang?.data_updated_success || "Dữ liệu đã được cập nhật"}`);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      isShow("error", `${dataLang?.update_failed || "Cập nhật dữ liệu thất bại"}`);
+    }
+  };
+
   //phần dropdown hoàn thành công đoạn
   const handClickDropdownCompleteStage = (type) => {
     const currentPackage = dataSeting?.package;
@@ -965,12 +957,14 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           open: true,
           children: (
             <PopupCompleteCommand
-              onClose={() =>
+              onClose={() => {
                 dispatch({
                   type: "statePopupGlobal",
                   payload: { open: false },
-                })
-              }
+                });
+                // Làm mới dữ liệu sau khi hoàn thành lệnh sản xuất
+                refreshData();
+              }}
             />
           ),
         },
@@ -1092,6 +1086,16 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         </h2>
 
         <div className="flex items-center gap-2 xl:max-w-[70%]">
+          <ButtonAnimationNew
+            icon={
+              <div className="size-4">
+                <ArrowCounterClockwiseIcon className="size-full" />
+              </div>
+            }
+            title={dataLang?.refresh_data || "Làm mới dữ liệu"}
+            className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-normal text-[#0375F3] border border-[#0375F3] hover:bg-[#EBF5FF] hover:shadow-hover-button rounded-lg"
+            onClick={refreshData}
+          />
           <div className="relative flex items-center justify-end">
             {/* Animated Search Input */}
             <AnimatePresence>

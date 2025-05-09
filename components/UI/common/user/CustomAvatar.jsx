@@ -1,14 +1,13 @@
-import { getColorByParam, getRandomColors } from "@/utils/helpers/radomcolor";
-import ImageErrors from "../../imageErrors"
+import { getColorByParam } from "@/utils/helpers/radomcolor";
+import ImageErrors from "../../imageErrors";
 
-import ModalImage from "react-modal-image"
-import { Lightbox } from "react-modal-image";
+import ModalImage from "react-modal-image";
 
 const CustomAvatar = ({ profileImage, fullName, data, classNameAvatar }) => {
     const randomColors = getColorByParam(fullName)
 
     return (
-        <div className="flex items-center justify-center w-full gap-1">
+        <div className="flex items-center w-full gap-1">
             <div className={`relative ${classNameAvatar} ${profileImage ? "w-[32px] min-w-[32px] max-w-[32px]" : " w-[26px] min-w-[26px] max-w-[26px]"} `}>
                 {
                     profileImage ?

@@ -25,6 +25,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import React, { useEffect, useState } from "react";
 import { VscFilePdf } from "react-icons/vsc";
 import { _ServerInstance as Axios } from "services/axios";
+import PrinterIcon from "../icons/common/PrinterIcon";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const FilePDF = ({
@@ -7381,15 +7382,15 @@ const FilePDF = ({
             {fullTitle.includes(props?.type) && (
                 <button
                     onClick={() => handlePrintPdf("fullTitle")}
-                    className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full"
+                    className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                 >
-                    <VscFilePdf
-                        size={20}
-                        className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
+                   <PrinterIcon
+                        color="#003DA0"
+                        className="size-5"
                     />
-                    <p className="group-hover:text-[#65a30d]">
+                    {/* <p className="group-hover:text-[#65a30d]">
                         {props?.dataLang?.btn_table_print || "btn_table_print"}
-                    </p>
+                    </p> */}
                 </button>
             )}
 

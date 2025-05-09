@@ -6,6 +6,7 @@ import Popup_dspt from "@/containers/accountant/receipts/components/popup";
 import Popup_Bom from "@/containers/products/components/product/popupBom";
 import Popup_Products from "@/containers/products/components/product/popupProducts";
 import Popup_Stage from "@/containers/products/components/product/popupStage";
+import PopupPrintTemNVL from "@/containers/purchase-order/import/components/PopupPrintTemNVL";
 import Popup_TableValidateDelete from "@/containers/purchase-order/order/components/validateDelete";
 import Popup_TableValidateEdit from "@/containers/purchase-order/order/components/validateEdit";
 import Popup_servie from "@/containers/purchase-order/servicev-voucher/components/popup";
@@ -17,6 +18,11 @@ import useActionRole from "@/hooks/useRole";
 import { useSetData } from "@/hooks/useSetData";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import {
+    fetchPDFPurchaseOrder,
+    fetchPDFPurchaseOrderImport,
+} from "@/managers/api/purchase-order/useLinkFilePDF";
+import { fetchPDFDelivery, fetchPDFSaleOrder, fetchPDFReceipts, fetchPDFPayments } from "@/managers/api/sales-order/useLinkFilePDF";
 import {
     routerImport,
     routerOrder,
@@ -37,35 +43,23 @@ import {
     routerReturnSales,
     routerSalesOrder,
 } from "@/routers/sellingGoods";
-import { ArrowDown2, Box1, BoxSearch, Trash } from "iconsax-react";
+import { Box1, BoxSearch, Trash } from "iconsax-react";
 import { useRouter } from "next/router";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import React, { useEffect, useState, useRef } from "react";
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
-import { useSelector, useDispatch } from "react-redux";
-import Popup from "reactjs-popup";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Tooltip } from "react-tooltip";
 import { _ServerInstance as Axios } from "services/axios";
+import PopupPrintItem from "../common/popup/PopupPrintItem";
+import EditIcon from "../icons/common/EditIcon";
+import PrinterIcon from "../icons/common/PrinterIcon";
+import PrinterTem from "../icons/common/PrinterTem";
+import StickerIcon from "../icons/common/StickerIcon";
+import TrashIcon from "../icons/common/TrashIcon";
+import ButtonPrintItem from "./button/ButtonPrintItem";
 import FilePDF from "./FilePDF";
 import PopupConfim from "./popupConfim/popupConfim";
-import ButtonPrintItem from "./button/ButtonPrintItem";
-import {
-    fetchPDFPurchaseOrder,
-    fetchPDFPurchaseOrderImport,
-} from "@/managers/api/purchase-order/useLinkFilePDF";
-import PopupPrintItem from "../common/popup/PopupPrintItem";
-import StickerIcon from "../icons/common/StickerIcon";
-import PopupPrintTemNVL from "@/containers/purchase-order/import/components/PopupPrintTemNVL";
-import { fetchPDFDelivery, fetchPDFSaleOrder } from "@/managers/api/sales-order/useLinkFilePDF";
-import EditIcon from "../icons/common/EditIcon";
-import TrashIcon from "../icons/common/TrashIcon";
-import PrinterIcon from "../icons/common/PrinterIcon";
-import { Tooltip } from "react-tooltip";
-import TooltipDefault from "../common/tooltip/TooltipDefault";
-import PrinterTem from "../icons/common/PrinterTem";
-import { createPortal } from 'react-dom';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -118,21 +112,37 @@ const Popup_Pdf = (props) => {
         dataProductSerial: props?.dataProductSerial,
         dataSeting: props?.dataSeting,
     };
+    
+    // Nếu isForceOpen được truyền vào, sử dụng nó thay vì isOpen
+    const isPopupOpen = props.isForceOpen !== undefined ? props.isForceOpen : isOpen;
+    
+    // Handle close cho cả trường hợp thông thường và khi được force open
+    const handleClose = () => {
+        if (props.isForceOpen !== undefined && props.onClose) {
+            props.onClose();
+        } else {
+            handleOpen(false);
+        }
+    };
+    
     return (
         <PopupCustom
             title={props.dataLang?.option_prin || "option_prin"}
             button={
-                <button className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap">
+                <button className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap">
                     {/* <VscFilePdf size={20}/> */}
-                    <PrinterTem className="size-5"/>
-                    <p className="whitespace-nowrap">
+                    <PrinterIcon
+                        color="#003DA0"
+                        className="size-5"
+                    />
+                    {/* <p className="whitespace-nowrap">
                         {props?.dataLang?.btn_table_print || "btn_table_print"}
-                    </p>
+                    </p> */}
                 </button>
             }
             onClickOpen={() => handleOpen(true)}
-            open={isOpen}
-            onClose={() => handleOpen(false)}
+            open={isPopupOpen}
+            onClose={handleClose}
             classNameBtn={props?.className}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
@@ -169,17 +179,26 @@ export const BtnAction = React.memo((props) => {
     const [loadingButtonPrint, setLoadingButtonPrint] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showMoreIcons, setShowMoreIcons] = useState(false);
+    const [showPdfPopup, setShowPdfPopup] = useState(false);
     const dropdownRef = useRef(null);
     const moreIconsRef = useRef(null);
 
     // Xử lý đóng dropdown khi click ra ngoài
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowDropdown(false);
-            }
-            if (moreIconsRef.current && !moreIconsRef.current.contains(event.target)) {
-                setShowMoreIcons(false);
+            // Kiểm tra xem event.target có thuộc về popup nào không
+            const isInsidePopup = event.target.closest('.popup-edit') || 
+                                event.target.closest('.popup-content') || 
+                                event.target.closest('.reactjs-popup');
+            
+            // Chỉ đóng dropdown nếu click outside và không nằm trong bất kỳ popup nào
+            if (!isInsidePopup) {
+                if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                    setShowDropdown(false);
+                }
+                if (moreIconsRef.current && !moreIconsRef.current.contains(event.target)) {
+                    setShowMoreIcons(false);
+                }
             }
         };
 
@@ -198,11 +217,13 @@ export const BtnAction = React.memo((props) => {
     const fetchPDFMultiplePage = {
         order: fetchPDFPurchaseOrder,
         sales_product: fetchPDFSaleOrder,
+        receipts: fetchPDFReceipts,
+        payment: fetchPDFPayments,
     };
     //Xử lý in tem PDF
     const handlePrintTem = async ({ idTem, typePage }) => {
         setLoadingButtonPrint(true);
-
+console.log(idTem)
         //kiếm hàm theo page 
         const fetchPDFhandle = fetchPDFMultiplePage[typePage];
         if (!fetchPDFhandle) {
@@ -639,16 +660,16 @@ export const BtnAction = React.memo((props) => {
                 <button
                     type="button"
                     onClick={() => handleQueryId({ id: props?.id, status: true })}
-                    className="text-xs transition-all ease-linear outline-none xl:text-base hover:scale-110"
+                    className="group hover:border-red-01 hover:bg-red-02 rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer"
                 >
-                    <Trash color="red" />
+                    <TrashIcon className="size-5 text-[#EE1E1E]"/>
                 </button>
             );
         }
         
         const allButtons = [];
         const totalButtons = calculateTotalButtons();
-        
+
         // Nút sửa - Edit
         if (props.type == "order") {
             allButtons.push(
@@ -792,11 +813,21 @@ export const BtnAction = React.memo((props) => {
             "returnSales",
             "import",
             "returns",
-            "receipts",
-            "payment",
+            // "receipts",
+            // "payment",
         ].includes(props?.type)) {
-            // Không hiển thị nút in
-        } else if (props?.type === "order" || props?.type === "sales_product") {
+            if (props?.type !== "import") {
+                allButtons.push(
+                    <Popup_Pdf
+                        dataLang={props.dataLang}
+                        props={props}
+                        openAction={openAction}
+                        setOpenAction={setOpenAction}
+                        {...shareProps}
+                    />
+                );
+            }
+        } else if (props?.type === "order" || props?.type === "sales_product" || props?.type === "receipts" || props?.type === "payment") {
             const totalButtons = calculateTotalButtons();
             allButtons.push(
                 <ButtonPrintItem
@@ -904,14 +935,14 @@ export const BtnAction = React.memo((props) => {
                                     <StickerIcon className="size-5" />
                                     <p>In tem</p>
                                 </li>
-                                <li>
-                                    <Popup_Pdf
-                                        dataLang={props.dataLang}
-                                        props={props}
-                                        openAction={openAction}
-                                        setOpenAction={setOpenAction}
-                                        {...shareProps}
-                                    />
+                                <li
+                                    onClick={() => setShowPdfPopup(true)}
+                                    className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+                                >
+                                    <PrinterTem className="size-5"/>
+                                    <p className="whitespace-nowrap">
+                                        {props?.dataLang?.btn_table_print || "btn_table_print"}
+                                    </p>
                                 </li>
                             </ul>
                         </div>
@@ -949,7 +980,8 @@ export const BtnAction = React.memo((props) => {
                         ${totalButtons > 3 
                             ? 'hover:bg-primary-05' 
                             : 'hover:border-red-01 hover:bg-red-02'
-                        }`}
+                        }`
+                    }
                     {...totalButtons <= 3 && {
                         "data-tooltip-id": "delete-tooltip",
                         "data-tooltip-content": props.dataLang?.btn_table_delete || "btn_table_delete"
@@ -1032,6 +1064,20 @@ export const BtnAction = React.memo((props) => {
                 cancel={() => handleQueryId({ status: false })}
             />
             <Tooltip id="delete-tooltip" place="top" className="z-[999999]" style={{ borderRadius: '6px' }} />
+            
+            {/* Popup PDF hidden component */}
+            {showPdfPopup && (
+                <Popup_Pdf
+                    dataLang={props.dataLang}
+                    props={props}
+                    openAction={openAction}
+                    setOpenAction={setOpenAction}
+                    {...shareProps}
+                    isForceOpen={showPdfPopup}
+                    onClose={() => setShowPdfPopup(false)}
+                    className="hidden"
+                />
+            )}
         </div>
     );
 });

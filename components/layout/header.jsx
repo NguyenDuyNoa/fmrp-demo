@@ -1313,7 +1313,7 @@ const Header = () => {
                     />
                 </form> */}
                 {/* {authState?.id_package_service === "1" && ( */}
-                {authState?.is_upgrade && (
+                {/* {authState?.is_upgrade && ( */}
                     <button className="py-1 px-2 rounded-full bg-typo-blue-4 flex items-center gap-2" 
                     onClick={() => {
                         dispatch({
@@ -1337,7 +1337,7 @@ const Header = () => {
                         <SparkleIcon className="text-white" size={16} />
                         <span className="3xl:text-base xxl:text-sm xl:text-xs text-[11px] font-normal text-white whitespace-nowrap">Nâng cấp Pro</span>
                     </button>
-                )}
+                {/* )} */}
                 <div className="flex items-center gap-3">
                 <Tooltip
                     title={"Cài đặt"}

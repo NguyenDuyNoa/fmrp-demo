@@ -322,10 +322,10 @@ const ProductRow = memo(
 
 ProductRow.displayName = "ProductRow";
 
-const PopupOrderCompleted = ({ onClose }) => {
+export const PopupOrderCompleted = ({ onClose, className }) => {
   return (
     <div
-      className={`p-9 flex flex-col gap-8 justify-center items-center rounded-3xl w-[610px] bg-neutral-00 ${deca.className}`}
+      className={`p-9 flex flex-col gap-8 justify-center items-center rounded-3xl w-[610px] bg-neutral-00 ${deca.className} ${className}`}
     >
       <div className="w-full flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -425,9 +425,13 @@ const PopupCompleteCommand = ({ onClose }) => {
           "success",
           responseData.message || "Hoàn thành công đoạn thành công"
         );
+        
+        setTimeout(() => {
+          onClose();
+        }, 2000);
       }
     }
-  }, [isSuccess, data]);
+  }, [isSuccess, data, onClose]);
 
   const handleConfirm = useCallback(async () => {
     const selectedProducts = products.filter((product) => product.selected);
