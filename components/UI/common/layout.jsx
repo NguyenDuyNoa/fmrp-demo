@@ -25,9 +25,9 @@ export const AnimatedTabUnderline = () => {
       className="absolute bottom-0 h-[2px] bg-typo-blue-4 z-10"
       initial={{ left: from.left, width: from.width }}
       animate={{ left: activeTabInfo.left, width: activeTabInfo.width }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 500, 
+      transition={{
+        type: "spring",
+        stiffness: 500,
         damping: 30,
       }}
     />
@@ -109,7 +109,7 @@ export const LayOutTableDynamic = ({
         {breadcrumb}
         <ContainerBody>
           <div className="flex flex-col h-full overflow-hidden gap-y-3">
-            <div className="flex justify-between mt-1 mr-2">{titleButton}</div>
+            <div className="flex justify-between mt-1">{titleButton}</div>
             {fillterTab && (
               <div className="w-full h-fit">
                 <ContainerFilterTab>{fillterTab}</ContainerFilterTab>

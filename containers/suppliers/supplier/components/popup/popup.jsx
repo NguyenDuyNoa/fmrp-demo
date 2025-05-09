@@ -17,6 +17,8 @@ import ButtonAdd from "../button/buttonAdd";
 import FormContact from "../form/formContact";
 import FormInfo from "../form/formInfo";
 import { useWardList } from "@/hooks/common/useAddress";
+import EditIcon from "@/components/icons/common/EditIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 
 const initalState = {
   open: false,
@@ -264,7 +266,17 @@ const Popup_dsncc = (props) => {
     <>
       <PopupCustom
         title={props.id ? `${props.dataLang?.suppliers_supplier_edit}` : `${props.dataLang?.suppliers_supplier_add}`}
-        button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+        button={props.id ?
+          // <IconEdit />
+          <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+            <EditIcon className={`size-5 transition-all duration-300 `} />
+          </div>
+          :
+          // `${props.dataLang?.branch_popup_create_new}`
+          <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">
+            <PlusIcon /> {props.dataLang?.branch_popup_create_new}
+          </p>
+        }
         onClickOpen={() => queryState({ open: true })}
         open={isState.open}
         onClose={() => queryState({ open: false })}

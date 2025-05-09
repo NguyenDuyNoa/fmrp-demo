@@ -1,4 +1,6 @@
 import apiDepartments from "@/Api/apiPersonnel/apiDepartments";
+import EditIcon from "@/components/icons/common/EditIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
@@ -34,7 +36,9 @@ const Popup_phongban = (props) => {
         sName(props.name ? props.name : "");
         sEmail(props.email ? props.email : "");
         sListBrand(props?.listBranch || []);
-        sValueBr(props.sValueBr?.map(e => ({ label: e.name, value: e.id })) || [])
+        sValueBr(
+            props.sValueBr?.map((e) => ({ label: e.name, value: e.id })) || []
+        );
     }, [open]);
 
     // xử lý vlaue chi nhánh thành mảng value
@@ -64,9 +68,9 @@ const Popup_phongban = (props) => {
     // lưu phòng ban
     const handingDepartment = useMutation({
         mutationFn: (data) => {
-            return apiDepartments.apiHandingDepartment(data, props.id)
-        }
-    })
+            return apiDepartments.apiHandingDepartment(data, props.id);
+        },
+    });
 
     const _ServerSending = () => {
         let data = new FormData();
@@ -88,13 +92,10 @@ const Popup_phongban = (props) => {
                     isShow("error", props.dataLang[message] || message);
                 }
             },
-            onError: (error) => {
-
-            },
-        })
+            onError: (error) => { },
+        });
         sOnSending(false);
     };
-
 
     useEffect(() => {
         onSending && _ServerSending();
@@ -112,8 +113,23 @@ const Popup_phongban = (props) => {
     };
     return (
         <PopupCustom
-            title={props.id ? `${props.dataLang?.personnels_deparrtments_edit}` : `${props.dataLang?.personnels_deparrtments_add}`}
-            button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+            title={
+                props.id
+                    ? `${props.dataLang?.personnels_deparrtments_edit}`
+                    : `${props.dataLang?.personnels_deparrtments_add}`
+            }
+            // button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+            button={
+                props.id ? (
+                    <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+                        <EditIcon className={`size-5 transition-all duration-300 `} />
+                    </div>
+                ) : (
+                    <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">
+                        <PlusIcon /> {props.dataLang?.branch_popup_create_new}
+                    </p>
+                )
+            }
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}
@@ -124,14 +140,17 @@ const Popup_phongban = (props) => {
                     <div>
                         <div className="flex flex-wrap justify-between">
                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                {props.dataLang?.personnels_deparrtments_name} <span className="text-red-500">*</span>
+                                {props.dataLang?.personnels_deparrtments_name}{" "}
+                                <span className="text-red-500">*</span>
                             </label>
                             <input
                                 value={name}
                                 onChange={_HandleChangeInput.bind(this, "name")}
                                 name="fname"
                                 type="text"
-                                className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                className={`${errInput
+                                        ? "border-red-500"
+                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
                             />
                             {errInput && (
@@ -154,7 +173,8 @@ const Popup_phongban = (props) => {
                             />
                         </div>
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_list_brand} <span className="text-red-500">*</span>
+                            {props.dataLang?.client_list_brand}{" "}
+                            <span className="text-red-500">*</span>
                         </label>
                         <Select
                             closeMenuOnSelect={false}
@@ -203,7 +223,9 @@ const Popup_phongban = (props) => {
                         // className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
                         />
                         {errInputBr && (
-                            <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_bran}</label>
+                            <label className="mb-2  text-[14px] text-red-500">
+                                {props.dataLang?.client_list_bran}
+                            </label>
                         )}
 
                         <div className="mt-5 space-x-2 text-right">

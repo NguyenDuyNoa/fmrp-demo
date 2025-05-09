@@ -1,4 +1,6 @@
 import apiGroups from "@/Api/apiSuppliers/groups/apiGroups";
+import EditIcon from "@/components/icons/common/EditIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
@@ -110,7 +112,17 @@ const Popup_groupKh = (props) => {
     return (
         <PopupCustom
             title={props.id ? `${props.dataLang?.suppliers_groups_edit}` : `${props.dataLang?.suppliers_groups_add}`}
-            button={props.id ? (<IconEdit />) : (`${props.dataLang?.branch_popup_create_new}`)}
+            button={props.id ? (
+                // <IconEdit />
+                <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+                    <EditIcon className={`size-5 transition-all duration-300 `} />
+                </div>
+            ) : (
+                <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">
+                    <PlusIcon /> {props.dataLang?.branch_popup_create_new}
+                </p>
+                // `${props.dataLang?.branch_popup_create_new}`
+            )}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}

@@ -212,8 +212,8 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox, dataLang, dataSetting }) => {
     };
 
     const onRedirect = () => {
-        // setOpenChatBox(false);
-        dispatch({ type: "chatbot/openBoxChatAi", payload: false });
+        console.log("123");
+        dispatch({ type: "chatbot/openBoxChatAi", payload: false })
         router.push("/products");
     };
 

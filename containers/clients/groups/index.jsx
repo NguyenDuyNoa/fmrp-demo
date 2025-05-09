@@ -192,7 +192,7 @@ const GroupClient = (props) => {
                 listBr={listBr}
                 onRefresh={refetch.bind(this)}
                 dataLang={dataLang}
-                className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
+                className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
               />
             ) : (
               <button
@@ -200,7 +200,7 @@ const GroupClient = (props) => {
                 onClick={() => {
                   isShow("error", WARNING_STATUS_ROLE);
                 }}
-                className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
+                className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
               >
                 {dataLang?.branch_popup_create_new}
               </button>
@@ -210,80 +210,65 @@ const GroupClient = (props) => {
       }
       table={
         <div className="flex flex-col h-full">
-          <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-            <div className="col-span-4">
-              <div className="grid items-center grid-cols-5 gap-2">
-                <SearchComponent
-                  dataLang={dataLang}
-                  onChange={_HandleOnChangeKeySearch.bind(this)}
-                  colSpan={1}
-                />
-                <SelectComponentNew
-                  isClearable={true}
-                  value={isState.idBranch}
-                  onChange={(e) => queryState({ idBranch: e })}
-                  options={[
-                    {
-                      value: "",
-                      label:
-                        dataLang?.price_quote_branch || "price_quote_branch",
-                      isDisabled: true,
-                    },
-                    ...listBr,
-                  ]}
-                  colSpan={2}
-                  classParent="ml-0 !font-semibold focus:ring-none focus:outline-none text-sm focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
-                  classNamePrefix={"productionSmoothing"}
-                  placeholder={
-                    dataLang?.price_quote_branch || "price_quote_branch"
-                  }
-                />
-              </div>
+          <div className="w-full items-center flex justify-between gap-2">
+            <div className="flex gap-3 items-center w-full">
+              <SearchComponent
+                dataLang={dataLang}
+                onChange={_HandleOnChangeKeySearch.bind(this)}
+                colSpan={1}
+              />
+              <SelectComponentNew
+                isClearable={true}
+                value={isState.idBranch}
+                onChange={(e) => queryState({ idBranch: e })}
+                options={[
+                  {
+                    value: "",
+                    label: dataLang?.price_quote_branch || "price_quote_branch",
+                    isDisabled: true,
+                  },
+                  ...listBr,
+                ]}
+                colSpan={2}
+                classParent="ml-0 !font-semibold focus:ring-none focus:outline-none text-sm focus-visible:ring-none focus-visible:outline-none placeholder:text-sm placeholder:text-[#52575E]"
+                classNamePrefix={"productionSmoothing"}
+                placeholder={
+                  dataLang?.price_quote_branch || "price_quote_branch"
+                }
+              />
             </div>
-            <div className="col-span-2">
-              <div className="flex items-center justify-end space-x-2">
-                <OnResetData
-                  onClick={() => refetch()}
-                  sOnFetching={(e) => { }}
-                />
-                {role == true || checkExport ? (
-                  <div className={``}>
-                    {data?.rResult?.length > 0 && (
-                      <ExcelFileComponent
-                        multiDataSet={multiDataSet}
-                        filename="Nhóm khách hàng"
-                        title="Nkh"
-                        dataLang={dataLang}
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                  >
-                    <Grid6
-                      className="scale-75 2xl:scale-100 xl:scale-100"
-                      size={18}
+
+            <div className="flex items-center justify-end space-x-2">
+              <OnResetData onClick={() => refetch()} sOnFetching={(e) => { }} />
+              {role == true || checkExport ? (
+                <div className={``}>
+                  {data?.rResult?.length > 0 && (
+                    <ExcelFileComponent
+                      multiDataSet={multiDataSet}
+                      filename="Nhóm khách hàng"
+                      title="Nkh"
+                      dataLang={dataLang}
                     />
-                    <span>{dataLang?.client_list_exportexcel}</span>
-                  </button>
-                )}
-                <div>
-                  <DropdowLimit
-                    sLimit={sLimit}
-                    limit={limit}
-                    dataLang={dataLang}
-                  />
+                  )}
                 </div>
-              </div>
+              ) : (
+                <button
+                  onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                  className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                >
+                  <Grid6
+                    className="scale-75 2xl:scale-100 xl:scale-100"
+                    size={18}
+                  />
+                  <span>{dataLang?.client_list_exportexcel}</span>
+                </button>
+              )}
             </div>
           </div>
-
           <Customscrollbar className="h-full overflow-auto">
             <div className="w-full">
               <HeaderTable gridCols={12}>
-                <ColumnTable colSpan={4} textAlign={"center"}>
+                <ColumnTable colSpan={4} textAlign={"left"}>
                   {dataLang?.client_group_name}
                 </ColumnTable>
                 <ColumnTable colSpan={2} textAlign={"center"}>
@@ -292,7 +277,7 @@ const GroupClient = (props) => {
                 <ColumnTable colSpan={2} textAlign={"center"}>
                   {dataLang?.client_group_color}
                 </ColumnTable>
-                <ColumnTable colSpan={2} textAlign={"center"}>
+                <ColumnTable colSpan={2} textAlign={"left"}>
                   {dataLang?.client_list_brand}
                 </ColumnTable>
                 <ColumnTable colSpan={2} textAlign={"center"}>
@@ -317,17 +302,23 @@ const GroupClient = (props) => {
                           backgroundColor={e.color}
                           colSpan={2}
                           textAlign={"center"}
-                          className={"py-1 rounded-md"}
+                          className={"py-1 rounded-md "}
                         >
                           {" "}
                           {e.color}
                         </RowItemTable>
                         <RowItemTable colSpan={2}>
-                          <span className="flex flex-wrap items-center justify-start gap-2">
-                            {e?.branch?.map((e) => (
-                              <TagBranch key={e.id}>{e.name}</TagBranch>
-                            ))}
-                          </span>
+                          {e?.branch?.map((e) => (
+                            <span className="flex flex-wrap items-center justify-start gap-2" key={e.id}>
+                              {/* <TagBranch
+                                key={e.id}
+                                className="py-0.5 px-1.5 2xl:py-1 2xl:px-2"
+                              >
+                                {e.name}
+                              </TagBranch> */}
+                              {e.name}
+                            </span>
+                          ))}
                         </RowItemTable>
                         <RowItemTable
                           colSpan={2}
@@ -336,7 +327,7 @@ const GroupClient = (props) => {
                           {role == true || checkEdit ? (
                             <Popup_groupKh
                               onRefresh={refetch.bind(this)}
-                              className="text-xs xl:text-base "
+                              className="xl:text-base "
                               listBr={listBr}
                               sValueBr={e.branch}
                               dataLang={dataLang}
@@ -372,13 +363,9 @@ const GroupClient = (props) => {
         </div>
       }
       pagination={
-        <>
+        <div className="flex items-center justify-between gap-2">
           {data?.rResult?.length != 0 && (
             <ContainerPagination>
-              <TitlePagination
-                dataLang={dataLang}
-                totalItems={data?.output?.iTotalDisplayRecords}
-              />
               <Pagination
                 postsPerPage={limit}
                 totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -387,7 +374,9 @@ const GroupClient = (props) => {
               />
             </ContainerPagination>
           )}
-        </>
+
+          <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+        </div>
       }
     />
   );

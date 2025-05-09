@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import LoadingThreeDotsJumping from "@/containers/botAI/components/LoadingThreeDotsJumping";
 
 const AnimatedGeneraEachWord = ({
@@ -9,88 +9,138 @@ const AnimatedGeneraEachWord = ({
     style = {},
     children,
     classNameWrapper = "",
+    cursorColor = "#21B972",
+    typingSpeed = 70,
+    text = "",
 }) => {
-    const fullText = Array.isArray(children) ? children.join(" ") : `${children}`;
-    const words = fullText.split(" ");
-    const [visibleCount, setVisibleCount] = useState(0);
+    const fullText = text
+        ? Array.isArray(text)
+            ? text.filter(Boolean).join(" ") // lọc bỏ phần tử null/undefined
+            : String(text)
+        : "";
+    const [displayedText, setDisplayedText] = useState("");
+    const [isTypingComplete, setIsTypingComplete] = useState(false);
+    const [showCursor, setShowCursor] = useState(true);
+    const animationRef = useRef(null);
     const [showDots, setShowDots] = useState(true);
-    // const wordVariant = {
-    //     hidden: { opacity: 0, x: 20 },
-    //     visible: {
-    //         opacity: 1,
-    //         x: 0,
-    //         transition: { duration: 0.5, ease: "easeOut" },
-    //     },
-    // };
-    // const wordVariant = {
-    //     hidden: { opacity: 0, x: 20 },
-    //     visible: (i) => ({
-    //         opacity: 1,
-    //         x: 0,
-    //         transition: {
-    //             duration: 0.4,
-    //             ease: "easeOut",
-    //             delay: i * 0.1, // từng chữ cách nhau 0.1s
-    //         },
-    //     }),
-    // };
+    const currentIndexRef = useRef(0);
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            const interval = setInterval(() => {
-                setVisibleCount((prev) => {
-                    const next = prev + 1;
-                    if (next >= words.length) {
-                        clearInterval(interval);
-                        setShowDots(false);
-                    }
-                    return next;
-                });
-            }, 400);
+        // Reset state when component mounts or text changes
+        setDisplayedText("");
+        setIsTypingComplete(false);
+        setShowCursor(true);
+        currentIndexRef.current = 0;
+
+        // Clear any existing timers
+        if (animationRef.current) {
+            clearTimeout(animationRef.current);
+        }
+        currentIndexRef.current = 0;
+
+        const typeNextCharacter = () => {
+            const currentChar = fullText[currentIndexRef.current] ?? "";
+            if (currentIndexRef.current < fullText.length) {
+                setDisplayedText((prev) => prev + currentChar);
+                currentIndexRef.current++;
+                animationRef.current = setTimeout(typeNextCharacter, typingSpeed);
+            } else {
+                setIsTypingComplete(true);
+            }
+        };
+
+        animationRef.current = setTimeout(() => {
+            typeNextCharacter();
         }, delay * 1000);
 
-        return () => clearTimeout(timeout);
-    }, [words, delay]);
+        // Fallback sau 10s
+        const fallbackTimer = setTimeout(() => {
+            setDisplayedText(fullText);
+            setIsTypingComplete(true);
+        }, 10000);
 
-    const visibleWords = words.slice(0, visibleCount);
+        // Cleanup function
+        return () => {
+            if (animationRef.current) {
+                clearTimeout(animationRef.current);
+            }
+            clearTimeout(fallbackTimer);
+        };
+    }, [fullText, delay, typingSpeed]);
+
+    // Handle cursor blinking after typing completes
+    useEffect(() => {
+        let cursorBlinkInterval;
+
+        if (isTypingComplete) {
+            cursorBlinkInterval = setInterval(() => {
+                setShowCursor((prev) => !prev);
+            }, 530); // Cursor blink interval
+        }
+
+        return () => {
+            if (cursorBlinkInterval) {
+                clearInterval(cursorBlinkInterval);
+            }
+        };
+    }, [isTypingComplete]);
+    // Animation từ phải qua trái
+    const wordVariant = {
+        hidden: {
+            opacity: 0,
+            x: 20, // Từ phải qua
+        },
+        visible: {
+            opacity: 1,
+            x: 0, // Về vị trí ban đầu
+            transition: {
+                duration: 0.25,
+                ease: "easeOut",
+            },
+        },
+    };
+
+    // Process special words (like "Fimo" that should be bold)
+    const processedText = () => {
+        // Split by word boundaries but keep spaces
+        const segments = displayedText.split(/(\s+)/);
+        return segments.map((segment, index) => {
+            if (segment === "Fimo") {
+                return <b key={index}>{segment}</b>;
+            }
+            return <span key={index}>{segment !== undefined ? segment : ""}</span>;
+        });
+    };
 
     return (
         <div
-            className={twMerge(
-                "relative inline-flex items-center whitespace-nowrap",
-                classNameWrapper
-            )}
-            style={style}
+            className={twMerge("relative inline-flex items-center", classNameWrapper)}
+            style={{
+                minWidth: "50px",
+                whiteSpace: "nowrap",
+                ...style,
+            }}
         >
-            <div
-                // initial={{ width: 0 }}
-                // animate={{ width: `${(visibleCount / words.length) * 100}%` }}
-                // transition={{ duration: 0.5, ease: "easeOut" }}
-                className="absolute inset-0 bg-transparent z-0 rounded-l-xl rounded-tr-xl w-fit"
-            />
             <h2
                 className={twMerge(
-                    "relative z-10 inline-flex flex-row justify-end whitespace-nowrap gap-x-[6px] items-end font-deca text-xs font-normal w-fit",
+                    "relative z-10 font-deca text-xs font-normal w-full whitespace-nowrap overflow-hidden text-ellipsis ",
                     className
                 )}
             >
-                {visibleWords.map((word, i) => (
-                    <motion.span
-                        key={`${word}-${i}`}
-                    // variants={wordVariant}
-                    // initial="hidden"
-                    // animate="visible"
-                    // custom={i}
-                    >
-                        {word === "Fimo" ? <b>{word}</b> : word}
-                    </motion.span>
-                ))}
-
-                {showDots && (
+                {processedText()}
+                <motion.span
+                    className="inline-block ml-[1px] -mr-[1px]"
+                    animate={{ opacity: showCursor ? 1 : 0 }}
+                    transition={{ duration: 0.1 }}
+                    variants={wordVariant}
+                    initial="hidden"
+                />
+                {!isTypingComplete && (
                     <motion.div
-                        className="inline-block"
+                        className="inline-block ml-1 flex-shrink-0"
+                        // className="absolute left-0 top-full mt-1"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: [0, 1, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.2 }}
+                        transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
                     >
                         <LoadingThreeDotsJumping
                             classNameDot1="bg-[#54E79E]"

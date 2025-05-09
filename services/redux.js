@@ -1,7 +1,7 @@
 import { combineReducers, createStore } from "redux";
 
 const initialChatBotState = {
-    open: false,
+    open: true,
     typeChat: null,
     contentChat: "",
     openViewModal: false,
