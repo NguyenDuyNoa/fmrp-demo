@@ -11,9 +11,11 @@ import { useSelector } from "react-redux";
 import Select from "react-select";
 import { useProductCategoryDetailOptions } from "../../hooks/category/useProductCategoryDetailOptions";
 import { useCategoryOptions } from "../../hooks/product/useCategoryOptions";
+import EditIcon from "@/components/icons/common/EditIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 
 const Popup_Products = React.memo((props) => {
-    const isShow = useToast()
+    const isShow = useToast();
 
     // lấy danh sách chi nhánh
     const dataOptBranch = useSelector((state) => state.branch);
@@ -41,10 +43,14 @@ const Popup_Products = React.memo((props) => {
     const [errCode, sErrCode] = useState(false);
 
     // danh sách nhóm danh mục
-    const { data: dataOptAll = [] } = useCategoryOptions()
+    const { data: dataOptAll = [] } = useCategoryOptions();
 
     // khi sửa thì truyền id lấy danh sách theo sửa
-    const { data: dataOption = [] } = useProductCategoryDetailOptions(open, { branch: branch }, props?.id)
+    const { data: dataOption = [] } = useProductCategoryDetailOptions(
+        open,
+        { branch: branch },
+        props?.id
+    );
 
     // set initital cho các sate khi mở poup
     useEffect(() => {
@@ -76,8 +82,8 @@ const Popup_Products = React.memo((props) => {
     const handingCategory = useMutation({
         mutationFn: async (data) => {
             return apiCategory.apiHandingCategory(props?.id, data);
-        }
-    })
+        },
+    });
 
     const _ServerSending = () => {
         let formData = new FormData();
@@ -104,10 +110,8 @@ const Popup_Products = React.memo((props) => {
                     isShow("error", props.dataLang[message] || message);
                 }
             },
-            onError: (error) => {
-
-            }
-        })
+            onError: (error) => { },
+        });
         sOnSending(false);
     };
 
@@ -121,7 +125,10 @@ const Popup_Products = React.memo((props) => {
             name?.length == 0 && sErrName(true);
             code?.length == 0 && sErrCode(true);
             branch?.length == 0 && sErrBranch(true);
-            isShow("error", props.dataLang?.required_field_null || "required_field_null");
+            isShow(
+                "error",
+                props.dataLang?.required_field_null || "required_field_null"
+            );
         } else {
             sOnSending(true);
         }
@@ -154,21 +161,34 @@ const Popup_Products = React.memo((props) => {
                     value: e.id,
                 }))
             );
-            return list
+            return list;
         },
-        enabled: open && !!props?.id
-    })
-
-
-
+        enabled: open && !!props?.id,
+    });
 
     return (
         <PopupCustom
-            title={props?.id
-                ? `${props.dataLang?.catagory_finishedProduct_group_edit || "catagory_finishedProduct_group_edit"}`
-                : `${props.dataLang?.catagory_finishedProduct_group_addnew || "catagory_finishedProduct_group_addnew"}`
+            title={
+                props?.id
+                    ? `${props.dataLang?.catagory_finishedProduct_group_edit ||
+                    "catagory_finishedProduct_group_edit"
+                    }`
+                    : `${props.dataLang?.catagory_finishedProduct_group_addnew ||
+                    "catagory_finishedProduct_group_addnew"
+                    }`
             }
-            button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+            // button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+            button={
+                props.id ? (
+                    <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+                        <EditIcon className={`size-5 transition-all duration-300 `} />
+                    </div>
+                ) : (
+                    <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">
+                        <PlusIcon /> {props.dataLang?.branch_popup_create_new}
+                    </p>
+                )
+            }
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}
@@ -185,9 +205,13 @@ const Popup_Products = React.memo((props) => {
                         value={branch}
                         onChange={_HandleChangeInput.bind(this, "branch")}
                         isClearable={true}
-                        placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
+                        placeholder={
+                            props.dataLang?.client_list_brand || "client_list_brand"
+                        }
                         isMulti
-                        noOptionsMessage={() => `${props.dataLang?.no_data_found || 'no_data_found'}`}
+                        noOptionsMessage={() =>
+                            `${props.dataLang?.no_data_found || "no_data_found"}`
+                        }
                         closeMenuOnSelect={false}
                         className={`${errBranch ? "border-red-500" : "border-transparent"
                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -215,43 +239,60 @@ const Popup_Products = React.memo((props) => {
                 </div>
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_code || 'category_material_group_code'} <span className="text-red-500">*</span>
+                        {props.dataLang?.category_material_group_code ||
+                            "category_material_group_code"}{" "}
+                        <span className="text-red-500">*</span>
                     </label>
                     <input
                         value={code}
                         onChange={_HandleChangeInput.bind(this, "code")}
                         type="text"
-                        placeholder={props.dataLang?.category_material_group_code || 'category_material_group_code'}
-                        className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                        placeholder={
+                            props.dataLang?.category_material_group_code ||
+                            "category_material_group_code"
+                        }
+                        className={`${errCode
+                            ? "border-red-500"
+                            : "focus:border-[#92BFF7] border-[#d0d5dd] "
                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                     />
                     {errCode && (
                         <label className="text-sm text-red-500">
-                            {props.dataLang?.category_material_group_err_code || 'category_material_group_err_code'}
+                            {props.dataLang?.category_material_group_err_code ||
+                                "category_material_group_err_code"}
                         </label>
                     )}
                 </div>
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_name || 'category_material_group_name'} <span className="text-red-500">*</span>
+                        {props.dataLang?.category_material_group_name ||
+                            "category_material_group_name"}{" "}
+                        <span className="text-red-500">*</span>
                     </label>
                     <input
                         value={name}
                         onChange={_HandleChangeInput.bind(this, "name")}
                         type="text"
-                        placeholder={props.dataLang?.category_material_group_name || 'category_material_group_name'}
-                        className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                        placeholder={
+                            props.dataLang?.category_material_group_name ||
+                            "category_material_group_name"
+                        }
+                        className={`${errName
+                            ? "border-red-500"
+                            : "focus:border-[#92BFF7] border-[#d0d5dd] "
                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                     />
                     {errName && (
                         <label className="text-sm text-red-500">
-                            {props.dataLang?.category_material_group_err_name || 'category_material_group_err_name'}
+                            {props.dataLang?.category_material_group_err_name ||
+                                "category_material_group_err_name"}
                         </label>
                     )}
                 </div>
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_level || 'category_material_group_level'}
+                        {props.dataLang?.category_material_group_level ||
+                            "category_material_group_level"}
                     </label>
                     <Select
                         options={branch?.length != 0 ? dataOption : dataOptAll}
@@ -267,8 +308,13 @@ const Popup_Products = React.memo((props) => {
                         }
                         onChange={_HandleChangeInput.bind(this, "group")}
                         isClearable={true}
-                        placeholder={props.dataLang?.category_material_group_level || 'category_material_group_level'}
-                        noOptionsMessage={() => `${props.dataLang?.no_data_found || 'no_data_found'}`}
+                        placeholder={
+                            props.dataLang?.category_material_group_level ||
+                            "category_material_group_level"
+                        }
+                        noOptionsMessage={() =>
+                            `${props.dataLang?.no_data_found || "no_data_found"}`
+                        }
                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
                         isSearchable={true}
                         theme={(theme) => ({
@@ -289,10 +335,14 @@ const Popup_Products = React.memo((props) => {
                     />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_popup_note || 'client_popup_note'}</label>
+                    <label className="text-[#344054] font-normal text-base">
+                        {props.dataLang?.client_popup_note || "client_popup_note"}
+                    </label>
                     <textarea
                         type="text"
-                        placeholder={props.dataLang?.client_popup_note || 'client_popup_note'}
+                        placeholder={
+                            props.dataLang?.client_popup_note || "client_popup_note"
+                        }
                         rows={5}
                         value={note}
                         onChange={_HandleChangeInput.bind(this, "note")}
@@ -311,10 +361,9 @@ const Popup_Products = React.memo((props) => {
                         onClick={_HandleSubmit.bind(this)}
                         className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#003DA0] hover:opacity-90 hover:scale-105 transition"
                     />
-
                 </div>
             </div>
         </PopupCustom>
     );
 });
-export default Popup_Products
+export default Popup_Products;

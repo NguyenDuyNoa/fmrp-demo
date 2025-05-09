@@ -1,5 +1,6 @@
 import apiCategory from "@/Api/apiProducts/category/apiCategory";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
@@ -13,7 +14,11 @@ import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Trash as IconDelete, GalleryEdit as IconEditImg, Image as IconImage } from "iconsax-react";
+import {
+    Trash as IconDelete,
+    GalleryEdit as IconEditImg,
+    Image as IconImage,
+} from "iconsax-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { BiEdit } from "react-icons/bi";
@@ -33,11 +38,20 @@ const Popup_Products = React.memo((props) => {
 
     const [isOpen, sIsOpen] = useState(false);
 
-    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    const { is_admin: role, permissions_current: auth } = useSelector(
+        (state) => state.auth
+    );
 
-    const { checkAdd, checkEdit } = useActionRole(auth, 'products');
+    const { checkAdd, checkEdit } = useActionRole(auth, "products");
     // cờ để show popup khi xóa
-    const { isOpen: openDelete, isId, isIdChild, handleOpen, handleToggle, handleQueryId } = useToggle();
+    const {
+        isOpen: openDelete,
+        isId,
+        isIdChild,
+        handleOpen,
+        handleToggle,
+        handleQueryId,
+    } = useToggle();
 
     const scrollAreaRef = useRef(null);
 
@@ -117,11 +131,17 @@ const Popup_Products = React.memo((props) => {
     const [dataVariantSending, sDataVariantSending] = useState([]);
     // check biến thể trùng
     useEffect(() => {
-        sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
+        sOptVariantMain(
+            dataOptVariant?.find((e) => e.value == variantMain)?.option
+        );
         // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
         prevVariantMain === undefined && sOptSelectedVariantMain([]);
         !variantMain && sOptSelectedVariantMain([]);
-        if (variantMain === variantSub && variantSub != null && variantMain != null) {
+        if (
+            variantMain === variantSub &&
+            variantSub != null &&
+            variantMain != null
+        ) {
             sVariantSub(null);
             isShow("error", `Biến thể bị trùng`);
         }
@@ -133,13 +153,18 @@ const Popup_Products = React.memo((props) => {
         // variantSub && optSelectedVariantSub?.length === 0 && sOptSelectedVariantSub([])
         prevVariantSub === undefined && sOptSelectedVariantSub([]);
         !variantSub && sOptSelectedVariantSub([]);
-        if (variantSub === variantMain && variantSub != null && variantMain != null) {
+        if (
+            variantSub === variantMain &&
+            variantSub != null &&
+            variantMain != null
+        ) {
             sVariantSub(null);
             isShow("error", `Biến thể bị trùng`);
         }
     }, [variantSub]);
 
-    const checkEqual = (prevValue, nextValue) => prevValue && nextValue && prevValue === nextValue;
+    const checkEqual = (prevValue, nextValue) =>
+        prevValue && nextValue && prevValue === nextValue;
 
     // chọn biến thể
     const _HandleSelectedVariant = (type, event) => {
@@ -152,7 +177,9 @@ const Popup_Products = React.memo((props) => {
                 sOptSelectedVariantMain(updatedOptions);
             } else {
                 // Xóa giá trị và id khỏi mảng khi input được bỏ chọn
-                const updatedOptions = optSelectedVariantMain.filter((option) => option.id !== id);
+                const updatedOptions = optSelectedVariantMain.filter(
+                    (option) => option.id !== id
+                );
                 sOptSelectedVariantMain(updatedOptions);
             }
         } else if (type == "sub") {
@@ -162,7 +189,9 @@ const Popup_Products = React.memo((props) => {
                 const updatedOptions = [...optSelectedVariantSub, { name, id }];
                 sOptSelectedVariantSub(updatedOptions);
             } else {
-                const updatedOptions = optSelectedVariantSub.filter((option) => option.id !== id);
+                const updatedOptions = optSelectedVariantSub.filter(
+                    (option) => option.id !== id
+                );
                 sOptSelectedVariantSub(updatedOptions);
             }
         }
@@ -172,7 +201,10 @@ const Popup_Products = React.memo((props) => {
     const _HandleSelectedAllVariant = (type) => {
         if (type == "main") {
             const uncheckedOptions = optVariantMain.filter(
-                (option) => !optSelectedVariantMain.some((selectedOpt) => selectedOpt.id === option.id)
+                (option) =>
+                    !optSelectedVariantMain.some(
+                        (selectedOpt) => selectedOpt.id === option.id
+                    )
             );
             // Thêm tất cả các option chưa được chọn vào mảng optSelectedVariantMain
             const updatedOptions = [...optSelectedVariantMain, ...uncheckedOptions];
@@ -180,7 +212,10 @@ const Popup_Products = React.memo((props) => {
             // Lấy tất cả các option chưa được chọn
         } else if (type == "sub") {
             const uncheckedOptions = optVariantSub.filter(
-                (option) => !optSelectedVariantSub.some((selectedOpt) => selectedOpt.id === option.id)
+                (option) =>
+                    !optSelectedVariantSub.some(
+                        (selectedOpt) => selectedOpt.id === option.id
+                    )
             );
             const updatedOptions = [...optSelectedVariantSub, ...uncheckedOptions];
             sOptSelectedVariantSub(updatedOptions);
@@ -189,33 +224,44 @@ const Popup_Products = React.memo((props) => {
     // áp dụng biến thể
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
-            const newData = optSelectedVariantMain?.map(e => {
-                const newViar = dataTotalVariant?.find(x => x?.id == e?.id)
+            const newData = optSelectedVariantMain?.map((e) => {
+                const newViar = dataTotalVariant?.find((x) => x?.id == e?.id);
                 return {
                     ...e,
                     id_primary: newViar?.id_primary ? newViar?.id_primary : e?.id_primary,
                     isDelete: newViar?.isDelete,
                     variation_option_2: optSelectedVariantSub?.map((item2) => {
-                        const check = newViar?.variation_option_2.find(x => x?.id == item2?.id);
-                        const checkItem = newViar?.variation_option_2?.find(x => x?.id_primary)
+                        const check = newViar?.variation_option_2.find(
+                            (x) => x?.id == item2?.id
+                        );
+                        const checkItem = newViar?.variation_option_2?.find(
+                            (x) => x?.id_primary
+                        );
                         return {
                             ...item2,
                             isDelete: check?.isDelete,
-                            id_primary: check && check?.id_primary ? check?.id_primary : item2?.id_primary,
-                            price: check && check?.price ? check?.price : checkItem ? checkItem.price : ""
-                        }
-
-                    })
-                }
-            })
-            const newdb = [...dataTotalVariant, ...newData]
+                            id_primary:
+                                check && check?.id_primary
+                                    ? check?.id_primary
+                                    : item2?.id_primary,
+                            price:
+                                check && check?.price
+                                    ? check?.price
+                                    : checkItem
+                                        ? checkItem.price
+                                        : "",
+                        };
+                    }),
+                };
+            });
+            const newdb = [...dataTotalVariant, ...newData];
 
             // Mảng chứa dữ liệu sau khi xử lý
             const processedData = [];
             // Tạo một đối tượng để theo dõi các phần tử theo id
             const idMap = {};
             // Duyệt qua mảng newdb
-            newdb.forEach(item => {
+            newdb.forEach((item) => {
                 const id = item.id;
                 // Nếu id chưa được thêm vào idMap hoặc variation_option_2.length lớn hơn, thì cập nhật idMap
                 // if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
@@ -226,7 +272,11 @@ const Popup_Products = React.memo((props) => {
                     idMap[id] = item;
                 } else {
                     // Nếu id chưa được thêm vào idMap hoặc variation_option_2 có id, thì cập nhật idMap
-                    if (!idMap[id] || (item.variation_option_2 && item.variation_option_2.find(option => option.id))) {
+                    if (
+                        !idMap[id] ||
+                        (item.variation_option_2 &&
+                            item.variation_option_2.find((option) => option.id))
+                    ) {
                         idMap[id] = item;
                     }
                 }
@@ -346,7 +396,7 @@ const Popup_Products = React.memo((props) => {
         queryKey: ["detail_product", props?.id],
         enabled: !!isOpen && !!props?.id,
         queryFn: async () => {
-            const list = await apiProducts.apiDetailProducts(props?.id)
+            const list = await apiProducts.apiDetailProducts(props?.id);
             sUnit({ label: list?.unit, value: list?.unit_id });
             sDataVariantSending(list?.variation);
             sVariantMain(list?.variation[0]?.id);
@@ -365,10 +415,14 @@ const Popup_Products = React.memo((props) => {
                     value: e.id,
                 }))
             );
-            sCategory(list?.category_id ? {
-                label: list?.category_name,
-                value: list?.category_id,
-            } : null);
+            sCategory(
+                list?.category_id
+                    ? {
+                        label: list?.category_name,
+                        value: list?.category_id,
+                    }
+                    : null
+            );
             sType({
                 label: props.dataLang[list?.type_products?.name],
                 value: list?.type_products?.code,
@@ -379,17 +433,18 @@ const Popup_Products = React.memo((props) => {
             // sExpiry(Number(data?.expiry));
             sNote(list?.note);
 
-            return list
+            return list;
         },
-    })
+    });
 
     // danh sách danh mục
     useQuery({
         queryKey: ["api_category", branch],
         queryFn: async () => {
             const params = {
-                "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : -1,
-            }
+                "filter[branch_id][]":
+                    branch?.length > 0 ? branch.map((e) => e.value) : -1,
+            };
             const { rResult } = await apiCategory.apiOptionCategory({ params });
             sDataCategory(
                 rResult.map((e) => ({
@@ -400,16 +455,16 @@ const Popup_Products = React.memo((props) => {
                     parent_id: e.parent_id,
                 }))
             );
-            return rResult
+            return rResult;
         },
-        enabled: (!!branch && !!isOpen)
-    })
+        enabled: !!branch && !!isOpen,
+    });
 
     const handingProducts = useMutation({
         mutationFn: async (data) => {
             return apiProducts.apiHandingProducts(props?.id, data);
-        }
-    })
+        },
+    });
 
     // lưu thành phẩm
     const _ServerSending = () => {
@@ -428,16 +483,31 @@ const Popup_Products = React.memo((props) => {
         for (let i = 0; i < dataTotalVariant?.length; i++) {
             var item = dataTotalVariant[i];
 
-            formData.set(`variation_option_value[${i}][variation_option_1_id]`, item.id);
+            formData.set(
+                `variation_option_value[${i}][variation_option_1_id]`,
+                item.id
+            );
             formData.set(`variation_option_value[${i}][image]`, item.image || "");
-            formData.set(`variation_option_value[${i}][id_primary]`, item?.id_primary || "0");
+            formData.set(
+                `variation_option_value[${i}][id_primary]`,
+                item?.id_primary || "0"
+            );
 
             if (item.variation_option_2?.length > 0) {
                 for (let j = 0; j < item.variation_option_2?.length; j++) {
                     var subItem = item.variation_option_2[j];
-                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem?.id);
-                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id_primary]`, subItem?.id_primary || "0");
-                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][price]`, subItem?.price || "");
+                    formData.set(
+                        `variation_option_value[${i}][variation_option_2][${j}][id]`,
+                        subItem?.id
+                    );
+                    formData.set(
+                        `variation_option_value[${i}][variation_option_2][${j}][id_primary]`,
+                        subItem?.id_primary || "0"
+                    );
+                    formData.set(
+                        `variation_option_value[${i}][variation_option_2][${j}][price]`,
+                        subItem?.price || ""
+                    );
                 }
             } else {
                 formData.set(`variation_option_value[${i}][price]`, item.price || "");
@@ -446,7 +516,10 @@ const Popup_Products = React.memo((props) => {
 
         for (let i = 0; i < dataVariantSending?.length; i++) {
             for (let j = 0; j < dataVariantSending[i].option?.length; j++) {
-                formData.append(`variation[${i}][option_id][${j}]`, dataVariantSending[i].option[j].id);
+                formData.append(
+                    `variation[${i}][option_id][${j}]`,
+                    dataVariantSending[i].option[j].id
+                );
             }
         }
         handingProducts.mutate(formData, {
@@ -459,9 +532,7 @@ const Popup_Products = React.memo((props) => {
                     isShow("error", props.dataLang[message] || message);
                 }
             },
-            onError: (error) => {
-
-            }
+            onError: (error) => { },
         });
         sOnSending(false);
     };
@@ -472,7 +543,14 @@ const Popup_Products = React.memo((props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (branch?.length == 0 || category?.value == null || type?.value == null || (props?.id && code == "") || unit?.value == null || name == "") {
+        if (
+            branch?.length == 0 ||
+            category?.value == null ||
+            type?.value == null ||
+            (props?.id && code == "") ||
+            unit?.value == null ||
+            name == ""
+        ) {
             branch?.length == 0 && sErrBranch(true);
             category?.value == null && sErrGroup(true);
             type?.value == null && sErrType(true);
@@ -500,20 +578,28 @@ const Popup_Products = React.memo((props) => {
     // change tiền trong biến thể
     const _HandleChangePrice = (parentId, id, value) => {
         var parentIndex = dataTotalVariant?.findIndex((x) => x.id === parentId);
-        var index = dataTotalVariant[parentIndex].variation_option_2.findIndex((x) => x.id === id);
-        dataTotalVariant[parentIndex].variation_option_2[index].price = Number(value.value);
+        var index = dataTotalVariant[parentIndex].variation_option_2.findIndex(
+            (x) => x.id === id
+        );
+        dataTotalVariant[parentIndex].variation_option_2[index].price = Number(
+            value.value
+        );
         sDataTotalVariant([...dataTotalVariant]);
     };
 
     // xóa biến thể
     const handleDeleteVariantItems = () => {
         if (isId && isIdChild) {
-            const newData = dataTotalVariant.map((item) => {
-                if (item.id === isId) {
-                    item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== isIdChild);
-                }
-                return item;
-            }).filter((item) => item.variation_option_2.length > 0);
+            const newData = dataTotalVariant
+                .map((item) => {
+                    if (item.id === isId) {
+                        item.variation_option_2 = item.variation_option_2.filter(
+                            (opt) => opt.id !== isIdChild
+                        );
+                    }
+                    return item;
+                })
+                .filter((item) => item.variation_option_2.length > 0);
             sDataTotalVariant(newData);
 
             const foundParent = newData.some((item) => item.id === isId);
@@ -546,7 +632,9 @@ const Popup_Products = React.memo((props) => {
             handleQueryId({ status: false });
         } else {
             sDataTotalVariant([...dataTotalVariant.filter((x) => x.id !== isId)]);
-            const filteredOption = dataVariantSending[0]?.option.filter((opt) => opt.id !== isId);
+            const filteredOption = dataVariantSending[0]?.option.filter(
+                (opt) => opt.id !== isId
+            );
             const updatedData = [...dataVariantSending];
             updatedData[0] = {
                 ...dataVariantSending[0],
@@ -559,19 +647,26 @@ const Popup_Products = React.memo((props) => {
     return (
         <PopupCustom
             title={
-                props?.id ? `${props.dataLang?.edit_finishedProduct || "edit_finishedProduct"}` : `${props.dataLang?.addNew_finishedProduct || "addNew_finishedProduct"}`
+                props?.id
+                    ? `${props.dataLang?.edit_finishedProduct || "edit_finishedProduct"}`
+                    : `${props.dataLang?.addNew_finishedProduct || "addNew_finishedProduct"
+                    }`
             }
             button={
-                props?.id ?
+                props?.id ? (
                     <div
                         onClick={() => {
                             if (role || checkEdit) {
-                                sIsOpen(true)
+                                sIsOpen(true);
                             } else {
-                                isShow("error", WARNING_STATUS_ROLE)
+                                isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
-                        className={props.type == 'add' && "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}>
+                        className={
+                            props.type == "add" &&
+                            "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"
+                        }
+                    >
                         <BiEdit
                             size={20}
                             className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
@@ -579,14 +674,17 @@ const Popup_Products = React.memo((props) => {
                         {/* <p className="group-hover:text-sky-500">
                             {props.dataLang?.btn_table_edit || "btn_table_edit"}
                         </p> */}
-
                     </div>
-                    : props.dataLang?.branch_popup_create_new || 'branch_popup_create_new'
-
+                ) : (
+                    // : props.dataLang?.branch_popup_create_new || 'branch_popup_create_new'
+                    <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">
+                        <PlusIcon /> {props.dataLang?.branch_popup_create_new}
+                    </p>
+                )
             }
             onClickOpen={() => {
                 if (!props?.id) {
-                    sIsOpen(true)
+                    sIsOpen(true);
                 }
             }}
             open={isOpen}
@@ -597,17 +695,22 @@ const Popup_Products = React.memo((props) => {
                 <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        className={`${tab === 0
+                            ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                            : "hover:text-[#0F4F9E] "
                             } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                     >
                         {props.dataLang?.information || "information"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        className={`${tab === 1
+                            ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                            : "hover:text-[#0F4F9E] "
                             } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                     >
-                        {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
+                        {props.dataLang?.category_material_list_variant ||
+                            "category_material_list_variant"}
                     </button>
                 </div>
                 <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]">
@@ -620,7 +723,8 @@ const Popup_Products = React.memo((props) => {
                                     <div className="space-y-2 2xl:space-y-3">
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.client_list_brand || "client_list_brand"}{" "}
+                                                {props.dataLang?.client_list_brand ||
+                                                    "client_list_brand"}{" "}
                                                 <span className="text-red-500">*</span>
                                             </label>
                                             <Select
@@ -628,9 +732,14 @@ const Popup_Products = React.memo((props) => {
                                                 value={branch}
                                                 onChange={_HandleChangeInput.bind(this, "branch")}
                                                 isClearable={true}
-                                                placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
+                                                placeholder={
+                                                    props.dataLang?.client_list_brand ||
+                                                    "client_list_brand"
+                                                }
                                                 isMulti
-                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                noOptionsMessage={() =>
+                                                    `${props.dataLang?.no_data_found}`
+                                                }
                                                 closeMenuOnSelect={false}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
@@ -661,13 +770,15 @@ const Popup_Products = React.memo((props) => {
                                             />
                                             {errBranch && branch?.length == 0 && (
                                                 <label className="text-sm text-red-500">
-                                                    {props.dataLang?.client_list_bran || "client_list_bran"}
+                                                    {props.dataLang?.client_list_bran ||
+                                                        "client_list_bran"}
                                                 </label>
                                             )}
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.category_titel} <span className="text-red-500">*</span>
+                                                {props.dataLang?.category_titel}{" "}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 options={dataCategory}
@@ -675,7 +786,9 @@ const Popup_Products = React.memo((props) => {
                                                 value={category}
                                                 onChange={_HandleChangeInput.bind(this, "category")}
                                                 isClearable={true}
-                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                noOptionsMessage={() =>
+                                                    `${props.dataLang?.no_data_found}`
+                                                }
                                                 placeholder={props.dataLang?.category_titel}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
@@ -761,10 +874,10 @@ const Popup_Products = React.memo((props) => {
                                                 isAllowed={(values) => {
                                                     const { floatValue } = values;
                                                     if (+floatValue < 0) {
-                                                        isShow("error", 'Giá bán không được âm')
+                                                        isShow("error", "Giá bán không được âm");
                                                         return false;
                                                     }
-                                                    return true
+                                                    return true;
                                                 }}
                                                 onValueChange={_HandleChangeInput.bind(this, "price")}
                                                 placeholder="Giá bán"
@@ -780,35 +893,46 @@ const Popup_Products = React.memo((props) => {
                                                 isAllowed={(values) => {
                                                     const { floatValue } = values;
                                                     if (+floatValue < 0) {
-                                                        isShow("error", 'Số lượng không được âm')
+                                                        isShow("error", "Số lượng không được âm");
                                                         return false;
                                                     }
-                                                    return true
+                                                    return true;
                                                 }}
-                                                onValueChange={_HandleChangeInput.bind(this, "minimumAmount")}
-                                                placeholder={props.dataLang?.minimum_amount || "minimum_amount"}
+                                                onValueChange={_HandleChangeInput.bind(
+                                                    this,
+                                                    "minimumAmount"
+                                                )}
+                                                placeholder={
+                                                    props.dataLang?.minimum_amount || "minimum_amount"
+                                                }
                                                 className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                             />
                                         </div>
                                         {props.dataProductExpiry?.is_enable === "1" && (
                                             <div className="2xl:space-y-1">
                                                 <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                    {props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}
+                                                    {props.dataLang?.category_material_list_expiry_date ||
+                                                        "category_material_list_expiry_date"}
                                                 </label>
                                                 <div className="relative flex flex-col items-center justify-center">
                                                     <InPutNumericFormat
                                                         isAllowed={(values) => {
                                                             const { floatValue } = values;
                                                             if (+floatValue < 0) {
-                                                                isShow("error", 'Thời hạn ngày không được âm')
+                                                                isShow("error", "Thời hạn ngày không được âm");
                                                                 return false;
                                                             }
-                                                            return true
+                                                            return true;
                                                         }}
                                                         value={expiry}
-                                                        onValueChange={_HandleChangeInput.bind(this, "expiry")}
+                                                        onValueChange={_HandleChangeInput.bind(
+                                                            this,
+                                                            "expiry"
+                                                        )}
                                                         placeholder={
-                                                            props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"
+                                                            props.dataLang
+                                                                ?.category_material_list_expiry_date ||
+                                                            "category_material_list_expiry_date"
                                                         }
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`}
                                                     />
@@ -831,10 +955,15 @@ const Popup_Products = React.memo((props) => {
                                                 onChange={_HandleChangeInput.bind(this, "type")}
                                                 isClearable={true}
                                                 placeholder={props.dataLang?.type_finishedProduct}
-                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                noOptionsMessage={() =>
+                                                    `${props.dataLang?.no_data_found}`
+                                                }
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${errType && type?.value == null ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errType && type?.value == null
+                                                    ? "border-red-500"
+                                                    : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 theme={(theme) => ({
                                                     ...theme,
                                                     colors: {
@@ -864,14 +993,17 @@ const Popup_Products = React.memo((props) => {
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.unit} <span className="text-red-500">*</span>
+                                                {props.dataLang?.unit}{" "}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 options={dataOptUnit}
                                                 value={unit}
                                                 onChange={_HandleChangeInput.bind(this, "unit")}
                                                 isClearable={true}
-                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                noOptionsMessage={() =>
+                                                    `${props.dataLang?.no_data_found}`
+                                                }
                                                 placeholder={props.dataLang?.unit}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
@@ -983,12 +1115,19 @@ const Popup_Products = React.memo((props) => {
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <label>
-                                                    {props.dataLang?.category_material_list_variant_main || "category_material_list_variant_main"}
+                                                    {props.dataLang
+                                                        ?.category_material_list_variant_main ||
+                                                        "category_material_list_variant_main"}
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
                                                     // isDisabled={false}
-                                                    isDisabled={dataVariantSending[0] && dataTotalVariant?.some(e => e?.id != "" || e?.id != null)}
+                                                    isDisabled={
+                                                        dataVariantSending[0] &&
+                                                        dataTotalVariant?.some(
+                                                            (e) => e?.id != "" || e?.id != null
+                                                        )
+                                                    }
                                                     // isDisabled={dataVariantSending[0] ? true : false}
                                                     value={
                                                         variantMain
@@ -1000,12 +1139,19 @@ const Popup_Products = React.memo((props) => {
                                                             }
                                                             : null
                                                     }
-                                                    onChange={_HandleChangeInput.bind(this, "variantMain")}
+                                                    onChange={_HandleChangeInput.bind(
+                                                        this,
+                                                        "variantMain"
+                                                    )}
                                                     isClearable={true}
                                                     placeholder={
-                                                        props.dataLang?.category_material_list_variant_main || "category_material_list_variant_main"
+                                                        props.dataLang
+                                                            ?.category_material_list_variant_main ||
+                                                        "category_material_list_variant_main"
                                                     }
-                                                    noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                    noOptionsMessage={() =>
+                                                        `${props.dataLang?.no_data_found}`
+                                                    }
                                                     menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     className={` placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -1033,11 +1179,15 @@ const Popup_Products = React.memo((props) => {
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <h5 className="text-sm text-slate-400">
-                                                    {props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}
+                                                    {props.dataLang?.branch_popup_variant_option ||
+                                                        "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantMain && (
                                                     <button
-                                                        onClick={_HandleSelectedAllVariant.bind(this, "main")}
+                                                        onClick={_HandleSelectedAllVariant.bind(
+                                                            this,
+                                                            "main"
+                                                        )}
                                                         className="text-sm font-medium"
                                                     >
                                                         Chọn tất cả
@@ -1054,7 +1204,10 @@ const Popup_Products = React.memo((props) => {
                                             <Customscrollbar className="max-h-[115px] w-full">
                                                 <div className="flex flex-col">
                                                     {optVariantMain?.map((e) => (
-                                                        <div key={e?.id.toString()} className="flex items-center ">
+                                                        <div
+                                                            key={e?.id.toString()}
+                                                            className="flex items-center "
+                                                        >
                                                             <label
                                                                 className="relative flex items-center p-2 rounded-full cursor-pointer"
                                                                 htmlFor={e.id}
@@ -1068,7 +1221,10 @@ const Popup_Products = React.memo((props) => {
                                                                     checked={optSelectedVariantMain.some(
                                                                         (selectedOpt) => selectedOpt.id === e.id
                                                                     )}
-                                                                    onChange={_HandleSelectedVariant.bind(this, "main")}
+                                                                    onChange={_HandleSelectedVariant.bind(
+                                                                        this,
+                                                                        "main"
+                                                                    )}
                                                                 />
                                                                 <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                                     <svg
@@ -1101,12 +1257,18 @@ const Popup_Products = React.memo((props) => {
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <label>
-                                                    {props.dataLang?.category_material_list_variant_sub || "category_material_list_variant_sub"}
+                                                    {props.dataLang?.category_material_list_variant_sub ||
+                                                        "category_material_list_variant_sub"}
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
                                                     // isDisabled={dataVariantSending[1] ? true : false}
-                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e.id && e?.variation_option_2?.length > 0)}
+                                                    isDisabled={
+                                                        dataVariantSending[1] &&
+                                                        dataTotalVariant?.some(
+                                                            (e) => e.id && e?.variation_option_2?.length > 0
+                                                        )
+                                                    }
                                                     // isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x.id != "" || x.id != null))}
                                                     // isDisabled={false}
                                                     value={
@@ -1121,8 +1283,14 @@ const Popup_Products = React.memo((props) => {
                                                     }
                                                     onChange={_HandleChangeInput.bind(this, "variantSub")}
                                                     isClearable={true}
-                                                    placeholder={props.dataLang?.category_material_list_variant_sub || "category_material_list_variant_sub"}
-                                                    noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                    placeholder={
+                                                        props.dataLang
+                                                            ?.category_material_list_variant_sub ||
+                                                        "category_material_list_variant_sub"
+                                                    }
+                                                    noOptionsMessage={() =>
+                                                        `${props.dataLang?.no_data_found}`
+                                                    }
                                                     menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     className={` placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -1150,11 +1318,15 @@ const Popup_Products = React.memo((props) => {
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <h5 className="text-sm text-slate-400">
-                                                    {props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}
+                                                    {props.dataLang?.branch_popup_variant_option ||
+                                                        "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantSub && (
                                                     <button
-                                                        onClick={_HandleSelectedAllVariant.bind(this, "sub")}
+                                                        onClick={_HandleSelectedAllVariant.bind(
+                                                            this,
+                                                            "sub"
+                                                        )}
                                                         className="text-sm font-medium"
                                                     >
                                                         Chọn tất cả
@@ -1168,11 +1340,13 @@ const Popup_Products = React.memo((props) => {
                                                     <div className="w-full h-9 bg-slate-100 animate-[pulse_1.2s_ease-in-out_infinite] rounded" />
                                                 </div>
                                             )}
-                                            <Customscrollbar className="max-h-[115px] w-full"
-                                            >
+                                            <Customscrollbar className="max-h-[115px] w-full">
                                                 <div className="flex flex-col space-y-0.5">
                                                     {optVariantSub?.map((e) => (
-                                                        <div key={e?.id.toString()} className="flex items-center ">
+                                                        <div
+                                                            key={e?.id.toString()}
+                                                            className="flex items-center "
+                                                        >
                                                             <label
                                                                 className="relative flex items-center p-2 rounded-full cursor-pointer"
                                                                 htmlFor={e.id}
@@ -1186,7 +1360,10 @@ const Popup_Products = React.memo((props) => {
                                                                     checked={optSelectedVariantSub.some(
                                                                         (selectedOpt) => selectedOpt.id === e.id
                                                                     )}
-                                                                    onChange={_HandleSelectedVariant.bind(this, "sub")}
+                                                                    onChange={_HandleSelectedVariant.bind(
+                                                                        this,
+                                                                        "sub"
+                                                                    )}
                                                                 />
                                                                 <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
                                                                     <svg
@@ -1220,7 +1397,12 @@ const Popup_Products = React.memo((props) => {
                                     <div className="flex justify-end py-2">
                                         <button
                                             onClick={_HandleApplyVariant.bind(this)}
-                                            disabled={optSelectedVariantMain?.length == 0 && optSelectedVariantSub?.length == 0 ? true : false}
+                                            disabled={
+                                                optSelectedVariantMain?.length == 0 &&
+                                                    optSelectedVariantSub?.length == 0
+                                                    ? true
+                                                    : false
+                                            }
                                             className="disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition"
                                         >
                                             {props.dataLang?.apply || "apply"}
@@ -1231,9 +1413,7 @@ const Popup_Products = React.memo((props) => {
                                             <h4 className="text-[#344054] font-medium">
                                                 {props.dataLang?.list_variant || "list_variant"}
                                             </h4>
-                                            <div
-                                                className={`grid-cols-9 grid gap-5 py-1`}
-                                            >
+                                            <div className={`grid-cols-9 grid gap-5 py-1`}>
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400 col-span-2">
                                                     {props.dataLang?.avatar || "avatar"}
                                                 </h4>
@@ -1247,7 +1427,8 @@ const Popup_Products = React.memo((props) => {
                                                     {"Giá"}
                                                 </h4>
                                                 <h4 className="text-[15px] text-left font-[300] text-slate-400">
-                                                    {props.dataLang?.branch_popup_properties || "branch_popup_properties"}
+                                                    {props.dataLang?.branch_popup_properties ||
+                                                        "branch_popup_properties"}
                                                 </h4>
                                             </div>
                                             <Customscrollbar className="max-h-[250px]">
@@ -1258,24 +1439,30 @@ const Popup_Products = React.memo((props) => {
                                                             key={e?.id ? e?.id.toString() : index + 1}
                                                         >
                                                             <div className="flex flex-col items-center justify-center w-full h-full col-span-2">
-                                                                {e?.id != null && <input
-                                                                    onChange={_HandleChangeVariant.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        "image"
-                                                                    )}
-                                                                    type="file"
-                                                                    id={`uploadImg+${e?.id}`}
-                                                                    accept="image/png, image/jpeg"
-                                                                    hidden
-                                                                />}
+                                                                {e?.id != null && (
+                                                                    <input
+                                                                        onChange={_HandleChangeVariant.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            "image"
+                                                                        )}
+                                                                        type="file"
+                                                                        id={`uploadImg+${e?.id}`}
+                                                                        accept="image/png, image/jpeg"
+                                                                        hidden
+                                                                    />
+                                                                )}
                                                                 <label
                                                                     htmlFor={`uploadImg+${e?.id}`}
-                                                                    className={`${e?.id != null && "cursor-pointer"} h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}
+                                                                    className={`${e?.id != null && "cursor-pointer"
+                                                                        } h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}
                                                                 >
                                                                     {e.image == null ? (
                                                                         <React.Fragment>
-                                                                            <div className={`${e?.id != null && "cursor-pointer"} h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}>
+                                                                            <div
+                                                                                className={`${e?.id != null && "cursor-pointer"
+                                                                                    } h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}
+                                                                            >
                                                                                 <IconImage />
                                                                             </div>
                                                                         </React.Fragment>
@@ -1293,7 +1480,9 @@ const Popup_Products = React.memo((props) => {
                                                                     )}
                                                                 </label>
                                                             </div>
-                                                            <div className="col-span-2 text-left truncate ">{e.name}</div>
+                                                            <div className="col-span-2 text-left truncate ">
+                                                                {e.name}
+                                                            </div>
                                                             {e?.variation_option_2?.length > 0 ? (
                                                                 <div className="grid items-center grid-cols-5 col-span-5 gap-1">
                                                                     {e?.variation_option_2?.map((ce) => (
@@ -1311,70 +1500,71 @@ const Popup_Products = React.memo((props) => {
                                                                                 isAllowed={(values) => {
                                                                                     const { floatValue } = values;
                                                                                     if (+floatValue < 0) {
-                                                                                        isShow("error", 'Giá không được âm')
+                                                                                        isShow(
+                                                                                            "error",
+                                                                                            "Giá không được âm"
+                                                                                        );
                                                                                         return false;
                                                                                     }
-                                                                                    return true
+                                                                                    return true;
                                                                                 }}
                                                                                 placeholder="Giá"
                                                                                 className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                                             />
                                                                             <div className="flex justify-center">
-                                                                                {ce?.isDelete && <button
-                                                                                    // onClick={_HandleDeleteVariant.bind(
-                                                                                    //     this,
-                                                                                    //     e.id,
-                                                                                    //     ce.id
-                                                                                    // )}
-                                                                                    onClick={() =>
-                                                                                        handleQueryId({
-                                                                                            id: e.id,
-                                                                                            status: true,
-                                                                                            idChild: ce.id,
-                                                                                        })
-                                                                                    }
-                                                                                    className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
-                                                                                >
-                                                                                    <IconDelete size="22" />
-                                                                                </button>
-                                                                                }
-                                                                                {ce?.isDelete == undefined && <button
-                                                                                    // onClick={_HandleDeleteVariant.bind(
-                                                                                    //     this,
-                                                                                    //     e.id,
-                                                                                    //     ce.id
-                                                                                    // )}
-                                                                                    onClick={() =>
-                                                                                        handleQueryId({
-                                                                                            id: e.id,
-                                                                                            status: true,
-                                                                                            idChild: ce.id,
-                                                                                        })
-                                                                                    }
-                                                                                    className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
-                                                                                >
-                                                                                    <IconDelete size="22" />
-                                                                                </button>
-                                                                                }
-
-
-
+                                                                                {ce?.isDelete && (
+                                                                                    <button
+                                                                                        // onClick={_HandleDeleteVariant.bind(
+                                                                                        //     this,
+                                                                                        //     e.id,
+                                                                                        //     ce.id
+                                                                                        // )}
+                                                                                        onClick={() =>
+                                                                                            handleQueryId({
+                                                                                                id: e.id,
+                                                                                                status: true,
+                                                                                                idChild: ce.id,
+                                                                                            })
+                                                                                        }
+                                                                                        className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
+                                                                                    >
+                                                                                        <IconDelete size="22" />
+                                                                                    </button>
+                                                                                )}
+                                                                                {ce?.isDelete == undefined && (
+                                                                                    <button
+                                                                                        // onClick={_HandleDeleteVariant.bind(
+                                                                                        //     this,
+                                                                                        //     e.id,
+                                                                                        //     ce.id
+                                                                                        // )}
+                                                                                        onClick={() =>
+                                                                                            handleQueryId({
+                                                                                                id: e.id,
+                                                                                                status: true,
+                                                                                                idChild: ce.id,
+                                                                                            })
+                                                                                        }
+                                                                                        className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
+                                                                                    >
+                                                                                        <IconDelete size="22" />
+                                                                                    </button>
+                                                                                )}
                                                                             </div>
                                                                         </React.Fragment>
                                                                     ))}
                                                                 </div>
                                                             ) : (
                                                                 <div className="grid grid-cols-5 col-span-5">
-                                                                    <div className="col-span-2 truncate">
-                                                                    </div>
+                                                                    <div className="col-span-2 truncate"></div>
                                                                     <InPutMoneyFormat
                                                                         isAllowed={(values) => {
                                                                             const { floatValue } = values;
                                                                             if (+floatValue < 0) {
-                                                                                isShow("error", 'Giá không được âm')
+                                                                                isShow("error", "Giá không được âm");
                                                                                 return false;
                                                                             }
-                                                                            return true
+                                                                            return true;
                                                                         }}
                                                                         value={e?.price}
                                                                         onValueChange={_HandleChangeVariant.bind(
@@ -1439,4 +1629,4 @@ const Popup_Products = React.memo((props) => {
         </PopupCustom>
     );
 });
-export default Popup_Products
+export default Popup_Products;

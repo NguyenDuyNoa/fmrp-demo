@@ -56,7 +56,7 @@ const Dashboard = (props) => {
           </div>
         </div>
 
-        <div className="fixed bottom-6 right-6 z-[9999]">
+        <div className="fixed bottom-12 right-6 z-[9999]">
           <ToggleBotAI dataLang={dataLang} />
         </div>
       </div>
