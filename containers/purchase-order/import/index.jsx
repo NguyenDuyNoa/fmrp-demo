@@ -537,7 +537,7 @@ const PurchaseImport = (props) => {
                                 <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={2.5} textAlign={"left"}>
+                                <ColumnTable colSpan={2} textAlign={"left"}>
                                     {dataLang?.import_supplier || "import_supplier"}
                                 </ColumnTable>
                                 <ColumnTable colSpan={1} textAlign={"left"}>
@@ -555,7 +555,7 @@ const PurchaseImport = (props) => {
                                 <ColumnTable colSpan={1} textAlign={"center"}>
                                     {dataLang?.import_payment_status || "import_payment_status"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"left"}>
+                                <ColumnTable colSpan={1.5} textAlign={"left"}>
                                     {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
                                 </ColumnTable>
                                 <ColumnTable colSpan={1} textAlign={"left"}>
@@ -581,12 +581,12 @@ const PurchaseImport = (props) => {
                                                 <RowItemTable colSpan={1} textAlign={"left"}>
                                                     <PopupDetail
                                                         dataLang={dataLang}
-                                                        className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
+                                                        className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                         name={e?.code}
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2.5} textAlign={"left"}>
+                                                <RowItemTable colSpan={2} textAlign={"left"}>
                                                     {e.supplier_name}
                                                 </RowItemTable>
                                                 <RowItemTable
@@ -596,7 +596,7 @@ const PurchaseImport = (props) => {
                                                     {
                                                         e?.purchase_order_code && (
                                                             <PopupDetailThere
-                                                                className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
+                                                                className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                                 name={e?.purchase_order_code}
                                                                 dataLang={dataLang}
                                                                 id={e?.purchase_order_id}
@@ -628,7 +628,7 @@ const PurchaseImport = (props) => {
                                                             <TagColorLime name={"Đã chi đủ"} />
                                                         ))}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className="cursor-pointer">
+                                                <RowItemTable colSpan={1.5} className="cursor-pointer">
                                                     <ButtonWarehouse
                                                         warehouseman_id={e?.warehouseman_id}
                                                         _HandleChangeInput={_HandleChangeInput}
@@ -657,7 +657,7 @@ const PurchaseImport = (props) => {
                                     </div>
                                 </>
                             ) : (
-                                <NoData />
+                                <NoData type="table"/>
                             )}
                         </div>
                     </Customscrollbar>

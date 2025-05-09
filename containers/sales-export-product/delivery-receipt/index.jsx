@@ -550,7 +550,7 @@ const DeliveryReceipt = (props) => {
                                                             dataLang={dataLang}
                                                             className="text-left"
                                                             name={
-                                                                <h1 className="px-1 col-span-1 3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-normal text-[9px] text-[#0BAA2E] bg-[#EBFEF2] hover:bg-[#0BAA2E]/90 hover:text-[#EBFEF2] py-0.5 rounded-2xl border-[#0BAA2E]/5 border  cursor-pointer transition-all ease-in-out duration-200 text-center ">
+                                                                <h1 className=" transition-all text-[#0F4F9E] hover:text-blue-600 ease-linear  cursor-pointer">
                                                                     {e?.reference_no_order}
                                                                 </h1>
                                                             }

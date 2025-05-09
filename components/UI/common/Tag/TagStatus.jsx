@@ -14,8 +14,8 @@ const TagColorProduct = ({ dataLang, dataKey, name, className, lang = true, text
     }
     return (
         <span
-            className={`${className} py-0.5 px-2 rounded-full h-fit w-fit font-[500] break-words leading-relaxed ${textSize ? textSize : "3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px]"}
-                } ${findColor[dataKey]}`}
+            className={`${className} py-0.5 px-2 rounded h-fit w-fit font-[500] break-words leading-relaxed ${textSize ? textSize : "responsive-text-sm"}
+                ${findColor[dataKey]}`}
         >
             {
                 lang ?

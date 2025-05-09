@@ -11,7 +11,7 @@ const ButtonPrintItem = ({
   totalButtons = 0,
 }) => {
   const isDisabled = disabled || isLoading;
-console.log(totalButtons)
+
   return (
     <button
       onClick={isDisabled ? undefined : onCLick}

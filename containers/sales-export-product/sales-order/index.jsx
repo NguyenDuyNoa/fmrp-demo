@@ -667,17 +667,17 @@ const SalesOrder = (props) => {
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
                                 >
-                                  <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] border font-medium flex justify-center items-center rounded-2xl mx-auto  px-3 py-0 bg-lime-200 border-lime-200 text-lime-500 ">
+                                  <div className="responsive-text-sm font-normal flex justify-center items-center rounded mx-auto py-0.5 px-1.5 2xl:py-1 2xl:px-2 bg-lime-200 text-lime-700 ">
                                     <PopupDetailQuote
                                       dataLang={dataLang}
-                                      className="text-left "
+                                      // className="text-left "
                                       name={"Phiếu báo giá"}
                                       id={e?.quote_id}
                                     />
                                   </div>
                                 </Zoom>
                               ) : (
-                                <div className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 border font-medium flex justify-center items-center rounded-2xl w-fit px-3 py-0 bg-red-200 border-red-200 text-red-500">
+                                <div className="responsive-text-sm font-normal flex justify-center items-center rounded w-fit py-0.5 px-1.5 2xl:py-1 2xl:px-2 bg-red-200 text-red-500">
                                   Tạo mới
                                 </div>
                               )}

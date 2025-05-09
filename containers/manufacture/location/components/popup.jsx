@@ -1,4 +1,6 @@
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import EditIcon from "@/components/icons/common/EditIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 import ButtonCancel from "@/components/UI/button/buttonCancel";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -6,8 +8,8 @@ import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
 import { SelectCore } from "@/utils/lib/Select";
 import { useMutation } from "@tanstack/react-query";
-import { Edit as IconEdit } from "iconsax-react";
 import { useEffect, useRef, useState } from "react";
+
 const PopupLocationWarehouse = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -134,7 +136,14 @@ const PopupLocationWarehouse = (props) => {
         <>
             <PopupCustom
                 title={props.id ? `${props.dataLang?.warehouses_localtion_edit}` : `${props.dataLang?.warehouses_localtion_add}`}
-                button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+                button={props.id ? 
+                    <div className="group hover:border-[#064E3B] hover:bg-[#064E3B]/10 rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer">
+                        <EditIcon className="size-5" color="#064E3B"/>
+                    </div> : 
+                    <div className="flex items-center gap-2">
+                        <PlusIcon />
+                        {props.dataLang?.branch_popup_create_new}
+                    </div>}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}

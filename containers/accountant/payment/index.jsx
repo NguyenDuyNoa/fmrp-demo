@@ -381,7 +381,7 @@ const Payment = (props) => {
                         </div>
                         <Customscrollbar className="h-full overflow-y-auto">
                             <div className="w-full">
-                                <HeaderTable gridCols={13} className="grid">
+                                <HeaderTable gridCols={14} className="grid">
                                     <ColumnTable colSpan={0.5} textAlign={"center"}>
                                         {dataLang?.stt || "stt"}
                                     </ColumnTable>
@@ -418,10 +418,10 @@ const Payment = (props) => {
                                     <ColumnTable colSpan={1} textAlign={'left'}>
                                         {dataLang?.payment_branch || "payment_branch"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={'left'}>
+                                    <ColumnTable colSpan={1.5} textAlign={'left'}>
                                         {dataLang?.payment_note || "payment_note"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={0.5} textAlign={'left'}>
+                                    <ColumnTable colSpan={1} textAlign={'left'}>
                                         {dataLang?.payment_action || "payment_action"}
                                     </ColumnTable>
                                 </HeaderTable>
@@ -430,7 +430,7 @@ const Payment = (props) => {
                                 ) : data?.rResult?.length > 0 ? (
                                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                         {data?.rResult?.map((e, index) => (
-                                            <RowTable gridCols={13} key={e.id.toString()}>
+                                            <RowTable gridCols={14} key={e.id.toString()}>
                                                 <RowItemTable colSpan={0.5} textAlign={"center"}>
                                                     {index + 1}
                                                 </RowItemTable>
@@ -444,13 +444,13 @@ const Payment = (props) => {
                                                         className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]" name={e?.code}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={'center'}>
+                                                <RowItemTable colSpan={1} textAlign={'left'}>
                                                     {
-                                                        (e?.objects === "client" && (<TagColorSky name={dataLang[e?.objects] || e?.objects} />))
+                                                        (e?.objects === "client" && (<TagColorSky className="flex whitespace-nowrap" name={dataLang[e?.objects] || e?.objects}/>))
                                                         ||
-                                                        (e?.objects === "supplier" && (<TagColorOrange name={dataLang[e?.objects] || e?.objects} />))
+                                                        (e?.objects === "supplier" && (<TagColorOrange className="flex whitespace-nowrap" name={dataLang[e?.objects] || e?.objects} />))
                                                         ||
-                                                        (e?.objects === "other" && (<TagColorRed name={dataLang[e?.objects] || e?.objects} />))
+                                                        (e?.objects === "other" && (<TagColorRed className="flex whitespace-nowrap" name={dataLang[e?.objects] || e?.objects} />))
                                                     }
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} textAlign={'left'}>
@@ -458,13 +458,13 @@ const Payment = (props) => {
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} textAlign={'center'}>
                                                     {
-                                                        (e?.type_vouchers === "import" && (<TagColorMore color={'#a855f7'} backgroundColor={"#e9d5ff"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
+                                                        (e?.type_vouchers === "import" && (<TagColorMore className="flex whitespace-nowrap" color={'#a855f7'} backgroundColor={"#e9d5ff"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
                                                         ||
-                                                        (e?.type_vouchers === "deposit" && (<TagColorMore color={'#06b6d4'} backgroundColor={"#a5f3fc"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
+                                                        (e?.type_vouchers === "deposit" && (<TagColorMore className="flex whitespace-nowrap" color={'#06b6d4'} backgroundColor={"#a5f3fc"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
                                                         ||
-                                                        (e?.type_vouchers === "service" && (<TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
+                                                        (e?.type_vouchers === "service" && (<TagColorRed className="flex whitespace-nowrap" name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
                                                         ||
-                                                        (e?.type_vouchers === "order" && (<TagColorMore color={'#22c55e'} backgroundColor={'#bbf7d0'} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
+                                                        (e?.type_vouchers === "order" && (<TagColorMore className="flex whitespace-nowrap" color={'#22c55e'} backgroundColor={'#bbf7d0'} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
                                                     }
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1}>
@@ -504,10 +504,10 @@ const Payment = (props) => {
                                                         {e?.branch_name}
                                                     {/* </TagBranch> */}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={'left'} className="truncate">
+                                                <RowItemTable colSpan={1.5} textAlign={'left'} className="truncate">
                                                     {e?.note}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={0.5} className="flex justify-center">
+                                                <RowItemTable colSpan={1} className="flex justify-center">
                                                     <BtnAction
                                                         id={e?.id}
                                                         onRefresh={refetch.bind(this)}

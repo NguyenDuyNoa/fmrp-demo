@@ -6,7 +6,6 @@ import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import {
@@ -15,7 +14,6 @@ import {
     RowItemTable,
     RowTable,
 } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
     TagColorOrange,
     TagColorSky,
@@ -575,7 +573,7 @@ const ReturnSales = (props) => {
                                         {dataLang?.import_brow_storekeepers ||
                                             "import_brow_storekeepers"}
                                     </ColumnTable>
-                                    <ColumnTable textAlign={"center"} colSpan={1}>
+                                    <ColumnTable textAlign={"left"} colSpan={1}>
                                         {dataLang?.import_branch || "import_branch"}
                                     </ColumnTable>
                                     <ColumnTable textAlign={"center"} colSpan={0.5}>
@@ -647,7 +645,7 @@ const ReturnSales = (props) => {
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="w-fit mx-auto">
+                                                    <RowItemTable colSpan={1}>
                                                         {/* <TagBranch> */}
                                                             {e?.branch_name}
                                                             {/* </TagBranch> */}

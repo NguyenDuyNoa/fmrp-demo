@@ -2,12 +2,11 @@ import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
@@ -42,7 +41,6 @@ import { useSelector } from "react-redux";
 import { useOrderFilterbar } from "./hooks/useOrderFilterbar";
 import { useOrderList, useOrderListCode } from "./hooks/useOrderList";
 import { useOrderTypeList } from "./hooks/useOrderTypeList";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 
 const initalState = {
     keySearch: "",
@@ -546,9 +544,9 @@ const Order = (props) => {
                                                         :
                                                         e?.order_type == "0"
                                                             ? (
-                                                                <TagColorRed name={"Tạo mới"} />
+                                                                <TagColorRed name={"Đặt mới"} />
                                                             ) : (
-                                                                <TagColorOrange name={"YCMH"} />
+                                                                <TagColorRed name={"Đặt mới"} />
                                                             )}
                                                     {/* {e?.order_type == "0" ? (
                                                             <TagColorRed name={"Tạo mới"} />
@@ -571,7 +569,7 @@ const Order = (props) => {
                                                         // : 
                                                         // "KHSX-22052437"
                                                         <React.Fragment key={purchase?.id_plan}>
-                                                            <div className="3xl:text-sm 2xl:text-xs xl:text-10 text-[9px] px-1 col-span-1 text-center items-center justify-center flex flex-wrap text-[#0F4F9E]  transition-all ease-in-out">
+                                                            <div className="responsive-text-sm px-1 col-span-1 text-center items-center justify-center flex flex-wrap text-[#0F4F9E]  transition-all ease-in-out">
                                                                 {purchase?.reference_no}
                                                             </div>
                                                         </React.Fragment>

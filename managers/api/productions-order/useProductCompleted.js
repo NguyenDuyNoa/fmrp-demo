@@ -51,6 +51,14 @@ export const useHandlingProductCompleted = () => {
         queryClient.invalidateQueries({
           queryKey: ["api_product_completed", variables.po_id],
         });
+        
+        queryClient.invalidateQueries({
+          queryKey: ["api_production_orders"],
+        });
+        
+        queryClient.invalidateQueries({
+          queryKey: ["apiDetailProductionOrders", variables.po_id],
+        });
       }
       return data;
     },
