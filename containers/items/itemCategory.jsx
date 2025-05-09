@@ -201,7 +201,7 @@ const ItemCategory = (props) => {
                   onRefreshOpt={refetchOpt.bind(this)}
                   dataLang={dataLang}
                   data={data?.rResult}
-                  className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
                 />
               ) : (
                 <button
@@ -209,7 +209,7 @@ const ItemCategory = (props) => {
                   onClick={() => {
                     isShow("error", WARNING_STATUS_ROLE);
                   }}
-                  className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
                 >
                   {dataLang?.branch_popup_create_new}
                 </button>
@@ -219,111 +219,101 @@ const ItemCategory = (props) => {
         }
         table={
           <div className="flex flex-col h-full">
-            <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-              <div className="col-span-4">
-                <div className="grid grid-cols-9 gap-2">
-                  <SearchComponent
-                    dataLang={dataLang}
-                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                    colSpan={2}
-                  />
-                  <SelectComponent
-                    options={[
-                      {
-                        value: "",
-                        label:
-                          dataLang?.price_quote_branch || "price_quote_branch",
-                        isDisabled: true,
-                      },
-                      ...options,
-                    ]}
-                    isClearable={true}
-                    onChange={_HandleFilterOpt.bind(this, "branch")}
-                    value={idBranch}
-                    placeholder={
-                      dataLang?.price_quote_branch || "price_quote_branch"
-                    }
-                    colSpan={3}
-                    components={{ MultiValue }}
-                    isMulti={true}
-                    closeMenuOnSelect={false}
-                  />
-                  <SelectComponent
-                    options={[
-                      {
-                        value: "",
-                        label:
-                          dataLang?.category_material_group_code ||
-                          "category_material_group_code",
-                        isDisabled: true,
-                      },
-                      ...dataOpt,
-                    ]}
-                    isClearable={true}
-                    onChange={_HandleFilterOpt.bind(this, "category")}
-                    value={idCategory}
-                    placeholder={
-                      dataLang?.category_material_group_code ||
-                      "category_material_group_code"
-                    }
-                    colSpan={3}
-                    formatOptionLabel={SelectOptionLever}
-                  />
-                </div>
+            <div className="w-full items-center flex justify-between gap-2">
+              <div className="flex gap-3 items-center w-full">
+                <SearchComponent
+                  dataLang={dataLang}
+                  onChange={_HandleOnChangeKeySearch.bind(this)}
+                  colSpan={2}
+                />
+                <SelectComponent
+                  options={[
+                    {
+                      value: "",
+                      label:
+                        dataLang?.price_quote_branch || "price_quote_branch",
+                      isDisabled: true,
+                    },
+                    ...options,
+                  ]}
+                  isClearable={true}
+                  onChange={_HandleFilterOpt.bind(this, "branch")}
+                  value={idBranch}
+                  placeholder={
+                    dataLang?.price_quote_branch || "price_quote_branch"
+                  }
+                  colSpan={3}
+                  components={{ MultiValue }}
+                  isMulti={true}
+                  closeMenuOnSelect={false}
+                />
+                <SelectComponent
+                  options={[
+                    {
+                      value: "",
+                      label:
+                        dataLang?.category_material_group_code ||
+                        "category_material_group_code",
+                      isDisabled: true,
+                    },
+                    ...dataOpt,
+                  ]}
+                  isClearable={true}
+                  onChange={_HandleFilterOpt.bind(this, "category")}
+                  value={idCategory}
+                  placeholder={
+                    dataLang?.category_material_group_code ||
+                    "category_material_group_code"
+                  }
+                  colSpan={3}
+                  formatOptionLabel={SelectOptionLever}
+                />
               </div>
-              <div className="col-span-2">
-                <div className="flex items-center justify-end space-x-2">
-                  <OnResetData
-                    onClick={refetch.bind(this)}
-                    sOnFetching={() => { }}
-                  />
+              <div className="flex items-center justify-end space-x-2">
+                <OnResetData
+                  onClick={refetch.bind(this)}
+                  sOnFetching={() => { }}
+                />
 
-                  {role == true || checkExport ? (
-                    <div className={``}>
-                      {data?.rResult?.length > 0 && (
-                        <ExcelFileComponent
-                          multiDataSet={multiDataSet}
-                          filename="Nhóm nvl"
-                          title="Hiii"
-                          dataLang={dataLang}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                      className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                    >
-                      <Grid6
-                        className="scale-75 2xl:scale-100 xl:scale-100"
-                        size={18}
+                {role == true || checkExport ? (
+                  <div className={``}>
+                    {data?.rResult?.length > 0 && (
+                      <ExcelFileComponent
+                        multiDataSet={multiDataSet}
+                        filename="Nhóm nvl"
+                        title="Hiii"
+                        dataLang={dataLang}
                       />
-                      <span>{dataLang?.client_list_exportexcel}</span>
-                    </button>
-                  )}
-                  <div>
-                    <DropdowLimit
-                      sLimit={sLimit}
-                      limit={limit}
-                      dataLang={dataLang}
-                    />
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                  >
+                    <Grid6
+                      className="scale-75 2xl:scale-100 xl:scale-100"
+                      size={18}
+                    />
+                    <span>{dataLang?.client_list_exportexcel}</span>
+                  </button>
+                )}
+
               </div>
             </div>
             <Customscrollbar className="h-full overflow-y-auto ">
               <div className="w-full">
                 <HeaderTable gridCols={11} display={"grid"}>
                   <ColumnTable colSpan={1} />
-                  <ColumnTable colSpan={2} textAlign={"center"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.category_material_group_code ||
                       "category_material_group_code"}
                   </ColumnTable>
-                  <ColumnTable colSpan={3} textAlign={"center"}>
+                  <ColumnTable colSpan={3} textAlign={"left"}>
                     {dataLang?.category_material_group_name ||
                       "category_material_group_name"}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"center"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.client_popup_note || "client_popup_note"}
                   </ColumnTable>
                   <ColumnTable colSpan={2} textAlign={"center"}>
@@ -356,13 +346,13 @@ const ItemCategory = (props) => {
           </div>
         }
         pagination={
-          <>
+          <div className="flex items-center justify-between gap-2">
             {data?.rResult?.length != 0 && (
               <ContainerPagination>
-                <TitlePagination
+                {/* <TitlePagination
                   dataLang={dataLang}
                   totalItems={data?.output?.iTotalDisplayRecords}
-                />
+                /> */}
                 <Pagination
                   postsPerPage={limit}
                   totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -371,7 +361,12 @@ const ItemCategory = (props) => {
                 />
               </ContainerPagination>
             )}
-          </>
+            <DropdowLimit
+              sLimit={sLimit}
+              limit={limit}
+              dataLang={dataLang}
+            />
+          </div>
         }
       />
     </React.Fragment>
@@ -421,12 +416,12 @@ const Items = React.memo((props) => {
         <RowItemTable colSpan={2} textAlign={"left"}>
           {props.data?.note}
         </RowItemTable>
-        <RowItemTable colSpan={2} textAlign={"left"}>
-          <span className="flex flex-wrap justify-start gap-2 ">
-            {props.data?.branch?.map((e) => (
-              <TagBranch>{e.name}</TagBranch>
-            ))}
-          </span>
+        <RowItemTable colSpan={2} textAlign={"center"}>
+          {props.data?.branch?.map((e, index) => (
+            <span className="flex flex-wrap justify-center gap-2 " key={index}>
+              {e.name}
+            </span>
+          ))}
         </RowItemTable>
         <RowItemTable colSpan={1} className="flex justify-center space-x-2">
           {role == true || checkEdit ? (
@@ -538,9 +533,12 @@ const ItemsChild = React.memo((props) => {
         <RowItemTable colSpan={2} textAlign={"left"}>
           {props.data?.note}
         </RowItemTable>
-        <RowItemTable colSpan={2} className="flex flex-wrap gap-2 px-2">
+        <RowItemTable colSpan={2} className="flex flex-wrap justify-center gap-2 px-2">
           {props.data?.branch.map((e) => (
-            <TagBranch key={e?.id}>{e.name}</TagBranch>
+            <span className="flex flex-wrap items-center justify-center gap-2" key={e.id}>
+              {e.name}
+              {/* <TagBranch key={e?.id}>{e.name}</TagBranch> */}
+            </span>
           ))}
         </RowItemTable>
         <RowItemTable colSpan={1} className="flex justify-center space-x-2">
