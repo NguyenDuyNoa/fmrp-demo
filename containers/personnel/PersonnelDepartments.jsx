@@ -4,9 +4,7 @@ import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import {
-  LayOutTableDynamic
-} from "@/components/UI/common/layout";
+import { LayOutTableDynamic } from "@/components/UI/common/layout";
 import {
   ColumnTable,
   HeaderTable,
@@ -59,15 +57,21 @@ const PersonnelDepartments = (props) => {
 
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-  const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+  const { is_admin: role, permissions_current: auth } = useSelector(
+    (state) => state.auth
+  );
 
-  const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "department");
+  const { checkAdd, checkEdit, checkExport } = useActionRole(
+    auth,
+    "department"
+  );
+  const [keySearch, sKeySearch] = useState("");
 
   const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
   // parasm tìm kiếm table
   const params = {
-    search: isState.keySearch,
+    search: keySearch,
     limit: limit,
     page: router.query?.page || 1,
     "filter[branch_id]":
@@ -82,8 +86,9 @@ const PersonnelDepartments = (props) => {
 
   // tìm kiếm table
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
-    queryState({ keySearch: value });
-    router.replace("/personnels/departments");
+    // queryState({ keySearch: value });
+    sKeySearch(value);
+    // router.replace("/personnels/departments");
   }, 500);
 
   // xuất exel
@@ -134,11 +139,14 @@ const PersonnelDepartments = (props) => {
 
   const breadcrumbItems = [
     {
-      label: `${dataLang?.header_category_personnel || "header_category_personnel"}`,
+      label: `${dataLang?.header_category_personnel || "header_category_personnel"
+        }`,
       // href: "/",
     },
     {
-      label: `${dataLang?.personnels_deparrtments_title || "personnels_deparrtments_title"}`,
+      label: `${dataLang?.personnels_deparrtments_title ||
+        "personnels_deparrtments_title"
+        }`,
     },
   ];
 
@@ -251,7 +259,6 @@ const PersonnelDepartments = (props) => {
                     <span>{dataLang?.client_list_exportexcel}</span>
                   </button>
                 )}
-
               </div>
             </div>
             <Customscrollbar className="h-full overflow-auto">
@@ -288,7 +295,10 @@ const PersonnelDepartments = (props) => {
                           </RowItemTable>
                           <RowItemTable colSpan={4}>
                             {e.branch?.map((i, index) => (
-                              <span className="flex flex-wrap items-center justify-start gap-2" key={index}>
+                              <span
+                                className="flex flex-wrap items-center justify-start gap-2"
+                                key={index}
+                              >
                                 {i.name}
                                 {/* <TagBranch key={i}>{i.name}</TagBranch> */}
                               </span>
@@ -353,11 +363,7 @@ const PersonnelDepartments = (props) => {
                 />
               </ContainerPagination>
             )}
-            <DropdowLimit
-              sLimit={sLimit}
-              limit={limit}
-              dataLang={dataLang}
-            />
+            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
           </div>
         }
       />

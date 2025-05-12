@@ -557,6 +557,8 @@ const Products = (props) => {
                                                             dataLang={dataLang}
                                                             dataKey={e?.type_products?.id}
                                                             name={e?.type_products?.name}
+                                                            className="!px-1"
+                                                            textSize="text-[6px]"
                                                         />
                                                         {/* </h6> */}
                                                     </RowItemTable>

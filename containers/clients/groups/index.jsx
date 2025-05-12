@@ -65,6 +65,7 @@ const GroupClient = (props) => {
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
   const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
+
   // phân quyền
   const { is_admin: role, permissions_current: auth } = useSelector(
     (state) => state.auth
@@ -81,11 +82,13 @@ const GroupClient = (props) => {
     search: isState.keySearch,
     limit: limit,
     page: router.query?.page || 1,
-    "filter[branch_id]":
-      isState.idBranch?.length > 0
-        ? isState.idBranch.map((e) => e.value)
-        : null,
+    // "filter[branch_id]":
+    //   isState.idBranch?.length > 0
+    //     ? isState.idBranch.map((e) => e.value)
+    //     : null,
+    "filter[branch_id]": isState.idBranch?.value ?? null,
   };
+
 
   // danh sách nhóm khách hàng
   const {
@@ -217,7 +220,7 @@ const GroupClient = (props) => {
                 onChange={_HandleOnChangeKeySearch.bind(this)}
                 colSpan={1}
               />
-              <SelectComponentNew
+              {/* <SelectComponentNew
                 isClearable={true}
                 value={isState.idBranch}
                 onChange={(e) => queryState({ idBranch: e })}
@@ -235,6 +238,23 @@ const GroupClient = (props) => {
                 placeholder={
                   dataLang?.price_quote_branch || "price_quote_branch"
                 }
+              /> */}
+              <SelectComponent
+                options={[
+                  {
+                    value: "",
+                    label: dataLang?.price_quote_branch || "price_quote_branch",
+                    isDisabled: true,
+                  },
+                  ...listBr,
+                ]}
+                colSpan={1}
+                onChange={(e) => queryState({ idBranch: e })}
+                value={isState.idBranch}
+                placeholder={
+                  dataLang?.price_quote_branch || "price_quote_branch"
+                }
+                isClearable={true}
               />
             </div>
 
@@ -309,7 +329,10 @@ const GroupClient = (props) => {
                         </RowItemTable>
                         <RowItemTable colSpan={2}>
                           {e?.branch?.map((e) => (
-                            <span className="flex flex-wrap items-center justify-start gap-2" key={e.id}>
+                            <span
+                              className="flex flex-wrap items-center justify-start gap-2"
+                              key={e.id}
+                            >
                               {/* <TagBranch
                                 key={e.id}
                                 className="py-0.5 px-1.5 2xl:py-1 2xl:px-2"
