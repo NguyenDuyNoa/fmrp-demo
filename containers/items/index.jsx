@@ -138,6 +138,16 @@ const Items = (props) => {
     }
   };
 
+  const renderMoneyOrDash = (value) => {
+    return Number(value) === 0 ? (
+      "-"
+    ) : (
+      <>
+        {formatNumber(value)} <span className="underline">đ</span>
+      </>
+    );
+  };
+
   const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
     sKeySearch(value);
     router.replace(router.route);
@@ -336,7 +346,7 @@ const Items = (props) => {
                   placeholder={
                     dataLang?.price_quote_branch || "price_quote_branch"
                   }
-                  colSpan={3}
+                  colSpan={1}
                   isClearable={true}
                   components={{ MultiValue }}
                   isMulti={true}
@@ -360,9 +370,10 @@ const Items = (props) => {
                     dataLang?.category_material_group_name ||
                     "category_material_group_name"
                   }
-                  colSpan={3}
-                  className={"min-w-[300px]"}
+                  colSpan={1}
                   formatOptionLabel={SelectOptionLever}
+                  isSearchable={true}
+                // className="min-w-[300px]"
                 />
               </div>
 
@@ -394,7 +405,6 @@ const Items = (props) => {
                     <span>{dataLang?.client_list_exportexcel}</span>
                   </button>
                 )}
-
               </div>
             </div>
 
@@ -491,14 +501,14 @@ const Items = (props) => {
                             {e?.unit}
                           </RowItemTable>
                           <RowItemTable colSpan={1} textAlign={"center"}>
-                            {formatNumber(e?.stock_quantity)}
+                            {renderMoneyOrDash(e?.stock_quantity)}
                           </RowItemTable>
                           <RowItemTable colSpan={1} textAlign={"left"}>
                             {e?.note}
                           </RowItemTable>
                           <RowItemTable colSpan={1} textAlign={"center"}>
                             {formatNumber(e?.variation_count - 1) == 0
-                              ? ""
+                              ? "-"
                               : e?.variation_count - 1}
                           </RowItemTable>
                           <RowItemTable
@@ -506,7 +516,10 @@ const Items = (props) => {
                             className="flex flex-col justify-start"
                           >
                             {e.branch?.map((i, index) => (
-                              <span className="flex flex-wrap items-center justify-start gap-2" key={index}>
+                              <span
+                                className="flex flex-wrap items-center justify-start gap-2"
+                                key={index}
+                              >
                                 {/* <TagBranch key={i}>{i.name}</TagBranch> */}
                                 {i.name}
                               </span>
@@ -565,11 +578,7 @@ const Items = (props) => {
                 />
               </ContainerPagination>
             )}
-            <DropdowLimit
-              sLimit={sLimit}
-              limit={limit}
-              dataLang={dataLang}
-            />
+            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
           </div>
         }
       />

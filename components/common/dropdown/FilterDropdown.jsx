@@ -72,7 +72,7 @@ const FilterDropdown = ({ children, trigger, className, classNameContainer, drop
     };
 
     return (
-        <div className={`${classNameContainer} relative w-full`}>
+        <div className={`${classNameContainer} relative w-full `}>
             {isValidElement(trigger)
                 ? cloneElement(trigger, {
                     ref: triggerRef,

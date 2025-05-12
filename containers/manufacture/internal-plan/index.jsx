@@ -7,9 +7,19 @@ import ContainerPagination from "@/components/UI/common/ContainerPagination/Cont
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import {
+    ColumnTable,
+    HeaderTable,
+    RowItemTable,
+    RowTable,
+} from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Container, ContainerBody, ContainerTable, LayOutTableDynamic } from "@/components/UI/common/layout";
+import {
+    Container,
+    ContainerBody,
+    ContainerTable,
+    LayOutTableDynamic,
+} from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -20,7 +30,10 @@ import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import {
+    CONFIRMATION_OF_CHANGES,
+    TITLE_STATUS,
+} from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranch";
@@ -43,7 +56,9 @@ import { useSelector } from "react-redux";
 import { useInternalPlanList } from "./hooks/useInternalPlanList";
 import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
-const PopupDetail = dynamic(() => import("./components/PopupDetail"), { ssr: false });
+const PopupDetail = dynamic(() => import("./components/PopupDetail"), {
+    ssr: false,
+});
 
 const initsId = {
     idBranch: null,
@@ -57,7 +72,7 @@ const InternalPlan = (props) => {
 
     const isShow = useToast();
 
-    const { paginate } = usePagination()
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
@@ -71,17 +86,34 @@ const InternalPlan = (props) => {
 
     const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
 
-    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    const { is_admin: role, permissions_current: auth } = useSelector(
+        (state) => state.auth
+    );
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "internal_plan");
+    const { checkAdd, checkEdit, checkExport } = useActionRole(
+        auth,
+        "internal_plan"
+    );
 
     const params = {
         search: keySearch,
         limit: limit,
         page: router.query?.page || 1,
         branch_id: idFillter.idBranch != null ? idFillter.idBranch.value : null,
-        start_date: idFillter?.valueDate?.startDate != null ? formatMoment(idFillter?.valueDate?.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : null,
-        end_date: idFillter?.valueDate?.endDate != null ? formatMoment(idFillter?.valueDate?.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : null,
+        start_date:
+            idFillter?.valueDate?.startDate != null
+                ? formatMoment(
+                    idFillter?.valueDate?.startDate,
+                    FORMAT_MOMENT.DATE_SLASH_LONG
+                )
+                : null,
+        end_date:
+            idFillter?.valueDate?.endDate != null
+                ? formatMoment(
+                    idFillter?.valueDate?.endDate,
+                    FORMAT_MOMENT.DATE_SLASH_LONG
+                )
+                : null,
     };
 
     const { data: dataBranch = [] } = useBranchList();
@@ -90,7 +122,10 @@ const InternalPlan = (props) => {
 
     const handlePostStatus = async (id, newStatus) => {
         try {
-            const { isSuccess, message } = await apiInternalPlan.apiPostStatus(id, newStatus);
+            const { isSuccess, message } = await apiInternalPlan.apiPostStatus(
+                id,
+                newStatus
+            );
             if (isSuccess == 1) {
                 isShow("success", `${dataLang[message] || message}`);
                 handleQueryId({ status: false });
@@ -101,11 +136,12 @@ const InternalPlan = (props) => {
             }
             isShow("error", `${dataLang[message] || message}`);
         } catch (error) {
-            throw error
+            throw error;
         }
     };
 
-    const onChangeFilter = (type) => (event) => sIdFillter((e) => ({ ...e, [type]: event }));
+    const onChangeFilter = (type) => (event) =>
+        sIdFillter((e) => ({ ...e, [type]: event }));
 
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
@@ -166,7 +202,8 @@ const InternalPlan = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.internal_plan_creators || "internal_plan_creators"}`,
+                    title: `${dataLang?.internal_plan_creators || "internal_plan_creators"
+                        }`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -260,68 +297,67 @@ const InternalPlan = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-4">
-                                <div className="grid grid-cols-9 gap-2">
-                                    <SearchComponent
-                                        dataLang={dataLang}
-                                        colSpan={3}
-                                        onChange={handleOnChangeKeySearch.bind(this)}
-                                    />
-                                    <SelectComponent
-                                        colSpan={3}
-                                        options={[
-                                            {
-                                                value: "",
-                                                label: dataLang?.price_quote_branch || "price_quote_branch",
-                                                isDisabled: true,
-                                            },
-                                            ...dataBranch,
-                                        ]}
-                                        onChange={onChangeFilter("idBranch")}
-                                        value={idFillter.idBranch}
-                                        placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
-                                        hideSelectedOptions={false}
-                                        isClearable={true}
-                                        isSearchable={true}
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        closeMenuOnSelect={true}
-                                    />
-                                    <DateToDateComponent
-                                        className='col-span-3'
-                                        value={idFillter.valueDate}
-                                        onChange={onChangeFilter("valueDate")}
-                                        colSpan={3}
-                                    />
-                                </div>
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
+                                <SearchComponent
+                                    dataLang={dataLang}
+                                    colSpan={3}
+                                    onChange={handleOnChangeKeySearch.bind(this)}
+                                />
+                                <SelectComponent
+                                    colSpan={3}
+                                    options={[
+                                        {
+                                            value: "",
+                                            label:
+                                                dataLang?.price_quote_branch || "price_quote_branch",
+                                            isDisabled: true,
+                                        },
+                                        ...dataBranch,
+                                    ]}
+                                    onChange={onChangeFilter("idBranch")}
+                                    value={idFillter.idBranch}
+                                    placeholder={
+                                        dataLang?.price_quote_branch || "price_quote_branch"
+                                    }
+                                    hideSelectedOptions={false}
+                                    isClearable={true}
+                                    isSearchable={true}
+                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                    closeMenuOnSelect={true}
+                                />
+                                <DateToDateComponent
+                                    className="col-span-3"
+                                    value={idFillter.valueDate}
+                                    onChange={onChangeFilter("valueDate")}
+                                    colSpan={3}
+                                />
                             </div>
-                            <div className="col-span-2">
-                                <div className="flex items-center justify-end gap-2">
-                                    <OnResetData sOnFetching={() => { }} onClick={() => refetch()} />
-                                    {role == true || checkExport ? (
-                                        <div className={``}>
-                                            {data?.rResult?.length > 0 && (
-                                                <ExcelFileComponent
-                                                    dataLang={dataLang}
-                                                    filename={"Danh sách kế hoạch nội bộ"}
-                                                    multiDataSet={multiDataSet}
-                                                    title="DSKHNB"
-                                                />
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                                            className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                                        >
-                                            <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
-                                            <span>{dataLang?.client_list_exportexcel}</span>
-                                        </button>
-                                    )}
-                                    <div>
-                                        <DropdowLimit dataLang={dataLang} sLimit={sLimit} limit={limit} />
+                            <div className="flex items-center justify-end gap-2">
+                                <OnResetData sOnFetching={() => { }} onClick={() => refetch()} />
+                                {role == true || checkExport ? (
+                                    <div className={``}>
+                                        {data?.rResult?.length > 0 && (
+                                            <ExcelFileComponent
+                                                dataLang={dataLang}
+                                                filename={"Danh sách kế hoạch nội bộ"}
+                                                multiDataSet={multiDataSet}
+                                                title="DSKHNB"
+                                            />
+                                        )}
                                     </div>
-                                </div>
+                                ) : (
+                                    <button
+                                        onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                                        className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                    >
+                                        <Grid6
+                                            className="scale-75 2xl:scale-100 xl:scale-100"
+                                            size={18}
+                                        />
+                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
                         <Customscrollbar className="h-full overflow-y-auto">
@@ -333,26 +369,27 @@ const InternalPlan = (props) => {
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={2} textAlign={"left "}>
                                         {dataLang?.internal_plan_name || "internal_plan_name"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.internal_plan_status || "internal_plan_status"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
-                                        {dataLang?.internal_plan_creators || "internal_plan_creators"}
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
+                                        {dataLang?.internal_plan_creators ||
+                                            "internal_plan_creators"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_branch || "import_branch"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.recall_noteChild || "recall_noteChild"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.import_action || "import_action"}
                                     </ColumnTable>
                                 </HeaderTable>
-                                {(isFetching && !refreshing) ? (
+                                {isFetching && !refreshing ? (
                                     <Loading className="h-full" color="#0f4f9e" />
                                 ) : data?.rResult?.length > 0 ? (
                                     <>
@@ -360,7 +397,12 @@ const InternalPlan = (props) => {
                                             {data?.rResult?.map((e, index) => (
                                                 <RowTable key={e.id.toString()} gridCols={9}>
                                                     <RowItemTable colSpan={1} textAlign={"center"}>
-                                                        {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
+                                                        {e?.date != null
+                                                            ? formatMoment(
+                                                                e?.date,
+                                                                FORMAT_MOMENT.DATE_SLASH_LONG
+                                                            )
+                                                            : ""}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} textAlign={"center"}>
                                                         <PopupDetail
@@ -391,13 +433,18 @@ const InternalPlan = (props) => {
                                                         className="flex items-center space-x-1"
                                                     >
                                                         <CustomAvatar
-                                                            classNameAvatar='max-w-[26%] w-[26%]'
+                                                            classNameAvatar="max-w-[26%] w-[26%]"
                                                             profileImage={e?.created_by_profile_image}
                                                             fullName={e?.created_by_full_name}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="mx-auto">
-                                                        <TagBranch className="w-fit">{e?.name_branch}</TagBranch>
+                                                    <RowItemTable colSpan={1} >
+                                                        {/* <TagBranch className="w-fit">
+                                                            {e?.name_branch}
+                                                        </TagBranch> */}
+                                                        <span className="flex flex-wrap items-center justify-start gap-2">
+                                                            {e?.name_branch}
+                                                        </span>
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
@@ -406,7 +453,10 @@ const InternalPlan = (props) => {
                                                     >
                                                         {e.note}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="flex justify-center">
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        className="flex justify-center"
+                                                    >
                                                         <BtnAction
                                                             onRefresh={refetch.bind(this)}
                                                             dataLang={dataLang}
@@ -428,10 +478,13 @@ const InternalPlan = (props) => {
                     </div>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
+                                <TitlePagination
+                                    dataLang={dataLang}
+                                    totalItems={data?.output?.iTotalDisplayRecords}
+                                />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -440,7 +493,8 @@ const InternalPlan = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit dataLang={dataLang} sLimit={sLimit} limit={limit} />
+                    </div>
                 }
             />
             <PopupConfim

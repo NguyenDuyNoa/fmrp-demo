@@ -120,7 +120,9 @@ const SelectComponentNew = ({
         }
 
     return (
-        <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
+        <div className={`${classParent ? classParent : "ml-1"}`}
+        // style={{ gridColumn: `span ${colSpan || 1}` }}
+        >
             <SelectCore
                 id={id ?? "parentSelect"}
                 options={options}
