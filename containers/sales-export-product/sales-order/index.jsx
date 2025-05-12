@@ -883,8 +883,10 @@ const SalesOrder = (props) => {
         }
         total={
           <>
-            <ContainerTotal className={"grid-cols-13"}>
-              <RowItemTable colSpan={2.5} textAlign={"end"} className="p-2">
+            <ContainerTotal className={"grid-cols-26"}>
+              <RowItemTable colSpan={3} textAlign={"end"} className="p-2">
+              </RowItemTable>
+              <RowItemTable colSpan={1} textAlign={"end"} className="p-2">
                 {dataLang?.total_outside || "total_outside"}
               </RowItemTable>
               <RowItemTable

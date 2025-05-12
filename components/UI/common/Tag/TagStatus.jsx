@@ -21,7 +21,7 @@ const TagColorProduct = ({
     };
     return (
         <span
-            className={` py-0.5 px-2 rounded h-fit w-fit font-[500] break-words ${textSize ? textSize : "responsive-text-sm"
+            className={` py-0.5 px-2 rounded h-fit w-fit font-[500] break-words ${textSize ? textSize : "text-11"
                 }
                 ${findColor[dataKey]} ${className}`}
         >
