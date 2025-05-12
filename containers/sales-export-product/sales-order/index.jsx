@@ -594,7 +594,7 @@ const SalesOrder = (props) => {
                   <ColumnTable colSpan={0.5} textAlign={"center"}>
                     {dataLang?.stt || "STT"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"left"}>
+                  <ColumnTable colSpan={1} textAlign={"left"} className={"whitespace-nowrap"}>
                     {dataLang?.sales_product_date || "sales_product_date"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"left"}>
@@ -603,10 +603,10 @@ const SalesOrder = (props) => {
                   <ColumnTable colSpan={1.5} textAlign={"left"}>
                     {dataLang?.customer || "customer"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  {/* <ColumnTable colSpan={1} textAlign={"center"}>
                     {dataLang?.sales_product_type_order ||
                       "sales_product_type_order"}
-                  </ColumnTable>
+                  </ColumnTable> */}
                   <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.sales_product_total_into_money ||
                       "sales_product_total_into_money"}
@@ -621,11 +621,11 @@ const SalesOrder = (props) => {
                   <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.branch || "branch"}
                   </ColumnTable>
-                  <ColumnTable colSpan={3} textAlign={"center"}>
+                  <ColumnTable colSpan={4} textAlign={"center"}>
                     {dataLang?.sales_product_order_process ||
                       "sales_product_order_process"}
                   </ColumnTable>
-                  <ColumnTable colSpan={0.5} textAlign={"center"}>
+                  <ColumnTable colSpan={0.5} textAlign={"center"} className={"whitespace-nowrap"}>
                     {dataLang?.sales_product_action || "sales_product_action"}
                   </ColumnTable>
                 </HeaderTable>
@@ -661,7 +661,7 @@ const SalesOrder = (props) => {
                               {e?.client_name}
                             </RowItemTable>
                             {/* fix */}
-                            <RowItemTable colSpan={1} textAlign={"center"}>
+                            {/* <RowItemTable colSpan={1} textAlign={"center"}>
                               {e?.quote_code !== null && e?.quote_id !== "0" ? (
                                 <Zoom
                                   whileHover={{ scale: 1.1 }}
@@ -681,7 +681,7 @@ const SalesOrder = (props) => {
                                   Tạo mới
                                 </div>
                               )}
-                            </RowItemTable>
+                            </RowItemTable> */}
                             <RowItemTable colSpan={1} textAlign={"left"}>
                               {formatNumber(e.total_amount)}{" "}
                               <span className="underline">đ</span>
@@ -739,8 +739,8 @@ const SalesOrder = (props) => {
                               {/* </TagBranch> */}
                             </RowItemTable>
 
-                            <RowItemTable colSpan={3}>
-                              <div className="flex items-start p-2 ">
+                            <RowItemTable colSpan={4}>
+                              <div className="grid grid-cols-3 items-start py-2 px-12 relative">
                                 {e?.process.map((item, i) => {
                                   const isValue = [
                                     "production_plan",
@@ -748,14 +748,13 @@ const SalesOrder = (props) => {
                                     "import_warehouse",
                                     "delivery",
                                   ].includes(item?.code);
-
                                   const isValueDelivery = ["delivery"].includes(
                                     item?.code
                                   );
 
                                   return (
                                     <div
-                                      className="relative"
+                                      className={`${i === e?.process.length - 1 ? 'absolute top-2 right-12 translate-x-full' : 'relative'}`}
                                       key={`process-${i}`}
                                     >
                                       {![
@@ -787,7 +786,7 @@ const SalesOrder = (props) => {
                                                 item?.active
                                                   ? "text-green-500"
                                                   : "text-slate-500"
-                                              } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                              } block w-full text-center mb-2 responsive-text-sm font-semibold leading-none absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
                                             >
                                               <div className="flex flex-col items-center justify-center w-full gap-1">
                                                 <h6>{dataLang[item?.name]}</h6>
@@ -798,7 +797,7 @@ const SalesOrder = (props) => {
                                                       isValueDelivery
                                                         ? "text-green-500"
                                                         : "text-orange-500"
-                                                    } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                    } responsive-text-sm`}
                                                   >{`(${
                                                     dataLang[item?.status] ||
                                                     item?.status
@@ -809,7 +808,7 @@ const SalesOrder = (props) => {
                                           </div>
                                         </>
                                       )}
-                                      <p className={`${isValueDelivery ? 'mt-[18px]' : ''} text-blue-700 cursor-pointer 3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold`}>
+                                      <p className={`${isValueDelivery ? 'mt-[24px]' : 'mt-3'} py-2 text-blue-700 text-center cursor-pointer responsive-text-sm left-0 translate-x-[-40%]  font-semibold`}>
                                         {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
 
                                         {item?.reference &&
@@ -836,19 +835,6 @@ const SalesOrder = (props) => {
                                                 : "Xem thêm"}
                                             </button>
                                           )}
-                                        {/* {isValue && item?.reference && item?.reference.slice(0, isExpanded ? item?.reference?.length : 2).map((ci, index) => (
-                                                                                        <div
-                                                                                            className="flex flex-col"
-                                                                                            key={index}
-                                                                                        >
-                                                                                            {ci?.code}
-                                                                                        </div>
-                                                                                    ))}
-                                                                                    {item?.reference && item?.reference?.length > 2 && (
-                                                                                        <button onClick={toggleShowAll}>
-                                                                                            {isExpanded ? "Rút gọn" : "Xem thêm"}
-                                                                                        </button>
-                                                                                    )} */}
                                       </p>
                                     </div>
                                   );
@@ -898,17 +884,17 @@ const SalesOrder = (props) => {
         total={
           <>
             <ContainerTotal className={"grid-cols-13"}>
-              <ColumnTable colSpan={2.5} textAlign={"end"} className="p-2">
+              <RowItemTable colSpan={2.5} textAlign={"end"} className="p-2">
                 {dataLang?.total_outside || "total_outside"}
-              </ColumnTable>
-              <ColumnTable
-                colSpan={0.5}
+              </RowItemTable>
+              <RowItemTable
+                colSpan={2}
                 textAlign={"left"}
                 className="whitespace-nowrap"
               >
                 {formatNumber(data?.rTotal?.total_amount)}{" "}
                 <span className="underline">đ</span>
-              </ColumnTable>
+              </RowItemTable>
             </ContainerTotal>
           </>
         }

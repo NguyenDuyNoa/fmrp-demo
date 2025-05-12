@@ -1,6 +1,7 @@
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
@@ -10,13 +11,13 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, LayOutTableDynamic, } from "@/components/UI/common/layout";
+import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
@@ -43,14 +44,11 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import PopupDetail from "./components/popup";
 import { useProductionWarehouseCombobox } from "./hooks/useProductionWarehouseCombobox";
 import { useProductionWarehouseFillterbar } from "./hooks/useProductionWarehouseFillterbar";
 import { useProductionWarehouseList } from "./hooks/useProductionWarehouseList";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initialState = {
     onSending: false,
@@ -127,6 +125,12 @@ const ProductionWarehouse = (props) => {
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
+
+    const renderMoneyOrDash = (value) => {
+        return Number(value) === 0
+            ? "-"
+            : <>{formatNumber(value)} <span className="underline">đ</span></>;
+    };  
 
     // tìm kiếm table
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -321,13 +325,13 @@ const ProductionWarehouse = (props) => {
                 showTotal={true}
                 total={
                     <>
-                        <ContainerTotal className="!grid-cols-9">
-                            <ColumnTable colSpan={3} textAlign={"center"} className="p-2">
+                        <ContainerTotal className="!grid-cols-20">
+                            <RowItemTable colSpan={3.5} textAlign={"right"} className="p-2">
                                 {dataLang?.import_total || "import_total"}
-                            </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign="right" className={"p-2 mr-1"}>
-                                {formatNumber(data?.rTotal?.grand_total)}
-                            </ColumnTable>
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign="left" className={"p-2 mr-1"}>
+                                {renderMoneyOrDash(data?.rTotal?.grand_total)}
+                            </RowItemTable>
                         </ContainerTotal>
                     </>
                 }
@@ -351,10 +355,9 @@ const ProductionWarehouse = (props) => {
                     </>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -363,7 +366,8 @@ const ProductionWarehouse = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
                 fillterTab={
                     <>
@@ -387,12 +391,16 @@ const ProductionWarehouse = (props) => {
                     <div className="flex flex-col h-full">
                         <div className="w-full items-center flex justify-between gap-2">
                             <div className="flex gap-3 items-center w-full">
-                                <div className="grid grid-cols-5 gap-2">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
                                         placeholder={dataLang?.branch_search}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    />
+                                    <DateToDateComponent
+                                        colSpan={1}
+                                        value={isState.valueDate}
+                                        onChange={(e) => queryState({ valueDate: e })}
                                     />
                                     <SelectComponent
                                         options={[
@@ -444,12 +452,6 @@ const ProductionWarehouse = (props) => {
                                         isClearable={true}
                                         colSpan={1}
                                     />
-                                    <DateToDateComponent
-                                        colSpan={1}
-                                        value={isState.valueDate}
-                                        onChange={(e) => queryState({ valueDate: e })}
-                                    />
-                                </div>
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex items-center justify-end gap-2">
@@ -474,40 +476,40 @@ const ProductionWarehouse = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <Customscrollbar className='h-full overflow-y-auto'>
                             <div className="w-full">
-                                <HeaderTable gridCols={9}>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                <HeaderTable gridCols={10}>
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "stt"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </ColumnTable>
                                     {/* <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}
                                         </ColumnTable> */}
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.production_warehouse_note || "production_warehouse_note"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_browse || "production_warehouse_browse"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_branch || "import_branch"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -518,21 +520,23 @@ const ProductionWarehouse = (props) => {
                                     <Loading className="h-80" color="#0f4f9e" />
                                 ) : data?.rResult?.length > 0 ? (
                                     <div className="h-full divide-y divide-slate-200">
-                                        {data?.rResult?.map((e) => (
-                                            <RowTable gridCols={9} key={e.id.toString()}>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                        {data?.rResult?.map((e, index) => (
+                                            <RowTable gridCols={10} key={e.id.toString()}>
+                                                <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                    {index + 1}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     <PopupDetail
                                                         dataLang={dataLang}
-                                                        className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                        className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                         name={e?.code}
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
-                                                    {/* {formatNumber(e.total_price)} */}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     {e?.reference_no_detail}
                                                 </RowItemTable>
                                                 {/* <LinkWarehouse
@@ -540,11 +544,11 @@ const ProductionWarehouse = (props) => {
                                                             warehouse_id={e?.warehouse_id}
                                                             warehouse_name={e?.warehouse_name}
                                                         /> */}
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
-                                                    {formatNumber(e?.grand_total)}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    {renderMoneyOrDash(e?.grand_total)}
                                                 </RowItemTable>
                                                 <RowItemTable
-                                                    colSpan={1}
+                                                    colSpan={1.5}
                                                     textAlign={"left"}
                                                     className="truncate"
                                                 >
@@ -590,8 +594,8 @@ const ProductionWarehouse = (props) => {
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className="mx-auto">
-                                                    <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                <RowItemTable colSpan={1}>
+                                                    {e?.branch_name}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} className="flex justify-center">
                                                     <BtnAction

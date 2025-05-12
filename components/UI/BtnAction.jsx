@@ -23,6 +23,7 @@ import {
     fetchPDFPurchaseOrderImport,
 } from "@/managers/api/purchase-order/useLinkFilePDF";
 import { fetchPDFDelivery, fetchPDFSaleOrder, fetchPDFReceipts, fetchPDFPayments } from "@/managers/api/sales-order/useLinkFilePDF";
+import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
 import {
     routerImport,
     routerOrder,
@@ -63,10 +64,29 @@ import PopupConfim from "./popupConfim/popupConfim";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const Popup_Pdf = (props) => {
+// Hàm xử lý in PDF cho phiếu trả hàng bán
+const fetchPDFReturnSales = async ({ id }) => {
+    try {
+        // Sử dụng apiDetailReturnOrder từ apiReturnSales để lấy thông tin phiếu
+        const response = await apiReturnSales.apiDetailReturnOrder(id);
+        
+        if (response && response.result === 1) {
+            return {
+                isSuccess: 1,
+                pdf_url: `/api_web/Api_return_order/print/${id}`,
+            };
+        }
+        return { isSuccess: 0, message: response?.message || "Không thể lấy thông tin phiếu" };
+    } catch (error) {
+        console.error("Error fetching return sales PDF:", error);
+        return { isSuccess: 0, message: error.message || "Lỗi không xác định" };
+    }
+};
 
-    const { isOpen, handleOpen } = useToggle(false);
+const Popup_Pdf = (props) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [isLoadingPrint, setIsLoadingPrint] = useState(false);
+    const dropdownRef = useRef(null);
 
     //kiếm hàm theo page 
     const fetchPDFMultiplePageByPrice = {
@@ -77,8 +97,6 @@ const Popup_Pdf = (props) => {
     //xử lý hàm in tem PDF
     const handlePrintTem = async ({ typePrint, id, typePage }) => {
         setIsLoadingPrint(true);
-
-
         const fetchPDFhandle = fetchPDFMultiplePageByPrice[typePage]
         if (!fetchPDFhandle) {
             console.warn(`Không tìm thấy hàm fetchPDFhandle cho typePage: ${typePage}`);
@@ -103,9 +121,6 @@ const Popup_Pdf = (props) => {
         }
     };
 
-
-
-
     const shareProps = {
         dataMaterialExpiry: props?.dataMaterialExpiry,
         dataProductExpiry: props?.dataProductExpiry,
@@ -113,42 +128,42 @@ const Popup_Pdf = (props) => {
         dataSeting: props?.dataSeting,
     };
     
-    // Nếu isForceOpen được truyền vào, sử dụng nó thay vì isOpen
-    const isPopupOpen = props.isForceOpen !== undefined ? props.isForceOpen : isOpen;
-    
-    // Handle close cho cả trường hợp thông thường và khi được force open
-    const handleClose = () => {
-        if (props.isForceOpen !== undefined && props.onClose) {
-            props.onClose();
-        } else {
-            handleOpen(false);
+    // Đóng dropdown khi click ra ngoài
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
         }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen]);
+
+    // Xử lý mở/đóng dropdown
+    const toggleDropdown = () => {
+        setIsOpen(!isOpen);
     };
     
     return (
-        <PopupCustom
-            title={props.dataLang?.option_prin || "option_prin"}
-            button={
-                <button className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap">
-                    {/* <VscFilePdf size={20}/> */}
-                    <PrinterIcon
-                        color="#003DA0"
-                        className="size-5"
-                    />
-                    {/* <p className="whitespace-nowrap">
-                        {props?.dataLang?.btn_table_print || "btn_table_print"}
-                    </p> */}
-                </button>
-            }
-            onClickOpen={() => handleOpen(true)}
-            open={isPopupOpen}
-            onClose={handleClose}
-            classNameBtn={props?.className}
-        >
-            <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-            <div className="space-x-5 w-[400px] h-auto">
-                <div>
-                    <div className="w-[400px]">
+        <div className="relative" ref={dropdownRef}>
+            <button
+                onClick={toggleDropdown}
+                className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+            >
+                <PrinterIcon
+                    color="#003DA0"
+                    className="size-5"
+                />
+            </button>
+            {isOpen && (
+                <div className="absolute top-full -right-5 p-1 mt-1 w-fit bg-white rounded-xl z-[999] border border-gray-200 shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
+                    <div className="">
                         {props.props?.type === "import" || props.props?.type === "deliveryReceipt" ? (
                             <PopupPrintItem
                                 dataLang={props.dataLang}
@@ -169,8 +184,8 @@ const Popup_Pdf = (props) => {
                         )}
                     </div>
                 </div>
-            </div>
-        </PopupCustom>
+            )}
+        </div>
     );
 };
 
@@ -179,9 +194,23 @@ export const BtnAction = React.memo((props) => {
     const [loadingButtonPrint, setLoadingButtonPrint] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showMoreIcons, setShowMoreIcons] = useState(false);
-    const [showPdfPopup, setShowPdfPopup] = useState(false);
+    const [printDropdowns, setPrintDropdowns] = useState({});
     const dropdownRef = useRef(null);
     const moreIconsRef = useRef(null);
+    const printDropdownRef = useRef(null);
+
+    // Hàm để mở/đóng dropdown in cho một phiếu cụ thể
+    const togglePrintDropdown = (id) => {
+        setPrintDropdowns(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
+    };
+
+    // Đóng tất cả dropdown in
+    const closeAllPrintDropdowns = () => {
+        setPrintDropdowns({});
+    };
 
     // Xử lý đóng dropdown khi click ra ngoài
     useEffect(() => {
@@ -199,11 +228,14 @@ export const BtnAction = React.memo((props) => {
                 if (moreIconsRef.current && !moreIconsRef.current.contains(event.target)) {
                     setShowMoreIcons(false);
                 }
+                if (printDropdownRef.current && !printDropdownRef.current.contains(event.target)) {
+                    closeAllPrintDropdowns();
+                }
             }
         };
 
         // Thêm event listener khi dropdown đang mở
-        if (showDropdown || showMoreIcons) {
+        if (showDropdown || showMoreIcons || Object.values(printDropdowns).some(Boolean)) {
             document.addEventListener("mousedown", handleClickOutside);
         }
 
@@ -211,7 +243,7 @@ export const BtnAction = React.memo((props) => {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [showDropdown, showMoreIcons]);
+    }, [showDropdown, showMoreIcons, printDropdowns]);
 
     //kiếm hàm fetchPDF theo page 
     const fetchPDFMultiplePage = {
@@ -219,30 +251,57 @@ export const BtnAction = React.memo((props) => {
         sales_product: fetchPDFSaleOrder,
         receipts: fetchPDFReceipts,
         payment: fetchPDFPayments,
+        import: fetchPDFPurchaseOrderImport,
+        deliveryReceipt: fetchPDFDelivery,
+        returnSales: fetchPDFReturnSales,
+        returns: fetchPDFPurchaseOrder
     };
-    //Xử lý in tem PDF
-    const handlePrintTem = async ({ idTem, typePage }) => {
+    
+    //Xử lý in PDF
+    const handlePrintTem = async ({ idTem, typePage, typePrint }) => {
         setLoadingButtonPrint(true);
-console.log(idTem)
-        //kiếm hàm theo page 
-        const fetchPDFhandle = fetchPDFMultiplePage[typePage];
-        if (!fetchPDFhandle) {
-            console.warn(`Không tìm thấy hàm fetchPDFhandle cho typePage: ${typePage}`);
-            setLoadingButtonPrint(false);
-            return;
-        }
-
+        
         try {
-            const response = await fetchPDFhandle({
-                id: idTem,
-            });
-            console.log("🚀 ~ handlePrintTem ~ response:", response);
+            let response;
+            
+            // Trường hợp in PDF với type (có giá/không giá) cho import và deliveryReceipt
+            if (typePrint && ['import', 'deliveryReceipt'].includes(typePage)) {
+                const typeNumber = typePrint === "notPrice" ? 1 : 2;
+                response = await fetchPDFMultiplePage[typePage]({
+                    id: idTem || props?.id,
+                    type: typeNumber,
+                });
+            } 
+            // Xử lý đặc biệt cho phiếu trả hàng
+            else if (typePage === 'returnSales') {
+                response = await fetchPDFReturnSales({
+                    id: idTem || props?.id,
+                });
+            }
+            // Trường hợp in PDF thông thường cho các loại khác
+            else {
+                // Kiểm tra nếu không có hàm tương ứng với typePage
+                if (!fetchPDFMultiplePage[typePage]) {
+                    console.warn(`Không tìm thấy API in cho typePage: ${typePage}`);
+                    isShow("error", `Chức năng in phiếu ${typePage} chưa được hỗ trợ`);
+                    setLoadingButtonPrint(false);
+                    return;
+                }
+                
+                response = await fetchPDFMultiplePage[typePage]({
+                    id: idTem || props?.id,
+                });
+            }
+            
             if (response?.isSuccess === 1 && response?.pdf_url) {
                 window.open(response.pdf_url, "_blank");
+            } else {
+                isShow("error", response?.message || `Không thể in phiếu. Vui lòng thử lại sau.`);
             }
             setLoadingButtonPrint(false);
         } catch (error) {
             console.log("🚀 ~ handlePrintTem ~ error:", error);
+            isShow("error", `Lỗi khi in phiếu: ${error.message || "Không xác định"}`);
             setLoadingButtonPrint(false);
         }
     };
@@ -601,6 +660,12 @@ console.log(idTem)
 
     const calculateTotalButtons = () => {
         let count = 0;
+        
+        // Trường hợp đặc biệt cho products
+        if (props.type === "products") {
+            return 5; // 3 nút đặc biệt (Stage, Bom, Products) + FilePDF + Delete
+        }
+        
         // Count edit button
         count++;
 
@@ -715,7 +780,7 @@ console.log(idTem)
                     type={props?.typeOpen}
                     dataProduct={props?.dataProduct}
                     onRefresh={props.onRefresh}
-                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
+                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap w-full"
                 />
             );
             allButtons.push(
@@ -729,7 +794,7 @@ console.log(idTem)
                     type={props?.typeOpen}
                     dataProduct={props?.dataProduct}
                     bom={props?.bom}
-                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
+                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap w-full"
                 />
             );
             allButtons.push(
@@ -741,7 +806,7 @@ console.log(idTem)
                     id={props?.id}
                     dataProduct={props?.dataProduct}
                     type={props?.typeOpen}
-                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
+                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap w-full"
                 />
             );
         } else if (props.type == "receipts") {
@@ -905,7 +970,7 @@ console.log(idTem)
             allButtons.push(
                 <div key="print-tem" className="relative" ref={dropdownRef}>
                     <button
-                        onClick={() => setShowDropdown(!showDropdown)}
+                        onClick={() => togglePrintDropdown(props?.id)}
                         className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                     >
                         <PrinterIcon
@@ -913,8 +978,8 @@ console.log(idTem)
                             className="size-5"
                         />
                     </button>
-                    {showDropdown && (
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 p-1 mt-1 w-fit bg-white rounded-xl z-[999] shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
+                    {printDropdowns[props?.id] && (
+                        <div className="absolute top-full -right-5 p-1 mt-1 w-fit bg-white rounded-xl z-[999] border border-gray-200 shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
                             <ul className="flex flex-col gap-1">
                                 <li
                                     onClick={() => {
@@ -929,6 +994,7 @@ console.log(idTem)
                                                 ),
                                             },
                                         });
+                                        closeAllPrintDropdowns();
                                     }}
                                     className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                                 >
@@ -936,12 +1002,27 @@ console.log(idTem)
                                     <p>In tem</p>
                                 </li>
                                 <li
-                                    onClick={() => setShowPdfPopup(true)}
+                                    onClick={() => {
+                                        handlePrintTem({ typePrint: "notPrice", id: props?.id, typePage: props?.type });
+                                        closeAllPrintDropdowns();
+                                    }}
                                     className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                                 >
                                     <PrinterTem className="size-5"/>
                                     <p className="whitespace-nowrap">
-                                        {props?.dataLang?.btn_table_print || "btn_table_print"}
+                                        {props?.dataLang?.btn_table_print_notprice || "In không giá"}
+                                    </p>
+                                </li>
+                                <li
+                                    onClick={() => {
+                                        handlePrintTem({ typePrint: "price", id: props?.id, typePage: props?.type });
+                                        closeAllPrintDropdowns();
+                                    }}
+                                    className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+                                >
+                                    <PrinterTem className="size-5"/>
+                                    <p className="whitespace-nowrap">
+                                        {props?.dataLang?.btn_table_print_price || "In có giá"}
                                     </p>
                                 </li>
                             </ul>
@@ -1034,7 +1115,10 @@ console.log(idTem)
                         }}
                         noArrow={true}
                         opacity={1}
-                        delayHide={500}
+                        delayHide={100}
+                        trigger="mouseenter"
+                        openOnClick={true}
+                        onClickOutside={() => setShowMoreIcons(false)}
                     >
                         <div
                             className="flex flex-col gap-1 min-w-[120px] p-1 bg-white"
@@ -1064,20 +1148,6 @@ console.log(idTem)
                 cancel={() => handleQueryId({ status: false })}
             />
             <Tooltip id="delete-tooltip" place="top" className="z-[999999]" style={{ borderRadius: '6px' }} />
-            
-            {/* Popup PDF hidden component */}
-            {showPdfPopup && (
-                <Popup_Pdf
-                    dataLang={props.dataLang}
-                    props={props}
-                    openAction={openAction}
-                    setOpenAction={setOpenAction}
-                    {...shareProps}
-                    isForceOpen={showPdfPopup}
-                    onClose={() => setShowPdfPopup(false)}
-                    className="hidden"
-                />
-            )}
         </div>
     );
 });

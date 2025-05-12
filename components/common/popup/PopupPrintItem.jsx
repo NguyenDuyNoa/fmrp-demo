@@ -1,5 +1,6 @@
 import Loading from "@/components/UI/loading/loading";
 import React from "react";
+import PrinterTem from "@/components/icons/common/PrinterTem";
 
 const PopupPrintItem = ({
     dataLang,
@@ -16,36 +17,36 @@ const PopupPrintItem = ({
         <>
             {isLoading ? (
                 <div className="w-full flex justify-center items-center py-4 gap-x-3">
-
                     <span
                         className={`${classLoading} inline-block size-6 shink animate-spin border-typo-blue-3 rounded-full border-[3px] border-solid border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`}
                     />
                     <span className="text-base font-medium text-typo-blue-3">Loading...</span>
                 </div>
             ) : (
-                <div className="flex items-center justify-center my-3">
-                    <button
+                <ul className="flex flex-col gap-1">
+                    <li
                         onClick={() => onCLick("notPrice")}
-                        className="relative hover:-translate-y-[3px] transition-all ease-linear inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+                        className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                     >
-                        <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                        <PrinterTem className="size-5"/>
+                        <p className="whitespace-nowrap">
                             {["payment", "receipts"].includes(type)
                                 ? dataLang?.PDF_PrintOnelink || "PDF_PrintOnelink"
-                                : dataLang?.option_prin_notprice ||
-                                "option_prin_notprice"}
-                        </span>
-                    </button>
-                    <button
+                                : dataLang?.btn_table_print_notprice || "In không giá"}
+                        </p>
+                    </li>
+                    <li
                         onClick={() => onCLick("price")}
-                        className="relative hover:-translate-y-[3px] transition-all ease-linear inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
+                        className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                     >
-                        <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                        <PrinterTem className="size-5"/>
+                        <p className="whitespace-nowrap">
                             {["payment", "receipts"].includes(type)
                                 ? dataLang?.PDF_PrintTwolink || "PDF_PrintTwolink"
-                                : dataLang?.option_prin_price || "option_prin_price"}
-                        </span>
-                    </button>
-                </div>
+                                : dataLang?.btn_table_print_price || "In có giá"}
+                        </p>
+                    </li>
+                </ul>
             )}
         </>
     );

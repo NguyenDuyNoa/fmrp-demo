@@ -1,5 +1,6 @@
 import apiComons from "@/Api/apiComon/apiComon";
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import EditIcon from "@/components/icons/common/EditIcon";
 import PlusIcon from "@/components/icons/common/PlusIcon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupCustom from "@/components/UI/popup";
@@ -172,7 +173,12 @@ const PopupWarehouse = (props) => {
                 }
                 button={
                     props.id ? (
-                        <IconEdit size={21} className="transition-all ease-linear hover:scale-110" />
+                        <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+                            <EditIcon
+                                color="#064E3B"
+                                className="size-5 group-hover:text-sky-500 group-hover:shadow-md"
+                            />                    
+                        </div>
                     ) : (
                         <div className="flex items-center gap-2">
                             <PlusIcon />

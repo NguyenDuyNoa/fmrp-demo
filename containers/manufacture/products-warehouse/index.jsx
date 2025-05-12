@@ -367,12 +367,16 @@ const ProductsWarehouse = (props) => {
                     <div className="flex flex-col h-full">
                         <div className="w-full items-center flex justify-between gap-2">
                             <div className="flex gap-3 items-center w-full">
-                                <div className="grid grid-cols-5 gap-2">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
                                         placeholder={dataLang?.branch_search}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    />
+                                     <DateToDateComponent
+                                        colSpan={1}
+                                        value={isState.valueDate}
+                                        onChange={(e) => queryState({ valueDate: e })}
                                     />
                                     <SelectComponent
                                         options={[
@@ -422,12 +426,6 @@ const ProductsWarehouse = (props) => {
                                         isClearable={true}
                                         isSearchable={true}
                                     />
-                                    <DateToDateComponent
-                                        colSpan={1}
-                                        value={isState.valueDate}
-                                        onChange={(e) => queryState({ valueDate: e })}
-                                    />
-                                </div>
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex items-center justify-end gap-2">
@@ -452,40 +450,40 @@ const ProductsWarehouse = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <Customscrollbar className="h-full overflow-y-auto">
                             <div className="w-full">
-                                <HeaderTable gridCols={10} display={"grid"}>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                <HeaderTable gridCols={11} display={"grid"}>
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "stt"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.production_warehouse_note || "production_warehouse_note"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_browse || "production_warehouse_browse"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_branch || "import_branch"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -496,12 +494,15 @@ const ProductsWarehouse = (props) => {
                                     <Loading className="h-full" color="#0f4f9e" />
                                 ) : data?.rResult?.length > 0 ? (
                                     <div className="h-full divide-y divide-slate-200">
-                                        {data?.rResult?.map((e) => (
-                                            <RowTable gridCols={10} key={e.id.toString()}>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                        {data?.rResult?.map((e, index) => (
+                                            <RowTable gridCols={11} key={e.id.toString()}>
+                                                <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                    {index + 1}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     <PopupDetail
                                                         dataLang={dataLang}
                                                         className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
@@ -509,21 +510,23 @@ const ProductsWarehouse = (props) => {
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     {e?.reference_no_detail}
                                                 </RowItemTable>
-                                                <LinkWarehouse
-                                                    disbleClick={true}
-                                                    colSpan={1}
-                                                    warehouse_id={e?.warehouse_id}
-                                                    warehouse_name={e?.warehouse_name}
-                                                />
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    <LinkWarehouse
+                                                        disbleClick={true}
+                                                        colSpan={1}
+                                                        warehouse_id={e?.warehouse_id}
+                                                        warehouse_name={e?.warehouse_name}
+                                                    />
+                                                </RowItemTable>
+
+                                                <RowItemTable colSpan={1} textAlign={"center"}>
                                                     {formatNumber(e?.total_quantity)}
-                                                    {/* {formatNumber(e?.count_item)} */}
                                                 </RowItemTable>
                                                 <RowItemTable
-                                                    colSpan={1}
+                                                    colSpan={1.5}
                                                     textAlign={"left"}
                                                     className={"truncate"}
                                                 >
@@ -538,30 +541,6 @@ const ProductsWarehouse = (props) => {
                                                         fullName={e?.staff_create?.full_name}
                                                         profileImage={e?.staff_create?.profile_image}
                                                     />
-                                                    {/* <div className="relative">
-                                                                <ModalImage
-                                                                    small={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
-                                                                    large={e?.staff_create?.profile_image ? e?.staff_create?.profile_image : "/user-placeholder.jpg"}
-                                                                    className="object-cover w-6 h-6 rounded-full "
-                                                                >
-                                                                    <div className="">
-                                                                        <ImageErrors
-                                                                            src={e?.staff_create?.profile_image}
-                                                                            width={25}
-                                                                            height={25}
-                                                                            defaultSrc="/user-placeholder.jpg"
-                                                                            alt="Image"
-                                                                            className="object-cover min-w-6 max-w-6 min-h-6 max-h-6 h-6 w-6  rounded-[100%] text-left cursor-pointer"
-                                                                        />
-                                                                    </div>
-                                                                </ModalImage>
-                                                                <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                    <span className="relative inline-flex w-2 h-2 rounded-full bg-lime-500">
-                                                                        <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-lime-400"></span>
-                                                                    </span>
-                                                                </span>
-                                                            </div>
-                                                            <h6 className="capitalize">{e?.staff_create?.full_name}</h6> */}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1}>
                                                     <ButtonWarehouse
@@ -570,8 +549,8 @@ const ProductsWarehouse = (props) => {
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className="mx-auto">
-                                                    <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                <RowItemTable colSpan={1}>
+                                                    {e?.branch_name}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} className="flex justify-center">
                                                     <BtnAction
@@ -612,7 +591,7 @@ const ProductsWarehouse = (props) => {
                     </ContainerTotal>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
                                 <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
@@ -624,7 +603,8 @@ const ProductsWarehouse = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
             {isState.dataExport?.length > 0 && (

@@ -47,7 +47,7 @@ const CustomAvatar = ({ profileImage, fullName, data, classNameAvatar }) => {
                     </span>
                 </span> */}
             </div>
-            <h6 className="text-[13px] capitalize">
+            <h6 className="responsive-text-sm capitalize">
                 {fullName}
             </h6>
         </div>

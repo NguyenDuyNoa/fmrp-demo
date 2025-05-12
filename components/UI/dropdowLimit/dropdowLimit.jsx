@@ -81,7 +81,7 @@ const DropdowLimit = ({ sLimit, limit, dataLang }) => {
   return (
     <div className="flex items-center gap-4">
       {/* Label */}
-      <div className="font-normal text-neutral-02 2xl:text-xs xl:text-sm text-[8px]">
+      <div className="font-normal text-neutral-02 responsive-text-sm">
         {dataLang?.display}
       </div>
 
@@ -91,7 +91,7 @@ const DropdowLimit = ({ sLimit, limit, dataLang }) => {
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`outline-none cursor-pointer text-neutral-05 text-[10px] xl:text-xs 2xl:text-base bg-white rounded-lg px-3 py-2 hover:bg-white/70 flex items-center gap-2 border transition-all duration-300 ${isOpen ? "border-[#003DA0]" : "border-border-gray-1"}`}
+          className={`outline-none cursor-pointer text-neutral-05 responsive-text-base bg-white rounded-lg px-1.5 py-1 2xl:px-2 2xl:py-1.5 3xl:px-3 3xl:py-2 hover:bg-white/70 flex items-center gap-2 border transition-all duration-300 ${isOpen ? "border-[#003DA0]" : "border-border-gray-1"}`}
         >
           {limit === -1 ? "Tất cả" : limit}
           <DropdownFilledIcon
@@ -108,7 +108,7 @@ const DropdowLimit = ({ sLimit, limit, dataLang }) => {
               <li
                 key={index}
                 onClick={() => handleSelect(e)}
-                className="text-center text-[10px] xl:text-xs 2xl:text-base px-2 py-1 cursor-pointer hover:bg-gray-100 text-neutral-05"
+                className="text-center responsive-text-base px-2 py-1 cursor-pointer hover:bg-gray-100 text-neutral-05"
               >
                 {e}
               </li>

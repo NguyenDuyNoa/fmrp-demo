@@ -437,7 +437,7 @@ const Receipts = (props) => {
                                                 <RowItemTable colSpan={1} textAlign={"left"}>
                                                     <PopupDetail
                                                         dataLang={dataLang}
-                                                        className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]"
+                                                        className="responsive-text-sm font-medium hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]"
                                                         name={e?.code}
                                                         id={e?.id}
                                                     />
@@ -458,44 +458,15 @@ const Receipts = (props) => {
                                                 <RowItemTable colSpan={1.5} textAlign={"left"}>
                                                     {e?.object_text}
                                                 </RowItemTable>
-                                                <RowItemTable
-                                                    colSpan={1}
-                                                    // className={"flex items-center justify-center"}
-                                                >
-                                                    {
-                                                        (e?.type_vouchers === "import" && (
-                                                            <TagColorMore
-                                                                color={"#a855f7"}
-                                                                backgroundColor={"#e9d5ff"}
-                                                                name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                            />
-                                                        ))
-                                                        ||
-                                                        (e?.type_vouchers === "deposit" && (
-                                                            <TagColorMore
-                                                                color={"#06b6d4"}
-                                                                backgroundColor={"#a5f3fc"}
-                                                                name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                            />
-                                                        ))
-                                                        ||
-                                                        (e?.type_vouchers === "service" && <TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />)
-                                                        ||
-                                                        (e?.type_vouchers === "order" && (
-                                                            <TagColorMore
-                                                                color={"#22c55e"}
-                                                                backgroundColor={"#bbf7d0"}
-                                                                name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                            />
-                                                        ))
-                                                    }
+                                                <RowItemTable colSpan={1}>
+                                                    { dataLang[e?.type_vouchers] || e?.type_vouchers}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} className="" textAlign={"left"}>
                                                     {e?.voucher?.map((code, index) => (
                                                         <PopupDetailThere
                                                             key={code?.id}
                                                             dataLang={dataLang}
-                                                            className=" hover:text-blue-600 transition-all ease-in-out 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 py-1  rounded-md text-center text-[#0F4F9E]"
+                                                            className=" hover:text-blue-600 transition-all ease-in-out responsive-text-sm px-2 py-1 rounded-md text-center text-[#0F4F9E]"
                                                             type={code.voucher_type}
                                                             id={code.id}
                                                             name={code?.code}
@@ -566,7 +537,7 @@ const Receipts = (props) => {
                 showTotal={true}
                 total={
                     <>
-                        <ContainerTotal className={"!grid-cols-24"}>
+                        <ContainerTotal className={"!grid-cols-26"}>
                             <RowItemTable colSpan={7.5} className="p-2" textAlign={"right"}>
                                 {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
                             </RowItemTable>
