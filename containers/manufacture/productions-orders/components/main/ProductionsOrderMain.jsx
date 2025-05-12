@@ -819,6 +819,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     </button>
   );
 
+  console.log("stateFilterDropdown?.open", stateFilterDropdown?.openDropdownId);
+
   // trigger của bộ lọc trạng thái
   const triggerFilterStatus = (
     <button

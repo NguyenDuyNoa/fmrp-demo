@@ -20,8 +20,8 @@ export const CustomOption = (props) => {
 // Custom Dropdown Indicator
 const DropdownIndicator = (props) => (
     <components.DropdownIndicator {...props}>
-        <DropdownFilledIcon 
-            className={`w-3 h-3 transition-transform duration-500 ${props.selectProps.menuIsOpen ? 'rotate-180 text-[#003DA0]' : 'text-neutral-02'}`} 
+        <DropdownFilledIcon
+            className={`w-3 h-3 transition-transform duration-500 ${props.selectProps.menuIsOpen ? 'rotate-180 text-[#003DA0]' : 'text-neutral-02'}`}
         />
     </components.DropdownIndicator>
 );
@@ -135,12 +135,12 @@ const SelectComponent = ({
         }
 
     return (
-        <div className={`${classParent ? classParent : ""}`} 
+        <div className={`${classParent ? classParent : ""}`}
         // style={{ gridColumn: `span ${colSpan || 1}` }}
         >
             <SelectCore
                 id={id ?? "parentSelect"}
-
+                menuPortalTarget={menuPortalTarget ?? document.body}
                 options={options}
                 value={value}
                 onInputChange={onInputChange ? onInputChange : ""}
@@ -165,7 +165,7 @@ const SelectComponent = ({
                 classNamePrefix={classNamePrefix}
                 maxMenuHeight={maxMenuHeight}
                 isClearable={isClearable}
-                menuPortalTarget={menuPortalTarget}
+                // menuPortalTarget={menuPortalTarget}
                 menuShouldBlockScroll={menuShouldBlockScroll}
                 // styles={{
                 //     ...[styles ? styles : configSelectFillter.styles],
