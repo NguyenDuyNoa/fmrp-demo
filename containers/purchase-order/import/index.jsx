@@ -666,28 +666,31 @@ const PurchaseImport = (props) => {
                 showTotal={true}
                 total={
                     <>
-                        <ContainerTotal className={"!grid-cols-13"}>
-                            <RowItemTable colSpan={3} textAlign={"end"} className="px-5">
+                        <ContainerTotal className={"!grid-cols-26"}>
+                            <RowItemTable colSpan={4.5} textAlign={"end"} className="px-5">
+                                {/* {dataLang?.import_total || "import_total"} */}
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign={"start"} className="px-2">
                                 {dataLang?.import_total || "import_total"}
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={0.5}
+                                colSpan={1}
                                 textAlign={"left"}
-                                className="flex gap-1 px-3"
+                                className="flex gap-1"
                             >
                                 {renderMoneyOrDash(data?.rTotal?.total_price)}
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={0.5}
+                                colSpan={1}
                                 textAlign={"left"}
-                                className="flex gap-1 px-3"
+                                className="flex gap-1"
                             >
                                 {renderMoneyOrDash(data?.rTotal?.total_tax_price)}
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={0.5}
+                                colSpan={1}
                                 textAlign={"left"}
-                                className="flex gap-1 px-3"
+                                className="flex gap-1"
                             >
                                 {renderMoneyOrDash(data?.rTotal?.total_amount)}
                             </RowItemTable>

@@ -109,7 +109,7 @@ export const LayOutTableDynamic = ({
         {breadcrumb}
         <ContainerBody>
           <div className="flex flex-col h-full overflow-hidden gap-y-3">
-            <div className="flex justify-between mt-1">{titleButton}</div>
+            <div className="flex justify-between mt-1 pr-1">{titleButton}</div>
             {fillterTab && (
               <div className="w-full h-fit">
                 <ContainerFilterTab>{fillterTab}</ContainerFilterTab>

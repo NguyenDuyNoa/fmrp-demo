@@ -1,14 +1,14 @@
 import apiComons from "@/Api/apiComon/apiComon";
 import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Container, ContainerBody, ContainerTable, LayOutTableDynamic } from "@/components/UI/common/layout";
+import { LayOutTableDynamic } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -44,7 +44,7 @@ import PopupDetail from "./components/popupDetail";
 import PopupStatus from "./components/popupStatus";
 import { useInventoryList } from "./hooks/useInventoryList";
 import Pagination from "/components/UI/pagination";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import TrashIcon from "@/components/icons/common/TrashIcon";
 
 const initialState = {
     keySearch: "",
@@ -295,9 +295,8 @@ const Inventory = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-4">
-                                <div className="grid grid-cols-9 gap-2">
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         dataLang={dataLang}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
@@ -324,7 +323,6 @@ const Inventory = (props) => {
                                         onChange={(e) => queryState({ valueDate: e })}
                                         colSpan={3}
                                     />
-                                </div>
                             </div>
                             <div className="col-span-2">
                                 <div className="flex items-center justify-end space-x-2">
@@ -349,22 +347,22 @@ const Inventory = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <Customscrollbar className="h-full overflow-y-auto">
                             <div className="w-full">
                                 <HeaderTable gridCols={11} display={"grid"}>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "stt"}
+                                    </ColumnTable>  
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.inventory_vouchercode || "inventory_vouchercode"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.inventory_warehouse || "inventory_warehouse"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -373,13 +371,13 @@ const Inventory = (props) => {
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.inventory_status || "inventory_status"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.inventory_creator || "inventory_creator"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.inventory_branch || "inventory_branch"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={3} textAlign={"center"}>
+                                    <ColumnTable colSpan={2.5} textAlign={"center"}>
                                         {dataLang?.inventory_note || "inventory_note"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -391,15 +389,18 @@ const Inventory = (props) => {
                                 ) : data?.rResult?.length > 0 ? (
                                     <>
                                         <div className="divide-y divide-slate-200 h-[100%]">
-                                            {data?.rResult?.map((e) => (
+                                            {data?.rResult?.map((e, index) => (
                                                 <RowTable gridCols={11} key={e?.id.toString()}>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                    <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                        {index + 1}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         <PopupDetail
                                                             dataLang={dataLang}
-                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-linear cursor-pointer"
+                                                            className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                             name={e?.code}
                                                             id={e?.id}
                                                         />
@@ -407,7 +408,7 @@ const Inventory = (props) => {
                                                     <RowItemTable colSpan={1} textAlign={"left"}>
                                                         {e?.waidname}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"right"}>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
                                                         {formatNumber(e?.total_item)}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className={"mx-auto"}>
@@ -440,20 +441,20 @@ const Inventory = (props) => {
                                                             profileImage={e?.staff_create_image}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className={"mx-auto"}>
-                                                        <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                    <RowItemTable colSpan={1}>
+                                                       {e?.branch_name}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={3} textAlign={"left"}>
+                                                    <RowItemTable colSpan={2.5} textAlign={"left"}>
                                                         {e?.note}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                    <RowItemTable colSpan={1} textAlign={"center"} className={"mx-auto"}>
                                                         <button
                                                             onClick={() =>
                                                                 handleQueryId({ id: e.id, status: true })
                                                             }
-                                                            className="text-xs xl:text-base "
-                                                        >
-                                                            <IconDelete color="red" />
+                                                            className="group hover:border-red-01 hover:bg-red-02 rounded-lg w-fit p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer"
+                                                            >
+                                                            <TrashIcon className="size-5 text-[#EE1E1E]"/>
                                                         </button>
                                                     </RowItemTable>
                                                 </RowTable>
@@ -468,10 +469,9 @@ const Inventory = (props) => {
                     </div>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -480,7 +480,8 @@ const Inventory = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
             {isState.dataExport?.length > 0 && (

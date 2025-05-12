@@ -361,6 +361,7 @@ const Items = (props) => {
                     "category_material_group_name"
                   }
                   colSpan={3}
+                  className={"min-w-[300px]"}
                   formatOptionLabel={SelectOptionLever}
                 />
               </div>

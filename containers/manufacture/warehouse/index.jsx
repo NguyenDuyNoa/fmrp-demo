@@ -538,7 +538,7 @@ const Warehouse = (props) => {
                                         <PopupParent
                                             key={item.id}
                                             trigger={
-                                                <div className="relative grid grid-cols-12">
+                                                <div className="relative grid grid-cols-12 mt-1">
                                                     <li
                                                         className={` col-span-12 ${isState.idWarehouse === item.id
                                                             ? "bg-[#3276FA] text-white"
@@ -576,14 +576,15 @@ const Warehouse = (props) => {
                                             }
                                             closeOnDocumentClick={false}
                                             position="right top"
-                                            // keepTooltipInside
-                                            on={["click"]}
+                                            keepTooltipInside
+                                            // on={["click"]}
+                                            on={["hover"]}
                                             arrow={false}
                                         // mouseLeaveDelay={5000}
                                         >
                                             {isState.idWarehouse === item.id &&
                                                 item.is_system == 0 && (
-                                                    <div className="flex items-center gap-2 px-4 py-2 ml-2 bg-gray-200 rounded-md 3xl:py-3">
+                                                    <div className="flex items-center gap-2 px-2 py-[5px] ml-2 bg-gray-200 rounded-md 3xl:py-3">
                                                         {role == true || checkEdit ? (
                                                             <PopupWarehouse
                                                                 dataLang={dataLang}

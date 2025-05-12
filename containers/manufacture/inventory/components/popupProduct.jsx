@@ -364,9 +364,9 @@ const PopupProduct = React.memo((props) => {
             classNameBtn={props.className}
         >
             <div className="py-4 w-[1000px] 2xl:space-y-5 space-y-4">
-                {isFetching ? (
+                {/* {isFetching ? (
                     <Loading className="h-60" color="#0f4f9e" />
-                ) : (
+                ) : ( */}
                     <div className="space-y-1">
                         <label>Mặt hàng</label>
                         <Select
@@ -430,7 +430,7 @@ const PopupProduct = React.memo((props) => {
                             )}
                         />
                     </div>
-                )}
+                {/* )} */}
                 {isFetchingProduct ? (
                     <Loading className="h-60" color="#0f4f9e" />
                 ) : (

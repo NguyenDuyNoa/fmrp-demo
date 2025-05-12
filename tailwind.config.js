@@ -197,6 +197,22 @@ module.exports = {
     },
     function({ addComponents, theme }) {
       addComponents({
+        '.responsive-text-xs': {
+          fontSize: '9px',
+          lineHeight: '11px',
+          '@screen xl': {
+            fontSize: '10px', /* text-10 */
+            lineHeight: '12px'
+          },
+          '@screen 2xl': {
+            fontSize: '11px', /* text-11 */
+            lineHeight: '14px'
+          },
+          '@screen 3xl': {
+            fontSize: '12px', /* text-12 */
+            lineHeight: '16px'
+          }
+        },
         '.responsive-text-sm': {
           fontSize: '11px',
           lineHeight: '14px',

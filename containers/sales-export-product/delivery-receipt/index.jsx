@@ -6,11 +6,9 @@ import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
@@ -640,7 +638,10 @@ const DeliveryReceipt = (props) => {
                 showTotal={true}
                 total={
                     <ContainerTotal>
-                        <RowItemTable colSpan={3} textAlign={"end"} className="px-5">
+                         <RowItemTable colSpan={2.5} textAlign={"end"} className="px-5">
+                            {/* {dataLang?.total_outside || "total_outside"} */}
+                        </RowItemTable>
+                        <RowItemTable colSpan={0.5} textAlign={"start"}>
                             {dataLang?.total_outside || "total_outside"}
                         </RowItemTable>
                         <RowItemTable colSpan={0.5} textAlign={"left"} className="whitespace-nowrap">

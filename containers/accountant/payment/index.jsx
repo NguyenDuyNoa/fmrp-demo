@@ -441,7 +441,7 @@ const Payment = (props) => {
                                                     <PopupDetail
                                                         id={e?.id}
                                                         dataLang={dataLang}
-                                                        className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]" name={e?.code}
+                                                        className="responsive-text-sm font-medium hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]" name={e?.code}
                                                     />
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} textAlign={'left'}>
@@ -456,23 +456,15 @@ const Payment = (props) => {
                                                 <RowItemTable colSpan={1} textAlign={'left'}>
                                                     {e?.object_text}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={'center'}>
-                                                    {
-                                                        (e?.type_vouchers === "import" && (<TagColorMore className="flex whitespace-nowrap" color={'#a855f7'} backgroundColor={"#e9d5ff"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
-                                                        ||
-                                                        (e?.type_vouchers === "deposit" && (<TagColorMore className="flex whitespace-nowrap" color={'#06b6d4'} backgroundColor={"#a5f3fc"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
-                                                        ||
-                                                        (e?.type_vouchers === "service" && (<TagColorRed className="flex whitespace-nowrap" name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
-                                                        ||
-                                                        (e?.type_vouchers === "order" && (<TagColorMore className="flex whitespace-nowrap" color={'#22c55e'} backgroundColor={'#bbf7d0'} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />))
-                                                    }
+                                                <RowItemTable colSpan={1}>
+                                                    {dataLang[e?.type_vouchers] || e?.type_vouchers}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1}>
                                                     {e?.voucher?.map((code) => (
                                                         <React.Fragment key={code.id}>
                                                             <PopupDetailThere
                                                                 dataLang={dataLang}
-                                                                className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
+                                                                className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                                 type={code.voucher_type}
                                                                 id={code.id}
                                                                 name={code?.code}
@@ -528,11 +520,13 @@ const Payment = (props) => {
                 }
                 showTotal={true}
                 total={
-                    <ContainerTotal className={"!grid grid-cols-26"}>
-                        <RowItemTable colSpan={8.5} className="p-2" textAlign={"end"}>
+                    <ContainerTotal className={"!grid grid-cols-28"}>
+                        <RowItemTable colSpan={7.5} className="p-2" textAlign={"end"}>
+                        </RowItemTable>
+                        <RowItemTable colSpan={1} className="p-2" textAlign={"start"}>
                             {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'left'} className={'p-2'}>
+                        <RowItemTable colSpan={5} textAlign={'left'} className={'p-2 whitespace-nowrap'}>
                             {renderMoneyOrDash(data?.rTotal?.sum_total)}
                         </RowItemTable>
                     </ContainerTotal>

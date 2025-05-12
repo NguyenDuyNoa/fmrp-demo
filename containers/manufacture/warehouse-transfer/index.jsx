@@ -585,7 +585,7 @@ const WarehouseTransfer = (props) => {
                                                             colSpan={1}
                                                             warehouse_id={e?.warehouses_to}
                                                             warehouse_name={e?.warehouses_to_name}
-                                                            color="text-green-600"
+                                                            color="text-neutral-07"
                                                         />
                                                     </RowItemTable>
 
@@ -675,8 +675,10 @@ const WarehouseTransfer = (props) => {
                 showTotal={true}
                 total={
                     <>
-                        <ContainerTotal className="!grid-cols-22">
-                            <RowItemTable colSpan={4} textAlign={"right"} className="p-2">
+                        <ContainerTotal className="!grid-cols-24">
+                            <RowItemTable colSpan={3.5} textAlign={"right"} className="p-2">
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign={"left"} className="p-2">
                                 {dataLang?.import_total || "import_total"}
                             </RowItemTable>
                             <RowItemTable colSpan={1} textAlign={"left"} className={"text-right"}>

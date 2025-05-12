@@ -771,7 +771,7 @@ const ExportToOtherForm = (props) => {
                                         </label>
                                     )}
                                 </div>
-                                <div className="col-span-2 ">
+                                {/* <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
@@ -819,7 +819,7 @@ const ExportToOtherForm = (props) => {
                                             }),
                                         }}
                                     />
-                                </div>
+                                </div> */}
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm">
                                         {props.dataLang?.payment_ob || "payment_ob"}{" "}

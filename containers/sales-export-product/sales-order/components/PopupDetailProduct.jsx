@@ -72,7 +72,7 @@ const PopupDetailProduct = (props) => {
                                         {data?.code}
                                     </h3>
                                 </div>
-                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
+                                {/* <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 ">
                                         {props.dataLang?.sales_product_order_type || "sales_product_order_type"}:
                                     </h3>
@@ -87,7 +87,7 @@ const PopupDetailProduct = (props) => {
                                             </div>
                                         )}
                                     </h3>
-                                </div>
+                                </div> */}
                                 <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 ">
                                         {props.dataLang?.sales_product_statusTT || "sales_product_statusTT"}:
@@ -117,14 +117,14 @@ const PopupDetailProduct = (props) => {
                             </div>
 
                             <div className="col-span-4 ">
-                                <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
+                                {/* <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_code || "price_quote_code"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal col-span-4">
                                         {data?.quote_code}
                                     </h3>
-                                </div>
+                                </div> */}
                                 <div className="grid grid-cols-6 my-3 font-medium xl:my-4">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_customer || "price_quote_customer"}:

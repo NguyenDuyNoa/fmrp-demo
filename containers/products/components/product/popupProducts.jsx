@@ -1,5 +1,6 @@
 import apiCategory from "@/Api/apiProducts/category/apiCategory";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
+import EditIcon from "@/components/icons/common/EditIcon";
 import PlusIcon from "@/components/icons/common/PlusIcon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
@@ -664,16 +665,16 @@ const Popup_Products = React.memo((props) => {
                         }}
                         className={
                             props.type == "add" &&
-                            "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"
+                            "hover:bg-primary-05 group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer"
                         }
                     >
-                        <BiEdit
+                        <EditIcon
                             size={20}
-                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                            className="size-5 transition-all duration-300 text-neutral-03 group-hover:text-neutral-07"
                         />
-                        {/* <p className="group-hover:text-sky-500">
+                        <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">
                             {props.dataLang?.btn_table_edit || "btn_table_edit"}
-                        </p> */}
+                        </p>
                     </div>
                 ) : (
                     // : props.dataLang?.branch_popup_create_new || 'branch_popup_create_new'

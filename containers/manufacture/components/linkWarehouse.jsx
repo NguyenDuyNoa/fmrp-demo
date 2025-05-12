@@ -15,7 +15,7 @@ const LinkWarehouse = ({ warehouse_id, warehouse_name, open, color, colSpan, dis
                                 : "responsive-text-base"
                             } ${color
                                 ? `${color} `
-                                : "text-sky-700  transition-all duration-200 ease-linear"
+                                : "text-neutral-07  transition-all duration-200 ease-linear"
                             } font-semibold `}
                     >
                         {warehouse_name}
