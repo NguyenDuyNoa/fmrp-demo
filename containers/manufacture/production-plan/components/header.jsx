@@ -19,7 +19,6 @@ const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), {
 });
 
 const Header = (props) => {
-
     const dataLang = props?.dataLang;
 
     const router = useRouter();
@@ -48,7 +47,7 @@ const Header = (props) => {
         },
     ];
     const stateFilterDropdown = useSelector((state) => state.stateFilterDropdown);
-    console.log("🚀 ~ Header ~ stateFilterDropdown:", stateFilterDropdown?.openDropdownId)
+   
 
     const countActiveFilters = (filters) => {
         let count = 0;
@@ -76,9 +75,8 @@ const Header = (props) => {
         return count;
     };
     const activeFilterCount = countActiveFilters(props?.isValue);
-    console.log("🚀 ~ Header ~ activeFilterCount:", activeFilterCount)
 
-    const [openDropdown, setOpenDropdown] = useState(false);
+
     const triggerFilterAll = (
         <button
             className={`${stateFilterDropdown?.open || activeFilterCount > 1
@@ -108,7 +106,9 @@ const Header = (props) => {
             }
             <span className="3xl:size-4 size-3.5 shrink-0">
                 <CaretDownIcon
-                    className={`${stateFilterDropdown?.open || activeFilterCount > 1 ? "rotate-180" : "rotate-0"
+                    className={`${stateFilterDropdown?.open || activeFilterCount > 1
+                        ? "rotate-180"
+                        : "rotate-0"
                         } w-full h-full custom-transition`}
                 />
             </span>
@@ -164,10 +164,10 @@ const Header = (props) => {
                     <FilterDropdown
                         trigger={triggerFilterAll}
                         style={{
-                            boxShadow:
-                                "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040",
+                            // boxShadow:
+                            //     "0px 20px 24px -4px #10182814, 0px 4px 4px 0px #00000040",
                         }}
-                        className="flex flex-col border-[#D8DAE5] rounded-lg min-w-[650px] w-fit h-fit"
+                        className="flex flex-col border-[#D8DAE5] rounded-lg 2xl:min-w-[700px] min-w-[550px] w-fit h-fit"
                         dropdownId="dropdownFilterMain"
                         classNameContainer="min-h-full"
                     >

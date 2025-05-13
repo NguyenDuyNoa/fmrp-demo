@@ -59,7 +59,7 @@ export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
 export const Container = ({ children, className }) => {
   return (
     <div
-      className={`${className} pt-[72px] 3xl:px-6 2xl:px-4 xl:px-4 px-4 3xl:space-y-2 space-y-1 overflow-hidden h-screen`}
+      className={`${className} pt-[72px] 3xl:px-6 2xl:px-4 xl:px-4 px-4 3xl:space-y-2 space-y-1 overflow-hidden min-h-screen`}
     >
       {/* return <div className={`${className} 3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-8 px-4 lg:pb-8 space-y-1 overflow-hidden h-screen`}> */}
       {children}

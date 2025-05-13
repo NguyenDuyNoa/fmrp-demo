@@ -30,7 +30,7 @@ const Header = ({ dataLang }) => {
                 <h2 className="text-title-section text-[#52575E] capitalize font-medium">
                     {dataLang?.materials_planning || 'materials_planning'}
                 </h2>
-                <div>
+                {/* <div>
                     <Zoom>
                         <button
                             type="button"
@@ -47,7 +47,7 @@ const Header = ({ dataLang }) => {
                             </h3>
                         </button>
                     </Zoom>
-                </div>
+                </div> */}
             </div>
         </>
     );
