@@ -16,7 +16,7 @@ import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { Add as IconClose } from "iconsax-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { IoCopyOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "react-tippy";
@@ -48,6 +48,9 @@ const PopupUpgradeProfessional = (props) => {
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isQrUpdating, setIsQrUpdating] = useState(false);
+  const [contentHeight, setContentHeight] = useState(null);
+  const detailsRef = useRef(null);
+  const detailsContentRef = useRef(null);
 
   const {
     data: packageData,
@@ -318,16 +321,6 @@ const PopupUpgradeProfessional = (props) => {
 
   const toggleDetails = () => {
     setIsDetailsOpen(!isDetailsOpen);
-
-    // Thêm hiệu ứng cuộn xuống khi mở chi tiết
-    // if (!isDetailsOpen) {
-    //   setTimeout(() => {
-    //     const detailSection = document.getElementById("price-details");
-    //     if (detailSection) {
-    //       detailSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    //     }
-    //   }, 300); // Đợi animation mở hoàn tất
-    // }
   };
 
   // Tính toán giá tiền
@@ -373,6 +366,56 @@ const PopupUpgradeProfessional = (props) => {
     return formatMoneyConfig(+number, dataSeting);
   };
 
+  // Theo dõi và cập nhật chiều cao khi component được mount
+  useEffect(() => {
+    if (detailsRef.current && !contentHeight) {
+      setContentHeight(detailsRef.current.clientHeight);
+    }
+    
+    // Xử lý sự kiện resize để tính toán lại chiều cao
+    const handleResize = () => {
+      if (detailsRef.current && !isDetailsOpen) {
+        setContentHeight(detailsRef.current.clientHeight);
+        detailsRef.current.style.height = "auto";
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    
+    // Cleanup khi component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isDetailsOpen]);
+
+  // Theo dõi trạng thái isDetailsOpen để điều chỉnh chiều cao
+  useEffect(() => {
+    if (!detailsRef.current) return;
+    
+    if (isDetailsOpen) {
+      // Khi mở chi tiết, đợi nội dung hiển thị và lấy chiều cao mới
+      setTimeout(() => {
+        if (detailsRef.current && detailsContentRef.current) {
+          // Lưu chiều cao ban đầu nếu chưa lưu
+          if (!contentHeight) {
+            setContentHeight(detailsRef.current.clientHeight);
+          }
+          
+          // Dùng auto thay vì giá trị cụ thể để đảm bảo nội dung hiển thị đầy đủ
+          // nhưng vẫn tôn trọng max-height
+          detailsRef.current.style.transition = "height 0.3s ease-in-out";
+          detailsRef.current.style.height = "auto";
+        }
+      }, 100);
+    } else {
+      // Khi đóng chi tiết, đặt lại chiều cao ban đầu
+      if (contentHeight && detailsRef.current) {
+        detailsRef.current.style.transition = "height 0.3s ease-in-out";
+        detailsRef.current.style.height = `${contentHeight}px`;
+      }
+    }
+  }, [isDetailsOpen, contentHeight]);
+
   return (
     <div
       className={`${deca.className} bg-[#F9FAFC] rounded-3xl p-5 2xl:p-9 w-full h-fit`}
@@ -398,7 +441,7 @@ const PopupUpgradeProfessional = (props) => {
       </div>
 
       <div className="border-t border-[#919EAB3D] mt-2 2xl:mt-3 w-full">
-        <div className="w-full flex flex-col lg:flex-row gap-10 xl:gap-16 pt-3 2xl:pt-6 -mr-6 2xl:-mr-9 pr-4 2xl:pr-6 h-fit max-h-[76vh]">
+        <div className="w-full flex flex-col lg:flex-row gap-10 xl:gap-16 pt-3 2xl:pt-6 -mr-6 2xl:-mr-9 pr-4 2xl:pr-6 h-fit max-h-[76vh]" ref={detailsRef} style={{ transition: "height 0.3s ease-in-out" }}>
           <div className="lg:w-[505px] flex-1">
             <Customscrollbar className="h-full overflow-y-auto">
               <div className="flex flex-col gap-2.5 2xl:gap-9 ">
@@ -847,15 +890,37 @@ const PopupUpgradeProfessional = (props) => {
                   </motion.div>
                 </button>
               </div>
-              <AnimatePresence>
+              <AnimatePresence
+                onExitComplete={() => {
+                  // Sau khi animation exit hoàn tất, đảm bảo chiều cao trở về giá trị ban đầu
+                  setTimeout(() => {
+                    if (detailsRef.current && contentHeight) {
+                      detailsRef.current.style.height = `${contentHeight}px`;
+                    }
+                  }, 50); // Thêm một thời gian trễ nhỏ để đảm bảo animation mượt mà
+                }}
+              >
                 {isDetailsOpen && (
                   <motion.div
                     id="price-details"
+                    ref={detailsContentRef}
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="overflow-hidden"
+                    onAnimationStart={() => {
+                      // Khi bắt đầu animation, đảm bảo container cha sẵn sàng điều chỉnh chiều cao
+                      if (detailsRef.current) {
+                        detailsRef.current.style.overflow = "hidden";
+                      }
+                    }}
+                    onAnimationComplete={() => {
+                      // Khi animation hoàn tất, cho phép cuộn nếu cần thiết
+                      if (detailsRef.current) {
+                        detailsRef.current.style.overflow = "";
+                      }
+                    }}
                   >
                     <div className="flex flex-col gap-3">
                       <div className="flex justify-between items-center">
