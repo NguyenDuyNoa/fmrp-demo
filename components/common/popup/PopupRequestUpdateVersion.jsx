@@ -9,6 +9,8 @@ import Link from "next/link";
 import ButtonAnimationNew from "../button/ButtonAnimationNew";
 import UpgradeIcon from "@/components/icons/common/UpgradeIcon";
 import { FaL } from "react-icons/fa6";
+import PopupUpgradeProfessional from "@/components/UI/popup/PopupUpgradeProfessional";
+import { useGetUpgradePackage } from "@/hooks/useAuth";
 
 // const inter = Inter({ subsets: ['latin'] });
 
@@ -19,6 +21,33 @@ const deca = Lexend_Deca({
 
 const PopupRequestUpdateVersion = ({ children }) => {
   const dispatch = useDispatch();
+  const { data: upgradePackageData, isLoading, error } = useGetUpgradePackage();
+  const handleUpdatePackage = () => {
+    dispatch({
+      type: "statePopupGlobal",
+      payload: {
+        open: false,
+      },
+    });
+    dispatch({
+      type: "statePopupGlobal",
+      payload: {
+        open: true,
+        children: (
+          <PopupUpgradeProfessional
+            upgradePackageData={upgradePackageData}
+            onClose={() =>
+              dispatch({
+                type: "statePopupUpgradeProfessional",
+                payload: { open: false },
+              })
+            }
+          />
+        ),
+      },
+    });
+  }
+
   return (
     <div className="">
       <div
@@ -67,37 +96,40 @@ const PopupRequestUpdateVersion = ({ children }) => {
         <div className="flex flex-col gap-8">
           {children}
 
-          <Link target="_blank" href="https://zalo.me/fososoft">
-            <ButtonAnimationNew
-              icon={<UpgradeIcon className="text-white text-[15px]" size={15} />}
-              classNameWithIcon="space-x-2"
-              reverse={false}
-              title="Nâng cấp"
-              className="border-gradient-button-foso w-full text-white text-[20px] font-medium rounded-[8px] text-center flex items-center justify-center py-3 transition-colors duration-300 ease-in-out"
-              style={{
-                background: `linear-gradient(to bottom right, #1FC583 0%, #1F9285 100%)`,
-              }}
-              whileHover={{
-                background: [
-                  "radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%), linear-gradient(0deg, #1AD598, #1AD598)",
-                  "radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 100%), linear-gradient(0deg, #1AD598, #1AD598)",
-                  "radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%), linear-gradient(0deg, #1AD598, #1AD598)",
-                  ,
-                ],
-                transition: {
-                  duration: 1.5,
-                  ease: [0.4, 0, 0.6, 1],
-                  repeat: Infinity,
-                },
-                boxShadow: [
-                  "inset -2px -2px 5px rgba(255,255,255,0.5), inset 2px 2px 4px rgba(0,0,0,0.15)",
-                  "inset -3px -3px 6px rgba(255,255,255,0.7), inset 3px 3px 6px rgba(0,0,0,0.35)",
-                  "inset -3px -3px 7px rgba(255,255,255,0.7), inset 3px 3px 7px rgba(0,0,0,0.4)",
-                  "inset -2px -2px 5px rgba(255,255,255,0.5), inset 2px 2px 4px rgba(0,0,0,0.3)",
-                ],
-              }}
-            />
-          </Link>
+          {/* <Link target="_blank" href="https://zalo.me/fososoft"> */}
+          {/* <div> */}
+          <ButtonAnimationNew
+            icon={<UpgradeIcon className="text-white text-[15px]" size={15} />}
+            classNameWithIcon="space-x-2"
+            reverse={false}
+            title="Nâng cấp"
+            className="border-gradient-button-foso w-full text-white text-[20px] font-medium rounded-[8px] text-center flex items-center justify-center py-3 transition-colors duration-300 ease-in-out"
+            style={{
+              background: `linear-gradient(to bottom right, #1FC583 0%, #1F9285 100%)`,
+            }}
+            whileHover={{
+              background: [
+                "radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%), linear-gradient(0deg, #1AD598, #1AD598)",
+                "radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 100%), linear-gradient(0deg, #1AD598, #1AD598)",
+                "radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%), linear-gradient(0deg, #1AD598, #1AD598)",
+                ,
+              ],
+              transition: {
+                duration: 1.5,
+                ease: [0.4, 0, 0.6, 1],
+                repeat: Infinity,
+              },
+              boxShadow: [
+                "inset -2px -2px 5px rgba(255,255,255,0.5), inset 2px 2px 4px rgba(0,0,0,0.15)",
+                "inset -3px -3px 6px rgba(255,255,255,0.7), inset 3px 3px 6px rgba(0,0,0,0.35)",
+                "inset -3px -3px 7px rgba(255,255,255,0.7), inset 3px 3px 7px rgba(0,0,0,0.4)",
+                "inset -2px -2px 5px rgba(255,255,255,0.5), inset 2px 2px 4px rgba(0,0,0,0.3)",
+              ],
+            }}
+            onClick={handleUpdatePackage}
+          />
+          {/* </div> */}
+          {/* </Link> */}
         </div>
       </div>
     </div>
