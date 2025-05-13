@@ -28,9 +28,9 @@ const DropdownIndicator = (props) => (
 
 // Custom Clear Indicator
 const ClearIndicator = (props) => (
-    <components.ClearIndicatorndicator {...props}>
+    <components.ClearIndicator {...props}>
         <CloseXIcon className="w-4 h-4 text-[#9295A4]" />
-    </components.ClearIndicatorndicator>
+    </components.ClearIndicator>
 );
 
 export const CustomMenuList = (props) => {
@@ -104,6 +104,11 @@ const SelectComponent = ({
                             color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
                         },
                     }),
+                    menu: (provided) => ({
+                        ...provided,
+                        position: "absolute",
+                        zIndex: 50,
+                    }),
                 }
                 :
                 configSelectFillter.styles
@@ -129,24 +134,29 @@ const SelectComponent = ({
             }),
             menu: (provided) => ({
                 ...provided,
-                zIndex: 9999, // Giá trị z-index tùy chỉnh
+                position: "absolute",
+                zIndex: 50,
             }),
 
         }
 
     return (
-        <div className={`${classParent ? classParent : ""}`}
+        <div className={`${classParent ? classParent : ""} relative`}
         // style={{ gridColumn: `span ${colSpan || 1}` }}
         >
             <SelectCore
                 id={id ?? "parentSelect"}
-                menuPortalTarget={menuPortalTarget ?? document.body}
+                //bật lên nó sẽ render ra ngoài dom gây đè header
+                menuPortalTarget={menuPortalTarget ?? null}
+                // menuPortalTarget={menuPortalTarget ?? document.body}
+                // menuPortalTarget={null}
                 options={options}
                 value={value}
                 onInputChange={onInputChange ? onInputChange : ""}
                 onChange={onChange}
                 placeholder={placeholder}
                 onMenuOpen={onMenuOpen}
+                // menuIsOpen={true}
                 {...configSelectFillter}
                 defaultValue={defaultValue}
                 className={`${configSelectFillter.className} ${className || "min-w-[200px]"}`}

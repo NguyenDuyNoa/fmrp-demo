@@ -577,17 +577,19 @@ const ProductsWarehouse = (props) => {
                 }
                 showTotal={true}
                 total={
-                    <ContainerTotal className="!grid-cols-10">
-                        <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
+                    <ContainerTotal className="!grid-cols-22">
+                        <RowItemTable colSpan={3.5} textAlign={"center"} className="p-2">
+                        </RowItemTable>
+                        <RowItemTable colSpan={1} textAlign={"left"} className="p-2">
                             {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
-                        </ColumnTable>
-                        <ColumnTable
+                        </RowItemTable>
+                        <RowItemTable
                             colSpan={1}
-                            textAlign={"right"}
-                            className="flex flex-wrap justify-end gap-2 p-2 mr-1"
+                            textAlign={"center"}
+                            // className="flex flex-wrap gap-2 p-2 mr-1"
                         >
                             {formatNumber(data?.rTotal?.total_count_item)}
-                        </ColumnTable>
+                        </RowItemTable>
                     </ContainerTotal>
                 }
                 pagination={

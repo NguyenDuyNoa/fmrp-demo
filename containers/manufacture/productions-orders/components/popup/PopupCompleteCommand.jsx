@@ -301,7 +301,7 @@ const ProductRow = memo(
         <td className="py-2 px-3 text-center border-b border-[#F3F3F4]">
           <div className="flex justify-center">
             <InputNumberCustom
-              state={product.quantity_rest}
+              state={product.quantity_success}
               setState={(value) => updateProductQuantity(index, value)}
             />
           </div>
@@ -394,10 +394,12 @@ const PopupCompleteCommand = ({ onClose }) => {
         ...item,
         selected: false,
         quantity_rest: item.quantity_rest || 0,
+        quantity_success: item.quantity_rest || 0,
         error: item.error || 0,
       }));
       setProducts(itemsWithDefaults);
       setSelectAll(false);
+      console.log(itemsWithDefaults)
     }
   }, [productCompleted]);
 
@@ -439,9 +441,9 @@ const PopupCompleteCommand = ({ onClose }) => {
     try {
       const formatData = selectedProducts.map((product) => ({
         ...product,
-        quantity_success: product.quantity_rest || 0,
+        quantity_success: product.quantity_success || 0,
         quantity_error: product.error || 0,
-        quantity1: product.error || 0,
+        // quantity1: product.error || 0,
       }));
       await handleProductCompleted({
         po_id: isStateProvider?.productionsOrders.idDetailProductionOrder,
@@ -471,8 +473,9 @@ const PopupCompleteCommand = ({ onClose }) => {
         const updatedProducts = [...prevProducts];
         updatedProducts[index] = {
           ...updatedProducts[index],
-          quantity_rest: value,
+          quantity_success: value,
         };
+        console.log(updatedProducts)
         return updatedProducts;
       });
     },

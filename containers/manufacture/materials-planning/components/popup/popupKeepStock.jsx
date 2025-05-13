@@ -535,7 +535,7 @@ const PopupKeepStock = ({
                                 control={form.control}
                                 render={({ field, fieldState }) => {
                                     return (
-                                        <div className="my-4 ">
+                                        <div className="my-4 relative">
                                             <SelectComponent
                                                 className={`${fieldState.error
                                                     ? "border-red-500"
@@ -587,6 +587,12 @@ const PopupKeepStock = ({
                                                         width: "100%",
                                                         zIndex: 999,
                                                     }),
+                                                    menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999999,
+                                                        position: "absolute",
+                                                      }),
+                                                    
                                                 }}
                                                 value={field.value}
                                                 maxMenuHeight={150}
@@ -763,11 +769,12 @@ const PopupKeepStock = ({
                                                                     dataLang?.salesOrder_select_warehouse ||
                                                                     "salesOrder_select_warehouse"
                                                                 }
+                                                                menuPortalTarget={document.body}
                                                                 options={arrWareHouse}
                                                                 formatOptionLabel={(option) => (
-                                                                    <div className="flex justify-start items-center gap-1 z-[99]">
-                                                                        <h2>{option?.label}</h2>
-                                                                        <h2>{`(${dataLang?.materials_planning_exist ||
+                                                                    <div className="flex flex-col justify-start gap-1 z-[99]">
+                                                                        <h2 className="responsive-text-sm">{option?.label}</h2>
+                                                                        <h2 className="responsive-text-sm">{`(${dataLang?.materials_planning_exist ||
                                                                             "materials_planning_exist"
                                                                             }: ${option?.value})`}</h2>
                                                                     </div>
@@ -787,6 +794,11 @@ const PopupKeepStock = ({
                                                                         width: "150%",
                                                                         zIndex: 999,
                                                                     }),
+                                                                    menuPortal: (base) => ({
+                                                                        ...base,
+                                                                        zIndex: 9999999,
+                                                                        position: "absolute",
+                                                                      }),
                                                                 }}
                                                                 value={
                                                                     findValue.arrayItem.find(

@@ -433,6 +433,7 @@ const WarehouseTransfer = (props) => {
                                         placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                         isClearable={true}
                                         colSpan={1}
+                                        className={"min-w-[140px]"}
                                     />
                                     <SelectComponent
                                         colSpan={1}
@@ -451,6 +452,7 @@ const WarehouseTransfer = (props) => {
                                         value={isState.idCode}
                                         placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
                                         isClearable={true}
+                                        className={"min-w-[140px]"}
                                     />
                                     <SelectComponent
                                         colSpan={1}
@@ -466,6 +468,7 @@ const WarehouseTransfer = (props) => {
                                         value={isState.idExportWarehouse}
                                         placeholder={dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
                                         isClearable={true}
+                                        className={"min-w-[170px]"}
                                     />
                                     <SelectComponent
                                         colSpan={1}
@@ -481,6 +484,7 @@ const WarehouseTransfer = (props) => {
                                         value={isState.idReceivingWarehouse}
                                         placeholder={dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
                                         isClearable={true}
+                                        className={"min-w-[170px]"}
                                     />
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">

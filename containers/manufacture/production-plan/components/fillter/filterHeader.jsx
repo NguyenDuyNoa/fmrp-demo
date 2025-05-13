@@ -215,6 +215,7 @@ const FilterHeader = ({
                                     dataLang?.production_plan_form_materials_client ||
                                     "production_plan_form_materials_client"
                                 }
+                                menuPortalTarget={document.body}
                             />
                         </div>
                     </div>
@@ -235,6 +236,7 @@ const FilterHeader = ({
                                     dataLang?.purchase_order_table_branch ||
                                     "purchase_order_table_branch"
                                 }
+                                menuPortalTarget={document.body}
                             />
                         </div>
                     </div>
@@ -271,6 +273,7 @@ const FilterHeader = ({
                                     dataLang?.production_plan_form_materials_finished_product_group ||
                                     "production_plan_form_materials_finished_product_group"
                                 }
+                                menuPortalTarget={document.body}
                             />
                         </div>
                     </div>
@@ -309,6 +312,7 @@ const FilterHeader = ({
                                     dataLang?.production_plan_form_materials_status_plan ||
                                     "production_plan_form_materials_status_plan"
                                 }
+                                menuPortalTarget={document.body}
                             />
                         </div>
                     </div>

@@ -658,10 +658,10 @@ const Products = (props) => {
                     <div className="flex items-center justify-between gap-2 pr-32">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination
+                                {/* <TitlePagination
                                     dataLang={dataLang}
                                     totalItems={data?.output?.iTotalDisplayRecords}
-                                />
+                                /> */}
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}

@@ -636,8 +636,7 @@ const SalesOrder = (props) => {
                   <>
                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                       {data?.rResult?.map((e, index) => (
-                        <>
-                          <RowTable gridCols={13} key={e.id.toString()}>
+                          <RowTable gridCols={13} key={`data-${e.id.toString()}`}>
                             <RowItemTable colSpan={0.5} textAlign={"center"}>
                               {index + 1}
                             </RowItemTable>
@@ -660,28 +659,6 @@ const SalesOrder = (props) => {
                             <RowItemTable colSpan={1.5} textAlign="left">
                               {e?.client_name}
                             </RowItemTable>
-                            {/* fix */}
-                            {/* <RowItemTable colSpan={1} textAlign={"center"}>
-                              {e?.quote_code !== null && e?.quote_id !== "0" ? (
-                                <Zoom
-                                  whileHover={{ scale: 1.1 }}
-                                  whileTap={{ scale: 0.9 }}
-                                >
-                                  <div className="responsive-text-sm font-normal flex justify-center items-center rounded mx-auto py-0.5 px-1.5 2xl:py-1 2xl:px-2 bg-lime-200 text-lime-700 ">
-                                    <PopupDetailQuote
-                                      dataLang={dataLang}
-                                      // className="text-left "
-                                      name={"Phiếu báo giá"}
-                                      id={e?.quote_id}
-                                    />
-                                  </div>
-                                </Zoom>
-                              ) : (
-                                <div className="responsive-text-sm font-normal flex justify-center items-center rounded w-fit py-0.5 px-1.5 2xl:py-1 2xl:px-2 bg-red-200 text-red-500">
-                                  Tạo mới
-                                </div>
-                              )}
-                            </RowItemTable> */}
                             <RowItemTable colSpan={1} textAlign={"left"}>
                               {formatNumber(e.total_amount)}{" "}
                               <span className="underline">đ</span>
@@ -734,9 +711,7 @@ const SalesOrder = (props) => {
                                 ))}
                             </RowItemTable>
                             <RowItemTable colSpan={1}>
-                              {/* <TagBranch> */}
                               {e?.branch_name}
-                              {/* </TagBranch> */}
                             </RowItemTable>
 
                             <RowItemTable colSpan={4}>
@@ -851,7 +826,6 @@ const SalesOrder = (props) => {
                               />
                             </RowItemTable>
                           </RowTable>
-                        </>
                       ))}
                     </div>
                   </>
@@ -883,8 +857,10 @@ const SalesOrder = (props) => {
         }
         total={
           <>
-            <ContainerTotal className={"grid-cols-13"}>
-              <RowItemTable colSpan={2.5} textAlign={"end"} className="p-2">
+            <ContainerTotal className={"grid-cols-26"}>
+              <RowItemTable colSpan={3} textAlign={"end"} className="p-2">
+              </RowItemTable>
+              <RowItemTable colSpan={1} textAlign={"end"} className="p-2">
                 {dataLang?.total_outside || "total_outside"}
               </RowItemTable>
               <RowItemTable
