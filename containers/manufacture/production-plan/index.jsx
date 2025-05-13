@@ -365,15 +365,18 @@ const ProductionPlan = (props) => {
                         isSort={isSort == "reference_no" ? false : true}
                         handleCheked={handleCheked}
                     /> */}
-                    <GanttChart
-                        {...shareProps}
-                        handleSort={handleSort}
-                        data={[]}
-                        timeLine={isData.timeLine}
-                        isSort={isSort == "reference_no" ? false : true}
-                        handleCheked={handleCheked}
-                        dataOrder={isData.listOrder}
-                    />
+                    <div className="min-h-full  w-full">
+                        <GanttChart
+                            {...shareProps}
+                            handleSort={handleSort}
+                            data={[]}
+                            timeLine={isData.timeLine}
+                            isSort={isSort == "reference_no" ? false : true}
+                            handleCheked={handleCheked}
+                            dataOrder={isData.listOrder}
+                        />
+                    </div>
+
                 </ProductionsOrdersProvider>
                 {/* {isData.listOrder?.length > 0 && (
                     <ContainerPagination className="flex items-center space-x-5">

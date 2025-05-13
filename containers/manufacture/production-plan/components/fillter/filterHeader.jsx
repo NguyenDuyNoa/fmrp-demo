@@ -189,7 +189,7 @@ const FilterHeader = ({
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 xl:py-6 py-4 justify-between gap-x-8 gap-y-6">
+                <div className="grid grid-cols-2 xl:py-6 py-4 justify-between gap-x-8 gap-y-6 w-fit">
                     <div className="flex flex-col gap-y-1">
                         <h3 className="text-xs text-[#051B44] font-medium ml-1">
                             {dataLang?.production_plan_form_materials_client ||

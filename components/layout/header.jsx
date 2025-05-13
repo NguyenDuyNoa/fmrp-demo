@@ -1314,83 +1314,83 @@ const Header = () => {
                 </form> */}
                 {/* {authState?.id_package_service === "1" && ( */}
                 {/* {authState?.is_upgrade && ( */}
-                    <button className="py-1 px-2 rounded-full bg-typo-blue-4 flex items-center gap-2" 
+                <button className="py-1 px-2 rounded-full bg-typo-blue-4 flex items-center gap-2"
                     onClick={() => {
                         dispatch({
                             type: "statePopupGlobal",
                             payload: {
-                            open: true,
-                            children: (
-                                <PopupUpgradeProfessional
-                                    upgradePackageData={upgradePackageData}
-                                    onClose={() =>
-                                        dispatch({
-                                        type: "statePopupUpgradeProfessional",
-                                        payload: { open: false },
-                                        })
-                                    }
-                                />
-                            ),
+                                open: true,
+                                children: (
+                                    <PopupUpgradeProfessional
+                                        upgradePackageData={upgradePackageData}
+                                        onClose={() =>
+                                            dispatch({
+                                                type: "statePopupUpgradeProfessional",
+                                                payload: { open: false },
+                                            })
+                                        }
+                                    />
+                                ),
                             },
                         });
                     }}>
-                        <SparkleIcon className="text-white" size={16} />
-                        <span className="3xl:text-base xxl:text-sm xl:text-xs text-[11px] font-normal text-white whitespace-nowrap">Nâng cấp Pro</span>
-                    </button>
+                    <SparkleIcon className="text-white" size={16} />
+                    <span className="3xl:text-base xxl:text-sm xl:text-xs text-[11px] font-normal text-white whitespace-nowrap">Nâng cấp Pro</span>
+                </button>
                 {/* )} */}
                 <div className="flex items-center gap-3">
-                <Tooltip
-                    title={"Cài đặt"}
-                    arrow
-                    className="cursor-pointer"
-                    theme="dark"
+                    <Tooltip
+                        title={"Cài đặt"}
+                        arrow
+                        className="cursor-pointer"
+                        theme="dark"
 
-                >
-                    <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
-                        <Image
-                            alt=""
-                            onClick={() => {
-                                if (role) {
-                                    router.push("/settings");
-                                } else {
-                                    isShow("error", WARNING_STATUS_ROLE_ADMIN);
-                                }
-                            }}
-                            src="/icon/header/right/seting.png"
-                            width={20}
-                            height={20}
-                            quality={100}
-                            className="object-contain w-full h-full transition"
-                            loading="lazy"
-                            crossOrigin="anonymous"
-                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                        />
-                    </div>
-                </Tooltip>
+                    >
+                        <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
+                            <Image
+                                alt=""
+                                onClick={() => {
+                                    if (role) {
+                                        router.push("/settings");
+                                    } else {
+                                        isShow("error", WARNING_STATUS_ROLE_ADMIN);
+                                    }
+                                }}
+                                src="/icon/header/right/seting.png"
+                                width={20}
+                                height={20}
+                                quality={100}
+                                className="object-contain w-full h-full transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </div>
+                    </Tooltip>
 
-                <Dropdown
-                    data={ListQuyTrinh}
-                    type='procedure'
-                    className="popover-quytrinh"
-                    position={"bottom right"}
-                    classNameTrigger={"2xl:!p-0 !p-0"}
-                >
-                    <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
-                    <Image
-                            alt=""
-                            src="/icon/header/right/quytrinh.png"
-                            width={18}
-                            height={18}
-                            quality={100}
-                            className="object-contain w-full h-full transition"
-                            loading="lazy"
-                            crossOrigin="anonymous"
-                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                        />
-                    </div>
-                </Dropdown>
+                    <Dropdown
+                        data={ListQuyTrinh}
+                        type='procedure'
+                        className="popover-quytrinh"
+                        position={"bottom right"}
+                        classNameTrigger={"2xl:!p-0 !p-0"}
+                    >
+                        <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
+                            <Image
+                                alt=""
+                                src="/icon/header/right/quytrinh.png"
+                                width={18}
+                                height={18}
+                                quality={100}
+                                className="object-contain w-full h-full transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </div>
+                    </Dropdown>
 
-                {/* <Tooltip
+                    {/* <Tooltip
                     title={"Góp ý"}
                     arrow
                     theme="dark"
@@ -1419,60 +1419,60 @@ const Header = () => {
                     </div>
                 </Tooltip> */}
 
-                <DropdownThongBao
-                    data={[] || ListThongBao}
-                    className="popover-thongbao"
-                    position={"bottom right"}
-                >
-                    <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
-                    <Image
-                            alt=""
-                            src="/icon/header/right/thongbao.png"
-                            width={18}
-                            height={18}
-                            quality={100}
-                            className="object-contain w-full h-full transition"
-                            loading="lazy"
-                            crossOrigin="anonymous"
-                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                        />
-                    </div>
-                    {/* <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
+                    <DropdownThongBao
+                        data={[] || ListThongBao}
+                        className="popover-thongbao"
+                        position={"bottom right"}
+                    >
+                        <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
+                            <Image
+                                alt=""
+                                src="/icon/header/right/thongbao.png"
+                                width={18}
+                                height={18}
+                                quality={100}
+                                className="object-contain w-full h-full transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </div>
+                        {/* <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
                                     2
                                 </div> */}
-                </DropdownThongBao>
+                    </DropdownThongBao>
 
-                <Tooltip
-                    title={"Hướng dẫn phần mềm"}
-                    className="cursor-pointer"
-                    arrow
-                    theme="dark"
-                >
-                    <motion.div
-                        className='cursor-pointer 2xl:size-6 xl:size-5 size-4 shink-0'
-                        onClick={() => window.open("https://help.fmrp.vn")}
-                        initial={{ rotate: 0 }}
-                        animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-                        transition={{
-                            duration: 0.6,
-                            repeat: Infinity,
-                            repeatDelay: 2,
-                            ease: "easeInOut"
-                        }}
+                    <Tooltip
+                        title={"Hướng dẫn phần mềm"}
+                        className="cursor-pointer"
+                        arrow
+                        theme="dark"
                     >
-                        <Image
-                            alt=""
-                            src="/icon/header/right/question.png"
-                            width={18}
-                            height={18}
-                            quality={100}
-                            className="object-contain w-full h-full transition"
-                            loading="lazy"
-                            crossOrigin="anonymous"
-                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                        />
-                    </motion.div>
-                </Tooltip>
+                        <motion.div
+                            className='cursor-pointer 2xl:size-6 xl:size-5 size-4 shink-0'
+                            onClick={() => window.open("https://help.fmrp.vn")}
+                            initial={{ rotate: 0 }}
+                            animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
+                            transition={{
+                                duration: 0.6,
+                                repeat: Infinity,
+                                repeatDelay: 2,
+                                ease: "easeInOut"
+                            }}
+                        >
+                            <Image
+                                alt=""
+                                src="/icon/header/right/question.png"
+                                width={18}
+                                height={18}
+                                quality={100}
+                                className="object-contain w-full h-full transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </motion.div>
+                    </Tooltip>
                 </div>
 
                 <DropdownAvatar />
@@ -1540,53 +1540,53 @@ const DropdownAvatar = React.memo(() => {
     const userMenuItems = [
         // Nhóm 1
         {
-        name: "Thông tin tài khoản",
-        icon: <UserCircleIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07"/>,
+            name: "Thông tin tài khoản",
+            icon: <UserCircleIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07" />,
             group: 1,
             onClick: () => {
-            dispatch({
-                type: "statePopupAccountInformation",
-                payload: {
-                open: true,
-              },
-            });
-          },
+                dispatch({
+                    type: "statePopupAccountInformation",
+                    payload: {
+                        open: true,
+                    },
+                });
+            },
         },
         {
-          name: "Đổi mật khẩu",
-          icon: <PasswordIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07"/>,
-          group: 1,
-          onClick: () => {
-            dispatch({
-              type: "statePopupChangePassword",
-              payload: {
-                open: true,
-              },
-            });
-          },
+            name: "Đổi mật khẩu",
+            icon: <PasswordIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07" />,
+            group: 1,
+            onClick: () => {
+                dispatch({
+                    type: "statePopupChangePassword",
+                    payload: {
+                        open: true,
+                    },
+                });
+            },
         },
         {
-          name: "Góp ý",
-          icon: <ChatIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07"/>,
-          group: 1,
-          onClick: () => {
-            dispatch({
-                type: "statePopupGlobal",
-                payload: {
-                    open: true,
-                    allowOutsideClick: false,
-                    allowEscape: false,
-                    children: <PopupFeelsCustomer
-                        onClose={() =>
-                            dispatch({
-                                type: "statePopupGlobal",
-                                payload: { open: false },
-                            })
-                        }
-                    />,
-                },
-            });
-          },
+            name: "Góp ý",
+            icon: <ChatIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07" />,
+            group: 1,
+            onClick: () => {
+                dispatch({
+                    type: "statePopupGlobal",
+                    payload: {
+                        open: true,
+                        allowOutsideClick: false,
+                        allowEscape: false,
+                        children: <PopupFeelsCustomer
+                            onClose={() =>
+                                dispatch({
+                                    type: "statePopupGlobal",
+                                    payload: { open: false },
+                                })
+                            }
+                        />,
+                    },
+                });
+            },
         },
         // Nhóm 2
         // ...(auth?.is_upgrade === false ? [{
@@ -1600,105 +1600,105 @@ const DropdownAvatar = React.memo(() => {
                 dispatch({
                     type: "statePopupGlobal",
                     payload: {
-                    open: true,
-                    children: (
-                        <PopupUpgradeProfessional
-                            upgradePackageData={upgradePackageData}
-                            onClose={() =>
-                                dispatch({
-                                type: "statePopupUpgradeProfessional",
-                                payload: { open: false },
-                                })
-                            }
-                        />
-                    ),
+                        open: true,
+                        children: (
+                            <PopupUpgradeProfessional
+                                upgradePackageData={upgradePackageData}
+                                onClose={() =>
+                                    dispatch({
+                                        type: "statePopupUpgradeProfessional",
+                                        payload: { open: false },
+                                    })
+                                }
+                            />
+                        ),
                     },
                 });
             },
-         }] : []),
-         {
-          name: "Đăng xuất",
-          icon: <SignOutIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07"/>,
-          group: 2,
-          onClick: _HandleLogout,
+        }] : []),
+        {
+            name: "Đăng xuất",
+            icon: <SignOutIcon size={16} className="size-4 text-neutral-03 group-hover:text-neutral-07" />,
+            group: 2,
+            onClick: _HandleLogout,
         },
     ];
 
     return (
-            <Popup
-                trigger={
-                    <button className={`hover:drop-shadow-[0_0_5px_#eabd7a99]`}>
-                        <div className="flex items-center self-center space-x-1 ">
-                            {auth?.user_avatar !== null ? (
-                                <Image
-                                    alt=""
-                                    src={auth?.user_avatar}
-                                    width={40}
-                                    height={40}
-                                    quality={100}
-                                    className="object-cover xl:min-w-[30px] xl:w-[30px] xl:min-h-[30px] xl:h-[30px] size-7 rounded-full shrink-0"
-                                    loading="lazy"
-                                    crossOrigin="anonymous"
-                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                />
-
-                            ) : (
-                                <AvatarText
-                                    fullName={auth?.user_full_name}
-                                    className={'xl:!min-w-[30px] xl:!min-h-[30px] xl:!w-[30px] xl:!h-[30px] xl:!max-w-[30px] xl:!max-h-[30px] size-7 shrink-0'}
-                                />
-                            )}
+        <Popup
+            trigger={
+                <button className={`hover:drop-shadow-[0_0_5px_#eabd7a99]`}>
+                    <div className="flex items-center self-center space-x-1 ">
+                        {auth?.user_avatar !== null ? (
                             <Image
                                 alt=""
-                                src="/icon/header/dropdown.png"
-                                width={12}
-                                height={12}
+                                src={auth?.user_avatar}
+                                width={40}
+                                height={40}
                                 quality={100}
-                                className="object-cover"
+                                className="object-cover xl:min-w-[30px] xl:w-[30px] xl:min-h-[30px] xl:h-[30px] size-7 rounded-full shrink-0"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
-                        </div>
-                    </button>
-                }
-                closeOnDocumentClick
-                position="bottom right"
-                className={`popover-edit`}
-                data-popup="true"
-            >
-                <div className={`w-[300px] bg-white rounded-lg border border-[#F2F4F7] shadow-[0px_4px_40px_0px_#2F416E1F] ${deca.className}`}>
-                    <div className="flex space-x-3 p-4 border-b border-[#F2F4F7]">
-                        <div className="h-fit w-fit relative border border-[#1FC583] rounded-full">
-                            {
-                                auth?.user_avatar !== null ?
-                                    (
-                                        <Image
-                                            alt=""
-                                            src={auth?.user_avatar}
-                                            width={40}
-                                            height={40}
-                                            quality={100}
-                                            className="flex-shrink-0 object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
-                                            loading="lazy"
-                                            crossOrigin="anonymous"
-                                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                        />
-                                    )
-                                    :
-                                    (
-                                        <AvatarText
-                                            fullName={auth?.user_full_name}
-                                            className={'!min-w-[40px] !min-h-[40px] !w-[40px] !h-[40px] !max-w-[40px] !max-h-[40px]'}
-                                        />
-                                    )
-                            }
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <div className="flex gap-2">
-                                <h5 className="font-semibold text-sm text-[#141522]">{auth?.user_full_name}</h5>
-                                {auth?.is_upgrade === false && (
-                                    <div 
+
+                        ) : (
+                            <AvatarText
+                                fullName={auth?.user_full_name}
+                                className={'xl:!min-w-[30px] xl:!min-h-[30px] xl:!w-[30px] xl:!h-[30px] xl:!max-w-[30px] xl:!max-h-[30px] size-7 shrink-0'}
+                            />
+                        )}
+                        <Image
+                            alt=""
+                            src="/icon/header/dropdown.png"
+                            width={12}
+                            height={12}
+                            quality={100}
+                            className="object-cover"
+                            loading="lazy"
+                            crossOrigin="anonymous"
+                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                        />
+                    </div>
+                </button>
+            }
+            closeOnDocumentClick
+            position="bottom right"
+            className={`popover-edit`}
+            data-popup="true"
+        >
+            <div className={`w-[300px] bg-white rounded-lg border border-[#F2F4F7] shadow-[0px_4px_40px_0px_#2F416E1F] ${deca.className}`}>
+                <div className="flex space-x-3 p-4 border-b border-[#F2F4F7]">
+                    <div className="h-fit w-fit relative border border-[#1FC583] rounded-full">
+                        {
+                            auth?.user_avatar !== null ?
+                                (
+                                    <Image
+                                        alt=""
+                                        src={auth?.user_avatar}
+                                        width={40}
+                                        height={40}
+                                        quality={100}
+                                        className="flex-shrink-0 object-cover min-w-[40px] min-h-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] rounded-full"
+                                        loading="lazy"
+                                        crossOrigin="anonymous"
+                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                    />
+                                )
+                                :
+                                (
+                                    <AvatarText
+                                        fullName={auth?.user_full_name}
+                                        className={'!min-w-[40px] !min-h-[40px] !w-[40px] !h-[40px] !max-w-[40px] !max-h-[40px]'}
+                                    />
+                                )
+                        }
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <div className="flex gap-2">
+                            <h5 className="font-semibold text-sm text-[#141522]">{auth?.user_full_name}</h5>
+                            {auth?.is_upgrade === false && (
+                                <div
                                     style={{
                                         background: "radial-gradient(circle at top right, #1FC583, #1F9285)",
                                         boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.1)",
@@ -1708,46 +1708,46 @@ const DropdownAvatar = React.memo(() => {
                                 >
                                     Pro
                                 </div>
-                                )}
-                            </div>
-                            <h6 className="text-[#9295A4] font-normal text-sm ">{dataSetting?.company_name}</h6>
+                            )}
                         </div>
+                        <h6 className="text-[#9295A4] font-normal text-sm ">{dataSetting?.company_name}</h6>
                     </div>
-                    <div className="">
-                        {/* Nhóm 1 */}
-                        {userMenuItems.filter(item => item.group === 1).map((item, index) => (
-                            <button
-                                key={`group1-${index}`}
-                                onClick={item.onClick}
-                                className="w-full text-left px-4 py-2.5 group hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none"
+                </div>
+                <div className="">
+                    {/* Nhóm 1 */}
+                    {userMenuItems.filter(item => item.group === 1).map((item, index) => (
+                        <button
+                            key={`group1-${index}`}
+                            onClick={item.onClick}
+                            className="w-full text-left px-4 py-2.5 group hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none"
+                        >
+                            {item.icon}
+                            <span className="font-deca text-base font-normal text-neutral-03 group-hover:text-neutral-07">{item.name}</span>
+                        </button>
+                    ))}
+
+                    {/* Border phân cách giữa 2 nhóm */}
+                    <div className="border-t border-[#F2F4F7]"></div>
+
+                    {/* Nhóm 2 */}
+                    {userMenuItems.filter(item => item.group === 2).map((item, index, array) => (
+                        <button
+                            key={`group2-${index}`}
+                            onClick={item.onClick}
+                            className={`w-full text-left px-4 py-2.5 group flex items-center space-x-2 outline-none ${item.hover ? item.hover : "hover:bg-[#F7F8F9]"} ${index === array.length - 1 ? "rounded-b-lg" : ""}`}
+                        >
+                            {item.icon}
+                            <span
+                                className="text-base font-normal text-neutral-03 group-hover:text-neutral-07"
+                                style={item.color ? { color: item.color } : {}}
                             >
-                                {item.icon}
-                                <span className="font-deca text-base font-normal text-neutral-03 group-hover:text-neutral-07">{item.name}</span>
-                            </button>
-                        ))}
+                                {item.name}
+                            </span>
+                        </button>
+                    ))}
 
-                        {/* Border phân cách giữa 2 nhóm */}
-                        <div className="border-t border-[#F2F4F7]"></div>
-
-                        {/* Nhóm 2 */}
-                        {userMenuItems.filter(item => item.group === 2).map((item, index, array) => (
-                            <button
-                                key={`group2-${index}`}
-                                onClick={item.onClick}
-                                className={`w-full text-left px-4 py-2.5 group flex items-center space-x-2 outline-none ${item.hover ? item.hover : "hover:bg-[#F7F8F9]"} ${index === array.length - 1 ? "rounded-b-lg" : ""}`}
-                            >
-                                {item.icon}
-                                <span 
-                                    className="text-base font-normal text-neutral-03 group-hover:text-neutral-07"
-                                    style={item.color ? { color: item.color } : {}}
-                                >
-                                    {item.name}
-                                </span>
-                            </button>
-                        ))}
-
-                        {/* Code đã được comment từ trước */}
-                        {/* <div className="flex px-4 py-2.5 justify-between items-center">
+                    {/* Code đã được comment từ trước */}
+                    {/* <div className="flex px-4 py-2.5 justify-between items-center">
                             <div className="flex items-center space-x-2">
                                 <Image
                                     alt=""
@@ -1779,9 +1779,9 @@ const DropdownAvatar = React.memo(() => {
                                 </div>
                             </div>
                         </div> */}
-                    </div>
                 </div>
-            </Popup>
+            </div>
+        </Popup>
     );
 });
 

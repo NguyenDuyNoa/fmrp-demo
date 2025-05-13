@@ -115,6 +115,7 @@ const PurchaseImport = (props) => {
     const { data: listBranch = [] } = useBranchList()
 
     const { data, isFetching, refetch } = useImportList(params);
+    console.log("🚀 ~ PurchaseImport ~ data:", data)
 
     const { data: listCode = [] } = useImportCombobox(isState.keySearchCode)
 
@@ -140,7 +141,7 @@ const PurchaseImport = (props) => {
         return Number(value) === 0
             ? "-"
             : <>{formatMoney(value)} <span className="underline">đ</span></>;
-    };    
+    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -430,98 +431,98 @@ const PurchaseImport = (props) => {
                 table={<div className="flex flex-col h-full">
                     <div className="w-full items-center flex justify-between gap-2">
                         {/* <div className="flex gap-3 items-center w-full"> */}
-                            <div className="flex gap-3 items-center w-full">
-                                <SearchComponent
-                                    colSpan={1}
-                                    dataLang={dataLang}
-                                    placeholder={dataLang?.search_production_order_code}
-                                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                                />
-                                <DateToDateComponent
-                                    colSpan={1}
-                                    value={isState.valueDate}
-                                    onChange={(e) => queryState({ valueDate: e })}
-                                />
-                                <SelectComponent
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: dataLang?.purchase_order_branch || "purchase_order_branch",
-                                            isDisabled: true,
-                                        },
-                                        ...listBranch,
-                                    ]}
-                                    colSpan={1}
-                                    onChange={(e) => queryState({ valueBr: e })}
-                                    value={isState.valueBr}
-                                    placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
-                                    isClearable={true}
-                                />
-                                <SelectComponent
-                                    onInputChange={(event) => {
-                                        _HandleSeachApi(event);
-                                    }}
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode",
-                                            isDisabled: true,
-                                        },
-                                        ...listCode,
-                                    ]}
-                                    onChange={(e) => queryState({ valueCode: e })}
-                                    value={isState.valueCode}
-                                    placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
-                                    colSpan={1}
-                                    isClearable={true}
-                                    // className="min-w-[200px] rounded-md bg-white 2xl:text-base xl:text-xs text-[10px] z-20"
-                                />
-                                <SelectComponent
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: dataLang?.purchase_order_supplier || "purchase_order_supplier",
-                                            isDisabled: true,
-                                        },
-                                        ...listSupplier,
-                                    ]}
-                                    onChange={(e) => queryState({ valueSupplier: e })}
-                                    value={isState.valueSupplier}
-                                    placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
-                                    colSpan={1}
-                                    isClearable={true}
-                                    // className="min-w-[200px] rounded-md bg-white 2xl:text-base xl:text-xs text-[10px] z-20"
-                                    isSearchable={true}
-                                />
-                            </div>
+                        <div className="flex gap-3 items-center w-full">
+                            <SearchComponent
+                                colSpan={1}
+                                dataLang={dataLang}
+                                placeholder={dataLang?.search_production_order_code}
+                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                            />
+                            <DateToDateComponent
+                                colSpan={1}
+                                value={isState.valueDate}
+                                onChange={(e) => queryState({ valueDate: e })}
+                            />
+                            <SelectComponent
+                                options={[
+                                    {
+                                        value: "",
+                                        label: dataLang?.purchase_order_branch || "purchase_order_branch",
+                                        isDisabled: true,
+                                    },
+                                    ...listBranch,
+                                ]}
+                                colSpan={1}
+                                onChange={(e) => queryState({ valueBr: e })}
+                                value={isState.valueBr}
+                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                                isClearable={true}
+                            />
+                            <SelectComponent
+                                onInputChange={(event) => {
+                                    _HandleSeachApi(event);
+                                }}
+                                options={[
+                                    {
+                                        value: "",
+                                        label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode",
+                                        isDisabled: true,
+                                    },
+                                    ...listCode,
+                                ]}
+                                onChange={(e) => queryState({ valueCode: e })}
+                                value={isState.valueCode}
+                                placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
+                                colSpan={1}
+                                isClearable={true}
+                            // className="min-w-[200px] rounded-md bg-white 2xl:text-base xl:text-xs text-[10px] z-20"
+                            />
+                            <SelectComponent
+                                options={[
+                                    {
+                                        value: "",
+                                        label: dataLang?.purchase_order_supplier || "purchase_order_supplier",
+                                        isDisabled: true,
+                                    },
+                                    ...listSupplier,
+                                ]}
+                                onChange={(e) => queryState({ valueSupplier: e })}
+                                value={isState.valueSupplier}
+                                placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
+                                colSpan={1}
+                                isClearable={true}
+                                // className="min-w-[200px] rounded-md bg-white 2xl:text-base xl:text-xs text-[10px] z-20"
+                                isSearchable={true}
+                            />
+                        </div>
                         {/* </div> */}
                         {/* <div className="col-span-2"> */}
-                            <div className="flex items-center gap-2">
-                                <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
-                                {role == true || checkExport ? (
-                                    <div className={``}>
-                                        {data?.rResult?.length > 0 && (
-                                            <ExcelFileComponent
-                                                dataLang={dataLang}
-                                                filename="Danh sách nhập hàng"
-                                                title={"SDNH"}
-                                                multiDataSet={multiDataSet}
-                                            />
-                                        )}
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                                        className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                                    >
-                                        <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
-                                        <span>{dataLang?.client_list_exportexcel}</span>
-                                    </button>
-                                )}
-                                <div>
-                                    {/* <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} /> */}
+                        <div className="flex items-center gap-2">
+                            <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
+                            {role == true || checkExport ? (
+                                <div className={``}>
+                                    {data?.rResult?.length > 0 && (
+                                        <ExcelFileComponent
+                                            dataLang={dataLang}
+                                            filename="Danh sách nhập hàng"
+                                            title={"SDNH"}
+                                            multiDataSet={multiDataSet}
+                                        />
+                                    )}
                                 </div>
+                            ) : (
+                                <button
+                                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                >
+                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
+                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                </button>
+                            )}
+                            <div>
+                                {/* <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} /> */}
                             </div>
+                        </div>
                         {/* </div> */}
                     </div>
 
@@ -637,8 +638,8 @@ const PurchaseImport = (props) => {
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} >
                                                     {/* <TagBranch className="w-fit"> */}
-                                                        {e?.branch_name}
-                                                        {/* </TagBranch> */}
+                                                    {e?.branch_name}
+                                                    {/* </TagBranch> */}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} className="flex">
                                                     <BtnAction
@@ -657,7 +658,7 @@ const PurchaseImport = (props) => {
                                     </div>
                                 </>
                             ) : (
-                                <NoData type="table"/>
+                                <NoData type="table" />
                             )}
                         </div>
                     </Customscrollbar>
