@@ -1058,7 +1058,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           payload: {
             open: true,
             allowOutsideClick: false,
-            children: <PopupPrintTemProduct dataItem={formatData} />,
+            children: <PopupPrintTemProduct dataItem={formatData} idManufacture={idManufacture}/>,
           },
         });
       }
