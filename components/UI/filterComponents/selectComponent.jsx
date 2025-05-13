@@ -147,8 +147,9 @@ const SelectComponent = ({
             <SelectCore
                 id={id ?? "parentSelect"}
                 //bật lên nó sẽ render ra ngoài dom gây đè header
+                menuPortalTarget={menuPortalTarget ?? null}
                 // menuPortalTarget={menuPortalTarget ?? document.body}
-                menuPortalTarget={null}
+                // menuPortalTarget={null}
                 options={options}
                 value={value}
                 onInputChange={onInputChange ? onInputChange : ""}
