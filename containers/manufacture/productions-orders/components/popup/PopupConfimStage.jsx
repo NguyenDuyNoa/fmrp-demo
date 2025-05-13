@@ -27,7 +27,11 @@ import { useLoadOutOfStock } from "../../hooks/useLoadOutOfStock";
 import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 import ButtonAnimationNew from "@/components/common/button/ButtonAnimationNew";
 import KanbanIcon from "@/components/icons/common/KanbanIcon";
-
+import CheckIcon from "@/components/icons/common/CheckIcon";
+import CloseXIcon from "@/components/icons/common/CloseXIcon";
+import { motion } from "framer-motion";
+import { Lexend_Deca } from "@next/font/google";
+import { PopupOrderCompleted } from "./PopupCompleteCommand";
 
 const initialState = {
     open: false,
@@ -53,6 +57,8 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
     const stateRef = useRef(initialState);
 
     const [isState, setState] = useState(initialState);
+    
+    const [isOrderCompleted, setIsOrderCompleted] = useState(false);
 
     const queryState = (data) => setState((prev) => ({ ...prev, ...data }));
 
@@ -97,7 +103,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
     const handleSubmit = async () => {
         if (!isState.objectWareHouse) {
-            isToast("error", "Vui lòng kiểm tra dữ liệu")
+            isToast("error", "Vui lòng kiểm tra dữ liệu")
             return
         }
 
@@ -109,15 +115,20 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         if (r?.isSuccess == 1) {
             refetch()
             refetchMainTable()
-            queryState({
-                open: r?.data?.status_manufacture == "2" ? false : true,
-                dataTableProducts: null,
-                dataTableBom: null,
-                arrayMoveBom: []
-            })
-            handleSelectStep(activeStep?.type, activeStep?.item, 'auto')
+            
+            // Kiểm tra xem lệnh sản xuất đã hoàn thành chưa
+            if (r?.data?.status_manufacture == "2") {
+                setIsOrderCompleted(true);
+            } else {
+                queryState({
+                    open: true,
+                    dataTableProducts: null,
+                    dataTableBom: null,
+                    arrayMoveBom: []
+                })
+                handleSelectStep(activeStep?.type, activeStep?.item, 'auto')
+            }
         }
-
     };
 
     useEffect(() => {
@@ -210,45 +221,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         };
     };
 
-
-    // const updateSerialsGeneric = (item, value, type) => {
-
-    //     let existingSerials = [...(item[type] || [])]; // Giữ serial cũ
-
-    //     const quantity = value?.floatValue ?? value;
-
-    //     if (quantity > existingSerials.length) {
-    //         //  Xác định số bắt đầu: `quantityEnterClient` dùng serial cuối, `quantityError` bắt đầu từ 1
-    //         const startSerial = existingSerials.length > 0
-    //             ? parseInt(existingSerials[existingSerials.length - 1].value.split('-').pop(), 10) + 1
-    //             : (type === 'serial' ? item?.max_serial_number + 1 : 1);
-
-    //         const additionalSerials = [...Array(quantity - existingSerials.length)].map((_, i) => ({
-    //             value: `${item?.ref}-${(startSerial + i).toString().padStart(2, '0')}`,
-    //             isDuplicate: false
-    //         }));
-
-    //         existingSerials = [...existingSerials, ...additionalSerials]; // Giữ nguyên serial cũ + thêm mới
-    //     }
-    //     //  Nếu số lượng giảm, chỉ cắt bớt serial mới, giữ nguyên serial cũ
-    //     else if (quantity < existingSerials.length) {
-    //         // existingSerials = existingSerials.slice(0, quantity);
-    //         existingSerials = existingSerials.slice(0, quantity).map(s => ({ ...s, isDuplicate: false }));
-
-    //     }
-    //     const valuesList = existingSerials.map(s => s?.value).filter(Boolean);
-    //     existingSerials = existingSerials.map(s => ({
-    //         ...s,
-    //         isDuplicate: valuesList.indexOf(s?.value) !== valuesList.lastIndexOf(s?.value)
-    //     }));
-    //     return {
-    //         ...item,
-    //         [type === 'serialError' ? 'quantityError' : 'quantityEnterClient']: quantity,
-    //         [type]: existingSerials
-    //     };
-    // };
-
-
     const handleChange = ({ table, type, value, row, index }) => {
 
         if (table == 'product') {
@@ -281,9 +253,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
                         return { ...item, [type]: updatedArray };
                     }
-                    // if (checkType) {
-                    //     return updateQuantityAndSerial(item, type, value, type === 'quantityEnterClient' ? 'serial' : 'serialError');
-                    // }
 
                     return { ...item, [type]: checkType ? value?.floatValue : value }
                 }
@@ -421,10 +390,15 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
     useEffect(() => {
         if (isState.open) {
-            const s = getPriorityItem(data?.stage_semi_products || [], data?.stage_products || []);
-
-            if (s) {
-                handleSelectStep(s?.type, s?.object, 'auto');
+            // Kiểm tra xem lệnh SX đã hoàn thành chưa
+            if (data?.po?.status_manufacture === "2") {
+                setIsOrderCompleted(true);
+            } else {
+                setIsOrderCompleted(false);
+                const s = getPriorityItem(data?.stage_semi_products || [], data?.stage_products || []);
+                if (s) {
+                    handleSelectStep(s?.type, s?.object, 'auto');
+                }
             }
         }
     }, [isState.open, data])
@@ -435,31 +409,33 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
             return
         }
         queryState({ ...initialState })
+        setIsOrderCompleted(false);
     }, [isState.open])
 
 
     const checkItemFinalStage = isState.dataTableProducts?.data?.items?.some(e => e?.final_stage == 1)
 
     return (
+        <>
+        {isOrderCompleted ? (
+            <PopupCustom
+                onClickOpen={() => {
+                    if (dataRight?.listDataRight?.statusManufacture == "2") {
+                        isToast('error', "Lệnh SX đã được hoàn thành")
+                        return
+                    }
+                    queryState({ open: true });
+                }}
+                lockScroll={true}
+                open={isState.open}
+            >
+                <PopupOrderCompleted className={"!p-6"} onClose={() => { setIsOrderCompleted(false); queryState({ open: false }); }} />
+            </PopupCustom>
+        ) : (
         <PopupCustom
             title={<p>Hoàn thành công đoạn <span className="text-blue-500">(Số lệnh sản xuất: {data?.po?.reference_no})</span></p>}
             button={
-                // <div className={`flex items-center gap-2 px-4 h-10`}>
-                //     <FaCheck className={`size-4 text-white`} />
-                //     <h3 className={`3xl:text-base text-sm font-medium text-white`}>
-                //         Hoàn thành công đoạn
-                //     </h3>
-                // </div>
-                // <ButtonAnimationNew
-                //     icon={
-                //         <div className='size-4'>
-                //             <FaCheck className={`size-full`} />
-                //         </div>
-                //     }
-                //     title="Hoàn thành công đoạn"
-                //     className="h-10 px-4 flex items-center gap-2 3xl:text-base text-sm font-medium text-white border border-[#0375D3] bg-[#0375D3] hover:shadow-hover-button rounded-lg"
-                // />
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full">
                     <span className="3xl:size-5 size-4 text-[#0375F3] shrink-0">
                         <KanbanIcon className="size-full" />
                     </span>
@@ -468,6 +444,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                     </span>
                 </div>
             }
+            classNameBtn={"!w-full"}
             onClickOpen={() => {
                 if (dataRight?.listDataRight?.statusManufacture == "2") {
                     isToast('error', "Lệnh SX đã được hoàn thành")
@@ -478,7 +455,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
             lockScroll={true}
             open={isState.open}
             onClose={() => { queryState({ open: false }); }}
-        // classNameBtn={`${dataRight?.listDataRight?.statusManufacture == "2" ? "bg-gray-400" : "bg-blue-500"} rounded-lg`}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
             <div className={`w-[85vw] xl:h-[80vh] h-[575px] overflow-hidden `}>
@@ -1106,6 +1082,8 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                 </div>
             </div>
         </PopupCustom >
+        )}
+        </>
     );
 };
 

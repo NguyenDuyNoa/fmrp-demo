@@ -288,7 +288,7 @@ const Client = (props) => {
                   onRefresh={refetch.bind(this)}
                   dataLang={dataLang}
                   nameModel={"client_contact"}
-                  className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
                 />
               ) : (
                 <button
@@ -296,7 +296,7 @@ const Client = (props) => {
                   onClick={() => {
                     isShow("error", WARNING_STATUS_ROLE);
                   }}
-                  className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                 >
                   {dataLang?.branch_popup_create_new}
                 </button>
@@ -311,12 +311,13 @@ const Client = (props) => {
                 return (
                   <div key={e.id}>
                     <TabFilter
-                      backgroundColor={e.color}
+                      // backgroundColor={e.color}
+                      backgroundColor="#e2f0fe"
                       onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                       total={e.count}
                       active={e.id}
-                      className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "
-                        }`}
+                      // className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "}`}
+                      className={"text-[#0F4F9E] "}
                     >
                       {e.name}
                     </TabFilter>
@@ -327,73 +328,60 @@ const Client = (props) => {
         }
         table={
           <div className="flex flex-col h-full">
-            <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-              <div className="col-span-4">
-                <div className="grid grid-cols-9 gap-2">
-                  <SearchComponent
-                    dataLang={dataLang}
-                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                    colSpan={2}
-                  />
-                  <SelectComponent
-                    options={[
-                      {
-                        value: "",
-                        label:
-                          dataLang?.price_quote_branch || "price_quote_branch",
-                        isDisabled: true,
-                      },
-                      ...listBr,
-                    ]}
-                    onChange={(e) => queryState({ idBranch: e })}
-                    value={isState.idBranch}
-                    placeholder={
-                      dataLang?.price_quote_branch || "price_quote_branch"
-                    }
-                    colSpan={3}
-                    components={{ MultiValue }}
-                    isMulti={true}
-                    closeMenuOnSelect={false}
-                  />
-                </div>
+            <div className="w-full items-center flex justify-between gap-2">
+              {/* <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5"> */}
+              <div className="flex gap-3 items-center w-full">
+                <SearchComponent
+                  dataLang={dataLang}
+                  onChange={_HandleOnChangeKeySearch.bind(this)}
+                  colSpan={2}
+                />
+                <SelectComponent
+                  options={[
+                    {
+                      value: "",
+                      label:
+                        dataLang?.price_quote_branch || "price_quote_branch",
+                      isDisabled: true,
+                    },
+                    ...listBr,
+                  ]}
+                  onChange={(e) => queryState({ idBranch: e })}
+                  value={isState.idBranch}
+                  placeholder={
+                    dataLang?.price_quote_branch || "price_quote_branch"
+                  }
+                  colSpan={3}
+                  components={{ MultiValue }}
+                  isMulti={true}
+                  closeMenuOnSelect={false}
+                />
               </div>
-              <div className="col-span-2">
-                <div className="flex items-center justify-end space-x-2">
-                  <OnResetData
-                    onClick={() => refetch()}
-                    sOnFetching={() => { }}
-                  />
-                  {role == true || checkExport ? (
-                    <div className={``}>
-                      {data?.rResult?.length > 0 && (
-                        <ExcelFileComponent
-                          multiDataSet={multiDataSet}
-                          filename="Danh sách khách hàng"
-                          title="Dskh"
-                          dataLang={dataLang}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                      className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                    >
-                      <Grid6
-                        className="scale-75 2xl:scale-100 xl:scale-100"
-                        size={18}
+              <div className="flex items-center justify-end space-x-2">
+                <OnResetData onClick={() => refetch()} sOnFetching={() => { }} />
+                {role == true || checkExport ? (
+                  <div className={``}>
+                    {data?.rResult?.length > 0 && (
+                      <ExcelFileComponent
+                        multiDataSet={multiDataSet}
+                        filename="Danh sách khách hàng"
+                        title="Dskh"
+                        dataLang={dataLang}
                       />
-                      <span>{dataLang?.client_list_exportexcel}</span>
-                    </button>
-                  )}
-                  <div>
-                    <DropdowLimit
-                      sLimit={sLimit}
-                      limit={limit}
-                      dataLang={dataLang}
-                    />
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                  >
+                    <Grid6
+                      className="scale-75 2xl:scale-100 xl:scale-100"
+                      size={18}
+                    />
+                    <span>{dataLang?.client_list_exportexcel}</span>
+                  </button>
+                )}
               </div>
             </div>
             <Customscrollbar className="h-full overflow-y-auto ">
@@ -402,25 +390,25 @@ const Client = (props) => {
                   <ColumnTable colSpan={1} textAlign={"center"}>
                     {dataLang?.client_list_namecode}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"center"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.client_list_name}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.client_list_taxtcode}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
                     {dataLang?.client_list_phone}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.client_list_adress}
                   </ColumnTable>
                   <ColumnTable colSpan={2} textAlign={"center"}>
                     {dataLang?.client_list_charge}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"center"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.client_list_group}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.client_list_brand}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -434,15 +422,22 @@ const Client = (props) => {
                     {data?.rResult?.map((e) => (
                       <RowTable gridCols={12} key={e.id.toString()}>
                         <RowItemTable colSpan={1} textAlign={"center"}>
-                          {e.code}
+                          {/* {e.code} */}
+                          <Popup_chitiet
+                            dataLang={dataLang}
+                            className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
+                            name={e.code}
+                            id={e?.id}
+                          />
                         </RowItemTable>
                         <RowItemTable colSpan={2} textAlign={"left"}>
-                          <Popup_chitiet
+                          {/* <Popup_chitiet
                             dataLang={dataLang}
                             className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5  rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear"
                             name={e.name}
                             id={e?.id}
-                          />
+                          /> */}
+                          {e.name}
                         </RowItemTable>
                         <RowItemTable colSpan={1} textAlign={"left"}>
                           {e.tax_code}
@@ -455,7 +450,7 @@ const Client = (props) => {
                         </RowItemTable>
                         <RowItemTable
                           colSpan={2}
-                          className="flex flex-wrap items-center justify-start object-cover gap-2"
+                          className="flex flex-wrap items-center justify-center object-cover gap-2"
                         >
                           {e?.staff_charge
                             ? e.staff_charge?.map((d) => {
@@ -485,7 +480,7 @@ const Client = (props) => {
                         </RowItemTable>
                         <RowItemTable
                           colSpan={2}
-                          className="flex flex-wrap items-center justify-start"
+                          className="flex flex-col items-start justify-start gap-y-1"
                         >
                           {e.client_group?.map((h) => {
                             return (
@@ -501,7 +496,8 @@ const Client = (props) => {
                                     : "white"
                                     }`,
                                 }}
-                                className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] font-[500] text-[8px] px-2 rounded-full  py-0.5`}
+                                // className={`mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] font-[500] text-[8px] px-2 rounded-full  py-0.5`}
+                                className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-semibold px-2 py-1 border rounded-md "
                               >
                                 {h.name}
                               </span>
@@ -510,10 +506,13 @@ const Client = (props) => {
                         </RowItemTable>
                         <RowItemTable
                           colSpan={1}
-                          className="flex flex-wrap items-center gap-1"
+                          className="flex flex-wrap items-center gap-1 justify-start"
                         >
                           {e.branch?.map((i, index) => (
-                            <TagBranch key={index}>{i.name}</TagBranch>
+                            <span className="flex flex-wrap items-center justify-start gap-2" key={index}>
+                              {/* <TagBranch key={index}>{i.name}</TagBranch> */}
+                              {i.name}
+                            </span>
                           ))}
                         </RowItemTable>
                         <RowItemTable
@@ -571,16 +570,12 @@ const Client = (props) => {
                 )}
               </div>
             </Customscrollbar>
-          </div>
+          </div >
         }
         pagination={
-          <>
+          <div div className="flex items-center justify-between gap-2" >
             {data?.rResult?.length != 0 && (
               <ContainerPagination>
-                <TitlePagination
-                  dataLang={dataLang}
-                  totalItems={data?.output?.iTotalDisplayRecords}
-                />
                 <Pagination
                   postsPerPage={limit}
                   totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -589,10 +584,11 @@ const Client = (props) => {
                 />
               </ContainerPagination>
             )}
-          </>
+            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+          </div>
         }
       />
-    </React.Fragment>
+    </React.Fragment >
   );
 };
 export default Client;

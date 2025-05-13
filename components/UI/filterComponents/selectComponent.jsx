@@ -1,11 +1,10 @@
+import CloseXIcon from "@/components/icons/common/CloseXIcon";
+import DropdownFilledIcon from "@/components/icons/common/DropdownFilledIcon";
 import configSelectFillter from "@/configs/configSelectFillter";
 import { SelectCore } from "@/utils/lib/Select";
 import { FaCheck } from "react-icons/fa";
 import { components } from "react-select";
 import { Customscrollbar } from "../common/Customscrollbar";
-import { MenuListClickAll } from "./selectItemComponent";
-import DropdownFilledIcon from "@/components/icons/common/DropdownFilledIcon";
-import CloseXIcon from "@/components/icons/common/CloseXIcon";
 
 export const CustomOption = (props) => {
     return (
@@ -21,17 +20,17 @@ export const CustomOption = (props) => {
 // Custom Dropdown Indicator
 const DropdownIndicator = (props) => (
     <components.DropdownIndicator {...props}>
-        <DropdownFilledIcon 
-            className={`w-3 h-3 transition-transform duration-500 ${props.selectProps.menuIsOpen ? 'rotate-180 text-[#003DA0]' : 'text-neutral-02'}`} 
+        <DropdownFilledIcon
+            className={`w-3 h-3 transition-transform duration-500 ${props.selectProps.menuIsOpen ? 'rotate-180 text-[#003DA0]' : 'text-neutral-02'}`}
         />
     </components.DropdownIndicator>
 );
 
 // Custom Clear Indicator
 const ClearIndicator = (props) => (
-    <components.ClearIndicatorndicator {...props}>
+    <components.ClearIndicator {...props}>
         <CloseXIcon className="w-4 h-4 text-[#9295A4]" />
-    </components.ClearIndicatorndicator>
+    </components.ClearIndicator>
 );
 
 export const CustomMenuList = (props) => {
@@ -105,6 +104,11 @@ const SelectComponent = ({
                             color: state?.isDisabled ? provided['&:hover']?.color : '#3b82f6'
                         },
                     }),
+                    menu: (provided) => ({
+                        ...provided,
+                        position: "absolute",
+                        zIndex: 50,
+                    }),
                 }
                 :
                 configSelectFillter.styles
@@ -130,27 +134,32 @@ const SelectComponent = ({
             }),
             menu: (provided) => ({
                 ...provided,
-                zIndex: 9999, // Giá trị z-index tùy chỉnh
+                position: "absolute",
+                zIndex: 50,
             }),
 
         }
 
     return (
-        <div className={`${classParent ? classParent : ""}`} 
+        <div className={`${classParent ? classParent : ""} relative`}
         // style={{ gridColumn: `span ${colSpan || 1}` }}
         >
             <SelectCore
                 id={id ?? "parentSelect"}
-
+                //bật lên nó sẽ render ra ngoài dom gây đè header
+                menuPortalTarget={menuPortalTarget ?? null}
+                // menuPortalTarget={menuPortalTarget ?? document.body}
+                // menuPortalTarget={null}
                 options={options}
                 value={value}
                 onInputChange={onInputChange ? onInputChange : ""}
                 onChange={onChange}
                 placeholder={placeholder}
                 onMenuOpen={onMenuOpen}
+                // menuIsOpen={true}
                 {...configSelectFillter}
                 defaultValue={defaultValue}
-                className={className ? className : configSelectFillter.className}
+                className={`${configSelectFillter.className} ${className || "min-w-[200px]"}`}
                 isMulti={isMulti ? isMulti : false}
                 components={{
                     ...components,
@@ -166,7 +175,7 @@ const SelectComponent = ({
                 classNamePrefix={classNamePrefix}
                 maxMenuHeight={maxMenuHeight}
                 isClearable={isClearable}
-                menuPortalTarget={menuPortalTarget}
+                // menuPortalTarget={menuPortalTarget}
                 menuShouldBlockScroll={menuShouldBlockScroll}
                 // styles={{
                 //     ...[styles ? styles : configSelectFillter.styles],

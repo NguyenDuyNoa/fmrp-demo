@@ -25,9 +25,9 @@ export const AnimatedTabUnderline = () => {
       className="absolute bottom-0 h-[2px] bg-typo-blue-4 z-10"
       initial={{ left: from.left, width: from.width }}
       animate={{ left: activeTabInfo.left, width: activeTabInfo.width }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 500, 
+      transition={{
+        type: "spring",
+        stiffness: 500,
         damping: 30,
       }}
     />
@@ -45,7 +45,7 @@ export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
           forceVisible="x"
           ref={ref}
           className={`${className} overflow-x-auto h-fit demo4 simplebar-scrollable-x relative`}
-          scrollableNodePropsClassName="[&>div]:flex [&>div]:items-center [&>div]:justify-start [&>div]:space-x-4 [&>div]:xl:space-x-10 h-fit"
+          scrollableNodePropsClassName="[&>div]:flex [&>div]:items-center [&>div]:justify-start [&>div]:space-x-4 [&>div]:xl:space-x-4 h-fit"
         >
           {children}
           <hr className="!ml-0 absolute bottom-0 left-0 right-0 border-b border-t-0 border-border-gray-1 z-[-1]" />
@@ -109,13 +109,13 @@ export const LayOutTableDynamic = ({
         {breadcrumb}
         <ContainerBody>
           <div className="flex flex-col h-full overflow-hidden gap-y-3">
-            <div className="flex justify-between mt-1 mr-2">{titleButton}</div>
+            <div className="flex justify-between mt-1 pr-1">{titleButton}</div>
             {fillterTab && (
               <div className="w-full h-fit">
                 <ContainerFilterTab>{fillterTab}</ContainerFilterTab>
               </div>
             )}
-            <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <div className="flex flex-col flex-1 min-h-0">
               <ContainerTable className="flex-1 min-h-0 overflow-hidden">
                 {table}
               </ContainerTable>

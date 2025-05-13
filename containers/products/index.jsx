@@ -54,6 +54,7 @@ import { useProductList } from "./hooks/product/useProductList";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import ToggleBotAI from "../botAI/components/ToggleBotAI";
 const Products = (props) => {
     const dataLang = props.dataLang;
 
@@ -85,7 +86,9 @@ const Products = (props) => {
 
     const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    const { is_admin: role, permissions_current: auth } = useSelector(
+        (state) => state.auth
+    );
 
     const { checkAdd, checkExport } = useActionRole(auth, "products");
 
@@ -127,7 +130,7 @@ const Products = (props) => {
         router.replace(router.route);
     }, 500);
 
-    // set state trạng thái thành phẩm 
+    // set state trạng thái thành phẩm
     useEffect(() => {
         sDataProductExpiry(feature?.dataProductExpiry);
     }, []);
@@ -249,15 +252,18 @@ const Products = (props) => {
 
     const breadcrumbItems = [
         {
-            label: `${dataLang?.header_category_material || "header_category_material"}`,
+            label: `${dataLang?.header_category_material || "header_category_material"
+                }`,
             // href: "/",
         },
         {
-            label: `${dataLang?.header_category_finishedProduct_list || "header_category_finishedProduct_list"}`,
+            label: `${dataLang?.header_category_finishedProduct_list ||
+                "header_category_finishedProduct_list"
+                }`,
         },
     ];
     return (
-        <React.Fragment>
+        <div className="min-h-screen relative">
             <LayOutTableDynamic
                 head={
                     <Head>
@@ -292,7 +298,7 @@ const Products = (props) => {
                                     setOpen={sOpenDetail}
                                     isOpen={openDetail}
                                     nameModel={"products"}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
                                 />
                             ) : (
                                 <button
@@ -300,7 +306,7 @@ const Products = (props) => {
                                     onClick={() => {
                                         isShow("error", WARNING_STATUS_ROLE);
                                     }}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white btn-animation hover:scale-105"
                                 >
                                     {dataLang?.branch_popup_create_new}
                                 </button>
@@ -352,108 +358,97 @@ const Products = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-4">
-                                <div className="grid items-center grid-cols-12 gap-2">
-                                    <SearchComponent
-                                        dataLang={dataLang}
-                                        onChange={_HandleOnChangeKeySearch.bind(this)}
-                                        colSpan={2}
-                                    />
-                                    <SelectComponent
-                                        options={[
-                                            {
-                                                value: "",
-                                                label:
-                                                    dataLang?.price_quote_branch || "price_quote_branch",
-                                                isDisabled: true,
-                                            },
-                                            ...dataBranchOption,
-                                        ]}
-                                        onChange={_HandleFilterOpt.bind(this, "branch")}
-                                        value={idBranch}
-                                        placeholder={
-                                            dataLang?.price_quote_branch || "price_quote_branch"
-                                        }
-                                        colSpan={4}
-                                        components={{ MultiValue }}
-                                        isMulti={true}
-                                        isClearable={true}
-                                        closeMenuOnSelect={false}
-                                    />
-                                    <SelectComponent
-                                        options={[
-                                            {
-                                                value: "",
-                                                label: dataLang?.category_titel || "category_titel",
-                                                isDisabled: true,
-                                            },
-                                            ...dataCategory,
-                                        ]}
-                                        formatOptionLabel={SelectOptionLever}
-                                        onChange={_HandleFilterOpt.bind(this, "category")}
-                                        value={valueCategory}
-                                        colSpan={3}
-                                        isClearable={true}
-                                        placeholder={dataLang?.category_titel || "category_titel"}
-                                    />
-                                    <SelectComponent
-                                        options={[
-                                            {
-                                                value: "",
-                                                label: `${dataLang?.product}`,
-                                                isDisabled: true,
-                                            },
-                                            ...(Array.isArray(data?.finishedPro)
-                                                ? data.finishedPro
-                                                : []),
-                                        ]}
-                                        onChange={_HandleFilterOpt.bind(this, "finishedPro")}
-                                        value={valueFinishedPro}
-                                        placeholder={dataLang?.product}
-                                        colSpan={3}
-                                        isClearable={true}
-                                        closeMenuOnSelect={false}
-                                    />
-                                </div>
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
+                                <SearchComponent
+                                    dataLang={dataLang}
+                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    colSpan={2}
+                                />
+                                <SelectComponent
+                                    options={[
+                                        {
+                                            value: "",
+                                            label:
+                                                dataLang?.price_quote_branch || "price_quote_branch",
+                                            isDisabled: true,
+                                        },
+                                        ...dataBranchOption,
+                                    ]}
+                                    onChange={_HandleFilterOpt.bind(this, "branch")}
+                                    value={idBranch}
+                                    placeholder={
+                                        dataLang?.price_quote_branch || "price_quote_branch"
+                                    }
+                                    colSpan={4}
+                                    components={{ MultiValue }}
+                                    isMulti={true}
+                                    isClearable={true}
+                                    closeMenuOnSelect={false}
+                                />
+                                <SelectComponent
+                                    options={[
+                                        {
+                                            value: "",
+                                            label: dataLang?.category_titel || "category_titel",
+                                            isDisabled: true,
+                                        },
+                                        ...dataCategory,
+                                    ]}
+                                    formatOptionLabel={SelectOptionLever}
+                                    onChange={_HandleFilterOpt.bind(this, "category")}
+                                    value={valueCategory}
+                                    colSpan={3}
+                                    isClearable={true}
+                                    placeholder={dataLang?.category_titel || "category_titel"}
+                                />
+                                <SelectComponent
+                                    options={[
+                                        {
+                                            value: "",
+                                            label: `${dataLang?.product}`,
+                                            isDisabled: true,
+                                        },
+                                        ...(Array.isArray(data?.finishedPro)
+                                            ? data.finishedPro
+                                            : []),
+                                    ]}
+                                    onChange={_HandleFilterOpt.bind(this, "finishedPro")}
+                                    value={valueFinishedPro}
+                                    placeholder={dataLang?.product}
+                                    colSpan={3}
+                                    isClearable={true}
+                                    closeMenuOnSelect={false}
+                                />
                             </div>
-                            <div className="col-span-2 ">
-                                <div className="flex items-center justify-end space-x-2">
-                                    <OnResetData
-                                        sOnFetching={() => { }}
-                                        onClick={refetch.bind(this)}
-                                    />
-                                    {role == true || checkExport ? (
-                                        <div className={``}>
-                                            {data?.rResult?.length > 0 && (
-                                                <ExcelFileComponent
-                                                    multiDataSet={multiDataSet}
-                                                    filename={dataLang?.product}
-                                                    title="DSTP"
-                                                    dataLang={dataLang}
-                                                />
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                                            className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                                        >
-                                            <Grid6
-                                                className="scale-75 2xl:scale-100 xl:scale-100"
-                                                size={18}
+                            <div className="flex items-center justify-end space-x-2">
+                                <OnResetData
+                                    sOnFetching={() => { }}
+                                    onClick={refetch.bind(this)}
+                                />
+                                {role == true || checkExport ? (
+                                    <div className={``}>
+                                        {data?.rResult?.length > 0 && (
+                                            <ExcelFileComponent
+                                                multiDataSet={multiDataSet}
+                                                filename={dataLang?.product}
+                                                title="DSTP"
+                                                dataLang={dataLang}
                                             />
-                                            <span>{dataLang?.client_list_exportexcel}</span>
-                                        </button>
-                                    )}
-                                    <div>
-                                        <DropdowLimit
-                                            sLimit={sLimit}
-                                            limit={limit}
-                                            dataLang={dataLang}
-                                        />
+                                        )}
                                     </div>
-                                </div>
+                                ) : (
+                                    <button
+                                        onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                                        className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                    >
+                                        <Grid6
+                                            className="scale-75 2xl:scale-100 xl:scale-100"
+                                            size={18}
+                                        />
+                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -463,14 +458,14 @@ const Products = (props) => {
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.image || "image"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.category_titel}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.code_finishedProduct ||
                                             "dataLang?.code_finishedProduct"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={2} textAlign={"left"}>
                                         {dataLang?.product}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -490,10 +485,10 @@ const Products = (props) => {
                                         {dataLang?.settings_category_stages_title ||
                                             "settings_category_stages_title"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.note || "note"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={2} textAlign={"left"}>
                                         {dataLang?.client_list_brand || "client_list_brand"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -545,7 +540,7 @@ const Products = (props) => {
                                                     <RowItemTable
                                                         colSpan={2}
                                                         textAlign={"left"}
-                                                        className="flex flex-col items-start justify-start"
+                                                        className="flex flex-col items-start justify-start gap-y-[4px]"
                                                     >
                                                         <Popup_Detail
                                                             id={e?.id}
@@ -562,6 +557,8 @@ const Products = (props) => {
                                                             dataLang={dataLang}
                                                             dataKey={e?.type_products?.id}
                                                             name={e?.type_products?.name}
+                                                            className="!px-1"
+                                                            textSize="text-[11px]"
                                                         />
                                                         {/* </h6> */}
                                                     </RowItemTable>
@@ -608,12 +605,15 @@ const Products = (props) => {
                                                     <RowItemTable colSpan={1} textAlign={"left"}>
                                                         {e?.note}
                                                     </RowItemTable>
-                                                    <RowItemTable
-                                                        colSpan={2}
-                                                        className="flex flex-wrap items-center gap-1"
-                                                    >
-                                                        {e?.branch.map((i) => (
-                                                            <TagBranch key={i}>{i.name}</TagBranch>
+                                                    <RowItemTable colSpan={2}>
+                                                        {e?.branch.map((i, index) => (
+                                                            <span
+                                                                className="flex flex-wrap items-center justify-start gap-2"
+                                                                key={index}
+                                                            >
+                                                                {i.name}
+                                                                {/* <TagBranch key={i}>{i.name}</TagBranch> */}
+                                                            </span>
                                                         ))}
                                                     </RowItemTable>
                                                     <RowItemTable
@@ -655,13 +655,13 @@ const Products = (props) => {
                     </div>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2 pr-32">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination
+                                {/* <TitlePagination
                                     dataLang={dataLang}
                                     totalItems={data?.output?.iTotalDisplayRecords}
-                                />
+                                /> */}
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -670,10 +670,14 @@ const Products = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
-        </React.Fragment>
+            <div className="fixed bottom-6 right-6 z-[9999]">
+                <ToggleBotAI dataLang={dataLang} />
+            </div>
+        </div>
     );
 };
 export default Products;

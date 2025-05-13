@@ -1,16 +1,16 @@
 import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, LayOutTableDynamic, } from "@/components/UI/common/layout";
+import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -41,7 +41,7 @@ import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import LinkWarehouse from "../components/linkWarehouse";
@@ -50,7 +50,6 @@ import PopupDetail from "./components/pupup";
 import { useRecallCombobox } from "./hooks/useRecallCombobox";
 import { useRecallFillterbar } from "./hooks/useRecallFillterbar";
 import { useRecallList } from "./hooks/useRecallList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initialState = {
     onSending: false,
@@ -370,14 +369,18 @@ const Recall = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                <div className="grid grid-cols-5 gap-2">
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
                                         placeholder={dataLang?.branch_search}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    />
+                                    <DateToDateComponent
+                                        colSpan={1}
+                                        value={isState.valueDate}
+                                        onChange={(e) => queryState({ valueDate: e })}
                                     />
                                     <SelectComponent
                                         options={[
@@ -429,12 +432,6 @@ const Recall = (props) => {
                                         isClearable={true}
                                         colSpan={1}
                                     />
-                                    <DateToDateComponent
-                                        colSpan={1}
-                                        value={isState.valueDate}
-                                        onChange={(e) => queryState({ valueDate: e })}
-                                    />
-                                </div>
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex items-center justify-end gap-2">
@@ -459,40 +456,40 @@ const Recall = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <Customscrollbar className='h-full overflow-y-auto'>
                             <div className="w-full">
-                                <HeaderTable gridCols={10}>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                <HeaderTable gridCols={11}>
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "stt"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.production_warehouse_note || "production_warehouse_note"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_browse || "production_warehouse_browse"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_branch || "import_branch"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -504,34 +501,39 @@ const Recall = (props) => {
                                 ) : data?.rResult?.length > 0 ? (
                                     <>
                                         <div className="h-full divide-y divide-slate-200">
-                                            {data?.rResult?.map((e) => (
-                                                <RowTable gridCols={10} key={e.id.toString()}>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                            {data?.rResult?.map((e, index) => (
+                                                <RowTable gridCols={11} key={e.id.toString()}>
+                                                    <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                        {index + 1}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         <PopupDetail
                                                             dataLang={dataLang}
-                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px]  text-[9px] font-medium px-2 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                            className="responsive-text-sm font-medium text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
                                                             name={e?.code}
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         {e?.reference_no_detail}
                                                     </RowItemTable>
-                                                    <LinkWarehouse
-                                                        colSpan={1}
-                                                        disbleClick={true}
-                                                        warehouse_id={e?.warehouse_id}
-                                                        warehouse_name={e?.warehouse_name}
-                                                    />
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                        <LinkWarehouse
+                                                            // colSpan={1.5}
+                                                            disbleClick={true}
+                                                            warehouse_id={e?.warehouse_id}
+                                                            warehouse_name={e?.warehouse_name}
+                                                        />
+                                                    </RowItemTable>
 
-                                                    <RowItemTable colSpan={1} textAlign={"right"}>
+                                                    <RowItemTable colSpan={1} textAlign={"center"}>
                                                         {formatNumber(e?.total_quantity)}
                                                     </RowItemTable>
                                                     <RowItemTable
-                                                        colSpan={1}
+                                                        colSpan={1.5}
                                                         textAlign={"left"}
                                                         className={"truncate"}
                                                     >
@@ -554,8 +556,8 @@ const Recall = (props) => {
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="mx-auto">
-                                                        <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                    <RowItemTable colSpan={1}>
+                                                        {e?.branch_name}
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
@@ -585,20 +587,21 @@ const Recall = (props) => {
                 }
                 showTotal={true}
                 total={
-                    <ContainerTotal className="!grid-cols-10">
-                        <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
+                    <ContainerTotal className="!grid-cols-22">
+                        <RowItemTable colSpan={3.5} textAlign={"center"} className="p-2">
+                        </RowItemTable>
+                        <RowItemTable colSpan={1} textAlign={"left"} className="p-2">
                             {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
-                        </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={"right"} className="p-2 mr-1">
+                        </RowItemTable>
+                        <RowItemTable colSpan={1} textAlign={"center"} className="p-2 mr-1">
                             {formatNumber(data?.rTotal?.total_quantity)}
-                        </ColumnTable>
+                        </RowItemTable>
                     </ContainerTotal>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -607,7 +610,8 @@ const Recall = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
             {isState.dataExport?.length > 0 && (

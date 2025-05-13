@@ -331,12 +331,13 @@ const Popup_Stage = React.memo((props) => {
                             isShow("error", WARNING_STATUS_ROLE);
                         }
                     }}
-                    className={props.type == "add" && "group outline-none transition-all ease-in-out flex items-center justify-center gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}
+                    className={props.type == "add" && "hover:bg-primary-05 group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer"}
                 >
                     {props.type == "add" && (
-                        <I3Square size={20} className="group-hover:text-amber-500 group-hover:scale-110" />
+                        <I3Square size={20} className="text-neutral-03 group-hover:text-neutral-07" />
+                        // <I3Square size={20} className="group-hover:text-amber-500 group-hover:scale-110" />
                     )}
-                    <button type="button" className="group-hover:text-amber-500">
+                    <button type="button" className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">
                         {props.type == "add" ? `${props.dataLang?.stage_design_finishedProduct || "stage_design_finishedProduct"}` : `${props.dataLang?.edit || "edit"}`}
                     </button>
                 </div>

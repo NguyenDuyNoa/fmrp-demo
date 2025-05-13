@@ -1,4 +1,6 @@
 import apiRoles from "@/Api/apiPersonnel/apiRoles";
+import EditIcon from "@/components/icons/common/EditIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading/loading";
 import PopupCustom from "@/components/UI/popup";
@@ -9,7 +11,6 @@ import { Edit as IconEdit, SearchNormal1 } from "iconsax-react";
 import React, { useEffect, useState } from "react";
 import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
-
 
 const initalState = {
     open: false,
@@ -24,8 +25,8 @@ const initalState = {
     errDepartment: false,
     tab: 0,
     dataPower: [],
-    valueSearch: ""
-}
+    valueSearch: "",
+};
 const PopupRoles = React.memo((props) => {
     const isShow = useToast();
 
@@ -36,9 +37,9 @@ const PopupRoles = React.memo((props) => {
     // sách sách vị trí
     const dataOptPosition = useSelector((state) => state.position_staff);
 
-    const [isState, setIsState] = useState(initalState)
+    const [isState, setIsState] = useState(initalState);
 
-    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }))
+    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
     useEffect(() => {
         isState.open && props?.id && queryState({ open: true });
@@ -47,93 +48,109 @@ const PopupRoles = React.memo((props) => {
     // convert lại data quyền hạn
     const transformData = (data) => {
         const transformedData = {};
-        data.forEach(item => {
+        data.forEach((item) => {
             const { key, is_check, name, child } = item;
             const transformedChild = {};
 
             if (child) {
-                child.forEach(childItem => {
+                child.forEach((childItem) => {
                     const { key: childKey, name: childName, permissions } = childItem;
                     const transformedPermissions = {};
                     if (permissions) {
-                        permissions.forEach(permission => {
+                        permissions.forEach((permission) => {
                             transformedPermissions[permission.key] = {
                                 name: permission.name,
-                                is_check: permission.is_check
+                                is_check: permission.is_check,
                             };
                         });
                     }
                     transformedChild[childKey] = {
                         name: childName,
-                        permissions: transformedPermissions
+                        permissions: transformedPermissions,
                     };
                 });
             }
             transformedData[key] = {
                 is_check,
                 name,
-                child: transformedChild
+                child: transformedChild,
             };
         });
 
         return transformedData;
-    }
+    };
 
     // lấy danh sách quyền
     useQuery({
         queryKey: ["api_permissions"],
         queryFn: async () => {
-            const { data, isSuccess, message } = await apiRoles.apiPermissions(props?.id)
+            const { data, isSuccess, message } = await apiRoles.apiPermissions(
+                props?.id
+            );
             if (isSuccess == 1) {
-                const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
-                    key,
-                    ...value,
-                    child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
-                        key: childKey,
-                        ...childValue,
-                        permissions: Object.entries(childValue?.permissions)?.map(([permissionsKey, permissionsValue]) => ({
-                            key: permissionsKey,
-                            ...permissionsValue,
-                        }))
-                    }))
-                }));
-                queryState({ dataPower: permissionsArray })
+                const permissionsArray = Object.entries(data.permissions)?.map(
+                    ([key, value]) => ({
+                        key,
+                        ...value,
+                        child: Object.entries(value?.child)?.map(
+                            ([childKey, childValue]) => ({
+                                key: childKey,
+                                ...childValue,
+                                permissions: Object.entries(childValue?.permissions)?.map(
+                                    ([permissionsKey, permissionsValue]) => ({
+                                        key: permissionsKey,
+                                        ...permissionsValue,
+                                    })
+                                ),
+                            })
+                        ),
+                    })
+                );
+                queryState({ dataPower: permissionsArray });
             }
         },
-        enabled: isState.open
+        enabled: isState.open,
         // enabled: isState.open && !!props?.id
-    })
+    });
 
     // lưu chức vụ
     const handingRoles = useMutation({
         mutationFn: (data) => {
             return apiRoles.apiHandingRoles(data, props?.id);
-        }
-    })
+        },
+    });
 
     const _ServerSending = () => {
         let formData = new FormData();
         const transformedResult = transformData(isState.dataPower);
         formData.append("name", isState.name ? isState.name : "");
-        formData.append("position_parent_id", isState.position?.value ? isState.position?.value : "");
-        formData.append("department_id", isState.department?.value ? isState.department?.value : "");
-        isState.valueBranch.forEach((e) => formData.append("branch_id[]", e?.value));
-        const utf8Bytes = JSON.stringify(transformedResult)
+        formData.append(
+            "position_parent_id",
+            isState.position?.value ? isState.position?.value : ""
+        );
+        formData.append(
+            "department_id",
+            isState.department?.value ? isState.department?.value : ""
+        );
+        isState.valueBranch.forEach((e) =>
+            formData.append("branch_id[]", e?.value)
+        );
+        const utf8Bytes = JSON.stringify(transformedResult);
         formData.append("permissions", utf8Bytes);
 
         handingRoles.mutate(formData, {
             onSuccess: ({ isSuccess, message }) => {
                 if (isSuccess) {
                     isShow("success", props.dataLang[message] || message);
-                    setIsState(initalState)
+                    setIsState(initalState);
                     props.onRefresh && props.onRefresh();
                     props.onRefreshSub && props.onRefreshSub();
                 } else {
                     isShow("error", props.dataLang[message] || message);
                 }
             },
-            onError: (error) => { }
-        })
+            onError: (error) => { },
+        });
         queryState({ onSending: false });
     };
 
@@ -143,10 +160,14 @@ const PopupRoles = React.memo((props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (isState.name == "" || isState.department == "" || isState.valueBranch?.length == 0) {
+        if (
+            isState.name == "" ||
+            isState.department == "" ||
+            isState.valueBranch?.length == 0
+        ) {
             isState.name == "" && queryState({ errName: true });
             isState.department == "" && queryState({ errDepartment: true });
-            isState.valueBranch?.length == 0 && queryState({ errBranch: true })
+            isState.valueBranch?.length == 0 && queryState({ errBranch: true });
             isShow("error", props.dataLang?.required_field_null);
         } else {
             queryState({ onSending: true });
@@ -155,15 +176,15 @@ const PopupRoles = React.memo((props) => {
 
     useEffect(() => {
         queryState({ errName: false });
-    }, [isState.name != ""])
+    }, [isState.name != ""]);
 
     useEffect(() => {
         queryState({ errDepartment: false });
-    }, [isState.department != ""])
+    }, [isState.department != ""]);
 
     useEffect(() => {
         queryState({ errBranch: false });
-    }, [isState.valueBranch?.length > 0])
+    }, [isState.valueBranch?.length > 0]);
 
     /// danh sách vị trí
     useQuery({
@@ -172,17 +193,26 @@ const PopupRoles = React.memo((props) => {
             const list = await apiRoles.apiPosition(props?.id);
             queryState({
                 name: list?.name,
-                department: { value: list?.department_id, label: list?.department_name },
-                position: list?.position_parent_id == 0 ? null : { value: list?.position_parent_id, label: list?.position_parent_name },
+                department: {
+                    value: list?.department_id,
+                    label: list?.department_name,
+                },
+                position:
+                    list?.position_parent_id == 0
+                        ? null
+                        : {
+                            value: list?.position_parent_id,
+                            label: list?.position_parent_name,
+                        },
                 valueBranch: list?.branch.map((e) => ({
                     label: e.name,
                     value: e.id,
                 })),
-            })
-            return list
+            });
+            return list;
         },
-        enabled: isState.open && !!props?.id
-    })
+        enabled: isState.open && !!props?.id,
+    });
 
     // dnah sách chức
     const { isFetching } = useQuery({
@@ -194,12 +224,12 @@ const PopupRoles = React.memo((props) => {
                     label: x.name,
                     value: x.id,
                     level: x.level,
-                }))
-            })
-            return rResult
+                })),
+            });
+            return rResult;
         },
-        enabled: isState.open && !!props?.id
-    })
+        enabled: isState.open && !!props?.id,
+    });
 
     // change modlue
     const handleChange = (parent, child = null, permissions = null) => {
@@ -213,12 +243,12 @@ const PopupRoles = React.memo((props) => {
                             permissions: x?.permissions?.map((y) => {
                                 return {
                                     ...y,
-                                    is_check: parent.is_check == 0 ? 1 : 0
+                                    is_check: parent.is_check == 0 ? 1 : 0,
                                 };
-                            })
+                            }),
                         };
                     }),
-                    is_check: parent.is_check == 0 ? 1 : 0
+                    is_check: parent.is_check == 0 ? 1 : 0,
                 };
             } else if (child != null && e?.key == parent && e?.is_check == 1) {
                 return {
@@ -231,15 +261,15 @@ const PopupRoles = React.memo((props) => {
                                     if (y?.key == permissions?.key) {
                                         return {
                                             ...y,
-                                            is_check: y.is_check === 0 ? 1 : 0
+                                            is_check: y.is_check === 0 ? 1 : 0,
                                         };
                                     }
                                     return y;
-                                })
+                                }),
                             };
                         }
                         return x;
-                    })
+                    }),
                 };
             }
             return e;
@@ -248,28 +278,27 @@ const PopupRoles = React.memo((props) => {
         queryState({ dataPower: newData });
     };
 
-
     // ẩn hiện module khi tìm kiếm
     useEffect(() => {
-        const filteredData = isState.dataPower.filter(item => item.name.toLowerCase().includes(isState.valueSearch.toLowerCase()));
+        const filteredData = isState.dataPower.filter((item) =>
+            item.name.toLowerCase().includes(isState.valueSearch.toLowerCase())
+        );
         const newdb = isState.dataPower.map((item) => {
             const itemChecked = filteredData.find((x) => item.key == x.key);
             if (itemChecked) {
                 return {
                     ...item,
                     ...itemChecked,
-                    hidden: false
-                }
+                    hidden: false,
+                };
             }
             return {
                 ...item,
-                hidden: true
-            }
-
-        })
+                hidden: true,
+            };
+        });
         queryState({ dataPower: newdb });
-
-    }, [isState.valueSearch])
+    }, [isState.valueSearch]);
 
     const styleSelect = {
         theme: (theme) => ({
@@ -286,13 +315,32 @@ const PopupRoles = React.memo((props) => {
                 ...base,
                 color: "#cbd5e1",
             }),
-        }
-    }
+        },
+    };
 
     return (
         <PopupCustom
-            title={props?.id ? `${props.dataLang?.category_personnel_position_edit || "category_personnel_position_edit"}` : `${props.dataLang?.category_personnel_position_addnew || "category_personnel_position_addnew"}`}
-            button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+            title={
+                props?.id
+                    ? `${props.dataLang?.category_personnel_position_edit ||
+                    "category_personnel_position_edit"
+                    }`
+                    : `${props.dataLang?.category_personnel_position_addnew ||
+                    "category_personnel_position_addnew"
+                    }`
+            }
+            // button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+            button={
+                props.id ? (
+                    <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+                        <EditIcon className={`size-5 transition-all duration-300 `} />
+                    </div>
+                ) : (
+                    <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">
+                        <PlusIcon /> {props.dataLang?.branch_popup_create_new}
+                    </p>
+                )
+            }
             onClickOpen={() => queryState({ open: true })}
             open={isState.open}
             onClose={() => queryState({ open: false })}
@@ -301,14 +349,18 @@ const PopupRoles = React.memo((props) => {
             <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                 <button
                     onClick={() => queryState({ tab: 0 })}
-                    className={`${isState.tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                    className={`${isState.tab === 0
+                        ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                        : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                 >
                     {props.dataLang?.personnels_staff_popup_info}
                 </button>
                 <button
                     onClick={() => queryState({ tab: 1 })}
-                    className={`${isState.tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                    className={`${isState.tab === 1
+                        ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                        : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                 >
                     {props.dataLang?.personnels_staff_popup_power}
@@ -318,7 +370,6 @@ const PopupRoles = React.memo((props) => {
                 {isFetching ? (
                     <Loading className="h-80" color="#0f4f9e" />
                 ) : (
-
                     <React.Fragment>
                         {isState.tab == 0 && (
                             <div className="space-y-2">
@@ -333,11 +384,15 @@ const PopupRoles = React.memo((props) => {
                                         value={isState.valueBranch}
                                         onChange={(value) => queryState({ valueBranch: value })}
                                         isClearable={true}
-                                        placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
+                                        placeholder={
+                                            props.dataLang?.client_list_brand || "client_list_brand"
+                                        }
                                         isMulti
                                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                         closeMenuOnSelect={false}
-                                        className={`${isState.errBranch ? "border-red-500" : "border-transparent"
+                                        className={`${isState.errBranch
+                                            ? "border-red-500"
+                                            : "border-transparent"
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border p-0`}
                                         {...styleSelect}
                                     />
@@ -349,7 +404,8 @@ const PopupRoles = React.memo((props) => {
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[#344054] font-normal text-base">
-                                        {props.dataLang?.category_personnel_position_department || "category_personnel_position_department"}{" "}
+                                        {props.dataLang?.category_personnel_position_department ||
+                                            "category_personnel_position_department"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <SelectComponent
@@ -360,22 +416,28 @@ const PopupRoles = React.memo((props) => {
                                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                         isClearable={true}
                                         placeholder={
-                                            props.dataLang?.category_personnel_position_department || "category_personnel_position_department"
+                                            props.dataLang?.category_personnel_position_department ||
+                                            "category_personnel_position_department"
                                         }
-                                        className={`${isState.errDepartment ? "border-red-500" : "border-transparent"
+                                        className={`${isState.errDepartment
+                                            ? "border-red-500"
+                                            : "border-transparent"
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border p-0`}
                                         isSearchable={true}
                                         {...styleSelect}
                                     />
                                     {isState.errDepartment && (
                                         <label className="text-sm text-red-500">
-                                            {props.dataLang?.category_personnel_position_err_department || "category_personnel_position_err_department"}
+                                            {props.dataLang
+                                                ?.category_personnel_position_err_department ||
+                                                "category_personnel_position_err_department"}
                                         </label>
                                     )}
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[#344054] font-normal text-base">
-                                        {props.dataLang?.category_personnel_position_name || "category_personnel_position_name"}{" "}
+                                        {props.dataLang?.category_personnel_position_name ||
+                                            "category_personnel_position_name"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <input
@@ -383,18 +445,23 @@ const PopupRoles = React.memo((props) => {
                                         onChange={(e) => queryState({ name: e.target.value })}
                                         type="text"
                                         placeholder={props.dataLang?.category_material_group_name}
-                                        className={`${isState.errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                        className={`${isState.errName
+                                            ? "border-red-500"
+                                            : "focus:border-[#92BFF7] border-[#d0d5dd] "
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-1.5 border outline-none `}
                                     />
                                     {isState.errName && (
                                         <label className="text-sm text-red-500">
-                                            {props.dataLang?.category_personnel_position_err_name || "category_personnel_position_err_name"}
+                                            {props.dataLang?.category_personnel_position_err_name ||
+                                                "category_personnel_position_err_name"}
                                         </label>
                                     )}
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[#344054] font-normal text-base">
-                                        {props.dataLang?.category_personnel_position_manage_position || "category_personnel_position_manage_position"}
+                                        {props.dataLang
+                                            ?.category_personnel_position_manage_position ||
+                                            "category_personnel_position_manage_position"}
                                     </label>
                                     <SelectComponent
                                         classParent={"m-0"}
@@ -405,12 +472,15 @@ const PopupRoles = React.memo((props) => {
                                         value={isState.position}
                                         onChange={(value) => queryState({ position: value })}
                                         isClearable={true}
-                                        placeholder={props.dataLang?.category_personnel_position_manage_position || "category_personnel_position_manage_position"}
+                                        placeholder={
+                                            props.dataLang
+                                                ?.category_personnel_position_manage_position ||
+                                            "category_personnel_position_manage_position"
+                                        }
                                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none p-0"
                                         isSearchable={true}
                                         {...styleSelect}
                                     />
-
                                 </div>
                             </div>
                         )}
@@ -419,17 +489,28 @@ const PopupRoles = React.memo((props) => {
                                 <div className="w-full">
                                     <label>Tìm kiếm</label>
                                     <div className="relative flex items-center">
-                                        <SearchNormal1 size={20} className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]" />
+                                        <SearchNormal1
+                                            size={20}
+                                            className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                                        />
                                         <input
-                                            onChange={(e) => queryState({ valueSearch: e?.target?.value })}
+                                            onChange={(e) =>
+                                                queryState({ valueSearch: e?.target?.value })
+                                            }
                                             dataLang={props.dataLang}
                                             value={isState.valueSearch}
-                                            className={"border py-1.5 rounded border-gray-300 2xl:text-left 2xl:pl-10 xl:!text-left xl:pl-16 relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-base text-xs  text-center 2xl:w-full xl:w-full w-[100%]"} />
-                                        {
-                                            isState.valueSearch != "" && <MdClear size={32} onClick={() => queryState({ valueSearch: "" })} className="absolute cursor-pointer hover:bg-gray-300 p-2 right-5 bottom-0.5 rounded-full transition-all duration-200 ease-linear" />
-                                        }
+                                            className={
+                                                "border py-1.5 rounded border-gray-300 2xl:text-left 2xl:pl-10 xl:!text-left xl:pl-16 relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-base text-xs  text-center 2xl:w-full xl:w-full w-[100%]"
+                                            }
+                                        />
+                                        {isState.valueSearch != "" && (
+                                            <MdClear
+                                                size={32}
+                                                onClick={() => queryState({ valueSearch: "" })}
+                                                className="absolute cursor-pointer hover:bg-gray-300 p-2 right-5 bottom-0.5 rounded-full transition-all duration-200 ease-linear"
+                                            />
+                                        )}
                                     </div>
-
                                 </div>
                                 <div className="space-y-2 max-h-[280px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className={`grid grid-cols-1`}>
@@ -480,12 +561,22 @@ const PopupRoles = React.memo((props) => {
                                                         <div className="">
                                                             {e?.child?.map((i, index) => {
                                                                 return (
-                                                                    <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
-                                                                        <div className="p-2 text-sm border-b">{i?.name}</div>
+                                                                    <div
+                                                                        key={i?.key}
+                                                                        className={`${e?.child?.length - 1 == index &&
+                                                                            "border-b"
+                                                                            } ml-10 border-t border-x`}
+                                                                    >
+                                                                        <div className="p-2 text-sm border-b">
+                                                                            {i?.name}
+                                                                        </div>
                                                                         <div className="grid grid-cols-3 gap-1 ">
                                                                             {i?.permissions?.map((s) => {
                                                                                 return (
-                                                                                    <div key={s?.key} className="flex items-center w-full">
+                                                                                    <div
+                                                                                        key={s?.key}
+                                                                                        className="flex items-center w-full"
+                                                                                    >
                                                                                         <div className="inline-flex items-center">
                                                                                             <label
                                                                                                 className="relative flex items-center p-3 rounded-full cursor-pointer"
@@ -497,9 +588,17 @@ const PopupRoles = React.memo((props) => {
                                                                                                     className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
                                                                                                     id={s?.key + "" + i?.key}
                                                                                                     value={s?.name}
-                                                                                                    checked={s?.is_check == 1 ? true : false}
+                                                                                                    checked={
+                                                                                                        s?.is_check == 1
+                                                                                                            ? true
+                                                                                                            : false
+                                                                                                    }
                                                                                                     onChange={(value) => {
-                                                                                                        handleChange(e?.key, i?.key, s)
+                                                                                                        handleChange(
+                                                                                                            e?.key,
+                                                                                                            i?.key,
+                                                                                                            s
+                                                                                                        );
                                                                                                     }}
                                                                                                 />
                                                                                                 <div className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
@@ -527,11 +626,11 @@ const PopupRoles = React.memo((props) => {
                                                                                             {s?.name}
                                                                                         </label>
                                                                                     </div>
-                                                                                )
+                                                                                );
                                                                             })}
                                                                         </div>
                                                                     </div>
-                                                                )
+                                                                );
                                                             })}
                                                         </div>
                                                     )}
@@ -540,12 +639,11 @@ const PopupRoles = React.memo((props) => {
                                         })}
                                     </div>
                                 </div>
-
                             </>
                         )}
                         <div className="flex justify-end space-x-2">
                             <button
-                                onClick={() => queryState({ open: false, })}
+                                onClick={() => queryState({ open: false })}
                                 className="px-4 py-2 text-base transition rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105"
                             >
                                 {props.dataLang?.branch_popup_exit}
@@ -563,4 +661,4 @@ const PopupRoles = React.memo((props) => {
         </PopupCustom>
     );
 });
-export default PopupRoles
+export default PopupRoles;

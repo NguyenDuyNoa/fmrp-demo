@@ -12,6 +12,20 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        '10': ['10px', {
+          lineHeight: '12px',
+        }],
+        '11': ['11px', {
+          lineHeight: '14px',
+        }],
+        '13': ['13px', {
+          lineHeight: '18px',
+        }],
+        '15': ['15px', {
+          lineHeight: '22px',
+        }],
+      },
       fontFamily: {
         deca: ["Lexend Deca", "sans-serif"],
       },
@@ -165,6 +179,8 @@ module.exports = {
           "linear-gradient(49.59deg, #E0FFCC 0%, #CCFFEC 100%)",
         "linear-background-toggle-bot":
           "linear-gradient(155.11deg, #1FC583 0%, #1F9285 100%)",
+        "linear-background-button-chat":
+          "linear-gradient(170.14deg, #1FC583 5.11%, #1F9285 95.28%)",
       },
     },
   },
@@ -179,5 +195,57 @@ module.exports = {
         },
       });
     },
+    function({ addComponents, theme }) {
+      addComponents({
+        '.responsive-text-xs': {
+          fontSize: '9px',
+          lineHeight: '11px',
+          '@screen xl': {
+            fontSize: '10px', /* text-10 */
+            lineHeight: '12px'
+          },
+          '@screen 2xl': {
+            fontSize: '11px', /* text-11 */
+            lineHeight: '14px'
+          },
+          '@screen 3xl': {
+            fontSize: '12px', /* text-12 */
+            lineHeight: '16px'
+          }
+        },
+        '.responsive-text-sm': {
+          fontSize: '11px',
+          lineHeight: '14px',
+          '@screen xl': {
+            fontSize: '0.75rem', /* text-xs */
+            lineHeight: '1rem'
+          },
+          '@screen 2xl': {
+            fontSize: '13px', /* text-13 */
+            lineHeight: '18px'
+          },
+          '@screen 3xl': {
+            fontSize: '0.875rem', /* text-sm */
+            lineHeight: '1.25rem'
+          }
+        },
+        '.responsive-text-base': {
+          fontSize: '13px',
+          lineHeight: '18px',
+          '@screen xl': {
+            fontSize: '0.875rem', /* text-sm */
+            lineHeight: '1.25rem'
+          },
+          '@screen 2xl': {
+            fontSize: '15px', /* text-15 */
+            lineHeight: '22px'
+          },
+          '@screen 3xl': {
+            fontSize: '1rem', /* text-base */
+            lineHeight: '1.5rem'
+          }
+        }
+      })
+    }
   ],
 };

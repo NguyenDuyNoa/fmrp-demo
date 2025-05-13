@@ -1,6 +1,7 @@
 import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
@@ -11,7 +12,7 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, LayOutTableDynamic, } from "@/components/UI/common/layout";
+import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -43,7 +44,7 @@ import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import LinkWarehouse from "../components/linkWarehouse";
@@ -52,7 +53,6 @@ import PopupDetail from "./components/popup";
 import { useExportToOtherCombobox } from "./hooks/useExportToOtherCombobox";
 import { useExportToOtherFillterbar } from "./hooks/useExportToOtherFillterbar";
 import { useExportToOtherList } from "./hooks/useExportToOtherList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initialState = {
     onSending: false,
@@ -130,6 +130,12 @@ const ExportToOther = (props) => {
     const formatNumber = (number) => {
         return formatMoneyConfig(+number, dataSeting);
     };
+
+    const renderMoneyOrDash = (value) => {
+        return Number(value) === 0
+            ? "-"
+            : <>{formatNumber(value)} <span className="underline">đ</span></>;
+    };   
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -369,14 +375,18 @@ const ExportToOther = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                <div className="grid grid-cols-6 gap-2">
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
                                         placeholder={dataLang?.branch_search}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    />
+                                    <DateToDateComponent
+                                        value={isState.valueDate}
+                                        onChange={(e) => queryState({ valueDate: e })}
+                                        colSpan={1}
                                     />
                                     <SelectComponent
                                         options={[
@@ -393,6 +403,7 @@ const ExportToOther = (props) => {
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         colSpan={1}
+                                        className={"w-[150px] 3xl:w-[200px]"}
                                     />
                                     <SelectComponent
                                         options={[
@@ -408,6 +419,7 @@ const ExportToOther = (props) => {
                                         placeholder={dataLang?.exportToOthe_objectType || "exportToOthe_objectType"}
                                         isClearable={true}
                                         colSpan={1}
+                                        className={"w-[150px] 3xl:w-[200px]"}
                                     />
                                     <SelectComponent
                                         onInputChange={(event) => {
@@ -429,6 +441,7 @@ const ExportToOther = (props) => {
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         colSpan={1}
+                                        className={"w-[150px] 3xl:w-[200px]"}
                                     />
                                     <SelectComponent
                                         options={[
@@ -446,12 +459,6 @@ const ExportToOther = (props) => {
                                         isClearable={true}
                                         colSpan={1}
                                     />
-                                    <DateToDateComponent
-                                        value={isState.valueDate}
-                                        onChange={(e) => queryState({ valueDate: e })}
-                                        colSpan={1}
-                                    />
-                                </div>
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex items-center justify-end gap-2">
@@ -476,43 +483,43 @@ const ExportToOther = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <Customscrollbar className='h-full overflow-y-auto'>
                             <div className="w-full">
-                                <HeaderTable gridCols={11} display={"grid"}>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                <HeaderTable gridCols={12} display={"grid"}>
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "stt"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.exportToOthe_objectType || "exportToOthe_objectType"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    {/* <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
-                                    </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    </ColumnTable> */}
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.exportToOthe_warehouse || "exportToOthe_warehouse"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.exportToOthe_totalValue || "exportToOthe_totalValue"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={2} textAlign={"left"}>
                                         {dataLang?.production_warehouse_note || "production_warehouse_note"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.production_warehouse_browse || "production_warehouse_browse"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_branch || "import_branch"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -524,22 +531,25 @@ const ExportToOther = (props) => {
                                 ) : data?.rResult?.length > 0 ? (
                                     <>
                                         <div className="h-full divide-y divide-slate-200">
-                                            {data?.rResult?.map((e) => (
-                                                <RowTable gridCols={11} key={e.id.toString()}>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                            {data?.rResult?.map((e, index) => (
+                                                <RowTable gridCols={12} key={e.id.toString()}>
+                                                    <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                        {index + 1}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1}>
                                                         <PopupDetail
                                                             dataLang={dataLang}
-                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                            className="responsive-text-sm font-medium text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
                                                             name={e?.code}
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
-                                                        className="flex items-center justify-center"
+                                                        className="flex"
                                                     >
                                                         {(e?.object == "client" && (
                                                             <TagColorSky name={dataLang[e?.object]} />
@@ -558,23 +568,23 @@ const ExportToOther = (props) => {
                                                                 />
                                                             ))}
                                                     </RowItemTable>
-                                                    <RowItemTable
+                                                    {/* <RowItemTable
                                                         colSpan={1}
-                                                        textAlign={"right"}
-                                                        className=""
-                                                    ></RowItemTable>
-                                                    <LinkWarehouse
-                                                        disbleClick={true}
-                                                        colSpan={1}
-                                                        warehouse_id={e?.warehouse_id}
-                                                        warehouse_name={e?.warehouse_name}
-                                                    />
+                                                    ></RowItemTable> */}
+                                                    <RowItemTable colSpan={1.5} textAlign={"left"}>
+                                                        <LinkWarehouse
+                                                            disbleClick={true}
+                                                            colSpan={1}
+                                                            warehouse_id={e?.warehouse_id}
+                                                            warehouse_name={e?.warehouse_name}
+                                                        />
+                                                    </RowItemTable>
 
-                                                    <RowItemTable colSpan={1} textAlign={"right"}>
-                                                        {formatNumber(e?.amount)}
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                        {renderMoneyOrDash(e?.amount)}
                                                     </RowItemTable>
                                                     <RowItemTable
-                                                        colSpan={1}
+                                                        colSpan={2}
                                                         textAlign={"left"}
                                                         className={"truncate"}
                                                     >
@@ -594,8 +604,8 @@ const ExportToOther = (props) => {
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="mx-auto">
-                                                        <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                    <RowItemTable colSpan={1}>
+                                                        {e?.branch_name}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className="flex justify-center">
                                                         <BtnAction
@@ -622,20 +632,21 @@ const ExportToOther = (props) => {
                 }
                 showTotal={true}
                 total={
-                    <ContainerTotal className="!grid-cols-11">
-                        <ColumnTable colSpan={5} className="p-2" textAlign={"center"}>
+                    <ContainerTotal className="!grid-cols-24">
+                        <RowItemTable colSpan={3.5} className="p-2" textAlign={"center"}>
+                        </RowItemTable>
+                        <RowItemTable colSpan={1.5} className="p-2" textAlign={"right"}>
                             {dataLang?.exportToOthe_totalValue || "exportToOthe_totalValue"}
-                        </ColumnTable>
-                        <ColumnTable colSpan={1} className="p-2 mr-1" textAlign={"right"}>
-                            {formatNumber(data?.rTotal?.amount)}
-                        </ColumnTable>
+                        </RowItemTable>
+                        <RowItemTable colSpan={1} className="p-2 mr-1" textAlign={"left"}>
+                            {renderMoneyOrDash(data?.rTotal?.amount)}
+                        </RowItemTable>
                     </ContainerTotal>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -644,7 +655,8 @@ const ExportToOther = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
             {isState.dataExport?.length > 0 && (

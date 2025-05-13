@@ -1,49 +1,52 @@
-import React from "react";
-import { VscFilePdf } from "react-icons/vsc";
+import PrinterIcon from "@/components/icons/common/PrinterIcon";
 import { twMerge } from "tailwind-merge";
 
 const ButtonPrintItem = ({
-    dataLang,
-    onCLick,
-    className = "",
-    disabled = false,
-    isLoading = false,
-    classLoading = ""
+  dataLang,
+  onCLick,
+  className = "",
+  disabled = false,
+  isLoading = false,
+  classLoading = "",
+  totalButtons = 0,
 }) => {
-    const isDisabled = disabled || isLoading;
+  const isDisabled = disabled || isLoading;
 
-    return (
-        <button
-            onClick={isDisabled ? undefined : onCLick}
-            disabled={isDisabled}
-            className={twMerge(
-                `transition-all ease-in-out flex items-center gap-2 group
-        2xl:text-sm xl:text-sm text-[8px]
-        px-5 rounded py-2.5 w-full
+  return (
+    <button
+      onClick={isDisabled ? undefined : onCLick}
+      disabled={isDisabled}
+      className={twMerge(
+        `group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
+        ${totalButtons > 3 
+          ? 'hover:bg-primary-05' 
+          : 'hover:border-[#003DA0] hover:bg-primary-05'
+        }
         ${isDisabled
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "hover:bg-slate-50 cursor-pointer"
-                }`,
-                className
-            )}
-        >
-            {isLoading && (
-                <span
-                    className={`${classLoading} inline-block size-4 shink animate-spin rounded-full border-[3px] border-solid border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`}
-                />
-            )}
-            {!isLoading && <VscFilePdf
-                size={20}
-                className={twMerge(
-                    "transition-all",
-                    isDisabled ? "text-gray-400" : "group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md"
-                )}
-            />}
-            <p className={isDisabled ? "text-gray-400" : "group-hover:text-[#65a30d]"}>
-                {dataLang?.btn_table_print || "btn_table_print"}
-            </p>
-        </button>
-    );
+          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+          : "cursor-pointer"
+        }`,
+        className
+      )}
+    >
+      {isLoading && (
+        <span
+          className={`${classLoading} inline-block size-4 shink animate-spin rounded-full border-[3px] border-solid border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`}
+        />
+      )}
+      {!isLoading && (
+        <PrinterIcon 
+          className={`size-5 transition-all duration-300 
+            ${totalButtons > 3 ? "text-neutral-03 group-hover:text-neutral-07" : "text-[#003DA0]"}`}
+        />
+      )}
+      {totalButtons > 3 && (
+        <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">
+          {dataLang?.btn_table_print || "In phiếu"}
+        </p>
+      )}
+    </button>
+  );
 };
 
 export default ButtonPrintItem;

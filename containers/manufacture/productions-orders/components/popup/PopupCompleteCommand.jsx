@@ -301,7 +301,7 @@ const ProductRow = memo(
         <td className="py-2 px-3 text-center border-b border-[#F3F3F4]">
           <div className="flex justify-center">
             <InputNumberCustom
-              state={product.quantity_rest}
+              state={product.quantity_success}
               setState={(value) => updateProductQuantity(index, value)}
             />
           </div>
@@ -322,10 +322,10 @@ const ProductRow = memo(
 
 ProductRow.displayName = "ProductRow";
 
-const PopupOrderCompleted = ({ onClose }) => {
+export const PopupOrderCompleted = ({ onClose, className }) => {
   return (
     <div
-      className={`p-9 flex flex-col gap-8 justify-center items-center rounded-3xl w-[610px] bg-neutral-00 ${deca.className}`}
+      className={`p-9 flex flex-col gap-8 justify-center items-center rounded-3xl w-[610px] bg-neutral-00 ${deca.className} ${className}`}
     >
       <div className="w-full flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -394,10 +394,12 @@ const PopupCompleteCommand = ({ onClose }) => {
         ...item,
         selected: false,
         quantity_rest: item.quantity_rest || 0,
+        quantity_success: item.quantity_rest || 0,
         error: item.error || 0,
       }));
       setProducts(itemsWithDefaults);
       setSelectAll(false);
+      console.log(itemsWithDefaults)
     }
   }, [productCompleted]);
 
@@ -425,9 +427,13 @@ const PopupCompleteCommand = ({ onClose }) => {
           "success",
           responseData.message || "Hoàn thành công đoạn thành công"
         );
+        
+        setTimeout(() => {
+          onClose();
+        }, 2000);
       }
     }
-  }, [isSuccess, data]);
+  }, [isSuccess, data, onClose]);
 
   const handleConfirm = useCallback(async () => {
     const selectedProducts = products.filter((product) => product.selected);
@@ -435,9 +441,9 @@ const PopupCompleteCommand = ({ onClose }) => {
     try {
       const formatData = selectedProducts.map((product) => ({
         ...product,
-        quantity_success: product.quantity_rest || 0,
+        quantity_success: product.quantity_success || 0,
         quantity_error: product.error || 0,
-        quantity1: product.error || 0,
+        // quantity1: product.error || 0,
       }));
       await handleProductCompleted({
         po_id: isStateProvider?.productionsOrders.idDetailProductionOrder,
@@ -467,8 +473,9 @@ const PopupCompleteCommand = ({ onClose }) => {
         const updatedProducts = [...prevProducts];
         updatedProducts[index] = {
           ...updatedProducts[index],
-          quantity_rest: value,
+          quantity_success: value,
         };
+        console.log(updatedProducts)
         return updatedProducts;
       });
     },

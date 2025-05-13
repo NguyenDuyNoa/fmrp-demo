@@ -1,23 +1,18 @@
 import apiImport from "@/Api/apiPurchaseOrder/apiImport";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import {
-    Container,
-    ContainerBody,
-    ContainerFilterTab,
-    ContainerTable,
     ContainerTotal,
-    LayOutTableDynamic,
+    LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -55,11 +50,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import { routerImport } from "routers/buyImportGoods";
 import PopupDetail from "./components/popup";
-import PopupStatus from "./components/popupStatus";
 import { useImportCombobox } from "./hooks/useImportCombobox";
 import { useImportFilterbar } from "./hooks/useImportFilterbar";
 import { useImportList } from "./hooks/useImportList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initalState = {
     onFetching: false,
@@ -122,6 +115,7 @@ const PurchaseImport = (props) => {
     const { data: listBranch = [] } = useBranchList()
 
     const { data, isFetching, refetch } = useImportList(params);
+    console.log("🚀 ~ PurchaseImport ~ data:", data)
 
     const { data: listCode = [] } = useImportCombobox(isState.keySearchCode)
 
@@ -141,6 +135,12 @@ const PurchaseImport = (props) => {
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
+    };
+
+    const renderMoneyOrDash = (value) => {
+        return Number(value) === 0
+            ? "-"
+            : <>{formatMoney(value)} <span className="underline">đ</span></>;
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -429,100 +429,100 @@ const PurchaseImport = (props) => {
                     </>
                 }
                 table={<div className="flex flex-col h-full">
-                    <div className="w-full items-center flex justify-between">
-                        {/* <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5"> */}
-                            <div className="flex gap-3 items-center w-full">
-                                <SearchComponent
-                                    colSpan={1}
-                                    dataLang={dataLang}
-                                    placeholder={dataLang?.search_production_order_code}
-                                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                                />
-                                <DateToDateComponent
-                                    colSpan={1}
-                                    value={isState.valueDate}
-                                    onChange={(e) => queryState({ valueDate: e })}
-                                />
-                                <SelectComponent
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: dataLang?.purchase_order_branch || "purchase_order_branch",
-                                            isDisabled: true,
-                                        },
-                                        ...listBranch,
-                                    ]}
-                                    colSpan={1}
-                                    onChange={(e) => queryState({ valueBr: e })}
-                                    value={isState.valueBr}
-                                    placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
-                                    isClearable={true}
-                                />
-                                <SelectComponent
-                                    onInputChange={(event) => {
-                                        _HandleSeachApi(event);
-                                    }}
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode",
-                                            isDisabled: true,
-                                        },
-                                        ...listCode,
-                                    ]}
-                                    onChange={(e) => queryState({ valueCode: e })}
-                                    value={isState.valueCode}
-                                    placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
-                                    colSpan={1}
-                                    isClearable={true}
-                                    className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
-                                />
-                                <SelectComponent
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: dataLang?.purchase_order_supplier || "purchase_order_supplier",
-                                            isDisabled: true,
-                                        },
-                                        ...listSupplier,
-                                    ]}
-                                    onChange={(e) => queryState({ valueSupplier: e })}
-                                    value={isState.valueSupplier}
-                                    placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
-                                    colSpan={1}
-                                    isClearable={true}
-                                    className="rounded-md bg-white   2xl:text-base xl:text-xs text-[10px]  z-20"
-                                    isSearchable={true}
-                                />
-                            </div>
+                    <div className="w-full items-center flex justify-between gap-2">
+                        {/* <div className="flex gap-3 items-center w-full"> */}
+                        <div className="flex gap-3 items-center w-full">
+                            <SearchComponent
+                                colSpan={1}
+                                dataLang={dataLang}
+                                placeholder={dataLang?.search_production_order_code}
+                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                            />
+                            <DateToDateComponent
+                                colSpan={1}
+                                value={isState.valueDate}
+                                onChange={(e) => queryState({ valueDate: e })}
+                            />
+                            <SelectComponent
+                                options={[
+                                    {
+                                        value: "",
+                                        label: dataLang?.purchase_order_branch || "purchase_order_branch",
+                                        isDisabled: true,
+                                    },
+                                    ...listBranch,
+                                ]}
+                                colSpan={1}
+                                onChange={(e) => queryState({ valueBr: e })}
+                                value={isState.valueBr}
+                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                                isClearable={true}
+                            />
+                            <SelectComponent
+                                onInputChange={(event) => {
+                                    _HandleSeachApi(event);
+                                }}
+                                options={[
+                                    {
+                                        value: "",
+                                        label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode",
+                                        isDisabled: true,
+                                    },
+                                    ...listCode,
+                                ]}
+                                onChange={(e) => queryState({ valueCode: e })}
+                                value={isState.valueCode}
+                                placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
+                                colSpan={1}
+                                isClearable={true}
+                            // className="min-w-[200px] rounded-md bg-white 2xl:text-base xl:text-xs text-[10px] z-20"
+                            />
+                            <SelectComponent
+                                options={[
+                                    {
+                                        value: "",
+                                        label: dataLang?.purchase_order_supplier || "purchase_order_supplier",
+                                        isDisabled: true,
+                                    },
+                                    ...listSupplier,
+                                ]}
+                                onChange={(e) => queryState({ valueSupplier: e })}
+                                value={isState.valueSupplier}
+                                placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
+                                colSpan={1}
+                                isClearable={true}
+                                // className="min-w-[200px] rounded-md bg-white 2xl:text-base xl:text-xs text-[10px] z-20"
+                                isSearchable={true}
+                            />
+                        </div>
                         {/* </div> */}
                         {/* <div className="col-span-2"> */}
-                            <div className="flex items-center gap-2">
-                                <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
-                                {role == true || checkExport ? (
-                                    <div className={``}>
-                                        {data?.rResult?.length > 0 && (
-                                            <ExcelFileComponent
-                                                dataLang={dataLang}
-                                                filename="Danh sách nhập hàng"
-                                                title={"SDNH"}
-                                                multiDataSet={multiDataSet}
-                                            />
-                                        )}
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                                        className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                                    >
-                                        <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
-                                        <span>{dataLang?.client_list_exportexcel}</span>
-                                    </button>
-                                )}
-                                <div>
-                                    {/* <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} /> */}
+                        <div className="flex items-center gap-2">
+                            <OnResetData sOnFetching={(e) => { }} onClick={() => refetch()} />
+                            {role == true || checkExport ? (
+                                <div className={``}>
+                                    {data?.rResult?.length > 0 && (
+                                        <ExcelFileComponent
+                                            dataLang={dataLang}
+                                            filename="Danh sách nhập hàng"
+                                            title={"SDNH"}
+                                            multiDataSet={multiDataSet}
+                                        />
+                                    )}
                                 </div>
+                            ) : (
+                                <button
+                                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                >
+                                    <Grid6 className="scale-75 2xl:scale-100 xl:scale-100" size={18} />
+                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                </button>
+                            )}
+                            <div>
+                                {/* <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} /> */}
                             </div>
+                        </div>
                         {/* </div> */}
                     </div>
 
@@ -530,7 +530,7 @@ const PurchaseImport = (props) => {
                         <div className="w-full">
                             <HeaderTable gridCols={13}>
                                 <ColumnTable colSpan={0.5} textAlign={"center"}>
-                                    {/* {dataLang?. || "stt"} */}STT
+                                    {dataLang?.stt || "stt"}
                                 </ColumnTable>
                                 <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_day_vouchers || "import_day_vouchers"}
@@ -538,7 +538,7 @@ const PurchaseImport = (props) => {
                                 <ColumnTable colSpan={1} textAlign={"left"}>
                                     {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={2.5} textAlign={"left"}>
+                                <ColumnTable colSpan={2} textAlign={"left"}>
                                     {dataLang?.import_supplier || "import_supplier"}
                                 </ColumnTable>
                                 <ColumnTable colSpan={1} textAlign={"left"}>
@@ -556,7 +556,7 @@ const PurchaseImport = (props) => {
                                 <ColumnTable colSpan={1} textAlign={"center"}>
                                     {dataLang?.import_payment_status || "import_payment_status"}
                                 </ColumnTable>
-                                <ColumnTable colSpan={1} textAlign={"left"}>
+                                <ColumnTable colSpan={1.5} textAlign={"left"}>
                                     {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
                                 </ColumnTable>
                                 <ColumnTable colSpan={1} textAlign={"left"}>
@@ -582,12 +582,12 @@ const PurchaseImport = (props) => {
                                                 <RowItemTable colSpan={1} textAlign={"left"}>
                                                     <PopupDetail
                                                         dataLang={dataLang}
-                                                        className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
+                                                        className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                         name={e?.code}
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2.5} textAlign={"left"}>
+                                                <RowItemTable colSpan={2} textAlign={"left"}>
                                                     {e.supplier_name}
                                                 </RowItemTable>
                                                 <RowItemTable
@@ -597,7 +597,7 @@ const PurchaseImport = (props) => {
                                                     {
                                                         e?.purchase_order_code && (
                                                             <PopupDetailThere
-                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
+                                                                className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                                 name={e?.purchase_order_code}
                                                                 dataLang={dataLang}
                                                                 id={e?.purchase_order_id}
@@ -607,15 +607,13 @@ const PurchaseImport = (props) => {
                                                     }
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} textAlign={"left"}>
-                                                    {formatMoney(e.total_price)} <span className="underline">đ</span>
+                                                    {renderMoneyOrDash(e.total_price)}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} textAlign={"left"}>
-                                                    {e.total_tax_price == 0 ? "-" : (
-                                                        <>{formatMoney(e.total_tax_price)} <span className="underline">đ</span></>
-                                                    )}
+                                                    {renderMoneyOrDash(e.total_tax_price)}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} textAlign={"left"}>
-                                                    {formatMoney(e.total_amount)} <span className="underline">đ</span>
+                                                    {renderMoneyOrDash(e.total_amount)}
                                                 </RowItemTable>
                                                 <RowItemTable
                                                     colSpan={1}
@@ -631,7 +629,7 @@ const PurchaseImport = (props) => {
                                                             <TagColorLime name={"Đã chi đủ"} />
                                                         ))}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className="cursor-pointer">
+                                                <RowItemTable colSpan={1.5} className="cursor-pointer">
                                                     <ButtonWarehouse
                                                         warehouseman_id={e?.warehouseman_id}
                                                         _HandleChangeInput={_HandleChangeInput}
@@ -640,8 +638,8 @@ const PurchaseImport = (props) => {
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} >
                                                     {/* <TagBranch className="w-fit"> */}
-                                                        {e?.branch_name}
-                                                        {/* </TagBranch> */}
+                                                    {e?.branch_name}
+                                                    {/* </TagBranch> */}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} className="flex">
                                                     <BtnAction
@@ -660,7 +658,7 @@ const PurchaseImport = (props) => {
                                     </div>
                                 </>
                             ) : (
-                                <NoData />
+                                <NoData type="table" />
                             )}
                         </div>
                     </Customscrollbar>
@@ -669,30 +667,33 @@ const PurchaseImport = (props) => {
                 showTotal={true}
                 total={
                     <>
-                        <ContainerTotal className={"!grid-cols-13"}>
-                            <RowItemTable colSpan={3} textAlign={"end"} className="px-5">
+                        <ContainerTotal className={"!grid-cols-26"}>
+                            <RowItemTable colSpan={4.5} textAlign={"end"} className="px-5">
+                                {/* {dataLang?.import_total || "import_total"} */}
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign={"start"} className="px-2">
                                 {dataLang?.import_total || "import_total"}
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={0.5}
+                                colSpan={1}
                                 textAlign={"left"}
-                                className="flex gap-1 px-3"
+                                className="flex gap-1"
                             >
-                                {formatNumber(data?.rTotal?.total_price)} <span className="underline">đ</span>
+                                {renderMoneyOrDash(data?.rTotal?.total_price)}
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={0.5}
+                                colSpan={1}
                                 textAlign={"left"}
-                                className="flex gap-1 px-3"
+                                className="flex gap-1"
                             >
-                                {formatNumber(data?.rTotal?.total_tax_price)} <span className="underline">đ</span>
+                                {renderMoneyOrDash(data?.rTotal?.total_tax_price)}
                             </RowItemTable>
                             <RowItemTable
-                                colSpan={0.5}
+                                colSpan={1}
                                 textAlign={"left"}
-                                className="flex gap-1 px-3"
+                                className="flex gap-1"
                             >
-                                {formatNumber(data?.rTotal?.total_amount)} <span className="underline">đ</span>
+                                {renderMoneyOrDash(data?.rTotal?.total_amount)}
                             </RowItemTable>
                         </ContainerTotal>
                     </>

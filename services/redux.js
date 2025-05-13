@@ -1,7 +1,7 @@
 import { combineReducers, createStore } from "redux";
 
 const initialChatBotState = {
-    open: false,
+    open: true,
     typeChat: null,
     contentChat: "",
     openViewModal: false,
@@ -86,7 +86,6 @@ const adminState = {
         open: false,
         children: null,
     },
-
     stateBoxChatAi: {
         open: false,
         typeChat: null,
@@ -184,6 +183,16 @@ function adminReducer(state = adminState, action) {
                 },
             };
         //chat bot
+
+        case "chatbot/openBoxChatAi":
+            return {
+                ...state,
+                stateBoxChatAi: {
+                    ...state.stateBoxChatAi,
+                    open: action.payload,
+                },
+            };
+
         case "chatbot/addInitialBotMessage":
             return {
                 ...state,

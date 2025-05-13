@@ -10,6 +10,8 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Select from "react-select";
 import { useItemCategoryOptoptions } from "../../hooks/category/useItemCategoryOptoptions";
+import EditIcon from "@/components/icons/common/EditIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 
 const Popup_NVL = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
@@ -138,7 +140,17 @@ const Popup_NVL = React.memo((props) => {
     return (
         <PopupCustom
             title={props.data?.id ? `${props.dataLang?.category_material_group_edit}` : `${props.dataLang?.category_material_group_addnew}`}
-            button={props.data?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
+            button={props.data?.id ?
+                // <IconEdit /> 
+                <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+                    <EditIcon className={`size-5 transition-all duration-300 `} />
+                </div>
+                :
+                // `${props.dataLang?.branch_popup_create_new}`
+                <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">
+                    <PlusIcon /> {props.dataLang?.branch_popup_create_new}
+                </p>
+            }
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}

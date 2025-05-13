@@ -1416,11 +1416,11 @@ const SalesOrderForm = (props) => {
                                         name="fname"
                                         type="text"
                                         placeholder={dataLang?.system_default || "system_default"}
-                                        className={`3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] focus:border-[#0F4F9E] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                        className={`3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99] focus:border-[#0F4F9E] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                     />
                                 </div>
 
-                                <div className="col-span-3">
+                                <div className="col-span-3 z-10">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.branch || "branch"}{" "}
                                         <span className="text-red-500">*</span>
@@ -1434,7 +1434,7 @@ const SalesOrderForm = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.select_branch || "select_branch"}
                                         className={`${errBranch ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         styles={{
@@ -1470,7 +1470,7 @@ const SalesOrderForm = (props) => {
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={`${errCustomer ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1512,7 +1512,7 @@ const SalesOrderForm = (props) => {
                                         }
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={` rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                                        className={` rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99] `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1554,7 +1554,7 @@ const SalesOrderForm = (props) => {
                                             className={`border ${errDate
                                                 ? "border-red-500"
                                                 : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                         />
                                         {startDate && (
                                             <>
@@ -1573,7 +1573,7 @@ const SalesOrderForm = (props) => {
                                     )}
                                 </div>
 
-                                <div className="col-span-3">
+                                <div className="col-span-3 z-[8]">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
                                         {dataLang?.sales_product_staff_in_charge ||
                                             "sales_product_staff_in_charge"}{" "}
@@ -1590,7 +1590,7 @@ const SalesOrderForm = (props) => {
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={`${errStaff ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1674,7 +1674,7 @@ const SalesOrderForm = (props) => {
                                             hideSelectedOptions={false}
                                             isClearable={true}
                                             className={`${errQuote && quote === null ? "border border-red-500 rounded-md" : ""
-                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99]`}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -1902,7 +1902,7 @@ const SalesOrderForm = (props) => {
                                             "sales_product_select_item"
                                         }
                                         hideSelectedOptions={false}
-                                        className={`cursor-pointer rounded-md bg-white  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`cursor-pointer rounded-md bg-white  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -2229,7 +2229,7 @@ const SalesOrderForm = (props) => {
                                     </div>
                                     <div className="flex items-center justify-end col-span-1 text-right">
                                         <h3
-                                            className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99]`}
                                         >
                                             {formatMoney(e?.total_amount)}
                                         </h3>

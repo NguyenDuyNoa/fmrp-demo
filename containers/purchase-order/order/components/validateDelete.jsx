@@ -1,4 +1,5 @@
 import apiOrder from "@/Api/apiPurchaseOrder/apiOrder";
+import TrashIcon from "@/components/icons/common/TrashIcon";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import PopupCustom from "@/components/UI/popup";
@@ -49,16 +50,14 @@ const PopupTableValidateDelete = (props) => {
                                 isShow("error", WARNING_STATUS_ROLE);
                             }
                         }}
-                        className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
-                        <RiDeleteBin6Line
-                            size={20}
-                            className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                        />
-                        <div
-                            className="group-hover:text-[#f87171]"
+                        className="group transition-all ease-in-out flex items-center justify-center text-left cursor-pointer w-full rounded-lg p-1 gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-red-02 border border-transparent hover:border-red-01"
+                        data-tooltip-id="delete-tooltip"
+                        data-tooltip-content="Xóa phiếu"
                         >
-                            {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                        </div>
+                            <TrashIcon
+                                color="#EE1E1E"
+                                className="size-5 transition-all duration-300"
+                            />
                     </div>}
                 open={props.isOpen && props.data?.payment_code?.length > 0}
                 onClose={_ToggleModal.bind(this, false)}

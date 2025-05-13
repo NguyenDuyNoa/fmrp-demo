@@ -19,7 +19,7 @@ const Popup = (props) => {
     }, [props.open])
     return (
         <React.Fragment>
-            <button className={props.classNameBtn} onClick={props.onClickOpen}>
+            <button className={props.classNameBtn} onClick={props.onClickOpen} >
                 {props.button}
             </button>
             <PopupParent

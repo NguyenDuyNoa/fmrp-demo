@@ -21,7 +21,7 @@ const Index = React.memo(
       <ReactPaginate
         previousLabel={
           <div
-            className={`flex items-center gap-2 text-sm ${
+            className={`flex items-center gap-2 responsive-text-sm ${
               isFirstPage ? "text-[#9295A4]" : "text-neutral-07"
             }`}
           >
@@ -34,7 +34,7 @@ const Index = React.memo(
         }
         nextLabel={
           <div
-            className={`flex items-center gap-2 text-sm ${
+            className={`flex items-center gap-2 responsive-text-sm ${
               isLastPage ? "text-[#9295A4]" : "text-neutral-07"
             }`}
           >
@@ -50,14 +50,14 @@ const Index = React.memo(
         marginPagesDisplayed={2}
         pageCount={pageCount}
         pageClassName="page-item"
-        pageLinkClassName="page-link"
+        pageLinkClassName="page-link !responsive-text-sm"
         previousClassName="page-item rounded-lg border border-[#D0D5DD] mr-2"
-        previousLinkClassName="page-link"
+        previousLinkClassName="page-link !responsive-text-sm"
         nextClassName="page-item rounded-lg border border-[#D0D5DD] ml-2"
-        nextLinkClassName="page-link"
+        nextLinkClassName="page-link !responsive-text-sm"
         breakLabel="..."
         breakClassName="page-item"
-        breakLinkClassName="page-link"
+        breakLinkClassName="page-link !responsive-text-sm"
         containerClassName="pagination"
         activeClassName="active"
         renderOnZeroPageCount={null}

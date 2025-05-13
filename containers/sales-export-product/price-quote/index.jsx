@@ -387,7 +387,7 @@ const PriceQuote = (props) => {
                         <ContainerTable>
                             <div className="space-y-2 xl:space-y-3">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9  xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                                    <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
+                                    <div className="flex gap-3 items-center w-full">
                                         <div className="grid grid-cols-5 gap-2">
                                             <div className="col-span-1">
                                                 <SearchComponent
@@ -543,7 +543,7 @@ const PriceQuote = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <PopupDetailQuote
                                                                 dataLang={dataLang}
-                                                                className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                                                                className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-medium px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                                                                 name={e?.reference_no}
                                                                 id={e?.id}
                                                             />

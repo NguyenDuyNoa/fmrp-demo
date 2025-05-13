@@ -1,6 +1,7 @@
 import apiSalesOrder from "@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { BtnStatusApproved } from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
@@ -14,17 +15,12 @@ import {
   RowItemTable,
   RowTable,
 } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
   TagColorLime,
   TagColorOrange,
   TagColorSky,
 } from "@/components/UI/common/Tag/TagStatus";
 import {
-  Container,
-  ContainerBody,
-  ContainerFilterTab,
-  ContainerTable,
   ContainerTotal,
   LayOutTableDynamic,
 } from "@/components/UI/common/layout";
@@ -72,7 +68,7 @@ import PopupDetailProduct from "./components/PopupDetailProduct";
 import { useSalesOrderCombobox } from "./hooks/useSalesOrderCombobox";
 import { useSalesOrderFilterbar } from "./hooks/useSalesOrderFilterbar";
 import { useSalesOrderList } from "./hooks/useSalesOrderList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 registerLocale("vi", vi);
 
 const initialValue = {
@@ -108,7 +104,7 @@ const SalesOrder = (props) => {
 
   const { limit, updateLimit: sLimit } = useLimitAndTotalItems();
 
-  const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
+  const { isOpen, isKeyState, isIdChild: status, handleQueryId } = useToggle();
 
   const { is_admin: role, permissions_current: auth } = useSelector(
     (state) => state.auth
@@ -116,7 +112,28 @@ const SalesOrder = (props) => {
 
   const { checkAdd, checkExport } = useActionRole(auth, "sales_product");
 
+  const [checkedWare, sCheckedWare] = useState({});
+
   const toggleShowAll = () => setIsExpanded(!isExpanded);
+
+  const _HandleChangeInput = (id, checkedUn, type, value) => {
+    handleQueryId({
+      status: true,
+      initialKey: { id, checkedUn, type, value },
+    });
+  };
+
+  const handleSaveStatus = () => {
+    if (isKeyState?.type === "browser") {
+      const checked = isKeyState.value.target.checked;
+      const warehousemanId = isKeyState.value.target.value;
+
+      // Xử lý thay đổi trạng thái đơn hàng
+      const newStatus = checked ? "approved" : "un_approved";
+      handlePostStatus(isKeyState?.id, newStatus);
+    }
+    handleQueryId({ status: false });
+  };
 
   const params = {
     search: keySearch,
@@ -326,7 +343,7 @@ const SalesOrder = (props) => {
   ];
 
   const toggleStatus = () => {
-    const index = data?.rResult.findIndex((x) => x.id == isId);
+    const index = data?.rResult.findIndex((x) => x.id == isKeyState);
 
     let newStatus = "";
 
@@ -336,7 +353,7 @@ const SalesOrder = (props) => {
       newStatus = "approved";
     }
 
-    handlePostStatus(isId, newStatus);
+    handlePostStatus(isKeyState, newStatus);
 
     handleQueryId({ status: false });
   };
@@ -458,88 +475,84 @@ const SalesOrder = (props) => {
         }
         table={
           <div className="flex flex-col h-full">
-            <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-              <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                <div className="grid grid-cols-5 gap-2">
-                  <div className="col-span-1">
-                    <SearchComponent
-                      dataLang={dataLang}
-                      onChange={handleOnChangeKeySearch}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <SelectComponent
-                      options={[
-                        {
-                          value: "",
-                          label:
-                            dataLang?.price_quote_branch ||
-                            "price_quote_branch",
-                          isDisabled: true,
-                        },
-                        ...dataBranch,
-                      ]}
-                      onChange={onChangeFilter("idBranch")}
-                      value={valueChange.idBranch}
-                      placeholder={
-                        dataLang?.price_quote_branch || "price_quote_branch"
-                      }
-                      isClearable={true}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <SelectComponent
-                      isLoading={dataCode == [] ? true : false}
-                      options={[
-                        {
-                          value: "",
-                          label:
-                            dataLang?.sales_product_code ||
-                            "sales_product_code",
-                          isDisabled: true,
-                        },
-                        ...dataCode,
-                      ]}
-                      onChange={onChangeFilter("idQuoteCode")}
-                      onInputChange={(e) => {
-                        handleSearchApiOrders(e);
-                      }}
-                      value={valueChange.idQuoteCode}
-                      placeholder={
-                        dataLang?.sales_product_code || "sales_product_code"
-                      }
-                      isClearable={true}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <SelectComponent
-                      options={[
-                        {
-                          value: "",
-                          label:
-                            dataLang?.price_quote_customer ||
-                            "price_quote_customer",
-                          isDisabled: true,
-                        },
-                        ...dataClient,
-                      ]}
-                      onInputChange={(e) => {
-                        handleSearchApi(e);
-                      }}
-                      onChange={onChangeFilter("idCustomer")}
-                      value={valueChange.idCustomer}
-                      placeholder={
-                        dataLang?.price_quote_customer || "price_quote_customer"
-                      }
-                      isClearable={true}
-                    />
-                  </div>
-                  <div className="z-20 col-span-1">
-                    <DateToDateComponent
-                      value={valueChange.valueDate}
-                      onChange={onChangeFilter("valueDate")}
-                    />
-                  </div>
+            <div className="w-full items-center flex justify-between gap-2">
+              <div className="flex gap-3 items-center w-full">
+                <div className="col-span-1">
+                  <SearchComponent
+                    dataLang={dataLang}
+                    onChange={handleOnChangeKeySearch}
+                  />
+                </div>
+                <div className="z-20 col-span-1">
+                  <DateToDateComponent
+                    value={valueChange.valueDate}
+                    onChange={onChangeFilter("valueDate")}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <SelectComponent
+                    options={[
+                      {
+                        value: "",
+                        label:
+                          dataLang?.price_quote_branch || "price_quote_branch",
+                        isDisabled: true,
+                      },
+                      ...dataBranch,
+                    ]}
+                    onChange={onChangeFilter("idBranch")}
+                    value={valueChange.idBranch}
+                    placeholder={
+                      dataLang?.price_quote_branch || "price_quote_branch"
+                    }
+                    isClearable={true}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <SelectComponent
+                    isLoading={dataCode == [] ? true : false}
+                    options={[
+                      {
+                        value: "",
+                        label:
+                          dataLang?.sales_product_code || "sales_product_code",
+                        isDisabled: true,
+                      },
+                      ...dataCode,
+                    ]}
+                    onChange={onChangeFilter("idQuoteCode")}
+                    onInputChange={(e) => {
+                      handleSearchApiOrders(e);
+                    }}
+                    value={valueChange.idQuoteCode}
+                    placeholder={
+                      dataLang?.sales_product_code || "sales_product_code"
+                    }
+                    isClearable={true}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <SelectComponent
+                    options={[
+                      {
+                        value: "",
+                        label:
+                          dataLang?.price_quote_customer ||
+                          "price_quote_customer",
+                        isDisabled: true,
+                      },
+                      ...dataClient,
+                    ]}
+                    onInputChange={(e) => {
+                      handleSearchApi(e);
+                    }}
+                    onChange={onChangeFilter("idCustomer")}
+                    value={valueChange.idCustomer}
+                    placeholder={
+                      dataLang?.price_quote_customer || "price_quote_customer"
+                    }
+                    isClearable={true}
+                  />
                 </div>
               </div>
               <div className="col-span-1 xl:col-span-2 lg:col-span-2">
@@ -571,51 +584,48 @@ const SalesOrder = (props) => {
                       <span>{dataLang?.client_list_exportexcel}</span>
                     </button>
                   )}
-                  <div>
-                    <DropdowLimit
-                      sLimit={sLimit}
-                      limit={limit}
-                      dataLang={dataLang}
-                    />
-                  </div>
+                  <div></div>
                 </div>
               </div>
             </div>
             <Customscrollbar className="h-full overflow-y-auto ">
               <div className="w-full">
                 <HeaderTable gridCols={13}>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={0.5} textAlign={"center"}>
+                    {dataLang?.stt || "STT"}
+                  </ColumnTable>
+                  <ColumnTable colSpan={1} textAlign={"left"} className={"whitespace-nowrap"}>
                     {dataLang?.sales_product_date || "sales_product_date"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.sales_product_code || "sales_product_code"}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"left"}>
+                  <ColumnTable colSpan={1.5} textAlign={"left"}>
                     {dataLang?.customer || "customer"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  {/* <ColumnTable colSpan={1} textAlign={"center"}>
                     {dataLang?.sales_product_type_order ||
                       "sales_product_type_order"}
-                  </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  </ColumnTable> */}
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.sales_product_total_into_money ||
                       "sales_product_total_into_money"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
                     {dataLang?.sales_product_status || "sales_product_status"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1.5} textAlign={"center"}>
                     {dataLang?.sales_product_statusTT ||
                       "sales_product_statusTT"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.branch || "branch"}
                   </ColumnTable>
-                  <ColumnTable colSpan={3} textAlign={"center"}>
+                  <ColumnTable colSpan={4} textAlign={"center"}>
                     {dataLang?.sales_product_order_process ||
                       "sales_product_order_process"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={0.5} textAlign={"center"} className={"whitespace-nowrap"}>
                     {dataLang?.sales_product_action || "sales_product_action"}
                   </ColumnTable>
                 </HeaderTable>
@@ -625,10 +635,12 @@ const SalesOrder = (props) => {
                 ) : data?.rResult?.length > 0 ? (
                   <>
                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                      {data?.rResult?.map((e) => (
-                        <>
-                          <RowTable gridCols={13} key={e.id.toString()}>
-                            <RowItemTable colSpan={1} textAlign="center">
+                      {data?.rResult?.map((e, index) => (
+                          <RowTable gridCols={13} key={`data-${e.id.toString()}`}>
+                            <RowItemTable colSpan={0.5} textAlign={"center"}>
+                              {index + 1}
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign="left">
                               {e?.date != null
                                 ? formatMoment(
                                     e?.date,
@@ -636,82 +648,40 @@ const SalesOrder = (props) => {
                                   )
                                 : ""}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} textAlign={"center"}>
+                            <RowItemTable colSpan={1} textAlign={"left"}>
                               <PopupDetailProduct
                                 dataLang={dataLang}
-                                className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                                className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-medium col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                                 name={e?.code ? e?.code : ""}
                                 id={e?.id}
                               />
                             </RowItemTable>
-                            <RowItemTable colSpan={2} textAlign="left">
+                            <RowItemTable colSpan={1.5} textAlign="left">
                               {e?.client_name}
                             </RowItemTable>
-                            {/* fix */}
-                            <RowItemTable colSpan={1} textAlign={"center"}>
-                              {e?.quote_code !== null && e?.quote_id !== "0" ? (
-                                <Zoom
-                                  whileHover={{ scale: 1.1 }}
-                                  whileTap={{ scale: 0.9 }}
-                                >
-                                  <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] border font-medium flex justify-center items-center rounded-2xl mx-auto  px-3 py-0 bg-lime-200 border-lime-200 text-lime-500 ">
-                                    <PopupDetailQuote
-                                      dataLang={dataLang}
-                                      className="text-left "
-                                      name={"Phiếu báo giá"}
-                                      id={e?.quote_id}
-                                    />
-                                  </div>
-                                </Zoom>
-                              ) : (
-                                <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] border font-medium flex justify-center items-center rounded-2xl mx-auto w-fit px-3 py-0 bg-red-200 border-red-200 text-red-500">
-                                  Tạo mới
-                                </div>
-                              )}
-                            </RowItemTable>
-                            <RowItemTable colSpan={1} textAlign={"right"}>
-                              {formatNumber(e.total_amount)}
+                            <RowItemTable colSpan={1} textAlign={"left"}>
+                              {formatNumber(e.total_amount)}{" "}
+                              <span className="underline">đ</span>
                             </RowItemTable>
 
                             <RowItemTable colSpan={1} textAlign={"center"}>
-                              <h6 className="flex items-center justify-center text-center cursor-pointer">
-                                {(e?.status === "approved" && (
-                                  <BtnStatusApproved
-                                    onClick={() =>
-                                      handleQueryId({
-                                        id: e?.id,
-                                        status: true,
-                                        idChild: "approved",
-                                      })
-                                    }
-                                    type="1"
-                                  />
-                                )) ||
-                                  (e?.status === "un_approved" && (
-                                    <BtnStatusApproved
-                                      onClick={() =>
-                                        handleQueryId({
-                                          id: e?.id,
-                                          status: true,
-                                          idChild: "un_approved",
-                                        })
-                                      }
-                                      type="0"
-                                    />
-                                  ))}
-                              </h6>
+                              <ButtonWarehouse
+                                warehouseman_id={
+                                  e?.status === "approved" ? "1" : "0"
+                                }
+                                _HandleChangeInput={_HandleChangeInput}
+                                id={e?.id}
+                              />
                             </RowItemTable>
                             <RowItemTable
-                              colSpan={1}
+                              colSpan={1.5}
                               className={"flex items-center justify-center"}
                             >
                               {(["payment_unpaid"].includes(
                                 e?.status_payment
                               ) && (
                                 <TagColorSky
-                                  className={
-                                    "w-full text-xs font-bold text-center xxl:px-1 xxl:py-1 3xl:py-1"
-                                  }
+                                  className={"text-center"}
                                   name={
                                     dataLang[e?.status_payment] ||
                                     e?.status_payment
@@ -740,12 +710,12 @@ const SalesOrder = (props) => {
                                   />
                                 ))}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} className="mx-auto w-fit">
-                              <TagBranch>{e?.branch_name}</TagBranch>
+                            <RowItemTable colSpan={1}>
+                              {e?.branch_name}
                             </RowItemTable>
 
-                            <RowItemTable colSpan={3}>
-                              <div className="flex items-start p-2 ">
+                            <RowItemTable colSpan={4}>
+                              <div className="grid grid-cols-3 items-start py-2 px-12 relative">
                                 {e?.process.map((item, i) => {
                                   const isValue = [
                                     "production_plan",
@@ -753,14 +723,13 @@ const SalesOrder = (props) => {
                                     "import_warehouse",
                                     "delivery",
                                   ].includes(item?.code);
-
                                   const isValueDelivery = ["delivery"].includes(
                                     item?.code
                                   );
 
                                   return (
                                     <div
-                                      className="relative"
+                                      className={`${i === e?.process.length - 1 ? 'absolute top-2 right-12 translate-x-full' : 'relative'}`}
                                       key={`process-${i}`}
                                     >
                                       {![
@@ -792,9 +761,9 @@ const SalesOrder = (props) => {
                                                 item?.active
                                                   ? "text-green-500"
                                                   : "text-slate-500"
-                                              } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                              } block w-full text-center mb-2 responsive-text-sm font-semibold leading-none absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
                                             >
-                                              <div className="flex items-center justify-center w-full gap-1">
+                                              <div className="flex flex-col items-center justify-center w-full gap-1">
                                                 <h6>{dataLang[item?.name]}</h6>
                                                 {isValueDelivery && (
                                                   <h6
@@ -803,7 +772,7 @@ const SalesOrder = (props) => {
                                                       isValueDelivery
                                                         ? "text-green-500"
                                                         : "text-orange-500"
-                                                    } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                    } responsive-text-sm`}
                                                   >{`(${
                                                     dataLang[item?.status] ||
                                                     item?.status
@@ -814,7 +783,7 @@ const SalesOrder = (props) => {
                                           </div>
                                         </>
                                       )}
-                                      <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
+                                      <p className={`${isValueDelivery ? 'mt-[24px]' : 'mt-3'} py-2 text-blue-700 text-center cursor-pointer responsive-text-sm left-0 translate-x-[-40%]  font-semibold`}>
                                         {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
 
                                         {item?.reference &&
@@ -841,26 +810,13 @@ const SalesOrder = (props) => {
                                                 : "Xem thêm"}
                                             </button>
                                           )}
-                                        {/* {isValue && item?.reference && item?.reference.slice(0, isExpanded ? item?.reference?.length : 2).map((ci, index) => (
-                                                                                        <div
-                                                                                            className="flex flex-col"
-                                                                                            key={index}
-                                                                                        >
-                                                                                            {ci?.code}
-                                                                                        </div>
-                                                                                    ))}
-                                                                                    {item?.reference && item?.reference?.length > 2 && (
-                                                                                        <button onClick={toggleShowAll}>
-                                                                                            {isExpanded ? "Rút gọn" : "Xem thêm"}
-                                                                                        </button>
-                                                                                    )} */}
                                       </p>
                                     </div>
                                   );
                                 })}
                               </div>
                             </RowItemTable>
-                            <RowItemTable colSpan={1}>
+                            <RowItemTable colSpan={0.5}>
                               <BtnAction
                                 onRefresh={refetch.bind(this)}
                                 dataLang={dataLang}
@@ -870,7 +826,6 @@ const SalesOrder = (props) => {
                               />
                             </RowItemTable>
                           </RowTable>
-                        </>
                       ))}
                     </div>
                   </>
@@ -882,13 +837,13 @@ const SalesOrder = (props) => {
           </div>
         }
         pagination={
-          <>
+          <div className="flex items-center justify-between gap-2">
             {data?.rResult?.length != 0 && (
               <ContainerPagination>
-                <TitlePagination
+                {/* <TitlePagination
                   dataLang={dataLang}
                   totalItems={data?.output?.iTotalDisplayRecords}
-                />
+                /> */}
                 <Pagination
                   postsPerPage={limit}
                   totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -897,17 +852,25 @@ const SalesOrder = (props) => {
                 />
               </ContainerPagination>
             )}
-          </>
+            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+          </div>
         }
         total={
           <>
-            <ContainerTotal className={"grid-cols-13"}>
-              <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
+            <ContainerTotal className={"grid-cols-26"}>
+              <RowItemTable colSpan={3} textAlign={"end"} className="p-2">
+              </RowItemTable>
+              <RowItemTable colSpan={1} textAlign={"end"} className="p-2">
                 {dataLang?.total_outside || "total_outside"}
-              </ColumnTable>
-              <ColumnTable colSpan={1} textAlign={"right"} className="">
-                {formatNumber(data?.rTotal?.total_amount)}
-              </ColumnTable>
+              </RowItemTable>
+              <RowItemTable
+                colSpan={2}
+                textAlign={"left"}
+                className="whitespace-nowrap"
+              >
+                {formatNumber(data?.rTotal?.total_amount)}{" "}
+                <span className="underline">đ</span>
+              </RowItemTable>
             </ContainerTotal>
           </>
         }
@@ -916,12 +879,11 @@ const SalesOrder = (props) => {
       <PopupConfim
         dataLang={dataLang}
         type="warning"
-        nameModel={"sales_product_status"}
+        nameModel={"sales_product"}
         title={TITLE_STATUS}
         subtitle={CONFIRMATION_OF_CHANGES}
         isOpen={isOpen}
-        status={status}
-        save={toggleStatus}
+        save={() => handleSaveStatus()}
         cancel={() => handleQueryId({ status: false })}
       />
     </React.Fragment>

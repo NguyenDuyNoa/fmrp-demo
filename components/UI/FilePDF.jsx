@@ -25,6 +25,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import React, { useEffect, useState } from "react";
 import { VscFilePdf } from "react-icons/vsc";
 import { _ServerInstance as Axios } from "services/axios";
+import PrinterIcon from "../icons/common/PrinterIcon";
+import PrinterTem from "../icons/common/PrinterTem";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const FilePDF = ({
@@ -7381,38 +7383,44 @@ const FilePDF = ({
             {fullTitle.includes(props?.type) && (
                 <button
                     onClick={() => handlePrintPdf("fullTitle")}
-                    className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full"
+                    className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                 >
-                    <VscFilePdf
-                        size={20}
-                        className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
+                   <PrinterIcon
+                        color="#003DA0"
+                        className="size-5"
                     />
-                    <p className="group-hover:text-[#65a30d]">
+                    {/* <p className="group-hover:text-[#65a30d]">
                         {props?.dataLang?.btn_table_print || "btn_table_print"}
-                    </p>
+                    </p> */}
                 </button>
             )}
 
             {doubleAction.includes(props?.type) && (
                 <React.Fragment>
-                    <div className="flex items-center justify-center my-3">
-                        <button
+                    <ul className="flex flex-col gap-1">
+                        <li
                             onClick={() => handlePrintPdf("noprice")}
-                            className="relative hover:-translate-y-[3px] transition-all ease-linear inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+                            className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                         >
-                            <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-                                {["payment", "receipts"].includes(props.type) ? props.dataLang?.PDF_PrintOnelink || "PDF_PrintOnelink" : props.dataLang?.option_prin_notprice || "option_prin_notprice"}
-                            </span>
-                        </button>
-                        <button
+                            <PrinterTem className="size-5"/>
+                            <p className="whitespace-nowrap">
+                                {["payment", "receipts"].includes(props.type) 
+                                    ? props.dataLang?.PDF_PrintOnelink || "PDF_PrintOnelink" 
+                                    : props.dataLang?.btn_table_print_notprice || "In không giá"}
+                            </p>
+                        </li>
+                        <li
                             onClick={() => handlePrintPdf("fullTitle")}
-                            className="relative hover:-translate-y-[3px] transition-all ease-linear inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
+                            className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                         >
-                            <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-                                {["payment", "receipts"].includes(props.type) ? props.dataLang?.PDF_PrintTwolink || "PDF_PrintTwolink" : props.dataLang?.option_prin_price || "option_prin_price"}
-                            </span>
-                        </button>
-                    </div>
+                            <PrinterTem className="size-5"/>
+                            <p className="whitespace-nowrap">
+                                {["payment", "receipts"].includes(props.type) 
+                                    ? props.dataLang?.PDF_PrintTwolink || "PDF_PrintTwolink" 
+                                    : props.dataLang?.btn_table_print_price || "In có giá"}
+                            </p>
+                        </li>
+                    </ul>
                 </React.Fragment>
             )}
         </>

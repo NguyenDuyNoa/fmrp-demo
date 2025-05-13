@@ -21,6 +21,7 @@ import { IoCopyOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "react-tippy";
 import PopupSuccessfulPayment from "./PopupSuccessfulPayment";
+import { Customscrollbar } from "../common/Customscrollbar";
 
 const deca = Lexend_Deca({
   subsets: ["latin"],
@@ -82,33 +83,33 @@ const PopupUpgradeProfessional = (props) => {
 
   const [selectedPackages, setSelectedPackages] = useState(null);
 
-useEffect(() => {
-  if (
-    packageData?.data?.length &&
-    upgradePackageApiData?.data?.id_package_detail
-  ) {
-    const matchedPackage = packageData.data.find(
-      (pkg) => pkg.id_detail === upgradePackageApiData.data.id_package_detail
-    );
-    if (matchedPackage) {
-      setSelectedPackages({
-        id_package_detail: matchedPackage.id_detail,
-        number_of_users: matchedPackage.default_user || 5,
-        id_service_add: [],
-        selectedServices: [],
-        selectedPackage: {
-          id: matchedPackage.id,
-          id_detail: matchedPackage.id_detail,
-          name: matchedPackage.name,
-          price: matchedPackage.price,
-          fullname: matchedPackage.fullname,
-          month: matchedPackage.month,
-        },
-      });
-      setUserCount(matchedPackage.default_user || 5);
+  useEffect(() => {
+    if (
+      packageData?.data?.length &&
+      upgradePackageApiData?.data?.id_package_detail
+    ) {
+      const matchedPackage = packageData.data.find(
+        (pkg) => pkg.id_detail === upgradePackageApiData.data.id_package_detail
+      );
+      if (matchedPackage) {
+        setSelectedPackages({
+          id_package_detail: matchedPackage.id_detail,
+          number_of_users: matchedPackage.default_user || 5,
+          id_service_add: [],
+          selectedServices: [],
+          selectedPackage: {
+            id: matchedPackage.id,
+            id_detail: matchedPackage.id_detail,
+            name: matchedPackage.name,
+            price: matchedPackage.price,
+            fullname: matchedPackage.fullname,
+            month: matchedPackage.month,
+          },
+        });
+        setUserCount(matchedPackage.default_user || 5);
+      }
     }
-  }
-}, [packageData?.data, upgradePackageApiData?.data?.id_package_detail]);
+  }, [packageData?.data, upgradePackageApiData?.data?.id_package_detail]);
 
   const [bankData, setBankData] = useState({
     accountNumber: "881688",
@@ -154,7 +155,7 @@ useEffect(() => {
           alt="qr-code"
           width={850}
           height={1100}
-          className={`w-[35%] aspect-[850/1100] ${
+          className={`w-[30%] aspect-[850/1100] ${
             isQrUpdating ? "opacity-50" : ""
           }`}
           priority
@@ -220,9 +221,9 @@ useEffect(() => {
         upgradePackageData?.data?.id,
         formData
       );
-      console.log(response)
-      if(response.result === false){
-        showToat('error', response.message)
+      console.log(response);
+      if (response.result === false) {
+        showToat("error", response.message);
       }
       return response;
     },
@@ -373,7 +374,9 @@ useEffect(() => {
   };
 
   return (
-    <div className={`${deca.className} bg-[#F9FAFC] rounded-3xl p-6 2xl:p-9`}>
+    <div
+      className={`${deca.className} bg-[#F9FAFC] rounded-3xl p-5 2xl:p-9 w-full h-fit`}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 w-full">
           <Image src="/icon/Sparkle.png" alt="logo" width={32} height={32} />
@@ -394,354 +397,386 @@ useEffect(() => {
         </button>
       </div>
 
-      <div className="border-t border-[#919EAB3D] mt-2 2xl:mt-3">
-        <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 pt-4 2xl:pt-6 -mr-6 2xl:-mr-9 pr-4 2xl:pr-6 h-[76vh] max-h-[76vh] 2xl:h-[72vh] 2xl:max-h-[72vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-          <div className="flex flex-col gap-3 2xl:gap-9 lg:w-[505px]">
-            <h3 className="text-xl font-semibold text-typo-black-4">
-              Thông tin chuyển khoản
-            </h3>
-            <div className="flex items-center justify-center">
-              {renderQRCode()}
-            </div>
-            <div className="flex flex-col gap-2 2xl:gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-[10px] rounded-[10px] bg-white border border-[#919EAB33]">
-                  <Image
-                    src={upgradePackageData?.dataQR?.bank?.logo_bank}
-                    alt="logo"
-                    width={29}
-                    height={29}
-                    priority
-                  />
-                </div>
-                <div className="flex flex-col gap-1 2xl:gap-2">
-                  <h3 className="text-lg font-semibold text-typo-black-4">
-                    {upgradePackageData?.dataQR?.bank?.account_bank}
-                  </h3>
-                  <p className="text-sm text-typo-gray-4">
-                    {upgradePackageData?.dataQR?.bank?.account_name_long}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1 2xl:gap-2">
-                <h3 className="text-sm font-normal text-typo-gray-4">
-                  Số tài khoản
-                </h3>
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-lg font-semibold text-typo-black-4">
-                    {upgradePackageData?.dataQR?.bank?.account_number}
-                  </p>
-                  <Tooltip
-                    title={tooltipTexts.accountNumber}
-                    arrow
-                    theme="dark"
-                    className="cursor-pointer"
-                  >
-                    <IoCopyOutline
-                      className="size-5 text-[#637381]"
-                      onClick={() =>
-                        handleCopyText(bankData.accountNumber, "accountNumber")
-                      }
-                    />
-                  </Tooltip>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1 2xl:gap-2">
-                <h3 className="text-sm font-normal text-typo-gray-4">
-                  Tên chủ tài khoản
-                </h3>
-                <div className="flex items-center justify-between gap-2">
-                  <p className="uppercase text-lg font-semibold text-typo-black-4">
-                    {upgradePackageData?.dataQR?.bank?.account_name}
-                  </p>
-                  <Tooltip
-                    title={tooltipTexts.accountName}
-                    arrow
-                    theme="dark"
-                    className="cursor-pointer"
-                  >
-                    <IoCopyOutline
-                      className="size-5 text-[#637381]"
-                      onClick={() =>
-                        handleCopyText(bankData.accountName, "accountName")
-                      }
-                    />
-                  </Tooltip>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1 2xl:gap-2">
-                <h3 className="text-sm font-normal text-typo-gray-4">
-                  Nội dung chuyển khoản
-                </h3>
-                <div className="flex items-center justify-between gap-2">
-                  <p className="uppercase text-lg font-semibold text-typo-black-4">
-                    {upgradePackageData?.dataQR?.bank?.note}
-                  </p>
-                  <Tooltip
-                    title={tooltipTexts.transferContent}
-                    arrow
-                    theme="dark"
-                    className="cursor-pointer"
-                  >
-                    <IoCopyOutline
-                      className="size-5 text-[#637381]"
-                      onClick={() =>
-                        handleCopyText(
-                          bankData.transferContent,
-                          "transferContent"
-                        )
-                      }
-                    />
-                  </Tooltip>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <div className="flex gap-2">
-                <Image
-                  src="/icon/Info.png"
-                  alt="qr-code"
-                  width={20}
-                  height={20}
-                  className="size-5"
-                />
-                <p className="text-base font-normal text-typo-gray-4">
-                  Vui lòng quét mã QR thanh toán trên bằng ứng dụng ngân hàng để
-                  thực hiện việc nâng cấp gói.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3 2xl:gap-9 lg:w-[505px] h-full flex-1 flex-shrink-0">
-            <div
-              className="pr-2 2xl:pr-2.5 flex flex-col gap-3 2xl:gap-9 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
-              style={{ maxHeight: "calc(76vh - 70px)" }}
-            >
-              <div className="flex flex-col gap-2 2xl:gap-3">
+      <div className="border-t border-[#919EAB3D] mt-2 2xl:mt-3 w-full">
+        <div className="w-full flex flex-col lg:flex-row gap-10 xl:gap-16 pt-3 2xl:pt-6 -mr-6 2xl:-mr-9 pr-4 2xl:pr-6 h-fit max-h-[76vh]">
+          <div className="lg:w-[505px] flex-1">
+            <Customscrollbar className="h-full overflow-y-auto">
+              <div className="flex flex-col gap-2.5 2xl:gap-9 ">
                 <h3 className="text-xl font-semibold text-typo-black-4">
-                  Gói thành viên
+                  Thông tin chuyển khoản
                 </h3>
-                {isLoadingPackage ? (
-                  <Skeleton className="h-20 w-full rounded-2xl" />
-                ) : (
-                  packageData?.data?.map((pkg, index) => (
-                    <div
-                      key={`package-${pkg.id}-${index}`}
-                      className="py-3 2xl:py-5 px-6 bg-white border border-[#919EAB3D] rounded-2xl flex gap-4 cursor-pointer hover:bg-[#F4F6F8] transition-colors"
-                      onClick={() => {
-                        // Bắt buộc phải có một gói được chọn, không thể bỏ chọn
-                        setSelectedPackages((prev) => ({
-                          ...prev,
-                          id_package_detail: pkg.id_detail,
-                          selectedPackage: {
-                            id: pkg.id,
-                            id_detail: pkg.id_detail,
-                            name: pkg.name,
-                            price: pkg.price,
-                            fullname: pkg.fullname,
-                            month: pkg.month,
-                          },
-                        }));
-                      }}
-                    >
+                <div className="flex items-center justify-center">
+                  {renderQRCode()}
+                </div>
+                <div className="flex flex-col gap-2 2xl:gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-[10px] rounded-[10px] bg-white border border-[#919EAB33]">
+                      <Image
+                        src={upgradePackageData?.dataQR?.bank?.logo_bank}
+                        alt="logo"
+                        width={29}
+                        height={29}
+                        priority
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1 2xl:gap-2">
+                      <h3 className="text-lg font-semibold text-typo-black-4">
+                        {upgradePackageData?.dataQR?.bank?.account_bank}
+                      </h3>
+                      <p className="text-sm text-typo-gray-4">
+                        {upgradePackageData?.dataQR?.bank?.account_name_long}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1 2xl:gap-2">
+                    <h3 className="text-sm font-normal text-typo-gray-4">
+                      Số tài khoản
+                    </h3>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-lg font-semibold text-typo-black-4">
+                        {upgradePackageData?.dataQR?.bank?.account_number}
+                      </p>
+                      <Tooltip
+                        title={tooltipTexts.accountNumber}
+                        arrow
+                        theme="dark"
+                        className="cursor-pointer"
+                      >
+                        <IoCopyOutline
+                          className="size-5 text-[#637381]"
+                          onClick={() =>
+                            handleCopyText(
+                              bankData.accountNumber,
+                              "accountNumber"
+                            )
+                          }
+                        />
+                      </Tooltip>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1 2xl:gap-2">
+                    <h3 className="text-sm font-normal text-typo-gray-4">
+                      Tên chủ tài khoản
+                    </h3>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="uppercase text-lg font-semibold text-typo-black-4">
+                        {upgradePackageData?.dataQR?.bank?.account_name}
+                      </p>
+                      <Tooltip
+                        title={tooltipTexts.accountName}
+                        arrow
+                        theme="dark"
+                        className="cursor-pointer"
+                      >
+                        <IoCopyOutline
+                          className="size-5 text-[#637381]"
+                          onClick={() =>
+                            handleCopyText(bankData.accountName, "accountName")
+                          }
+                        />
+                      </Tooltip>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1 2xl:gap-2">
+                    <h3 className="text-sm font-normal text-typo-gray-4">
+                      Nội dung chuyển khoản
+                    </h3>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="uppercase text-lg font-semibold text-typo-black-4">
+                        {upgradePackageData?.dataQR?.bank?.note}
+                      </p>
+                      <Tooltip
+                        title={tooltipTexts.transferContent}
+                        arrow
+                        theme="dark"
+                        className="cursor-pointer"
+                      >
+                        <IoCopyOutline
+                          className="size-5 text-[#637381]"
+                          onClick={() =>
+                            handleCopyText(
+                              bankData.transferContent,
+                              "transferContent"
+                            )
+                          }
+                        />
+                      </Tooltip>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
+                    <Image
+                      src="/icon/Info.png"
+                      alt="qr-code"
+                      width={20}
+                      height={20}
+                      className="size-5"
+                    />
+                    <p className="text-base font-normal text-typo-gray-4">
+                      Vui lòng quét mã QR thanh toán trên bằng ứng dụng ngân
+                      hàng để thực hiện việc nâng cấp gói.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Customscrollbar>
+          </div>
+          <div className="flex flex-col gap-3 2xl:gap-9 lg:w-[505px] flex-1">
+            <Customscrollbar className="pr-2 2xl:pr-2.5 flex flex-col gap-3 2xl:gap-9">
+              <div className="flex flex-col gap-3 2xl:gap-9">
+                <div className="flex flex-col gap-2 2xl:gap-3">
+                  <h3 className="text-xl font-semibold text-typo-black-4">
+                    Gói thành viên
+                  </h3>
+                  {isLoadingPackage ? (
+                    <Skeleton className="h-20 w-full rounded-2xl" />
+                  ) : (
+                    packageData?.data?.map((pkg, index) => (
                       <div
-                        className="checkbox-wrapper flex items-center justify-center"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        key={`package-${pkg.id}-${index}`}
+                        className="py-3 2xl:py-5 px-6 bg-white border border-[#919EAB3D] rounded-2xl flex gap-4 cursor-pointer hover:bg-[#F4F6F8] transition-colors"
+                        onClick={() => {
+                          // Bắt buộc phải có một gói được chọn, không thể bỏ chọn
+                          setSelectedPackages((prev) => ({
+                            ...prev,
+                            id_package_detail: pkg.id_detail,
+                            selectedPackage: {
+                              id: pkg.id,
+                              id_detail: pkg.id_detail,
+                              name: pkg.name,
+                              price: pkg.price,
+                              fullname: pkg.fullname,
+                              month: pkg.month,
+                            },
+                          }));
                         }}
                       >
-                        <CheckboxDefault
-                          checked={
-                            selectedPackages?.id_package_detail === pkg.id_detail
-                          }
-                          onChange={() => {
-                            // Luôn chọn gói được click, không thể bỏ chọn
-                            setSelectedPackages((prev) => ({
-                              ...prev,
-                              id_package_detail: pkg.id_detail,
-                              selectedPackage: {
-                                id: pkg.id,
-                                id_detail: pkg.id_detail,
-                                name: pkg.name,
-                                price: pkg.price,
-                                fullname: pkg.fullname,
-                                month: pkg.month,
-                              },
-                            }));
+                        <div
+                          className="checkbox-wrapper flex items-center justify-center"
+                          onClick={(e) => {
+                            e.stopPropagation();
                           }}
-                        />
+                        >
+                          <CheckboxDefault
+                            checked={
+                              selectedPackages?.id_package_detail ===
+                              pkg.id_detail
+                            }
+                            onChange={() => {
+                              // Luôn chọn gói được click, không thể bỏ chọn
+                              setSelectedPackages((prev) => ({
+                                ...prev,
+                                id_package_detail: pkg.id_detail,
+                                selectedPackage: {
+                                  id: pkg.id,
+                                  id_detail: pkg.id_detail,
+                                  name: pkg.name,
+                                  price: pkg.price,
+                                  fullname: pkg.fullname,
+                                  month: pkg.month,
+                                },
+                              }));
+                            }}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1 cursor-pointer w-full">
+                          <h4 className="text-xl font-bold text-typo-black-4">
+                            {pkg.fullname}
+                          </h4>
+                          <p className="text-base font-normal text-typo-gray-4">
+                            {pkg.full_note_price}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1 cursor-pointer w-full">
-                        <h4 className="text-xl font-bold text-typo-black-4">
-                          {pkg.fullname}
-                        </h4>
-                        <p className="text-base font-normal text-typo-gray-4">
-                          {pkg.full_note_price}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                )}
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-normal text-typo-gray-4">
-                    Số user
-                  </span>
-                  <InputNumberCustom
-                    classNameButton="rounded-full bg-[#EBF5FF] hover:bg-[#C7DFFB] cursor-pointer"
-                    className="p-[4px]"
-                    state={userCount}
-                    setState={(value) => {
-                      console.log("Đã thay đổi số user:", value);
-                      setUserCount(value);
-                    }}
-                    min={packageData?.data?.[0]?.default_user || 5}
-                  />
+                    ))
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-normal text-typo-gray-4">
+                      Số user
+                    </span>
+                    <InputNumberCustom
+                      classNameButton="rounded-full bg-[#EBF5FF] hover:bg-[#C7DFFB] cursor-pointer"
+                      className="p-[4px]"
+                      state={userCount}
+                      setState={(value) => {
+                        console.log("Đã thay đổi số user:", value);
+                        setUserCount(value);
+                      }}
+                      min={packageData?.data?.[0]?.default_user || 5}
+                    />
+                  </div>
                 </div>
-              </div>
+                <div className="flex flex-col gap-2 2xl:gap-3">
+                  <hr className="border-[#919EAB3D] mb-3" />
+                  <h3 className="text-xl font-semibold text-typo-black-4">
+                    Dịch vụ Add-on
+                  </h3>
+                  {isLoadingServiceAdd ? (
+                    <>
+                      <Skeleton className="h-20 w-full rounded-2xl" />
+                      <Skeleton className="h-20 w-full rounded-2xl" />
+                      <Skeleton className="h-20 w-full rounded-2xl" />
+                    </>
+                  ) : (
+                    serviceAddData?.data?.map((service, index) => (
+                      <div
+                        key={`service-${service.id}-${index}`}
+                        className="py-3 2xl:py-5 px-6 bg-white border border-[#919EAB3D] rounded-2xl flex gap-4 cursor-pointer hover:bg-[#F4F6F8] transition-colors"
+                        onClick={(e) => {
+                          // Ngăn sự kiện click lan truyền nếu click vào checkbox
+                          if (e.target.closest(".checkbox-wrapper")) {
+                            return;
+                          }
+                          if (service.type === "radio") {
+                            // Với service loại radio, cập nhật id_service_add
+                            const newId =
+                              selectedPackages?.selectedServiceId === service.id
+                                ? null
+                                : service.id;
+                            setSelectedPackages((prev) => {
+                              // Xóa service radio cũ khỏi id_service_add (nếu có)
+                              const filteredServiceAdd = prev.selectedServiceId
+                                ? prev.id_service_add.filter(
+                                    (id) => id !== prev.selectedServiceId
+                                  )
+                                : [...prev.id_service_add];
 
-              <div className="flex flex-col gap-2 2xl:gap-3">
-                <hr className="border-[#919EAB3D] mb-3" />
-                <h3 className="text-xl font-semibold text-typo-black-4">
-                  Dịch vụ Add-on
-                </h3>
-                {isLoadingServiceAdd ? (
-                  <>
-                    <Skeleton className="h-20 w-full rounded-2xl" />
-                    <Skeleton className="h-20 w-full rounded-2xl" />
-                    <Skeleton className="h-20 w-full rounded-2xl" />
-                  </>
-                ) : (
-                  serviceAddData?.data?.map((service, index) => (
-                    <div
-                      key={`service-${service.id}-${index}`}
-                      className="py-3 2xl:py-5 px-6 bg-white border border-[#919EAB3D] rounded-2xl flex gap-4 cursor-pointer hover:bg-[#F4F6F8] transition-colors"
-                      onClick={(e) => {
-                        // Ngăn sự kiện click lan truyền nếu click vào checkbox
-                        if (e.target.closest(".checkbox-wrapper")) {
-                          return;
-                        }
-                        if (service.type === "radio") {
-                          // Với service loại radio, cập nhật id_service_add
-                          const newId =
-                            selectedPackages?.selectedServiceId === service.id
-                              ? null
-                              : service.id;
-                          setSelectedPackages((prev) => {
-                            // Xóa service radio cũ khỏi id_service_add (nếu có)
-                            const filteredServiceAdd = prev.selectedServiceId
-                              ? prev.id_service_add.filter(
-                                  (id) => id !== prev.selectedServiceId
-                                )
-                              : [...prev.id_service_add];
+                              // Thêm service radio mới vào id_service_add (nếu có chọn)
+                              const newServiceAdd = newId
+                                ? [...filteredServiceAdd, newId]
+                                : filteredServiceAdd;
 
-                            // Thêm service radio mới vào id_service_add (nếu có chọn)
-                            const newServiceAdd = newId
-                              ? [...filteredServiceAdd, newId]
-                              : filteredServiceAdd;
-
-                            return {
-                              ...prev,
-                              selectedServiceId: newId,
-                              id_service_add: newServiceAdd,
-                              // Thêm thông tin tên và giá của service được chọn
-                              selectedServices: newId
-                                ? [
-                                    ...(prev.selectedServices || []).filter(
+                              return {
+                                ...prev,
+                                selectedServiceId: newId,
+                                id_service_add: newServiceAdd,
+                                // Thêm thông tin tên và giá của service được chọn
+                                selectedServices: newId
+                                  ? [
+                                      ...(prev.selectedServices || []).filter(
+                                        (item) =>
+                                          item.id !== prev.selectedServiceId
+                                      ),
+                                      {
+                                        id: newId,
+                                        name: service.name,
+                                        price: service.price,
+                                      },
+                                    ]
+                                  : (prev.selectedServices || []).filter(
                                       (item) =>
                                         item.id !== prev.selectedServiceId
                                     ),
-                                    {
-                                      id: newId,
-                                      name: service.name,
-                                      price: service.price,
-                                    },
-                                  ]
-                                : (prev.selectedServices || []).filter(
-                                    (item) => item.id !== prev.selectedServiceId
-                                  ),
-                            };
-                          });
-                        } else {
-                          // Với service loại checkbox, cập nhật id_service_add
-                          const isSelected =
-                            selectedPackages?.id_service_add?.includes(
-                              service.id
-                            );
-                          setSelectedPackages((prev) => {
-                            const newServiceAdd = isSelected
-                              ? prev.id_service_add.filter(
-                                  (id) => id !== service.id
-                                )
-                              : [...prev.id_service_add, service.id];
-
-                            return {
-                              ...prev,
-                              id_service_add: newServiceAdd,
-                              // Thêm thông tin tên và giá của service được chọn
-                              selectedServices: isSelected
-                                ? (prev.selectedServices || []).filter(
-                                    (item) => item.id !== service.id
+                              };
+                            });
+                          } else {
+                            // Với service loại checkbox, cập nhật id_service_add
+                            const isSelected =
+                              selectedPackages?.id_service_add?.includes(
+                                service.id
+                              );
+                            setSelectedPackages((prev) => {
+                              const newServiceAdd = isSelected
+                                ? prev.id_service_add.filter(
+                                    (id) => id !== service.id
                                   )
-                                : [
-                                    ...(prev.selectedServices || []),
-                                    {
-                                      id: service.id,
-                                      name: service.name,
-                                      price: service.price,
-                                    },
-                                  ],
-                            };
-                          });
-                        }
-                      }}
-                    >
-                      <div
-                        className="checkbox-wrapper flex items-center justify-center"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                                : [...prev.id_service_add, service.id];
+
+                              return {
+                                ...prev,
+                                id_service_add: newServiceAdd,
+                                // Thêm thông tin tên và giá của service được chọn
+                                selectedServices: isSelected
+                                  ? (prev.selectedServices || []).filter(
+                                      (item) => item.id !== service.id
+                                    )
+                                  : [
+                                      ...(prev.selectedServices || []),
+                                      {
+                                        id: service.id,
+                                        name: service.name,
+                                        price: service.price,
+                                      },
+                                    ],
+                              };
+                            });
+                          }
                         }}
                       >
-                        <CheckboxDefault
-                          checked={
-                            service.type === "radio"
-                              ? selectedPackages?.selectedServiceId ===
-                                service.id
-                              : selectedPackages?.id_service_add?.includes(
+                        <div
+                          className="checkbox-wrapper flex items-center justify-center"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          <CheckboxDefault
+                            checked={
+                              service.type === "radio"
+                                ? selectedPackages?.selectedServiceId ===
                                   service.id
-                                )
-                          }
-                          onChange={(checked) => {
-                            if (service.type === "radio") {
-                              // Với service loại radio, cập nhật id_service_add và selectedServiceId
-                              setSelectedPackages((prev) => {
-                                // Xóa service radio cũ khỏi id_service_add (nếu có)
-                                const filteredServiceAdd =
-                                  prev.selectedServiceId
-                                    ? prev.id_service_add.filter(
-                                        (id) => id !== prev.selectedServiceId
-                                      )
-                                    : [...prev.id_service_add];
+                                : selectedPackages?.id_service_add?.includes(
+                                    service.id
+                                  )
+                            }
+                            onChange={(checked) => {
+                              if (service.type === "radio") {
+                                // Với service loại radio, cập nhật id_service_add và selectedServiceId
+                                setSelectedPackages((prev) => {
+                                  // Xóa service radio cũ khỏi id_service_add (nếu có)
+                                  const filteredServiceAdd =
+                                    prev.selectedServiceId
+                                      ? prev.id_service_add.filter(
+                                          (id) => id !== prev.selectedServiceId
+                                        )
+                                      : [...prev.id_service_add];
 
-                                // Thêm service radio mới vào id_service_add (nếu có chọn)
-                                const newServiceAdd = checked
-                                  ? [...filteredServiceAdd, service.id]
-                                  : filteredServiceAdd;
+                                  // Thêm service radio mới vào id_service_add (nếu có chọn)
+                                  const newServiceAdd = checked
+                                    ? [...filteredServiceAdd, service.id]
+                                    : filteredServiceAdd;
 
-                                return {
-                                  ...prev,
-                                  selectedServiceId: checked
-                                    ? service.id
-                                    : null,
-                                  id_service_add: newServiceAdd,
-                                  // Thêm thông tin tên và giá của service được chọn
-                                  selectedServices: checked
-                                    ? [
-                                        ...(prev.selectedServices || []).filter(
+                                  return {
+                                    ...prev,
+                                    selectedServiceId: checked
+                                      ? service.id
+                                      : null,
+                                    id_service_add: newServiceAdd,
+                                    // Thêm thông tin tên và giá của service được chọn
+                                    selectedServices: checked
+                                      ? [
+                                          ...(
+                                            prev.selectedServices || []
+                                          ).filter(
+                                            (item) =>
+                                              item.id !== prev.selectedServiceId
+                                          ),
+                                          {
+                                            id: service.id,
+                                            name: service.name,
+                                            price: service.price,
+                                          },
+                                        ]
+                                      : (prev.selectedServices || []).filter(
                                           (item) =>
                                             item.id !== prev.selectedServiceId
                                         ),
+                                  };
+                                });
+                              } else {
+                                // Với service loại checkbox, cập nhật id_service_add
+                                setSelectedPackages((prev) => ({
+                                  ...prev,
+                                  id_service_add: checked
+                                    ? [...prev.id_service_add, service.id]
+                                    : prev.id_service_add.filter(
+                                        (id) => id !== service.id
+                                      ),
+                                  // Thêm thông tin tên và giá của service được chọn
+                                  selectedServices: checked
+                                    ? [
+                                        ...(prev.selectedServices || []),
                                         {
                                           id: service.id,
                                           name: service.name,
@@ -749,60 +784,36 @@ useEffect(() => {
                                         },
                                       ]
                                     : (prev.selectedServices || []).filter(
-                                        (item) =>
-                                          item.id !== prev.selectedServiceId
+                                        (item) => item.id !== service.id
                                       ),
-                                };
-                              });
-                            } else {
-                              // Với service loại checkbox, cập nhật id_service_add
-                              setSelectedPackages((prev) => ({
-                                ...prev,
-                                id_service_add: checked
-                                  ? [...prev.id_service_add, service.id]
-                                  : prev.id_service_add.filter(
-                                      (id) => id !== service.id
-                                    ),
-                                // Thêm thông tin tên và giá của service được chọn
-                                selectedServices: checked
-                                  ? [
-                                      ...(prev.selectedServices || []),
-                                      {
-                                        id: service.id,
-                                        name: service.name,
-                                        price: service.price,
-                                      },
-                                    ]
-                                  : (prev.selectedServices || []).filter(
-                                      (item) => item.id !== service.id
-                                    ),
-                              }));
-                            }
-                          }}
-                        />
+                                }));
+                              }
+                            }}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1 cursor-pointer w-full">
+                          <h4 className="text-xl font-bold text-typo-black-4 truncate">
+                            {service.name}
+                          </h4>
+                          <p className="text-base font-normal text-typo-gray-4 truncate">
+                            {service.full_note_price}
+                          </p>
+                        </div>
+                        {service.img && (
+                          <Image
+                            src={service.img}
+                            alt={service.name}
+                            width={58}
+                            height={58}
+                            className="size-[58px] object-cover"
+                          />
+                        )}
                       </div>
-                      <div className="flex flex-col gap-1 cursor-pointer w-full">
-                        <h4 className="text-xl font-bold text-typo-black-4 truncate">
-                          {service.name}
-                        </h4>
-                        <p className="text-base font-normal text-typo-gray-4 truncate">
-                          {service.full_note_price}
-                        </p>
-                      </div>
-                      {service.img && (
-                        <Image
-                          src={service.img}
-                          alt={service.name}
-                          width={58}
-                          height={58}
-                          className="size-[58px] object-cover"
-                        />
-                      )}
-                    </div>
-                  ))
-                )}
+                    ))
+                  )}
+                </div>
               </div>
-            </div>
+            </Customscrollbar>
 
             <div className="pr-2 2xl:pr-2.5 flex flex-col gap-2 2xl:gap-6 bg-[#F9FAFC]">
               <hr className="border-[#919EAB3D]" />

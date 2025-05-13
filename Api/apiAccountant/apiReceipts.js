@@ -14,5 +14,14 @@ const apiReceipts = {
         const response = await axiosCustom('POST', id ? `/api_web/Api_expense_payslips/expenseCoupon/${id}?csrf_protection=true` : "/api_web/Api_expense_payslips/expenseCoupon/?csrf_protection=true", data);
         return response.data
     },
+    async apiPrintReceipts(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_print/Print_ReceiptsWeb?csrf_protection=true`, data)
+        return response.data
+    },  
+
+    async apiPrintPayments(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_print/Print_PaymentsWeb?csrf_protection=true`, data)
+        return response.data
+    },
 }
 export default apiReceipts

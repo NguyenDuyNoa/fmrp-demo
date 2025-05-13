@@ -262,7 +262,7 @@ const Supplier = (props) => {
                   onRefreshGroup={refetchGroup.bind(this)}
                   dataLang={dataLang}
                   nameModel={"suppliers"}
-                  className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                 />
               ) : (
                 <button
@@ -270,7 +270,7 @@ const Supplier = (props) => {
                   onClick={() => {
                     isShow("error", WARNING_STATUS_ROLE);
                   }}
-                  className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                  className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                 >
                   {dataLang?.branch_popup_create_new}
                 </button>
@@ -301,73 +301,62 @@ const Supplier = (props) => {
         }
         table={
           <div className="flex flex-col h-full">
-            <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-              <div className="col-span-4">
-                <div className="grid grid-cols-9 gap-2">
-                  <SearchComponent
-                    dataLang={dataLang}
-                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                    colSpan={2}
-                  />
-                  <SelectComponent
-                    options={[
-                      {
-                        value: "",
-                        label:
-                          dataLang?.price_quote_branch || "price_quote_branch",
-                        isDisabled: true,
-                      },
-                      ...listBr,
-                    ]}
-                    onChange={(e) => queryState({ idBranch: e })}
-                    value={isState.idBranch}
-                    placeholder={
-                      dataLang?.price_quote_branch || "price_quote_branch"
-                    }
-                    colSpan={3}
-                    components={{ MultiValue }}
-                    isMulti={true}
-                    closeMenuOnSelect={false}
-                  />
-                </div>
+            <div className="w-full items-center flex justify-between gap-2">
+              <div className="flex gap-3 items-center w-full">
+                <SearchComponent
+                  dataLang={dataLang}
+                  onChange={_HandleOnChangeKeySearch.bind(this)}
+                  colSpan={2}
+                />
+                <SelectComponent
+                  options={[
+                    {
+                      value: "",
+                      label:
+                        dataLang?.price_quote_branch || "price_quote_branch",
+                      isDisabled: true,
+                    },
+                    ...listBr,
+                  ]}
+                  onChange={(e) => queryState({ idBranch: e })}
+                  value={isState.idBranch}
+                  placeholder={
+                    dataLang?.price_quote_branch || "price_quote_branch"
+                  }
+                  colSpan={3}
+                  components={{ MultiValue }}
+                  isMulti={true}
+                  closeMenuOnSelect={false}
+                />
               </div>
-              <div className="col-span-2">
-                <div className="flex items-center justify-end space-x-2">
-                  <OnResetData
-                    onClick={refetch.bind(this)}
-                    sOnFetching={(e) => { }}
-                  />
-                  {role == true || checkExport ? (
-                    <div className={``}>
-                      {data?.rResult?.length > 0 && (
-                        <ExcelFileComponent
-                          multiDataSet={multiDataSet}
-                          filename="Danh sách nhà cung cấp"
-                          title="Dsncc"
-                          dataLang={dataLang}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                      className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                    >
-                      <Grid6
-                        className="scale-75 2xl:scale-100 xl:scale-100"
-                        size={18}
+              <div className="flex items-center justify-end space-x-2">
+                <OnResetData
+                  onClick={refetch.bind(this)}
+                  sOnFetching={(e) => { }}
+                />
+                {role == true || checkExport ? (
+                  <div className={``}>
+                    {data?.rResult?.length > 0 && (
+                      <ExcelFileComponent
+                        multiDataSet={multiDataSet}
+                        filename="Danh sách nhà cung cấp"
+                        title="Dsncc"
+                        dataLang={dataLang}
                       />
-                      <span>{dataLang?.client_list_exportexcel}</span>
-                    </button>
-                  )}
-                  <div>
-                    <DropdowLimit
-                      sLimit={sLimit}
-                      limit={limit}
-                      dataLang={dataLang}
-                    />
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                  >
+                    <Grid6
+                      className="scale-75 2xl:scale-100 xl:scale-100"
+                      size={18}
+                    />
+                    <span>{dataLang?.client_list_exportexcel}</span>
+                  </button>
+                )}
               </div>
             </div>
             <Customscrollbar className="h-full overflow-y-auto ">
@@ -377,7 +366,7 @@ const Supplier = (props) => {
                     {dataLang?.suppliers_supplier_code ||
                       "suppliers_supplier_code"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.suppliers_supplier_name ||
                       "suppliers_supplier_name"}
                   </ColumnTable>
@@ -389,7 +378,7 @@ const Supplier = (props) => {
                     {dataLang?.suppliers_supplier_phone ||
                       "suppliers_supplier_phone"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.suppliers_supplier_adress ||
                       "suppliers_supplier_adress"}
                   </ColumnTable>
@@ -397,7 +386,7 @@ const Supplier = (props) => {
                     {dataLang?.suppliers_supplier_group ||
                       "suppliers_supplier_group"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={1} textAlign={"left"}>
                     {dataLang?.client_list_brand || "client_list_brand"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -413,17 +402,24 @@ const Supplier = (props) => {
                       {data?.rResult?.map((e) => (
                         <RowTable gridCols={8} key={e.id.toString()}>
                           <RowItemTable colSpan={1} textAlign={"center"}>
-                            {e.code}
-                          </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={"left"}>
+                            {/* {e.code} */}
                             <Popup_chitiet
                               dataLang={dataLang}
                               className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5 col-span-1   rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear"
-                              name={e.name}
+                              name={e.code}
                               id={e?.id}
                             />
                           </RowItemTable>
                           <RowItemTable colSpan={1} textAlign={"left"}>
+                            {/* <Popup_chitiet
+                              dataLang={dataLang}
+                              className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5 col-span-1   rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear"
+                              name={e.name}
+                              id={e?.id}
+                            /> */}
+                            {e.name}
+                          </RowItemTable>
+                          <RowItemTable colSpan={1} textAlign={"center"}>
                             {e.tax_code}
                           </RowItemTable>
                           <RowItemTable colSpan={1} textAlign={"center"}>
@@ -434,14 +430,14 @@ const Supplier = (props) => {
                           </RowItemTable>
                           <RowItemTable
                             colSpan={1}
-                            className="flex flex-wrap justify-start "
+                            className="flex flex-wrap justify-start gap-x-1"
                           >
                             {e.supplier_group?.map((h) => {
                               return (
                                 <span
                                   key={h.id}
                                   style={{ backgroundColor: "#e2f0fe" }}
-                                  className={`text-[#0F4F9E]  font-[500] mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px]  px-2 rounded-full py-0.5`}
+                                  className={`text-[#0F4F9E] font-normal responsive-text-sm rounded-md py-0.5 px-1.5 2xl:py-1 2xl:px-2 w-fit`}
                                 >
                                   {h.name}
                                 </span>
@@ -450,10 +446,16 @@ const Supplier = (props) => {
                           </RowItemTable>
                           <RowItemTable
                             colSpan={1}
-                            className="flex flex-wrap items-center gap-1"
+                            className="items-center justify-start gap-1"
                           >
                             {e.branch?.map((i) => (
-                              <TagBranch key={i}>{i.name}</TagBranch>
+                              <span
+                                className="flex flex-wrap items-center justify-start gap-2"
+                                key={i}
+                              >
+                                {/* <TagBranch key={i}>{i.name}</TagBranch> */}
+                                {i.name}
+                              </span>
                             ))}
                           </RowItemTable>
                           <RowItemTable
@@ -513,13 +515,13 @@ const Supplier = (props) => {
           </div>
         }
         pagination={
-          <>
+          <div className="flex items-center justify-between gap-2">
             {data?.rResult?.length != 0 && (
               <ContainerPagination>
-                <TitlePagination
+                {/* <TitlePagination
                   dataLang={dataLang}
                   totalItems={data?.output?.iTotalDisplayRecords}
-                />
+                /> */}
                 <Pagination
                   postsPerPage={limit}
                   totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -528,7 +530,8 @@ const Supplier = (props) => {
                 />
               </ContainerPagination>
             )}
-          </>
+            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+          </div>
         }
       />
     </React.Fragment>

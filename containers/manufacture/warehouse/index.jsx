@@ -373,7 +373,7 @@ const Warehouse = (props) => {
                                     onRefresh={refetch.bind(this)}
                                     onRefreshGroup={refetchWarehouseDetail.bind(this)}
                                     dataLang={dataLang}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                                 />
                             ) : (
                                 <button
@@ -381,7 +381,7 @@ const Warehouse = (props) => {
                                     onClick={() => {
                                         isShow("error", WARNING_STATUS_ROLE);
                                     }}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                                 >
                                     {dataLang?.branch_popup_create_new}
                                 </button>
@@ -391,9 +391,9 @@ const Warehouse = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full ">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                <div className="grid grid-cols-5 gap-2">
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
+                                {/* <div className="grid grid-cols-5 gap-2"> */}
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
@@ -494,7 +494,7 @@ const Warehouse = (props) => {
                                         components={{ MultiValue }}
                                         colSpan={1}
                                     />
-                                </div>
+                                {/* </div> */}
                             </div>
                             <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex items-center justify-end gap-2 space-x-2">
@@ -528,15 +528,6 @@ const Warehouse = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit
-                                            sLimit={(e) => {
-                                                queryKeyIsState({ limitItemWarehouseDetail: e });
-                                            }}
-                                            limit={isState.limitItemWarehouseDetail}
-                                            dataLang={dataLang}
-                                        />
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -547,7 +538,7 @@ const Warehouse = (props) => {
                                         <PopupParent
                                             key={item.id}
                                             trigger={
-                                                <div className="relative grid grid-cols-12">
+                                                <div className="relative grid grid-cols-12 mt-1">
                                                     <li
                                                         className={` col-span-12 ${isState.idWarehouse === item.id
                                                             ? "bg-[#3276FA] text-white"
@@ -585,14 +576,15 @@ const Warehouse = (props) => {
                                             }
                                             closeOnDocumentClick={false}
                                             position="right top"
-                                            // keepTooltipInside
-                                            on={["click"]}
+                                            keepTooltipInside
+                                            // on={["click"]}
+                                            on={["hover"]}
                                             arrow={false}
                                         // mouseLeaveDelay={5000}
                                         >
                                             {isState.idWarehouse === item.id &&
                                                 item.is_system == 0 && (
-                                                    <div className="flex items-center gap-2 px-4 py-2 ml-2 bg-gray-200 rounded-md 3xl:py-3">
+                                                    <div className="flex items-center gap-2 px-2 py-[5px] ml-2 bg-gray-200 rounded-md 3xl:py-3">
                                                         {role == true || checkEdit ? (
                                                             <PopupWarehouse
                                                                 dataLang={dataLang}
@@ -644,16 +636,16 @@ const Warehouse = (props) => {
                                                         : 7
                                         }
                                     >
-                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                        <ColumnTable colSpan={2} textAlign={"left"}>
                                             {dataLang?.warehouses_detail_product || "warehouses_detail_product"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                        <ColumnTable colSpan={1} textAlign={"left"}>
                                             {dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                        <ColumnTable colSpan={1} textAlign={"left"}>
                                             {dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                        <ColumnTable colSpan={1} textAlign={"left"}>
                                             {dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}
                                         </ColumnTable>
                                         {dataProductSerial?.is_enable === "1" && (
@@ -676,7 +668,7 @@ const Warehouse = (props) => {
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                        <ColumnTable colSpan={1} textAlign={"left"}>
                                             {dataLang?.warehouses_detail_value || "warehouses_detail_value"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -694,16 +686,16 @@ const Warehouse = (props) => {
                                                         className={`${dataProductSerial?.is_enable == "1"
                                                             ? dataMaterialExpiry?.is_enable !=
                                                                 dataProductExpiry?.is_enable
-                                                                ? "grid-cols-10"
+                                                                ? "grid-cols-20"
                                                                 : dataMaterialExpiry?.is_enable == "1"
-                                                                    ? "grid-cols-10"
-                                                                    : "grid-cols-8"
+                                                                    ? "grid-cols-20"
+                                                                    : "grid-cols-16"
                                                             : dataMaterialExpiry?.is_enable !=
                                                                 dataProductExpiry?.is_enable
-                                                                ? "grid-cols-9"
+                                                                ? "grid-cols-18"
                                                                 : dataMaterialExpiry?.is_enable == "1"
-                                                                    ? "grid-cols-9"
-                                                                    : "grid-cols-7"
+                                                                    ? "grid-cols-18"
+                                                                    : "grid-cols-14"
                                                             }  grid hover:bg-slate-50 px-2`}
                                                     >
                                                         <RowItemTable
@@ -721,13 +713,13 @@ const Warehouse = (props) => {
                                                                             />
                                                                         </div>
                                                                         <div className="3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1">
-                                                                            <h6 className="w-full text-xs font-semibold text-left 3xl:text-base xl:text-sm lg:text-xs text-zinc-600">
+                                                                            <h6 className="w-full font-semibold text-left responsive-text-base text-zinc-600">
                                                                                 {e.item_name == null
                                                                                     ? "-"
                                                                                     : e.item_name}
                                                                             </h6>
 
-                                                                            <h6 className="w-full text-xs font-medium text-left 3xl:text-sm xl:text-xs lg:text-xs text-zinc-500">
+                                                                            <h6 className="w-full font-medium text-left responsive-text-sm text-zinc-500">
                                                                                 {e.item_code == null
                                                                                     ? "-"
                                                                                     : e.item_code}
@@ -799,13 +791,13 @@ const Warehouse = (props) => {
                                                                             />
                                                                         </div>
                                                                         <div className="3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1">
-                                                                            <h6 className="w-full text-xs font-semibold text-left 3xl:text-base xl:text-sm lg:text-xs text-zinc-600 ">
+                                                                            <h6 className="w-full font-semibold text-left responsive-text-base text-zinc-600 ">
                                                                                 {e.item_name == null
                                                                                     ? "-"
                                                                                     : e.item_name}
                                                                             </h6>
 
-                                                                            <h6 className="w-full text-xs font-medium text-left 3xl:text-sm xl:text-xs lg:text-xs text-zinc-500">
+                                                                            <h6 className="w-full font-medium text-left responsive-text-sm text-zinc-500">
                                                                                 {e.item_code == null
                                                                                     ? "-"
                                                                                     : e.item_code}
@@ -876,16 +868,16 @@ const Warehouse = (props) => {
                                                             className={` grid ${dataProductSerial?.is_enable == "1"
                                                                 ? dataMaterialExpiry?.is_enable !=
                                                                     dataProductExpiry?.is_enable
-                                                                    ? "col-span-8"
+                                                                    ? "col-span-16"
                                                                     : dataMaterialExpiry?.is_enable == "1"
-                                                                        ? "col-span-8"
-                                                                        : "col-span-6"
+                                                                        ? "col-span-16"
+                                                                        : "col-span-12"
                                                                 : dataMaterialExpiry?.is_enable !=
                                                                     dataProductExpiry?.is_enable
-                                                                    ? "col-span-7"
+                                                                    ? "col-span-14"
                                                                     : dataMaterialExpiry?.is_enable == "1"
-                                                                        ? "col-span-7"
-                                                                        : "col-span-5"
+                                                                        ? "col-span-14"
+                                                                        : "col-span-10"
                                                                 }`}
                                                         >
                                                             {e?.detail.map((item) => (
@@ -893,20 +885,20 @@ const Warehouse = (props) => {
                                                                     className={`grid ${dataProductSerial?.is_enable == "1"
                                                                         ? dataMaterialExpiry?.is_enable !=
                                                                             dataProductExpiry?.is_enable
-                                                                            ? "grid-cols-8"
+                                                                            ? "grid-cols-16"
                                                                             : dataMaterialExpiry.is_enable == "1"
-                                                                                ? "grid-cols-8"
-                                                                                : "grid-cols-6"
+                                                                                ? "grid-cols-16"
+                                                                                : "grid-cols-12"
                                                                         : dataMaterialExpiry?.is_enable !=
                                                                             dataProductExpiry?.is_enable
-                                                                            ? "grid-cols-7"
+                                                                            ? "grid-cols-14"
                                                                             : dataMaterialExpiry?.is_enable == "1"
-                                                                                ? "grid-cols-7"
-                                                                                : " grid-cols-5"
+                                                                                ? "grid-cols-14"
+                                                                                : " grid-cols-10"
                                                                         }`}
                                                                 >
                                                                     <RowItemTable
-                                                                        textSize={"text-[12px]"}
+                                                                        // textSize={"text-[12px]"}
                                                                         colSpan={1}
                                                                         className="py-3 border-b !font-normal"
                                                                     >
@@ -916,9 +908,9 @@ const Warehouse = (props) => {
                                                                     </RowItemTable>
                                                                     <RowItemTable
                                                                         colSpan={1}
-                                                                        textSize={"text-[13px]"}
+                                                                        // textSize={"text-[13px]"}
                                                                         className="py-3 border-b !font-normal"
-                                                                        textAlign={"center"}
+                                                                        textAlign={"left"}
                                                                     >
                                                                         {item.option_name_1 == null
                                                                             ? "-"
@@ -926,9 +918,9 @@ const Warehouse = (props) => {
                                                                     </RowItemTable>
                                                                     <RowItemTable
                                                                         colSpan={1}
-                                                                        textSize={"text-[13px]"}
+                                                                        // textSize={"text-[13px]"}
                                                                         className="py-3 border-b !font-normal"
-                                                                        textAlign={"center"}
+                                                                        textAlign={"left"}
                                                                     >
                                                                         {item.option_name_2 == null
                                                                             ? "-"
@@ -937,7 +929,7 @@ const Warehouse = (props) => {
                                                                     {dataProductSerial?.is_enable === "1" ? (
                                                                         <RowItemTable
                                                                             colSpan={1}
-                                                                            textSize={"text-[13px]"}
+                                                                            // textSize={"text-[13px]"}
                                                                             className="py-3 border-b !font-normal"
                                                                             textAlign={"center"}
                                                                         >
@@ -953,7 +945,7 @@ const Warehouse = (props) => {
                                                                         <>
                                                                             <RowItemTable
                                                                                 colSpan={1}
-                                                                                textSize={"text-[13px]"}
+                                                                                // textSize={"text-[13px]"}
                                                                                 className="py-3 border-b !font-normal"
                                                                                 textAlign={"center"}
                                                                             >
@@ -963,7 +955,7 @@ const Warehouse = (props) => {
                                                                             </RowItemTable>
                                                                             <RowItemTable
                                                                                 colSpan={1}
-                                                                                textSize={"text-[13px]"}
+                                                                                // textSize={"text-[13px]"}
                                                                                 className="py-3 border-b !font-normal"
                                                                                 textAlign={"center"}
                                                                             >
@@ -981,7 +973,7 @@ const Warehouse = (props) => {
                                                                     <RowItemTable
                                                                         textAlign={"center"}
                                                                         colSpan={1}
-                                                                        textSize={"text-[13px]"}
+                                                                        // textSize={"text-[13px]"}
                                                                         className="py-3 font-semibold border-b"
                                                                     >
                                                                         {item?.quantity ? (
@@ -999,9 +991,9 @@ const Warehouse = (props) => {
                                                                         )}
                                                                     </RowItemTable>
                                                                     <RowItemTable
-                                                                        textAlign={"right"}
+                                                                        textAlign={"left"}
                                                                         colSpan={1}
-                                                                        textSize={"text-[13px]"}
+                                                                        // textSize={"text-[13px]"}
                                                                         className="py-3 border-b !font-normal"
                                                                     >
                                                                         {item.amount
@@ -1023,13 +1015,13 @@ const Warehouse = (props) => {
                     </div>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {dataWarehouse?.rResult?.length != 0 && (
                             <ContainerPagination className={"justify-end"}>
-                                <TitlePagination
+                                {/* <TitlePagination
                                     dataLang={dataLang}
                                     totalItems={data?.output?.iTotalDisplayRecords}
-                                />
+                                /> */}
                                 <Pagination
                                     postsPerPage={isState.limitItemWarehouseDetail}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -1039,7 +1031,14 @@ const Warehouse = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit
+                            sLimit={(e) => {
+                                queryKeyIsState({ limitItemWarehouseDetail: e });
+                            }}
+                            limit={isState.limitItemWarehouseDetail}
+                            dataLang={dataLang}
+                        />
+                    </div>
                 }
             />
         </React.Fragment>

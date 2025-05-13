@@ -6,6 +6,7 @@ import Popup_dspt from "@/containers/accountant/receipts/components/popup";
 import Popup_Bom from "@/containers/products/components/product/popupBom";
 import Popup_Products from "@/containers/products/components/product/popupProducts";
 import Popup_Stage from "@/containers/products/components/product/popupStage";
+import PopupPrintTemNVL from "@/containers/purchase-order/import/components/PopupPrintTemNVL";
 import Popup_TableValidateDelete from "@/containers/purchase-order/order/components/validateDelete";
 import Popup_TableValidateEdit from "@/containers/purchase-order/order/components/validateEdit";
 import Popup_servie from "@/containers/purchase-order/servicev-voucher/components/popup";
@@ -17,6 +18,12 @@ import useActionRole from "@/hooks/useRole";
 import { useSetData } from "@/hooks/useSetData";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import {
+    fetchPDFPurchaseOrder,
+    fetchPDFPurchaseOrderImport,
+} from "@/managers/api/purchase-order/useLinkFilePDF";
+import { fetchPDFDelivery, fetchPDFSaleOrder, fetchPDFReceipts, fetchPDFPayments } from "@/managers/api/sales-order/useLinkFilePDF";
+import apiReturnSales from "@/Api/apiSalesExportProduct/returnSales/apiReturnSales";
 import {
     routerImport,
     routerOrder,
@@ -37,41 +44,49 @@ import {
     routerReturnSales,
     routerSalesOrder,
 } from "@/routers/sellingGoods";
-import { ArrowDown2, Box1, BoxSearch, Trash } from "iconsax-react";
+import { Box1, BoxSearch, Trash } from "iconsax-react";
 import { useRouter } from "next/router";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import React, { useEffect, useState, useRef } from "react";
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
-import { useSelector, useDispatch } from "react-redux";
-import Popup from "reactjs-popup";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Tooltip } from "react-tooltip";
 import { _ServerInstance as Axios } from "services/axios";
+import PopupPrintItem from "../common/popup/PopupPrintItem";
+import EditIcon from "../icons/common/EditIcon";
+import PrinterIcon from "../icons/common/PrinterIcon";
+import PrinterTem from "../icons/common/PrinterTem";
+import StickerIcon from "../icons/common/StickerIcon";
+import TrashIcon from "../icons/common/TrashIcon";
+import ButtonPrintItem from "./button/ButtonPrintItem";
 import FilePDF from "./FilePDF";
 import PopupConfim from "./popupConfim/popupConfim";
-import ButtonPrintItem from "./button/ButtonPrintItem";
-import {
-    fetchPDFPurchaseOrder,
-    fetchPDFPurchaseOrderImport,
-} from "@/managers/api/purchase-order/useLinkFilePDF";
-import PopupPrintItem from "../common/popup/PopupPrintItem";
-import StickerIcon from "../icons/common/StickerIcon";
-import PopupPrintTemNVL from "@/containers/purchase-order/import/components/PopupPrintTemNVL";
-import { fetchPDFDelivery, fetchPDFSaleOrder } from "@/managers/api/sales-order/useLinkFilePDF";
-import EditIcon from "../icons/common/EditIcon";
-import TrashIcon from "../icons/common/TrashIcon";
-import PrinterIcon from "../icons/common/PrinterIcon";
-import { Tooltip } from "react-tooltip";
-import TooltipDefault from "../common/tooltip/TooltipDefault";
-import PrinterTem from "../icons/common/PrinterTem";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const Popup_Pdf = (props) => {
+// Hàm xử lý in PDF cho phiếu trả hàng bán
+const fetchPDFReturnSales = async ({ id }) => {
+    try {
+        // Sử dụng apiDetailReturnOrder từ apiReturnSales để lấy thông tin phiếu
+        const response = await apiReturnSales.apiDetailReturnOrder(id);
+        
+        if (response && response.result === 1) {
+            return {
+                isSuccess: 1,
+                pdf_url: `/api_web/Api_return_order/print/${id}`,
+            };
+        }
+        return { isSuccess: 0, message: response?.message || "Không thể lấy thông tin phiếu" };
+    } catch (error) {
+        console.error("Error fetching return sales PDF:", error);
+        return { isSuccess: 0, message: error.message || "Lỗi không xác định" };
+    }
+};
 
-    const { isOpen, handleOpen } = useToggle(false);
+const Popup_Pdf = (props) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [isLoadingPrint, setIsLoadingPrint] = useState(false);
+    const dropdownRef = useRef(null);
 
     //kiếm hàm theo page 
     const fetchPDFMultiplePageByPrice = {
@@ -82,8 +97,6 @@ const Popup_Pdf = (props) => {
     //xử lý hàm in tem PDF
     const handlePrintTem = async ({ typePrint, id, typePage }) => {
         setIsLoadingPrint(true);
-
-
         const fetchPDFhandle = fetchPDFMultiplePageByPrice[typePage]
         if (!fetchPDFhandle) {
             console.warn(`Không tìm thấy hàm fetchPDFhandle cho typePage: ${typePage}`);
@@ -108,36 +121,49 @@ const Popup_Pdf = (props) => {
         }
     };
 
-
-
-
     const shareProps = {
         dataMaterialExpiry: props?.dataMaterialExpiry,
         dataProductExpiry: props?.dataProductExpiry,
         dataProductSerial: props?.dataProductSerial,
         dataSeting: props?.dataSeting,
     };
-    return (
-        <PopupCustom
-            title={props.dataLang?.option_prin || "option_prin"}
-            button={
-                <button className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap">
-                    {/* <VscFilePdf size={20}/> */}
-                    <PrinterTem className="size-5"/>
-                    <p className="whitespace-nowrap">
-                        {props?.dataLang?.btn_table_print || "btn_table_print"}
-                    </p>
-                </button>
+    
+    // Đóng dropdown khi click ra ngoài
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
             }
-            onClickOpen={() => handleOpen(true)}
-            open={isOpen}
-            onClose={() => handleOpen(false)}
-            classNameBtn={props?.className}
-        >
-            <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-            <div className="space-x-5 w-[400px] h-auto">
-                <div>
-                    <div className="w-[400px]">
+        };
+
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen]);
+
+    // Xử lý mở/đóng dropdown
+    const toggleDropdown = () => {
+        setIsOpen(!isOpen);
+    };
+    
+    return (
+        <div className="relative" ref={dropdownRef}>
+            <button
+                onClick={toggleDropdown}
+                className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+            >
+                <PrinterIcon
+                    color="#003DA0"
+                    className="size-5"
+                />
+            </button>
+            {isOpen && (
+                <div className="absolute top-full -right-5 p-1 mt-1 w-fit bg-white rounded-xl z-[999] border border-gray-200 shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
+                    <div className="">
                         {props.props?.type === "import" || props.props?.type === "deliveryReceipt" ? (
                             <PopupPrintItem
                                 dataLang={props.dataLang}
@@ -158,8 +184,8 @@ const Popup_Pdf = (props) => {
                         )}
                     </div>
                 </div>
-            </div>
-        </PopupCustom>
+            )}
+        </div>
     );
 };
 
@@ -167,18 +193,48 @@ export const BtnAction = React.memo((props) => {
     const dispatch = useDispatch();
     const [loadingButtonPrint, setLoadingButtonPrint] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showMoreIcons, setShowMoreIcons] = useState(false);
+    const [printDropdownOpen, setPrintDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const moreIconsRef = useRef(null);
+    const printDropdownRef = useRef(null);
+
+    // Hàm để mở/đóng dropdown in cho component này
+    const togglePrintDropdown = () => {
+        setPrintDropdownOpen(!printDropdownOpen);
+    };
+
+    // Đóng tất cả dropdown in
+    const closeAllDropdowns = () => {
+        setPrintDropdownOpen(false);
+        setShowDropdown(false);
+        setShowMoreIcons(false);
+    };
 
     // Xử lý đóng dropdown khi click ra ngoài
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowDropdown(false);
+            // Kiểm tra xem event.target có thuộc về popup nào không
+            const isInsidePopup = event.target.closest('.popup-edit') || 
+                                event.target.closest('.popup-content') || 
+                                event.target.closest('.reactjs-popup');
+            
+            // Chỉ đóng dropdown nếu click outside và không nằm trong bất kỳ popup nào
+            if (!isInsidePopup) {
+                if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                    setShowDropdown(false);
+                }
+                if (moreIconsRef.current && !moreIconsRef.current.contains(event.target)) {
+                    setShowMoreIcons(false);
+                }
+                if (printDropdownRef.current && !printDropdownRef.current.contains(event.target)) {
+                    setPrintDropdownOpen(false);
+                }
             }
         };
 
         // Thêm event listener khi dropdown đang mở
-        if (showDropdown) {
+        if (showDropdown || showMoreIcons || printDropdownOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
 
@@ -186,37 +242,68 @@ export const BtnAction = React.memo((props) => {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [showDropdown]);
+    }, [showDropdown, showMoreIcons, printDropdownOpen]);
 
     //kiếm hàm fetchPDF theo page 
     const fetchPDFMultiplePage = {
         order: fetchPDFPurchaseOrder,
         sales_product: fetchPDFSaleOrder,
-
+        receipts: fetchPDFReceipts,
+        payment: fetchPDFPayments,
+        import: fetchPDFPurchaseOrderImport,
+        deliveryReceipt: fetchPDFDelivery,
+        returnSales: fetchPDFReturnSales,
+        returns: fetchPDFPurchaseOrder
     };
-    //Xử lý in tem PDF
-    const handlePrintTem = async ({ idTem, typePage }) => {
+    
+    //Xử lý in PDF
+    const handlePrintTem = async ({ idTem, typePage, typePrint }) => {
+        // Đảm bảo luôn lấy đúng ID từ tham số, hoặc từ props nếu không có
+        const currentId = idTem || props?.id;
+        
         setLoadingButtonPrint(true);
-
-        //kiếm hàm theo page 
-        const fetchPDFhandle = fetchPDFMultiplePage[typePage];
-        if (!fetchPDFhandle) {
-            console.warn(`Không tìm thấy hàm fetchPDFhandle cho typePage: ${typePage}`);
-            setLoadingButtonPrint(false);
-            return;
-        }
-
+        
         try {
-            const response = await fetchPDFhandle({
-                id: idTem,
-            });
-            console.log("🚀 ~ handlePrintTem ~ response:", response);
+            let response;
+            
+            // Trường hợp in PDF với type (có giá/không giá) cho import và deliveryReceipt
+            if (typePrint && ['import', 'deliveryReceipt'].includes(typePage)) {
+                const typeNumber = typePrint === "notPrice" ? 1 : 2;
+                response = await fetchPDFMultiplePage[typePage]({
+                    id: currentId,
+                    type: typeNumber,
+                });
+            } 
+            // Xử lý đặc biệt cho phiếu trả hàng
+            else if (typePage === 'returnSales') {
+                response = await fetchPDFReturnSales({
+                    id: currentId,
+                });
+            }
+            // Trường hợp in PDF thông thường cho các loại khác
+            else {
+                // Kiểm tra nếu không có hàm tương ứng với typePage
+                if (!fetchPDFMultiplePage[typePage]) {
+                    console.warn(`Không tìm thấy API in cho typePage: ${typePage}`);
+                    isShow("error", `Chức năng in phiếu ${typePage} chưa được hỗ trợ`);
+                    setLoadingButtonPrint(false);
+                    return;
+                }
+                
+                response = await fetchPDFMultiplePage[typePage]({
+                    id: currentId,
+                });
+            }
+            
             if (response?.isSuccess === 1 && response?.pdf_url) {
                 window.open(response.pdf_url, "_blank");
+            } else {
+                isShow("error", response?.message || `Không thể in phiếu. Vui lòng thử lại sau.`);
             }
             setLoadingButtonPrint(false);
         } catch (error) {
             console.log("🚀 ~ handlePrintTem ~ error:", error);
+            isShow("error", `Lỗi khi in phiếu: ${error.message || "Không xác định"}`);
             setLoadingButtonPrint(false);
         }
     };
@@ -363,6 +450,9 @@ export const BtnAction = React.memo((props) => {
         }
         ///Đơn hàng bán
         else if (props?.id && props?.type === "sales_product") {
+            console.log(props?.id, props?.type)
+    console.log(props)
+
             if (props?.status !== "approved") {
                 confimDelete(typeConfig);
             }
@@ -573,335 +663,493 @@ export const BtnAction = React.memo((props) => {
         dataSeting,
     };
 
-    return (
-        <div className="flex items-center justify-center gap-1">
-            {[
-                "client_customers",
-                "client_status",
-                "client_group",
-                "suppliers",
-                "suppliers_groups",
-                "material_category",
-                "materials",
-                "category_products",
-                "personnel_staff",
-                "department",
-                "personnel_roles",
-                "warehouse",
-                "warehouse_location",
-                "settings_branch",
-                "taxes",
-                "currencies",
-                "paymentmodes",
-                "units",
-                "stages",
-                "costs",
-                "settings_variant",
-                "category_errors",
-                "category_detail_errors",
-                "check_quality",
-            ].includes(props?.type) ? (
+    const calculateTotalButtons = () => {
+        let count = 0;
+        
+        // Trường hợp đặc biệt cho products
+        if (props.type === "products") {
+            return 5; // 3 nút đặc biệt (Stage, Bom, Products) + FilePDF + Delete
+        }
+        
+        // Count edit button
+        count++;
+
+        // Count print button
+        if (!["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(props?.type)) {
+            if (props?.type === "order" || props?.type === "sales_product") {
+                count++;
+            } else {
+                count++;
+            }
+        }
+
+        // Count keep stock and see stock buttons for sales_product
+        if (props.type === "sales_product") {
+            count += 2;
+        }
+
+        // Count print tem button for import
+        if (props.type === "import") {
+            count++;
+        }
+
+        // Count delete button
+        count++;
+
+        return count;
+    };
+
+    const renderActionButtons = () => {
+        if ([
+            "client_customers",
+            "client_status",
+            "client_group",
+            "suppliers",
+            "suppliers_groups",
+            "material_category",
+            "materials",
+            "category_products",
+            "personnel_staff",
+            "department",
+            "personnel_roles",
+            "warehouse",
+            "warehouse_location",
+            "settings_branch",
+            "taxes",
+            "currencies",
+            "paymentmodes",
+            "units",
+            "stages",
+            "costs",
+            "settings_variant",
+            "category_errors",
+            "category_detail_errors",
+            "check_quality",
+        ].includes(props?.type)) {
+            return (
                 <button
                     type="button"
                     onClick={() => handleQueryId({ id: props?.id, status: true })}
-                    className="text-xs transition-all ease-linear outline-none xl:text-base hover:scale-110"
+                    className="group hover:border-red-01 hover:bg-red-02 rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer"
                 >
-                    <Trash color="red" />
+                    <TrashIcon className="size-5 text-[#EE1E1E]"/>
                 </button>
-            ) : (
-                <>
-                   {props.type == "order" && (
-                                <Popup_TableValidateEdit
-                                    {...props}
-                                    {...shareProps}
-                                    isOpenValidate={isOpenValidate}
-                                    sIsOpenValidate={sIsOpenValidate}
-                                    data={isData}
-                                    className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "
-                                />
-                            )}
+            );
+        }
 
-                            {props.type == "servicev_voucher" && (
-                                <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full">
-                                    <EditIcon
-                                        color="#064E3B"
-                                        className="group-hover:text-sky-500 group-hover:shadow-md "
-                                    />
-                                    <Popup_servie
-                                        status_pay={props?.status_pay}
-                                        onRefreshGr={props.onRefreshGr}
-                                        onClick={() => handleClick()}
-                                        onRefresh={props.onRefresh}
-                                        dataLang={props.dataLang}
-                                        id={props?.id}
-                                        {...shareProps}
-                                        className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5"
-                                    >
-                                        {props.dataLang?.purchase_order_table_edit ||
-                                            "purchase_order_table_edit"}
-                                    </Popup_servie>
-                                </div>
-                            )}
+        const allButtons = [];
+        const totalButtons = calculateTotalButtons();
 
-                            {props.type == "products" && (
-                                <>
-                                    <Popup_Stage
-                                        dataLang={props.dataLang}
-                                        id={props.id}
-                                        name={props?.name}
-                                        code={props?.code}
-                                        type={props?.typeOpen}
-                                        dataProduct={props?.dataProduct}
-                                        onRefresh={props.onRefresh}
-                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
-                                    />
-                                    <Popup_Bom
-                                        dataLang={props.dataLang}
-                                        id={props.id}
-                                        name={props?.name}
-                                        code={props?.code}
-                                        onRefresh={props.onRefresh}
-                                        type={props?.typeOpen}
-                                        dataProduct={props?.dataProduct}
-                                        bom={props?.bom}
-                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
-                                    />
-                                    <Popup_Products
-                                        onRefresh={props.onRefresh}
-                                        dataProductExpiry={props.dataProductExpiry}
-                                        dataLang={props.dataLang}
-                                        id={props?.id}
-                                        dataProduct={props?.dataProduct}
-                                        type={props?.typeOpen}
-                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap"
-                                    />
-                                </>
-                            )}
+        // Nút sửa - Edit
+        if (props.type == "order") {
+            allButtons.push(
+                <Popup_TableValidateEdit
+                    key="edit"
+                    {...props}
+                    {...shareProps}
+                    isOpenValidate={isOpenValidate}
+                    sIsOpenValidate={sIsOpenValidate}
+                    data={isData}
+                    className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
+                />
+            );
+        } else if (props.type == "servicev_voucher") {
+            allButtons.push(
+                <div key="edit" className="group transition-all ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
+                    <EditIcon
+                        color="#064E3B"
+                        className="group-hover:text-sky-500 group-hover:shadow-md"
+                    />
+                    <Popup_servie
+                        status_pay={props?.status_pay}
+                        onRefreshGr={props.onRefreshGr}
+                        onClick={() => handleClick()}
+                        onRefresh={props.onRefresh}
+                        dataLang={props.dataLang}
+                        id={props?.id}
+                        {...shareProps}
+                        className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
+                    >
+                        {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                    </Popup_servie>
+                </div>
+            );
+        } else if (props.type == "products") {
+            allButtons.push(
+                <Popup_Stage
+                    key="stage"
+                    dataLang={props.dataLang}
+                    id={props.id}
+                    name={props?.name}
+                    code={props?.code}
+                    type={props?.typeOpen}
+                    dataProduct={props?.dataProduct}
+                    onRefresh={props.onRefresh}
+                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap w-full"
+                />
+            );
+            allButtons.push(
+                <Popup_Bom
+                    key="bom"
+                    dataLang={props.dataLang}
+                    id={props.id}
+                    name={props?.name}
+                    code={props?.code}
+                    onRefresh={props.onRefresh}
+                    type={props?.typeOpen}
+                    dataProduct={props?.dataProduct}
+                    bom={props?.bom}
+                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap w-full"
+                />
+            );
+            allButtons.push(
+                <Popup_Products
+                    key="products"
+                    onRefresh={props.onRefresh}
+                    dataProductExpiry={props.dataProductExpiry}
+                    dataLang={props.dataLang}
+                    id={props?.id}
+                    dataProduct={props?.dataProduct}
+                    type={props?.typeOpen}
+                    className="text-sm hover:bg-slate-50 text-left cursor-pointer whitespace-nowrap w-full"
+                />
+            );
+        } else if (props.type == "receipts") {
+            allButtons.push(
+                <Popup_dspt
+                    key="receipts"
+                    onRefresh={props.onRefresh}
+                    dataLang={props.dataLang}
+                    id={props?.id}
+                    className="text-sm hover:bg-slate-50 text-left cursor-pointer"
+                >
+                    {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                </Popup_dspt>
+            );
+        } else if (props.type == "payment") {
+            allButtons.push(
+                <Popup_dspc
+                    key="payment"
+                    onRefresh={props.onRefresh}
+                    dataLang={props.dataLang}
+                    id={props?.id}
+                    className="text-sm hover:bg-slate-50 text-left cursor-pointer"
+                >
+                    {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                </Popup_dspc>
+            );
+        } else if (![
+            "order",
+            "products",
+            "servicev_voucher",
+            "receipts",
+            "payment",
+        ].includes(props.type)) {
+            const totalButtons = calculateTotalButtons();
 
-                            {props.type == "receipts" && (
-                                <Popup_dspt
-                                    onRefresh={props.onRefresh}
-                                    dataLang={props.dataLang}
-                                    id={props?.id}
-                                    className="text-sm hover:bg-slate-50 text-left cursor-pointer"
-                                >
-                                    {props.dataLang?.purchase_order_table_edit ||
-                                        "purchase_order_table_edit"}
-                                </Popup_dspt>
-                            )}
+            allButtons.push(
+                <button
+                    key="edit"
+                    onClick={() => {
+                        if (role) {
+                            handleClick();
+                        } else if (checkEdit) {
+                            handleClick();
+                        } else {
+                            isShow("error", WARNING_STATUS_ROLE);
+                        }
+                    }}
+                    className={`group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
+                                ${totalButtons > 3
+                            ? 'hover:bg-primary-05'
+                            : 'hover:border-[#064E3B] hover:bg-[#064E3B]/10'
+                        }`
+                    }
+                >
+                    <EditIcon
+                        className={`size-5 transition-all duration-300 
+                            ${totalButtons > 3 ? "text-neutral-03 group-hover:text-neutral-07" : ""}`}
+                    />
+                    {totalButtons > 3 && (
+                        <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">Sửa phiếu</p>
+                    )}
+                </button>
+            );
+        }
 
-                            {props.type == "payment" && (
-                                <Popup_dspc
-                                    onRefresh={props.onRefresh}
-                                    dataLang={props.dataLang}
-                                    id={props?.id}
-                                    className="text-sm hover:bg-slate-50 text-left cursor-pointer"
-                                >
-                                    {props.dataLang?.purchase_order_table_edit ||
-                                        "purchase_order_table_edit"}
-                                </Popup_dspc>
-                            )}
+        // Nút in - Print PDF 
+        if ([
+            "deliveryReceipt",
+            "returnSales",
+            "import",
+            "returns",
+            // "receipts",
+            // "payment",
+        ].includes(props?.type)) {
+            if (props?.type !== "import") {
+                allButtons.push(
+                    <Popup_Pdf
+                        dataLang={props.dataLang}
+                        props={props}
+                        openAction={openAction}
+                        setOpenAction={setOpenAction}
+                        {...shareProps}
+                    />
+                );
+            }
+        } else if (props?.type === "order" || props?.type === "sales_product" || props?.type === "receipts" || props?.type === "payment") {
+            const totalButtons = calculateTotalButtons();
+            allButtons.push(
+                <ButtonPrintItem
+                    key="print"
+                    onCLick={() =>
+                        handlePrintTem({ idTem: props?.id, typePage: props?.type })
+                    }
+                    dataLang={props?.dataLang}
+                    isLoading={loadingButtonPrint}
+                    totalButtons={totalButtons}
+                />
+            );
+        } else {
+            allButtons.push(
+                <FilePDF
+                    key="pdf"
+                    {...shareProps}
+                    props={props}
+                    openAction={openAction}
+                    setOpenAction={setOpenAction}
+                />
+            );
+        }
 
-                            {![
-                                "order",
-                                "products",
-                                "servicev_voucher",
-                                "receipts",
-                                "payment",
-                            ].includes(props.type) && (
-                                    <button
-                                        onClick={() => {
-                                            if (role) {
-                                                handleClick();
-                                            } else if (checkEdit) {
-                                                handleClick();
-                                            } else {
-                                                isShow("error", WARNING_STATUS_ROLE);
-                                            }
-                                        }}
-                                        className={` group rounded-lg p-1 border border-transparent hover:border-[#064E3B] hover:bg-[#064E3B]/10 transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer`}
-                                    >
-                                        <EditIcon
-                                            color="#064E3B"
-                                            className="size-5 transition-all duration-300"
-                                        />
-                                        {/* <p className="group-hover:text-sky-500">
-                                            {props.dataLang?.btn_table_edit || "btn_table_edit"}
-                                        </p> */}
-                                    </button>
-                                )}
+        // Nút giữ hàng - Keep Stock (chỉ cho sales_product)
+        if (props.type == "sales_product") {
+            if (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) {
+                allButtons.push(<PopupKeepStock key="keep-stock" {...props} {...shareProps} totalButtons={totalButtons} />);
+            } else {
+                allButtons.push(
+                    <button
+                        key="keep-stock"
+                        onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                        type="button"
+                        className={`${props.type == "sales_product" ? "" : "justify-center"} group transition-all ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer`}
+                    >
+                        <Box1
+                            size={20}
+                            className="group-hover:text-orange-500 group-hover:shadow-md"
+                        />
+                        <p className="pr-4 group-hover:text-orange-500">
+                            {props.dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
+                        </p>
+                    </button>
+                );
+            }
+        }
 
-                            {[
-                                "deliveryReceipt",
-                                "returnSales",
-                                "import",
-                                "returns",
-                                "receipts",
-                                "payment",
-                            ].includes(props?.type) ? (
-                                // <Popup_Pdf
-                                //     dataLang={props.dataLang}
-                                //     props={props}
-                                //     openAction={openAction}
-                                //     setOpenAction={setOpenAction}
-                                //     {...shareProps}
-                                // />
-                                <></>
-                            ) : props?.type === "order" || props?.type === "sales_product" ? (
-                                <ButtonPrintItem
-                                    onCLick={() =>
-                                        handlePrintTem({ idTem: props?.id, typePage: props?.type })
-                                    }
-                                    dataLang={props?.dataLang}
-                                    isLoading={loadingButtonPrint}
-                                />
-                            ) : (
-                                <FilePDF
-                                    {...shareProps}
-                                    props={props}
-                                    openAction={openAction}
-                                    setOpenAction={setOpenAction}
-                                />
-                            )}
+        // Nút xem tồn kho - See Stock (chỉ cho sales_product)
+        if (props.type == "sales_product") {
+            if (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) {
+                allButtons.push(<PopupDetailKeepStock key="detail-stock" {...props} {...shareProps} totalButtons={totalButtons} />);
+            } else {
+                allButtons.push(
+                    <button
+                        key="detail-stock"
+                        type="button"
+                        onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                        className="group transition-all ease-in-out flex items-center justify-center gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer"
+                    >
+                        <BoxSearch
+                            size={20}
+                            className="group-hover:text-amber-500 group-hover:shadow-md"
+                        />
+                        <p className="group-hover:text-amber-500 pr-2.5">
+                            {props.dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
+                        </p>
+                    </button>
+                );
+            }
+        }
 
-                            {props.type == "sales_product" && (
-                                <>
-                                    {role == true ||
-                                        auth?.orders?.is_create == 1 ||
-                                        auth?.orders?.is_edit == 1 ? (
-                                        <PopupKeepStock {...props} {...shareProps} />
-                                    ) : (
-                                        <button
-                                            onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                                            type="button"
-                                            className={`${props.type == "sales_product" ? "" : "justify-center"
-                                                } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer`}
-                                        >
-                                            <Box1
-                                                size={20}
-                                                className="group-hover:text-orange-500 group-hover:shadow-md "
-                                            />
-                                            <p className="pr-4 group-hover:text-orange-500">
-                                                {props.dataLang?.salesOrder_keep_stock ||
-                                                    "salesOrder_keep_stock"}
-                                            </p>
-                                        </button>
-                                    )}
-                                </>
-                            )}
-
-                            {props.type == "sales_product" && (
-                                <>
-                                    {role == true ||
-                                        auth?.orders?.is_create == 1 ||
-                                        auth?.orders?.is_edit == 1 ? (
-                                        <PopupDetailKeepStock {...props} {...shareProps} />
-                                    ) : (
-                                        <button
-                                            type="button"
-                                            onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer"
-                                        >
-                                            <BoxSearch
-                                                size={20}
-                                                className="group-hover:text-amber-500 group-hover:shadow-md "
-                                            />
-                                            <p className="group-hover:text-amber-500 pr-2.5">
-                                                {props.dataLang?.salesOrder_see_stock_keeping ||
-                                                    "salesOrder_see_stock_keeping"}
-                                            </p>
-                                        </button>
-                                    )}
-                                </>
-                            )}
-
-                            {props.type == "import" && (
-                                <div className="relative" ref={dropdownRef}>
-                                    <button
-                                        onClick={() => setShowDropdown(!showDropdown)}
-                                        className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
-                                    >
-                                        <PrinterIcon
-                                            color="#003DA0"
-                                            className="size-5"
-                                        />
-                                    </button>
-                                    {showDropdown && (
-                                        <div className="absolute top-full left-1/2 -translate-x-1/2 p-1 mt-1 w-fit bg-white rounded-xl z-[999] shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
-                                            <ul className="flex flex-col gap-1">
-                                            <li
-                                                onClick={() => {
-                                                    dispatch({
-                                                        type: "statePopupGlobal",
-                                                        payload: {
-                                                            open: true,
-                                                            children: (
-                                                                <PopupPrintTemNVL
-                                                                    id={props?.id}
-                                                                />
-                                                            ),
-                                                        },
-                                                    });
-                                                }}
-                                                className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
-                                            >
-                                                <StickerIcon
-                                                    // size={20}
-                                                    className="size-5"
-                                                />
-                                                <p>In tem</p>
-                                            </li>
-                                            <li>
-                                            <Popup_Pdf
-                                                dataLang={props.dataLang}
-                                                props={props}
-                                                openAction={openAction}
-                                                setOpenAction={setOpenAction}
-                                                {...shareProps}
-                                            />
-                                            </li>
-                                            </ul>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                            
-                            {props.type == "order" ? (
-                                <Popup_TableValidateDelete
-                                    {...shareProps}
-                                    isOpen={isOpen}
-                                    handleQueryId={handleQueryId}
-                                    {...props}
-                                    className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
-                                />
-                            ) : (
-                                <button
+        // Nút in tem (chỉ cho import)
+        if (props.type == "import") {
+            // Lưu ID của phần tử hiện tại để đảm bảo sử dụng đúng ID khi xử lý các thao tác
+            const currentId = props?.id;
+            
+            allButtons.push(
+                <div key={`print-tem-${currentId}`} className="relative" ref={printDropdownRef}>
+                    <button
+                        onClick={togglePrintDropdown}
+                        className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+                        data-id={currentId} /* Store the ID as a data attribute */
+                    >
+                        <PrinterIcon
+                            color="#003DA0"
+                            className="size-5"
+                        />
+                    </button>
+                    {printDropdownOpen && (
+                        <div className="absolute top-full -right-5 p-1 mt-1 w-fit bg-white rounded-xl z-[999] border border-gray-200 shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
+                            <ul className="flex flex-col gap-1" data-row-id={currentId}>
+                                <li
                                     onClick={() => {
-                                        if (role) {
-                                            handleQueryId({ id: props?.id, status: true });
-                                        } else if (checkDelete) {
-                                            handleQueryId({ id: props?.id, status: true });
-                                        } else {
-                                            isShow("error", WARNING_STATUS_ROLE);
-                                        }
+                                        dispatch({
+                                            type: "statePopupGlobal",
+                                            payload: {
+                                                open: true,
+                                                children: (
+                                                    <PopupPrintTemNVL
+                                                        id={currentId}
+                                                    />
+                                                ),
+                                            },
+                                        });
+                                        setPrintDropdownOpen(false);
                                     }}
-                                    className={`group transition-all ease-in-out flex items-center ${(props.type == "products" && "justify-start") ||
-                                        props.type == "sales_product"
-                                        ? ""
-                                        : "justify-center"
-                                        } 
-                                    rounded-lg p-1 gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-red-02 text-left cursor-pointer border border-transparent hover:border-red-01`}
-                                    data-tooltip-id="delete-tooltip"
-                                    data-tooltip-content="Xóa phiếu"
+                                    className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                                 >
-                                    <TrashIcon
-                                        color="#EE1E1E"
-                                        className="size-5 transition-all duration-300"
-                                    />
-                                </button>
-                            )}
-                </>
-            )}
+                                    <StickerIcon className="size-5" />
+                                    <p>In tem</p>
+                                </li>
+                                <li
+                                    onClick={() => {
+                                        handlePrintTem({ typePrint: "notPrice", id: currentId, typePage: props?.type });
+                                        setPrintDropdownOpen(false);
+                                    }}
+                                    className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+                                >
+                                    <PrinterTem className="size-5"/>
+                                    <p className="whitespace-nowrap">
+                                        {props?.dataLang?.btn_table_print_notprice || "In không giá"}
+                                    </p>
+                                </li>
+                                <li
+                                    onClick={() => {
+                                        handlePrintTem({ typePrint: "price", id: currentId, typePage: props?.type });
+                                        setPrintDropdownOpen(false);
+                                    }}
+                                    className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+                                >
+                                    <PrinterTem className="size-5"/>
+                                    <p className="whitespace-nowrap">
+                                        {props?.dataLang?.btn_table_print_price || "In có giá"}
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Nút xóa - Delete
+        if (props.type == "order") {
+            allButtons.push(
+                <Popup_TableValidateDelete
+                    key="delete"
+                    {...shareProps}
+                    isOpen={isOpen}
+                    handleQueryId={handleQueryId}
+                    {...props}
+                    className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
+                />
+            );
+        } else {
+            allButtons.push(
+                <button
+                    key="delete"
+                    onClick={() => {
+                        if (role) {
+                            handleQueryId({ id: props?.id, status: true });
+                        } else if (checkDelete) {
+                            handleQueryId({ id: props?.id, status: true });
+                        } else {
+                            isShow("error", WARNING_STATUS_ROLE);
+                        }
+                    }}
+                    className={`group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
+                        ${totalButtons > 3
+                            ? 'hover:bg-primary-05'
+                            : 'hover:border-red-01 hover:bg-red-02'
+                        }`
+                    }
+                    {...totalButtons <= 3 && {
+                        "data-tooltip-id": "delete-tooltip",
+                        "data-tooltip-content": props.dataLang?.btn_table_delete || "btn_table_delete"
+                    }}
+                >
+                    <TrashIcon
+                        className={`size-5 transition-all duration-300 
+                            ${totalButtons > 3 ? "text-neutral-03 group-hover:text-neutral-07" : "text-[#EE1E1E]"}`}
+                    />
+                    {totalButtons > 3 && (
+                        <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">
+                            {props.dataLang?.btn_table_delete || "btn_table_delete"}
+                        </p>
+                    )}
+                </button>
+            );
+        }
+
+        // Hiển thị tối đa 3 nút, nếu nhiều hơn thì hiển thị dấu "..."
+        if (allButtons.length <= 3) {
+            return allButtons;
+        } else {
+            // Lưu ID của phần tử hiện tại để đảm bảo sử dụng đúng ID khi xử lý các thao tác
+            const currentId = props?.id;
+            
+            return [
+                <div key={`more-${currentId}`} className="relative" ref={moreIconsRef}>
+                    <button
+                        onClick={() => setShowMoreIcons(!showMoreIcons)}
+                        data-tooltip-id={`more-actions-tooltip-${currentId}`}
+                        data-tooltip-place="bottom-end"
+                        className="group rounded-lg p-1 border border-transparent hover:border-[#555] hover:bg-gray-100 transition-all ease-in-out flex items-center justify-center text-left cursor-pointer"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 24 24" fill="#003DA0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="1" />
+                            <circle cx="19" cy="12" r="1" />
+                            <circle cx="5" cy="12" r="1" />
+                        </svg>
+                    </button>
+                    <Tooltip
+                        id={`more-actions-tooltip-${currentId}`}
+                        place="bottom-end"
+                        variant="light"
+                        clickable={true}
+                        isOpen={showMoreIcons}
+                        setIsOpen={setShowMoreIcons}
+                        className="z-[999999999] !border !border-gray-200 !rounded-xl !p-0 !bg-white opacity-100 overflow-hidden"
+                        style={{
+                            backgroundColor: 'white',
+                            opacity: '1 !important',
+                            borderRadius: '12px',
+                            overflow: 'hidden'
+                        }}
+                        noArrow={true}
+                        opacity={1}
+                        delayHide={100}
+                        trigger="mouseenter"
+                        openOnClick={true}
+                        onClickOutside={() => setShowMoreIcons(false)}
+                    >
+                        <div
+                            className="flex flex-col gap-1 min-w-[120px] p-1 bg-white"
+                            style={{ opacity: 1, borderRadius: '10px' }}
+                            data-row-id={currentId} /* Store the ID as a data attribute */
+                        >
+                            {allButtons.map((button, index) => (
+                                <div key={`action-${currentId}-${index}`} className="">{button}</div>
+                            ))}
+                        </div>
+                    </Tooltip>
+                </div>
+            ];
+        }
+    };
+
+    return (
+        <div className="flex items-center justify-center gap-1">
+            {renderActionButtons()}
             <PopupConfim
                 dataLang={props.dataLang}
                 type="warning"

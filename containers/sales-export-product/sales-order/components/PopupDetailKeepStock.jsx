@@ -36,7 +36,7 @@ const initialValues = {
 };
 
 const PopupDetailKeepStock = (props) => {
-    const { dataLang, id } = props;
+    const { dataLang, id, totalButtons = 0 } = props;
 
     const [data, sData] = useState({});
 
@@ -227,16 +227,25 @@ const PopupDetailKeepStock = (props) => {
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
-                classNameBtn={""}
+                classNameBtn={"w-full"}
                 button={
-                    <button className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                    <button 
+                        className={`group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer
+                            ${totalButtons > 3 
+                                ? 'hover:bg-primary-05' 
+                                : 'hover:border-amber-500 hover:bg-amber-50'
+                            }`}
+                    >
                         <BoxSearch
                             size={20}
-                            className="group-hover:text-amber-500 group-hover:scale-110 group-hover:shadow-md "
+                            className={`size-5 transition-all duration-300 
+                                ${totalButtons > 3 ? "text-neutral-03 group-hover:text-neutral-07" : "group-hover:text-amber-500"}`}
                         />
-                        <p className="group-hover:text-amber-500 pr-2.5">
-                            {dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
-                        </p>
+                        {totalButtons > 3 && (
+                            <p className="text-neutral-03 group-hover:text-neutral-07 font-normal whitespace-nowrap">
+                                {dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
+                            </p>
+                        )}
                     </button>
                 }
             >

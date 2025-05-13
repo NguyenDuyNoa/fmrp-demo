@@ -1,13 +1,12 @@
 import { BtnAction } from "@/components/UI/BtnAction";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { Container, ContainerBody, ContainerTable, ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
+import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -41,7 +40,6 @@ import PopupDetailThere from "../components/detailThere";
 import PopupDetail from "./components/detail";
 import Popup_dspt from "./components/popup";
 import { useReceiptsList } from "./hooks/useReceiptsList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 
 const inistialValue = {
@@ -103,6 +101,12 @@ const Receipts = (props) => {
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
     };
+
+    const renderMoneyOrDash = (value) => {
+        return Number(value) === 0
+            ? "-"
+            : <>{formatMoney(value)} <span className="underline">đ</span></>;
+    };  
 
     const multiDataSet = [
         {
@@ -270,7 +274,7 @@ const Receipts = (props) => {
                                 <Popup_dspt
                                     onRefresh={refetch.bind(this)}
                                     dataLang={dataLang}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                                 />
                                 :
                                 <button
@@ -278,7 +282,7 @@ const Receipts = (props) => {
                                     onClick={() => {
                                         isShow("warning", WARNING_STATUS_ROLE);
                                     }}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                                 >
                                     {dataLang?.branch_popup_create_new}
                                 </button>
@@ -288,13 +292,18 @@ const Receipts = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-8 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-6">
-                                <div className="grid grid-cols-10 gap-2">
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
+                                {/* <div className="grid grid-cols-10 gap-2"> */}
                                     <SearchComponent
                                         dataLang={dataLang}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
                                         colSpan={2}
+                                    />
+                                    <DateToDateComponent
+                                        colSpan={2}
+                                        value={value.valueDate}
+                                        onChange={onChangeValue("valueDate")}
                                     />
                                     <SelectComponent
                                         options={[
@@ -341,12 +350,7 @@ const Receipts = (props) => {
                                         placeholder={dataLang?.payment_ob || "payment_ob"}
                                         colSpan={2}
                                     />
-                                    <DateToDateComponent
-                                        colSpan={2}
-                                        value={value.valueDate}
-                                        onChange={onChangeValue("valueDate")}
-                                    />
-                                </div>
+                                {/* </div> */}
                             </div>
                             <div className="col-span-2">
                                 <div className="flex items-center justify-end gap-2">
@@ -372,46 +376,46 @@ const Receipts = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     }
-                                    <div className="">
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <Customscrollbar className="h-full overflow-y-auto">
                             <div className="w-full">
-                                <HeaderTable gridCols={12} display={"grid"}>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                <HeaderTable gridCols={13} display={"grid"}>
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "stt"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.payment_date || "payment_date"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.payment_code || "payment_code"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.payment_obType || "payment_obType"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.payment_ob || "payment_ob"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.payment_voucherCode || "payment_voucherCode"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={0.5} textAlign={"left"}>
                                         {"PTTT"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.payment_creator || "payment_creator"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.payment_branch || "payment_branch"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.payment_note || "payment_note"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -422,23 +426,26 @@ const Receipts = (props) => {
                                     <Loading className="h-full" color="#0f4f9e" />
                                 ) : data?.rResult?.length > 0 ? (
                                     <div className="h-full divide-y divide-slate-200">
-                                        {data?.rResult?.map((e) => (
-                                            <RowTable gridCols={12} key={e.id.toString()}>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                        {data?.rResult?.map((e, index) => (
+                                            <RowTable gridCols={13} key={e.id.toString()}>
+                                                <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                    {index + 1}
+                                                </RowItemTable>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
                                                     <PopupDetail
                                                         dataLang={dataLang}
-                                                        className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]"
+                                                        className="responsive-text-sm font-medium hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]"
                                                         name={e?.code}
                                                         id={e?.id}
                                                     />
                                                 </RowItemTable>
                                                 <RowItemTable
                                                     colSpan={1}
-                                                    textAlign={"center"}
-                                                    className={"flex items-center justify-center"}
+                                                    textAlign={"left"}
+                                                    // className={"flex items-center justify-center"}
                                                 >
                                                     {
                                                         (e?.objects === "client" && <TagColorSky name={dataLang[e?.objects] || e?.objects} />)
@@ -448,47 +455,18 @@ const Receipts = (props) => {
                                                         (e?.objects === "other" && <TagColorRed name={dataLang[e?.objects] || e?.objects} />)
                                                     }
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                <RowItemTable colSpan={1.5} textAlign={"left"}>
                                                     {e?.object_text}
                                                 </RowItemTable>
-                                                <RowItemTable
-                                                    colSpan={1}
-                                                    className={"flex items-center justify-center"}
-                                                >
-                                                    {
-                                                        (e?.type_vouchers === "import" && (
-                                                            <TagColorMore
-                                                                color={"#a855f7"}
-                                                                backgroundColor={"#e9d5ff"}
-                                                                name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                            />
-                                                        ))
-                                                        ||
-                                                        (e?.type_vouchers === "deposit" && (
-                                                            <TagColorMore
-                                                                color={"#06b6d4"}
-                                                                backgroundColor={"#a5f3fc"}
-                                                                name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                            />
-                                                        ))
-                                                        ||
-                                                        (e?.type_vouchers === "service" && <TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />)
-                                                        ||
-                                                        (e?.type_vouchers === "order" && (
-                                                            <TagColorMore
-                                                                color={"#22c55e"}
-                                                                backgroundColor={"#bbf7d0"}
-                                                                name={dataLang[e?.type_vouchers] || e?.type_vouchers}
-                                                            />
-                                                        ))
-                                                    }
+                                                <RowItemTable colSpan={1}>
+                                                    { dataLang[e?.type_vouchers] || e?.type_vouchers}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} className="" textAlign={"left"}>
                                                     {e?.voucher?.map((code, index) => (
                                                         <PopupDetailThere
                                                             key={code?.id}
                                                             dataLang={dataLang}
-                                                            className=" hover:text-blue-600 transition-all ease-in-out 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 py-1  rounded-md text-center text-[#0F4F9E]"
+                                                            className=" hover:text-blue-600 transition-all ease-in-out responsive-text-sm px-2 py-1 rounded-md text-center text-[#0F4F9E]"
                                                             type={code.voucher_type}
                                                             id={code.id}
                                                             name={code?.code}
@@ -497,23 +475,25 @@ const Receipts = (props) => {
                                                         </PopupDetailThere>
                                                     ))}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                                <RowItemTable colSpan={0.5} textAlign={"left"}>
                                                     {e?.payment_mode_name}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"right"}>
-                                                    {formatMoney(e?.total)}
+                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    {renderMoneyOrDash(e?.total)}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className={""}>
+                                                <RowItemTable colSpan={1} textAlign={"center"}>
                                                     <CustomAvatar
                                                         fullName={e?.staff_name}
                                                         profileImage={e?.profile_image}
                                                     />
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} className="col-span-1 mx-auto">
-                                                    <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
+                                                <RowItemTable colSpan={1}>
+                                                    {/* <TagBranch className="w-fit"> */}
+                                                        {e?.branch_name}
+                                                        {/* </TagBranch> */}
                                                 </RowItemTable>
                                                 <RowItemTable
-                                                    colSpan={1}
+                                                    colSpan={1.5}
                                                     textAlign={"left"}
                                                     className={"truncate"}
                                                 >
@@ -539,10 +519,10 @@ const Receipts = (props) => {
                     </div>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
+                                {/* <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} /> */}
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -551,18 +531,19 @@ const Receipts = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
                 showTotal={true}
                 total={
                     <>
-                        <ContainerTotal>
-                            <ColumnTable colSpan={7} className="p-2" textAlign={"center"}>
+                        <ContainerTotal className={"!grid-cols-26"}>
+                            <RowItemTable colSpan={7.5} className="p-2" textAlign={"right"}>
                                 {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
-                            </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={"right"} className="p-2 mr-1">
-                                {formatMoney(data?.rTotal?.sum_total)}
-                            </ColumnTable>
+                            </RowItemTable>
+                            <RowItemTable colSpan={1} textAlign={"left"} className="p-2 mr-1">
+                                {renderMoneyOrDash(data?.rTotal?.sum_total)}
+                            </RowItemTable>
                         </ContainerTotal>
                     </>
                 }

@@ -16,7 +16,10 @@ import TabPlan from "./tabPlan";
 import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { CONFIRM_DELETION, TITLE_DELETE_COMMAND } from "@/constants/delete/deleteTable";
+import {
+    CONFIRM_DELETION,
+    TITLE_DELETE_COMMAND,
+} from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useBranchList } from "@/hooks/common/useBranch";
 import { useInternalPlansSearchCombobox } from "@/hooks/common/useInternalPlans";
@@ -34,8 +37,15 @@ import { ProductionsOrdersContext } from "@/containers/manufacture/productions-o
 import dynamic from "next/dynamic";
 import PopupPurchaseBeta from "../popup/popupPurchaseBeta";
 import useSetingServer from "@/hooks/useConfigNumber";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 // import ModalDetail from "@/containers/manufacture/productions-orders/components/modal/modalDetail";
-const ModalDetail = dynamic(() => import("@/containers/manufacture/productions-orders/components/modal/modalDetail"), { ssr: false });
+const ModalDetail = dynamic(
+    () =>
+        import(
+            "@/containers/manufacture/productions-orders/components/modal/modalDetail"
+        ),
+    { ssr: false }
+);
 
 const initialState = {
     isTab: "item",
@@ -44,7 +54,7 @@ const initialState = {
     listDataRight: {
         title: "",
         poId: null,
-        referenceNoPo: '',
+        referenceNoPo: "",
         dataPPItems: [],
         dataBom: {
             materialsBom: [],
@@ -68,7 +78,8 @@ const initialValue = {
     valuePlan: null,
     valueBr: null,
     searchOrder: "",
-    searchPlan: ""
+    searchPlan: "",
+    valueDate: { startDate: null, endDate: null },
 };
 
 const MainTable = ({ dataLang }) => {
@@ -93,18 +104,25 @@ const MainTable = ({ dataLang }) => {
         {
             id: 1,
             name: dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock",
-            icon: <MdAdd className="text-base text-blue-600" />,
+            // icon: <MdAdd className="text-base text-blue-600" />,
+            icon: <PlusIcon className="text-white" />,
         },
         {
             id: 2,
             name: "Thêm mua hàng",
-            icon: <MdAdd className="text-base text-blue-600" />,
+            // icon: <MdAdd className="text-base text-blue-600" />,
             // icon: "/materials_planning/add.png",
+            icon: <PlusIcon className="text-white" />,
         },
         {
             id: 3,
             name: dataLang?.materials_planning_delete || "materials_planning_delete",
-            icon: <RiDeleteBin5Line className="text-base text-red-600" />,
+            icon: (
+                <RiDeleteBin5Line
+                    // className="text-base text-red-600"
+                    className="text-white"
+                />
+            ),
             // icon: "/materials_planning/delete.png",
         },
     ];
@@ -130,7 +148,7 @@ const MainTable = ({ dataLang }) => {
 
     const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const [isParentId, sIsParentId] = useState(null);
 
@@ -148,13 +166,18 @@ const MainTable = ({ dataLang }) => {
 
     const queryState = (key) => sDataTable((prve) => ({ ...prve, ...key }));
 
-    const { data: listBranch = [] } = useBranchList()
+    const { data: listBranch = [] } = useBranchList();
 
-    const { data: listOrder = [] } = useOrdersSearchCombobox(isValue.searchOrder)
+    const { data: listOrder = [] } = useOrdersSearchCombobox(isValue.searchOrder);
 
-    const { data: listPlan = [] } = useInternalPlansSearchCombobox(isValue.searchPlan)
+    const { data: listPlan = [] } = useInternalPlansSearchCombobox(
+        isValue.searchPlan
+    );
 
-    const { isStateProvider: isStateProviderProductions, queryState: queryStateProviderProductions } = useContext(ProductionsOrdersContext);
+    const {
+        isStateProvider: isStateProviderProductions,
+        queryState: queryStateProviderProductions,
+    } = useContext(ProductionsOrdersContext);
 
     useEffect(() => {
         sIsMounted(true);
@@ -179,25 +202,47 @@ const MainTable = ({ dataLang }) => {
                 note: "",
             };
         });
+
         return newData;
     };
 
     const params = {
-        date_start: isValue.dateStart ? formatMoment(isValue.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
-        date_end: isValue.dateEnd ? formatMoment(isValue.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        // date_start: isValue.dateStart
+        //     ? formatMoment(isValue.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG)
+        //     : "",
+        // date_end: isValue.dateEnd
+        //     ? formatMoment(isValue.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG)
+        //     : "",
+
+        date_start:
+            isValue.valueDate?.startDate != null
+                ? formatMoment(isValue.valueDate?.startDate, FORMAT_MOMENT.DATE_SLASH_LONG)
+                : null,
+        date_end:
+            isValue.valueDate?.endDate != null ? formatMoment(isValue.valueDate?.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : null,
         search: isValue.search == "" ? "" : isValue.search,
-        orders_id: [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map((e) => e) : "",
-        internal_plans_id: [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map((e) => e) : "",
+        orders_id:
+            [isValue.valueOrder?.value]?.length > 0
+                ? [isValue.valueOrder?.value].map((e) => e)
+                : "",
+        internal_plans_id:
+            [isValue.valuePlan?.value]?.length > 0
+                ? [isValue.valuePlan?.value].map((e) => e)
+                : "",
         branch_id: isValue.valueBr?.value || "",
     };
-
+    console.log("🚀 ~ params:", params)
     useEffect(() => {
-        sIsParentId(null)
-    }, [isValue.search])
+        sIsParentId(null);
+    }, [isValue.search]);
 
     const fetchDataTable = async (page = 1, type) => {
         try {
-            const { data } = await apiMaterialsPlanning.apiProductionPlans(page, isValue.limit, { params: params });
+            const { data } = await apiMaterialsPlanning.apiProductionPlans(
+                page,
+                isValue.limit,
+                { params: params }
+            );
             const arrayItem = convertArrData(data?.productionPlans);
 
             queryState({
@@ -206,15 +251,20 @@ const MainTable = ({ dataLang }) => {
                 next: data?.next == 1,
             });
 
-            sIsParentId((isValue.search || type == 'delete') ? arrayItem[0]?.id : !isParentId ? arrayItem[0]?.id : isParentId ?? null)
+            sIsParentId(
+                isValue.search || type == "delete"
+                    ? arrayItem[0]?.id
+                    : !isParentId
+                        ? arrayItem[0]?.id
+                        : isParentId ?? null
+            );
 
-
-            if (type == 'submit') {
-                refetch()
+            if (type == "submit") {
+                refetch();
             }
 
-            if (type == 'delete') {
-                await fetchDataTableRight(arrayItem[0]?.id)
+            if (type == "delete") {
+                await fetchDataTableRight(arrayItem[0]?.id);
             }
 
             if (data?.productionPlans?.length == 0) {
@@ -240,11 +290,24 @@ const MainTable = ({ dataLang }) => {
         if (isMounted) {
             fetchDataTable(isValue.page);
         }
-    }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan, isValue.valueBr, isMounted,]);
+    }, [
+        isValue.search,
+        isValue.dateStart,
+        isValue.dateEnd,
+        isValue.valueOrder,
+        isValue.valuePlan,
+        isValue.valueBr,
+        isMounted,
+        isValue.valueDate
+    ]);
 
     const fetchDataTableSeeMore = async () => {
         try {
-            const { data } = await apiMaterialsPlanning.apiProductionPlans(isValue.page, isValue.limit, { params: params });
+            const { data } = await apiMaterialsPlanning.apiProductionPlans(
+                isValue.page,
+                isValue.limit,
+                { params: params }
+            );
             const item = convertArrData(data?.productionPlans);
             let arrayItem = [...dataTable.productionOrdersList, ...item];
             queryState({
@@ -261,7 +324,7 @@ const MainTable = ({ dataLang }) => {
                         poId: null,
                         referenceNoPo: null,
                         dataPPItems: [],
-                        dataBom: { productsBom: [], materialsBom: [], },
+                        dataBom: { productsBom: [], materialsBom: [] },
                         dataKeepStock: [],
                         dataPurchases: [],
                     },
@@ -278,11 +341,10 @@ const MainTable = ({ dataLang }) => {
         }
     }, [isValue.page]);
 
-
-
     const fetchDataTableRight = async (id) => {
         try {
-            const { data, isSuccess } = await apiMaterialsPlanning.apiDetailProductionPlans(id);
+            const { data, isSuccess } =
+                await apiMaterialsPlanning.apiDetailProductionPlans(id);
 
             if (isSuccess == 1) {
                 queryState({
@@ -307,8 +369,14 @@ const MainTable = ({ dataLang }) => {
                                         quantity: +i?.quantity,
                                         unit: i?.unit_name,
                                         timeline: {
-                                            start: formatMoment(i?.timeline_start, FORMAT_MOMENT.DATE_SLASH_LONG),
-                                            end: formatMoment(i?.timeline_end, FORMAT_MOMENT.DATE_SLASH_LONG),
+                                            start: formatMoment(
+                                                i?.timeline_start,
+                                                FORMAT_MOMENT.DATE_SLASH_LONG
+                                            ),
+                                            end: formatMoment(
+                                                i?.timeline_end,
+                                                FORMAT_MOMENT.DATE_SLASH_LONG
+                                            ),
                                         },
                                     };
                                 }),
@@ -400,13 +468,19 @@ const MainTable = ({ dataLang }) => {
                                         processBar: [
                                             {
                                                 id: uddid(),
-                                                active: i?.quantity_order && i?.quantity_order > 0 ? true : false,
+                                                active:
+                                                    i?.quantity_order && i?.quantity_order > 0
+                                                        ? true
+                                                        : false,
                                                 title: "Đặt hàng",
                                                 quantity: i?.quantity_order,
                                             },
                                             {
                                                 id: uddid(),
-                                                active: i?.quantity_import && i?.quantity_import > 0 ? true : false,
+                                                active:
+                                                    i?.quantity_import && i?.quantity_import > 0
+                                                        ? true
+                                                        : false,
                                                 title: "Nhập hàng",
                                                 quantity: i?.quantity_import,
                                             },
@@ -419,29 +493,28 @@ const MainTable = ({ dataLang }) => {
                 });
             }
         } catch (error) {
-            throw error
+            throw error;
         }
     };
 
-
-
     const { isLoading: isLoadingDataTableRight, refetch } = useQuery({
-        queryKey: ['fetch_data_table_right', isParentId],
+        queryKey: ["fetch_data_table_right", isParentId],
         queryFn: () => fetchDataTableRight(isParentId),
         enabled: !!isParentId,
         staleTime: 10000,
         placeholderData: keepPreviousData,
-        ...optionsQuery
-    })
+        ...optionsQuery,
+    });
 
     const handleActiveTab = (e) => {
         queryState({ isTab: e });
     };
 
     const handleConfim = async () => {
-        const { isSuccess, message } = await apiMaterialsPlanning.apiDeleteProductionPlans(isId);
+        const { isSuccess, message } =
+            await apiMaterialsPlanning.apiDeleteProductionPlans(isId);
         if (isSuccess == 1) {
-            fetchDataTable(1, 'delete');
+            fetchDataTable(1, "delete");
             isShow("success", `${dataLang[message] || message}`);
         } else {
             isShow("error", `${dataLang[message] || message}`);
@@ -480,26 +553,25 @@ const MainTable = ({ dataLang }) => {
             dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
             dataPurchases: `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`,
         };
-        const { isSuccess, message } = await apiMaterialsPlanning.apiDeletePurchasesTransfer(type[isIdChild]);
+        const { isSuccess, message } =
+            await apiMaterialsPlanning.apiDeletePurchasesTransfer(type[isIdChild]);
         if (isSuccess) {
-            fetchDataTable(1, 'delete');
+            fetchDataTable(1, "delete");
             queryValue({ page: 1 });
             isShow("success", dataLang[message] || message);
         } else {
             isShow("error", dataLang[message] || message);
         }
         handleQueryId({ status: false });
-
     };
 
     const fetchDataPlan = debounce(async (e) => {
-        queryValue({ searchPlan: e })
+        queryValue({ searchPlan: e });
     }, 500);
 
     const fetchDataOrder = debounce(async (e) => {
-        queryValue({ searchOrder: e })
+        queryValue({ searchOrder: e });
     }, 500);
-
 
     const shareProps = {
         dataTable,
@@ -522,11 +594,13 @@ const MainTable = ({ dataLang }) => {
     if (!isMounted) return null;
 
     return (
-        <React.Fragment>
+        <div className="h-full">
             <FilterHeader {...shareProps} />
             <div className="!mt-[14px]">
                 <h1 className="text-[#141522] font-medium text-sm my-2">
-                    {dataLang?.materials_planning_total_nvl || "materials_planning_total_nvl"}: {dataTable?.countAll}
+                    {dataLang?.materials_planning_total_nvl ||
+                        "materials_planning_total_nvl"}
+                    : {dataTable?.countAll}
                 </h1>
                 <div className="flex ">
                     <div className="w-[20%] border-r-0 border-[#d8dae5] border">
@@ -540,7 +614,10 @@ const MainTable = ({ dataLang }) => {
                                     onChange={(e) => onChangeSearch(e)}
                                     className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                     type="text"
-                                    placeholder={dataLang?.materials_planning_find_nvl || "materials_planning_find_nvl"}
+                                    placeholder={
+                                        dataLang?.materials_planning_find_nvl ||
+                                        "materials_planning_find_nvl"
+                                    }
                                 />
                             </form>
                         </div>
@@ -553,7 +630,11 @@ const MainTable = ({ dataLang }) => {
                                         sIsParentId(e.id);
                                     }}
                                     // onClick={() => handleShow(e.id)}
-                                    className={`py-2 pl-2 pr-3 ${e.id == isParentId && "bg-[#F0F7FF]"} hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"} `}
+                                    className={`py-2 pl-2 pr-3 ${e.id == isParentId && "bg-[#F0F7FF]"
+                                        } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${dataTable.length - 1 == eIndex
+                                            ? "border-b-none"
+                                            : "border-b"
+                                        } `}
                                 >
                                     <div className="flex justify-between">
                                         <div className="flex flex-col gap-1">
@@ -561,19 +642,25 @@ const MainTable = ({ dataLang }) => {
                                                 {e.title}
                                             </h1>
                                             <h3 className="text-[#667085] font-normal text-[11px]">
-                                                {dataLang?.materials_planning_create_on || "materials_planning_create_on"}{" "}
+                                                {dataLang?.materials_planning_create_on ||
+                                                    "materials_planning_create_on"}{" "}
                                                 <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
                                                     {e.time}
                                                 </span>
                                             </h3>
-                                            <TagBranch className="w-fit">{e?.nameBranch}</TagBranch>
+                                            {/* <TagBranch className="w-fit">{e?.nameBranch}</TagBranch> */}
+                                            <p className="responsive-text-sm font-semibold text-wrap py-1">
+                                                {e?.nameBranch}
+                                            </p>
                                         </div>
                                     </div>
                                     {e.id == isParentId && (
                                         <div className="flex flex-col gap-2 mt-1">
                                             <div className="flex items-center gap-1">
                                                 <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
-                                                    {dataLang?.materials_planning_foloww_up || "materials_planning_foloww_up"} :
+                                                    {dataLang?.materials_planning_foloww_up ||
+                                                        "materials_planning_foloww_up"}{" "}
+                                                    :
                                                 </h3>
                                                 <div className="flex items-center gap-1">
                                                     {e.followUp.map((i) => (
@@ -595,7 +682,8 @@ const MainTable = ({ dataLang }) => {
                                     onClick={() => queryValue({ page: isValue.page + 1 })}
                                     className="block w-full py-1 mx-auto mt-1 text-sm transition-all duration-200 ease-linear bg-blue-50 hover:bg-blue-200"
                                 >
-                                    {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
+                                    {dataLang?.materials_planning_see_more ||
+                                        "materials_planning_see_more"}
                                 </button>
                             )}
                         </Customscrollbar>
@@ -608,87 +696,97 @@ const MainTable = ({ dataLang }) => {
                                 </h1>
                                 <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
                                     {/* {dataTable.listDataRight?.title ?? (dataLang?.materials_planning_no_nvl || "materials_planning_no_nvl")} <span>{}</span> */}
-                                    {
-                                        dataTable.listDataRight?.title
-                                            ?
-                                            <div className="flex items-center">
-                                                <p>{dataTable.listDataRight?.title}</p>{
-                                                    dataTable.listDataRight?.referenceNoPo && <span>
-                                                        /  <TagColorOrange
-                                                            onClick={() => {
-                                                                // queryStateProviderProductions({
-                                                                //     openModal: true,
-                                                                //     dataModal: {
-                                                                //         id: dataTable.listDataRight?.poId
-                                                                //     }
-                                                                // });
-                                                            }}
-                                                            name={dataTable.listDataRight?.referenceNoPo}
-                                                            className={'relative !text-[11px] top-0 3xl:!py-1 !py-1 cursor-pointer select-none'}
-                                                        />
-                                                    </span>
-                                                }
-                                            </div>
-                                            :
-                                            (dataLang?.materials_planning_no_nvl || "materials_planning_no_nvl")
-                                    }
+                                    {dataTable.listDataRight?.title ? (
+                                        <div className="flex items-center">
+                                            <p>{dataTable.listDataRight?.title}</p>
+                                            {dataTable.listDataRight?.referenceNoPo && (
+                                                <span>
+                                                    /{" "}
+                                                    <TagColorOrange
+                                                        onClick={() => {
+                                                            // queryStateProviderProductions({
+                                                            //     openModal: true,
+                                                            //     dataModal: {
+                                                            //         id: dataTable.listDataRight?.poId
+                                                            //     }
+                                                            // });
+                                                        }}
+                                                        name={dataTable.listDataRight?.referenceNoPo}
+                                                        className={
+                                                            "relative !text-[11px] top-0 3xl:!py-1 !py-1 cursor-pointer select-none"
+                                                        }
+                                                    />
+                                                </span>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        dataLang?.materials_planning_no_nvl ||
+                                        "materials_planning_no_nvl"
+                                    )}
                                 </h1>
                             </div>
                             <div className="flex gap-4">
-                                {
-                                    arrButton.map((e) => (
-                                        <Zoom
-                                            key={e.id}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 1.08 }}
-                                            className="w-fit"
-                                        >
-                                            {(e.id == 3 && (
-                                                <button
-                                                    className="bg-red-100 rounded-lg outline-none focus:outline-none"
-                                                    onClick={() => {
-                                                        if (+dataTable?.countAll == 0) {
-                                                            return isShow("error", dataLang?.materials_planning_please_add || "materials_planning_please_add");
-                                                        }
-                                                        if (e.id == 3) {
-                                                            queryValue({ page: 1 });
-                                                            handleQueryId({ status: true, id: dataTable.listDataRight?.idCommand });
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className="flex items-center gap-2 px-3 py-2 ">
+                                {arrButton.map((e) => (
+                                    <Zoom
+                                        key={e.id}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 1.08 }}
+                                        className="w-fit"
+                                    >
+                                        {(e.id == 3 && (
+                                            <button
+                                                // className="bg-red-100 rounded-lg outline-none focus:outline-none"
+                                                className=" responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 bg-red-600 text-white rounded-lg btn-animation hover:scale-105 flex items-center gap-x-2"
+                                                onClick={() => {
+                                                    if (+dataTable?.countAll == 0) {
+                                                        return isShow(
+                                                            "error",
+                                                            dataLang?.materials_planning_please_add ||
+                                                            "materials_planning_please_add"
+                                                        );
+                                                    }
+                                                    if (e.id == 3) {
+                                                        queryValue({ page: 1 });
+                                                        handleQueryId({
+                                                            status: true,
+                                                            id: dataTable.listDataRight?.idCommand,
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                {e.icon} {e.name}
+                                                {/* <div className="flex items-center gap-2 px-3 py-2 ">
                                                         {e.icon}
                                                         <h3 className="text-xs font-medium text-red-600 3xl:text-base">
                                                             {e.name}
                                                         </h3>
-                                                    </div>
-                                                </button>
+                                                    </div> */}
+                                            </button>
+                                        )) ||
+                                            (e.id == 1 && (
+                                                <PopupKeepStock
+                                                    id={e.id}
+                                                    queryValue={queryValue}
+                                                    fetchDataTable={fetchDataTable}
+                                                    dataLang={dataLang}
+                                                    title={e.name}
+                                                    dataTable={dataTable}
+                                                    icon={e.icon}
+                                                />
                                             )) ||
-                                                (e.id == 1 && (
-                                                    <PopupKeepStock
-                                                        id={e.id}
-                                                        queryValue={queryValue}
-                                                        fetchDataTable={fetchDataTable}
-                                                        dataLang={dataLang}
-                                                        title={e.name}
-                                                        dataTable={dataTable}
-                                                        icon={e.icon}
-                                                    />
-                                                )) ||
-                                                (e.id == 2 && (
-                                                    <PopupPurchaseBeta
-                                                        id={e.id}
-                                                        queryValue={queryValue}
-                                                        fetchDataTable={fetchDataTable}
-                                                        dataLang={dataLang}
-                                                        title={e.name}
-                                                        dataTable={dataTable}
-                                                        icon={e.icon}
-                                                    />
-                                                ))}
-                                        </Zoom>
-                                    ))
-                                }
+                                            (e.id == 2 && (
+                                                <PopupPurchaseBeta
+                                                    id={e.id}
+                                                    queryValue={queryValue}
+                                                    fetchDataTable={fetchDataTable}
+                                                    dataLang={dataLang}
+                                                    title={e.name}
+                                                    dataTable={dataTable}
+                                                    icon={e.icon}
+                                                />
+                                            ))}
+                                    </Zoom>
+                                ))}
                             </div>
                         </div>
                         <div className="mx-4">
@@ -698,9 +796,17 @@ const MainTable = ({ dataLang }) => {
                                         <button
                                             key={e.id}
                                             onClick={() => handleActiveTab(e.type)}
-                                            className={`hover:bg-[#F7FBFF] ${dataTable.isTab == e.type ? "border-[#0F4F9E] border-b bg-[#F7FBFF]" : 'border-b border-transparent'} hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
+                                            className={`hover:bg-[#F7FBFF] ${dataTable.isTab == e.type
+                                                ? "border-[#0F4F9E] border-b bg-[#F7FBFF]"
+                                                : "border-b border-transparent"
+                                                } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
                                         >
-                                            <h3 className={`py-[10px] px-2  font-normal ${dataTable.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"} 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}>
+                                            <h3
+                                                className={`py-[10px] px-2  font-normal ${dataTable.isTab == e.type
+                                                    ? "text-[#0F4F9E]"
+                                                    : "text-[#667085]"
+                                                    } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
+                                            >
                                                 {e.name}
                                             </h3>
                                         </button>
@@ -710,13 +816,15 @@ const MainTable = ({ dataLang }) => {
                             <div className="">
                                 {dataTable.isTab == "item" && <TabItem {...shareProps} />}
                                 {dataTable.isTab == "plan" && <TabPlan {...shareProps} />}
-                                {dataTable.isTab == "keepStock" && <TabKeepStock {...shareProps} />}
+                                {dataTable.isTab == "keepStock" && (
+                                    <TabKeepStock {...shareProps} />
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <ModalDetail {...shareProps} />
+            {/* <ModalDetail {...shareProps} /> */}
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
@@ -732,7 +840,7 @@ const MainTable = ({ dataLang }) => {
                 }}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment>
+        </div>
     );
 };
 export default MainTable;

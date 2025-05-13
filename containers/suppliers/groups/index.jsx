@@ -173,7 +173,7 @@ const SuppliersGroups = (props) => {
                 isState={isState}
                 onRefresh={refetch.bind(this)}
                 dataLang={dataLang}
-                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white  btn-animation hover:scale-105"
               />
             ) : (
               <button
@@ -181,7 +181,7 @@ const SuppliersGroups = (props) => {
                 onClick={() => {
                   isShow("error", WARNING_STATUS_ROLE);
                 }}
-                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                className="responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 text-sm font-normal rounded-md bg-background-blue-2 text-white  btn-animation hover:scale-105"
               >
                 {dataLang?.branch_popup_create_new}
               </button>
@@ -191,82 +191,72 @@ const SuppliersGroups = (props) => {
       }
       table={
         <div className="flex flex-col h-full">
-          <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-            <div className="col-span-4">
-              <div className="grid items-center grid-cols-9 gap-2">
-                <SearchComponent
-                  dataLang={dataLang}
-                  onChange={_HandleOnChangeKeySearch.bind(this)}
-                  colSpan={2}
-                />
-                <SelectComponent
-                  options={[
-                    {
-                      value: "",
-                      label:
-                        dataLang?.price_quote_branch || "price_quote_branch",
-                      isDisabled: true,
-                    },
-                    ...listBr,
-                  ]}
-                  onChange={(e) => queryState({ idBranch: e })}
-                  value={isState.idBranch}
-                  placeholder={
-                    dataLang?.price_quote_branch || "price_quote_branch"
-                  }
-                  colSpan={3}
-                  components={{ MultiValue }}
-                  isMulti={true}
-                  closeMenuOnSelect={false}
-                />
-              </div>
+          <div className="w-full items-center flex justify-between gap-2">
+            <div className="flex gap-3 items-center w-full">
+              <SearchComponent
+                dataLang={dataLang}
+                onChange={_HandleOnChangeKeySearch.bind(this)}
+                colSpan={2}
+              />
+              <SelectComponent
+                options={[
+                  {
+                    value: "",
+                    label:
+                      dataLang?.price_quote_branch || "price_quote_branch",
+                    isDisabled: true,
+                  },
+                  ...listBr,
+                ]}
+                onChange={(e) => queryState({ idBranch: e })}
+                value={isState.idBranch}
+                placeholder={
+                  dataLang?.price_quote_branch || "price_quote_branch"
+                }
+                colSpan={3}
+                components={{ MultiValue }}
+                isMulti={true}
+                closeMenuOnSelect={false}
+              />
             </div>
-            <div className="col-span-2">
-              <div className="flex items-center justify-end space-x-2">
-                <OnResetData
-                  onClick={refetch.bind(this)}
-                  sOnFetching={(e) => { }}
-                />
-                {role == true || checkExport ? (
-                  <div className={``}>
-                    {data?.rResult?.length > 0 && (
-                      <ExcelFileComponent
-                        multiDataSet={multiDataSet}
-                        filename="Nhóm nhà cung cấp"
-                        title="Nncc"
-                        dataLang={dataLang}
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => isShow("error", WARNING_STATUS_ROLE)}
-                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
-                  >
-                    <Grid6
-                      className="scale-75 2xl:scale-100 xl:scale-100"
-                      size={18}
+            <div className="flex items-center justify-end space-x-2">
+              <OnResetData
+                onClick={refetch.bind(this)}
+                sOnFetching={(e) => { }}
+              />
+              {role == true || checkExport ? (
+                <div className={``}>
+                  {data?.rResult?.length > 0 && (
+                    <ExcelFileComponent
+                      multiDataSet={multiDataSet}
+                      filename="Nhóm nhà cung cấp"
+                      title="Nncc"
+                      dataLang={dataLang}
                     />
-                    <span>{dataLang?.client_list_exportexcel}</span>
-                  </button>
-                )}
-                <div>
-                  <DropdowLimit
-                    sLimit={sLimit}
-                    limit={limit}
-                    dataLang={dataLang}
-                  />
+                  )}
                 </div>
-              </div>
+              ) : (
+                <button
+                  onClick={() => isShow("error", WARNING_STATUS_ROLE)}
+                  className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                >
+                  <Grid6
+                    className="scale-75 2xl:scale-100 xl:scale-100"
+                    size={18}
+                  />
+                  <span>{dataLang?.client_list_exportexcel}</span>
+                </button>
+              )}
+
             </div>
           </div>
           <Customscrollbar className="h-full overflow-y-auto">
             <div className="w-full">
               <HeaderTable gridCols={12}>
-                <ColumnTable colSpan={6} textAlign={"center"}>
+                <ColumnTable colSpan={6} textAlign={"left"}>
                   {dataLang?.suppliers_groups_name}
                 </ColumnTable>
-                <ColumnTable colSpan={4} textAlign={"center"}>
+                <ColumnTable colSpan={4} textAlign={"left"}>
                   {dataLang?.client_list_brand}
                 </ColumnTable>
                 <ColumnTable colSpan={2} textAlign={"center"}>
@@ -287,7 +277,10 @@ const SuppliersGroups = (props) => {
                         className="flex flex-wrap items-center gap-1"
                       >
                         {e.branch?.map((i) => (
-                          <TagBranch key={i}>{i.name}</TagBranch>
+                          <span className="flex flex-wrap items-center justify-center gap-2" key={i}>
+                            {/* <TagBranch key={i}>{i.name}</TagBranch> */}
+                            {i.name}
+                          </span>
                         ))}
                       </RowItemTable>
                       <RowItemTable
@@ -333,13 +326,13 @@ const SuppliersGroups = (props) => {
         </div>
       }
       pagination={
-        <>
+        <div className="flex items-center justify-between gap-2">
           {data?.rResult?.length != 0 && (
             <ContainerPagination>
-              <TitlePagination
+              {/* <TitlePagination
                 dataLang={dataLang}
                 totalItems={data?.output?.iTotalDisplayRecords}
-              />
+              /> */}
               <Pagination
                 postsPerPage={limit}
                 totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -348,7 +341,12 @@ const SuppliersGroups = (props) => {
               />
             </ContainerPagination>
           )}
-        </>
+          <DropdowLimit
+            sLimit={sLimit}
+            limit={limit}
+            dataLang={dataLang}
+          />
+        </div>
       }
     />
   );

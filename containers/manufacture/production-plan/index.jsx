@@ -13,7 +13,10 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useTab from "@/hooks/useTab";
 import { useToggle } from "@/hooks/useToggle";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import {
+    CONFIRMATION_OF_CHANGES,
+    TITLE_DELETE_ITEMS,
+} from "@/constants/delete/deleteItems";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
@@ -39,35 +42,39 @@ import { useCategoryOptions } from "@/containers/products/hooks/product/useCateg
 import { useBranchList } from "@/hooks/common/useBranch";
 import { useClientComboboxNoSearchToParams } from "@/hooks/common/useClients";
 import { useProductsVariantByBranchSearch } from "@/hooks/common/useProductTypeProducts";
-import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import {
+    keepPreviousData,
+    useInfiniteQuery,
+    useQuery,
+} from "@tanstack/react-query";
 import FilterHeader from "./components/fillter/filterHeader";
 import { ProductionsOrdersProvider } from "../productions-orders/context/productionsOrders";
 import GanttChart from "./components/gantt/ganttFinal";
-
 
 const initialData = {
     timeLine: [],
     listOrder: [],
     planStatus: [
-        { id: '-1', value: "-1", label: "Tất cả" },
+        { id: "-1", value: "-1", label: "Tất cả" },
         // { id: uuid(), value: "outDate", label: "Đã quá hạn" },
-        { id: '0', value: "0", label: "Chưa thực hiện" },
-        { id: '1', value: "1", label: "Đang thực hiện" },
-        { id: '2', value: "2", label: "Hoàn thành" },
+        { id: "0", value: "0", label: "Chưa thực hiện" },
+        { id: "1", value: "1", label: "Đang thực hiện" },
+        { id: "2", value: "2", label: "Hoàn thành" },
         // 0: chưa thuc hien, 1 đang thic hien, 2 hoàn thành
     ],
     keySearchProducts: "",
-    dataBackend: null
+    dataBackend: null,
 };
 
 const initialValues = {
-    startDate: null,
-    endDate: null,
+    // startDate: null,
+    // endDate: null,
     idClient: null,
     idProductGroup: null,
     idProduct: null,
     valueBr: null,
     planStatus: null,
+    valueDate: { startDate: null, endDate: null },
 };
 
 const ProductionPlan = (props) => {
@@ -80,7 +87,6 @@ const ProductionPlan = (props) => {
     const { paginate } = usePagination();
 
     const { handleTab } = useTab("order");
-
 
     const [isSort, sIsSort] = useState("");
 
@@ -96,35 +102,60 @@ const ProductionPlan = (props) => {
 
     const { limit, totalItems, updateTotalItems } = useLimitAndTotalItems();
 
-    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    const { is_admin: role, permissions_current: auth } = useSelector(
+        (state) => state.auth
+    );
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "production_plans_fmrp");
+    const { checkAdd, checkEdit, checkExport } = useActionRole(
+        auth,
+        "production_plans_fmrp"
+    );
 
-    const { data: listBranch = [] } = useBranchList()
+    const { data: listBranch = [] } = useBranchList();
 
-    const { data: listCategory = [] } = useCategoryOptions({})
+    const { data: listCategory = [] } = useCategoryOptions({});
 
     const { data: listClient = [] } = useClientComboboxNoSearchToParams({});
 
-    const { data: listProduct = [] } = useProductsVariantByBranchSearch({ value: 0 }, isData.keySearchProducts)
+    const { data: listProduct = [] } = useProductsVariantByBranchSearch(
+        { value: 0 },
+        isData.keySearchProducts
+    );
 
     const params = {
         page: router.query?.page || 1,
         limit: 15,
         sort: isSort,
-        status: isValue?.planStatus?.map(e => e?.value),
-        date_start: isValue.startDate ? formatMoment(isValue.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
-        date_end: isValue.endDate ? formatMoment(isValue.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        status: isValue?.planStatus?.map((e) => e?.value),
+        // date_start: isValue.startDate ? formatMoment(isValue.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        // date_end: isValue.endDate ? formatMoment(isValue.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        date_start:
+            isValue.valueDate?.startDate != null
+                ? formatMoment(isValue.valueDate?.startDate, FORMAT_MOMENT.DATE_SLASH_LONG)
+                : null,
+        date_end:
+            isValue.valueDate?.endDate != null ? formatMoment(isValue.valueDate?.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : null,
         customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
-        category_id: isValue.idProductGroup?.value ? isValue.idProductGroup?.value : "",
+        category_id: isValue.idProductGroup?.value
+            ? isValue.idProductGroup?.value
+            : "",
         branch_id: isValue.valueBr?.value ? isValue.valueBr?.value : "",
-        product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,
+        product_id:
+            isValue.idProduct?.length > 0
+                ? isValue.idProduct.map((e) => e?.value)
+                : null,
     };
 
+
     const _ServerFetching = async (req) => {
-        const url = router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true";
+        const url =
+            router.query?.tab == "plan"
+                ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true"
+                : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true";
         try {
-            const { data } = await apiProductionPlan.apiListOrderPlan(url, { params: req });
+            const { data } = await apiProductionPlan.apiListOrderPlan(url, {
+                params: req,
+            });
             const res = data?.rResult?.map((i) => {
                 return {
                     ...i,
@@ -153,7 +184,7 @@ const ProductionPlan = (props) => {
                         };
                     }),
                 };
-            })
+            });
             // updateData({
             //     timeLine: data?.listDate?.map((e) => {
             //         return {
@@ -174,11 +205,10 @@ const ProductionPlan = (props) => {
             // updateTotalItems({ iTotalDisplayRecords: data?.output?.iTotalDisplayRecords, iTotalRecords: data?.output?.iTotalRecords });
             return {
                 ...data,
-                rResult: res
-            }
-
+                rResult: res,
+            };
         } catch (error) {
-            throw error
+            throw error;
         }
     };
 
@@ -189,65 +219,77 @@ const ProductionPlan = (props) => {
     //     enabled: router.query.tab == 'order' || router.query.tab == 'plan',
     //     ...optionsQuery
     // })
-    const { isLoading, isFetching, data, hasNextPage, fetchNextPage } = useInfiniteQuery({
-        queryKey: ["api_production_internal_plan", { ...params }, router.query.tab],
-        queryFn: async ({ pageParam = 1 }) => {
-            const data = await _ServerFetching({
-                ...params,
-                page: pageParam
-            })
+    const { isLoading, isFetching, data, hasNextPage, fetchNextPage } =
+        useInfiniteQuery({
+            queryKey: [
+                "api_production_internal_plan",
+                { ...params },
+                router.query.tab,
+            ],
+            queryFn: async ({ pageParam = 1 }) => {
+                const data = await _ServerFetching({
+                    ...params,
+                    page: pageParam,
+                });
 
-            return data;
-        },
-        getNextPageParam: (lastPage, pages) => {
-            return lastPage?.output?.next == 1 ? pages?.length + 1 : null;
-        },
-        retry: 5,
-        retryDelay: 5000,
-        initialPageParam: 1,
-        enabled: router.query.tab == 'order' || router.query.tab == 'plan',
-        ...optionsQuery,
-    })
+                return data;
+            },
+            getNextPageParam: (lastPage, pages) => {
+                return lastPage?.output?.next == 1 ? pages?.length + 1 : null;
+            },
+            retry: 5,
+            retryDelay: 5000,
+            initialPageParam: 1,
+            enabled: router.query.tab == "order" || router.query.tab == "plan",
+            ...optionsQuery,
+        });
 
-    const convertData = data ? data?.pages?.map((item) => item?.rResult).flat() : []
+    const convertData = data
+        ? data?.pages?.map((item) => item?.rResult).flat()
+        : [];
     useEffect(() => {
-        updateData({ listOrder: convertData })
-    }, [data])
+        updateData({ listOrder: convertData });
+    }, [data]);
 
     const _HandleSeachApi = debounce(async (inputValue) => {
         try {
             updateData({ keySearchProducts: inputValue });
         } catch (error) {
-            throw error
+            throw error;
         }
     }, 500);
 
     const [checkedItems, setCheckedItems] = useState([]);
 
     const handleCheked = (order, product) => {
-
-        setCheckedItems(prev => {
-            const index = prev.findIndex(item => item?.id === product?.id);
+        setCheckedItems((prev) => {
+            const index = prev.findIndex((item) => item?.id === product?.id);
 
             if (index !== -1) {
                 // Nếu sản phẩm đã có trong danh sách, bỏ chọn (xoá khỏi danh sách)
-                return prev.filter(item => item?.id !== product?.id);
+                return prev.filter((item) => item?.id !== product?.id);
             } else {
                 // Nếu chưa có, thêm nguyên phần tử vào danh sách
-                return [...prev, { ...product, idParent: order?.id, nameOrder: order?.nameOrder }];
+                return [
+                    ...prev,
+                    { ...product, idParent: order?.id, nameOrder: order?.nameOrder },
+                ];
             }
         });
     };
 
     const handleChekedAll = () => {
-        setCheckedItems(prev => {
-            if (prev.length === isData.listOrder?.flatMap(order => order?.listProducts)?.length) {
+        setCheckedItems((prev) => {
+            if (
+                prev.length ===
+                isData.listOrder?.flatMap((order) => order?.listProducts)?.length
+            ) {
                 // Nếu tất cả đã được chọn, thì bỏ chọn hết
                 return [];
             } else {
                 // Nếu chưa chọn hết, chọn tất cả và push nguyên phần tử
-                return isData.listOrder?.flatMap(order =>
-                    order.listProducts?.map(product => ({
+                return isData.listOrder?.flatMap((order) =>
+                    order.listProducts?.map((product) => ({
                         ...product,
                     }))
                 );
@@ -255,7 +297,8 @@ const ProductionPlan = (props) => {
         });
     };
 
-    const handleSort = () => sIsSort(isSort == "reference_no" ? "-reference_no" : "reference_no");
+    const handleSort = () =>
+        sIsSort(isSort == "reference_no" ? "-reference_no" : "reference_no");
 
     useEffect(() => {
         removeItem("arrData");
@@ -294,25 +337,24 @@ const ProductionPlan = (props) => {
         router: router.query?.tab,
         page: router.query?.page,
         typeScreen: props.type,
-        hasNextPage, fetchNextPage
+        hasNextPage,
+        fetchNextPage,
     };
-
-    
 
     return (
         <>
             <Head>
-                <title>{dataLang?.production_plan_title || 'production_plan_title'}</title>
+                <title>
+                    {dataLang?.production_plan_title || "production_plan_title"}
+                </title>
             </Head>
             <Container>
-                {
-                    props.type == 'mobile'
-                        ?
-                        null
-                        :
-                        statusExprired ? <EmptyExprired /> : <Header {...shareProps} />
-                }
-                <FilterHeader {...shareProps} onChangeValue={onChangeValue} />
+                {props.type == "mobile" ? null : statusExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <Header {...shareProps} onChangeValue={onChangeValue} />
+                )}
+                {/* <FilterHeader {...shareProps} onChangeValue={onChangeValue} /> */}
                 <ProductionsOrdersProvider>
                     {/* <BodyGantt
                         {...shareProps}
@@ -323,14 +365,18 @@ const ProductionPlan = (props) => {
                         isSort={isSort == "reference_no" ? false : true}
                         handleCheked={handleCheked}
                     /> */}
-                    <GanttChart
-                        {...shareProps}
-                        handleSort={handleSort}
-                        data={[]}
-                        timeLine={isData.timeLine}
-                        isSort={isSort == "reference_no" ? false : true}
-                        handleCheked={handleCheked}
-                        dataOrder={isData.listOrder} />
+                    <div className="min-h-full  w-full">
+                        <GanttChart
+                            {...shareProps}
+                            handleSort={handleSort}
+                            data={[]}
+                            timeLine={isData.timeLine}
+                            isSort={isSort == "reference_no" ? false : true}
+                            handleCheked={handleCheked}
+                            dataOrder={isData.listOrder}
+                        />
+                    </div>
+
                 </ProductionsOrdersProvider>
                 {/* {isData.listOrder?.length > 0 && (
                     <ContainerPagination className="flex items-center space-x-5">

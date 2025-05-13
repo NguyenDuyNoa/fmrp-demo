@@ -1,11 +1,11 @@
 import apiReturns from "@/Api/apiPurchaseOrder/apiReturns";
 import { BtnAction } from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import {
@@ -14,18 +14,13 @@ import {
     RowItemTable,
     RowTable,
 } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
     TagColorOrange,
     TagColorSky,
 } from "@/components/UI/common/Tag/TagStatus";
 import {
-    Container,
-    ContainerBody,
-    ContainerFilterTab,
-    ContainerTable,
     ContainerTotal,
-    LayOutTableDynamic,
+    LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
@@ -68,7 +63,6 @@ import PopupDetail from "./components/popup";
 import { useReturnCombobox } from "./hooks/useReturnCombobox";
 import { useReturnFilterbar } from "./hooks/useReturnFilterbar";
 import { useReturnList } from "./hooks/useReturnList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initialState = {
     onSending: false,
@@ -156,6 +150,12 @@ const PurchaseReturns = (props) => {
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
     };
+
+    const renderMoneyOrDash = (value) => {
+        return Number(value) === 0
+            ? "-"
+            : <>{formatMoney(value)} <span className="underline">đ</span></>;
+    };   
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -424,15 +424,19 @@ const PurchaseReturns = (props) => {
                     </>
                 }
                 table={
-                    <div className="flex flex-col h-full">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                <div className="grid grid-cols-5">
+                    <div className="flex flex-col gap-3 h-full">
+                        <div className="w-full items-center flex justify-between gap-2">
+                                <div className="flex gap-3 items-center w-full">
                                     <SearchComponent
                                         colSpan={1}
                                         dataLang={dataLang}
                                         placeholder={dataLang?.branch_search}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    />
+                                    <DateToDateComponent
+                                        colSpan={1}
+                                        value={isState.valueDate}
+                                        onChange={(e) => queryState({ valueDate: e })}
                                     />
                                     <SelectComponent
                                         options={[
@@ -499,14 +503,7 @@ const PurchaseReturns = (props) => {
                                         isSearchable={true}
                                         colSpan={1}
                                     />
-                                    <DateToDateComponent
-                                        colSpan={1}
-                                        value={isState.valueDate}
-                                        onChange={(e) => queryState({ valueDate: e })}
-                                    />
                                 </div>
-                            </div>
-                            <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                 <div className="flex justify-end items-center gap-2">
                                     <OnResetData
                                         sOnFetching={(e) => { }}
@@ -536,44 +533,42 @@ const PurchaseReturns = (props) => {
                                         </button>
                                     )}
                                     <div>
-                                        <DropdowLimit
-                                            sLimit={sLimit}
-                                            limit={limit}
-                                            dataLang={dataLang}
-                                        />
-                                    </div>
                                 </div>
                             </div>
                         </div>
+
                         <Customscrollbar className="h-full overflow-y-auto">
                             <div className="w-full">
-                                <HeaderTable gridCols={10}>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                <HeaderTable gridCols={11}>
+                                    <ColumnTable colSpan={0.5} textAlign={"center"}>
+                                        {dataLang?.stt || "ST"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1.5} textAlign={"left"}>
                                         {dataLang?.import_supplier || "import_supplier"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_total_amount || "import_total_amount"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_tax_money || "import_tax_money"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_into_money || "import_into_money"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.returns_form || "returns_form"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_brow_storekeepers ||
                                             "import_brow_storekeepers"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"left"}>
                                         {dataLang?.import_branch || "import_branch"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -585,9 +580,12 @@ const PurchaseReturns = (props) => {
                                 ) : data?.rResult?.length > 0 ? (
                                     <>
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                            {data?.rResult?.map((e) => (
-                                                <RowTable gridCols={10} key={e.id.toString()}>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                            {data?.rResult?.map((e, index) => (
+                                                <RowTable gridCols={11} key={e.id.toString()}>
+                                                    <RowItemTable colSpan={0.5} textAlign={"center"}>
+                                                        {index + 1}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         {e?.date != null
                                                             ? formatMoment(
                                                                 e?.date,
@@ -595,25 +593,25 @@ const PurchaseReturns = (props) => {
                                                             )
                                                             : ""}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"center"}>
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
                                                         <PopupDetail
                                                             dataLang={dataLang}
-                                                            className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                            className="3xl:text-sm 2xl:text-13 xl:text-xs text-11 font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
                                                             name={e?.code}
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                    <RowItemTable colSpan={1.5} textAlign={"left"}>
                                                         {e.supplier_name}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"right"}>
-                                                        {formatMoney(e.total_price)}
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                        {renderMoneyOrDash(e.total_price)}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"right"}>
-                                                        {formatMoney(e.total_tax_price)}
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                        {renderMoneyOrDash(e.total_tax_price)}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"right"}>
-                                                        {formatMoney(e.total_amount)}
+                                                    <RowItemTable colSpan={1} textAlign={"left"}>
+                                                        {renderMoneyOrDash(e.total_amount)}
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
@@ -639,10 +637,10 @@ const PurchaseReturns = (props) => {
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="mx-auto">
-                                                        <TagBranch className="w-fit">
+                                                    <RowItemTable colSpan={1}>
+                                                        {/* <TagBranch className="w-fit"> */}
                                                             {e?.branch_name}
-                                                        </TagBranch>
+                                                        {/* </TagBranch> */}
                                                     </RowItemTable>
                                                     <RowItemTable
                                                         colSpan={1}
@@ -673,30 +671,30 @@ const PurchaseReturns = (props) => {
                 showTotal={true}
                 total={
                     <>
-                        <ContainerTotal className="!grid-cols-10">
-                            <RowItemTable colSpan={3} textAlign={"center"} className="p-2">
+                        <ContainerTotal className="!grid-cols-11">
+                            <RowItemTable colSpan={2} textAlign={"end"} className="px-5">
                                 {dataLang?.import_total || "import_total"}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
-                                {formatMoney(data?.rTotal?.total_price)}
+                            <RowItemTable colSpan={0.5} textAlign={"left"} className={"mr-1"}>
+                                {renderMoneyOrDash(data?.rTotal?.total_price)}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
-                                {formatMoney(data?.rTotal?.total_tax_price)}
+                            <RowItemTable colSpan={0.5} textAlign={"left"} className={"mr-1"}>
+                                {renderMoneyOrDash(data?.rTotal?.total_tax_price)}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} textAlign={"right"} className={"mr-1"}>
-                                {formatMoney(data?.rTotal?.total_amount)}
+                            <RowItemTable colSpan={0.5} textAlign={"left"} className={"mr-1"}>
+                                {renderMoneyOrDash(data?.rTotal?.total_amount)}
                             </RowItemTable>
                         </ContainerTotal>
                     </>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination
+                                {/* <TitlePagination
                                     dataLang={dataLang}
                                     totalItems={data?.output?.iTotalDisplayRecords}
-                                />
+                                /> */}
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -705,7 +703,9 @@ const PurchaseReturns = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
             />
             <PopupConfim

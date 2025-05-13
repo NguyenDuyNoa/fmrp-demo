@@ -1,12 +1,13 @@
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 import { BtnAction } from "@/components/UI/BtnAction";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import { Container, ContainerBody, ContainerTable, LayOutTableDynamic } from "@/components/UI/common/layout";
+import { LayOutTableDynamic } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
@@ -31,12 +32,11 @@ import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useWarehouseList } from "../warehouse/hooks/useWarehouseList";
 import PopupLocationWarehouse from "./components/popup";
 import { useLocationList } from "./hooks/useLocationList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 
 const initialState = {
     keySearch: "",
@@ -227,10 +227,9 @@ const Location = (props) => {
                     </>
                 }
                 pagination={
-                    <>
+                    <div className="flex items-center justify-between gap-2">
                         {data?.rResult?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination dataLang={dataLang} totalItems={data?.output?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(data?.output?.iTotalDisplayRecords)}
@@ -239,7 +238,8 @@ const Location = (props) => {
                                 />
                             </ContainerPagination>
                         )}
-                    </>
+                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                    </div>
                 }
 
                 titleButton={
@@ -254,7 +254,7 @@ const Location = (props) => {
                                     dataWarehouse={dataWarehouse}
                                     onRefresh={refetch.bind(this)}
                                     dataLang={dataLang}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                                 />
                             ) : (
                                 <button
@@ -262,7 +262,7 @@ const Location = (props) => {
                                     onClick={() => {
                                         isShow("error", WARNING_STATUS_ROLE);
                                     }}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-[#003DA0] text-white rounded btn-animation hover:scale-105"
+                                    className="responsive-text-sm xl:px-5 px-3 xl:py-2.5 py-1.5 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105"
                                 >
                                     {dataLang?.branch_popup_create_new}
                                 </button>
@@ -272,9 +272,9 @@ const Location = (props) => {
                 }
                 table={
                     <div className="flex flex-col h-full overflow-hidden">
-                        <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                            <div className="col-span-4">
-                                <div className="grid grid-cols-9 gap-2">
+                        <div className="w-full items-center flex justify-between gap-2">
+                            <div className="flex gap-3 items-center w-full">
+                                {/* <div className="grid grid-cols-9 gap-2"> */}
                                     <SearchComponent
                                         colSpan={2}
                                         onChange={_HandleOnChangeKeySearch.bind(this)}
@@ -298,7 +298,7 @@ const Location = (props) => {
                                         isClearable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                     />
-                                </div>
+                                {/* </div> */}
                             </div>
                             <div className="col-span-2">
                                 <div className="flex items-center justify-end space-x-2">
@@ -324,31 +324,31 @@ const Location = (props) => {
                                             <span>{dataLang?.client_list_exportexcel}</span>
                                         </button>
                                     )}
-                                    <div>
-                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <Customscrollbar className="h-full overflow-y-auto">
                             <div className="w-full">
                                 <HeaderTable display={"grid"} gridCols={12}>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
+                                        {dataLang?.stt || "stt"}
+                                    </ColumnTable>
+                                    <ColumnTable colSpan={2} textAlign={"left"}>
                                         {dataLang?.warehouses_localtion_ware}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={2} textAlign={"left"}>
                                         {dataLang?.warehouses_localtion_code}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={2} textAlign={"left"}>
                                         {dataLang?.warehouses_localtion_NAME}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={2} textAlign={"left"}>
                                         {dataLang?.warehouses_localtion_status}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={2} textAlign={"left"}>
                                         {dataLang?.warehouses_localtion_date}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={2} textAlign={"center"}>
+                                    <ColumnTable colSpan={1} textAlign={"center"}>
                                         {dataLang?.branch_popup_properties}
                                     </ColumnTable>
                                 </HeaderTable>
@@ -356,8 +356,11 @@ const Location = (props) => {
                                     <Loading className="h-80" color="#0f4f9e" />
                                 ) : data?.rResult?.length > 0 ? (
                                     <div className="h-full divide-y divide-slate-200">
-                                        {data?.rResult?.map((e) => (
+                                        {data?.rResult?.map((e, index) => (
                                             <RowTable gridCols={12} key={e?.id?.toString()}>
+                                                <RowItemTable colSpan={1} textAlign={"center"}>
+                                                    {index + 1}
+                                                </RowItemTable>
                                                 <RowItemTable colSpan={2} textAlign={"left"}>
                                                     {e.warehouse_name}
                                                 </RowItemTable>
@@ -367,7 +370,7 @@ const Location = (props) => {
                                                 <RowItemTable colSpan={2} textAlign={"left"}>
                                                     {e.name}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={2} textAlign={"center"}>
+                                                <RowItemTable colSpan={2} textAlign={"left"}>
                                                     <label
                                                         htmlFor={e.id}
                                                         className="relative inline-flex items-center cursor-pointer"
@@ -396,7 +399,7 @@ const Location = (props) => {
                                                 </RowItemTable>
 
                                                 <RowItemTable
-                                                    colSpan={2}
+                                                    colSpan={1}
                                                     className="flex items-center justify-center space-x-2 text-center"
                                                 >
                                                     {role == true || checkEdit ? (

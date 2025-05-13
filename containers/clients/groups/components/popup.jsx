@@ -1,4 +1,6 @@
 import apiGroup from "@/Api/apiClients/group/apiGroup";
+import EditIcon from "@/components/icons/common/EditIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
 import PopupCustom from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
@@ -15,7 +17,7 @@ const initilaState = {
     errInput: false,
     errInputBr: false,
     errInputName: false,
-}
+};
 const Popup_groupKh = (props) => {
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
@@ -23,11 +25,11 @@ const Popup_groupKh = (props) => {
         return { menuPortalTarget };
     };
 
-    const isShow = useToast()
+    const isShow = useToast();
 
-    const [isState, sIsState] = useState(initilaState)
+    const [isState, sIsState] = useState(initilaState);
 
-    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     // lấy dữ liệu lưu chi nhánh, tên, màu, slected chi nhánh
     useEffect(() => {
@@ -35,20 +37,22 @@ const Popup_groupKh = (props) => {
             listBr: props.listBr || [],
             name: props.name ? props.name : "",
             color: props.color ? props.color : "",
-            valueBr: props.sValueBr ? props.sValueBr?.map((e) => {
-                return {
-                    label: e.name,
-                    value: e.id
-                };
-            }) : []
+            valueBr: props.sValueBr
+                ? props.sValueBr?.map((e) => {
+                    return {
+                        label: e.name,
+                        value: e.id,
+                    };
+                })
+                : [],
         });
     }, [isState.open]);
 
     const handingGroup = useMutation({
         mutationFn: (data) => {
-            return apiGroup.apiHandingGroup(data, props.id)
-        }
-    })
+            return apiGroup.apiHandingGroup(data, props.id);
+        },
+    });
 
     // lưu dữ liệu
     const _ServerSending = async () => {
@@ -57,22 +61,19 @@ const Popup_groupKh = (props) => {
         data.append("color", isState.color);
         isState.valueBr.forEach((e) => {
             data.append("branch_id[]", e?.value);
-        })
+        });
         handingGroup.mutate(data, {
             onSuccess: ({ isSuccess, message }) => {
                 if (isSuccess) {
                     isShow("success", props.dataLang[message] || message);
                     sIsState(initilaState);
                     props.onRefresh && props.onRefresh();
-
                 } else {
                     isShow("error", props.dataLang[message] || message);
                 }
             },
-            onError: (error) => {
-
-            }
-        })
+            onError: (error) => { },
+        });
         queryState({ open: false });
     };
 
@@ -82,10 +83,10 @@ const Popup_groupKh = (props) => {
 
     useEffect(() => {
         isState.name != "" && queryState({ errInputName: false });
-    }, [isState.name])
+    }, [isState.name]);
     useEffect(() => {
         isState.valueBr?.length > 0 && queryState({ errInputBr: false });
-    }, [isState.valueBr])
+    }, [isState.valueBr]);
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
@@ -99,8 +100,23 @@ const Popup_groupKh = (props) => {
     };
     return (
         <PopupCustom
-            title={props.id ? `${props.dataLang?.client_group_edit}` : `${props.dataLang?.client_group_add}`}
-            button={props.id ? (<IconEdit />) : (`${props.dataLang?.branch_popup_create_new}`)}
+            title={
+                props.id
+                    ? `${props.dataLang?.client_group_edit}`
+                    : `${props.dataLang?.client_group_add}`
+            }
+            button={
+                props.id ? (
+                    // <IconEdit />
+                    <div className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10">
+                        <EditIcon className={`size-5 transition-all duration-300 `} />
+                    </div>
+                ) : (
+                    <p className="flex flex-row justify-center items-center gap-x-1 responsive-text-sm text-sm font-normal">
+                        <PlusIcon /> {props.dataLang?.branch_popup_create_new}
+                    </p>
+                )
+            }
             onClickOpen={() => queryState({ open: true })}
             open={isState.open}
             onClose={() => queryState({ open: false })}
@@ -167,9 +183,7 @@ const Popup_groupKh = (props) => {
                                     },
                                 }),
                             }}
-                            className={`${isState.errInputBr
-                                ? "border-red-500"
-                                : "border-transparent"
+                            className={`${isState.errInputBr ? "border-red-500" : "border-transparent"
                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                         />
                         {isState.errInputBr && (
