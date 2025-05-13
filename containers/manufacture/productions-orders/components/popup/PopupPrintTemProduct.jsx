@@ -29,7 +29,7 @@ const deca = Lexend_Deca({
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-const PopupPrintTemProduct = ({ dataItem }) => {
+const PopupPrintTemProduct = ({ dataItem, idManufacture }) => {
     const dispatch = useDispatch();
     const [listItem, setListItem] = useState(dataItem ?? []);
     const [selectItems, setSelectItems] = useState([]);
@@ -118,7 +118,7 @@ const PopupPrintTemProduct = ({ dataItem }) => {
                 };
             });
             formatData.forEach((item, index) => {
-                formData.append(`id`, item.id);
+                formData.append(`id`, idManufacture);
                 formData.append(`data[${index}][id]`, item.id);
                 formData.append(`data[${index}][code]`, item.item_code);
                 formData.append(`data[${index}][name]`, item.item_name);
