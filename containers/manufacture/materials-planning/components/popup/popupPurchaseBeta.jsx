@@ -377,7 +377,7 @@ const PopupPurchaseBeta = ({
               control={form.control}
               render={({ field, fieldState }) => {
                 return (
-                  <div className="">
+                  <div className=" relative">
                     <SelectComponent
                       className={`${
                         fieldState.error
@@ -399,6 +399,11 @@ const PopupPurchaseBeta = ({
                           ...provided,
                           width: "100%",
                           zIndex: 999,
+                        }),
+                        menuPortal: (base) => ({
+                          ...base,
+                          zIndex: 9999999,
+                          position: "absolute",
                         }),
                       }}
                       value={field.value}

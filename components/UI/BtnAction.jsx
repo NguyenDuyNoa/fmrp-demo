@@ -194,22 +194,21 @@ export const BtnAction = React.memo((props) => {
     const [loadingButtonPrint, setLoadingButtonPrint] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showMoreIcons, setShowMoreIcons] = useState(false);
-    const [printDropdowns, setPrintDropdowns] = useState({});
+    const [printDropdownOpen, setPrintDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const moreIconsRef = useRef(null);
     const printDropdownRef = useRef(null);
 
-    // Hàm để mở/đóng dropdown in cho một phiếu cụ thể
-    const togglePrintDropdown = (id) => {
-        setPrintDropdowns(prev => ({
-            ...prev,
-            [id]: !prev[id]
-        }));
+    // Hàm để mở/đóng dropdown in cho component này
+    const togglePrintDropdown = () => {
+        setPrintDropdownOpen(!printDropdownOpen);
     };
 
     // Đóng tất cả dropdown in
-    const closeAllPrintDropdowns = () => {
-        setPrintDropdowns({});
+    const closeAllDropdowns = () => {
+        setPrintDropdownOpen(false);
+        setShowDropdown(false);
+        setShowMoreIcons(false);
     };
 
     // Xử lý đóng dropdown khi click ra ngoài
@@ -229,13 +228,13 @@ export const BtnAction = React.memo((props) => {
                     setShowMoreIcons(false);
                 }
                 if (printDropdownRef.current && !printDropdownRef.current.contains(event.target)) {
-                    closeAllPrintDropdowns();
+                    setPrintDropdownOpen(false);
                 }
             }
         };
 
         // Thêm event listener khi dropdown đang mở
-        if (showDropdown || showMoreIcons || Object.values(printDropdowns).some(Boolean)) {
+        if (showDropdown || showMoreIcons || printDropdownOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
 
@@ -243,7 +242,7 @@ export const BtnAction = React.memo((props) => {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [showDropdown, showMoreIcons, printDropdowns]);
+    }, [showDropdown, showMoreIcons, printDropdownOpen]);
 
     //kiếm hàm fetchPDF theo page 
     const fetchPDFMultiplePage = {
@@ -259,6 +258,9 @@ export const BtnAction = React.memo((props) => {
     
     //Xử lý in PDF
     const handlePrintTem = async ({ idTem, typePage, typePrint }) => {
+        // Đảm bảo luôn lấy đúng ID từ tham số, hoặc từ props nếu không có
+        const currentId = idTem || props?.id;
+        
         setLoadingButtonPrint(true);
         
         try {
@@ -268,14 +270,14 @@ export const BtnAction = React.memo((props) => {
             if (typePrint && ['import', 'deliveryReceipt'].includes(typePage)) {
                 const typeNumber = typePrint === "notPrice" ? 1 : 2;
                 response = await fetchPDFMultiplePage[typePage]({
-                    id: idTem || props?.id,
+                    id: currentId,
                     type: typeNumber,
                 });
             } 
             // Xử lý đặc biệt cho phiếu trả hàng
             else if (typePage === 'returnSales') {
                 response = await fetchPDFReturnSales({
-                    id: idTem || props?.id,
+                    id: currentId,
                 });
             }
             // Trường hợp in PDF thông thường cho các loại khác
@@ -289,7 +291,7 @@ export const BtnAction = React.memo((props) => {
                 }
                 
                 response = await fetchPDFMultiplePage[typePage]({
-                    id: idTem || props?.id,
+                    id: currentId,
                 });
             }
             
@@ -448,6 +450,9 @@ export const BtnAction = React.memo((props) => {
         }
         ///Đơn hàng bán
         else if (props?.id && props?.type === "sales_product") {
+            console.log(props?.id, props?.type)
+    console.log(props)
+
             if (props?.status !== "approved") {
                 confimDelete(typeConfig);
             }
@@ -967,20 +972,24 @@ export const BtnAction = React.memo((props) => {
 
         // Nút in tem (chỉ cho import)
         if (props.type == "import") {
+            // Lưu ID của phần tử hiện tại để đảm bảo sử dụng đúng ID khi xử lý các thao tác
+            const currentId = props?.id;
+            
             allButtons.push(
-                <div key="print-tem" className="relative" ref={dropdownRef}>
+                <div key={`print-tem-${currentId}`} className="relative" ref={printDropdownRef}>
                     <button
-                        onClick={() => togglePrintDropdown(props?.id)}
+                        onClick={togglePrintDropdown}
                         className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer rounded-lg p-1 border border-transparent hover:border-[#003DA0] hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
+                        data-id={currentId} /* Store the ID as a data attribute */
                     >
                         <PrinterIcon
                             color="#003DA0"
                             className="size-5"
                         />
                     </button>
-                    {printDropdowns[props?.id] && (
+                    {printDropdownOpen && (
                         <div className="absolute top-full -right-5 p-1 mt-1 w-fit bg-white rounded-xl z-[999] border border-gray-200 shadow-[0px_20px_40px_-4px_#919EAB3D,0px_0px_2px_0px_#919EAB3D]">
-                            <ul className="flex flex-col gap-1">
+                            <ul className="flex flex-col gap-1" data-row-id={currentId}>
                                 <li
                                     onClick={() => {
                                         dispatch({
@@ -989,12 +998,12 @@ export const BtnAction = React.memo((props) => {
                                                 open: true,
                                                 children: (
                                                     <PopupPrintTemNVL
-                                                        id={props?.id}
+                                                        id={currentId}
                                                     />
                                                 ),
                                             },
                                         });
-                                        closeAllPrintDropdowns();
+                                        setPrintDropdownOpen(false);
                                     }}
                                     className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                                 >
@@ -1003,8 +1012,8 @@ export const BtnAction = React.memo((props) => {
                                 </li>
                                 <li
                                     onClick={() => {
-                                        handlePrintTem({ typePrint: "notPrice", id: props?.id, typePage: props?.type });
-                                        closeAllPrintDropdowns();
+                                        handlePrintTem({ typePrint: "notPrice", id: currentId, typePage: props?.type });
+                                        setPrintDropdownOpen(false);
                                     }}
                                     className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                                 >
@@ -1015,8 +1024,8 @@ export const BtnAction = React.memo((props) => {
                                 </li>
                                 <li
                                     onClick={() => {
-                                        handlePrintTem({ typePrint: "price", id: props?.id, typePage: props?.type });
-                                        closeAllPrintDropdowns();
+                                        handlePrintTem({ typePrint: "price", id: currentId, typePage: props?.type });
+                                        setPrintDropdownOpen(false);
                                     }}
                                     className="group transition-all duration-200 ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] text-left cursor-pointer px-1.5 py-2 rounded-lg hover:bg-primary-05 text-neutral-03 hover:text-neutral-07 font-normal whitespace-nowrap"
                                 >
@@ -1085,11 +1094,14 @@ export const BtnAction = React.memo((props) => {
         if (allButtons.length <= 3) {
             return allButtons;
         } else {
+            // Lưu ID của phần tử hiện tại để đảm bảo sử dụng đúng ID khi xử lý các thao tác
+            const currentId = props?.id;
+            
             return [
-                <div key="more" className="relative" ref={moreIconsRef}>
+                <div key={`more-${currentId}`} className="relative" ref={moreIconsRef}>
                     <button
                         onClick={() => setShowMoreIcons(!showMoreIcons)}
-                        data-tooltip-id="more-actions-tooltip"
+                        data-tooltip-id={`more-actions-tooltip-${currentId}`}
                         data-tooltip-place="bottom-end"
                         className="group rounded-lg p-1 border border-transparent hover:border-[#555] hover:bg-gray-100 transition-all ease-in-out flex items-center justify-center text-left cursor-pointer"
                     >
@@ -1100,7 +1112,7 @@ export const BtnAction = React.memo((props) => {
                         </svg>
                     </button>
                     <Tooltip
-                        id="more-actions-tooltip"
+                        id={`more-actions-tooltip-${currentId}`}
                         place="bottom-end"
                         variant="light"
                         clickable={true}
@@ -1123,9 +1135,10 @@ export const BtnAction = React.memo((props) => {
                         <div
                             className="flex flex-col gap-1 min-w-[120px] p-1 bg-white"
                             style={{ opacity: 1, borderRadius: '10px' }}
+                            data-row-id={currentId} /* Store the ID as a data attribute */
                         >
                             {allButtons.map((button, index) => (
-                                <div key={index} className="">{button}</div>
+                                <div key={`action-${currentId}-${index}`} className="">{button}</div>
                             ))}
                         </div>
                     </Tooltip>

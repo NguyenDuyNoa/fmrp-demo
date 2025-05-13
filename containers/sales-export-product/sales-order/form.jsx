@@ -1405,7 +1405,7 @@ const SalesOrderForm = (props) => {
                                     "detail_general_information"}
                             </h2>
 
-                            <div className="flex items-center grid-cols-12 gap-1">
+                            <div className="grid items-center grid-cols-12 gap-1">
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px]">
                                         {dataLang?.sales_product_code || "sales_product_code"}
@@ -1420,7 +1420,7 @@ const SalesOrderForm = (props) => {
                                     />
                                 </div>
 
-                                <div className="col-span-3">
+                                <div className="col-span-3 z-10">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.branch || "branch"}{" "}
                                         <span className="text-red-500">*</span>
@@ -1434,7 +1434,7 @@ const SalesOrderForm = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.select_branch || "select_branch"}
                                         className={`${errBranch ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99]`}
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         styles={{
@@ -1573,7 +1573,7 @@ const SalesOrderForm = (props) => {
                                     )}
                                 </div>
 
-                                <div className="col-span-3">
+                                <div className="col-span-3 z-[8]">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
                                         {dataLang?.sales_product_staff_in_charge ||
                                             "sales_product_staff_in_charge"}{" "}

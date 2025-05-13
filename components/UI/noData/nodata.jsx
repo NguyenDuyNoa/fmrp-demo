@@ -4,14 +4,14 @@ import Image from "next/image";
 const IMAGE_TYPE = {
     notificationheader: '/icon/nodata-noti-final.svg',
     dashboard: '/icon/task.svg',
-    table: "/background/system/nodata-table-2.svg",
+    table: "/background/system/nodata-table-2.png",
     comment: "/background/system/message_empty.svg"
 };
 
 const NoData = ({
-    type = '',
+    type = 'table',
     className = '',
-    classNameImage = '3xl:max-w-[180px] max-w-[160px] w-full h-auto object-contain',
+    classNameImage = '3xl:max-w-[280px] max-w-[200px] w-full h-auto object-contain',
     classNameTitle = 'text-sm',
     ...rest
 }) => {
@@ -36,8 +36,8 @@ const NoData = ({
             <div className="h-full flex flex-col justify-center items-center 3xl:gap-5 gap-3 3xl:py-5 py-3 mx-auto">
                 <Image
                     src={imageSrc}
-                    width={300}
-                    height={300}
+                    width={500}
+                    height={500}
                     alt="nodata"
                     className={classNameImage}
                     priority

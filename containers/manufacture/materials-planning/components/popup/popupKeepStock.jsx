@@ -454,7 +454,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                     control={form.control}
                                     render={({ field, fieldState }) => {
                                         return (
-                                            <div className="my-4 ">
+                                            <div className="my-4 relative">
                                                 <SelectComponent
                                                     className={`${fieldState.error ? "border-red-500" : "border-transparent"}  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                     isClearable={true}
@@ -494,6 +494,11 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                             width: "100%",
                                                             zIndex: 999,
                                                         }),
+                                                        menuPortal: (base) => ({
+                                                            ...base,
+                                                            zIndex: 9999999,
+                                                            position: "absolute",
+                                                          }),
                                                     }}
                                                     value={field.value}
                                                     maxMenuHeight={150}
@@ -649,7 +654,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                         render={({ field, fieldState }) => {
                                                             const arrWareHouse = findValue.arrayItem.find((x) => x?.id == e?.id)?.warehouse;
                                                             return (
-                                                                <>
+                                                                <div className="relative">
                                                                     <SelectComponent
                                                                         className={`${fieldState.error ? "border-red-500" : "border-gray-400"} border  rounded`}
                                                                         isClearable={true}
@@ -673,9 +678,15 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                         styles={{
                                                                             menu: (provided, state) => ({
                                                                                 ...provided,
-                                                                                width: "150%",
+                                                                                width: "200%",
                                                                                 zIndex: 999,
                                                                             }),
+                                                                            menuPortal: (base) => ({
+                                                                                ...base,
+                                                                                zIndex: 9999999,
+                                                                                position: "absolute",
+                                                                              }),
+                                                                             
                                                                         }}
                                                                         value={findValue.arrayItem.find((x) => x?.id == e?.id)?.valueWarehouse}
                                                                         maxMenuHeight={150}
@@ -685,7 +696,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                             {fieldState.error.message}{" "}
                                                                         </span>
                                                                     )}
-                                                                </>
+                                                                </div>
                                                             );
                                                         }}
                                                     />
