@@ -55,6 +55,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import { useInternalPlanList } from "./hooks/useInternalPlanList";
 import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 
 const PopupDetail = dynamic(() => import("./components/PopupDetail"), {
     ssr: false,
@@ -155,6 +156,18 @@ const InternalPlan = (props) => {
 
     const toggleStatus = () => {
         handlePostStatus(isId, status);
+    };
+
+    const _HandleChangeInput = (id, checkedUn, type, value) => {
+        console.log("🚀 ~ const_HandleChangeInput= ~ value:", value);
+        console.log("🚀 ~ const_HandleChangeInput= ~ type:", type);
+        console.log("🚀 ~ const_HandleChangeInput= ~ checkedUn:", checkedUn);
+        console.log("🚀 ~ const_HandleChangeInput= ~ id:", id);
+
+        handleQueryId({
+            status: true,
+            initialKey: { id, checkedUn, type, value },
+        });
     };
 
     // excel
@@ -416,7 +429,7 @@ const InternalPlan = (props) => {
                                                         {e.plan_name}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className="mx-auto">
-                                                        <BtnStatusApproved
+                                                        {/* <BtnStatusApproved
                                                             onClick={() =>
                                                                 handleQueryId({
                                                                     id: e?.id,
@@ -425,6 +438,17 @@ const InternalPlan = (props) => {
                                                                 })
                                                             }
                                                             type={e.status == "1" ? "1" : "0"}
+                                                        /> */}
+                                                        <ButtonWarehouse
+                                                            warehouseman_id={e.status == "1" ? "1" : "0"}
+                                                            _HandleChangeInput={() =>
+                                                                handleQueryId({
+                                                                    id: e?.id,
+                                                                    status: true,
+                                                                    idChild: e.status == "1" ? "0" : "1",
+                                                                })
+                                                            }
+                                                            id={e?.id}
                                                         />
                                                     </RowItemTable>
                                                     <RowItemTable
@@ -438,7 +462,7 @@ const InternalPlan = (props) => {
                                                             fullName={e?.created_by_full_name}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} >
+                                                    <RowItemTable colSpan={1}>
                                                         {/* <TagBranch className="w-fit">
                                                             {e?.name_branch}
                                                         </TagBranch> */}

@@ -174,32 +174,32 @@ const PopupPurchaseBeta = ({
     },
   });
 
-    const onSubmit = async (value) => {
-        console.log('value', value);
+  const onSubmit = async (value) => {
+    console.log('value', value);
 
-        if (value.arrayItem.length == 0) {
-            return shhowToat("error", dataLang?.materials_planning_no_items_purchase || "materials_planning_no_items_purchase");
-        }
+    if (value.arrayItem.length == 0) {
+      return shhowToat("error", dataLang?.materials_planning_no_items_purchase || "materials_planning_no_items_purchase");
+    }
 
-        let formData = new FormData();
-        formData.append("note", value.note ?? "");
-        formData.append("name", value.purchaseName ?? "");
-        formData.append("type", value.type == "material" ? 1 : 2);
-        formData.append("plan_id", dataTable?.listDataRight?.idCommand);
+    let formData = new FormData();
+    formData.append("note", value.note ?? "");
+    formData.append("name", value.purchaseName ?? "");
+    formData.append("type", value.type == "material" ? 1 : 2);
+    formData.append("plan_id", dataTable?.listDataRight?.idCommand);
 
 
 
-        formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG));
-        formData.append("suppliers_id", value?.supplier?.value ?? "");
-        formData.append("branch_id", value?.idBranch ?? "");
-        value.arrayItem?.forEach((e, index) => {
-            formData.append(`items[${index}][id]`, e?.idParent);
-            formData.append(`items[${index}][quantity]`, typeof e?.quantity == 'number' ? e?.quantity : parseFloat(e?.quantity?.replace(/,/g, '')));
-            formData.append(`items[${index}][item_id]`, e?.item?.item_id);
-            formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
-            formData.append(`items[${index}][quantity_rest]`, typeof e?.quantityRest == 'number' ? e?.quantityRest : parseFloat(e?.quantityRest?.replace(/,/g, '')))
-            formData.append(`items[${index}][quantity_purchase]`, typeof e?.quantityPurchased == 'number' ? e?.quantityPurchased : parseFloat(e?.quantityPurchased?.replace(/,/g, '')))
-        });
+    formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG));
+    formData.append("suppliers_id", value?.supplier?.value ?? "");
+    formData.append("branch_id", value?.idBranch ?? "");
+    value.arrayItem?.forEach((e, index) => {
+      formData.append(`items[${index}][id]`, e?.idParent);
+      formData.append(`items[${index}][quantity]`, typeof e?.quantity == 'number' ? e?.quantity : parseFloat(e?.quantity?.replace(/,/g, '')));
+      formData.append(`items[${index}][item_id]`, e?.item?.item_id);
+      formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
+      formData.append(`items[${index}][quantity_rest]`, typeof e?.quantityRest == 'number' ? e?.quantityRest : parseFloat(e?.quantityRest?.replace(/,/g, '')))
+      formData.append(`items[${index}][quantity_purchase]`, typeof e?.quantityPurchased == 'number' ? e?.quantityPurchased : parseFloat(e?.quantityPurchased?.replace(/,/g, '')))
+    });
 
     hangdingMutation.mutate(formData, {
       onSuccess: ({ isSuccess, message }) => {
@@ -243,17 +243,20 @@ const PopupPurchaseBeta = ({
               return isShow(
                 "error",
                 dataLang?.materials_planning_please_add ||
-                  "materials_planning_please_add"
+                "materials_planning_please_add"
               );
             }
             _ToggleModal(true);
           }}
         >
-          <div className="flex items-center gap-2 px-3 py-2 ">
-            {icon}
-            <h3 className="text-xs font-medium text-blue-600 3xl:text-base">
+          <div
+            // className="flex items-center gap-2 px-3 py-2 "
+            className=" responsive-text-sm 3xl:py-3 3xl:px-4 py-2 px-3 bg-background-blue-2 text-white rounded-lg btn-animation hover:scale-105 flex items-center gap-x-2"
+          >
+            {icon} {title}
+            {/* <h3 className="text-xs font-medium text-blue-600 3xl:text-base">
               {title}
-            </h3>
+            </h3> */}
           </div>
         </button>
       }
@@ -301,11 +304,10 @@ const PopupPurchaseBeta = ({
                         placeholderText="DD/MM/YYYY HH:mm:ss"
                         dateFormat="dd/MM/yyyy h:mm:ss aa"
                         timeInputLabel={"Time: "}
-                        className={`border ${
-                          fieldState.error
-                            ? "border-red-500"
-                            : "border-[#d0d5dd]"
-                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                        className={`border ${fieldState.error
+                          ? "border-red-500"
+                          : "border-[#d0d5dd]"
+                          } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                       />
                       {field.value && (
                         <MdClear
@@ -379,11 +381,10 @@ const PopupPurchaseBeta = ({
                 return (
                   <div className=" relative">
                     <SelectComponent
-                      className={`${
-                        fieldState.error
-                          ? "border-red-500"
-                          : "border-transparent"
-                      }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                      className={`${fieldState.error
+                        ? "border-red-500"
+                        : "border-transparent"
+                        }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                       isClearable={true}
                       placeholder={
                         dataLang?.purchase_order_supplier ??
@@ -570,9 +571,8 @@ const PopupPurchaseBeta = ({
                             return (
                               <duv className="flex flex-col items-center justify-center">
                                 <InPutNumericFormat
-                                  className={`${
-                                    fieldState.error && "border-red-500"
-                                  } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                  className={`${fieldState.error && "border-red-500"
+                                    } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                   {...field}
                                   onValueChange={(event) =>
                                     field.onChange(
