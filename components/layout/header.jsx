@@ -1210,7 +1210,7 @@ const Header = () => {
     const currentDropdown = dropdowns[currentDropdownIndex];
 
     return (
-        <header className="fixed z-[999] w-full bg-[#003DA0] top-0 xl:h-[72px] h-[62px] flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 py-4">
+        <header className="fixed z-[999999999] w-full bg-[#003DA0] top-0 xl:h-[72px] h-[62px] flex items-center justify-between 3xl:px-6 2xl:px-4 px-5 py-4">
             {/* <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             <div className="flex items-center flex-row gap-x-4">
                 <Link
@@ -1313,7 +1313,7 @@ const Header = () => {
                     />
                 </form> */}
                 {/* {authState?.id_package_service === "1" && ( */}
-                {/* {authState?.is_upgrade && ( */}
+                {authState?.is_upgrade && (
                 <button className="py-1 px-2 rounded-full bg-typo-blue-4 flex items-center gap-2"
                     onClick={() => {
                         dispatch({
@@ -1337,7 +1337,7 @@ const Header = () => {
                     <SparkleIcon className="text-white" size={16} />
                     <span className="3xl:text-base xxl:text-sm xl:text-xs text-[11px] font-normal text-white whitespace-nowrap">Nâng cấp Pro</span>
                 </button>
-                {/* )} */}
+                )}
                 <div className="flex items-center gap-3">
                     <Tooltip
                         title={"Cài đặt"}
