@@ -290,7 +290,11 @@ function adminReducer(state = adminState, action) {
                 ...state,
                 stateBoxChatAi: { ...initialChatBotState },
             };
-
+        case "chatbot/resetLogout":
+            return {
+                ...state,
+                stateBoxChatAi: { ...initialChatBotState, open: false },
+            };
         default:
             return state;
     }
