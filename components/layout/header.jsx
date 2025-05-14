@@ -1244,7 +1244,6 @@ const Header = () => {
                 <div className='flex flex-row items-center xl:gap-1 gap-0.5'>
                     {
                         dropdowns.map((dropdown, index) => {
-
                             return (
                                 <React.Fragment key={index}>
                                     <Tooltip
@@ -1339,40 +1338,11 @@ const Header = () => {
                     </button>
                 )}
                 <div className="flex items-center gap-3">
-                    <Tooltip
-                        title={"Cài đặt"}
-                        arrow
-                        className="cursor-pointer"
-                        theme="dark"
-
-                    >
-                        <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
-                            <Image
-                                alt=""
-                                onClick={() => {
-                                    if (role) {
-                                        router.push("/settings");
-                                    } else {
-                                        isShow("error", WARNING_STATUS_ROLE_ADMIN);
-                                    }
-                                }}
-                                src="/icon/header/right/seting.png"
-                                width={20}
-                                height={20}
-                                quality={100}
-                                className="object-contain w-full h-full transition"
-                                loading="lazy"
-                                crossOrigin="anonymous"
-                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                            />
-                        </div>
-                    </Tooltip>
-
                     <Dropdown
                         data={ListQuyTrinh}
                         type='procedure'
                         className="popover-quytrinh"
-                        position={"bottom right"}
+                        position={"bottom"}
                         classNameTrigger={"2xl:!p-0 !p-0"}
                     >
                         <div className='2xl:size-5 xl:size-4 size-3 shink-0'>
@@ -1441,7 +1411,6 @@ const Header = () => {
                                     2
                                 </div> */}
                     </DropdownThongBao>
-
                     <Tooltip
                         title={"Hướng dẫn phần mềm"}
                         className="cursor-pointer"
@@ -1472,6 +1441,34 @@ const Header = () => {
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
                         </motion.div>
+                    </Tooltip>
+                    <Tooltip
+                        title={"Cài đặt"}
+                        arrow
+                        className="cursor-pointer"
+                        theme="dark"
+
+                    >
+                        <div className='2xl:size-6 xl:size-5 size-4 shink-0'>
+                            <Image
+                                alt=""
+                                onClick={() => {
+                                    if (role) {
+                                        router.push("/settings");
+                                    } else {
+                                        isShow("error", WARNING_STATUS_ROLE_ADMIN);
+                                    }
+                                }}
+                                src="/icon/header/right/seting.png"
+                                width={20}
+                                height={20}
+                                quality={100}
+                                className="object-contain w-full h-full transition"
+                                loading="lazy"
+                                crossOrigin="anonymous"
+                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                            />
+                        </div>
                     </Tooltip>
                 </div>
 
