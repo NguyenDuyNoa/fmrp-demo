@@ -1058,7 +1058,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           payload: {
             open: true,
             allowOutsideClick: false,
-            children: <PopupPrintTemProduct dataItem={formatData} idManufacture={idManufacture}/>,
+            children: <PopupPrintTemProduct dataItem={formatData} idManufacture={idManufacture} />,
           },
         });
       }
@@ -1777,7 +1777,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                   className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
                 />
 
-                <ButtonAnimationNew
+                {/* <ButtonAnimationNew
                   icon={
                     <div className="3xl:size-5 size-4">
                       <ArrowCounterClockwiseIcon className="size-full" />
@@ -1788,7 +1788,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                   }}
                   title="Tải lại"
                   className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-normal text-[#0BAA2E] border border-[#0BAA2E] hover:bg-[#EBFEF2] hover:shadow-hover-button rounded-lg"
-                />
+                /> */}
 
                 <ButtonAnimationNew
                   icon={
