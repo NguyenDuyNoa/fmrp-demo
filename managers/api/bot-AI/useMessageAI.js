@@ -13,22 +13,10 @@ export const fetchStartMessageAI = async (type) => {
     }
 };
 
-export const useStartMessageAI = ({ type, enable }) => {
-    // const fetchNewMessageAI = async () => {
-    //     try {
-    //         const response = await apiChatAI.apiNewStartChat({
-    //             data: {
-    //                 type: type,
-    //             },
-    //         });
-    //         return response.data;
-    //     } catch (error) {
-    //         throw new Error(error);
-    //     }
-    // };
+export const useStartMessageAI = ({ type, enable, authState }) => {
 
     return useQuery({
-        queryKey: ["startChatAI"],
+        queryKey: ["startChatAI", authState?.user_email || ""],
         queryFn: () => fetchStartMessageAI(type),
         enabled: enable,
     });

@@ -46,10 +46,15 @@ const BoxChatAI = ({ openChatBox, setOpenChatBox, dataLang, dataSetting }) => {
     const [productAnalysis, setProductAnalysis] = useState({});
     const [isLastMessageAnimationDone, setIsLastMessageAnimationDone] =
         useState(false);
+    const authState = useSelector((state) => state.auth);
+    console.log("🚀 ~ authState:", authState)
+
     const { data: dataNewChatAI, isLoadingNewChatAi } = useStartMessageAI({
         type: PRODUCT_ANALYSIS,
         enable: openChatBox && !hasFetchedFirstMessage.current,
+        authState : authState
     });
+    console.log("🚀 ~ BoxChatAI ~ dataNewChatAI:", dataNewChatAI)
 
     const { messenger, options, chatScenariosId, sessionId, step, response } =
         useSelector((state) => state.stateBoxChatAi);
