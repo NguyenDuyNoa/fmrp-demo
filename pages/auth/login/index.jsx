@@ -442,14 +442,14 @@ const Login = React.memo((props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="absolute bottom-0 right-0 pointer-events-none select-none">
+                    <div className="absolute -bottom-10 -right-10 pointer-events-none select-none">
                         <Image
-                            src="/Illust.png"
+                            src="/bgImageLogin.png"
                             alt=""
                             width={500}
                             height={500}
                             quality={100}
-                            className="object-contain w-[500px] h-auto"
+                            className="object-contain w-[600px] h-auto"
                             loading="lazy"
                             crossOrigin="anonymous"
                             placeholder="blur"

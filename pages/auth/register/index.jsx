@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import apiLogin from "@/Api/apiLogin/apiLogin";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import LoadingButton from "@/components/UI/loading/loadingButton";
@@ -8,7 +8,11 @@ import useToast from "@/hooks/useToast";
 import { CookieCore } from "@/utils/lib/cookie";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Building, Eye as IconEye, EyeSlash as IconEyeSlash } from "iconsax-react";
+import {
+    Building,
+    Eye as IconEye,
+    EyeSlash as IconEyeSlash,
+} from "iconsax-react";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -19,9 +23,30 @@ import { FiRefreshCcw } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import "sweetalert2/src/sweetalert2.scss";
 
+
+const formatPhone = (phone) => {
+    // Xoá hết dấu cách và ký tự không phải số
+    const digits = phone.replace(/\D/g, "");
+
+    // Nếu đủ 10 số thì format thành "XXXX XXX XXX"
+    if (digits.length === 10) {
+        return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+    }
+
+    // Nếu đủ 11 số thì format thành "XXXX XXX XXXX"
+    if (digits.length === 11) {
+        return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+    }
+
+    // Ngược lại trả về nguyên bản
+    return phone;
+};
+
 const Register = React.memo((props) => {
     const initialState = {
-        rememberMe: localStorage?.getItem("remembermeFMRP") ? localStorage?.getItem("remembermeFMRP") : false,
+        rememberMe: localStorage?.getItem("remembermeFMRP")
+            ? localStorage?.getItem("remembermeFMRP")
+            : false,
         onSending: false,
         listMajor: [],
         listPosition: [],
@@ -49,21 +74,40 @@ const Register = React.memo((props) => {
     const showToat = useToast();
 
     const [isState, sIsState] = useState(initialState);
+    console.log("isState.countOtp", isState.countOtp);
 
     const data = useSelector((state) => state.availableLang);
 
     const queryState = (key) => sIsState((pver) => ({ ...pver, ...key }));
 
-    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
+    const {
+        register,
+        handleSubmit,
+        watch,
+        setValue,
+        formState: { errors },
+    } = useForm();
+
+    const phone = watch("phone");
+
 
     const valueForm = watch();
 
     useEffect(() => {
-        setValue("code", localStorage?.getItem("usercodeFMRP") ? localStorage?.getItem("usercodeFMRP") : "");
-        setValue("name", localStorage?.getItem("usernameFMRP") ? localStorage?.getItem("usernameFMRP") : "");
+        setValue(
+            "code",
+            localStorage?.getItem("usercodeFMRP")
+                ? localStorage?.getItem("usercodeFMRP")
+                : ""
+        );
+        setValue(
+            "name",
+            localStorage?.getItem("usernameFMRP")
+                ? localStorage?.getItem("usernameFMRP")
+                : ""
+        );
         router.push("/auth/register");
     }, []);
-
 
     useEffect(() => {
         if (isState.isRegister && isState.countOtp > 0) {
@@ -74,7 +118,6 @@ const Register = React.memo((props) => {
             return () => clearTimeout(timer);
         }
     }, [isState.countOtp, isState.isRegister]);
-
 
     ///Đăng ký
     const _HandleIsLogin = (e) => {
@@ -89,13 +132,13 @@ const Register = React.memo((props) => {
             return res;
         },
         placeholderData: keepPreviousData,
-        ...optionsQuery
-    })
+        ...optionsQuery,
+    });
 
     const _HandleSelectStep = (e) => {
         if (isState.checkMajior) {
             queryState({ stepRegister: e });
-            return
+            return;
         }
         showToat("error", "Vui lòng chọn ngành hàng của bạn");
     };
@@ -105,20 +148,18 @@ const Register = React.memo((props) => {
             return apiLogin.apiRegister(data);
         },
         retry: 10,
-        retryDelay: 5000
-    })
+        retryDelay: 5000,
+    });
 
     const submitResendOtp = useMutation({
         mutationFn: (data) => {
             return apiLogin.apiRegister(data);
         },
         retry: 10,
-        retryDelay: 5000
-    })
-
+        retryDelay: 5000,
+    });
 
     const fnSetDataAuth = (value, res) => {
-
         const { isSuccess, message, token, database_app } = res;
         dispatch({ type: "auth/update", payload: res.data?.data });
         CookieCore.set("tokenFMRP", token, {
@@ -143,7 +184,7 @@ const Register = React.memo((props) => {
         // setTimeout(() => {
         //     router.replace("/dashboard");
         // }, 2000);
-    }
+    };
 
     const onSubmit = async (data, type) => {
         if (type == "login") {
@@ -157,8 +198,8 @@ const Register = React.memo((props) => {
                 });
                 if (res?.isSuccess) {
                     router.replace("/dashboard");
-                    fnSetDataAuth(data, res)
-                    return
+                    fnSetDataAuth(data, res);
+                    return;
                 }
                 showToat("error", `${res?.message || "Đăng nhập thất bại"}`);
             } catch (error) { }
@@ -166,7 +207,7 @@ const Register = React.memo((props) => {
 
         if (type == "sendOtp") {
             // await handleSendOtp(data?.phone);
-            setValue('otp', '')
+            setValue("otp", "");
             queryState({ checkValidateOtp: true });
             const dataSubmit = new FormData();
             dataSubmit.append("career", data?.major);
@@ -177,22 +218,20 @@ const Register = React.memo((props) => {
             dataSubmit.append("address", data?.city);
             dataSubmit.append("password", data?.password);
             dataSubmit.append("role_user", data?.location);
-            dataSubmit.append("type", 'send_otp_mail');
+            dataSubmit.append("type", "send_otp_mail");
 
-            const r = await submitResendOtp.mutateAsync(dataSubmit)
+            const r = await submitResendOtp.mutateAsync(dataSubmit);
             if (r?.isSuccess) {
                 showToat("success", r?.message);
-                queryState({ isRegister: true, countOtp: 120, checkValidateOtp: true });
-                return
+                queryState({ isRegister: true, countOtp: 300, checkValidateOtp: true });
+                return;
             }
             showToat("error", r?.message);
-            queryState({ checkValidateOtp: false, });
+            queryState({ checkValidateOtp: false });
         }
 
         if (type == "checkOtp") {
-
             // await handleVeryfyOtp(data?.otp);
-
         }
 
         if (type == "register") {
@@ -212,19 +251,24 @@ const Register = React.memo((props) => {
                 dataSubmit.append("otp_code", data?.otp);
             }
             try {
-
                 const res = await submitOtp.mutateAsync(dataSubmit);
                 if (res?.isSuccess) {
-                    //google ads 
-                    window.dataLayer = window.dataLayer || []
+                    //google ads
+                    window.dataLayer = window.dataLayer || [];
                     window.dataLayer.push({
                         event: "enhanced_conversion",
                         email: data?.email,
                         phone: data?.phone,
-                    })
-                    queryState({ name: res?.email, code: res?.code, isRegister: false, isLogin: true, countOtp: 0 });
-                    fnSetDataAuth(data, res)
-                    return
+                    });
+                    queryState({
+                        name: res?.email,
+                        code: res?.code,
+                        isRegister: false,
+                        isLogin: true,
+                        countOtp: 0,
+                    });
+                    fnSetDataAuth(data, res);
+                    return;
                 }
                 queryState({ sendOtp: false });
                 showToat("error", res?.message);
@@ -265,13 +309,28 @@ const Register = React.memo((props) => {
                             placeholder="blur"
                             blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                         />
-                        <h2 className="text-white text-2xl font-[600] mt-8 capitalize">Đăng ký tài khoản</h2>
-                        <h6 className="mt-3 text-white">Hỗ trợ đăng ký: 0901.13.6968 - 0932.755.968</h6>
+                        <h2 className="text-white text-2xl font-[600] mt-8 capitalize">
+                            Đăng ký tài khoản
+                        </h2>
+                        <h6 className="mt-3 text-white">
+                            Hỗ trợ đăng ký: 0901.13.6968 - 0932.755.968
+                        </h6>
                     </div>
                 </div>
                 <div className="h-full col-span-3 bg-white ">
-                    <Customscrollbar scrollableNodePropsClassName={`  ${Object.keys(errors).length === 0 ? '[&>div]:h-full' : '[&>div]:my-3'}`} className="h-screen">
-                        <div className={`flex flex-col gap-1 items-center  h-full  ${Object.keys(errors).length === 0 ? 'justify-center ' : 'justify-start'}`}>
+                    <Customscrollbar
+                        scrollableNodePropsClassName={`  ${Object.keys(errors).length === 0
+                            ? "[&>div]:h-full"
+                            : "[&>div]:my-3"
+                            }`}
+                        className="h-screen"
+                    >
+                        <div
+                            className={`flex flex-col gap-1 items-center  h-full  ${Object.keys(errors).length === 0
+                                ? "justify-center "
+                                : "justify-start"
+                                }`}
+                        >
                             <div className="flex flex-row items-center gap-2">
                                 <h1 className="text-[#11315B] font-semibold 2xl:text-xl text-[18.5px] text-center capitalize">
                                     Bước Vào Kỷ Nguyên Số Hóa Sản Xuất Cùng
@@ -303,56 +362,58 @@ const Register = React.memo((props) => {
                                 </div>
                                 {isState.stepRegister == 0 ? (
                                     <div className="grid grid-cols-3 gap-3 mt-2 2xl:gap-5 3xl:mt-5 xxl:mt-1">
-                                        {
-                                            isLoadingMajior
-                                                ?
-                                                <>
-                                                    {Array.from({ length: 9 }).map((_, Register) => (
-                                                        <div key={Register} className='h-[135px] w-full bg-slate-100 animate-pulse rounded-md'></div>
-                                                    ))}
-                                                </>
-                                                :
-                                                isState.listMajor.map((e, index) => (
-                                                    <label
-                                                        key={e?.id?.toString()}
-                                                        htmlFor={`major ${e?.id}`}
-                                                        className="w-full h-full cursor-pointer  rounded-md border border-[#DDDDE2] relative"
-                                                    >
-                                                        <div className="flex flex-col items-center justify-between w-full h-full gap-2 px-4 py-5 select-none 2xl:p-4 xxl:p-5">
-                                                            <input
-                                                                type="radio"
-                                                                id={`major ${e?.id}`}
-                                                                // {...register("major", {
-                                                                //     onChange: (e) => {
-                                                                //         sCheckMajior(
-                                                                //             e?.target
-                                                                //                 ?.checked
-                                                                //         );
-                                                                //     },
-                                                                // })}
-                                                                {...register(`major`)}
-                                                                onChange={(e) => {
-                                                                    queryState({ checkMajior: e.target.checked });
-                                                                }}
-                                                                value={e?.id}
-                                                                // name="major register"
-                                                                className="2xl:w-5 w-4 2xl:h-5 h-4 accent-[#1847ED] peer relative z-[1]"
-                                                            />
-                                                            <Image
-                                                                alt={e?.title}
-                                                                src={e?.img}
-                                                                width={44}
-                                                                height={44}
-                                                                quality={80}
-                                                                className="w-auto 2xl:h-[36px] xl:h-[38px] h-[32px] object-contain relative z-[1]"
-                                                            />
-                                                            <label className="text-[#1760B9] relative z-[1] 2xl:text-base xl:text-sm [@media(min-width:1336px)]:text-[13px] text-[13px] text-center">
-                                                                {e?.title}
-                                                            </label>
-                                                            <div className="w-full h-full peer-checked:bg-[#E2F0FE]/40 absolute top-0 left-0 transition duration-300 peer-checked:border border-[#C7DFFB] rounded-md" />
-                                                        </div>
-                                                    </label>
+                                        {isLoadingMajior ? (
+                                            <>
+                                                {Array.from({ length: 9 }).map((_, Register) => (
+                                                    <div
+                                                        key={Register}
+                                                        className="h-[135px] w-full bg-slate-100 animate-pulse rounded-md"
+                                                    ></div>
                                                 ))}
+                                            </>
+                                        ) : (
+                                            isState.listMajor.map((e, index) => (
+                                                <label
+                                                    key={e?.id?.toString()}
+                                                    htmlFor={`major ${e?.id}`}
+                                                    className="w-full h-full cursor-pointer  rounded-md border border-[#DDDDE2] relative"
+                                                >
+                                                    <div className="flex flex-col items-center justify-between w-full h-full gap-2 px-4 py-5 select-none 2xl:p-4 xxl:p-5">
+                                                        <input
+                                                            type="radio"
+                                                            id={`major ${e?.id}`}
+                                                            // {...register("major", {
+                                                            //     onChange: (e) => {
+                                                            //         sCheckMajior(
+                                                            //             e?.target
+                                                            //                 ?.checked
+                                                            //         );
+                                                            //     },
+                                                            // })}
+                                                            {...register(`major`)}
+                                                            onChange={(e) => {
+                                                                queryState({ checkMajior: e.target.checked });
+                                                            }}
+                                                            value={e?.id}
+                                                            // name="major register"
+                                                            className="2xl:w-5 w-4 2xl:h-5 h-4 accent-[#1847ED] peer relative z-[1]"
+                                                        />
+                                                        <Image
+                                                            alt={e?.title}
+                                                            src={e?.img}
+                                                            width={44}
+                                                            height={44}
+                                                            quality={80}
+                                                            className="w-auto 2xl:h-[48px] xl:h-[50px] h-[45px] object-contain relative z-[1]"
+                                                        />
+                                                        <label className="text-[#1760B9] relative z-[1] 2xl:text-base xl:text-sm [@media(min-width:1336px)]:text-[13px] text-[13px] text-center">
+                                                            {e?.title}
+                                                        </label>
+                                                        <div className="w-full h-full peer-checked:bg-[#E2F0FE]/40 absolute top-0 left-0 transition duration-300 peer-checked:border border-[#C7DFFB] rounded-md" />
+                                                    </div>
+                                                </label>
+                                            ))
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="space-y-2">
@@ -510,20 +571,32 @@ const Register = React.memo((props) => {
                                                     />
                                                     <button
                                                         type="button"
-                                                        onClick={() => queryState({ typePassword: !isState.typePassword })}
+                                                        onClick={() =>
+                                                            queryState({
+                                                                typePassword: !isState.typePassword,
+                                                            })
+                                                        }
                                                         className="absolute translate-y-1/2 -top-1 right-3"
                                                     >
-                                                        {isState.typePassword ? <IconEyeSlash /> : <IconEye />}
+                                                        {isState.typePassword ? (
+                                                            <IconEyeSlash />
+                                                        ) : (
+                                                            <IconEye />
+                                                        )}
                                                     </button>
                                                 </div>
-                                                {errors.password && errors.password.type === "required" && (
-                                                    <span className="text-xs text-red-500">
-                                                        Vui lòng nhập mật khẩu
-                                                    </span>
-                                                )}
-                                                {errors.password && errors.password.type === "minLength" && (
-                                                    <span className="text-xs text-red-500">Tối thiểu 10 ký tự</span>
-                                                )}
+                                                {errors.password &&
+                                                    errors.password.type === "required" && (
+                                                        <span className="text-xs text-red-500">
+                                                            Vui lòng nhập mật khẩu
+                                                        </span>
+                                                    )}
+                                                {errors.password &&
+                                                    errors.password.type === "minLength" && (
+                                                        <span className="text-xs text-red-500">
+                                                            Tối thiểu 10 ký tự
+                                                        </span>
+                                                    )}
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
@@ -549,7 +622,9 @@ const Register = React.memo((props) => {
                                                         />
                                                         <label
                                                             htmlFor={`posiiton ${e?.id}`}
-                                                            className={`${errors.location ? "text-[#52575E]" : "text-[#52575E]"
+                                                            className={`${errors.location
+                                                                ? "text-[#52575E]"
+                                                                : "text-[#52575E]"
                                                                 } text-sm cursor-pointer`}
                                                         >
                                                             {e?.title}
@@ -563,49 +638,56 @@ const Register = React.memo((props) => {
                                                 </span>
                                             )}
                                         </div>
-                                        {
-                                            isState.isRegister && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: -20 }}  // Bắt đầu từ trên, mờ
-                                                    animate={{ opacity: 1, y: 0 }}   // Hiện ra, trượt xuống
-                                                    exit={{ opacity: 0, y: -20 }}    // Khi biến mất, trượt lên
-                                                    transition={{ duration: 0.2, ease: "easeOut" }} // Hiệu ứng mượt
-                                                    className="flex flex-row items-start gap-5"
-                                                >
-                                                    <div className="w-1/2 flex justify-center items-center bg-[#E2F0FE] text-[#1760B9] rounded text-sm px-2 py-3">
-                                                        Nhập mã xác thực qua Email
-                                                    </div>
-                                                    <div className="w-1/2">
-                                                        <input
-                                                            type="number"
-                                                            placeholder="Nhập mã xác thực"
-                                                            name="otp"
-                                                            {...register("otp", {
-                                                                required: {
-                                                                    value: isState.checkValidateOtp,
-                                                                    message: "Vui lòng nhập mã xác thực",
-                                                                },
-                                                                minLength: {
-                                                                    value: isState.checkValidateOtp ? 6 : undefined,
-                                                                    message: isState.checkValidateOtp && "Mã xác thực tối thiểu 6 số",
-                                                                },
-                                                                maxLength: {
-                                                                    value: isState.checkValidateOtp ? 6 : undefined,
-                                                                    message: isState.checkValidateOtp && "Mã xác thực tối đa 6 số",
-                                                                },
-                                                            })}
-                                                            className="w-full border border-[#D0D5DD] p-2.5 outline-none focus:border-[#3276FA] rounded placeholder:text-[13px] text-[13px]"
-                                                        />
+                                        {isState.isRegister && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -20 }} // Bắt đầu từ trên, mờ
+                                                animate={{ opacity: 1, y: 0 }} // Hiện ra, trượt xuống
+                                                exit={{ opacity: 0, y: -20 }} // Khi biến mất, trượt lên
+                                                transition={{ duration: 0.2, ease: "easeOut" }} // Hiệu ứng mượt
+                                                className="flex flex-col items-center gap-x-5 gap-y-2"
+                                            >
+                                                <div className="w-full flex flex-row justify-center items-center bg-[#E2F0FE] text-[#1760B9] rounded text-sm px-2 py-3">
+                                                    <span>
+                                                        Nhận mã xác thực qua Zalo :
+                                                    </span>
+                                                    <strong className="ml-1">
+                                                        {formatPhone(phone) || "điện thoại zalo của bạn"}
+                                                    </strong>
+                                                </div>
+                                                <div className="w-full">
+                                                    <input
+                                                        type="number"
+                                                        placeholder="Nhập mã xác thực"
+                                                        name="otp"
+                                                        {...register("otp", {
+                                                            required: {
+                                                                value: isState.checkValidateOtp,
+                                                                message: "Vui lòng nhập mã xác thực",
+                                                            },
+                                                            minLength: {
+                                                                value: isState.checkValidateOtp ? 6 : undefined,
+                                                                message:
+                                                                    isState.checkValidateOtp &&
+                                                                    "Mã xác thực tối thiểu 6 số",
+                                                            },
+                                                            maxLength: {
+                                                                value: isState.checkValidateOtp ? 6 : undefined,
+                                                                message:
+                                                                    isState.checkValidateOtp &&
+                                                                    "Mã xác thực tối đa 6 số",
+                                                            },
+                                                        })}
+                                                        className="w-full border border-[#D0D5DD] p-2.5 outline-none focus:border-[#3276FA] rounded placeholder:text-[13px] text-[13px]"
+                                                    />
 
-                                                        {errors.otp && (
-                                                            <span className="text-xs text-red-500">{errors.otp.message}</span>
-                                                        )}
-                                                    </div>
-                                                </motion.div>
-                                            )
-
-                                        }
-
+                                                    {errors.otp && (
+                                                        <span className="text-xs text-red-500">
+                                                            {errors.otp.message}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        )}
                                     </div>
                                 )}
                                 {isState.stepRegister == 0 ? (
@@ -623,7 +705,7 @@ const Register = React.memo((props) => {
                                         <div className="flex justify-center gap-2 mt-1">
                                             <span className="font-[300] ">Bạn đã có tài khoản?</span>
                                             <button
-                                                type='button'
+                                                type="button"
                                                 onClick={() => router.push("/auth/login")}
                                                 className="text-[#5599EC]"
                                             >
@@ -633,56 +715,83 @@ const Register = React.memo((props) => {
                                     </>
                                 ) : (
                                     <>
-                                        {isState.countOtp > 0 && (
-                                            <div className="mt-2 text-sm text-gray-400">
-                                                Gửi lại mã xác thực sau {isState.countOtp} giây
-                                            </div>
-                                        )}
-                                        <div className="flex gap-5">
-                                            {isState.isRegister && (
+                                        <div className="w-full flex justify-end ">
+                                            {isState.countOtp > 0 && (
+                                                <div className="mt-2 text-sm text-gray-400">
+                                                    Gửi lại mã xác thực sau <strong>{isState.countOtp}</strong>  giây
+                                                </div>
+                                            )}
+                                            {isState.isRegister && isState.countOtp <= 0 && <div
+                                                onClick={() => {
+                                                    queryState({ checkValidateOtp: false });
+                                                    handleSubmit((data) => onSubmit(data, "sendOtp"))();
+                                                }}
+                                                className="mt-2 text-sm  cursor-pointer text-[#5599EC] group">
+                                                {submitResendOtp.isPending ? (
+                                                    <LoadingButton />
+                                                ) : (
+                                                    <p className="flex items-center justify-center gap-2">
+                                                        <FiRefreshCcw className="w-4 h-4 transform transition-transform duration-300 group-hover:rotate-180" />{" "}
+                                                        <span>Gửi lại mã xác thực</span>{" "}
+                                                    </p>
+                                                )}
+                                            </div>}
+                                        </div>
+
+                                        <div className="flex gap-5 mt-3">
+                                            {/* {isState.isRegister && (
                                                 <button
                                                     onClick={() => {
                                                         queryState({ checkValidateOtp: false });
                                                         handleSubmit((data) => onSubmit(data, "sendOtp"))();
                                                     }}
-                                                    disabled={isState.countOtp > 0 || submitResendOtp.isPending}
-                                                    type="button"
-                                                    className={`${isState.countOtp > 0 || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} group w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded  bg-gradient-to-l from-[#0375f3]  via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
-                                                >
-                                                    {
-                                                        submitResendOtp.isPending
-                                                            ?
-                                                            <LoadingButton />
-                                                            :
-                                                            <p className="flex items-center justify-center gap-2"><FiRefreshCcw className="w-4 h-4" /> <span>Gửi lại mã xác thực</span> </p>
+                                                    disabled={
+                                                        isState.countOtp > 0 || submitResendOtp.isPending
                                                     }
+                                                    type="button"
+                                                    className={`${isState.countOtp > 0 || submitResendOtp.isPending
+                                                        ? "cursor-not-allowed"
+                                                        : "cursor-pointer"
+                                                        } group w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded  bg-gradient-to-l from-[#0375f3]  via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                >
+                                                    {submitResendOtp.isPending ? (
+                                                        <LoadingButton />
+                                                    ) : (
+                                                        <p className="flex items-center justify-center gap-2">
+                                                            <FiRefreshCcw className="w-4 h-4" />{" "}
+                                                            <span>Gửi lại mã xác thực</span>{" "}
+                                                        </p>
+                                                    )}
                                                 </button>
-                                            )}
+                                            )} */}
 
                                             <button
                                                 type="button"
                                                 onClick={() => {
                                                     handleSubmit((data) =>
-                                                        onSubmit(data,
-                                                            isState.isRegister ?
-                                                                'register'
-                                                                :
-                                                                "sendOtp"
+                                                        onSubmit(
+                                                            data,
+                                                            isState.isRegister ? "register" : "sendOtp"
                                                         )
                                                     )();
                                                 }}
-                                                disabled={submitOtp.isPending || submitResendOtp.isPending}
-                                                className={`${submitOtp.isPending || submitResendOtp.isPending ? "cursor-not-allowed" : "cursor-pointer"} flex items-center gap-2 justify-center w-full py-3 text-center rounded  bg-gradient-to-l from-blue-800  via-[#296dc1] to-blue-800 btn-animation hover:scale-105 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                                disabled={
+                                                    submitOtp.isPending || submitResendOtp.isPending
+                                                }
+                                                className={`${submitOtp.isPending || submitResendOtp.isPending
+                                                    ? "cursor-not-allowed"
+                                                    : "cursor-pointer"
+                                                    } flex items-center gap-2 justify-center w-full py-3 text-center rounded  bg-gradient-to-l from-blue-800  via-[#296dc1] to-blue-800 btn-animation hover:scale-105 text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                             >
-                                                {
-                                                    (isState.isRegister ? submitOtp.isPending : submitResendOtp.isPending)
-                                                        ?
-                                                        (
-                                                            isState.isRegister
-                                                                ?
-                                                                <div>
-                                                                    <div className="flex items-center justify-center">
-                                                                        {/* <svg
+                                                {(
+                                                    isState.isRegister
+                                                        ? submitOtp.isPending
+                                                        : submitResendOtp.isPending
+                                                ) ? (
+                                                    isState.isRegister ? (
+                                                        <div>
+                                                            <div className="flex items-center justify-center">
+                                                                {/* <svg
                                                                                             aria-hidden="true"
                                                                                             className="w-6 h-6 mr-2 text-gray-200 animate-spin fill-white"
                                                                                             viewBox="0 0 100 101"
@@ -698,22 +807,24 @@ const Register = React.memo((props) => {
                                                                                                 fill="currentFill"
                                                                                             />
                                                                                         </svg> */}
-                                                                        <LoadingButton hiddenTitle />
-                                                                        <h2>Khởi tạo dữ liệu ...</h2>
-                                                                    </div>
-                                                                </div>
-                                                                :
-                                                                <LoadingButton />
-                                                        )
-                                                        :
-                                                        <>
-                                                            {/* <Building
+                                                                <LoadingButton hiddenTitle />
+                                                                <h2>Khởi tạo dữ liệu ...</h2>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <LoadingButton />
+                                                    )
+                                                ) : (
+                                                    <>
+                                                        {/* <Building
                                                                 size="18"
                                                                 color="#ffff"
                                                             /> */}
-                                                            <p className="capitalize">Khởi tạo gian quản lý ngay</p>
-                                                        </>
-                                                }
+                                                        <p className="capitalize">
+                                                            {isState.isRegister ? "Xác nhận khởi tạo" : "Khởi tạo gian quản lý ngay"}
+                                                        </p>
+                                                    </>
+                                                )}
                                             </button>
                                         </div>
                                         <button
